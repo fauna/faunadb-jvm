@@ -4,21 +4,22 @@ import java.net.URL
 
 import com.codahale.metrics.MetricRegistry
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.databind.{ObjectMapper, JsonNode}
+import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.ning.http.client._
 import com.ning.http.util.Base64
-import scala.collection.JavaConversions._
-import scala.concurrent.Promise
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Promise
 
 object Connection {
-  private def DefaultConfig = new AsyncHttpClientConfig.Builder()
+  def DefaultConfig = new AsyncHttpClientConfig.Builder()
     .setConnectionTimeoutInMs(1000) // 1 second connect timeout
     .setRequestTimeoutInMs(5000) // 5 second req. timeout
     .setMaximumConnectionsPerHost(20)
     .setMaximumConnectionsTotal(20) // 20 max connections
     .build()
+
+  val DefaultRoot = "https://rest1.fauna.org"
 
   case class Builder(authToken: String = "", faunaRoot: String = "https://rest1.fauna.org", clientConfig: AsyncHttpClientConfig = DefaultConfig, metricRegistry: MetricRegistry = new MetricRegistry) {
     def setAuthToken(tok: String) = copy(authToken = tok)
@@ -27,15 +28,14 @@ object Connection {
     def setMetricRegistry(registry: MetricRegistry) = copy(metricRegistry = registry)
 
     def build() = {
-      new Connection(faunaRoot, authToken, new AsyncHttpClient(clientConfig), metricRegistry)
+      new Connection(new URL(faunaRoot), authToken, new AsyncHttpClient(clientConfig), metricRegistry)
     }
   }
 }
 
-class Connection(faunaRootUrl: String, authToken: String, client: AsyncHttpClient, registry: MetricRegistry) {
+class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, registry: MetricRegistry) {
   private val json = new ObjectMapper()
   private val authHeader = "Basic " + Base64.encode((authToken + ":").getBytes("ASCII"))
-  private val faunaRoot = new URL(faunaRootUrl)
 
   def get(path: String) = {
     val req = new RequestBuilder("GET")
