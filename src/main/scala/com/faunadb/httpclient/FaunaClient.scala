@@ -17,7 +17,6 @@ class FaunaClient(connection: Connection) {
   private def postOrPut(instance: FaunaInstance) = {
     val body = json.createObjectNode()
     body.set("data", instance.data)
-    body.set("constraints", instance.constraints)
     if (instance.ref.isEmpty) {
       val uri = "/" + instance.classRef
       connection.post(uri, body)
@@ -36,7 +35,6 @@ class FaunaClient(connection: Connection) {
   def createOrPatchInstance(instance: FaunaInstance): Future[FaunaInstance] = {
     val body = json.createObjectNode()
     body.set("data", instance.data)
-    body.set("constraints", instance.constraints)
     val rv = if (instance.ref.isEmpty) {
       val uri = "/" + instance.classRef
       connection.post(uri, body)
@@ -71,8 +69,10 @@ class FaunaClient(connection: Connection) {
     }
   }
 
-  def findInstance(instanceRef: String): Future[FaunaInstance] = {
-    connection.get(instanceRef).map { resp => json.treeToValue(resp.resource, classOf[FaunaInstance]) }
+  def findInstance(instanceRef: String): Future[Option[FaunaInstance]] = {
+    connection.get(instanceRef)
+      .map { resp => Some(json.treeToValue(resp.resource, classOf[FaunaInstance])) }
+      .recover { case _: NotFoundException => None }
   }
 
   private def resourceToSet(resp: ResourceResponse): FaunaSet  = {

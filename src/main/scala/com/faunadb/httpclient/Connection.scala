@@ -46,10 +46,11 @@ class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, reg
   }
 
   def get(path: String, params: (String, String)*) = {
+    val qParams = new FluentStringsMap()
     val builder = new RequestBuilder("GET")
       .setUrl(new URL(faunaRoot, path).toString)
 
-    params foreach { case (k,v) => builder.addParameter(k,v) }
+    params foreach { case (k,v) => builder.addQueryParameter(k,v) }
 
     val req = builder.build()
 

@@ -11,16 +11,17 @@ case class FaunaInstance(
   @JsonProperty("ref") ref: String = "",
   @JsonProperty("class") classRef: String = "",
   @JsonProperty("ts") ts: Long = 0,
-  @JsonProperty("data") data: ObjectNode = JsonNodeFactory.instance.objectNode(),
-  @JsonProperty("constraints") constraints: ObjectNode = JsonNodeFactory.instance.objectNode(),
-  @JsonProperty("references") references: ObjectNode = JsonNodeFactory.instance.objectNode()) extends FaunaResource {
+  @JsonProperty("data") data: ObjectNode = JsonNodeFactory.instance.objectNode()
+) extends FaunaResource {
   def withRef(newRef: String) = copy(ref = newRef)
   def withClass(newClass: String) = copy(classRef = newClass)
   def withTs(newTs: Long) = copy(ts = newTs)
-  def withConstraints(newConstraints: ObjectNode) = copy(constraints = newConstraints)
-  def build() = new FaunaInstance(ref, classRef, ts, data, constraints)
-}
 
+  def getRef() = ref
+  def getClassRef() = classRef
+  def getTs() = ts
+  def getData() = data
+}
 
 case class FaunaDatabase(
   @JsonProperty("ref") ref: String,
@@ -43,6 +44,13 @@ case class FaunaSet(
     @JsonProperty("count") count: Int,
     @JsonProperty("before") before: String,
     @JsonProperty("after") after: String) = this(ref, classRef, count, before, after, new mutable.LinkedHashMap())
+
+  def getRef() = ref
+  def getClassRef() = classRef
+  def getCount() = count
+  def getBefore() = before
+  def getAfter = after
+  def getResources() = resources
 }
 
 case class FaunaKey(

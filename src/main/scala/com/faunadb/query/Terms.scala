@@ -1,7 +1,5 @@
 package com.faunadb.query
 
-import scala.annotation.varargs
-
 object Terms {
   implicit def stringRefToTerm(str: String) = new ClassRef(str)
 
@@ -17,14 +15,8 @@ object Terms {
     def toQueryString = "events(" + term.toQueryString +")"
   }
 
-  object Match {
-    @varargs def create(className: String, jsonPath: String, queryTerm: String*) = {
-      new Match(className, jsonPath, queryTerm: _*)
-    }
-  }
-
-  case class Match(className: String, jsonPath: String, queryTerm: String*) extends Term {
-    def toQueryString = "match(" + className + "," + jsonPath + ","+ queryTerm.map { "\"" + _ + "\"" }.mkString(",") + ")"
+  case class Match(indexName: String, queryTerm: String) extends Term {
+    def toQueryString = "match(" + indexName + ", \"" + queryTerm +"\")"
   }
 
   abstract class SetTerm(opName: String, first: Term, rest: Seq[Term]) extends Term {
