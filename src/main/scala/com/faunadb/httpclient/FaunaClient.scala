@@ -1,6 +1,5 @@
 package com.faunadb.httpclient
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.faunadb._
 import scala.collection.JavaConversions._
@@ -8,8 +7,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class FaunaClient(connection: Connection) {
-  private val json = new ObjectMapper
-
+  val json = connection.json
   def query(query: String): Future[FaunaSet] = {
     connection.get("/queries", "q" -> query).map { resourceToSet(_) }
   }

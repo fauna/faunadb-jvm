@@ -21,20 +21,20 @@ object Connection {
 
   val DefaultRoot = "https://rest1.fauna.org"
 
-  case class Builder(authToken: String = "", faunaRoot: String = "https://rest1.fauna.org", clientConfig: AsyncHttpClientConfig = DefaultConfig, metricRegistry: MetricRegistry = new MetricRegistry) {
+  case class Builder(authToken: String = "", faunaRoot: String = "https://rest1.fauna.org", clientConfig: AsyncHttpClientConfig = DefaultConfig, metricRegistry: MetricRegistry = new MetricRegistry, objectMapper: ObjectMapper = new ObjectMapper()) {
     def setAuthToken(tok: String) = copy(authToken = tok)
     def setFaunaRoot(root: String) = copy(faunaRoot = root)
     def setClientConfig(config: AsyncHttpClientConfig) = copy(clientConfig = config)
     def setMetricRegistry(registry: MetricRegistry) = copy(metricRegistry = registry)
+    def setJson(mapper: ObjectMapper) = copy(objectMapper = mapper)
 
     def build() = {
-      new Connection(new URL(faunaRoot), authToken, new AsyncHttpClient(clientConfig), metricRegistry)
+      new Connection(new URL(faunaRoot), authToken, new AsyncHttpClient(clientConfig), metricRegistry, objectMapper)
     }
   }
 }
 
-class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, registry: MetricRegistry) {
-  private val json = new ObjectMapper()
+class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, registry: MetricRegistry, private[httpclient] val json: ObjectMapper) {
   private val authHeader = "Basic " + Base64.encode((authToken + ":").getBytes("ASCII"))
 
   def get(path: String) = {
