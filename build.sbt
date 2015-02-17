@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
   "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
   "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
   "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
   "io.dropwizard.metrics" % "metrics-core" % metricsVersion,
   "commons-beanutils" % "commons-beanutils" % "1.9.2",
   "org.yaml" % "snakeyaml" % "1.14" % "test",

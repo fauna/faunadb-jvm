@@ -5,6 +5,7 @@ import java.net.URL
 import com.codahale.metrics.MetricRegistry
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.ning.http.client._
 import com.ning.http.util.Base64
 
@@ -34,7 +35,8 @@ object Connection {
   }
 }
 
-class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, registry: MetricRegistry, private[httpclient] val json: ObjectMapper) {
+class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, registry: MetricRegistry, jsonSource: ObjectMapper) {
+  private[httpclient] val json = jsonSource.copy().registerModule(DefaultScalaModule)
   private val authHeader = "Basic " + Base64.encode((authToken + ":").getBytes("ASCII"))
 
   def get(path: String) = {

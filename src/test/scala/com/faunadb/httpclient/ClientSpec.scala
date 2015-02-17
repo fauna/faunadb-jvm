@@ -10,12 +10,13 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, FlatSpec}
 import org.yaml.snakeyaml.Yaml
 
 import scala.collection.JavaConverters._
-import scala.concurrent.Await
+import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 
 import java.util.{ Map => JMap }
 
 import scala.util.Random
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   val config = readConfig("config/test.yml")
@@ -46,12 +47,15 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val classFuture = client.createClass("classes/derp")
     Await.result(classFuture, 1 second)
+
+    val indexFuture = client.createIndex("indexes/derp_by_test", "classes/derp", "data.queryTest1", false)
+    Await.result(indexFuture, 1 second)
   }
 
 
   "Fauna Client" should "should not find an instance" in {
     val resp = client.findInstance("classes/derp/1234")
-    an [NotFoundException] should be thrownBy Await.result(resp, 1 second)
+    Await.result(resp, 1 second) shouldBe None
   }
 
   it should "create a new instance" in {
@@ -78,8 +82,27 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val create1 = Await.result(createFuture, 1 second)
     val create2 = Await.result(createFuture2, 1 second)
 
-    val queryFuture = client.query(Match("classes/derp", "data.queryTest1", randomText1).toQueryString)
+    val queryFuture = client.query(Match("indexes/derp_by_test", randomText1).toQueryString)
     val queryResult = Await.result(queryFuture, 1 second)
     queryResult.resources.keys.toSeq shouldBe Seq(create1.ref)
+  }
+
+  it should "get and page a query" in {
+    val futures = for(i <- 1.until(10)) yield {
+      val instance = FaunaInstance(classRef="users")
+      client.createOrReplaceInstance(instance)
+    }
+
+    Await.result(Future.sequence(futures), 5 seconds)
+
+    val fullQuery = Await.result(client.query("users/instances"), 5 seconds)
+    val singleQuery = Await.result(client.query("users/instances", 1), 5 seconds)
+
+    singleQuery.resources.size shouldBe 1
+    singleQuery.resources.head._1 shouldBe fullQuery.resources.head._1
+
+    val nextQuery = Await.result(client.query("users/instances", 1, Before(singleQuery.before.get)), 5 seconds)
+    nextQuery.resources.size shouldBe 1
+    nextQuery.resources.head._1 shouldBe fullQuery.resources.tail.head._1
   }
 }

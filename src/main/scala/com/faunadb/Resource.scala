@@ -33,8 +33,8 @@ case class FaunaSet(
   ref: String,
   classRef: String,
   count: Int,
-  before: String,
-  after: String,
+  before: Option[String],
+  after: Option[String],
   resources: mutable.LinkedHashMap[String, FaunaInstance]) extends FaunaResource {
 
   @JsonCreator
@@ -42,14 +42,14 @@ case class FaunaSet(
     @JsonProperty("ref") ref: String,
     @JsonProperty("class") classRef: String,
     @JsonProperty("count") count: Int,
-    @JsonProperty("before") before: String,
-    @JsonProperty("after") after: String) = this(ref, classRef, count, before, after, new mutable.LinkedHashMap())
+    @JsonProperty("before") before: Option[String] = None,
+    @JsonProperty("after") after: Option[String] = None) = this(ref, classRef, count, before, after, new mutable.LinkedHashMap())
 
   def getRef() = ref
   def getClassRef() = classRef
   def getCount() = count
   def getBefore() = before
-  def getAfter = after
+  def getAfter() = after
   def getResources() = resources
 }
 
@@ -68,3 +68,13 @@ case class FaunaClass(
   @JsonProperty("name") name: String,
   @JsonProperty("ts") ts: Long,
   @JsonProperty("history_days") historyDays: Int)
+
+case class FaunaIndex(
+  @JsonProperty("ref") ref: String,
+  @JsonProperty("name") name: String,
+  @JsonProperty("class") classRef: String,
+  @JsonProperty("source") sourceRef: String,
+  @JsonProperty("path") path: String,
+  @JsonProperty("unique") unique: Boolean,
+  @JsonProperty("live") live: Boolean,
+  @JsonProperty("ts") ts: Long)

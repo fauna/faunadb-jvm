@@ -6,10 +6,26 @@ import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+sealed trait PageTerm
+case class Before(ref: String) extends PageTerm
+case class After(ref: String) extends PageTerm
+
 class FaunaClient(connection: Connection) {
   val json = connection.json
   def query(query: String): Future[FaunaSet] = {
     connection.get("/queries", "q" -> query).map { resourceToSet(_) }
+  }
+
+  def query(query: String, size: Int): Future[FaunaSet] = {
+    connection.get("/queries", "q" -> query, "size" -> size.toString).map { resourceToSet(_) }
+  }
+
+  def query(query: String, size: Int, pageTerm: PageTerm): Future[FaunaSet] = {
+    val pageTermPair = pageTerm match {
+      case Before(ref) => ("before" -> ref)
+      case After(ref) => ("after" -> ref)
+    }
+    connection.get("/queries", "q" -> query, "size" -> size.toString, pageTermPair).map { resourceToSet(_) }
   }
 
   private def postOrPut(instance: FaunaInstance) = {
@@ -64,6 +80,16 @@ class FaunaClient(connection: Connection) {
     body.put("role", role)
     connection.post("/keys", body) map { resp =>
       json.treeToValue(resp.resource, classOf[FaunaKey])
+    }
+  }
+
+  def createIndex(indexRef: String, sourceRef: String, path: String, unique: Boolean): Future[FaunaIndex] = {
+    val body = json.createObjectNode()
+    body.put("source", sourceRef)
+    body.put("path", path)
+    body.put("unique", unique)
+    connection.put(indexRef, body).map { resp =>
+      json.treeToValue(resp.resource, classOf[FaunaIndex])
     }
   }
 

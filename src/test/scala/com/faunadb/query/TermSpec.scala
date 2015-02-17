@@ -5,8 +5,8 @@ import com.faunadb.query.Terms._
 
 class TermSpec extends FlatSpec with Matchers {
   "Match Terms" should "stringify properly" in {
-    val term = new Match("classes/test", "constraints.something", "word1", "word2", "word3")
-    term.toQueryString shouldBe "match(classes/test,constraints.something,\"word1\",\"word2\",\"word3\")"
+    val term = new Match("indexes/test", "word1")
+    term.toQueryString shouldBe "match(indexes/test, \"word1\")"
   }
 
   "Nested Set Query Terms" should "stringify properly" in {
