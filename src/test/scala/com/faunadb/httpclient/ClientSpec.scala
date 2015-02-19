@@ -5,7 +5,8 @@ import java.io.FileInputStream
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.faunadb.FaunaInstance
-import com.faunadb.query.Terms._
+import com.faunadb.oldquery.Terms
+import Terms._
 import org.scalatest.{BeforeAndAfterAll, Matchers, FlatSpec}
 import org.yaml.snakeyaml.Yaml
 

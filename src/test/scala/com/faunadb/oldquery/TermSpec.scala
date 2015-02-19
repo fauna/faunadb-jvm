@@ -1,7 +1,7 @@
-package com.faunadb.query
+package com.faunadb.oldquery
 
-import org.scalatest.{Matchers, FlatSpec}
-import com.faunadb.query.Terms._
+import com.faunadb.oldquery.Terms._
+import org.scalatest.{FlatSpec, Matchers}
 
 class TermSpec extends FlatSpec with Matchers {
   "Match Terms" should "stringify properly" in {

@@ -1,4 +1,4 @@
-package com.faunadb.query
+package com.faunadb.oldquery
 
 object Terms {
   implicit def stringRefToTerm(str: String) = new ClassRef(str)
