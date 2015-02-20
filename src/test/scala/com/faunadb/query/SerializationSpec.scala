@@ -24,13 +24,13 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize a match" in {
-    val m = MatchSet("testTerm", Ref("some/index"))
+    val m = Match("testTerm", Ref("some/index"))
     json.writeValueAsString(m) shouldBe "{\"match\":\"testTerm\",\"index\":{\"@ref\":\"some/index\"}}"
   }
 
   it should "serialize a complex set" in {
-    val setTerm1 = MatchSet("testTerm1", Ref("some/index"))
-    val setTerm2 = MatchSet("testTerm2", Ref("another/index"))
+    val setTerm1 = Match("testTerm1", Ref("some/index"))
+    val setTerm2 = Match("testTerm2", Ref("another/index"))
 
     val union = Union(Array(setTerm1, setTerm2))
     json.writeValueAsString(union) shouldBe "{\"union\":[{\"match\":\"testTerm1\",\"index\":{\"@ref\":\"some/index\"}},{\"match\":\"testTerm2\",\"index\":{\"@ref\":\"another/index\"}}]}"
@@ -80,5 +80,14 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val delete = Delete(ref)
     json.writeValueAsString(delete) shouldBe "{\"delete\":{\"@ref\":\"some/ref\"}}"
+  }
+
+  it should "serialize a complex expression" in {
+    val ref = Ref("some/ref")
+    val expr1 = Create(ref, ObjectPrimitive(Map()))
+    val expr2 = Create(ref, ObjectPrimitive(Map()))
+
+    val complex = Do(Array(expr1, expr2))
+    json.writeValueAsString(complex) shouldBe "{\"do\":[{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{}}},{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{}}}]}"
   }
 }

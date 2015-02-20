@@ -95,7 +95,6 @@ class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, reg
       .build()
 
     performRequest(req)
-
   }
 
   def performRequest(request: Request) = {

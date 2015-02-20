@@ -1,7 +1,10 @@
 package com.faunadb.httpclient
 
+import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.faunadb._
+import com.faunadb.query.{Expression, Response, SetDeserializerModifier}
+
 import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -12,20 +15,31 @@ case class After(ref: String) extends PageTerm
 
 class FaunaClient(connection: Connection) {
   val json = connection.json
-  def query(query: String): Future[FaunaSet] = {
+  val queryJson = json.copy()
+  queryJson.registerModule(new SimpleModule().setDeserializerModifier(new SetDeserializerModifier))
+
+  def oldQuery(query: String): Future[FaunaSet] = {
     connection.get("/queries", "q" -> query).map { resourceToSet(_) }
   }
 
-  def query(query: String, size: Int): Future[FaunaSet] = {
+  def oldQuery(query: String, size: Int): Future[FaunaSet] = {
     connection.get("/queries", "q" -> query, "size" -> size.toString).map { resourceToSet(_) }
   }
 
-  def query(query: String, size: Int, pageTerm: PageTerm): Future[FaunaSet] = {
+  def oldQuery(query: String, size: Int, pageTerm: PageTerm): Future[FaunaSet] = {
     val pageTermPair = pageTerm match {
       case Before(ref) => ("before" -> ref)
       case After(ref) => ("after" -> ref)
     }
     connection.get("/queries", "q" -> query, "size" -> size.toString, pageTermPair).map { resourceToSet(_) }
+  }
+
+  def query[R <: Response](expr: Expression)(implicit t: reflect.ClassTag[R]): Future[R] = {
+    val body = queryJson.createObjectNode()
+    body.set("q", queryJson.valueToTree(expr))
+    connection.post("/", body).map { resp =>
+      queryJson.treeToValue(resp.resource, t.runtimeClass).asInstanceOf[R]
+    }
   }
 
   private def postOrPut(instance: FaunaInstance) = {

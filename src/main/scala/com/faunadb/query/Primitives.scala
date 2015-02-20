@@ -19,6 +19,7 @@ object Primitives {
 case class StringPrimitive(@(JsonValue @getter) value: String) extends Primitive
 case class NumberPrimitive(@(JsonValue @getter) value: Long) extends Primitive
 case class BooleanPrimitive(@(JsonValue @getter) value: Boolean) extends Primitive
+
 case class ArrayPrimitive(@(JsonValue @getter) values: scala.Array[Primitive]) extends Primitive
 
 case class ObjectPrimitive(@JsonIgnore values: Map[String, Primitive]) extends Primitive {

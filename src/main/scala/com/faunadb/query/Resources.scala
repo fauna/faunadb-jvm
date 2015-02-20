@@ -9,7 +9,7 @@ import scala.annotation.meta.field
 
 trait Retrievable
 
-sealed trait Resource
+sealed trait Resource extends Expression
 
 @JsonSerialize(using = classOf[GetSerializer])
 case class Get(resource: Retrievable,

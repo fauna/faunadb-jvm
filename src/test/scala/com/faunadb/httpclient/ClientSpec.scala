@@ -1,23 +1,19 @@
 package com.faunadb.httpclient
 
 import java.io.FileInputStream
+import java.util.{Map => JMap}
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.faunadb.FaunaInstance
-import com.faunadb.oldquery.Terms
-import Terms._
-import org.scalatest.{BeforeAndAfterAll, Matchers, FlatSpec}
+import com.faunadb.query._
+import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.yaml.snakeyaml.Yaml
 
 import scala.collection.JavaConverters._
-import scala.concurrent.{Future, Await}
+import scala.concurrent.Await
 import scala.concurrent.duration._
-
-import java.util.{ Map => JMap }
-
 import scala.util.Random
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   val config = readConfig("config/test.yml")
@@ -46,64 +42,69 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     client = new FaunaClient(Connection.Builder().setFaunaRoot(config("root_url")).setAuthToken(key.secret).build())
 
-    val classFuture = client.createClass("classes/derp")
+    val classFuture = client.createClass("classes/spells")
     Await.result(classFuture, 1 second)
 
-    val indexFuture = client.createIndex("indexes/derp_by_test", "classes/derp", "data.queryTest1", false)
+    val indexFuture = client.createIndex("indexes/spells_by_test", "classes/spells", "data.queryTest1", false)
     Await.result(indexFuture, 1 second)
   }
 
-
   "Fauna Client" should "should not find an instance" in {
-    val resp = client.findInstance("classes/derp/1234")
+    val resp = client.findInstance("classes/spells/1234")
     Await.result(resp, 1 second) shouldBe None
   }
 
   it should "create a new instance" in {
     val data = Map("testField" -> "testValue").asJava
     val dataNode: ObjectNode = json.valueToTree(data)
-    val instanceToCreate = new FaunaInstance(classRef="classes/derp", data=dataNode)
+    val instanceToCreate = new FaunaInstance(classRef="classes/spells", data=dataNode)
     val respFuture = client.createOrReplaceInstance(instanceToCreate)
     val resp = Await.result(respFuture, 1 second)
 
-    resp.ref should startWith ("classes/derp/")
-    resp.classRef shouldBe "classes/derp"
+    resp.ref should startWith ("classes/spells/")
+    resp.classRef shouldBe "classes/spells"
     json.treeToValue(resp.data, classOf[JMap[String, String]]) shouldBe data
   }
 
-  it should "successfully issue a query" in {
+  it should "create an instance with the query AST" in {
+    import Primitives._
+
+    val queryF = client.query[InstanceResponse](Create(Ref("classes/spells"), ObjectPrimitive(Map[String, Primitive]("data" -> Map[String, Primitive]("test" -> "data")))))
+    val resp = Await.result(queryF, 5 seconds)
+    resp.classRef shouldBe Ref("classes/spells")
+    resp.ref.ref.startsWith("classes/spells") shouldBe true
+  }
+
+  it should "issue a query with the query AST" in {
+    import Primitives._
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
-    val instance1 = FaunaInstance(classRef="classes/derp", data=json.valueToTree[ObjectNode](Map("queryTest1" -> randomText1).asJava))
-    val instance2 = FaunaInstance(classRef="classes/derp", data=json.valueToTree[ObjectNode](Map("queryTest1" -> randomText2).asJava))
-
-    val createFuture = client.createOrReplaceInstance(instance1)
-    val createFuture2 = client.createOrReplaceInstance(instance2)
+    val classRef = Ref("classes/spells")
+    val createFuture = client.query[InstanceResponse](Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("queryTest1" -> randomText1))))
+    val createFuture2 = client.query[InstanceResponse](Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("queryTest1" -> randomText2))))
 
     val create1 = Await.result(createFuture, 1 second)
     val create2 = Await.result(createFuture2, 1 second)
 
-    val queryFuture = client.query(Match("indexes/derp_by_test", randomText1).toQueryString)
-    val queryResult = Await.result(queryFuture, 1 second)
-    queryResult.resources.keys.toSeq shouldBe Seq(create1.ref)
+    val queryF = client.query[SetResponse](Get(Match(randomText1, Ref("indexes/spells_by_test"))))
+    val resp = Await.result(queryF, 5 seconds)
+    resp.data.map { _.value } shouldBe Seq(create1.ref)
   }
 
-  it should "get and page a query" in {
-    val futures = for(i <- 1.until(10)) yield {
-      val instance = FaunaInstance(classRef="users")
-      client.createOrReplaceInstance(instance)
-    }
+  it should "issue a query with a complex expression" in {
+    import Primitives._
 
-    Await.result(Future.sequence(futures), 5 seconds)
+    val classRef = Ref("classes/spells")
+    val randomText1 = Random.alphanumeric.take(8).mkString
+    val randomText2 = Random.alphanumeric.take(8).mkString
+    val storeOp1 = Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("test" -> randomText1)))
+    val storeOp2 = Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("test" -> randomText2)))
+    val queryF = client.query[InstanceResponse](Do(Array(storeOp1, storeOp2)))
+    val resp = Await.result(queryF, 5 seconds)
 
-    val fullQuery = Await.result(client.query("users/instances"), 5 seconds)
-    val singleQuery = Await.result(client.query("users/instances", 1), 5 seconds)
+    val query2F = client.query[InstanceResponse](Get(resp.ref))
+    val resp2 = Await.result(query2F, 5 seconds)
 
-    singleQuery.resources.size shouldBe 1
-    singleQuery.resources.head._1 shouldBe fullQuery.resources.head._1
-
-    val nextQuery = Await.result(client.query("users/instances", 1, Before(singleQuery.before.get)), 5 seconds)
-    nextQuery.resources.size shouldBe 1
-    nextQuery.resources.head._1 shouldBe fullQuery.resources.tail.head._1
+    resp2.data.get("test") shouldBe randomText2
   }
 }
