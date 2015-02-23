@@ -2,9 +2,9 @@ package com.faunadb.query
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.{JsonParseException, JsonParser}
+import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.databind._
 
 import scala.annotation.meta.field
 import scala.collection.JavaConversions._
@@ -20,7 +20,7 @@ case class Difference(@(JsonProperty @field)("difference") sets: Array[Set]) ext
 case class Join(@(JsonProperty @field)("join") source: Set, @(JsonProperty @field)("with") target: String) extends Set
 
 object SetDeserializer {
-  val SetClasses = Map(
+  val SetClasses = collection.Map(
     "match" -> classOf[Match],
     "union" -> classOf[Union],
     "intersection" -> classOf[Intersection],

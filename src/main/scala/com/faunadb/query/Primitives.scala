@@ -1,9 +1,9 @@
 package com.faunadb.query
 
-import com.fasterxml.jackson.annotation.{JsonIgnore, JsonValue, JsonProperty}
-import scala.collection.JavaConverters._
+import com.fasterxml.jackson.annotation.{JsonIgnore, JsonProperty, JsonValue}
 
-import scala.annotation.meta.{getter, field}
+import scala.annotation.meta.{field, getter}
+import scala.collection.JavaConverters._
 
 case class Ref(@(JsonProperty @field)("@ref") ref: String) extends Retrievable
 
@@ -13,7 +13,7 @@ object Primitives {
   implicit def longToPrimitive(unwrapped: Long) = NumberPrimitive(unwrapped)
   implicit def boolToPrimitive(unwrapped: Boolean) = BooleanPrimitive(unwrapped)
   implicit def arrayToPrimitive(unwrapped: Array[Primitive]) = ArrayPrimitive(unwrapped)
-  implicit def mapToPrimitive(unwrapped: Map[String, Primitive]) = ObjectPrimitive(unwrapped)
+  implicit def mapToPrimitive(unwrapped: collection.Map[String, Primitive]) = ObjectPrimitive(unwrapped)
 }
 
 case class StringPrimitive(@(JsonValue @getter) value: String) extends Primitive
@@ -22,8 +22,8 @@ case class BooleanPrimitive(@(JsonValue @getter) value: Boolean) extends Primiti
 
 case class ArrayPrimitive(@(JsonValue @getter) values: scala.Array[Primitive]) extends Primitive
 
-case class ObjectPrimitive(@JsonIgnore values: Map[String, Primitive]) extends Primitive {
-  @JsonProperty("object") def javaValues = values.asJava
+case class ObjectPrimitive(@JsonIgnore values: collection.Map[String, Primitive]) extends Primitive {
+  @JsonProperty("@object") def javaValues = values.asJava
 }
 
 

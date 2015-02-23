@@ -76,5 +76,5 @@ case class FaunaIndex(
   @JsonProperty("source") sourceRef: String,
   @JsonProperty("path") path: String,
   @JsonProperty("unique") unique: Boolean,
-  @JsonProperty("live") live: Boolean,
+  @JsonProperty("active") active: Boolean,
   @JsonProperty("ts") ts: Long)

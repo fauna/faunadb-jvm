@@ -11,16 +11,18 @@ trait Retrievable
 
 sealed trait Resource extends Expression
 
-@JsonSerialize(using = classOf[GetSerializer])
-case class Get(resource: Retrievable,
+case class Get(@(JsonProperty @field)("get") resource: Retrievable) extends Resource
+
+@JsonSerialize(using = classOf[PaginateSerializer])
+case class Paginate(resource: Retrievable,
                ts: Option[Long] = None,
                cursor: Option[Cursor] = None,
                size: Option[Long] = None) extends Resource
 
-class GetSerializer extends JsonSerializer[Get] {
-  override def serialize(t: Get, jsonGenerator: JsonGenerator, serializerProvider: SerializerProvider): Unit = {
+class PaginateSerializer extends JsonSerializer[Paginate] {
+  override def serialize(t: Paginate, jsonGenerator: JsonGenerator, serializerProvider: SerializerProvider): Unit = {
     jsonGenerator.writeStartObject()
-    jsonGenerator.writeObjectField("get", t.resource)
+    jsonGenerator.writeObjectField("paginate", t.resource)
 
     t.ts.foreach { tsNum =>
       jsonGenerator.writeNumberField("ts", tsNum)

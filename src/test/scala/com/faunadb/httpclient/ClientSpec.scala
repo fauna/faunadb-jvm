@@ -11,6 +11,7 @@ import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.yaml.snakeyaml.Yaml
 
 import scala.collection.JavaConverters._
+import scala.collection.Map
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.Random
@@ -47,6 +48,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val indexFuture = client.createIndex("indexes/spells_by_test", "classes/spells", "data.queryTest1", false)
     Await.result(indexFuture, 1 second)
+
+    val setIndexFuture = client.createIndex("indexes/spells_instances", "classes/spells", "class", false)
+    Await.result(setIndexFuture, 1 second)
   }
 
   "Fauna Client" should "should not find an instance" in {
@@ -86,9 +90,14 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val create1 = Await.result(createFuture, 1 second)
     val create2 = Await.result(createFuture2, 1 second)
 
-    val queryF = client.query[SetResponse](Get(Match(randomText1, Ref("indexes/spells_by_test"))))
+    val queryF = client.query[SetResponse](Paginate(Match(randomText1, Ref("indexes/spells_by_test"))))
     val resp = Await.result(queryF, 5 seconds)
-    resp.data.map { _.value } shouldBe Seq(create1.ref)
+    resp.data shouldBe Seq(create1.ref)
+
+    val query2F = client.query[SetResponse](Paginate(Ref("classes/spells/instances")))
+    val resp2 = Await.result(query2F, 5 seconds)
+    resp2.data.toList.contains(create1.ref) shouldBe true
+    resp2.data.toList.contains(create2.ref) shouldBe true
   }
 
   it should "issue a query with a complex expression" in {
