@@ -100,6 +100,37 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     resp2.data.toList.contains(create2.ref) shouldBe true
   }
 
+  it should "issue a paged query with the query AST" in {
+    import Primitives._
+    val randomText1 = Random.alphanumeric.take(8).mkString
+    val randomText2 = Random.alphanumeric.take(8).mkString
+    val randomText3 = Random.alphanumeric.take(8).mkString
+    val classRef = Ref("classes/spells")
+
+    val createFuture = client.query[InstanceResponse](Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("queryTest1" -> randomText1))))
+    val createFuture2 = client.query[InstanceResponse](Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("queryTest1" -> randomText2))))
+    val createFuture3 = client.query[InstanceResponse](Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("queryTest1" -> randomText3))))
+
+    val create1 = Await.result(createFuture, 1 second)
+    val create2 = Await.result(createFuture2, 1 second)
+    val create3 = Await.result(createFuture3, 1 second)
+
+    val queryF = client.query[SetResponse](Paginate(Ref("classes/spells/instances"), size=Some(1)))
+    val resp = Await.result(queryF, 5 seconds)
+
+    resp.data.size shouldBe 1
+    resp.before shouldNot be (None)
+    resp.after shouldBe None
+
+    val query2F = client.query[SetResponse](Paginate(Ref("classes/spells/instances"), size=Some(1), cursor=Some(com.faunadb.query.Before(resp.before.get))))
+    val resp2 = Await.result(query2F, 5 seconds)
+
+    resp2.data.size shouldBe 1
+    resp2.data shouldNot be (resp.data)
+    resp2.before shouldNot be (None)
+    resp2.after shouldNot be (None)
+  }
+
   it should "issue a query with a complex expression" in {
     import Primitives._
 
