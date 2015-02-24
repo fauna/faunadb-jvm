@@ -17,5 +17,5 @@ case class Quote(quote: Expression) extends Expression
 case class Fetch(@(JsonProperty @field)("fetch") path: Array[Path], from: Primitive) extends Expression
 
 case class Lambda(@(JsonProperty @field)("lambda") argument: String, expr: Expression)
-case class Map(@(JsonProperty @field)("map") lambda: Lambda, collection: Primitive) extends Expression
-case class Foreach(@(JsonProperty @field)("foreach") lambda: Lambda, collection: Primitive) extends Expression
+case class Map(@(JsonProperty @field)("map") lambda: Lambda, collection: Expression) extends Expression
+case class Foreach(@(JsonProperty @field)("foreach") lambda: Lambda, collection: Expression) extends Expression

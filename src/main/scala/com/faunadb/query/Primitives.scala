@@ -5,7 +5,13 @@ import com.fasterxml.jackson.annotation._
 import scala.annotation.meta.{field, getter}
 import scala.collection.JavaConverters._
 
-case class Ref(@(JsonProperty @field)("@ref") ref: String) extends Retrievable
+sealed trait Response
+
+case class Instance(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, data: ObjectPrimitive) extends Response
+
+case class Ref(@(JsonProperty @field)("@ref") ref: String) extends Retrievable with Response
+
+case class Var(@(JsonProperty @field)("var") variable: String) extends Retrievable
 
 sealed trait Primitive {
   def asObject = this match {
@@ -41,6 +47,9 @@ object Primitives {
   implicit def arrayToPrimitive(unwrapped: Array[Primitive]) = ArrayPrimitive(unwrapped)
   implicit def mapToPrimitive(unwrapped: collection.Map[String, Primitive]) = ObjectPrimitive(unwrapped)
   implicit def doubleToPrimitive(unwrapped: Double) = DoublePrimitive(unwrapped)
+
+  // Java interop
+  def newObject(map: java.util.Map[String, Primitive]) = new ObjectPrimitive(map)
 }
 
 case object NullPrimitive extends Primitive {
