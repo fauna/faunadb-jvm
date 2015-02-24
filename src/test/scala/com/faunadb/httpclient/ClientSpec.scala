@@ -4,8 +4,6 @@ import java.io.FileInputStream
 import java.util.{Map => JMap}
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.faunadb.FaunaInstance
 import com.faunadb.query._
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.yaml.snakeyaml.Yaml
@@ -59,28 +57,36 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "create a new instance" in {
-    val data = Map("testField" -> "testValue").asJava
-    val dataNode: ObjectNode = json.valueToTree(data)
-    val instanceToCreate = new FaunaInstance(classRef="classes/spells", data=dataNode)
-    val respFuture = client.createOrReplaceInstance(instanceToCreate)
+    import com.faunadb.query.Primitives._
+    val data = Map[String, Primitive]("testField" -> "testValue")
+    val respFuture = client.query[InstanceResponse](Create(Ref("classes/spells"), Map[String, Primitive]("data" -> data)))
     val resp = Await.result(respFuture, 1 second)
 
-    resp.ref should startWith ("classes/spells/")
-    resp.classRef shouldBe "classes/spells"
-    json.treeToValue(resp.data, classOf[JMap[String, String]]) shouldBe data
+    resp.ref.ref should startWith ("classes/spells/")
+    resp.classRef shouldBe Ref("classes/spells")
+    resp.data.values shouldBe data
   }
 
   it should "create an instance with the query AST" in {
-    import Primitives._
+    import com.faunadb.query.Primitives._
 
-    val queryF = client.query[InstanceResponse](Create(Ref("classes/spells"), ObjectPrimitive(Map[String, Primitive]("data" -> Map[String, Primitive]("test" -> "data")))))
+    val queryF = client.query[InstanceResponse](Create(Ref("classes/spells"), Map[String, Primitive]("data" -> Map[String, Primitive]("test" -> "data"))))
     val resp = Await.result(queryF, 5 seconds)
     resp.classRef shouldBe Ref("classes/spells")
     resp.ref.ref.startsWith("classes/spells") shouldBe true
+
+    val query2F = client.query[InstanceResponse](Create(Ref("classes/spells"),
+      Map[String, Primitive]("data" -> Map[String, Primitive]("testField" -> Map[String, Primitive]("array" -> Array[Primitive](1, "2", 3.4), "bool" -> true, "num" -> 1234, "string" -> "sup", "float" -> 1.234, "null" -> NullPrimitive)))))
+    val resp2 = Await.result(query2F, 5 seconds)
+    resp2.data.values.contains("testField") shouldBe true
+    val testFieldObject = resp2.data.values("testField").asObject
+    testFieldObject.values("array").asArray.values.toSeq shouldBe Array[Primitive](1, "2", 3.4).toSeq
+    testFieldObject.values("string").asString.value shouldBe "sup"
+    testFieldObject.values("num").asNumber.value shouldBe 1234
   }
 
   it should "issue a query with the query AST" in {
-    import Primitives._
+    import com.faunadb.query.Primitives._
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
     val classRef = Ref("classes/spells")
@@ -101,7 +107,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "issue a paged query with the query AST" in {
-    import Primitives._
+    import com.faunadb.query.Primitives._
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
     val randomText3 = Random.alphanumeric.take(8).mkString
@@ -132,7 +138,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "issue a query with a complex expression" in {
-    import Primitives._
+    import com.faunadb.query.Primitives._
 
     val classRef = Ref("classes/spells")
     val randomText1 = Random.alphanumeric.take(8).mkString
@@ -145,6 +151,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val query2F = client.query[InstanceResponse](Get(resp.ref))
     val resp2 = Await.result(query2F, 5 seconds)
 
-    resp2.data.get("test") shouldBe randomText2
+    resp2.data.values.get("test").get shouldBe StringPrimitive(randomText2)
   }
 }

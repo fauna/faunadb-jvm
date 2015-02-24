@@ -1,38 +1,16 @@
 package com.faunadb.httpclient
 
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.faunadb._
-import com.faunadb.query.{Expression, Response, SetDeserializerModifier}
+import com.faunadb.query.{Expression, Response, FaunaDeserializerModifier}
 
-import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-sealed trait PageTerm
-case class Before(ref: String) extends PageTerm
-case class After(ref: String) extends PageTerm
-
 class FaunaClient(connection: Connection) {
-  val json = connection.json
-  val queryJson = json.copy()
-  queryJson.registerModule(new SimpleModule().setDeserializerModifier(new SetDeserializerModifier))
-
-  def oldQuery(query: String): Future[FaunaSet] = {
-    connection.get("/queries", "q" -> query).map { resourceToSet(_) }
-  }
-
-  def oldQuery(query: String, size: Int): Future[FaunaSet] = {
-    connection.get("/queries", "q" -> query, "size" -> size.toString).map { resourceToSet(_) }
-  }
-
-  def oldQuery(query: String, size: Int, pageTerm: PageTerm): Future[FaunaSet] = {
-    val pageTermPair = pageTerm match {
-      case Before(ref) => ("before" -> ref)
-      case After(ref) => ("after" -> ref)
-    }
-    connection.get("/queries", "q" -> query, "size" -> size.toString, pageTermPair).map { resourceToSet(_) }
-  }
+  private val json = connection.json
+  private val queryJson = json.copy()
+  queryJson.registerModule(new SimpleModule().setDeserializerModifier(new FaunaDeserializerModifier))
 
   def query[R <: Response](expr: Expression)(implicit t: reflect.ClassTag[R]): Future[R] = {
     val body = queryJson.createObjectNode()
@@ -52,26 +30,6 @@ class FaunaClient(connection: Connection) {
       val uri = "/" + instance.ref
       connection.put(uri, body)
     }
-  }
-
-  def createOrReplaceInstance(instance: FaunaInstance): Future[FaunaInstance] = {
-    postOrPut(instance) map { resp =>
-      json.treeToValue(resp.resource, classOf[FaunaInstance])
-    }
-  }
-
-  def createOrPatchInstance(instance: FaunaInstance): Future[FaunaInstance] = {
-    val body = json.createObjectNode()
-    body.set("data", instance.data)
-    val rv = if (instance.ref.isEmpty) {
-      val uri = "/" + instance.classRef
-      connection.post(uri, body)
-    } else {
-      val uri = "/" + instance.ref
-      connection.patch(uri, body)
-    }
-
-    rv map { resp => json.treeToValue(resp.resource, classOf[FaunaInstance]) }
   }
 
   def createDatabase(dbName: String): Future[FaunaDatabase] = {
@@ -111,21 +69,5 @@ class FaunaClient(connection: Connection) {
     connection.get(instanceRef)
       .map { resp => Some(json.treeToValue(resp.resource, classOf[FaunaInstance])) }
       .recover { case _: NotFoundException => None }
-  }
-
-  private def resourceToSet(resp: ResourceResponse): FaunaSet  = {
-    val resources = resp.resource.asInstanceOf[ObjectNode].get("resources")
-    resp.resource.asInstanceOf[ObjectNode].remove("resources")
-    val rv = json.treeToValue(resp.resource, classOf[FaunaSet])
-
-    if (resources.isArray && resp.references.size() > 0) {
-      val resArray = resources.asInstanceOf[ArrayNode]
-      resArray foreach { ref =>
-        val refStr = ref.asText()
-        rv.resources += (refStr -> json.treeToValue(resp.references.get(refStr), classOf[FaunaInstance]))
-      }
-    }
-
-    rv
   }
 }
