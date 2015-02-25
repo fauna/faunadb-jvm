@@ -2,7 +2,6 @@ package com.faunadb.httpclient
 
 import com.fasterxml.jackson.databind.`type`.TypeFactory
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.faunadb._
 import com.faunadb.query.{Ref, Expression, Response, FaunaDeserializerModifier}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -25,6 +24,15 @@ class FaunaClient(connection: Connection) {
     }
   }
 
+  def querySet[R <: Response](expr: Expression, clazz: Class[R]): Future[SetResponse[R]] = {
+    val body = queryJson.createObjectNode()
+    body.set("q", queryJson.valueToTree(expr))
+    connection.post("/", body).map { resp =>
+      val jacksonType = TypeFactory.defaultInstance().constructParametricType(classOf[SetResponse[R]], clazz)
+      queryJson.convertValue(resp.resource, jacksonType).asInstanceOf[SetResponse[R]]
+    }
+  }
+
   def querySet[R <: Response](expr: Expression)(implicit t: reflect.ClassTag[R]): Future[SetResponse[R]] = {
     val body = queryJson.createObjectNode()
     body.set("q", queryJson.valueToTree(expr))
@@ -33,55 +41,5 @@ class FaunaClient(connection: Connection) {
       queryJson.convertValue(resp.resource, jacksonType).asInstanceOf[SetResponse[R]]
     }
   }
-
-  private def postOrPut(instance: FaunaInstance) = {
-    val body = json.createObjectNode()
-    body.set("data", instance.data)
-    if (instance.ref.isEmpty) {
-      val uri = "/" + instance.classRef
-      connection.post(uri, body)
-    } else {
-      val uri = "/" + instance.ref
-      connection.put(uri, body)
-    }
-  }
-
-  def createDatabase(dbName: String): Future[FaunaDatabase] = {
-    val instance = new FaunaInstance(ref="databases/"+dbName, classRef="databases")
-    postOrPut(instance) map { resp =>
-      json.treeToValue(resp.resource, classOf[FaunaDatabase])
-    }
-  }
-
-  def createClass(classRef: String): Future[FaunaClass] = {
-    val instance = new FaunaInstance(ref=classRef, classRef="classes")
-    postOrPut(instance) map { resp =>
-      json.treeToValue(resp.resource, classOf[FaunaClass])
-    }
-  }
-
-  def createKey(database: String, role: String): Future[FaunaKey] = {
-    val body = json.createObjectNode()
-    body.put("database", database)
-    body.put("role", role)
-    connection.post("/keys", body) map { resp =>
-      json.treeToValue(resp.resource, classOf[FaunaKey])
-    }
-  }
-
-  def createIndex(indexRef: String, sourceRef: String, path: String, unique: Boolean): Future[FaunaIndex] = {
-    val body = json.createObjectNode()
-    body.put("source", sourceRef)
-    body.put("path", path)
-    body.put("unique", unique)
-    connection.put(indexRef, body).map { resp =>
-      json.treeToValue(resp.resource, classOf[FaunaIndex])
-    }
-  }
-
-  def findInstance(instanceRef: String): Future[Option[FaunaInstance]] = {
-    connection.get(instanceRef)
-      .map { resp => Some(json.treeToValue(resp.resource, classOf[FaunaInstance])) }
-      .recover { case _: NotFoundException => None }
-  }
 }
+

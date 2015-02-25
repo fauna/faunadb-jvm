@@ -31,29 +31,32 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   override protected def beforeAll(): Unit = {
-    val resultFuture = rootClient.createDatabase(testDbName)
+    import Primitives._
+    val resultFuture = rootClient.query[Database](Create(Ref("databases"), Map[String, Primitive]("name" -> testDbName)))
     val result = Await.result(resultFuture, 1 second)
 
     val dbRef = result.ref
 
-    val keyFuture = rootClient.createKey(dbRef, "server")
+    val keyFuture = rootClient.query[Key](Create(Ref("keys"), Map[String, Primitive]("database" -> dbRef, "role" -> "server")))
     val key = Await.result(keyFuture, 1 second)
 
     client = new FaunaClient(Connection.Builder().setFaunaRoot(config("root_url")).setAuthToken(key.secret).build())
 
-    val classFuture = client.createClass("classes/spells")
+    val classFuture = client.query[Class](Create(Ref("classes"), Map[String, Primitive]("name" -> "spells")))
     Await.result(classFuture, 1 second)
 
-    val indexFuture = client.createIndex("indexes/spells_by_test", "classes/spells", "data.queryTest1", false)
+    val indexFuture = client.query[Index](Create(Ref("indexes"), Map[String, Primitive]("name" -> "spells_by_test", "source" -> Ref("classes/spells"), "path" -> "data.queryTest1", "unique" -> false)))
     Await.result(indexFuture, 1 second)
 
-    val setIndexFuture = client.createIndex("indexes/spells_instances", "classes/spells", "class", false)
+    val setIndexFuture = client.query[Index](Create(Ref("indexes"), Map[String, Primitive]("name" -> "spells_instances", "source" -> Ref("classes/spells"), "path" -> "class", "unique" -> false)))
     Await.result(setIndexFuture, 1 second)
   }
 
   "Fauna Client" should "should not find an instance" in {
-    val resp = client.findInstance("classes/spells/1234")
-    Await.result(resp, 1 second) shouldBe None
+    val resp = client.query[Instance](Get(Ref("classes/spells/1234")))
+    intercept[NotFoundException] {
+      Await.result(resp, 1 second)
+    }
   }
 
   it should "create a new instance" in {

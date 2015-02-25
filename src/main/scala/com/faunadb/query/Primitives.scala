@@ -8,8 +8,11 @@ import scala.collection.JavaConverters._
 sealed trait Response
 
 case class Instance(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, data: ObjectPrimitive) extends Response
-
-case class Ref(@(JsonProperty @field)("@ref") ref: String) extends Retrievable with Response
+case class Key(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, database: Ref, role: String, secret: String, @(JsonProperty @field)("hashed_secret") hashedSecret: String, ts: Long, data: ObjectPrimitive) extends Response
+case class Database(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, name: String) extends Response
+case class Ref(@(JsonProperty @field)("@ref") ref: String) extends Retrievable with Response with Primitive
+case class Class(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, @(JsonProperty @field)("history_days") historyDays: Long, name: String) extends Response
+case class Index(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, unique: Boolean, active: Boolean, name: String, source: Ref, path: String) extends Response
 
 case class Var(@(JsonProperty @field)("var") variable: String) extends Retrievable
 
@@ -63,8 +66,11 @@ case class BooleanPrimitive(@(JsonValue @getter) value: Boolean) extends Primiti
 
 case class ArrayPrimitive(@(JsonValue @getter) values: scala.Array[Primitive]) extends Primitive
 
-case class ObjectPrimitive(@(JsonIgnore @field) values: collection.Map[String, Primitive]) extends Primitive {
+object ObjectPrimitive {
+  def empty() = ObjectPrimitive(scala.collection.Map.empty)
+}
 
+case class ObjectPrimitive(@(JsonIgnore @field) values: collection.Map[String, Primitive]) extends Primitive {
   @JsonCreator
   def this(javaMap: java.util.Map[String, Primitive]) = this(javaMap.asScala)
 
