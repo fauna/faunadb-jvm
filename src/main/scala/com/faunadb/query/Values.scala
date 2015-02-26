@@ -3,7 +3,7 @@ package com.faunadb.query
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 
-import scala.annotation.meta.{field, getter}
+import scala.annotation.meta.{param, field, getter}
 import scala.collection.JavaConverters._
 
 sealed trait Expression
@@ -94,18 +94,43 @@ sealed trait Value extends Response with Expression {
   }
 }
 
-case class Ref(@(JsonProperty @field)("@ref") value: String) extends Value with Identifier
+case class Ref(@(JsonProperty @field @param)("@ref") value: String) extends Value with Identifier
 case class Var(@(JsonProperty @field)("var") variable: String) extends Identifier
-
-
 
 sealed trait Resource extends Response
 
-case class Instance(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, data: ObjectV) extends Resource
-case class Key(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, database: Ref, role: String, secret: String, @(JsonProperty @field)("hashed_secret") hashedSecret: String, ts: Long, data: ObjectV) extends Resource
-case class Database(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, name: String) extends Resource
-case class Class(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, @(JsonProperty @field)("history_days") historyDays: Long, name: String) extends Resource
-case class Index(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, unique: Boolean, active: Boolean, name: String, source: Ref, path: String) extends Resource
+case class Instance(@(JsonProperty)("ref") ref: Ref,
+                    @(JsonProperty @field @param)("class") classRef: Ref,
+                    @JsonProperty("ts") ts: Long,
+                    @JsonProperty("data") data: ObjectV) extends Resource
+
+case class Key(@JsonProperty("ref") ref: Ref,
+               @(JsonProperty @field @param)("class") classRef: Ref,
+               @JsonProperty("database") database: Ref,
+               @JsonProperty("role") role: String,
+               @JsonProperty("secret") secret: String,
+               @(JsonProperty @field @param)("hashed_secret") hashedSecret: String,
+               @JsonProperty("ts") ts: Long,
+               @JsonProperty("data") data: ObjectV) extends Resource
+
+case class Database(@JsonProperty("ref") ref: Ref,
+                    @(JsonProperty @field @param)("class") classRef: Ref,
+                    @JsonProperty("ts") ts: Long,
+                    @JsonProperty("name") name: String) extends Resource
+
+case class Class(@JsonProperty("ref") ref: Ref,
+                 @(JsonProperty @field @param)("class") classRef: Ref,
+                 @JsonProperty("ts") ts: Long,
+                 @(JsonProperty @field @param)("history_days") historyDays: Long,
+                 @JsonProperty("name") name: String) extends Resource
+case class Index(@JsonProperty("ref") ref: Ref,
+                 @(JsonProperty @field @param)("class") classRef: Ref,
+                 @JsonProperty("ts") ts: Long,
+                 @JsonProperty("unique") unique: Boolean,
+                 @JsonProperty("active") active: Boolean,
+                 @JsonProperty("name") name: String,
+                 @JsonProperty("source") source: Ref,
+                 @JsonProperty("path") path: String) extends Resource
 
 object Values {
   implicit def stringToValue(unwrapped: String) = StringV(unwrapped)

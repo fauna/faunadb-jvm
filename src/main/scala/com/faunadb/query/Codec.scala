@@ -75,7 +75,15 @@ class PrimitiveDeserializer extends JsonDeserializer[Value] {
       case VALUE_NUMBER_FLOAT => new DoubleV(jsonParser.getValueAsDouble())
       case VALUE_NULL => NullPrimitive
       case START_OBJECT =>
-        new ObjectV(json.readValue(jsonParser, TypeFactory.defaultInstance().constructMapType(classOf[HashMap[_,_]], classOf[String], classOf[Value])).asInstanceOf[java.util.Map[String, Value]])
+        val objectTree = json.readTree[ObjectNode](jsonParser)
+        if (objectTree.has("@object")) {
+          val objectValue = objectTree.get("@object").asInstanceOf[ObjectNode]
+          new ObjectV(json.convertValue(objectValue, TypeFactory.defaultInstance().constructMapType(classOf[HashMap[_,_]], classOf[String], classOf[Value])).asInstanceOf[java.util.Map[String, Value]])
+        } else if (objectTree.has("@ref")) {
+          json.treeToValue(objectTree, classOf[Ref])
+        } else {
+          new ObjectV(json.convertValue(objectTree, TypeFactory.defaultInstance().constructMapType(classOf[HashMap[_,_]], classOf[String], classOf[Value])).asInstanceOf[java.util.Map[String, Value]])
+        }
       case START_ARRAY =>
         ArrayV(json.readValue(jsonParser, TypeFactory.defaultInstance().constructArrayType(classOf[Value])).asInstanceOf[Array[Value]])
     }
