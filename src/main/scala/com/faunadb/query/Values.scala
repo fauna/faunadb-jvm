@@ -97,11 +97,15 @@ sealed trait Value extends Response with Expression {
 case class Ref(@(JsonProperty @field)("@ref") value: String) extends Value with Identifier
 case class Var(@(JsonProperty @field)("var") variable: String) extends Identifier
 
-case class Instance(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, data: ObjectV) extends Response
-case class Key(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, database: Ref, role: String, secret: String, @(JsonProperty @field)("hashed_secret") hashedSecret: String, ts: Long, data: ObjectV) extends Response
-case class Database(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, name: String) extends Response
-case class Class(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, @(JsonProperty @field)("history_days") historyDays: Long, name: String) extends Response
-case class Index(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, unique: Boolean, active: Boolean, name: String, source: Ref, path: String) extends Response
+
+
+sealed trait Resource extends Response
+
+case class Instance(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, data: ObjectV) extends Resource
+case class Key(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, database: Ref, role: String, secret: String, @(JsonProperty @field)("hashed_secret") hashedSecret: String, ts: Long, data: ObjectV) extends Resource
+case class Database(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, name: String) extends Resource
+case class Class(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, @(JsonProperty @field)("history_days") historyDays: Long, name: String) extends Resource
+case class Index(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, unique: Boolean, active: Boolean, name: String, source: Ref, path: String) extends Resource
 
 object Values {
   implicit def stringToValue(unwrapped: String) = StringV(unwrapped)
