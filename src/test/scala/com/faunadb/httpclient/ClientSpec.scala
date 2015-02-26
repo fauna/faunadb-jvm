@@ -82,10 +82,10 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       Map[String, Primitive]("data" -> Map[String, Primitive]("testField" -> Map[String, Primitive]("array" -> Array[Primitive](1, "2", 3.4), "bool" -> true, "num" -> 1234, "string" -> "sup", "float" -> 1.234, "null" -> NullPrimitive)))))
     val resp2 = Await.result(query2F, 5 seconds)
     resp2.data.values.contains("testField") shouldBe true
-    val testFieldObject = resp2.data.values("testField").asObject
-    testFieldObject.values("array").asArray.values.toSeq shouldBe Array[Primitive](1, "2", 3.4).toSeq
-    testFieldObject.values("string").asString.value shouldBe "sup"
-    testFieldObject.values("num").asNumber.value shouldBe 1234
+    val testFieldObject = resp2.data.values("testField").`object`
+    testFieldObject("array").array.toSeq shouldBe Array[Primitive](1, "2", 3.4).toSeq
+    testFieldObject("string").string shouldBe "sup"
+    testFieldObject("num").number shouldBe 1234
   }
 
   it should "issue a query with the query AST" in {

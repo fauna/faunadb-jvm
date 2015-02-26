@@ -5,14 +5,8 @@ import com.fasterxml.jackson.annotation._
 import scala.annotation.meta.{field, getter}
 import scala.collection.JavaConverters._
 
-sealed trait Response
 
-case class Instance(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, data: ObjectPrimitive) extends Response
-case class Key(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, database: Ref, role: String, secret: String, @(JsonProperty @field)("hashed_secret") hashedSecret: String, ts: Long, data: ObjectPrimitive) extends Response
-case class Database(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, name: String) extends Response
 case class Ref(@(JsonProperty @field)("@ref") ref: String) extends Retrievable with Response with Primitive
-case class Class(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, @(JsonProperty @field)("history_days") historyDays: Long, name: String) extends Response
-case class Index(ref: Ref, @(JsonProperty @field)("class") classRef: Ref, ts: Long, unique: Boolean, active: Boolean, name: String, source: Ref, path: String) extends Response
 
 case class Var(@(JsonProperty @field)("var") variable: String) extends Retrievable
 
@@ -39,6 +33,31 @@ sealed trait Primitive {
 
   def asNumber = this match {
     case x: NumberPrimitive => x
+    case _ => null
+  }
+
+  def `object`() = this match {
+    case x: ObjectPrimitive => x.values
+    case _ => null
+  }
+
+  def array() = this match {
+    case x: ArrayPrimitive => x.values
+    case _ => null
+  }
+
+  def string() = this match {
+    case x: StringPrimitive => x.value
+    case _ => null
+  }
+
+  def boolean() = this match {
+    case x: BooleanPrimitive => x.value
+    case _ => null
+  }
+
+  def number() = this match {
+    case x: NumberPrimitive => x.value
     case _ => null
   }
 }
