@@ -1,7 +1,6 @@
 package com.faunadb.query
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import scala.collection
 import org.scalatest.{FlatSpec, Matchers}
 
 class SerializationSpec extends FlatSpec with Matchers {
@@ -57,19 +56,19 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize object primitives" in {
-    import Primitives._
+    import Values._
 
-    val obj = ObjectPrimitive(collection.Map("test1" -> "value1", "test2" -> 2, "test3" -> true))
+    val obj = ObjectV("test1" -> "value1", "test2" -> 2, "test3" -> true)
     json.writeValueAsString(obj) shouldBe "{\"@object\":{\"test1\":\"value1\",\"test2\":2,\"test3\":true}}"
 
-    val nestedObj = ObjectPrimitive(collection.Map("test1" -> ObjectPrimitive(collection.Map("nested1" -> "nestedValue1"))))
+    val nestedObj = ObjectV("test1" -> ObjectV("nested1" -> "nestedValue1"))
     json.writeValueAsString(nestedObj) shouldBe "{\"@object\":{\"test1\":{\"@object\":{\"nested1\":\"nestedValue1\"}}}}"
   }
 
   it should "serialize a resource operation" in {
-    import Primitives._
+    import Values._
     val ref = Ref("some/ref")
-    val params = collection.Map[String, Primitive]("test1" -> "value2")
+    val params = collection.Map[String, Value]("test1" -> "value2")
     val create = Create(ref, params)
     json.writeValueAsString(create) shouldBe "{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"@object\":{\"test1\":\"value2\"}}}"
 
@@ -85,8 +84,8 @@ class SerializationSpec extends FlatSpec with Matchers {
 
   it should "serialize a complex expression" in {
     val ref = Ref("some/ref")
-    val expr1 = Create(ref, ObjectPrimitive(collection.Map()))
-    val expr2 = Create(ref, ObjectPrimitive(collection.Map()))
+    val expr1 = Create(ref, ObjectV.empty)
+    val expr2 = Create(ref, ObjectV.empty)
 
     val complex = Do(Array(expr1, expr2))
     json.writeValueAsString(complex) shouldBe "{\"do\":[{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"@object\":{}}},{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"@object\":{}}}]}"

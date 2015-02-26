@@ -31,24 +31,24 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   override protected def beforeAll(): Unit = {
-    import Primitives._
-    val resultFuture = rootClient.query[Database](Create(Ref("databases"), Map[String, Primitive]("name" -> testDbName)))
+    import Values._
+    val resultFuture = rootClient.query[Database](Create(Ref("databases"), ObjectV("name" -> testDbName)))
     val result = Await.result(resultFuture, 1 second)
 
     val dbRef = result.ref
 
-    val keyFuture = rootClient.query[Key](Create(Ref("keys"), Map[String, Primitive]("database" -> dbRef, "role" -> "server")))
+    val keyFuture = rootClient.query[Key](Create(Ref("keys"), ObjectV("database" -> dbRef, "role" -> "server")))
     val key = Await.result(keyFuture, 1 second)
 
     client = new FaunaClient(Connection.Builder().setFaunaRoot(config("root_url")).setAuthToken(key.secret).build())
 
-    val classFuture = client.query[Class](Create(Ref("classes"), Map[String, Primitive]("name" -> "spells")))
+    val classFuture = client.query[Class](Create(Ref("classes"), ObjectV("name" -> "spells")))
     Await.result(classFuture, 1 second)
 
-    val indexFuture = client.query[Index](Create(Ref("indexes"), Map[String, Primitive]("name" -> "spells_by_test", "source" -> Ref("classes/spells"), "path" -> "data.queryTest1", "unique" -> false)))
+    val indexFuture = client.query[Index](Create(Ref("indexes"), ObjectV("name" -> "spells_by_test", "source" -> Ref("classes/spells"), "path" -> "data.queryTest1", "unique" -> false)))
     Await.result(indexFuture, 1 second)
 
-    val setIndexFuture = client.query[Index](Create(Ref("indexes"), Map[String, Primitive]("name" -> "spells_instances", "source" -> Ref("classes/spells"), "path" -> "class", "unique" -> false)))
+    val setIndexFuture = client.query[Index](Create(Ref("indexes"), ObjectV("name" -> "spells_instances", "source" -> Ref("classes/spells"), "path" -> "class", "unique" -> false)))
     Await.result(setIndexFuture, 1 second)
   }
 
@@ -60,41 +60,41 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "create a new instance" in {
-    import com.faunadb.query.Primitives._
-    val data = Map[String, Primitive]("testField" -> "testValue")
-    val respFuture = client.query[Instance](Create(Ref("classes/spells"), Map[String, Primitive]("data" -> data)))
+    import com.faunadb.query.Values._
+    val data = ObjectV("testField" -> "testValue")
+    val respFuture = client.query[Instance](Create(Ref("classes/spells"), ObjectV("data" -> data)))
     val resp = Await.result(respFuture, 1 second)
 
-    resp.ref.ref should startWith ("classes/spells/")
+    resp.ref.value should startWith ("classes/spells/")
     resp.classRef shouldBe Ref("classes/spells")
-    resp.data.values shouldBe data
+    resp.data shouldBe data
   }
 
   it should "create an instance with the query AST" in {
-    import com.faunadb.query.Primitives._
+    import com.faunadb.query.Values._
 
-    val queryF = client.query[Instance](Create(Ref("classes/spells"), Map[String, Primitive]("data" -> Map[String, Primitive]("test" -> "data"))))
+    val queryF = client.query[Instance](Create(Ref("classes/spells"), ObjectV("data" -> ObjectV("test" -> "data"))))
     val resp = Await.result(queryF, 5 seconds)
     resp.classRef shouldBe Ref("classes/spells")
-    resp.ref.ref.startsWith("classes/spells") shouldBe true
+    resp.ref.value.startsWith("classes/spells") shouldBe true
 
     val query2F = client.query[Instance](Create(Ref("classes/spells"),
-      Map[String, Primitive]("data" -> Map[String, Primitive]("testField" -> Map[String, Primitive]("array" -> Array[Primitive](1, "2", 3.4), "bool" -> true, "num" -> 1234, "string" -> "sup", "float" -> 1.234, "null" -> NullPrimitive)))))
+      ObjectV("data" -> ObjectV("testField" -> ObjectV("array" -> ArrayV(1, "2", 3.4), "bool" -> true, "num" -> 1234, "string" -> "sup", "float" -> 1.234, "null" -> NullPrimitive)))))
     val resp2 = Await.result(query2F, 5 seconds)
     resp2.data.values.contains("testField") shouldBe true
-    val testFieldObject = resp2.data.values("testField").`object`
-    testFieldObject("array").array.toSeq shouldBe Array[Primitive](1, "2", 3.4).toSeq
-    testFieldObject("string").string shouldBe "sup"
-    testFieldObject("num").number shouldBe 1234
+    val testFieldObject = resp2.data.values("testField").asObject
+    testFieldObject("array").asArray.toSeq shouldBe Seq[Value](1, "2", 3.4)
+    testFieldObject("string").asString shouldBe "sup"
+    testFieldObject("num").asNumber shouldBe 1234
   }
 
   it should "issue a query with the query AST" in {
-    import com.faunadb.query.Primitives._
+    import com.faunadb.query.Values._
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
     val classRef = Ref("classes/spells")
-    val createFuture = client.query[Instance](Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("queryTest1" -> randomText1))))
-    val createFuture2 = client.query[Instance](Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("queryTest1" -> randomText2))))
+    val createFuture = client.query[Instance](Create(classRef, ObjectV("data" -> ObjectV("queryTest1" -> randomText1))))
+    val createFuture2 = client.query[Instance](Create(classRef, ObjectV("data" -> ObjectV("queryTest1" -> randomText2))))
 
     val create1 = Await.result(createFuture, 1 second)
     val create2 = Await.result(createFuture2, 1 second)
@@ -110,15 +110,15 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "issue a paged query with the query AST" in {
-    import com.faunadb.query.Primitives._
+    import com.faunadb.query.Values._
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
     val randomText3 = Random.alphanumeric.take(8).mkString
     val classRef = Ref("classes/spells")
 
-    val createFuture = client.query[Instance](Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("queryTest1" -> randomText1))))
-    val createFuture2 = client.query[Instance](Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("queryTest1" -> randomText2))))
-    val createFuture3 = client.query[Instance](Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("queryTest1" -> randomText3))))
+    val createFuture = client.query[Instance](Create(classRef, ObjectV("data" -> ObjectV("queryTest1" -> randomText1))))
+    val createFuture2 = client.query[Instance](Create(classRef, ObjectV("data" -> ObjectV("queryTest1" -> randomText2))))
+    val createFuture3 = client.query[Instance](Create(classRef, ObjectV("data" -> ObjectV("queryTest1" -> randomText3))))
 
     val create1 = Await.result(createFuture, 1 second)
     val create2 = Await.result(createFuture2, 1 second)
@@ -141,31 +141,31 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "issue a query with a complex expression" in {
-    import com.faunadb.query.Primitives._
+    import com.faunadb.query.Values._
 
     val classRef = Ref("classes/spells")
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
-    val storeOp1 = Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("test" -> randomText1)))
-    val storeOp2 = Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("test" -> randomText2)))
+    val storeOp1 = Create(classRef, ObjectV("data" -> ObjectV("test" -> randomText1)))
+    val storeOp2 = Create(classRef, ObjectV("data" -> ObjectV("test" -> randomText2)))
     val queryF = client.query[Instance](Do(Array(storeOp1, storeOp2)))
     val resp = Await.result(queryF, 5 seconds)
 
     val query2F = client.query[Instance](Get(resp.ref))
     val resp2 = Await.result(query2F, 5 seconds)
 
-    resp2.data.values.get("test").get shouldBe StringPrimitive(randomText2)
+    resp2.data.values.get("test").get shouldBe StringV(randomText2)
 
   }
 
   it should "issue a lambda query" in {
-    import com.faunadb.query.Primitives._
+    import com.faunadb.query.Values._
 
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
     val classRef = Ref("classes/spells")
-    val createFuture = client.query[Instance](Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("queryTest1" -> randomText1))))
-    val createFuture2 = client.query[Instance](Create(classRef, Map[String, Primitive]("data" -> Map[String, Primitive]("queryTest1" -> randomText2))))
+    val createFuture = client.query[Instance](Create(classRef, ObjectV("data" -> ObjectV("queryTest1" -> randomText1))))
+    val createFuture2 = client.query[Instance](Create(classRef, ObjectV("data" -> ObjectV("queryTest1" -> randomText2))))
 
     val create1 = Await.result(createFuture, 1 second)
     val create2 = Await.result(createFuture2, 1 second)

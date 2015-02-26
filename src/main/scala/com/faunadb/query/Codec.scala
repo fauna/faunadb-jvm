@@ -17,7 +17,7 @@ class FaunaDeserializerModifier extends BeanDeserializerModifier {
   override def modifyDeserializer(config: DeserializationConfig, beanDesc: BeanDescription, deserializer: JsonDeserializer[_]): JsonDeserializer[_] = {
     if (beanDesc.getBeanClass == classOf[Set])
       setDeserializer
-    else if (beanDesc.getBeanClass == classOf[Primitive])
+    else if (beanDesc.getBeanClass == classOf[Value])
       primitiveDeserializer
     else
       deserializer
@@ -64,20 +64,20 @@ class EventsSerializer extends JsonSerializer[Events] {
   }
 }
 
-class PrimitiveDeserializer extends JsonDeserializer[Primitive] {
-  override def deserialize(jsonParser: JsonParser, deserializationContext: DeserializationContext): Primitive = {
+class PrimitiveDeserializer extends JsonDeserializer[Value] {
+  override def deserialize(jsonParser: JsonParser, deserializationContext: DeserializationContext): Value = {
     val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
     jsonParser.getCurrentToken match {
-      case VALUE_TRUE => BooleanPrimitive(true)
-      case VALUE_FALSE => BooleanPrimitive(false)
-      case VALUE_STRING => StringPrimitive(jsonParser.getValueAsString)
-      case VALUE_NUMBER_INT => new NumberPrimitive(jsonParser.getValueAsLong())
-      case VALUE_NUMBER_FLOAT => new DoublePrimitive(jsonParser.getValueAsDouble())
+      case VALUE_TRUE => BooleanV(true)
+      case VALUE_FALSE => BooleanV(false)
+      case VALUE_STRING => StringV(jsonParser.getValueAsString)
+      case VALUE_NUMBER_INT => new NumberV(jsonParser.getValueAsLong())
+      case VALUE_NUMBER_FLOAT => new DoubleV(jsonParser.getValueAsDouble())
       case VALUE_NULL => NullPrimitive
       case START_OBJECT =>
-        new ObjectPrimitive(json.readValue(jsonParser, TypeFactory.defaultInstance().constructMapType(classOf[HashMap[_,_]], classOf[String], classOf[Primitive])).asInstanceOf[java.util.Map[String, Primitive]])
+        new ObjectV(json.readValue(jsonParser, TypeFactory.defaultInstance().constructMapType(classOf[HashMap[_,_]], classOf[String], classOf[Value])).asInstanceOf[java.util.Map[String, Value]])
       case START_ARRAY =>
-        ArrayPrimitive(json.readValue(jsonParser, TypeFactory.defaultInstance().constructArrayType(classOf[Primitive])).asInstanceOf[Array[Primitive]])
+        ArrayV(json.readValue(jsonParser, TypeFactory.defaultInstance().constructArrayType(classOf[Value])).asInstanceOf[Array[Value]])
     }
   }
 }

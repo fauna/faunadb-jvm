@@ -43,11 +43,11 @@ class FaunaClient(connection: Connection) {
     }
   }
 
-  def toObject(source: Object): ObjectPrimitive = {
-    json.convertValue(source, TypeFactory.defaultInstance().constructMapType(classOf[java.util.Map[_,_]], classOf[String], classOf[Primitive]))
+  def toObject(source: Object): ObjectV = {
+    json.convertValue(source, TypeFactory.defaultInstance().constructMapType(classOf[java.util.Map[_,_]], classOf[String], classOf[Value]))
   }
 
-  def fromObject[R](source: ObjectPrimitive, target: java.lang.Class[R]): R = {
+  def fromObject[R](source: ObjectV, target: java.lang.Class[R]): R = {
     json.convertValue(source, target)
   }
 }
