@@ -55,6 +55,7 @@ case class Put(@(JsonProperty @field)("put") ref: Ref, @(JsonProperty @field)("p
 case class Patch(@(JsonProperty @field)("patch") ref: Ref, @(JsonProperty @field)("params") obj: ObjectV) extends Identifier
 case class Delete(@(JsonProperty @field)("delete") ref: Ref) extends Identifier
 
+
 sealed trait Response
 
 sealed trait Value extends Response with Expression {
@@ -131,6 +132,7 @@ case class Index(@JsonProperty("ref") ref: Ref,
                  @JsonProperty("name") name: String,
                  @JsonProperty("source") source: Ref,
                  @JsonProperty("path") path: String) extends Resource
+
 
 object Values {
   implicit def stringToValue(unwrapped: String) = StringV(unwrapped)
