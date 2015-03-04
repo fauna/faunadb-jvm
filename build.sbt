@@ -4,7 +4,7 @@ version := "0.1-SNAPSHOT"
 
 scalaVersion := "2.11.4"
 
-val jacksonVersion = "2.4.4"
+val jacksonVersion = "2.5.1"
 val metricsVersion = "3.1.0"
 
 libraryDependencies ++= Seq(
