@@ -86,6 +86,8 @@ class PrimitiveDeserializer extends JsonDeserializer[Value] {
         }
       case START_ARRAY =>
         ArrayV(json.readValue(jsonParser, TypeFactory.defaultInstance().constructArrayType(classOf[Value])).asInstanceOf[Array[Value]])
+      case sym@_ =>
+        throw new JsonParseException("Unable to deserialize Fauna primitive. Unexpected token: "+sym, jsonParser.getCurrentLocation)
     }
   }
 }
