@@ -3,11 +3,13 @@ package com.faunadb.httpclient
 import java.net.URL
 
 import com.codahale.metrics.MetricRegistry
-import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.ning.http.client._
 import com.ning.http.util.Base64
+
+import scala.collection.JavaConversions._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Promise
@@ -133,8 +135,11 @@ class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, reg
         ResourceResponse(response.getStatusCode, resources, references)
       case code@_ =>
         val parsed = parseResponseBody(response)
-        val message = parsed.path("error").asText()
-        throw FaunaException.wrapResponse(ErrorResponse(code, message))
+        val errorsPath = parsed.path("errors")
+        val errors = if (errorsPath.isNull) Seq.empty[Error] else errorsPath.asInstanceOf[ArrayNode].iterator().map { err =>
+          json.treeToValue(err.asInstanceOf[ObjectNode], classOf[Error])
+        }.toSeq
+        throw FaunaException.wrapResponse(ErrorResponse(code, errors))
     }
   }
 

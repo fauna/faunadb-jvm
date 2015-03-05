@@ -12,7 +12,7 @@ object FaunaException {
   }
 }
 
-abstract class FaunaException(response: ErrorResponse) extends Exception(response.error)
+abstract class FaunaException(response: ErrorResponse) extends Exception(response.errors.map(_.reason).mkString(", "))
 case class UnauthorizedException(response: ErrorResponse) extends FaunaException(response)
 case class BadRequestException(response: ErrorResponse) extends FaunaException(response)
 case class NotFoundException(response: ErrorResponse) extends FaunaException(response)
