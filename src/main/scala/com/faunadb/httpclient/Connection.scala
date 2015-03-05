@@ -29,16 +29,15 @@ object Connection {
     def setFaunaRoot(root: String) = copy(faunaRoot = root)
     def setClientConfig(config: AsyncHttpClientConfig) = copy(clientConfig = config)
     def setMetricRegistry(registry: MetricRegistry) = copy(metricRegistry = registry)
-    def setJson(mapper: ObjectMapper) = copy(objectMapper = mapper)
 
     def build() = {
-      new Connection(new URL(faunaRoot), authToken, new AsyncHttpClient(clientConfig), metricRegistry, objectMapper)
+      new Connection(new URL(faunaRoot), authToken, new AsyncHttpClient(clientConfig), metricRegistry)
     }
   }
 }
 
-class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, registry: MetricRegistry, jsonSource: ObjectMapper) {
-  private[httpclient] val json = jsonSource.copy().registerModule(DefaultScalaModule)
+class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, registry: MetricRegistry) {
+  private[httpclient] val json =  new ObjectMapper().registerModule(DefaultScalaModule)
   private val authHeader = "Basic " + Base64.encode((authToken + ":").getBytes("ASCII"))
 
   def get(path: String) = {

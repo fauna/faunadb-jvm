@@ -51,8 +51,8 @@ case class Paginate(resource: Identifier,
 case class Events(resource: Identifier, cursor: Option[Cursor] = None, size: Option[Long] = None) extends Identifier
 
 case class Create(@(JsonProperty @field)("create") ref: Ref, @(JsonProperty @field)("params") obj: ObjectV = ObjectV.empty) extends Identifier
-case class Put(@(JsonProperty @field)("put") ref: Ref, @(JsonProperty @field)("params") obj: ObjectV) extends Identifier
-case class Patch(@(JsonProperty @field)("patch") ref: Ref, @(JsonProperty @field)("params") obj: ObjectV) extends Identifier
+case class Replace(@(JsonProperty @field)("replace") ref: Ref, @(JsonProperty @field)("params") obj: ObjectV) extends Identifier
+case class Update(@(JsonProperty @field)("update") ref: Ref, @(JsonProperty @field)("params") obj: ObjectV) extends Identifier
 case class Delete(@(JsonProperty @field)("delete") ref: Ref) extends Identifier
 
 
@@ -174,7 +174,7 @@ object ObjectV {
   def apply(pairs: (String, Value)*) = new ObjectV(pairs.toMap)
 }
 
-case class ObjectV(@(JsonIgnore @field) values: collection.Map[String, Value]) extends Value {
+case class ObjectV(@(JsonIgnore @field @getter) values: collection.Map[String, Value]) extends Value {
   @JsonCreator
   def this(javaMap: java.util.Map[String, Value]) = this(javaMap.asScala)
 
