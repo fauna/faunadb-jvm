@@ -54,7 +54,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   "Fauna Client" should "should not find an instance" in {
     val resp = client.query[Instance](Get(Ref("classes/spells/1234")))
-    intercept[NotFoundException] {
+    intercept[NotFoundQueryException] {
       Await.result(resp, 1 second)
     }
   }

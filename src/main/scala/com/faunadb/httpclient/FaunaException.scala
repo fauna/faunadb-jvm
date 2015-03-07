@@ -1,20 +1,13 @@
 package com.faunadb.httpclient
 
-object FaunaException {
-  def wrapResponse(response: ErrorResponse) = {
-    response.status match {
-      case 400 => BadRequestException(response)
-      case 401 => UnauthorizedException(response)
-      case 404 => NotFoundException(response)
-      case 500 => InternalException(response)
-      case _ => UnknownException(response)
-    }
-  }
-}
+//abstract class FaunaException(response: ErrorResponse) extends Exception(response.errors.map(_.reason).mkString(", "))
+abstract class FaunaException(message: String) extends Exception(message)
+class QueryException(val response: QueryErrorResponse) extends FaunaException(response.errors.map(r => r.code + ": " + r.reason).mkString(", "))
+case class BadQueryException(r: QueryErrorResponse) extends QueryException(r)
+case class NotFoundQueryException(r: QueryErrorResponse) extends QueryException(r)
+case class UnknownQueryException(r: QueryErrorResponse) extends QueryException(r)
 
-abstract class FaunaException(response: ErrorResponse) extends Exception(response.errors.map(_.reason).mkString(", "))
-case class UnauthorizedException(response: ErrorResponse) extends FaunaException(response)
-case class BadRequestException(response: ErrorResponse) extends FaunaException(response)
-case class NotFoundException(response: ErrorResponse) extends FaunaException(response)
-case class InternalException(response: ErrorResponse) extends FaunaException(response)
-case class UnknownException(response: ErrorResponse) extends FaunaException(response)
+case class NotFoundException(message: String) extends FaunaException(message)
+case class InternalException(message: String) extends FaunaException(message)
+case class UnauthorizedException(message: String) extends FaunaException(message)
+case class UnknownException(message: String) extends FaunaException(message)

@@ -2,12 +2,13 @@ package com.faunadb.httpclient
 
 import com.fasterxml.jackson.databind.`type`.TypeFactory
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.databind.node.{ObjectNode, ArrayNode}
 import com.faunadb.query._
 
+import com.ning.http.client.{Response => HttpResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
-case class SetResponse[R <: Response](data: Array[R], before: Option[Ref], after: Option[Ref])
+import scala.collection.JavaConversions._
 
 class FaunaClient(connection: Connection) {
   private val json = connection.json
@@ -18,7 +19,11 @@ class FaunaClient(connection: Connection) {
     val body = queryJson.createObjectNode()
     body.set("q", queryJson.valueToTree(expr))
     connection.post("/", body).map { resp =>
-      queryJson.treeToValue(resp.resource, t.runtimeClass).asInstanceOf[R]
+      handleSimpleErrors(resp)
+      handleQueryErrors(resp)
+      val respBody = parseResponseBody(resp)
+      val resource = respBody.get("resource").asInstanceOf[ObjectNode]
+      queryJson.treeToValue(resource, t.runtimeClass).asInstanceOf[R]
     }
   }
 
@@ -26,8 +31,12 @@ class FaunaClient(connection: Connection) {
     val body = queryJson.createObjectNode()
     body.set("q", queryJson.valueToTree(expr))
     connection.post("/", body).map { resp =>
-      val jacksonType = TypeFactory.defaultInstance().constructParametricType(classOf[SetResponse[R]], t.runtimeClass)
-      queryJson.convertValue(resp.resource, jacksonType).asInstanceOf[SetResponse[R]]
+      handleSimpleErrors(resp)
+      handleQueryErrors(resp)
+      val jacksonType = TypeFactory.defaultInstance().constructParametrizedType(classOf[SetResponse[R]], classOf[SetResponse[R]], t.runtimeClass)
+      val respBody = parseResponseBody(resp)
+      val resource = respBody.get("resource").asInstanceOf[ObjectNode]
+      queryJson.convertValue(resource, jacksonType).asInstanceOf[SetResponse[R]]
     }
   }
 
@@ -36,7 +45,11 @@ class FaunaClient(connection: Connection) {
     val body = queryJson.createObjectNode()
     body.set("q", queryJson.valueToTree(expr))
     connection.post("/", body).map { resp =>
-      queryJson.treeToValue(resp.resource, clazz)
+      handleSimpleErrors(resp)
+      handleQueryErrors(resp)
+      val respBody = parseResponseBody(resp)
+      val resource = respBody.get("resource").asInstanceOf[ObjectNode]
+      queryJson.treeToValue(resource, clazz)
     }
   }
 
@@ -44,9 +57,45 @@ class FaunaClient(connection: Connection) {
     val body = queryJson.createObjectNode()
     body.set("q", queryJson.valueToTree(expr))
     connection.post("/", body).map { resp =>
-      val jacksonType = TypeFactory.defaultInstance().constructParametricType(classOf[SetResponse[R]], clazz)
-      queryJson.convertValue(resp.resource, jacksonType).asInstanceOf[SetResponse[R]]
+      handleSimpleErrors(resp)
+      handleQueryErrors(resp)
+      val jacksonType = TypeFactory.defaultInstance().constructParametrizedType(classOf[SetResponse[R]], classOf[SetResponse[R]], clazz)
+      val respBody = parseResponseBody(resp)
+      val resource = respBody.get("resource").asInstanceOf[ObjectNode]
+      queryJson.convertValue(resource, jacksonType).asInstanceOf[SetResponse[R]]
     }
   }
-}
 
+  private def handleSimpleErrors(response: HttpResponse) = {
+    response.getStatusCode match {
+      case x if x >= 300 =>
+        x match {
+          case 401 =>
+            val error = parseResponseBody(response).get("error").asText()
+            throw new UnauthorizedException(error)
+          case _ =>
+        }
+      case _ =>
+    }
+  }
+
+  private def handleQueryErrors(response: HttpResponse) = {
+    response.getStatusCode match {
+      case x if x >= 300 =>
+        val errors = parseResponseBody(response).get("errors").asInstanceOf[ArrayNode]
+        val parsedErrors = errors.iterator().map { json.treeToValue(_, classOf[QueryError]) }.toSeq
+        val error = QueryErrorResponse(x, parsedErrors)
+        x match {
+          case 400 => throw new BadQueryException(error)
+          case 404 => throw new NotFoundQueryException(error)
+          case _ => throw new UnknownQueryException(error)
+        }
+      case _ =>
+    }
+  }
+
+  private def parseResponseBody(response: HttpResponse) = {
+    val body = response.getResponseBody("UTF-8")
+    json.readTree(body)
+  }
+}

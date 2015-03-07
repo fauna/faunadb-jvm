@@ -72,11 +72,11 @@ class SerializationSpec extends FlatSpec with Matchers {
     val create = Create(ref, params)
     json.writeValueAsString(create) shouldBe "{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"@object\":{\"test1\":\"value2\"}}}"
 
-    val put = Put(ref, params)
-    json.writeValueAsString(put) shouldBe "{\"put\":{\"@ref\":\"some/ref\"},\"params\":{\"@object\":{\"test1\":\"value2\"}}}"
+    val put = Replace(ref, params)
+    json.writeValueAsString(put) shouldBe "{\"replace\":{\"@ref\":\"some/ref\"},\"params\":{\"@object\":{\"test1\":\"value2\"}}}"
 
-    val patch = Patch(ref, params)
-    json.writeValueAsString(patch) shouldBe "{\"patch\":{\"@ref\":\"some/ref\"},\"params\":{\"@object\":{\"test1\":\"value2\"}}}"
+    val patch = Update(ref, params)
+    json.writeValueAsString(patch) shouldBe "{\"update\":{\"@ref\":\"some/ref\"},\"params\":{\"@object\":{\"test1\":\"value2\"}}}"
 
     val delete = Delete(ref)
     json.writeValueAsString(delete) shouldBe "{\"delete\":{\"@ref\":\"some/ref\"}}"

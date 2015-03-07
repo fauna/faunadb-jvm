@@ -22,9 +22,9 @@ object Connection {
     .setMaximumConnectionsTotal(20) // 20 max connections
     .build()
 
-  val DefaultRoot = "https://rest1.fauna.org"
+  val DefaultRoot = "https://rest.faunadb.com"
 
-  case class Builder(authToken: String = "", faunaRoot: String = "https://rest1.fauna.org", clientConfig: AsyncHttpClientConfig = DefaultConfig, metricRegistry: MetricRegistry = new MetricRegistry, objectMapper: ObjectMapper = new ObjectMapper()) {
+  case class Builder(authToken: String = "", faunaRoot: String = "https://rest.faunadb.com", clientConfig: AsyncHttpClientConfig = DefaultConfig, metricRegistry: MetricRegistry = new MetricRegistry, objectMapper: ObjectMapper = new ObjectMapper()) {
     def setAuthToken(tok: String) = copy(authToken = tok)
     def setFaunaRoot(root: String) = copy(faunaRoot = root)
     def setClientConfig(config: AsyncHttpClientConfig) = copy(clientConfig = config)
@@ -51,6 +51,7 @@ class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, reg
   def get(path: String, params: (String, String)*) = {
     val qParams = new FluentStringsMap()
     val builder = new RequestBuilder("GET")
+      .setHeader("Connection", "close")
       .setUrl(new URL(faunaRoot, path).toString)
 
     params foreach { case (k,v) => builder.addQueryParameter(k,v) }
@@ -64,6 +65,7 @@ class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, reg
     val req = new RequestBuilder("POST")
       .setUrl(new URL(faunaRoot, path).toString)
       .setBody(json.writeValueAsString(body))
+      .setHeader("Connection", "close")
       .setHeader("Content-Type", "application/json")
       .build()
 
@@ -82,6 +84,7 @@ class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, reg
     val req = new RequestBuilder("PUT")
       .setUrl(new URL(faunaRoot, path).toString)
       .setBody(json.writeValueAsString(body))
+      .setHeader("Connection", "close")
       .setHeader("Content-Type", "application/json")
       .build()
 
@@ -92,6 +95,7 @@ class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, reg
     val req = new RequestBuilder("PATCH")
       .setUrl(new URL(faunaRoot, path).toString)
       .setBody(json.writeValueAsString(body))
+      .setHeader("Connection", "close")
       .setHeader("Content-Type", "application/json")
       .build()
 
@@ -114,36 +118,6 @@ class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, reg
       }
     })
 
-    rv.future.map(parseResponseAndHandleErrors(_))
-  }
-
-  private def parseResponseAndHandleErrors(response: Response): ResourceResponse =  {
-    response.getStatusCode match {
-      case 204 =>
-        ResourceResponse(204, json.createObjectNode(), json.createObjectNode())
-      case x if x >= 200 && x < 300 =>
-        val parsed = parseResponseBody(response)
-        val refNode = parsed.path("references")
-        val references = if (refNode.isMissingNode) {
-          json.createObjectNode() // empty
-        } else {
-          refNode.asInstanceOf[ObjectNode]
-        }
-
-        val resources = parsed.path("resource")
-        ResourceResponse(response.getStatusCode, resources, references)
-      case code@_ =>
-        val parsed = parseResponseBody(response)
-        val errorsPath = parsed.path("errors")
-        val errors = if (errorsPath.isNull) Seq.empty[Error] else errorsPath.asInstanceOf[ArrayNode].iterator().map { err =>
-          json.treeToValue(err.asInstanceOf[ObjectNode], classOf[Error])
-        }.toSeq
-        throw FaunaException.wrapResponse(ErrorResponse(code, errors))
-    }
-  }
-
-  private def parseResponseBody(response: Response) = {
-    val body = response.getResponseBody("UTF-8")
-    json.readTree(body)
+    rv.future
   }
 }
