@@ -2,6 +2,7 @@ package com.faunadb.query
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.scalatest.{FlatSpec, Matchers}
+import Values._
 
 class SerializationSpec extends FlatSpec with Matchers {
   val json = new ObjectMapper()
@@ -56,8 +57,6 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize object primitives" in {
-    import Values._
-
     val obj = ObjectV("test1" -> "value1", "test2" -> 2, "test3" -> true)
     json.writeValueAsString(obj) shouldBe "{\"@object\":{\"test1\":\"value1\",\"test2\":2,\"test3\":true}}"
 
@@ -66,7 +65,6 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize a resource operation" in {
-    import Values._
     val ref = Ref("some/ref")
     val params = collection.Map[String, Value]("test1" -> "value2")
     val create = Create(ref, params)

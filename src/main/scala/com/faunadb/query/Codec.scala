@@ -8,18 +8,22 @@ import java.util.HashMap
 import com.fasterxml.jackson.core.JsonToken._
 
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.faunadb.query.Error.{UnknownError, ValidationFailed}
 import scala.collection.JavaConversions._
 
 class FaunaDeserializerModifier extends BeanDeserializerModifier {
   val setDeserializer = new SetDeserializer
   val primitiveDeserializer = new PrimitiveDeserializer
+  val errorDeserializer = new ErrorDeserializer
 
   override def modifyDeserializer(config: DeserializationConfig, beanDesc: BeanDescription, deserializer: JsonDeserializer[_]): JsonDeserializer[_] = {
     if (beanDesc.getBeanClass == classOf[Set])
       setDeserializer
     else if (beanDesc.getBeanClass == classOf[Value])
       primitiveDeserializer
-    else
+    else if (beanDesc.getBeanClass == classOf[Error]) {
+      errorDeserializer
+    } else
       deserializer
   }
 }
@@ -115,5 +119,18 @@ class SetDeserializer extends JsonDeserializer[Set] {
 
     val clazz = SetDeserializer.SetClasses(fields.head)
     json.treeToValue(tree, clazz)
+  }
+}
+
+class ErrorDeserializer extends JsonDeserializer[Error] {
+  override def deserialize(jsonParser: JsonParser, deserializationContext: DeserializationContext): Error = {
+    val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
+    val tree = json.readTree(jsonParser).asInstanceOf[ObjectNode]
+
+    val code = tree.get("code").asText()
+    code match {
+      case Errors.ValidationFailed => json.treeToValue(tree, classOf[ValidationFailed])
+      case _ => json.treeToValue(tree, classOf[UnknownError])
+    }
   }
 }

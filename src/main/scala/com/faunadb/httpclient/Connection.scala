@@ -1,25 +1,24 @@
 package com.faunadb.httpclient
 
-import java.net.URL
+import java.net.{ConnectException, URL}
 
 import com.codahale.metrics.MetricRegistry
-import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.ning.http.client._
 import com.ning.http.util.Base64
-
-import scala.collection.JavaConversions._
+import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Promise
+import scala.util.{Failure, Success}
 
 object Connection {
   def DefaultConfig = new AsyncHttpClientConfig.Builder()
     .setConnectionTimeoutInMs(1000) // 1 second connect timeout
     .setRequestTimeoutInMs(5000) // 5 second req. timeout
-    .setMaximumConnectionsPerHost(20)
-    .setMaximumConnectionsTotal(20) // 20 max connections
+    .setAllowPoolingConnection(false)
+    .setAllowSslConnectionPool(false)
     .build()
 
   val DefaultRoot = "https://rest.faunadb.com"
@@ -38,6 +37,7 @@ object Connection {
 
 class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, registry: MetricRegistry) {
   private[httpclient] val json =  new ObjectMapper().registerModule(DefaultScalaModule)
+  private val log = LoggerFactory.getLogger("fauna")
   private val authHeader = "Basic " + Base64.encode((authToken + ":").getBytes("ASCII"))
 
   def get(path: String) = {
@@ -102,7 +102,16 @@ class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, reg
     performRequest(req)
   }
 
+  def logRequest(request: Request) = {
+  }
+
+  def close(): Unit = {
+    client.close()
+  }
+
   def performRequest(request: Request) = {
+    logRequest(request)
+
     val rv = Promise[Response]()
     val ctx = registry.timer("fauna-request").time()
     client.prepareRequest(request).addHeader("Authorization", authHeader).execute(new AsyncCompletionHandler[Response] {
@@ -118,6 +127,22 @@ class Connection(faunaRoot: URL, authToken: String, client: AsyncHttpClient, reg
       }
     })
 
-    rv.future
+    val f = rv.future
+
+    f.onComplete {
+      case Success(resp) =>
+        val reqData = Option(request.getStringData).getOrElse("")
+        val faunaHost = Option(resp.getHeader("X-FaunaDB-Host")).getOrElse("Unknown")
+        val faunaBuild = Option(resp.getHeader("X-FaunaDB-Build")).getOrElse("Unknown")
+        val respBody = Option(resp.getResponseBody).getOrElse("")
+        log.debug(s"Request: ${request.getMethod} ${request.getURI}: ${reqData}. Response: Status=${resp.getStatusCode}, Fauna Host=${faunaHost}, Fauna Build=${faunaBuild}: ${respBody}}")
+      case Failure(ex) =>
+        val reqData = Option(request.getStringData).getOrElse("")
+        log.info(s"Request: ${request.getMethod} ${request.getURI}: ${reqData}. Failed: ${ex.getMessage}", ex)
+    }
+
+    f.recover {
+      case ex: ConnectException => throw new UnavailableException(ex.getMessage)
+    }
   }
 }
