@@ -15,6 +15,7 @@ libraryDependencies ++= Seq(
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
   "io.dropwizard.metrics" % "metrics-core" % metricsVersion,
   "commons-beanutils" % "commons-beanutils" % "1.9.2",
+  "org.slf4j" % "slf4j-api" % "1.7.7",
   "org.yaml" % "snakeyaml" % "1.14" % "test",
   "org.scalatest" %% "scalatest" % "2.2.1" % "test"
 )

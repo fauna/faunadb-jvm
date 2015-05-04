@@ -66,6 +66,10 @@ class FaunaClient(connection: Connection) {
     }
   }
 
+  def close(): Unit = {
+    connection.close()
+  }
+
   private def handleSimpleErrors(response: HttpResponse) = {
     response.getStatusCode match {
       case x if x >= 300 =>
@@ -83,7 +87,7 @@ class FaunaClient(connection: Connection) {
     response.getStatusCode match {
       case x if x >= 300 =>
         val errors = parseResponseBody(response).get("errors").asInstanceOf[ArrayNode]
-        val parsedErrors = errors.iterator().map { json.treeToValue(_, classOf[QueryError]) }.toSeq
+        val parsedErrors = errors.iterator().map { queryJson.treeToValue(_, classOf[Error]) }.toSeq
         val error = QueryErrorResponse(x, parsedErrors)
         x match {
           case 400 => throw new BadQueryException(error)

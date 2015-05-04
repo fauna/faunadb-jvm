@@ -1,18 +1,33 @@
 package com.faunadb.httpclient
 
+import java.util.Optional
+
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.faunadb.query.{Ref, Response}
+import scala.collection.JavaConverters._
 
 object QueryError {
   case class Param(error: String, reason: String)
 }
-case class QueryError(position: Seq[String], code: String, reason: String, parameters: Map[String, QueryError.Param])
+case class QueryError(position: Seq[String], code: String, reason: String, parameters: Map[String, QueryError.Param]) {
+  def getPosition() = position.asJava
+  def getCode() = code
+  def getReason() = reason
+  def getParameters() = parameters.asJava
+}
 
 sealed abstract class FaunaResponse
 
 final case class ErrorResponse(status: Int, error: String) extends FaunaResponse
-final case class QueryErrorResponse(status: Int, errors: Seq[QueryError]) extends FaunaResponse
+
+final case class QueryErrorResponse(status: Int, errors: Seq[com.faunadb.query.Error]) extends FaunaResponse {
+  def getStatus() = status
+  def getErrors() = errors.asJava
+  def getError[A <: com.faunadb.query.Error](errorType: Class[A]): Optional[A] = {
+    errors.find(err => errorType.isAssignableFrom(err.getClass))
+  }.map(err => Optional.of(err.asInstanceOf[A])).getOrElse(Optional.empty[A]())
+}
 
 final class NoContentResponse extends FaunaResponse
 

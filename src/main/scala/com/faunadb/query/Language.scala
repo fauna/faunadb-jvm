@@ -3,6 +3,7 @@ package com.faunadb.query
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 
+import java.lang.{ Iterable => JIterable }
 import scala.annotation.meta.{param, field, getter}
 import scala.collection.JavaConverters._
 
@@ -16,10 +17,22 @@ case class ObjectPath(@(JsonValue @getter) field: String) extends Path
 case class ArrayPath(@(JsonValue @getter) index: Int) extends Path
 
 case class Let(@(JsonProperty @field)("let") vars: collection.Map[String, Expression], in: Expression) extends Expression
-case class Do(@(JsonProperty @field)("do") expressions: Array[Expression]) extends Expression
+object Do {
+  def create[A >: Expression](expressions: JIterable[A]) = new Do(expressions.asScala.map { _.asInstanceOf[Expression]})
+}
+
+case class Do(@(JsonIgnore @field @getter) expressions: Iterable[Expression]) extends Expression {
+  @JsonCreator
+  def this(@JsonProperty("do") expressions: JIterable[Expression]) = this(expressions.asScala)
+  @JsonProperty("do")
+  def javaExpressions = expressions.asJavaCollection
+}
+
 case class If(@(JsonProperty @field)("if") condition: Expression, then: Expression, `else`: Expression) extends Expression
 case class Quote(quote: Expression) extends Expression
-case class Fetch(@(JsonProperty @field)("fetch") path: Array[Path], from: Value) extends Expression
+case class Fetch(@(JsonProperty @field)("fetch") path: Iterable[Path], from: Value) extends Expression {
+  def this(path: JIterable[Path], from: Value) = this(path.asScala, from)
+}
 
 case class Lambda(@(JsonProperty @field)("lambda") argument: String, expr: Expression)
 case class Map(@(JsonProperty @field)("map") lambda: Lambda, collection: Expression) extends Expression
@@ -29,10 +42,42 @@ case class Foreach(@(JsonProperty @field)("foreach") lambda: Lambda, collection:
 
 sealed trait Set extends Identifier
 
-case class Match(@(JsonProperty @field)("match") term: String, @(JsonProperty @field) index: Ref) extends Set
-case class Union(@(JsonProperty @field)("union") sets: Array[Set]) extends Set
-case class Intersection(@(JsonProperty @field)("intersection") sets: Array[Set]) extends Set
-case class Difference(@(JsonProperty @field)("difference") sets: Array[Set]) extends Set
+case class Match(@(JsonProperty @field)("match") term: Value, @(JsonProperty @field) index: Ref) extends Set {
+  def this(term: String, index: Ref) = this(StringV(term), index)
+}
+
+object Union {
+  def create[A >: Set](expressions: JIterable[A]) = new Union(expressions.asScala.map { _.asInstanceOf[Set] })
+}
+case class Union(@(JsonIgnore @field @getter) sets: Iterable[Set]) extends Set {
+  @JsonCreator
+  def this(@JsonProperty("union") sets: JIterable[Set]) = this(sets.asScala)
+  @JsonProperty("union")
+  def javaSets = sets.asJavaCollection
+}
+
+object Intersection {
+  def create[A >: Set](sets: JIterable[A]) = new Intersection(sets.asScala.map { _.asInstanceOf[Set] })
+}
+case class Intersection(@(JsonIgnore @field @getter) sets: Iterable[Set]) extends Set {
+  @JsonCreator
+  def this(@JsonProperty("intersection") sets: JIterable[Set]) = this(sets.asScala)
+
+  @JsonProperty("intersection")
+  def javaSets = sets.asJavaCollection
+}
+
+object Difference {
+  def create[A >: Set](sets: JIterable[A]) = new Difference(sets.asScala.map { _.asInstanceOf[Set] })
+}
+case class Difference(@(JsonIgnore @field @getter) sets: Iterable[Set]) extends Set {
+  @JsonCreator
+  def this(@JsonProperty("difference") sets: JIterable[Set]) = this(sets.asScala)
+
+  @JsonProperty("difference")
+  def javaSets = sets.asJavaCollection
+}
+
 case class Join(@(JsonProperty @field)("join") source: Set, @(JsonProperty @field)("with") target: String) extends Set
 
 case class Get(@(JsonProperty @field)("get") resource: Identifier) extends Identifier
@@ -45,15 +90,18 @@ object Paginate {
 case class Paginate(resource: Identifier,
                     ts: Option[Long] = None,
                     cursor: Option[Cursor] = None,
-                    size: Option[Long] = None) extends Identifier
+                    size: Option[Long] = None) extends Identifier {
+  def withCursor(cursor: Cursor) = copy(cursor = Some(cursor))
+  def withSize(size: Long) = copy(size = Some(size))
+}
 
 @JsonSerialize(using = classOf[EventsSerializer])
 case class Events(resource: Identifier, cursor: Option[Cursor] = None, size: Option[Long] = None) extends Identifier
 
-case class Create(@(JsonProperty @field)("create") ref: Ref, @(JsonProperty @field)("params") obj: ObjectV = ObjectV.empty) extends Identifier
-case class Replace(@(JsonProperty @field)("replace") ref: Ref, @(JsonProperty @field)("params") obj: ObjectV) extends Identifier
-case class Update(@(JsonProperty @field)("update") ref: Ref, @(JsonProperty @field)("params") obj: ObjectV) extends Identifier
-case class Delete(@(JsonProperty @field)("delete") ref: Ref) extends Identifier
+case class Create(@(JsonProperty @field)("create") ref: Identifier, @(JsonProperty @field)("params") obj: ObjectV = ObjectV.empty) extends Identifier
+case class Replace(@(JsonProperty @field)("replace") ref: Identifier, @(JsonProperty @field)("params") obj: ObjectV) extends Identifier
+case class Update(@(JsonProperty @field)("update") ref: Identifier, @(JsonProperty @field)("params") obj: ObjectV) extends Identifier
+case class Delete(@(JsonProperty @field)("delete") ref: Identifier) extends Identifier
 
 
 sealed trait Response
@@ -95,7 +143,9 @@ sealed trait Value extends Response with Expression {
   }
 }
 
-case class Ref(@(JsonProperty @field @param)("@ref") value: String) extends Value with Identifier
+case class Ref(@(JsonProperty @field @param)("@ref") value: String) extends Value with Identifier {
+  def this(parent: Ref, child: String) = this(parent.value + "/" + child)
+}
 case class Var(@(JsonProperty @field)("var") variable: String) extends Identifier
 
 sealed trait Resource extends Response
