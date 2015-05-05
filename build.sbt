@@ -8,7 +8,7 @@ val jacksonVersion = "2.5.1"
 val metricsVersion = "3.1.0"
 
 libraryDependencies ++= Seq(
-  "com.ning" % "async-http-client" % "1.9.15",
+  "com.ning" % "async-http-client" % "1.8.15",
   "com.google.guava" % "guava" % "18.0",
   "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
   "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
