@@ -2,13 +2,15 @@ package com.faunadb.httpclient
 
 import com.fasterxml.jackson.databind.`type`.TypeFactory
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.node.{ObjectNode, ArrayNode}
+import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.faunadb.query._
-
+import com.faunadb.util.FutureImplicits._
+import com.faunadb.util.ScalaListenableFuture
 import com.ning.http.client.{Response => HttpResponse}
+
+import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.collection.JavaConversions._
 
 class FaunaClient(connection: Connection) {
   private val json = connection.json
@@ -41,7 +43,7 @@ class FaunaClient(connection: Connection) {
   }
 
   // Java Compatibility
-  def query[R <: Response](expr: Expression, clazz: java.lang.Class[R]): Future[R] = {
+  def query[R <: Response](expr: Expression, clazz: java.lang.Class[R]): ScalaListenableFuture[R] = {
     val body = queryJson.createObjectNode()
     body.set("q", queryJson.valueToTree(expr))
     connection.post("/", body).map { resp =>
@@ -50,10 +52,10 @@ class FaunaClient(connection: Connection) {
       val respBody = parseResponseBody(resp)
       val resource = respBody.get("resource").asInstanceOf[ObjectNode]
       queryJson.treeToValue(resource, clazz)
-    }
+    }.toListenableFuture()
   }
 
-  def querySet[R <: Response](expr: Expression, clazz: java.lang.Class[R]): Future[SetResponse[R]] = {
+  def querySet[R <: Response](expr: Expression, clazz: java.lang.Class[R]): ScalaListenableFuture[SetResponse[R]] = {
     val body = queryJson.createObjectNode()
     body.set("q", queryJson.valueToTree(expr))
     connection.post("/", body).map { resp =>
@@ -63,7 +65,7 @@ class FaunaClient(connection: Connection) {
       val respBody = parseResponseBody(resp)
       val resource = respBody.get("resource").asInstanceOf[ObjectNode]
       queryJson.convertValue(resource, jacksonType).asInstanceOf[SetResponse[R]]
-    }
+    }.toListenableFuture()
   }
 
   def close(): Unit = {
