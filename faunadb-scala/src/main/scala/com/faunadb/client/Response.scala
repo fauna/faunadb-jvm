@@ -1,10 +1,11 @@
-package com.faunadb.httpclient
+package com.faunadb.client
 
 import java.util.Optional
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.faunadb.query.{Ref, Response}
+import com.faunadb.client.query.{Ref, Response}
+
 import scala.collection.JavaConverters._
 
 object QueryError {
@@ -21,10 +22,10 @@ sealed abstract class FaunaResponse
 
 final case class ErrorResponse(status: Int, error: String) extends FaunaResponse
 
-final case class QueryErrorResponse(status: Int, errors: Seq[com.faunadb.query.Error]) extends FaunaResponse {
+final case class QueryErrorResponse(status: Int, errors: Seq[com.faunadb.client.query.Error]) extends FaunaResponse {
   def getStatus() = status
   def getErrors() = errors.asJava
-  def getError[A <: com.faunadb.query.Error](errorType: Class[A]): Optional[A] = {
+  def getError[A <: com.faunadb.client.query.Error](errorType: Class[A]): Optional[A] = {
     errors.find(err => errorType.isAssignableFrom(err.getClass))
   }.map(err => Optional.of(err.asInstanceOf[A])).getOrElse(Optional.empty[A]())
 }

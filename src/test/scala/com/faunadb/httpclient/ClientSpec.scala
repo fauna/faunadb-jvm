@@ -4,7 +4,8 @@ import java.io.FileInputStream
 import java.util.{Map => JMap}
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.faunadb.query._
+import com.faunadb.client.{NotFoundQueryException, FaunaClient}
+import com.faunadb.client.query._
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.yaml.snakeyaml.Yaml
 
@@ -60,7 +61,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "create a new instance" in {
-    import com.faunadb.query.Values._
+    import com.faunadb.client.query.Values._
     val data = ObjectV("testField" -> "testValue")
     val respFuture = client.query[Instance](Create(Ref("classes/spells"), ObjectV("data" -> data)))
     val resp = Await.result(respFuture, 1 second)
@@ -71,7 +72,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "create an instance with the query AST" in {
-    import com.faunadb.query.Values._
+    import com.faunadb.client.query.Values._
 
     val queryF = client.query[Instance](Create(Ref("classes/spells"), ObjectV("data" -> ObjectV("test" -> "data"))))
     val resp = Await.result(queryF, 5 seconds)
@@ -89,7 +90,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "issue a query with the query AST" in {
-    import com.faunadb.query.Values._
+    import com.faunadb.client.query.Values._
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
     val classRef = Ref("classes/spells")
@@ -110,7 +111,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "issue a paged query with the query AST" in {
-    import com.faunadb.query.Values._
+    import com.faunadb.client.query.Values._
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
     val randomText3 = Random.alphanumeric.take(8).mkString
@@ -141,7 +142,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "issue a query with a complex expression" in {
-    import com.faunadb.query.Values._
+    import com.faunadb.client.query.Values._
 
     val classRef = Ref("classes/spells")
     val randomText1 = Random.alphanumeric.take(8).mkString
@@ -159,7 +160,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "issue a lambda query" in {
-    import com.faunadb.query.Values._
+    import com.faunadb.client.query.Values._
 
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
