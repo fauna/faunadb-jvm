@@ -1,8 +1,5 @@
 package com.faunadb.client.query
 
-import java.util.AbstractMap.SimpleImmutableEntry
-import java.util.{Map => JMap, Optional}
-
 import com.fasterxml.jackson.annotation.JsonProperty
 
 import scala.collection.JavaConverters._
@@ -29,16 +26,7 @@ sealed trait Error {
 }
 
 object Error {
-  case class ValidationFailed(position: Seq[String], code: String, reason: String, parameters: scala.collection.SortedMap[String, ValidationError]) extends Error {
-      def getValidationError(err: ValidationError.Error): Optional[JMap.Entry[String, ValidationError]] = {
-      parameters.find { case (field, error) =>  error.error == err.error }
-        .map { case (k,v) => new SimpleImmutableEntry[String, ValidationError](k,v) }
-        .map(e => Optional.of(e.asInstanceOf[JMap.Entry[String, ValidationError]])).getOrElse(Optional.empty[JMap.Entry[String, ValidationError]]())
-    }
-
-    def getParameters() = parameters.asJava
-  }
-
+  case class ValidationFailed(position: Seq[String], code: String, reason: String, parameters: scala.collection.SortedMap[String, ValidationError]) extends Error
   case class UnknownError(position: Seq[String], code: String, reason: String) extends Error
 }
 

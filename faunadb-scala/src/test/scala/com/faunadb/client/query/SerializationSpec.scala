@@ -1,11 +1,15 @@
 package com.faunadb.client.query
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import org.scalatest.{FlatSpec, Matchers}
 import Values._
 
 class SerializationSpec extends FlatSpec with Matchers {
   val json = new ObjectMapper()
+  json.registerModule(new DefaultScalaModule)
+  json.registerModule(new SimpleModule().setDeserializerModifier(new FaunaDeserializerModifier))
 
   "Query AST serialization" should "serialize ref" in {
     val ref = Ref("some/ref")

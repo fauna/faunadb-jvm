@@ -8,7 +8,7 @@ import com.faunadb.client.query.{ObjectV, FaunaDeserializerModifier}
 class ExternalObjectSerializer extends JsonSerializer[ObjectV] {
   override def serialize(value: ObjectV, gen: JsonGenerator, serializers: SerializerProvider): Unit = {
     val json = gen.getCodec.asInstanceOf[ObjectMapper]
-    json.writeValue(gen, value.javaValues)
+    json.writeValue(gen, value)
   }
 }
 

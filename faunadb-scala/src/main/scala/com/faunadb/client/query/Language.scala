@@ -17,22 +17,11 @@ case class ObjectPath(@(JsonValue @getter) field: String) extends Path
 case class ArrayPath(@(JsonValue @getter) index: Int) extends Path
 
 case class Let(@(JsonProperty @field)("let") vars: collection.Map[String, Expression], in: Expression) extends Expression
-object Do {
-  def create[A >: Expression](expressions: JIterable[A]) = new Do(expressions.asScala.map { _.asInstanceOf[Expression]})
-}
-
-case class Do(@(JsonIgnore @field @getter) expressions: Iterable[Expression]) extends Expression {
-  @JsonCreator
-  def this(@JsonProperty("do") expressions: JIterable[Expression]) = this(expressions.asScala)
-  @JsonProperty("do")
-  def javaExpressions = expressions.asJavaCollection
-}
+case class Do(@(JsonProperty @field @getter)("do") expressions: Iterable[Expression]) extends Expression
 
 case class If(@(JsonProperty @field)("if") condition: Expression, then: Expression, `else`: Expression) extends Expression
 case class Quote(quote: Expression) extends Expression
-case class Fetch(@(JsonProperty @field)("fetch") path: Iterable[Path], from: Value) extends Expression {
-  def this(path: JIterable[Path], from: Value) = this(path.asScala, from)
-}
+case class Fetch(@(JsonProperty @field)("fetch") path: Iterable[Path], from: Value) extends Expression
 
 case class Lambda(@(JsonProperty @field)("lambda") argument: String, expr: Expression)
 case class Map(@(JsonProperty @field)("map") lambda: Lambda, collection: Expression) extends Expression
@@ -49,42 +38,15 @@ case class Match(@(JsonProperty @field)("match") term: Value, @(JsonProperty @fi
 object Union {
   def create[A >: Set](expressions: JIterable[A]) = new Union(expressions.asScala.map { _.asInstanceOf[Set] })
 }
-case class Union(@(JsonIgnore @field @getter) sets: Iterable[Set]) extends Set {
-  @JsonCreator
-  def this(@JsonProperty("union") sets: JIterable[Set]) = this(sets.asScala)
-  @JsonProperty("union")
-  def javaSets = sets.asJavaCollection
-}
+case class Union(@(JsonProperty @field @getter)("union") sets: Iterable[Set]) extends Set
 
-object Intersection {
-  def create[A >: Set](sets: JIterable[A]) = new Intersection(sets.asScala.map { _.asInstanceOf[Set] })
-}
-case class Intersection(@(JsonIgnore @field @getter) sets: Iterable[Set]) extends Set {
-  @JsonCreator
-  def this(@JsonProperty("intersection") sets: JIterable[Set]) = this(sets.asScala)
+case class Intersection(@(JsonProperty @field @getter)("intersection") sets: Iterable[Set]) extends Set
 
-  @JsonProperty("intersection")
-  def javaSets = sets.asJavaCollection
-}
-
-object Difference {
-  def create[A >: Set](sets: JIterable[A]) = new Difference(sets.asScala.map { _.asInstanceOf[Set] })
-}
-case class Difference(@(JsonIgnore @field @getter) sets: Iterable[Set]) extends Set {
-  @JsonCreator
-  def this(@JsonProperty("difference") sets: JIterable[Set]) = this(sets.asScala)
-
-  @JsonProperty("difference")
-  def javaSets = sets.asJavaCollection
-}
+case class Difference(@(JsonProperty @field @getter)("difference") sets: Iterable[Set]) extends Set
 
 case class Join(@(JsonProperty @field)("join") source: Set, @(JsonProperty @field)("with") target: String) extends Set
 
 case class Get(@(JsonProperty @field)("get") resource: Identifier) extends Identifier
-
-object Paginate {
-  def create(resource: Identifier) = new Paginate(resource, None, None, None)
-}
 
 @JsonSerialize(using = classOf[PaginateSerializer])
 case class Paginate(resource: Identifier,
@@ -195,9 +157,6 @@ object Values {
   implicit def pairToValuePair[T](p: (String, T))(implicit convert: T => Value) = {
     (p._1, convert(p._2))
   }
-
-  // Java interop
-  def newObject(map: java.util.Map[String, Value]) = new ObjectV(map)
 }
 
 case object NullPrimitive extends Value {
@@ -224,9 +183,4 @@ object ObjectV {
   def apply(pairs: (String, Value)*) = new ObjectV(pairs.toMap)
 }
 
-case class ObjectV(@(JsonIgnore @field @getter) values: collection.Map[String, Value]) extends Value {
-  @JsonCreator
-  def this(javaMap: java.util.Map[String, Value]) = this(javaMap.asScala)
-
-  @JsonProperty("@object") def javaValues = values.asJava
-}
+case class ObjectV(@(JsonProperty @field @getter)("@object") values: collection.Map[String, Value]) extends Value
