@@ -1,7 +1,7 @@
 package com.faunadb.client.query
 
 import com.fasterxml.jackson.annotation._
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.databind.annotation.{JsonDeserialize, JsonSerialize}
 
 import java.lang.{ Iterable => JIterable }
 import scala.annotation.meta.{param, field, getter}
@@ -183,4 +183,5 @@ object ObjectV {
   def apply(pairs: (String, Value)*) = new ObjectV(pairs.toMap)
 }
 
+@JsonDeserialize(using = classOf[ObjectDeserializer])
 case class ObjectV(@(JsonProperty @field @getter)("@object") values: collection.Map[String, Value]) extends Value
