@@ -14,12 +14,13 @@ import scala.collection.Map
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.Random
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   val config = readConfig("config/test.yml")
   val json = new ObjectMapper()
 
-  val rootClient = new FaunaClient(Connection.Builder().setFaunaRoot(config("root_url")).setAuthToken(config("root_token")).build())
+  val rootClient = FaunaClient(Connection.builder().withFaunaRoot(config("root_url")).withAuthToken(config("root_token")).build())
 
   val testDbName = "fauna-java-test-" + Random.alphanumeric.take(8).mkString
   var client: FaunaClient = null
@@ -41,7 +42,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val keyFuture = rootClient.query[Key](Create(Ref("keys"), ObjectV("database" -> dbRef, "role" -> "server")))
     val key = Await.result(keyFuture, 1 second)
 
-    client = new FaunaClient(Connection.Builder().setFaunaRoot(config("root_url")).setAuthToken(key.secret).build())
+    client = FaunaClient(Connection.builder().withFaunaRoot(config("root_url")).withAuthToken(key.secret).build())
 
     val classFuture = client.query[Class](Create(Ref("classes"), ObjectV("name" -> "spells")))
     Await.result(classFuture, 1 second)
@@ -132,7 +133,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     resp.before shouldNot be (None)
     resp.after shouldBe None
 
-    val query2F = client.querySet[Ref](Paginate(Ref("classes/spells/instances"), size=Some(1), cursor=Some(com.faunadb.query.Before(resp.before.get))))
+    val query2F = client.querySet[Ref](Paginate(Ref("classes/spells/instances"), size=Some(1), cursor=Some(com.faunadb.client.query.Before(resp.before.get))))
     val resp2 = Await.result(query2F, 5 seconds)
 
     resp2.data.size shouldBe 1
@@ -171,7 +172,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val create1 = Await.result(createFuture, 1 second)
     val create2 = Await.result(createFuture2, 1 second)
 
-    val queryF = client.querySet[Instance](com.faunadb.query.Map(Lambda("x", Get(Var("x"))), Paginate(Ref("classes/spells/instances"), size = Some(2))))
+    val queryF = client.querySet[Instance](com.faunadb.client.query.Map(Lambda("x", Get(Var("x"))), Paginate(Ref("classes/spells/instances"), size = Some(2))))
     val resp = Await.result(queryF, 5 seconds)
     resp.data.length shouldBe 2
   }

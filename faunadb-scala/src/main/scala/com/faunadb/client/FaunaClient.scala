@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.`type`.TypeFactory
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.node.{ObjectNode, ArrayNode}
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.client.query.{FaunaDeserializerModifier, Response, Expression}
 import com.faunadb.httpclient.Connection
 import com.ning.http.client.{Response => HttpResponse}
@@ -18,6 +19,7 @@ object FaunaClient {
 }
 
 class FaunaClient(connection: Connection, json: ObjectMapper) {
+  json.registerModule(new DefaultScalaModule)
   json.registerModule(new SimpleModule().setDeserializerModifier(new FaunaDeserializerModifier))
 
   def query[R <: Response](expr: Expression)(implicit t: reflect.ClassTag[R], ec: ExecutionContext): Future[R] = {

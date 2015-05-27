@@ -5,17 +5,12 @@ lazy val commonSettings = Seq(
   version := "0.1-SNAPSHOT"
 )
 
-
 lazy val root = (project in file("."))
   .settings(commonSettings: _*)
   .settings(
     name := "faunadb-jvm",
     libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
-      "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
-      "commons-beanutils" % "commons-beanutils" % "1.9.2",
-      "org.yaml" % "snakeyaml" % "1.14" % "test",
-      "org.scalatest" %% "scalatest" % "2.2.1" % "test"
+      "commons-beanutils" % "commons-beanutils" % "1.9.2"
     )
    ).aggregate(httpclient, scala)
 
@@ -44,6 +39,10 @@ lazy val scala = project.in(file("faunadb-scala"))
     name := "faunadb-scala",
     scalaVersion := "2.11.6",
     libraryDependencies ++= Seq(
+      "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
+      "org.yaml" % "snakeyaml" % "1.14" % "test",
+      "org.scalatest" %% "scalatest" % "2.2.1" % "test"
     )
   )
   .dependsOn(httpclient)
