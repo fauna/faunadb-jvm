@@ -1,14 +1,13 @@
 package com.faunadb.client.query
 
-import com.fasterxml.jackson.core.{JsonParseException, JsonParser, JsonGenerator}
+import com.fasterxml.jackson.core.JsonToken._
+import com.fasterxml.jackson.core.{JsonGenerator, JsonParseException, JsonParser}
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.`type`.TypeFactory
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier
-import java.util.HashMap
-import com.fasterxml.jackson.core.JsonToken._
-
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.faunadb.client.query.Error.{UnknownError, ValidationFailed}
+
 import scala.collection.JavaConversions._
 
 class FaunaDeserializerModifier extends BeanDeserializerModifier {
@@ -23,8 +22,9 @@ class FaunaDeserializerModifier extends BeanDeserializerModifier {
       primitiveDeserializer
     else if (beanDesc.getBeanClass == classOf[Error]) {
       errorDeserializer
-    } else
+    } else {
       deserializer
+    }
   }
 }
 
@@ -68,6 +68,21 @@ class EventsSerializer extends JsonSerializer[Events] {
   }
 }
 
+class ObjectDeserializer extends JsonDeserializer[ObjectV] {
+  override def deserialize(jsonParser: JsonParser, ctxt: DeserializationContext): ObjectV = {
+    val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
+    val tree = json.readTree[ObjectNode](jsonParser)
+    val tf = TypeFactory.defaultInstance()
+    val mapType = tf.constructMapLikeType(classOf[collection.Map[_,_]], classOf[String], classOf[Value])
+    if (tree.has("@object")) {
+      val objectValue = tree.get("@object").asInstanceOf[ObjectNode]
+      new ObjectV(json.convertValue(objectValue, mapType))
+    } else {
+      new ObjectV(json.convertValue(tree, mapType))
+    }
+  }
+}
+
 class PrimitiveDeserializer extends JsonDeserializer[Value] {
   override def deserialize(jsonParser: JsonParser, deserializationContext: DeserializationContext): Value = {
     val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
@@ -80,13 +95,10 @@ class PrimitiveDeserializer extends JsonDeserializer[Value] {
       case VALUE_NULL => NullPrimitive
       case START_OBJECT =>
         val objectTree = json.readTree[ObjectNode](jsonParser)
-        if (objectTree.has("@object")) {
-          val objectValue = objectTree.get("@object").asInstanceOf[ObjectNode]
-          new ObjectV(json.convertValue(objectValue, TypeFactory.defaultInstance().constructMapType(classOf[HashMap[_,_]], classOf[String], classOf[Value])).asInstanceOf[java.util.Map[String, Value]])
-        } else if (objectTree.has("@ref")) {
+        if (objectTree.has("@ref")) {
           json.treeToValue(objectTree, classOf[Ref])
         } else {
-          new ObjectV(json.convertValue(objectTree, TypeFactory.defaultInstance().constructMapType(classOf[HashMap[_,_]], classOf[String], classOf[Value])).asInstanceOf[java.util.Map[String, Value]])
+          json.convertValue[ObjectV](objectTree, classOf[ObjectV])
         }
       case START_ARRAY =>
         ArrayV(json.readValue(jsonParser, TypeFactory.defaultInstance().constructArrayType(classOf[Value])).asInstanceOf[Array[Value]])
