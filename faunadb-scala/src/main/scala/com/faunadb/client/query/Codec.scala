@@ -1,4 +1,4 @@
-package com.faunadb.query
+package com.faunadb.client.query
 
 import com.fasterxml.jackson.core.{JsonParseException, JsonParser, JsonGenerator}
 import com.fasterxml.jackson.databind._
@@ -8,7 +8,7 @@ import java.util.HashMap
 import com.fasterxml.jackson.core.JsonToken._
 
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.faunadb.query.Error.{UnknownError, ValidationFailed}
+import com.faunadb.client.query.Error.{UnknownError, ValidationFailed}
 import scala.collection.JavaConversions._
 
 class FaunaDeserializerModifier extends BeanDeserializerModifier {

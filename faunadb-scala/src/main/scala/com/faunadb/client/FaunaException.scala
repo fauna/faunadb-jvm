@@ -1,22 +1,21 @@
-package com.faunadb.httpclient
+package com.faunadb.client
 
 import java.util.AbstractMap.SimpleImmutableEntry
-import java.util.Optional
-import java.util.{Map => JMap}
 import java.util.function.{Function => JFunction}
+import java.util.{Map => JMap, Optional}
 
-import com.faunadb.query.Error.ValidationFailed
-import com.faunadb.query.ValidationError
+import com.faunadb.client.query.Error.ValidationFailed
+import com.faunadb.client.query.ValidationError
 
 abstract class FaunaException(message: String) extends Exception(message)
 
 case class UnavailableException(message: String) extends FaunaException("FaunaDB host unavailable: "+message)
 
 class QueryException(val response: QueryErrorResponse) extends FaunaException(response.errors.map(r => r.code + ": " + r.reason).mkString(", ")) {
-  def getError[A <: com.faunadb.query.Error](errorType: Class[A]): Optional[A] = response.getError(errorType)
+  def getError[A <: com.faunadb.client.query.Error](errorType: Class[A]): Optional[A] = response.getError(errorType)
   def getResponse() = response
 
-  def handleError[A <: com.faunadb.query.Error, R](errorType: Class[A], f: JFunction[A, R]): R = {
+  def handleError[A <: com.faunadb.client.query.Error, R](errorType: Class[A], f: JFunction[A, R]): R = {
     response.errors.find { e => errorType.isAssignableFrom(e.getClass) }.map { e => f(e.asInstanceOf[A]) }.getOrElse(throw this)
   }
 

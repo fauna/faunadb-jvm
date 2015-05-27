@@ -1,4 +1,4 @@
-package com.faunadb.util
+package com.faunadb.client.util
 
 import com.google.common.util.concurrent.AbstractFuture
 

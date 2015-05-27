@@ -1,4 +1,4 @@
-package com.faunadb.query
+package com.faunadb.client.query
 
 import java.util.AbstractMap.SimpleImmutableEntry
 import java.util.{Map => JMap, Optional}

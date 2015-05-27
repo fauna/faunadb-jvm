@@ -1,4 +1,4 @@
-package com.faunadb.query
+package com.faunadb.client.query
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.scalatest.{FlatSpec, Matchers}
