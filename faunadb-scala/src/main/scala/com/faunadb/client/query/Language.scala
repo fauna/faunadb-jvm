@@ -143,7 +143,8 @@ case class Index(@JsonProperty("ref") ref: Ref,
                  @JsonProperty("active") active: Boolean,
                  @JsonProperty("name") name: String,
                  @JsonProperty("source") source: Ref,
-                 @JsonProperty("path") path: String) extends Resource
+                 @JsonProperty("path") path: String,
+                 @JsonProperty("terms") terms: Seq[scala.collection.immutable.Map[String, String]]) extends Resource
 
 
 object Values {
@@ -184,4 +185,4 @@ object ObjectV {
 }
 
 @JsonDeserialize(using = classOf[ObjectDeserializer])
-case class ObjectV(@(JsonProperty @field @getter)("@object") values: collection.Map[String, Value]) extends Value
+case class ObjectV(@(JsonProperty @field @getter)("object") values: collection.Map[String, Value]) extends Value

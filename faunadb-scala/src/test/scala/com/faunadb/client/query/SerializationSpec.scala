@@ -62,23 +62,23 @@ class SerializationSpec extends FlatSpec with Matchers {
 
   it should "serialize object primitives" in {
     val obj = ObjectV("test1" -> "value1", "test2" -> 2, "test3" -> true)
-    json.writeValueAsString(obj) shouldBe "{\"@object\":{\"test1\":\"value1\",\"test2\":2,\"test3\":true}}"
+    json.writeValueAsString(obj) shouldBe "{\"object\":{\"test1\":\"value1\",\"test2\":2,\"test3\":true}}"
 
     val nestedObj = ObjectV("test1" -> ObjectV("nested1" -> "nestedValue1"))
-    json.writeValueAsString(nestedObj) shouldBe "{\"@object\":{\"test1\":{\"@object\":{\"nested1\":\"nestedValue1\"}}}}"
+    json.writeValueAsString(nestedObj) shouldBe "{\"object\":{\"test1\":{\"object\":{\"nested1\":\"nestedValue1\"}}}}"
   }
 
   it should "serialize a resource operation" in {
     val ref = Ref("some/ref")
     val params = collection.Map[String, Value]("test1" -> "value2")
     val create = Create(ref, params)
-    json.writeValueAsString(create) shouldBe "{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"@object\":{\"test1\":\"value2\"}}}"
+    json.writeValueAsString(create) shouldBe "{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"test1\":\"value2\"}}}"
 
     val put = Replace(ref, params)
-    json.writeValueAsString(put) shouldBe "{\"replace\":{\"@ref\":\"some/ref\"},\"params\":{\"@object\":{\"test1\":\"value2\"}}}"
+    json.writeValueAsString(put) shouldBe "{\"replace\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"test1\":\"value2\"}}}"
 
     val patch = Update(ref, params)
-    json.writeValueAsString(patch) shouldBe "{\"update\":{\"@ref\":\"some/ref\"},\"params\":{\"@object\":{\"test1\":\"value2\"}}}"
+    json.writeValueAsString(patch) shouldBe "{\"update\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"test1\":\"value2\"}}}"
 
     val delete = Delete(ref)
     json.writeValueAsString(delete) shouldBe "{\"delete\":{\"@ref\":\"some/ref\"}}"
@@ -90,6 +90,6 @@ class SerializationSpec extends FlatSpec with Matchers {
     val expr2 = Create(ref, ObjectV.empty)
 
     val complex = Do(Array(expr1, expr2))
-    json.writeValueAsString(complex) shouldBe "{\"do\":[{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"@object\":{}}},{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"@object\":{}}}]}"
+    json.writeValueAsString(complex) shouldBe "{\"do\":[{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{}}},{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{}}}]}"
   }
 }

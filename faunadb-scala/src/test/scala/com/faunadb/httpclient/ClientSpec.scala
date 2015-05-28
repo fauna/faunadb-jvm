@@ -105,7 +105,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val resp = Await.result(queryF, 5 seconds)
     resp.data shouldBe Seq(create1.ref)
 
-    val query2F = client.querySet[Ref](Paginate(Ref("classes/spells/instances")))
+    val query2F = client.querySet[Ref](Paginate(Match(Ref("classes/spells"), Ref("indexes/spells_instances"))))
     val resp2 = Await.result(query2F, 5 seconds)
     resp2.data.toList.contains(create1.ref) shouldBe true
     resp2.data.toList.contains(create2.ref) shouldBe true
@@ -126,14 +126,14 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val create2 = Await.result(createFuture2, 1 second)
     val create3 = Await.result(createFuture3, 1 second)
 
-    val queryF = client.querySet[Ref](Paginate(Ref("classes/spells/instances"), size=Some(1)))
+    val queryF = client.querySet[Ref](Paginate(Match(Ref("classes/spells"), Ref("indexes/spells_instances")), size=Some(1)))
     val resp = Await.result(queryF, 5 seconds)
 
     resp.data.size shouldBe 1
     resp.before shouldNot be (None)
     resp.after shouldBe None
 
-    val query2F = client.querySet[Ref](Paginate(Ref("classes/spells/instances"), size=Some(1), cursor=Some(com.faunadb.client.query.Before(resp.before.get))))
+    val query2F = client.querySet[Ref](Paginate(Match(Ref("classes/spells"), Ref("indexes/spells_instances")), size=Some(1), cursor=Some(Before(resp.before.get))))
     val resp2 = Await.result(query2F, 5 seconds)
 
     resp2.data.size shouldBe 1
@@ -172,7 +172,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val create1 = Await.result(createFuture, 1 second)
     val create2 = Await.result(createFuture2, 1 second)
 
-    val queryF = client.querySet[Instance](com.faunadb.client.query.Map(Lambda("x", Get(Var("x"))), Paginate(Ref("classes/spells/instances"), size = Some(2))))
+    val queryF = client.querySet[Instance](com.faunadb.client.query.Map(Lambda("x", Get(Var("x"))), Paginate(Match(Ref("classes/spells"), Ref("indexes/spells_instances")), size = Some(2))))
     val resp = Await.result(queryF, 5 seconds)
     resp.data.length shouldBe 2
   }

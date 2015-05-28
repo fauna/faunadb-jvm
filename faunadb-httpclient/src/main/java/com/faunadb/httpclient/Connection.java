@@ -56,8 +56,26 @@ public class Connection {
       return this;
     }
 
-    public Connection build() throws UnsupportedEncodingException {
-      return new Connection(faunaRoot, authToken, client, metricRegistry);
+    public Connection build() throws UnsupportedEncodingException, MalformedURLException {
+      MetricRegistry r;
+      if (metricRegistry == null)
+        r = new MetricRegistry();
+      else
+        r = metricRegistry;
+
+      AsyncHttpClient c;
+      if (client == null)
+        c = new AsyncHttpClient();
+      else
+        c = client;
+
+      URL root;
+      if (faunaRoot == null)
+        root = new URL("https://rest.faunadb.com");
+      else
+        root = faunaRoot;
+
+      return new Connection(root, authToken, c, r);
     }
   }
 
