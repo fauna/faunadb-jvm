@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.`type`.TypeFactory
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.node.{ObjectNode, ArrayNode}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.faunadb.client.query.{FaunaDeserializerModifier, Response, Expression}
+import com.faunadb.client.query.{Instance, FaunaDeserializerModifier, Response, Expression}
 import com.faunadb.httpclient.Connection
 import com.ning.http.client.{Response => HttpResponse}
 
@@ -31,6 +31,19 @@ class FaunaClient(connection: Connection, json: ObjectMapper) {
       val respBody = parseResponseBody(resp)
       val resource = respBody.get("resource").asInstanceOf[ObjectNode]
       json.treeToValue(resource, t.runtimeClass).asInstanceOf[R]
+    }
+  }
+
+  def query(exprs: Iterable[Expression])(implicit ec: ExecutionContext): Future[Iterable[Instance]] = {
+    val body = json.createObjectNode()
+    body.set("q", json.valueToTree(exprs))
+    connection.post("/", body).asScalaFuture.map { resp =>
+      handleSimpleErrors(resp)
+      handleQueryErrors(resp)
+      val respBody = parseResponseBody(resp)
+      respBody.get("resource").asInstanceOf[ArrayNode].asScala.map { node =>
+        json.treeToValue(node, classOf[Instance])
+      }
     }
   }
 
