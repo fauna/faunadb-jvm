@@ -69,37 +69,37 @@ case class Delete(@(JsonProperty @field)("delete") ref: Identifier) extends Iden
 sealed trait Response
 
 sealed trait Value extends Response with Expression {
-  def asObject = this match {
+  def asObject: scala.collection.Map[String, Value] = this match {
     case x: ObjectV => x.values
     case _ => null
   }
 
-  def asArray = this match {
+  def asArray: Array[Value] = this match {
     case x: ArrayV => x.values
     case _ => null
   }
 
-  def asString = this match {
+  def asString: String = this match {
     case x: StringV => x.value
     case _ => null
   }
 
-  def asBoolean = this match {
+  def asBoolean: java.lang.Boolean = this match {
     case x: BooleanV => x.value
     case _ => null
   }
 
-  def asNumber = this match {
+  def asNumber: java.lang.Long = this match {
     case x: NumberV => x.value
     case _ => null
   }
 
-  def asDouble = this match {
+  def asDouble: java.lang.Double = this match {
     case x: DoubleV => x.value
     case _ => null
   }
 
-  def asRef = this match {
+  def asRef: Ref = this match {
     case x: Ref => x
     case _ => null
   }
