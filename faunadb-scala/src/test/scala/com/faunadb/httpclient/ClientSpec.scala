@@ -111,6 +111,20 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     resp2.data.toList.contains(create2.ref) shouldBe true
   }
 
+  it should "issue a batched query" in {
+    import com.faunadb.client.query.Values._
+    val randomText1 = Random.alphanumeric.take(8).mkString
+    val randomText2 = Random.alphanumeric.take(8).mkString
+    val classRef = Ref("classes/spells")
+    val expr1 = Create(classRef, ObjectV("data" -> ObjectV("queryTest1" -> randomText1)))
+    val expr2 = Create(classRef, ObjectV("data" -> ObjectV("queryTest1" -> randomText2)))
+
+    val createFuture = client.query(Seq(expr1, expr2))
+    val results = Await.result(createFuture, 1 second)
+
+    println(results)
+  }
+
   it should "issue a paged query with the query AST" in {
     import com.faunadb.client.query.Values._
     val randomText1 = Random.alphanumeric.take(8).mkString
