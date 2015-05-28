@@ -25,7 +25,7 @@ public class Connection {
     return new Builder();
   }
 
-  static class Builder {
+  public static class Builder {
     private URL faunaRoot;
     private String authToken;
     private AsyncHttpClient client;
