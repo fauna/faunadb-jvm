@@ -36,7 +36,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val resultFuture = rootClient.query(Create(Ref("databases"), ObjectV("name" -> testDbName)))
     val result = Await.result(resultFuture, 1 second)
 
-    val dbRef = result.asRef
+    val dbRef = result.asDatabase.ref
 
     val keyFuture = rootClient.query(Create(Ref("keys"), ObjectV("database" -> dbRef, "role" -> "server")))
     val key = Await.result(keyFuture, 1 second).asKey
@@ -68,7 +68,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     resp.ref.value should startWith ("classes/spells/")
     resp.classRef shouldBe Ref("classes/spells")
-    resp.data shouldBe data
+    resp.data("testField").asString shouldBe "testValue"
   }
 
   it should "create an instance with the query AST" in {
@@ -84,7 +84,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val resp2 = Await.result(query2F, 5 seconds).asInstance
     resp2.data.contains("testField") shouldBe true
     val testFieldObject = resp2.data("testField").asObject
-    testFieldObject("array").asArray.toSeq shouldBe Seq[Value](1, "2", 3.4)
+    testFieldObject("array").asArray(0).asNumber shouldBe 1
+    testFieldObject("array").asArray(1).asString shouldBe "2"
+    testFieldObject("array").asArray(2).asDouble shouldBe 3.4
     testFieldObject("string").asString shouldBe "sup"
     testFieldObject("num").asNumber shouldBe 1234
   }
@@ -102,12 +104,13 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val queryF = client.query(Paginate(Match(randomText1, Ref("indexes/spells_by_test"))))
     val resp = Await.result(queryF, 5 seconds).asPage
-    resp.data shouldBe Seq(create1.ref)
+    resp.data(0).asRef shouldBe create1.ref
 
     val query2F = client.query(Paginate(Match(Ref("classes/spells"), Ref("indexes/spells_instances"))))
     val resp2 = Await.result(query2F, 5 seconds).asPage
-    resp2.data.toList.contains(create1.ref) shouldBe true
-    resp2.data.toList.contains(create2.ref) shouldBe true
+    val refs = resp2.data.map(_.asRef)
+    refs.contains(create1.ref) shouldBe true
+    refs.contains(create2.ref) shouldBe true
   }
 
   it should "issue a batched query" in {
@@ -121,7 +124,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val createFuture = client.query(Seq(expr1, expr2))
     val results = Await.result(createFuture, 1 second)
 
-    println(results)
+    results.length shouldBe 2
+    results(0).asInstance.data("queryTest1").asString shouldBe randomText1
+    results(1).asInstance.data("queryTest1").asString shouldBe randomText2
   }
 
   it should "issue a paged query with the query AST" in {
@@ -169,7 +174,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val query2F = client.query(Get(resp.ref))
     val resp2 = Await.result(query2F, 5 seconds).asInstance
 
-    resp2.data.get("test").get shouldBe StringV(randomText2)
+    resp2.data("test").asString shouldBe randomText2
 
   }
 

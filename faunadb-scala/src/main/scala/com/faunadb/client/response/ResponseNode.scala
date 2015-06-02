@@ -29,8 +29,16 @@ class ResponseNode(private val underlying: JsonNode, json: ObjectMapper) {
   def asInstance = asInstanceOpt.get
 
   def asKeyOpt: Option[Key] = Option(json.convertValue(underlying, classOf[Key]))
-
   def asKey = asKeyOpt.get
+
+  def asDatabaseOpt: Option[Database] = Option(json.convertValue(underlying, classOf[Database]))
+  def asDatabase = asDatabaseOpt.get
+
+  def asClassOpt: Option[Class] = Option(json.convertValue(underlying, classOf[Class]))
+  def asClass = asClassOpt.get
+
+  def asIndexOpt: Option[Index] = Option(json.convertValue(underlying, classOf[Index]))
+  def asIndex = asIndexOpt.get
 
   override def toString: String = underlying.toString
 
