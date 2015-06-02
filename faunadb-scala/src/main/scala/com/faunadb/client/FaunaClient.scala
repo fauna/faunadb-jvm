@@ -1,17 +1,17 @@
 package com.faunadb.client
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.`type`.TypeFactory
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.node.{ObjectNode, ArrayNode}
+import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.faunadb.client.query.{Instance, FaunaDeserializerModifier, Response, Expression}
+import com.faunadb.client.query.{Expression, FaunaDeserializerModifier}
+import com.faunadb.client.response.ResponseNode
+import com.faunadb.client.util.FutureImplicits._
 import com.faunadb.httpclient.Connection
 import com.ning.http.client.{Response => HttpResponse}
 
-import com.faunadb.client.util.FutureImplicits._
-import scala.concurrent.{ExecutionContext, Future}
 import scala.collection.JavaConverters._
+import scala.concurrent.{ExecutionContext, Future}
 
 object FaunaClient {
   def apply(connection: Connection) = new FaunaClient(connection, new ObjectMapper())
@@ -22,7 +22,7 @@ class FaunaClient(connection: Connection, json: ObjectMapper) {
   json.registerModule(new DefaultScalaModule)
   json.registerModule(new SimpleModule().setDeserializerModifier(new FaunaDeserializerModifier))
 
-  def query[R <: Response](expr: Expression)(implicit t: reflect.ClassTag[R], ec: ExecutionContext): Future[R] = {
+  def query(expr: Expression)(implicit ec: ExecutionContext): Future[ResponseNode] = {
     val body = json.createObjectNode()
     body.set("q", json.valueToTree(expr))
     connection.post("/", body).asScalaFuture.map { resp =>
@@ -30,11 +30,11 @@ class FaunaClient(connection: Connection, json: ObjectMapper) {
       handleQueryErrors(resp)
       val respBody = parseResponseBody(resp)
       val resource = respBody.get("resource").asInstanceOf[ObjectNode]
-      json.treeToValue(resource, t.runtimeClass).asInstanceOf[R]
+      json.treeToValue(resource, classOf[ResponseNode])
     }
   }
 
-  def query(exprs: Iterable[Expression])(implicit ec: ExecutionContext): Future[Iterable[Instance]] = {
+  def query(exprs: Iterable[Expression])(implicit ec: ExecutionContext): Future[IndexedSeq[ResponseNode]] = {
     val body = json.createObjectNode()
     body.set("q", json.valueToTree(exprs))
     connection.post("/", body).asScalaFuture.map { resp =>
@@ -42,21 +42,8 @@ class FaunaClient(connection: Connection, json: ObjectMapper) {
       handleQueryErrors(resp)
       val respBody = parseResponseBody(resp)
       respBody.get("resource").asInstanceOf[ArrayNode].asScala.map { node =>
-        json.treeToValue(node, classOf[Instance])
-      }
-    }
-  }
-
-  def querySet[R <: Response](expr: Expression)(implicit t: reflect.ClassTag[R], ec: ExecutionContext): Future[SetResponse[R]] = {
-    val body = json.createObjectNode()
-    body.set("q", json.valueToTree(expr))
-    connection.post("/", body).asScalaFuture.map { resp =>
-      handleSimpleErrors(resp)
-      handleQueryErrors(resp)
-      val jacksonType = TypeFactory.defaultInstance().constructParametrizedType(classOf[SetResponse[R]], classOf[SetResponse[R]], t.runtimeClass)
-      val respBody = parseResponseBody(resp)
-      val resource = respBody.get("resource").asInstanceOf[ObjectNode]
-      json.convertValue(resource, jacksonType).asInstanceOf[SetResponse[R]]
+        json.treeToValue(node, classOf[ResponseNode])
+      }.toIndexedSeq
     }
   }
 
