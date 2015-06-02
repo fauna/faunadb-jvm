@@ -112,40 +112,6 @@ case class Var(@(JsonProperty @field)("var") variable: String) extends Identifie
 
 sealed trait Resource extends Response
 
-case class Instance(@(JsonProperty)("ref") ref: Ref,
-                    @(JsonProperty @field @param)("class") classRef: Ref,
-                    @JsonProperty("ts") ts: Long,
-                    @JsonProperty("data") data: ObjectV) extends Resource
-
-case class Key(@JsonProperty("ref") ref: Ref,
-               @(JsonProperty @field @param)("class") classRef: Ref,
-               @JsonProperty("database") database: Ref,
-               @JsonProperty("role") role: String,
-               @JsonProperty("secret") secret: String,
-               @(JsonProperty @field @param)("hashed_secret") hashedSecret: String,
-               @JsonProperty("ts") ts: Long,
-               @JsonProperty("data") data: ObjectV) extends Resource
-
-case class Database(@JsonProperty("ref") ref: Ref,
-                    @(JsonProperty @field @param)("class") classRef: Ref,
-                    @JsonProperty("ts") ts: Long,
-                    @JsonProperty("name") name: String) extends Resource
-
-case class Class(@JsonProperty("ref") ref: Ref,
-                 @(JsonProperty @field @param)("class") classRef: Ref,
-                 @JsonProperty("ts") ts: Long,
-                 @(JsonProperty @field @param)("history_days") historyDays: Long,
-                 @JsonProperty("name") name: String) extends Resource
-case class Index(@JsonProperty("ref") ref: Ref,
-                 @(JsonProperty @field @param)("class") classRef: Ref,
-                 @JsonProperty("ts") ts: Long,
-                 @JsonProperty("unique") unique: Boolean,
-                 @JsonProperty("active") active: Boolean,
-                 @JsonProperty("name") name: String,
-                 @JsonProperty("source") source: Ref,
-                 @JsonProperty("path") path: String,
-                 @JsonProperty("terms") terms: Seq[scala.collection.immutable.Map[String, String]]) extends Resource
-
 
 object Values {
   implicit def stringToValue(unwrapped: String) = StringV(unwrapped)
