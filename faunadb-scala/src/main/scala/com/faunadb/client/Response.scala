@@ -2,6 +2,7 @@ package com.faunadb.client
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.faunadb.client.response.Error
 
 object QueryError {
   case class Param(error: String, reason: String)
@@ -12,7 +13,7 @@ sealed abstract class FaunaResponse
 
 final case class ErrorResponse(status: Int, error: String) extends FaunaResponse
 
-final case class QueryErrorResponse(status: Int, errors: Seq[com.faunadb.client.query.Error]) extends FaunaResponse
+final case class QueryErrorResponse(status: Int, errors: Seq[Error]) extends FaunaResponse
 
 final class NoContentResponse extends FaunaResponse
 

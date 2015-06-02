@@ -1,11 +1,10 @@
 package com.faunadb.client
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.faunadb.client.query.{Expression, FaunaDeserializerModifier}
-import com.faunadb.client.response.ResponseNode
+import com.faunadb.client.query.Expression
+import com.faunadb.client.response.{Error, ResponseNode}
 import com.faunadb.client.util.FutureImplicits._
 import com.faunadb.httpclient.Connection
 import com.ning.http.client.{Response => HttpResponse}
@@ -20,7 +19,6 @@ object FaunaClient {
 
 class FaunaClient(connection: Connection, json: ObjectMapper) {
   json.registerModule(new DefaultScalaModule)
-  json.registerModule(new SimpleModule().setDeserializerModifier(new FaunaDeserializerModifier))
 
   def query(expr: Expression)(implicit ec: ExecutionContext): Future[ResponseNode] = {
     val body = json.createObjectNode()
@@ -68,7 +66,7 @@ class FaunaClient(connection: Connection, json: ObjectMapper) {
     response.getStatusCode match {
       case x if x >= 300 =>
         val errors = parseResponseBody(response).get("errors").asInstanceOf[ArrayNode]
-        val parsedErrors = errors.iterator().asScala.map { json.treeToValue(_, classOf[com.faunadb.client.query.Error]) }.toSeq
+        val parsedErrors = errors.iterator().asScala.map { json.treeToValue(_, classOf[Error]) }.toSeq
         val error = QueryErrorResponse(x, parsedErrors)
         x match {
           case 400 => throw new BadQueryException(error)
