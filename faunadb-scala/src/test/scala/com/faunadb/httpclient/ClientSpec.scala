@@ -5,7 +5,7 @@ import java.util.{Map => JMap}
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.faunadb.client.query._
-import com.faunadb.client.{FaunaClient, NotFoundQueryException}
+import com.faunadb.client.{BadQueryException, FaunaClient, NotFoundQueryException}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.yaml.snakeyaml.Yaml
 
@@ -50,6 +50,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     Await.result(indexFuture, 1 second)
 
     val setIndexFuture = client.query(Create(Ref("indexes"), ObjectV("name" -> "spells_instances", "source" -> Ref("classes/spells"), "path" -> "class", "unique" -> false)))
+    Await.result(setIndexFuture, 1 second)
+
+    val uniqueIndexFuture = client.query(Create(Ref("indexes"), ObjectV("name" -> "spells_by_unique_test", "source" -> Ref("classes/spells"), "path" -> "data.uniqueTest1", "unique" -> true)))
     Await.result(setIndexFuture, 1 second)
   }
 
@@ -193,5 +196,22 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val queryF = client.query(com.faunadb.client.query.Map(Lambda("x", Get(Var("x"))), Paginate(Match(Ref("classes/spells"), Ref("indexes/spells_instances")), size = Some(2))))
     val resp = Await.result(queryF, 5 seconds).asPage
     resp.data.length shouldBe 2
+  }
+
+  it should "handle a constraint violation" in {
+    import com.faunadb.client.query.Values._
+    val randomText = Random.alphanumeric.take(8).mkString
+    val classRef = Ref("classes/spells")
+    val createFuture = client.query(Create(classRef, ObjectV("data" -> ObjectV("uniqueTest1" -> randomText))))
+    val create1 = Await.result(createFuture, 1 second).asInstance
+
+    val createFuture2 = client.query(Create(classRef, ObjectV("data" -> ObjectV("uniqueTest1" -> randomText))))
+
+    val exception = intercept[BadQueryException] {
+      Await.result(createFuture2, 1 second).asInstance
+    }
+
+    exception.errors(0).code shouldBe "validation failed"
+    exception.errors(0).parameters("data.uniqueTest1").error shouldBe "duplicate value"
   }
 }

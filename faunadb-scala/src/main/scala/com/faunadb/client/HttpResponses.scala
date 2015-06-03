@@ -13,7 +13,7 @@ sealed abstract class FaunaResponse
 
 final case class ErrorResponse(status: Int, error: String) extends FaunaResponse
 
-final case class QueryErrorResponse(status: Int, errors: Seq[Error]) extends FaunaResponse
+final case class QueryErrorResponse(status: Int, errors: IndexedSeq[Error]) extends FaunaResponse
 
 final class NoContentResponse extends FaunaResponse
 
