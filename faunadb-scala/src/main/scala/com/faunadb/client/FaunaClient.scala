@@ -66,7 +66,7 @@ class FaunaClient(connection: Connection, json: ObjectMapper) {
     response.getStatusCode match {
       case x if x >= 300 =>
         val errors = parseResponseBody(response).get("errors").asInstanceOf[ArrayNode]
-        val parsedErrors = errors.iterator().asScala.map { json.treeToValue(_, classOf[Error]) }.toSeq
+        val parsedErrors = errors.iterator().asScala.map { json.treeToValue(_, classOf[Error]) }.toIndexedSeq
         val error = QueryErrorResponse(x, parsedErrors)
         x match {
           case 400 => throw new BadQueryException(error)
