@@ -47,3 +47,16 @@ lazy val scala = project.in(file("faunadb-scala"))
   )
   .dependsOn(httpclient)
 
+lazy val java = project.in(file("faunadb-java"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "faunadb-java",
+    crossPaths := false,
+    autoScalaLibrary := false,
+    compileOrder := CompileOrder.JavaThenScala,
+    javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
+    libraryDependencies ++= Seq(
+      "junit" % "junit" % "4.12" % "test"
+    )
+  )
+  .dependsOn(httpclient)
