@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 
 import scala.annotation.meta.{field, getter, param}
-import scala.collection.JavaConverters._
 
 sealed trait Expression
 sealed trait Identifier extends Expression
@@ -36,9 +35,6 @@ case class Match(@(JsonProperty @field)("match") term: Value, @(JsonProperty @fi
   def this(term: String, index: Ref) = this(StringV(term), index)
 }
 
-object Union {
-  def create[A >: Set](expressions: JIterable[A]) = new Union(expressions.asScala.map { _.asInstanceOf[Set] })
-}
 case class Union(@(JsonProperty @field @getter)("union") sets: Iterable[Set]) extends Set
 
 case class Intersection(@(JsonProperty @field @getter)("intersection") sets: Iterable[Set]) extends Set
