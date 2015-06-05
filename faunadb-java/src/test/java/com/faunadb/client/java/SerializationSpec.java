@@ -2,13 +2,14 @@ package com.faunadb.client.java;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.faunadb.client.java.query.*;
 import com.faunadb.client.java.query.Cursor.*;
-import com.faunadb.client.java.query.Get;
-import com.faunadb.client.java.query.Match;
-import com.faunadb.client.java.query.Paginate;
 import com.faunadb.client.java.query.Value.*;
 import com.faunadb.client.java.types.Ref;
 import static org.junit.Assert.*;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
 public class SerializationSpec {
@@ -38,5 +39,52 @@ public class SerializationSpec {
   public void serializeMatch() throws JsonProcessingException {
     Match m = Match.create(StringV.create("testTerm"), Ref.create("some/index"));
     assertEquals("{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm\"}", json.writeValueAsString(m));
+  }
+
+  @Test
+  public void serializeComplexSet() throws JsonProcessingException {
+    Match setTerm1 = Match.create(StringV.create("testTerm1"), Ref.create("some/index"));
+    Match setTerm2 = Match.create(StringV.create("testTerm2"), Ref.create("another/index"));
+
+    Union union = Union.create(ImmutableList.of(setTerm1, setTerm2));
+    assertEquals("{\"union\":[{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm1\"},{\"index\":{\"@ref\":\"another/index\"},\"match\":\"testTerm2\"}]}", json.writeValueAsString(union));
+
+    Intersection intersection = Intersection.create(ImmutableList.of(setTerm1, setTerm2));
+    assertEquals("{\"intersection\":[{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm1\"},{\"index\":{\"@ref\":\"another/index\"},\"match\":\"testTerm2\"}]}", json.writeValueAsString(intersection));
+
+    Difference difference = Difference.create(ImmutableList.of(setTerm1, setTerm2));
+    assertEquals("{\"difference\":[{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm1\"},{\"index\":{\"@ref\":\"another/index\"},\"match\":\"testTerm2\"}]}", json.writeValueAsString(difference));
+
+    Join join = Join.create(setTerm1, "some/target/_");
+    assertEquals("{\"join\":{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm1\"},\"with\":\"some/target/_\"}", json.writeValueAsString(join));
+  }
+
+  @Test
+  public void serializeEvents() throws JsonProcessingException {
+    Ref ref = Ref.create("some/ref");
+    Events events = Events.create(RefV.create(ref));
+
+    assertEquals("{\"events\":{\"@ref\":\"some/ref\"}}", json.writeValueAsString(events));
+
+    Events events2 = events.withCursor(Before.create(Ref.create("another/ref")));
+    assertEquals("{\"events\":{\"@ref\":\"some/ref\"},\"before\":{\"@ref\":\"another/ref\"}}", json.writeValueAsString(events2));
+
+    Events events3 = events2.withSize(50L);
+    assertEquals("{\"events\":{\"@ref\":\"some/ref\"},\"before\":{\"@ref\":\"another/ref\"},\"size\":50}", json.writeValueAsString(events3));
+  }
+
+  @Test
+  public void serializeObject() throws JsonProcessingException {
+    ObjectV obj = ObjectV.create(ImmutableMap.of("test1", StringV.create("value1"),
+      "test2", NumberV.create(2),
+      "test3", BooleanV.create(true)));
+
+    assertEquals("{\"test1\":\"value1\",\"test2\":2,\"test3\":true}", json.writeValueAsString(obj));
+
+    ObjectV nestedObj = ObjectV.create(ImmutableMap.of(
+      "test1", ObjectV.create(ImmutableMap.of("nested1", StringV.create("nestedValue1")))
+    ));
+
+    assertEquals("{\"test1\":{\"nested1\":\"nestedValue1\"}}", json.writeValueAsString(nestedObj));
   }
 }

@@ -23,7 +23,7 @@ public abstract class Value {
 
     @JsonValue
     public ImmutableMap<String, Value> values() {
-      return values();
+      return values;
     }
 
     @Override
