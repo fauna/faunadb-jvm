@@ -87,4 +87,26 @@ public class SerializationSpec {
 
     assertEquals("{\"test1\":{\"nested1\":\"nestedValue1\"}}", json.writeValueAsString(nestedObj));
   }
+
+  @Test
+  public void serializeResourceOperation() throws JsonProcessingException {
+    Ref ref = Ref.create("some/ref");
+    ObjectV params =  ObjectV.create(ImmutableMap.of("test1", StringV.create("value2")));
+    Create create = Create.create(RefV.create(ref), params);
+    assertEquals("{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"test1\":\"value2\"}}", json.writeValueAsString(create));
+
+    Replace replace = Replace.create(RefV.create(ref), params);
+    assertEquals("{\"replace\":{\"@ref\":\"some/ref\"},\"params\":{\"test1\":\"value2\"}}", json.writeValueAsString(replace));
+
+    Update update = Update.create(RefV.create(ref), params);
+    assertEquals("{\"update\":{\"@ref\":\"some/ref\"},\"params\":{\"test1\":\"value2\"}}", json.writeValueAsString(update));
+
+    Delete delete = Delete.create(RefV.create(ref));
+    assertEquals("{\"delete\":{\"@ref\":\"some/ref\"}}", json.writeValueAsString(delete));
+  }
+
+  @Test
+  public void serializeComplexExpression() {
+
+  }
 }

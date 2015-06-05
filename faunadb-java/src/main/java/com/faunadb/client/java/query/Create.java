@@ -1,9 +1,12 @@
 package com.faunadb.client.java.query;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.java.query.Value.*;
 
 public class Create implements Identifier {
+  @JsonProperty("create")
   private final Identifier ref;
+  @JsonProperty("params")
   private final ObjectV params;
 
   public static Create create(Identifier ref) {
