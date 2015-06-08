@@ -1,5 +1,6 @@
 package com.faunadb.client.java.query;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 
 public class Let implements Expression {
@@ -7,7 +8,9 @@ public class Let implements Expression {
     return new Let(vars, in);
   }
 
+  @JsonProperty("let")
   private final ImmutableMap<String, Expression> vars;
+  @JsonProperty("in")
   private final Expression in;
 
   Let(ImmutableMap<String, Expression> vars, Expression in) {

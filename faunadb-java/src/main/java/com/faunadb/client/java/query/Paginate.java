@@ -5,14 +5,14 @@ import com.google.common.base.Optional;
 
 @JsonSerialize(using=Codec.PaginateSerializer.class)
 public class Paginate implements Identifier {
+  public static Paginate create(Identifier resource) {
+    return new Paginate(resource, Optional.<Long>absent(), Optional.<Cursor>absent(), Optional.<Long>absent());
+  }
+
   private final Identifier resource;
   private final Optional<Long> ts;
   private final Optional<Cursor> cursor;
   private final Optional<Long> size;
-
-  public static Paginate create(Identifier resource) {
-    return new Paginate(resource, Optional.<Long>absent(), Optional.<Cursor>absent(), Optional.<Long>absent());
-  }
 
   Paginate(Identifier resource, Optional<Long> ts, Optional<Cursor> cursor, Optional<Long> size) {
     this.resource = resource;

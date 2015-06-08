@@ -56,6 +56,7 @@ lazy val java = project.in(file("faunadb-java"))
     compileOrder := CompileOrder.JavaThenScala,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     libraryDependencies ++= Seq(
+      "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,
       "junit" % "junit" % "4.12" % "test"
     )
   )
