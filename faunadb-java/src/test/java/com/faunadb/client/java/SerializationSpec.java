@@ -106,7 +106,12 @@ public class SerializationSpec {
   }
 
   @Test
-  public void serializeComplexExpression() {
+  public void serializeComplexExpression() throws JsonProcessingException {
+    Ref ref = Ref.create("some/ref");
+    Create expr1 = Create.create(RefV.create(ref), ObjectV.empty());
+    Create expr2 = Create.create(RefV.create(ref), ObjectV.empty());
 
+    Do complex = Do.create(ImmutableList.of(expr1, expr2));
+    System.out.println(json.writeValueAsString(complex));
   }
 }
