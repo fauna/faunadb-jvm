@@ -1,5 +1,6 @@
 package com.faunadb.client.java.query;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 
 public class Fetch {
@@ -7,7 +8,9 @@ public class Fetch {
     return new Fetch(path, from);
   }
 
+  @JsonProperty("fetch")
   private final ImmutableList<Path> path;
+  @JsonProperty("from")
   private final Value from;
 
   Fetch(ImmutableList<Path> path, Value from) {
