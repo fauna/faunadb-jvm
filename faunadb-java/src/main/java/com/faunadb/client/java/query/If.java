@@ -1,6 +1,4 @@
-package com.faunadb.client.java;
-
-import com.faunadb.client.java.query.Expression;
+package com.faunadb.client.java.query;
 
 public class If implements Expression {
   public static If create(Expression condition, Expression then, Expression elseExpression) {

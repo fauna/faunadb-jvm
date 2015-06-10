@@ -1,5 +1,6 @@
 package com.faunadb.client.java.response;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.java.types.Ref;
 
@@ -14,14 +15,23 @@ public class Key {
   private final String role;
   @JsonProperty("secret")
   private final String secret;
-  @JsonProperty("hashedSecret")
+  @JsonProperty("hashed_secret")
   private final String hashedSecret;
   @JsonProperty("ts")
   private final Long ts;
   @JsonProperty("data")
   private final ResponseMap data;
 
-  public Key(Ref ref, Ref classRef, Ref database, String role, String secret, String hashedSecret, Long ts, ResponseMap data) {
+  @JsonCreator
+  Key(@JsonProperty("ref") Ref ref,
+      @JsonProperty("class") Ref classRef,
+      @JsonProperty("database") Ref database,
+      @JsonProperty("role") String role,
+      @JsonProperty("secret") String secret,
+      @JsonProperty("hashed_secret") String hashedSecret,
+      @JsonProperty("ts") Long ts,
+      @JsonProperty("data") ResponseMap data) {
+
     this.ref = ref;
     this.classRef = classRef;
     this.database = database;

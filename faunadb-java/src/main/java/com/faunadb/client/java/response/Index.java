@@ -1,5 +1,6 @@
 package com.faunadb.client.java.response;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.java.types.Ref;
 import com.google.common.collect.ImmutableList;
@@ -25,7 +26,16 @@ public class Index {
   @JsonProperty("terms")
   private final ImmutableList<ImmutableMap<String, String>> terms;
 
-  public Index(Ref ref, Ref classRef, Long ts, Boolean unique, Boolean active, String name, Ref source, String path, ImmutableList<ImmutableMap<String, String>> terms) {
+  @JsonCreator
+  Index(@JsonProperty("ref") Ref ref,
+        @JsonProperty("class") Ref classRef,
+        @JsonProperty("ts") Long ts,
+        @JsonProperty("unique") Boolean unique,
+        @JsonProperty("active") Boolean active,
+        @JsonProperty("name") String name,
+        @JsonProperty("source") Ref source,
+        @JsonProperty("path") String path,
+        @JsonProperty("terms") ImmutableList<ImmutableMap<String, String>> terms) {
     this.ref = ref;
     this.classRef = classRef;
     this.ts = ts;

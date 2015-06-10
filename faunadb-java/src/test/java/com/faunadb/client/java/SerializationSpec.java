@@ -46,13 +46,13 @@ public class SerializationSpec {
     Match setTerm1 = Match.create(StringV.create("testTerm1"), Ref.create("some/index"));
     Match setTerm2 = Match.create(StringV.create("testTerm2"), Ref.create("another/index"));
 
-    Union union = Union.create(ImmutableList.of(setTerm1, setTerm2));
+    Union union = Union.create(ImmutableList.<Set>of(setTerm1, setTerm2));
     assertEquals("{\"union\":[{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm1\"},{\"index\":{\"@ref\":\"another/index\"},\"match\":\"testTerm2\"}]}", json.writeValueAsString(union));
 
-    Intersection intersection = Intersection.create(ImmutableList.of(setTerm1, setTerm2));
+    Intersection intersection = Intersection.create(ImmutableList.<Set>of(setTerm1, setTerm2));
     assertEquals("{\"intersection\":[{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm1\"},{\"index\":{\"@ref\":\"another/index\"},\"match\":\"testTerm2\"}]}", json.writeValueAsString(intersection));
 
-    Difference difference = Difference.create(ImmutableList.of(setTerm1, setTerm2));
+    Difference difference = Difference.create(ImmutableList.<Set>of(setTerm1, setTerm2));
     assertEquals("{\"difference\":[{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm1\"},{\"index\":{\"@ref\":\"another/index\"},\"match\":\"testTerm2\"}]}", json.writeValueAsString(difference));
 
     Join join = Join.create(setTerm1, "some/target/_");
@@ -81,8 +81,8 @@ public class SerializationSpec {
 
     assertEquals("{\"test1\":\"value1\",\"test2\":2,\"test3\":true}", json.writeValueAsString(obj));
 
-    ObjectV nestedObj = ObjectV.create(ImmutableMap.of(
-      "test1", ObjectV.create(ImmutableMap.of("nested1", StringV.create("nestedValue1")))
+    ObjectV nestedObj = ObjectV.create(ImmutableMap.<String, Value>of(
+      "test1", ObjectV.create(ImmutableMap.<String, Value>of("nested1", StringV.create("nestedValue1")))
     ));
 
     assertEquals("{\"test1\":{\"nested1\":\"nestedValue1\"}}", json.writeValueAsString(nestedObj));
@@ -91,7 +91,7 @@ public class SerializationSpec {
   @Test
   public void serializeResourceOperation() throws JsonProcessingException {
     Ref ref = Ref.create("some/ref");
-    ObjectV params =  ObjectV.create(ImmutableMap.of("test1", StringV.create("value2")));
+    ObjectV params =  ObjectV.create(ImmutableMap.<String, Value>of("test1", StringV.create("value2")));
     Create create = Create.create(RefV.create(ref), params);
     assertEquals("{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"test1\":\"value2\"}}", json.writeValueAsString(create));
 
@@ -111,7 +111,7 @@ public class SerializationSpec {
     Create expr1 = Create.create(RefV.create(ref), ObjectV.empty());
     Create expr2 = Create.create(RefV.create(ref), ObjectV.empty());
 
-    Do complex = Do.create(ImmutableList.of(expr1, expr2));
+    Do complex = Do.create(ImmutableList.<Expression>of(expr1, expr2));
     System.out.println(json.writeValueAsString(complex));
   }
 }
