@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.java.errors.NotFoundQueryException;
 import com.faunadb.client.java.query.Create;
 import com.faunadb.client.java.query.Get;
-import com.faunadb.client.java.query.Quote;
 import com.faunadb.client.java.query.Value;
 import com.faunadb.client.java.query.Value.*;
+import com.faunadb.client.java.response.Instance;
 import com.faunadb.client.java.response.Key;
 import com.faunadb.client.java.response.ResponseNode;
 import com.faunadb.client.java.types.Ref;
@@ -23,6 +23,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
+import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
 
 public class ClientSpec {
   static ImmutableMap<String, String> config = readConfig("config/test.yml");
@@ -46,42 +49,42 @@ public class ClientSpec {
   @BeforeClass
   public static void beforeAll() throws IOException, ExecutionException, InterruptedException {
     rootClient = FaunaClient.create(Connection.builder().withFaunaRoot(config.get("root_url")).withAuthToken(config.get("root_token")).build());
-    ListenableFuture<ResponseNode> dbCreateF = rootClient.query(Create.create(RefV.create("databases"), Value.ObjectV.create(ImmutableMap.<String, Value>of("name", Value.StringV.create(testDbName)))));
+    ListenableFuture<ResponseNode> dbCreateF = rootClient.query(Create.create(RefV.create("databases"), ObjectV.create("name", StringV.create(testDbName))));
     ResponseNode dbCreateR = dbCreateF.get();
     Ref dbRef = dbCreateR.asDatabase().ref();
 
-    ListenableFuture<ResponseNode> keyCreateF = rootClient.query(Create.create(RefV.create("keys"), ObjectV.create(ImmutableMap.<String, Value>of("database", RefV.create(dbRef), "role", StringV.create("server")))));
+    ListenableFuture<ResponseNode> keyCreateF = rootClient.query(Create.create(RefV.create("keys"), ObjectV.create("database", RefV.create(dbRef), "role", StringV.create("server"))));
     ResponseNode keyCreateR = keyCreateF.get();
     Key key = keyCreateR.asKey();
 
     client = FaunaClient.create(Connection.builder().withFaunaRoot(config.get("root_url")).withAuthToken(key.secret()).build());
 
-    ListenableFuture<ResponseNode> classCreateF = client.query(Create.create(RefV.create("classes"), ObjectV.create(ImmutableMap.<String, Value>of("name", StringV.create("spells")))));
+    ListenableFuture<ResponseNode> classCreateF = client.query(Create.create(RefV.create("classes"), ObjectV.create("name", StringV.create("spells"))));
     classCreateF.get();
 
-    ListenableFuture<ResponseNode> indexCreateF = client.query(Create.create(RefV.create("indexes"), ObjectV.create(ImmutableMap.<String, Value>of(
+    ListenableFuture<ResponseNode> indexCreateF = client.query(Create.create(RefV.create("indexes"), ObjectV.create(
       "name", StringV.create("spells_by_test"),
       "source", RefV.create("classes/spells"),
       "path", StringV.create("class"),
-      "unique", BooleanV.create(false)))));
+      "unique", BooleanV.create(false))));
 
     indexCreateF.get();
 
-    ListenableFuture<ResponseNode> setIndexF = client.query(Create.create(RefV.create("indexes"), ObjectV.create(ImmutableMap.<String, Value>of(
+    ListenableFuture<ResponseNode> setIndexF = client.query(Create.create(RefV.create("indexes"), ObjectV.create(
       "name", StringV.create("spells_instances"),
       "source", RefV.create("classes/spells"),
       "path", StringV.create("class"),
       "unique", BooleanV.create(false)
-    ))));
+    )));
 
     setIndexF.get();
 
-    ListenableFuture<ResponseNode> uniqueIndexF = client.query(Create.create(RefV.create("indexes"), ObjectV.create(ImmutableMap.<String, Value>of(
+    ListenableFuture<ResponseNode> uniqueIndexF = client.query(Create.create(RefV.create("indexes"), ObjectV.create(
       "name", StringV.create("spells_by_unique_test"),
       "source", RefV.create("classes/spells"),
       "path", StringV.create("data.uniqueTest1"),
       "unique", BooleanV.create(true)
-    ))));
+    )));
 
     uniqueIndexF.get();
   }
@@ -97,6 +100,12 @@ public class ClientSpec {
   }
 
   @Test
-  public void testCreateNewInstance() {
+  public void testCreateNewInstance() throws IOException, ExecutionException, InterruptedException {
+    ListenableFuture<ResponseNode> respF = client.query(Create.create(RefV.create("classes/spells"), ObjectV.create("data", ObjectV.create("testField", StringV.create("testValue")))));
+    Instance resp = respF.get().asInstance();
+
+    assertThat(resp.ref().value(), startsWith("classes/spells/"));
+    assertThat(resp.classRef().value(), is("classes/spells"));
+    assertThat(resp.data().get("testField").asString(), is("testValue"));
   }
 }

@@ -14,6 +14,26 @@ public abstract class Value {
       return new ObjectV(ImmutableMap.<String, Value>of());
     }
 
+    public static ObjectV create(String k1, Value v1) {
+      return new ObjectV(ImmutableMap.<String, Value>of(k1, v1));
+    }
+
+    public static ObjectV create(String k1, Value v1, String k2, Value v2) {
+      return new ObjectV(ImmutableMap.<String, Value>of(k1, v1, k2, v2));
+    }
+
+    public static ObjectV create(String k1, Value v1, String k2, Value v2, String k3, Value v3) {
+      return new ObjectV(ImmutableMap.<String, Value>of(k1, v1, k2, v2, k3, v3));
+    }
+
+    public static ObjectV create(String k1, Value v1, String k2, Value v2, String k3, Value v3, String k4, Value v4) {
+      return new ObjectV(ImmutableMap.<String, Value>of(k1, v1, k2, v2, k3, v3, k4, v4));
+    }
+
+    public static ObjectV create(String k1, Value v1, String k2, Value v2, String k3, Value v3, String k4, Value v4, String k5, Value v5) {
+      return new ObjectV(ImmutableMap.<String, Value>of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5));
+    }
+
     public static ObjectV create(ImmutableMap<String, Value> values) {
       return new ObjectV(values);
     }
