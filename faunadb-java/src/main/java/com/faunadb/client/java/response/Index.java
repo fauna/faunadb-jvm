@@ -3,6 +3,7 @@ package com.faunadb.client.java.response;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.java.types.Ref;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -83,4 +84,18 @@ public class Index {
     return terms;
   }
 
+  @Override
+  public String toString() {
+    return "Index(" + Joiner.on(", ").join(
+      "ref: " + ref(),
+      "class: " + classRef(),
+      "ts: " + ts(),
+      "unique: " + unique(),
+      "active: " + active(),
+      "name: " + name(),
+      "source: " + source(),
+      "path: " + path(),
+      "terms: " + terms()
+    ) + ")";
+  }
 }

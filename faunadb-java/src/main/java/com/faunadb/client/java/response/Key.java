@@ -3,6 +3,7 @@ package com.faunadb.client.java.response;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.java.types.Ref;
+import com.google.common.base.Joiner;
 
 public class Key {
   @JsonProperty("ref")
@@ -72,5 +73,19 @@ public class Key {
 
   public String role() {
     return role;
+  }
+
+  @Override
+  public String toString() {
+    return "Key(" + Joiner.on(", ").join(
+      "ref: " + ref,
+      "class: " + classRef,
+      "database: " + database,
+      "role: " + role,
+      "secret: "+ secret,
+      "hashedSecret: " +hashedSecret,
+      "ts: " + ts,
+      "data: " + data
+    ) + ")";
   }
 }

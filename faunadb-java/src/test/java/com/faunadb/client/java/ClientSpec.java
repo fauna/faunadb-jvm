@@ -1,7 +1,9 @@
 package com.faunadb.client.java;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.faunadb.client.java.errors.NotFoundQueryException;
 import com.faunadb.client.java.query.Create;
+import com.faunadb.client.java.query.Get;
 import com.faunadb.client.java.query.Quote;
 import com.faunadb.client.java.query.Value;
 import com.faunadb.client.java.query.Value.*;
@@ -26,6 +28,7 @@ public class ClientSpec {
   static ImmutableMap<String, String> config = readConfig("config/test.yml");
   ObjectMapper json = new ObjectMapper();
   static FaunaClient rootClient;
+  static FaunaClient client;
   static String testDbName = RandomStringUtils.randomAlphanumeric(8);
 
   static ImmutableMap<String, String> readConfig(String filename) {
@@ -43,19 +46,57 @@ public class ClientSpec {
   @BeforeClass
   public static void beforeAll() throws IOException, ExecutionException, InterruptedException {
     rootClient = FaunaClient.create(Connection.builder().withFaunaRoot(config.get("root_url")).withAuthToken(config.get("root_token")).build());
-    ListenableFuture<ResponseNode> dbCreateF = rootClient.query(Create.create(RefV.create(Ref.create("databases")), Value.ObjectV.create(ImmutableMap.<String, Value>of("name", Value.StringV.create(testDbName)))));
+    ListenableFuture<ResponseNode> dbCreateF = rootClient.query(Create.create(RefV.create("databases"), Value.ObjectV.create(ImmutableMap.<String, Value>of("name", Value.StringV.create(testDbName)))));
     ResponseNode dbCreateR = dbCreateF.get();
     Ref dbRef = dbCreateR.asDatabase().ref();
 
-    ListenableFuture<ResponseNode> keyCreateF = rootClient.query(Create.create(RefV.create(Ref.create("keys")), ObjectV.create(ImmutableMap.<String, Value>of("database", RefV.create(dbRef), "role", StringV.create("server")))));
-    ResponseNode keyCreateR = dbCreateF.get();
+    ListenableFuture<ResponseNode> keyCreateF = rootClient.query(Create.create(RefV.create("keys"), ObjectV.create(ImmutableMap.<String, Value>of("database", RefV.create(dbRef), "role", StringV.create("server")))));
+    ResponseNode keyCreateR = keyCreateF.get();
     Key key = keyCreateR.asKey();
 
-    System.out.println(key);
+    client = FaunaClient.create(Connection.builder().withFaunaRoot(config.get("root_url")).withAuthToken(key.secret()).build());
+
+    ListenableFuture<ResponseNode> classCreateF = client.query(Create.create(RefV.create("classes"), ObjectV.create(ImmutableMap.<String, Value>of("name", StringV.create("spells")))));
+    classCreateF.get();
+
+    ListenableFuture<ResponseNode> indexCreateF = client.query(Create.create(RefV.create("indexes"), ObjectV.create(ImmutableMap.<String, Value>of(
+      "name", StringV.create("spells_by_test"),
+      "source", RefV.create("classes/spells"),
+      "path", StringV.create("class"),
+      "unique", BooleanV.create(false)))));
+
+    indexCreateF.get();
+
+    ListenableFuture<ResponseNode> setIndexF = client.query(Create.create(RefV.create("indexes"), ObjectV.create(ImmutableMap.<String, Value>of(
+      "name", StringV.create("spells_instances"),
+      "source", RefV.create("classes/spells"),
+      "path", StringV.create("class"),
+      "unique", BooleanV.create(false)
+    ))));
+
+    setIndexF.get();
+
+    ListenableFuture<ResponseNode> uniqueIndexF = client.query(Create.create(RefV.create("indexes"), ObjectV.create(ImmutableMap.<String, Value>of(
+      "name", StringV.create("spells_by_unique_test"),
+      "source", RefV.create("classes/spells"),
+      "path", StringV.create("data.uniqueTest1"),
+      "unique", BooleanV.create(true)
+    ))));
+
+    uniqueIndexF.get();
+  }
+
+  @Test(expected=NotFoundQueryException.class)
+  public void testLookupMissingInstance() throws Throwable {
+    ListenableFuture<ResponseNode> resp = client.query(Get.create(RefV.create("classes/spells/1234")));
+    try {
+      resp.get();
+    } catch (ExecutionException ex) {
+      throw ex.getCause();
+    }
   }
 
   @Test
-  public void sup() {
-    System.out.println(config);
+  public void testCreateNewInstance() {
   }
 }
