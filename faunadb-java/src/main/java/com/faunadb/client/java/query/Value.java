@@ -150,6 +150,10 @@ public abstract class Value {
   public static class RefV extends Value implements Identifier {
     private final Ref value;
 
+    public static RefV create(String value) {
+      return new RefV(Ref.create(value));
+    }
+
     public static RefV create(Ref value) {
       return new RefV(value);
     }

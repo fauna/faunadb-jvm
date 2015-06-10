@@ -3,6 +3,7 @@ package com.faunadb.client.java.response;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.java.types.Ref;
+import com.google.common.base.Joiner;
 
 public class Class {
   @JsonProperty("ref")
@@ -49,4 +50,14 @@ public class Class {
     return name;
   }
 
+  @Override
+  public String toString() {
+    return "Class(" + Joiner.on(", ").join(
+      "ref: " + ref(),
+      "class: " + classRef(),
+      "ts: " + ts(),
+      "historyDays: " + historyDays(),
+      "name: " + name()
+    ) + ")";
+  }
 }
