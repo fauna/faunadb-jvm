@@ -1,5 +1,6 @@
 package com.faunadb.client.java.response;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.java.types.Ref;
 
@@ -13,7 +14,11 @@ public class Database {
   @JsonProperty("name")
   private final String name;
 
-  public Database(Ref ref, Ref classRef, Long ts, String name) {
+  @JsonCreator
+  Database(@JsonProperty("ref") Ref ref,
+           @JsonProperty("class") Ref classRef,
+           @JsonProperty("ts") Long ts,
+           @JsonProperty("name") String name) {
     this.ref = ref;
     this.classRef = classRef;
     this.ts = ts;

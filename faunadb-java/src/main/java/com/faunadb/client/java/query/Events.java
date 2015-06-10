@@ -6,7 +6,7 @@ import com.google.common.base.Optional;
 @JsonSerialize(using=Codec.EventsSerializer.class)
 public class Events {
   public static Events create(Identifier resource) {
-    return new Events(resource, Optional.absent(), Optional.absent());
+    return new Events(resource, Optional.<Cursor>absent(), Optional.<Long>absent());
   }
 
   private final Identifier resource;

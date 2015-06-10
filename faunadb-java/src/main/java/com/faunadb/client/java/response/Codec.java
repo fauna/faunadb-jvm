@@ -36,7 +36,7 @@ public class Codec {
       }
 
       MapLikeType t = deserializationContext.getTypeFactory().constructMapLikeType(ImmutableMap.class, String.class, ResponseNode.class);
-      return new ResponseMap(json.convertValue(innerTree, t));
+      return new ResponseMap(json.<ImmutableMap<String, ResponseNode>>convertValue(innerTree, t));
     }
   }
 }

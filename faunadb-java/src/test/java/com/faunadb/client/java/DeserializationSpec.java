@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.java.response.Instance;
+import com.faunadb.client.java.response.ResponseMap;
 import com.faunadb.client.java.response.ResponseNode;
 import com.faunadb.client.java.types.Ref;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
 
 public class DeserializationSpec {
   ObjectMapper json = new ObjectMapper().registerModule(new GuavaModule());
@@ -34,5 +36,15 @@ public class DeserializationSpec {
     assertEquals(instance.classRef(), Ref.create("classes/derp"));
     assertEquals(instance.ts().longValue(), 1432763268186882L);
     assertEquals(instance.data().get("test").asNumber().intValue(), 1);
+  }
+
+  @Test
+  public void deserializeQueryResponseWithObjectLiteral() throws IOException {
+    String toDeserialize = "{\n\"class\": {\n\"@ref\": \"classes/derp\"\n},\n\"data\": {\n\"test\": {\n\"field1\": {\n\"@obj\": {\n\"@name\": \"Test\"\n}\n}\n}\n},\n\"ref\": {\n\"@ref\": \"classes/derp/101727203651223552\"\n},\n\"ts\": 1433273471399755\n}";
+    ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
+    Instance instance = parsed.asInstance();
+    System.out.println(instance);
+    ResponseMap unwrappedField = instance.data().get("test").asObject().get("field1").asObject();
+    assertEquals("Test", unwrappedField.get("@name").asString());
   }
 }

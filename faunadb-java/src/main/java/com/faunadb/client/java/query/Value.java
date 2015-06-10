@@ -1,5 +1,6 @@
 package com.faunadb.client.java.query;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.faunadb.client.java.types.Ref;
 import com.google.common.collect.ImmutableList;
@@ -21,7 +22,7 @@ public abstract class Value {
       this.values = values;
     }
 
-    @JsonValue
+    @JsonProperty("object")
     public ImmutableMap<String, Value> values() {
       return values;
     }
