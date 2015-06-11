@@ -2,14 +2,9 @@ package com.faunadb.client.java;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.java.errors.NotFoundQueryException;
-import com.faunadb.client.java.query.Create;
-import com.faunadb.client.java.query.Get;
-import com.faunadb.client.java.query.Value;
+import com.faunadb.client.java.query.*;
 import com.faunadb.client.java.query.Value.*;
-import com.faunadb.client.java.response.Instance;
-import com.faunadb.client.java.response.Key;
-import com.faunadb.client.java.response.ResponseMap;
-import com.faunadb.client.java.response.ResponseNode;
+import com.faunadb.client.java.response.*;
 import com.faunadb.client.java.types.Ref;
 import com.faunadb.httpclient.Connection;
 import com.google.common.collect.ImmutableList;
@@ -67,7 +62,7 @@ public class ClientSpec {
     ListenableFuture<ResponseNode> indexCreateF = client.query(Create.create(RefV.create("indexes"), ObjectV.create(
       "name", StringV.create("spells_by_test"),
       "source", RefV.create("classes/spells"),
-      "path", StringV.create("class"),
+      "path", StringV.create("data.queryTest1"),
       "unique", BooleanV.create(false))));
 
     indexCreateF.get();
@@ -122,5 +117,35 @@ public class ClientSpec {
     assertThat(testFieldObj.get("string").asString(), is("sup"));
     assertThat(testFieldObj.get("num").asNumber(), is(1234L));
     assertThat(testFieldObj.get("bool").asBoolean(), is(true));
+  }
+
+  @Test
+  public void testIssueQuery() throws IOException, ExecutionException, InterruptedException {
+    String randomText1 = RandomStringUtils.randomAlphanumeric(8);
+    String randomText2 = RandomStringUtils.randomAlphanumeric(8);
+    Ref classRef = Ref.create("classes/spells");
+    ListenableFuture<ResponseNode> createF1 = client.query(Create.create(RefV.create(classRef), ObjectV.create("data", ObjectV.create("queryTest1", StringV.create(randomText1)))));
+    ListenableFuture<ResponseNode> createF2 = client.query(Create.create(RefV.create(classRef), ObjectV.create("data", ObjectV.create("queryTest1", StringV.create(randomText2)))));
+
+    Instance create1 = createF1.get().asInstance();
+    Instance create2 = createF2.get().asInstance();
+
+    ListenableFuture<ResponseNode> queryF1 = client.query(Paginate.create(Match.create(StringV.create(randomText1), Ref.create("indexes/spells_by_test"))));
+    Page page1 = queryF1.get().asPage();
+    assertThat(page1.data().size(), is(1));
+    assertThat(page1.data().get(0).asRef(), is(create1.ref()));
+
+    ListenableFuture<ResponseNode> queryF2 = client.query(Paginate.create(Match.create(RefV.create(classRef), Ref.create("indexes/spells_instances"))));
+    Page page = queryF2.get().asPage();
+
+    ImmutableList.Builder<Ref> refsBuilder = ImmutableList.builder();
+    for (ResponseNode node : page.data()) {
+      refsBuilder.add(node.asRef());
+    }
+
+    ImmutableList<Ref> refs = refsBuilder.build();
+
+    assertTrue(refs.contains(create1.ref()));
+    assertTrue(refs.contains(create2.ref()));
   }
 }
