@@ -60,6 +60,30 @@ public abstract class Value {
       return new ArrayV(ImmutableList.<Value>of());
     }
 
+    public static ArrayV create(Value v1) {
+      return new ArrayV(ImmutableList.<Value>of(v1));
+    }
+
+    public static ArrayV create(Value v1, Value v2) {
+      return new ArrayV(ImmutableList.<Value>of(v1, v2));
+    }
+
+    public static ArrayV create(Value v1, Value v2, Value v3) {
+      return new ArrayV(ImmutableList.<Value>of(v1, v2, v3));
+    }
+
+    public static ArrayV create(Value v1, Value v2, Value v3, Value v4) {
+      return new ArrayV(ImmutableList.<Value>of(v1, v2, v3, v4));
+    }
+
+    public static ArrayV create(Value v1, Value v2, Value v3, Value v4, Value v5) {
+      return new ArrayV(ImmutableList.<Value>of(v1, v2, v3, v4, v5));
+    }
+
+    public static ArrayV create(Value v1, Value v2, Value v3, Value v4, Value v5, Value v6) {
+      return new ArrayV(ImmutableList.<Value>of(v1, v2, v3, v4, v5, v6));
+    }
+
     public static ArrayV create(ImmutableList<Value> values) {
       return new ArrayV(values);
     }
