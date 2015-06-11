@@ -3,6 +3,7 @@ package com.faunadb.client.java.response;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.java.types.Ref;
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -32,4 +33,12 @@ public class Page {
     return after;
   }
 
+  @Override
+  public String toString() {
+    return "Page(" + Joiner.on(", ").join(
+        "data: " + data(),
+        "before: " + before(),
+        "after: " + after()
+    ) + ")";
+  }
 }
