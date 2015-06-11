@@ -1,11 +1,13 @@
 package com.faunadb.client.java;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.java.query.*;
 import com.faunadb.client.java.query.Cursor.*;
 import com.faunadb.client.java.query.Value.*;
 import com.faunadb.client.java.types.Ref;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import com.google.common.collect.ImmutableList;
@@ -14,6 +16,20 @@ import org.junit.Test;
 
 public class SerializationSpec {
   ObjectMapper json = new ObjectMapper();
+
+  @Test
+  public void serializeLiteralValues() throws JsonProcessingException {
+    assertThat(json.writeValueAsString(BooleanV.True), is("true"));
+    assertThat(json.writeValueAsString(BooleanV.False), is("false"));
+
+    assertThat(json.writeValueAsString(StringV.create("test")), is("\"test\""));
+    assertThat(json.writeValueAsString(NumberV.create(1234)), is("1234"));
+    assertThat(json.writeValueAsString(NumberV.create(Long.MAX_VALUE)), is(Long.valueOf(Long.MAX_VALUE).toString()));
+
+    assertThat(json.writeValueAsString(DoubleV.create(1.234)), is("1.234"));
+
+    assertThat(json.writeValueAsString(NullV.Null), is("null"));
+  }
 
   @Test
   public void serializeRef() throws JsonProcessingException {

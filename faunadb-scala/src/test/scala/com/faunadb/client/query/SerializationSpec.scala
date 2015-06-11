@@ -15,6 +15,17 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(ref) shouldBe "{\"@ref\":\"some/ref\"}"
   }
 
+  it should "serialize literal values" in {
+    json.writeValueAsString(BooleanV(true)) shouldBe "true"
+    json.writeValueAsString(BooleanV(false)) shouldBe "false"
+    json.writeValueAsString(StringV("test")) shouldBe "\"test\""
+    json.writeValueAsString(NumberV(1234)) shouldBe "1234"
+    json.writeValueAsString(NumberV(Long.MaxValue)) shouldBe Long.MaxValue.toString
+    json.writeValueAsString(DoubleV(1.234)) shouldBe "1.234"
+    json.writeValueAsString(NullV) shouldBe "null"
+
+  }
+
   it should "serialize a get and paginate" in {
     val ref = Ref("some/ref")
     val get = Get(ref)

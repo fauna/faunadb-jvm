@@ -2,6 +2,7 @@ package com.faunadb.client.java.query;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.faunadb.client.java.types.Ref;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -105,6 +106,9 @@ public abstract class Value {
 
   public static class BooleanV extends Value {
     private final Boolean value;
+
+    public final static BooleanV True = BooleanV.create(true);
+    public final static BooleanV False = BooleanV.create(false);
 
     public static BooleanV create(boolean value) {
       return new BooleanV(value);
@@ -214,6 +218,17 @@ public abstract class Value {
     @Override
     public int hashCode() {
       return value.hashCode();
+    }
+  }
+
+  public static class NullV extends Value implements Identifier {
+    public static final NullV Null = new NullV();
+
+    NullV() { }
+
+    @JsonValue
+    public NullNode value() {
+      return NullNode.getInstance();
     }
   }
 }

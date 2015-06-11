@@ -83,7 +83,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     resp.ref.value.startsWith("classes/spells") shouldBe true
 
     val query2F = client.query(Create(Ref("classes/spells"),
-      ObjectV("data" -> ObjectV("testField" -> ObjectV("array" -> ArrayV(1, "2", 3.4), "bool" -> true, "num" -> 1234, "string" -> "sup", "float" -> 1.234, "null" -> NullPrimitive)))))
+      ObjectV("data" -> ObjectV("testField" -> ObjectV("array" -> ArrayV(1, "2", 3.4), "bool" -> true, "num" -> 1234, "string" -> "sup", "float" -> 1.234, "null" -> NullV)))))
     val resp2 = Await.result(query2F, 5 seconds).asInstance
     resp2.data.contains("testField") shouldBe true
     val testFieldObject = resp2.data("testField").asObject
