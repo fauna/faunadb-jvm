@@ -31,7 +31,7 @@ public class SerializationSpec {
     Paginate get2 = Paginate.create(RefV.create(ref)).withCursor(Before.create(Ref.create("another/ref")));
     assertEquals("{\"paginate\":{\"@ref\":\"some/ref\"},\"before\":{\"@ref\":\"another/ref\"}}", json.writeValueAsString(get2));
 
-    Paginate get3 = Paginate.create(RefV.create(ref)).withTs(1234L).withCursor(After.create(Ref.create("another/ref"))).withSize(1000L);
+    Paginate get3 = Paginate.create(RefV.create(ref)).withTs(1234L).withCursor(After.create(Ref.create("another/ref"))).withSize(1000);
     assertEquals("{\"paginate\":{\"@ref\":\"some/ref\"},\"ts\":1234,\"after\":{\"@ref\":\"another/ref\"},\"size\":1000}", json.writeValueAsString(get3));
   }
 

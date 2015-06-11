@@ -10,7 +10,10 @@ public class HttpResponses {
     private final String error;
     private final String reason;
 
-    public Param(String error, String reason) {
+    @JsonCreator
+    public Param(
+        @JsonProperty("error") String error,
+        @JsonProperty("reason") String reason) {
       this.error = error;
       this.reason = reason;
     }
@@ -28,13 +31,13 @@ public class HttpResponses {
     private final ImmutableList<String> position;
     private final String code;
     private final String reason;
-    private final ImmutableMap<String, String> parameters;
+    private final ImmutableMap<String, Param> parameters;
 
     @JsonCreator
     public QueryError(@JsonProperty("position") ImmutableList<String> position,
                       @JsonProperty("code") String code,
                       @JsonProperty("reason") String reason,
-                      @JsonProperty("parameters") ImmutableMap<String, String> parameters) {
+                      @JsonProperty("parameters") ImmutableMap<String, Param> parameters) {
       this.position = position;
       this.code = code;
       this.reason = reason;
@@ -53,7 +56,7 @@ public class HttpResponses {
       return reason;
     }
 
-    public ImmutableMap<String, String> parameters() {
+    public ImmutableMap<String, Param> parameters() {
       return parameters;
     }
   }
