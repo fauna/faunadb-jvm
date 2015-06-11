@@ -8,9 +8,11 @@ import com.faunadb.client.java.query.Value;
 import com.faunadb.client.java.query.Value.*;
 import com.faunadb.client.java.response.Instance;
 import com.faunadb.client.java.response.Key;
+import com.faunadb.client.java.response.ResponseMap;
 import com.faunadb.client.java.response.ResponseNode;
 import com.faunadb.client.java.types.Ref;
 import com.faunadb.httpclient.Connection;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -107,5 +109,18 @@ public class ClientSpec {
     assertThat(resp.ref().value(), startsWith("classes/spells/"));
     assertThat(resp.classRef().value(), is("classes/spells"));
     assertThat(resp.data().get("testField").asString(), is("testValue"));
+
+    ListenableFuture<ResponseNode> resp2F = client.query(Create.create(RefV.create("classes/spells"), ObjectV.create("data", ObjectV.create("testField", ObjectV.create("array", ArrayV.create(NumberV.create(1), StringV.create("2"), DoubleV.create(3.4)), "bool", BooleanV.create(true), "num", NumberV.create(1234), "string", StringV.create("sup"), "float", DoubleV.create(1.234))))));
+    Instance resp2 = resp2F.get().asInstance();
+
+    assertTrue(resp.data().containsKey("testField"));
+    ResponseMap testFieldObj = resp2.data().get("testField").asObject();
+    ImmutableList<ResponseNode> array = testFieldObj.get("array").asArray();
+    assertThat(array.get(0).asNumber(), is(1L));
+    assertThat(array.get(1).asString(), is("2"));
+    assertThat(array.get(2).asDouble(), is(3.4));
+    assertThat(testFieldObj.get("string").asString(), is("sup"));
+    assertThat(testFieldObj.get("num").asNumber(), is(1234L));
+    assertThat(testFieldObj.get("bool").asBoolean(), is(true));
   }
 }

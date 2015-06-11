@@ -29,6 +29,14 @@ public class ResponseNode {
     return underlying.asText();
   }
 
+  public Boolean asBoolean() {
+    if (underlying.isBoolean()) {
+      return underlying.asBoolean();
+    } else {
+      return null;
+    }
+  }
+
   public Long asNumber() {
     if (underlying.isNumber()) {
       return underlying.asLong();
@@ -46,7 +54,7 @@ public class ResponseNode {
   }
 
   public ImmutableList<ResponseNode> asArray() {
-    return json.convertValue(underlying, TypeFactory.defaultInstance().constructCollectionLikeType(ImmutableList.class, ResponseNode.class));
+    return json.convertValue(underlying, TypeFactory.defaultInstance().constructCollectionType(ImmutableList.class, ResponseNode.class));
   }
 
   public ResponseMap asObject() {
