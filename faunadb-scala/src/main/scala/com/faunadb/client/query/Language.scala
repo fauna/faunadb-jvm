@@ -4,6 +4,7 @@ import java.lang.{Iterable => JIterable}
 
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.databind.node.NullNode
 
 import scala.annotation.meta.{field, getter, param}
 
@@ -123,8 +124,8 @@ object Values {
   }
 }
 
-case object NullPrimitive extends Value {
-  @(JsonValue @getter) val value = null
+case object NullV extends Value {
+  @(JsonValue @getter) val value = NullNode.instance;
 }
 
 case class StringV(@(JsonValue @getter) value: String) extends Value
