@@ -148,4 +148,22 @@ public class ClientSpec {
     assertTrue(refs.contains(create1.ref()));
     assertTrue(refs.contains(create2.ref()));
   }
+
+  @Test
+  public void testIssueBatchedQuery() throws IOException, ExecutionException, InterruptedException {
+    String randomText1 = RandomStringUtils.randomAlphanumeric(8);
+    String randomText2 = RandomStringUtils.randomAlphanumeric(8);
+
+    Ref classRef = Ref.create("classes/spells");
+
+    Expression expr1 = Create.create(RefV.create(classRef), ObjectV.create("data", ObjectV.create("queryTest1", StringV.create(randomText1))));
+    Expression expr2 = Create.create(RefV.create(classRef), ObjectV.create("data", ObjectV.create("queryTest1", StringV.create(randomText2))));
+
+    ListenableFuture<ImmutableList<ResponseNode>> createFuture = client.query(ImmutableList.of(expr1, expr2));
+    ImmutableList<ResponseNode> results = createFuture.get();
+
+    assertThat(results.size(), is(2));
+    assertThat(results.get(0).asInstance().data().get("queryTest1").asString(), is(randomText1));
+    assertThat(results.get(1).asInstance().data().get("queryTest1").asString(), is(randomText2));
+  }
 }
