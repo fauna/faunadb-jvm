@@ -18,6 +18,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.ning.http.client.Response;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 
 public class FaunaClient {
   public static FaunaClient create(Connection connection) {
@@ -55,6 +56,31 @@ public class FaunaClient {
           JsonNode responseBody = parseResponseBody(response);
           ObjectNode resource = (ObjectNode) responseBody.get("resource");
           return json.treeToValue(resource, ResponseNode.class);
+        } catch (IOException ex) {
+          throw new RuntimeException(ex);
+        }
+      }
+    });
+  }
+
+  public ListenableFuture<ImmutableList<ResponseNode>> query(ImmutableList<Expression> exprs) throws IOException {
+    ObjectNode body = json.createObjectNode();
+    body.set("q", json.valueToTree(exprs));
+    return Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<ResponseNode>>() {
+      @Override
+      public ImmutableList<ResponseNode> apply(Response resp) {
+        try {
+          handleSimpleErrors(resp);
+          handleQueryErrors(resp);
+          JsonNode responseBody = parseResponseBody(resp);
+          ArrayNode resources = ((ArrayNode)responseBody.get("resource"));
+          ImmutableList.Builder<ResponseNode> responseNodeBuilder = ImmutableList.builder();
+
+          for (JsonNode resource : resources) {
+            responseNodeBuilder.add(json.treeToValue(resource, ResponseNode.class));
+          }
+
+          return responseNodeBuilder.build();
         } catch (IOException ex) {
           throw new RuntimeException(ex);
         }
