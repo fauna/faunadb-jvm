@@ -63,7 +63,7 @@ public class FaunaClient {
     });
   }
 
-  public ListenableFuture<ImmutableList<ResponseNode>> query(ImmutableList<Expression> exprs) throws IOException {
+  public <T extends Expression> ListenableFuture<ImmutableList<ResponseNode>> query(ImmutableList<T> exprs) throws IOException {
     ObjectNode body = json.createObjectNode();
     body.set("q", json.valueToTree(exprs));
     return Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<ResponseNode>>() {

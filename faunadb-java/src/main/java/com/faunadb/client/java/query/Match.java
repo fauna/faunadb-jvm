@@ -9,6 +9,10 @@ public class Match extends Set {
   @JsonProperty("match")
   private final Value term;
 
+  public static Match create(Ref term, Ref index) {
+    return new Match(Value.RefV.create(term), index);
+  }
+
   public static Match create(Value term, Ref index) {
     return new Match(term, index);
   }
