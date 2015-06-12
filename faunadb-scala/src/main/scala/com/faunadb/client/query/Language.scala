@@ -13,6 +13,11 @@ sealed trait Identifier extends Expression
 
 
 
+object Path {
+  implicit def stringToObjectPath(str: String) = ObjectPath(str)
+  implicit def intToArrayPath(i: Int) = ArrayPath(i)
+}
+
 sealed trait Path
 case class ObjectPath(@(JsonValue @getter) field: String) extends Path
 case class ArrayPath(@(JsonValue @getter) index: Int) extends Path
@@ -22,7 +27,7 @@ case class Do(@(JsonProperty @field @getter)("do") expressions: Iterable[Express
 
 case class If(@(JsonProperty @field)("if") condition: Expression, then: Expression, `else`: Expression) extends Expression
 case class Quote(quote: Expression) extends Expression
-case class Fetch(@(JsonProperty @field)("fetch") path: Iterable[Path], from: Value) extends Expression
+case class Select(@(JsonProperty @field)("select") path: Iterable[Path], from: Value) extends Expression
 
 case class Lambda(@(JsonProperty @field)("lambda") argument: String, expr: Expression)
 case class Map(@(JsonProperty @field)("map") lambda: Lambda, collection: Expression) extends Expression
