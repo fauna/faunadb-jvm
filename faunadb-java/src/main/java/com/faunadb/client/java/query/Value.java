@@ -8,6 +8,34 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 public abstract class Value {
+  public static ObjectV ObjectV() {
+    return ObjectV.empty();
+  }
+
+  public static ObjectV ObjectV(ImmutableMap<String, Value> values) {
+    return ObjectV.create(values);
+  }
+
+  public static ObjectV ObjectV(String k1, Value v1) {
+    return ObjectV.create(k1, v1);
+  }
+
+  public static ObjectV ObjectV(String k1, Value v1, String k2, Value v2) {
+    return ObjectV.create(k1, v1, k2, v2);
+  }
+
+  public static ObjectV ObjectV(String k1, Value v1, String k2, Value v2, String k3, Value v3) {
+    return ObjectV.create(k1, v1, k2, v2, k3, v3);
+  }
+
+  public static ObjectV ObjectV(String k1, Value v1, String k2, Value v2, String k3, Value v3, String k4, Value v4) {
+    return ObjectV.create(k1, v1, k2, v2, k3, v3, k4, v4);
+  }
+
+  public static ObjectV ObjectV(String k1, Value v1, String k2, Value v2, String k3, Value v3, String k4, Value v4, String k5, Value v5) {
+    return ObjectV.create(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
+  }
+
   public static class ObjectV extends Value {
     private final ImmutableMap<String, Value> values;
 
@@ -52,6 +80,38 @@ public abstract class Value {
     public int hashCode() {
       return values.hashCode();
     }
+  }
+
+  public static ArrayV ArrayV() {
+    return ArrayV.empty();
+  }
+
+  public static ArrayV ArrayV(ImmutableList<Value> values) {
+    return ArrayV.create(values);
+  }
+
+  public static ArrayV ArrayV(Value v1) {
+    return ArrayV.create(v1);
+  }
+
+  public static ArrayV ArrayV(Value v1, Value v2) {
+    return ArrayV.create(v1, v2);
+  }
+
+  public static ArrayV ArrayV(Value v1, Value v2, Value v3) {
+    return ArrayV.create(v1, v2, v3);
+  }
+
+  public static ArrayV ArrayV(Value v1, Value v2, Value v3, Value v4) {
+    return ArrayV.create(v1, v2, v3, v4);
+  }
+
+  public static ArrayV ArrayV(Value v1, Value v2, Value v3, Value v4, Value v5) {
+    return ArrayV.create(v1, v2, v3, v4, v5);
+  }
+
+  public static ArrayV ArrayV(Value v1, Value v2, Value v3, Value v4, Value v5, Value v6) {
+    return ArrayV.create(v1, v2, v3, v4, v5, v6);
   }
 
   public static class ArrayV extends Value {
@@ -104,6 +164,10 @@ public abstract class Value {
     }
   }
 
+  public static BooleanV BooleanV(boolean value) {
+    return BooleanV.create(value);
+  }
+
   public static class BooleanV extends Value {
     private final Boolean value;
 
@@ -129,6 +193,10 @@ public abstract class Value {
     }
   }
 
+  public static DoubleV DoubleV(double value) {
+    return DoubleV.create(value);
+  }
+
   public static class DoubleV extends Value {
     private final Double value;
 
@@ -149,6 +217,10 @@ public abstract class Value {
     public int hashCode() {
       return value.hashCode();
     }
+  }
+
+  public static NumberV NumberV(long value) {
+    return NumberV.create(value);
   }
 
   public static class NumberV extends Value {
@@ -173,6 +245,10 @@ public abstract class Value {
     }
   }
 
+  public static StringV StringV(String value) {
+    return StringV.create(value);
+  }
+
   public static class StringV extends Value {
     private final String value;
 
@@ -193,6 +269,14 @@ public abstract class Value {
     public int hashCode() {
       return value.hashCode();
     }
+  }
+
+  public static RefV RefV(Ref ref) {
+    return RefV.create(ref);
+  }
+
+  public static RefV RefV(String value) {
+    return RefV.create(value);
   }
 
   public static class RefV extends Value implements Identifier {
