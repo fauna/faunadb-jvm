@@ -3,6 +3,7 @@ package com.faunadb.client.query
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import org.scalatest.{FlatSpec, Matchers}
+import Path._
 import Values._
 
 class SerializationSpec extends FlatSpec with Matchers {
@@ -41,6 +42,9 @@ class SerializationSpec extends FlatSpec with Matchers {
       Create(Ref("some/ref/1"), ObjectV("data" -> ObjectV("name" -> "Hen Wen"))),
       Get(Ref("some/ref/1"))))
     json.writeValueAsString(doForm) shouldBe "{\"do\":[{\"create\":{\"@ref\":\"some/ref/1\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Hen Wen\"}}}}},{\"get\":{\"@ref\":\"some/ref/1\"}}]}"
+
+    val select = Select(Seq("favorites", "foods", 1), ObjectV("favorites" -> ObjectV("foods" -> ArrayV("crunchings", "munchings", "lunchings"))))
+    json.writeValueAsString(select) shouldBe "{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}"
   }
 
   it should "serialize a get and paginate" in {

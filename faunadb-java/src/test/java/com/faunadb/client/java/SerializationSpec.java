@@ -56,6 +56,11 @@ public class SerializationSpec {
         Create.create(RefV("some/ref/1"), ObjectV("data", ObjectV("name", StringV("Hen Wen")))),
         Get.create(RefV("some/ref/1"))));
     assertThat(json.writeValueAsString(doForm), is("{\"do\":[{\"create\":{\"@ref\":\"some/ref/1\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Hen Wen\"}}}}},{\"get\":{\"@ref\":\"some/ref/1\"}}]}"));
+
+    Select select = Select.create(ImmutableList.of(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
+      ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings"), StringV("lunchings")))));
+
+    assertThat(json.writeValueAsString(select), is("{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}"));
   }
 
   @Test
@@ -131,14 +136,5 @@ public class SerializationSpec {
 
     Delete delete = Delete.create(RefV(ref));
     assertEquals("{\"delete\":{\"@ref\":\"some/ref\"}}", json.writeValueAsString(delete));
-  }
-
-  @Test
-  public void serializeComplexExpression() throws JsonProcessingException {
-    Ref ref = Ref.create("some/ref");
-    Create expr1 = Create.create(RefV(ref), ObjectV());
-    Create expr2 = Create.create(RefV(ref), ObjectV());
-
-    Do complex = Do.create(ImmutableList.<Expression>of(expr1, expr2));
   }
 }
