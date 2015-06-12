@@ -32,6 +32,16 @@ public class SerializationSpec {
   }
 
   @Test
+  public void serializeComplexValues() throws JsonProcessingException {
+    ArrayV value1 = ArrayV.create(NumberV.create(1), StringV.create("test"));
+    assertThat(json.writeValueAsString(value1), is("[1,\"test\"]"));
+    ArrayV value2 = ArrayV.create(ArrayV.create(ObjectV.create("test", StringV.create("value")), NumberV.create(2323), BooleanV.True), StringV.create("hi"), ObjectV.create("test", StringV.create("yo"), "test2", NullV.Null));
+    assertThat(json.writeValueAsString(value2), is("[[{\"object\":{\"test\":\"value\"}},2323,true],\"hi\",{\"object\":{\"test\":\"yo\",\"test2\":null}}]"));
+    ObjectV obj1 = ObjectV.create("test", NumberV.create(1), "test2", RefV.create("some/ref"));
+    assertThat(json.writeValueAsString(obj1), is("{\"object\":{\"test\":1,\"test2\":{\"@ref\":\"some/ref\"}}}"));
+  }
+
+  @Test
   public void serializeRef() throws JsonProcessingException {
     Ref ref = Ref.create("some/ref");
     assertEquals(json.writeValueAsString(ref), "{\"@ref\":\"some/ref\"}");

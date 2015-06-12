@@ -1,7 +1,6 @@
 package com.faunadb.client.query
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import org.scalatest.{FlatSpec, Matchers}
 import Values._
@@ -23,7 +22,12 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(NumberV(Long.MaxValue)) shouldBe Long.MaxValue.toString
     json.writeValueAsString(DoubleV(1.234)) shouldBe "1.234"
     json.writeValueAsString(NullV) shouldBe "null"
+  }
 
+  it should "serialize complex values" in {
+    json.writeValueAsString(ArrayV(1, "test")) shouldBe "[1,\"test\"]"
+    json.writeValueAsString(ArrayV(ArrayV(ObjectV("test" -> "value"), 2323, true), "hi", ObjectV("test" -> "yo", "test2" -> NullV))) shouldBe "[[{\"object\":{\"test\":\"value\"}},2323,true],\"hi\",{\"object\":{\"test\":\"yo\",\"test2\":null}}]"
+    json.writeValueAsString(ObjectV("test" -> 1, "test2" -> Ref("some/ref"))) shouldBe "{\"object\":{\"test\":1,\"test2\":{\"@ref\":\"some/ref\"}}}"
   }
 
   it should "serialize a get and paginate" in {
@@ -68,14 +72,6 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val events2 = Events(ref, cursor=Some(Before(Ref("another/ref"))), size=Some(50))
     json.writeValueAsString(events2) shouldBe "{\"events\":{\"@ref\":\"some/ref\"},\"before\":{\"@ref\":\"another/ref\"},\"size\":50}"
-  }
-
-  it should "serialize object primitives" in {
-    val obj = ObjectV("test1" -> "value1", "test2" -> 2, "test3" -> true)
-    json.writeValueAsString(obj) shouldBe "{\"object\":{\"test1\":\"value1\",\"test2\":2,\"test3\":true}}"
-
-    val nestedObj = ObjectV("test1" -> ObjectV("nested1" -> "nestedValue1"))
-    json.writeValueAsString(nestedObj) shouldBe "{\"object\":{\"test1\":{\"object\":{\"nested1\":\"nestedValue1\"}}}}"
   }
 
   it should "serialize a resource operation" in {
