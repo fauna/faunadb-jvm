@@ -33,6 +33,14 @@ public class Codec {
         jsonGenerator.writeNumberField("size", paginate.size().get());
       }
 
+      if (paginate.events()) {
+        jsonGenerator.writeBooleanField("events", paginate.events());
+      }
+
+      if (paginate.sources()) {
+        jsonGenerator.writeBooleanField("sources", paginate.sources());
+      }
+
       jsonGenerator.writeEndObject();
     }
   }

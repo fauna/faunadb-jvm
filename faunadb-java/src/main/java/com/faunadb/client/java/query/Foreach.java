@@ -7,7 +7,7 @@ public class Foreach {
     return new Foreach(lambda, collection);
   }
 
-  @JsonProperty("lambda")
+  @JsonProperty("foreach")
   private final Lambda lambda;
   @JsonProperty("collection")
   private final Expression collection;
