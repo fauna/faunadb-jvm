@@ -55,10 +55,14 @@ case class Get(@(JsonProperty @field)("get") resource: Identifier) extends Ident
 case class Paginate(resource: Identifier,
                     ts: Option[Long] = None,
                     cursor: Option[Cursor] = None,
-                    size: Option[Long] = None) extends Identifier {
+                    size: Option[Long] = None,
+                    sources: Boolean = false,
+                    events: Boolean = false) extends Identifier {
   def withCursor(cursor: Cursor) = copy(cursor = Some(cursor))
   def withSize(size: Long) = copy(size = Some(size))
 }
+
+case class Count(@(JsonProperty @field)("count") set: Set) extends Identifier
 
 @JsonSerialize(using = classOf[EventsSerializer])
 case class Events(resource: Identifier, cursor: Option[Cursor] = None, size: Option[Long] = None) extends Identifier

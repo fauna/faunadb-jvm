@@ -55,16 +55,41 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(foreach) shouldBe "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":\"another/ref/1\"},{\"@ref\":\"another/ref/2\"}]}"
   }
 
-  it should "serialize a get and paginate" in {
-    val ref = Ref("some/ref")
+  it should "serialize resource retrievals" in {
+    val ref = Ref("some/ref/1")
     val get = Get(ref)
-    json.writeValueAsString(get) shouldBe "{\"get\":{\"@ref\":\"some/ref\"}}"
+    json.writeValueAsString(get) shouldBe "{\"get\":{\"@ref\":\"some/ref/1\"}}"
 
-    val get2 = Paginate(ref, cursor = Some(Before(Ref("another/ref"))))
-    json.writeValueAsString(get2) shouldBe "{\"paginate\":{\"@ref\":\"some/ref\"},\"before\":{\"@ref\":\"another/ref\"}}"
+    val paginate1 = Paginate(Union(Seq(Match("term", Ref("indexes/some_index")), Match("term2", Ref("indexes/some_index")))))
+    json.writeValueAsString(paginate1) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]}}"
 
-    val get3 = Paginate(ref, ts = Some(1234), cursor = Some(After(Ref("another/ref"))), size = Some(1000))
-    json.writeValueAsString(get3) shouldBe "{\"paginate\":{\"@ref\":\"some/ref\"},\"ts\":1234,\"after\":{\"@ref\":\"another/ref\"},\"size\":1000}"
+    val paginate2 = Paginate(Union(Seq(Match("term", Ref("indexes/some_index")), Match("term2", Ref("indexes/some_index")))), sources=true)
+    json.writeValueAsString(paginate2) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"sources\":true}"
+
+    val paginate3 = Paginate(Union(Seq(Match("term", Ref("indexes/some_index")), Match("term2", Ref("indexes/some_index")))), events=true)
+    json.writeValueAsString(paginate3) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"events\":true}"
+
+    val paginate4 = Paginate(Union(Seq(Match("term", Ref("indexes/some_index")), Match("term2", Ref("indexes/some_index")))), cursor=Some(Before(Ref("some/ref/1"))), size=Some(4))
+    json.writeValueAsString(paginate4) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"before\":{\"@ref\":\"some/ref/1\"},\"size\":4}"
+
+    val count = Count(Match("fire", Ref("indexes/spells_by_element")))
+    json.writeValueAsString(count) shouldBe "{\"count\":{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}}"
+  }
+
+  it should "serialize resource modifications" in {
+    val ref = Ref("classes/spells")
+    val params = ObjectV("name" -> "Mountainous Thunder", "element" -> "air", "cost" -> 15)
+    val create = Create(ref, ObjectV("data" -> params))
+    json.writeValueAsString(create) shouldBe "{\"create\":{\"@ref\":\"classes/spells\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountainous Thunder\",\"element\":\"air\",\"cost\":15}}}}}"
+
+    val update = Update(Ref("classes/spells/123456"), ObjectV("data" -> ObjectV("name" -> "Mountain's Thunder", "cost" -> NullV)))
+    json.writeValueAsString(update) shouldBe "{\"update\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"cost\":null}}}}}"
+
+    val replace = Replace(Ref("classes/spells/123456"), ObjectV("data" -> ObjectV("name" -> "Mountain's Thunder", "element" -> ArrayV("air", "earth"), "cost" -> 10)))
+    json.writeValueAsString(replace) shouldBe "{\"replace\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"element\":[\"air\",\"earth\"],\"cost\":10}}}}}"
+
+    val delete = Delete(Ref("classes/spells/123456"))
+    json.writeValueAsString(delete) shouldBe "{\"delete\":{\"@ref\":\"classes/spells/123456\"}}"
   }
 
   it should "serialize a match" in {
@@ -99,19 +124,4 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(events2) shouldBe "{\"events\":{\"@ref\":\"some/ref\"},\"before\":{\"@ref\":\"another/ref\"},\"size\":50}"
   }
 
-  it should "serialize a resource operation" in {
-    val ref = Ref("some/ref")
-    val params = collection.Map[String, Value]("test1" -> "value2")
-    val create = Create(ref, params)
-    json.writeValueAsString(create) shouldBe "{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"test1\":\"value2\"}}}"
-
-    val put = Replace(ref, params)
-    json.writeValueAsString(put) shouldBe "{\"replace\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"test1\":\"value2\"}}}"
-
-    val patch = Update(ref, params)
-    json.writeValueAsString(patch) shouldBe "{\"update\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"test1\":\"value2\"}}}"
-
-    val delete = Delete(ref)
-    json.writeValueAsString(delete) shouldBe "{\"delete\":{\"@ref\":\"some/ref\"}}"
-  }
 }
