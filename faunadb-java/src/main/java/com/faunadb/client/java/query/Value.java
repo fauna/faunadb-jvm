@@ -7,7 +7,7 @@ import com.faunadb.client.java.types.Ref;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-public abstract class Value {
+public abstract class Value implements Expression {
   public static ObjectV ObjectV() {
     return ObjectV.empty();
   }

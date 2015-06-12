@@ -5,13 +5,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.java.query.*;
 import com.faunadb.client.java.query.Cursor.*;
+import com.faunadb.client.java.query.Set;
 import com.faunadb.client.java.query.Value.*;
-import com.faunadb.client.java.types.Ref;
+import com.faunadb.client.java.types.*;
+
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static com.faunadb.client.java.query.Value.*;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
 public class SerializationSpec {
@@ -42,7 +45,21 @@ public class SerializationSpec {
   }
 
   @Test
-  public void serializeRef() throws JsonProcessingException {
+  public void serializeBasicForms() throws JsonProcessingException {
+    Let letAndVar = Let.create(ImmutableMap.<String, Expression>of("x", NumberV(1), "y", StringV("2")), Var.create("x"));
+    assertThat(json.writeValueAsString(letAndVar), is("{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"));
+
+    If ifForm = If.create(BooleanV.True, StringV("was true"), StringV("was false"));
+    assertThat(json.writeValueAsString(ifForm), is("{\"if\":true,\"then\":\"was true\",\"else\":\"was false\"}"));
+
+    Do doForm = Do.create(ImmutableList.<Expression>of(
+        Create.create(RefV("some/ref/1"), ObjectV("data", ObjectV("name", StringV("Hen Wen")))),
+        Get.create(RefV("some/ref/1"))));
+    assertThat(json.writeValueAsString(doForm), is("{\"do\":[{\"create\":{\"@ref\":\"some/ref/1\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Hen Wen\"}}}}},{\"get\":{\"@ref\":\"some/ref/1\"}}]}"));
+  }
+
+  @Test
+  public void serializeRefAndSet() throws JsonProcessingException {
     Ref ref = Ref.create("some/ref");
     assertEquals(json.writeValueAsString(ref), "{\"@ref\":\"some/ref\"}");
   }

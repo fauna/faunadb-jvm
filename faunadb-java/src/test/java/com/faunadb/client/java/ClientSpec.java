@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.java.errors.BadQueryException;
 import com.faunadb.client.java.errors.NotFoundQueryException;
 import com.faunadb.client.java.query.*;
-import com.faunadb.client.java.query.Value.*;
 import com.faunadb.client.java.response.*;
 import com.faunadb.client.java.types.Ref;
 import com.faunadb.httpclient.Connection;
