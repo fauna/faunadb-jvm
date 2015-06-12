@@ -21,6 +21,14 @@ class PaginateSerializer extends JsonSerializer[Paginate] {
       jsonGenerator.writeNumberField("size", sNum)
     }
 
+    if (t.events) {
+      jsonGenerator.writeBooleanField("events", t.events)
+    }
+
+    if (t.sources) {
+      jsonGenerator.writeBooleanField("sources", t.sources)
+    }
+
     jsonGenerator.writeEndObject()
   }
 }

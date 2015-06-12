@@ -110,6 +110,26 @@ public class SerializationSpec {
       .withSize(4);
 
     assertThat(json.writeValueAsString(paginate4), is("{\"paginate\":{\"union\":[{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term\"},{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term2\"}]},\"before\":{\"@ref\":\"some/ref/1\"},\"size\":4}"));
+
+    Count count = Count.create(Match.create(StringV("fire"), Ref.create("indexes/spells_by_element")));
+    assertThat(json.writeValueAsString(count), is("{\"count\":{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"}}"));
+  }
+
+  @Test
+  public void serializeResourceModification() throws JsonProcessingException {
+    Ref ref = Ref.create("classes/spells");
+    ObjectV params = ObjectV("name", StringV("Mountainous Thunder"), "element", StringV("air"), "cost", NumberV(15));
+    Create create = Create.create(RefV(ref), ObjectV("data", params));
+    assertThat(json.writeValueAsString(create), is("{\"create\":{\"@ref\":\"classes/spells\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountainous Thunder\",\"element\":\"air\",\"cost\":15}}}}}"));
+
+    Update update = Update.create(RefV("classes/spells/123456"), ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "cost", NullV.Null)));
+    assertThat(json.writeValueAsString(update), is("{\"update\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"cost\":null}}}}}"));
+
+    Replace replace = Replace.create(RefV("classes/spells/123456"), ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "element", ArrayV(StringV("air"), StringV("earth")), "cost", NumberV(10))));
+    assertThat(json.writeValueAsString(replace), is("{\"replace\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"element\":[\"air\",\"earth\"],\"cost\":10}}}}}"));
+
+    Delete delete = Delete.create(RefV("classes/spells/123456"));
+    assertThat(json.writeValueAsString(delete), is("{\"delete\":{\"@ref\":\"classes/spells/123456\"}}"));
   }
 
   @Test
@@ -148,22 +168,5 @@ public class SerializationSpec {
 
     Events events3 = events2.withSize(50L);
     assertEquals("{\"events\":{\"@ref\":\"some/ref\"},\"before\":{\"@ref\":\"another/ref\"},\"size\":50}", json.writeValueAsString(events3));
-  }
-
-  @Test
-  public void serializeResourceOperation() throws JsonProcessingException {
-    Ref ref = Ref.create("some/ref");
-    ObjectV params = ObjectV("test1", StringV("value2"));
-    Create create = Create.create(RefV(ref), params);
-    assertEquals("{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"test1\":\"value2\"}}}", json.writeValueAsString(create));
-
-    Replace replace = Replace.create(RefV(ref), params);
-    assertEquals("{\"replace\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"test1\":\"value2\"}}}", json.writeValueAsString(replace));
-
-    Update update = Update.create(RefV(ref), params);
-    assertEquals("{\"update\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"test1\":\"value2\"}}}", json.writeValueAsString(update));
-
-    Delete delete = Delete.create(RefV(ref));
-    assertEquals("{\"delete\":{\"@ref\":\"some/ref\"}}", json.writeValueAsString(delete));
   }
 }
