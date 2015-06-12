@@ -30,6 +30,19 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(ObjectV("test" -> 1, "test2" -> Ref("some/ref"))) shouldBe "{\"object\":{\"test\":1,\"test2\":{\"@ref\":\"some/ref\"}}}"
   }
 
+  it should "serialize basic forms" in {
+    val let = Let(scala.collection.Map[String, Value]("x" -> 1, "y" -> "2"), Var("x"))
+    json.writeValueAsString(let) shouldBe "{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"
+
+    val ifForm = If(true, "was true", "was false")
+    json.writeValueAsString(ifForm) shouldBe "{\"if\":true,\"then\":\"was true\",\"else\":\"was false\"}"
+
+    val doForm = Do(Seq(
+      Create(Ref("some/ref/1"), ObjectV("data" -> ObjectV("name" -> "Hen Wen"))),
+      Get(Ref("some/ref/1"))))
+    json.writeValueAsString(doForm) shouldBe "{\"do\":[{\"create\":{\"@ref\":\"some/ref/1\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Hen Wen\"}}}}},{\"get\":{\"@ref\":\"some/ref/1\"}}]}"
+  }
+
   it should "serialize a get and paginate" in {
     val ref = Ref("some/ref")
     val get = Get(ref)
@@ -88,14 +101,5 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val delete = Delete(ref)
     json.writeValueAsString(delete) shouldBe "{\"delete\":{\"@ref\":\"some/ref\"}}"
-  }
-
-  it should "serialize a complex expression" in {
-    val ref = Ref("some/ref")
-    val expr1 = Create(ref, ObjectV.empty)
-    val expr2 = Create(ref, ObjectV.empty)
-
-    val complex = Do(Array(expr1, expr2))
-    json.writeValueAsString(complex) shouldBe "{\"do\":[{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{}}},{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{}}}]}"
   }
 }
