@@ -305,6 +305,27 @@ public abstract class Value implements Expression {
     }
   }
 
+  public static VarV VarV(String value) {
+    return VarV.create(value);
+  }
+
+  public static class VarV extends Value implements Identifier {
+    public static VarV create(String value) {
+      return new VarV(value);
+    }
+
+    @JsonProperty("var")
+    private final String value;
+
+    VarV(String value) {
+      this.value = value;
+    }
+
+    public String value() {
+      return value;
+    }
+  }
+
   public static class NullV extends Value implements Identifier {
     public static final NullV Null = new NullV();
 

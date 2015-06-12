@@ -47,6 +47,14 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(select) shouldBe "{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}"
   }
 
+  it should "serialize collections" in {
+    val map = Map(Lambda("munchings", Var("munchings")), ArrayV(1, 2, 3))
+    json.writeValueAsString(map) shouldBe "{\"map\":{\"lambda\":\"munchings\",\"expr\":{\"var\":\"munchings\"}},\"collection\":[1,2,3]}"
+
+    val foreach = Foreach(Lambda("creature", Create(Ref("some/ref"), ObjectV("data" -> ObjectV("some" -> Var("creature"))))), ArrayV(Ref("another/ref/1"), Ref("another/ref/2")))
+    json.writeValueAsString(foreach) shouldBe "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":\"another/ref/1\"},{\"@ref\":\"another/ref/2\"}]}"
+  }
+
   it should "serialize a get and paginate" in {
     val ref = Ref("some/ref")
     val get = Get(ref)

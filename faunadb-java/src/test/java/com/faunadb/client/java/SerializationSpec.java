@@ -70,17 +70,46 @@ public class SerializationSpec {
   }
 
   @Test
-  public void serializeGetAndPaginate() throws JsonProcessingException {
-    Ref ref = Ref.create("some/ref");
+  public void serializeCollections() throws JsonProcessingException {
+    Map map = Map.create(Lambda.create("munchings", Var.create("munchings")), ArrayV(NumberV(1), NumberV(2), NumberV(3)));
+    assertEquals(json.writeValueAsString(map), "{\"map\":{\"lambda\":\"munchings\",\"expr\":{\"var\":\"munchings\"}},\"collection\":[1,2,3]}");
+
+    Foreach foreach = Foreach.create(Lambda.create("creature", Create.create(RefV.create("some/ref"), ObjectV("data", ObjectV("some", VarV("creature"))))), ArrayV(RefV("another/ref/1"), RefV("another/ref/2")));
+    assertEquals(json.writeValueAsString(foreach), "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":\"another/ref/1\"},{\"@ref\":\"another/ref/2\"}]}");
+  }
+
+  @Test
+  public void serializeResourceRetrieval() throws JsonProcessingException {
+    Ref ref = Ref.create("some/ref/1");
     Get get = Get.create(RefV(ref));
 
-    assertEquals("{\"get\":{\"@ref\":\"some/ref\"}}", json.writeValueAsString(get));
+    assertThat(json.writeValueAsString(get), is("{\"get\":{\"@ref\":\"some/ref/1\"}}"));
 
-    Paginate get2 = Paginate.create(RefV(ref)).withCursor(Before.create(Ref.create("another/ref")));
-    assertEquals("{\"paginate\":{\"@ref\":\"some/ref\"},\"before\":{\"@ref\":\"another/ref\"}}", json.writeValueAsString(get2));
+    Paginate paginate1 = Paginate.create(Union.create(ImmutableList.<Set>of(
+      Match.create(StringV("term"), Ref.create("indexes/some_index")),
+      Match.create(StringV("term2"), Ref.create("indexes/some_index")))));
 
-    Paginate get3 = Paginate.create(RefV(ref)).withTs(1234L).withCursor(After.create(Ref.create("another/ref"))).withSize(1000);
-    assertEquals("{\"paginate\":{\"@ref\":\"some/ref\"},\"ts\":1234,\"after\":{\"@ref\":\"another/ref\"},\"size\":1000}", json.writeValueAsString(get3));
+    assertThat(json.writeValueAsString(paginate1), is("{\"paginate\":{\"union\":[{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term\"},{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term2\"}]}}"));
+
+    Paginate paginate2 = Paginate.create(Union.create(ImmutableList.<Set>of(
+      Match.create(StringV("term"), Ref.create("indexes/some_index")),
+      Match.create(StringV("term2"), Ref.create("indexes/some_index"))))).withSources(true);
+
+    assertThat(json.writeValueAsString(paginate2), is("{\"paginate\":{\"union\":[{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term\"},{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term2\"}]},\"sources\":true}"));
+
+    Paginate paginate3 = Paginate.create(Union.create(ImmutableList.<Set>of(
+      Match.create(StringV("term"), Ref.create("indexes/some_index")),
+      Match.create(StringV("term2"), Ref.create("indexes/some_index"))))).withEvents(true);
+
+    assertThat(json.writeValueAsString(paginate3), is("{\"paginate\":{\"union\":[{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term\"},{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term2\"}]},\"events\":true}"));
+
+    Paginate paginate4 = Paginate.create(Union.create(ImmutableList.<Set>of(
+      Match.create(StringV("term"), Ref.create("indexes/some_index")),
+      Match.create(StringV("term2"), Ref.create("indexes/some_index")))))
+      .withCursor(Before.create(Ref.create("some/ref/1")))
+      .withSize(4);
+
+    assertThat(json.writeValueAsString(paginate4), is("{\"paginate\":{\"union\":[{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term\"},{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term2\"}]},\"before\":{\"@ref\":\"some/ref/1\"},\"size\":4}"));
   }
 
   @Test

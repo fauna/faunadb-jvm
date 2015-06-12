@@ -111,7 +111,7 @@ sealed trait Value extends Response with Expression {
 case class Ref(@(JsonProperty @field @param)("@ref") value: String) extends Value with Identifier {
   def this(parent: Ref, child: String) = this(parent.value + "/" + child)
 }
-case class Var(@(JsonProperty @field)("var") variable: String) extends Identifier
+case class Var(@(JsonProperty @field)("var") variable: String) extends Value with Identifier
 
 sealed trait Resource extends Response
 
