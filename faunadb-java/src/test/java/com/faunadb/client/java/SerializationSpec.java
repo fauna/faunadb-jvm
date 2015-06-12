@@ -9,9 +9,9 @@ import com.faunadb.client.java.query.Value.*;
 import com.faunadb.client.java.types.Ref;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import static com.faunadb.client.java.query.Value.*;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
 public class SerializationSpec {
@@ -22,22 +22,22 @@ public class SerializationSpec {
     assertThat(json.writeValueAsString(BooleanV.True), is("true"));
     assertThat(json.writeValueAsString(BooleanV.False), is("false"));
 
-    assertThat(json.writeValueAsString(StringV.create("test")), is("\"test\""));
-    assertThat(json.writeValueAsString(NumberV.create(1234)), is("1234"));
-    assertThat(json.writeValueAsString(NumberV.create(Long.MAX_VALUE)), is(Long.valueOf(Long.MAX_VALUE).toString()));
+    assertThat(json.writeValueAsString(StringV("test")), is("\"test\""));
+    assertThat(json.writeValueAsString(NumberV(1234)), is("1234"));
+    assertThat(json.writeValueAsString(NumberV(Long.MAX_VALUE)), is(Long.valueOf(Long.MAX_VALUE).toString()));
 
-    assertThat(json.writeValueAsString(DoubleV.create(1.234)), is("1.234"));
+    assertThat(json.writeValueAsString(DoubleV(1.234)), is("1.234"));
 
     assertThat(json.writeValueAsString(NullV.Null), is("null"));
   }
 
   @Test
   public void serializeComplexValues() throws JsonProcessingException {
-    ArrayV value1 = ArrayV.create(NumberV.create(1), StringV.create("test"));
+    ArrayV value1 = ArrayV(NumberV(1), StringV("test"));
     assertThat(json.writeValueAsString(value1), is("[1,\"test\"]"));
-    ArrayV value2 = ArrayV.create(ArrayV.create(ObjectV.create("test", StringV.create("value")), NumberV.create(2323), BooleanV.True), StringV.create("hi"), ObjectV.create("test", StringV.create("yo"), "test2", NullV.Null));
+    ArrayV value2 = ArrayV(ArrayV(ObjectV("test", StringV("value")), NumberV(2323), BooleanV.True), StringV("hi"), ObjectV("test", StringV("yo"), "test2", NullV.Null));
     assertThat(json.writeValueAsString(value2), is("[[{\"object\":{\"test\":\"value\"}},2323,true],\"hi\",{\"object\":{\"test\":\"yo\",\"test2\":null}}]"));
-    ObjectV obj1 = ObjectV.create("test", NumberV.create(1), "test2", RefV.create("some/ref"));
+    ObjectV obj1 = ObjectV("test", NumberV(1), "test2", RefV.create("some/ref"));
     assertThat(json.writeValueAsString(obj1), is("{\"object\":{\"test\":1,\"test2\":{\"@ref\":\"some/ref\"}}}"));
   }
 
@@ -50,27 +50,27 @@ public class SerializationSpec {
   @Test
   public void serializeGetAndPaginate() throws JsonProcessingException {
     Ref ref = Ref.create("some/ref");
-    Get get = Get.create(RefV.create(ref));
+    Get get = Get.create(RefV(ref));
 
     assertEquals("{\"get\":{\"@ref\":\"some/ref\"}}", json.writeValueAsString(get));
 
-    Paginate get2 = Paginate.create(RefV.create(ref)).withCursor(Before.create(Ref.create("another/ref")));
+    Paginate get2 = Paginate.create(RefV(ref)).withCursor(Before.create(Ref.create("another/ref")));
     assertEquals("{\"paginate\":{\"@ref\":\"some/ref\"},\"before\":{\"@ref\":\"another/ref\"}}", json.writeValueAsString(get2));
 
-    Paginate get3 = Paginate.create(RefV.create(ref)).withTs(1234L).withCursor(After.create(Ref.create("another/ref"))).withSize(1000);
+    Paginate get3 = Paginate.create(RefV(ref)).withTs(1234L).withCursor(After.create(Ref.create("another/ref"))).withSize(1000);
     assertEquals("{\"paginate\":{\"@ref\":\"some/ref\"},\"ts\":1234,\"after\":{\"@ref\":\"another/ref\"},\"size\":1000}", json.writeValueAsString(get3));
   }
 
   @Test
   public void serializeMatch() throws JsonProcessingException {
-    Match m = Match.create(StringV.create("testTerm"), Ref.create("some/index"));
+    Match m = Match.create(StringV("testTerm"), Ref.create("some/index"));
     assertEquals("{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm\"}", json.writeValueAsString(m));
   }
 
   @Test
   public void serializeComplexSet() throws JsonProcessingException {
-    Match setTerm1 = Match.create(StringV.create("testTerm1"), Ref.create("some/index"));
-    Match setTerm2 = Match.create(StringV.create("testTerm2"), Ref.create("another/index"));
+    Match setTerm1 = Match.create(StringV("testTerm1"), Ref.create("some/index"));
+    Match setTerm2 = Match.create(StringV("testTerm2"), Ref.create("another/index"));
 
     Union union = Union.create(ImmutableList.<Set>of(setTerm1, setTerm2));
     assertEquals("{\"union\":[{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm1\"},{\"index\":{\"@ref\":\"another/index\"},\"match\":\"testTerm2\"}]}", json.writeValueAsString(union));
@@ -88,7 +88,7 @@ public class SerializationSpec {
   @Test
   public void serializeEvents() throws JsonProcessingException {
     Ref ref = Ref.create("some/ref");
-    Events events = Events.create(RefV.create(ref));
+    Events events = Events.create(RefV(ref));
 
     assertEquals("{\"events\":{\"@ref\":\"some/ref\"}}", json.writeValueAsString(events));
 
@@ -100,44 +100,28 @@ public class SerializationSpec {
   }
 
   @Test
-  public void serializeObject() throws JsonProcessingException {
-    ObjectV obj = ObjectV.create(ImmutableMap.of("test1", StringV.create("value1"),
-      "test2", NumberV.create(2),
-      "test3", BooleanV.create(true)));
-
-    assertEquals("{\"test1\":\"value1\",\"test2\":2,\"test3\":true}", json.writeValueAsString(obj));
-
-    ObjectV nestedObj = ObjectV.create(ImmutableMap.<String, Value>of(
-      "test1", ObjectV.create(ImmutableMap.<String, Value>of("nested1", StringV.create("nestedValue1")))
-    ));
-
-    assertEquals("{\"test1\":{\"nested1\":\"nestedValue1\"}}", json.writeValueAsString(nestedObj));
-  }
-
-  @Test
   public void serializeResourceOperation() throws JsonProcessingException {
     Ref ref = Ref.create("some/ref");
-    ObjectV params =  ObjectV.create(ImmutableMap.<String, Value>of("test1", StringV.create("value2")));
-    Create create = Create.create(RefV.create(ref), params);
-    assertEquals("{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"test1\":\"value2\"}}", json.writeValueAsString(create));
+    ObjectV params = ObjectV("test1", StringV("value2"));
+    Create create = Create.create(RefV(ref), params);
+    assertEquals("{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"test1\":\"value2\"}}}", json.writeValueAsString(create));
 
-    Replace replace = Replace.create(RefV.create(ref), params);
-    assertEquals("{\"replace\":{\"@ref\":\"some/ref\"},\"params\":{\"test1\":\"value2\"}}", json.writeValueAsString(replace));
+    Replace replace = Replace.create(RefV(ref), params);
+    assertEquals("{\"replace\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"test1\":\"value2\"}}}", json.writeValueAsString(replace));
 
-    Update update = Update.create(RefV.create(ref), params);
-    assertEquals("{\"update\":{\"@ref\":\"some/ref\"},\"params\":{\"test1\":\"value2\"}}", json.writeValueAsString(update));
+    Update update = Update.create(RefV(ref), params);
+    assertEquals("{\"update\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"test1\":\"value2\"}}}", json.writeValueAsString(update));
 
-    Delete delete = Delete.create(RefV.create(ref));
+    Delete delete = Delete.create(RefV(ref));
     assertEquals("{\"delete\":{\"@ref\":\"some/ref\"}}", json.writeValueAsString(delete));
   }
 
   @Test
   public void serializeComplexExpression() throws JsonProcessingException {
     Ref ref = Ref.create("some/ref");
-    Create expr1 = Create.create(RefV.create(ref), ObjectV.empty());
-    Create expr2 = Create.create(RefV.create(ref), ObjectV.empty());
+    Create expr1 = Create.create(RefV(ref), ObjectV());
+    Create expr2 = Create.create(RefV(ref), ObjectV());
 
     Do complex = Do.create(ImmutableList.<Expression>of(expr1, expr2));
-    System.out.println(json.writeValueAsString(complex));
   }
 }
