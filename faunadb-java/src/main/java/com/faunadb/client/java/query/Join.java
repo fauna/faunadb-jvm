@@ -3,7 +3,7 @@ package com.faunadb.client.java.query;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Join {
-  public static Join create(Set source, String target) {
+  public static Join create(Set source, Lambda target) {
     return new Join(source, target);
   }
 
@@ -11,9 +11,9 @@ public class Join {
   private final Set source;
 
   @JsonProperty("with")
-  private final String target;
+  private final Lambda target;
 
-  Join(Set source, String target) {
+  Join(Set source, Lambda target) {
     this.source = source;
     this.target = target;
   }
