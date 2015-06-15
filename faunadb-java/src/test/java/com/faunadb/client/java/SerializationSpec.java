@@ -11,7 +11,7 @@ import com.faunadb.client.java.types.*;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-import static com.faunadb.client.java.query.Value.*;
+import static com.faunadb.client.java.query.Language.*;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -40,24 +40,24 @@ public class SerializationSpec {
     assertThat(json.writeValueAsString(value1), is("[1,\"test\"]"));
     ArrayV value2 = ArrayV(ArrayV(ObjectV("test", StringV("value")), NumberV(2323), BooleanV.True), StringV("hi"), ObjectV("test", StringV("yo"), "test2", NullV.Null));
     assertThat(json.writeValueAsString(value2), is("[[{\"object\":{\"test\":\"value\"}},2323,true],\"hi\",{\"object\":{\"test\":\"yo\",\"test2\":null}}]"));
-    ObjectV obj1 = ObjectV("test", NumberV(1), "test2", RefV.create("some/ref"));
+    ObjectV obj1 = ObjectV("test", NumberV(1), "test2", RefV("some/ref"));
     assertThat(json.writeValueAsString(obj1), is("{\"object\":{\"test\":1,\"test2\":{\"@ref\":\"some/ref\"}}}"));
   }
 
   @Test
   public void serializeBasicForms() throws JsonProcessingException {
-    Let letAndVar = Let.create(ImmutableMap.<String, Expression>of("x", NumberV(1), "y", StringV("2")), Var.create("x"));
+    Let letAndVar = Let(ImmutableMap.<String, Expression>of("x", NumberV(1), "y", StringV("2")), Var("x"));
     assertThat(json.writeValueAsString(letAndVar), is("{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"));
 
-    If ifForm = If.create(BooleanV.True, StringV("was true"), StringV("was false"));
+    If ifForm = If(BooleanV.True, StringV("was true"), StringV("was false"));
     assertThat(json.writeValueAsString(ifForm), is("{\"if\":true,\"then\":\"was true\",\"else\":\"was false\"}"));
 
-    Do doForm = Do.create(ImmutableList.<Expression>of(
-        Create.create(RefV("some/ref/1"), ObjectV("data", ObjectV("name", StringV("Hen Wen")))),
-        Get.create(RefV("some/ref/1"))));
+    Do doForm = Do(ImmutableList.of(
+      Create(RefV("some/ref/1"), ObjectV("data", ObjectV("name", StringV("Hen Wen")))),
+      Get(RefV("some/ref/1"))));
     assertThat(json.writeValueAsString(doForm), is("{\"do\":[{\"create\":{\"@ref\":\"some/ref/1\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Hen Wen\"}}}}},{\"get\":{\"@ref\":\"some/ref/1\"}}]}"));
 
-    Select select = Select.create(ImmutableList.of(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
+    Select select = Select(ImmutableList.of(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
       ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings"), StringV("lunchings")))));
 
     assertThat(json.writeValueAsString(select), is("{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}"));
@@ -65,101 +65,101 @@ public class SerializationSpec {
 
   @Test
   public void serializeRefAndSet() throws JsonProcessingException {
-    Ref ref = Ref.create("some/ref");
+    Ref ref = Ref("some/ref");
     assertEquals(json.writeValueAsString(ref), "{\"@ref\":\"some/ref\"}");
   }
 
   @Test
   public void serializeCollections() throws JsonProcessingException {
-    Map map = Map.create(Lambda.create("munchings", Var.create("munchings")), ArrayV(NumberV(1), NumberV(2), NumberV(3)));
+    Map map = Map(Lambda("munchings", Var("munchings")), ArrayV(NumberV(1), NumberV(2), NumberV(3)));
     assertEquals(json.writeValueAsString(map), "{\"map\":{\"lambda\":\"munchings\",\"expr\":{\"var\":\"munchings\"}},\"collection\":[1,2,3]}");
 
-    Foreach foreach = Foreach.create(Lambda.create("creature", Create.create(RefV.create("some/ref"), ObjectV("data", ObjectV("some", VarV("creature"))))), ArrayV(RefV("another/ref/1"), RefV("another/ref/2")));
+    Foreach foreach = Foreach(Lambda("creature", Create(RefV("some/ref"), ObjectV("data", ObjectV("some", VarV("creature"))))), ArrayV(RefV("another/ref/1"), RefV("another/ref/2")));
     assertEquals(json.writeValueAsString(foreach), "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":\"another/ref/1\"},{\"@ref\":\"another/ref/2\"}]}");
   }
 
   @Test
   public void serializeResourceRetrieval() throws JsonProcessingException {
-    Ref ref = Ref.create("some/ref/1");
-    Get get = Get.create(RefV(ref));
+    Ref ref = Ref("some/ref/1");
+    Get get = Get(RefV(ref));
 
     assertThat(json.writeValueAsString(get), is("{\"get\":{\"@ref\":\"some/ref/1\"}}"));
 
-    Paginate paginate1 = Paginate.create(Union.create(ImmutableList.<Set>of(
-      Match.create(StringV("term"), Ref.create("indexes/some_index")),
-      Match.create(StringV("term2"), Ref.create("indexes/some_index")))));
+    Paginate paginate1 = Paginate(Union(ImmutableList.<Set>of(
+      Match(StringV("term"), Ref("indexes/some_index")),
+      Match(StringV("term2"), Ref("indexes/some_index")))));
 
     assertThat(json.writeValueAsString(paginate1), is("{\"paginate\":{\"union\":[{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term\"},{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term2\"}]}}"));
 
-    Paginate paginate2 = Paginate.create(Union.create(ImmutableList.<Set>of(
-      Match.create(StringV("term"), Ref.create("indexes/some_index")),
-      Match.create(StringV("term2"), Ref.create("indexes/some_index"))))).withSources(true);
+    Paginate paginate2 = Paginate(Union(ImmutableList.<Set>of(
+      Match(StringV("term"), Ref("indexes/some_index")),
+      Match(StringV("term2"), Ref("indexes/some_index"))))).withSources(true);
 
     assertThat(json.writeValueAsString(paginate2), is("{\"paginate\":{\"union\":[{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term\"},{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term2\"}]},\"sources\":true}"));
 
-    Paginate paginate3 = Paginate.create(Union.create(ImmutableList.<Set>of(
-      Match.create(StringV("term"), Ref.create("indexes/some_index")),
-      Match.create(StringV("term2"), Ref.create("indexes/some_index"))))).withEvents(true);
+    Paginate paginate3 = Paginate(Union(ImmutableList.<Set>of(
+      Match(StringV("term"), Ref("indexes/some_index")),
+      Match(StringV("term2"), Ref("indexes/some_index"))))).withEvents(true);
 
     assertThat(json.writeValueAsString(paginate3), is("{\"paginate\":{\"union\":[{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term\"},{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term2\"}]},\"events\":true}"));
 
-    Paginate paginate4 = Paginate.create(Union.create(ImmutableList.<Set>of(
-      Match.create(StringV("term"), Ref.create("indexes/some_index")),
-      Match.create(StringV("term2"), Ref.create("indexes/some_index")))))
-      .withCursor(Before.create(Ref.create("some/ref/1")))
+    Paginate paginate4 = Paginate(Union(ImmutableList.<Set>of(
+      Match(StringV("term"), Ref("indexes/some_index")),
+      Match(StringV("term2"), Ref("indexes/some_index")))))
+      .withCursor(Before(Ref("some/ref/1")))
       .withSize(4);
 
     assertThat(json.writeValueAsString(paginate4), is("{\"paginate\":{\"union\":[{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term\"},{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term2\"}]},\"before\":{\"@ref\":\"some/ref/1\"},\"size\":4}"));
 
-    Count count = Count.create(Match.create(StringV("fire"), Ref.create("indexes/spells_by_element")));
+    Count count = Count(Match(StringV("fire"), Ref("indexes/spells_by_element")));
     assertThat(json.writeValueAsString(count), is("{\"count\":{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"}}"));
   }
 
   @Test
   public void serializeResourceModification() throws JsonProcessingException {
-    Ref ref = Ref.create("classes/spells");
+    Ref ref = Ref("classes/spells");
     ObjectV params = ObjectV("name", StringV("Mountainous Thunder"), "element", StringV("air"), "cost", NumberV(15));
-    Create create = Create.create(RefV(ref), ObjectV("data", params));
+    Create create = Create(RefV(ref), ObjectV("data", params));
     assertThat(json.writeValueAsString(create), is("{\"create\":{\"@ref\":\"classes/spells\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountainous Thunder\",\"element\":\"air\",\"cost\":15}}}}}"));
 
-    Update update = Update.create(RefV("classes/spells/123456"), ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "cost", NullV.Null)));
+    Update update = Update(RefV("classes/spells/123456"), ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "cost", NullV.Null)));
     assertThat(json.writeValueAsString(update), is("{\"update\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"cost\":null}}}}}"));
 
-    Replace replace = Replace.create(RefV("classes/spells/123456"), ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "element", ArrayV(StringV("air"), StringV("earth")), "cost", NumberV(10))));
+    Replace replace = Replace(RefV("classes/spells/123456"), ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "element", ArrayV(StringV("air"), StringV("earth")), "cost", NumberV(10))));
     assertThat(json.writeValueAsString(replace), is("{\"replace\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"element\":[\"air\",\"earth\"],\"cost\":10}}}}}"));
 
-    Delete delete = Delete.create(RefV("classes/spells/123456"));
+    Delete delete = Delete(RefV("classes/spells/123456"));
     assertThat(json.writeValueAsString(delete), is("{\"delete\":{\"@ref\":\"classes/spells/123456\"}}"));
   }
 
   @Test
   public void serializeSets() throws JsonProcessingException {
-    Match match = Match.create(StringV("fire"), Ref.create("indexes/spells_by_elements"));
+    Match match = Match(StringV("fire"), Ref("indexes/spells_by_elements"));
     assertThat(json.writeValueAsString(match), is("{\"index\":{\"@ref\":\"indexes/spells_by_elements\"},\"match\":\"fire\"}"));
 
-    Union union = Union.create(ImmutableList.<Set>of(
-      Match.create(StringV("fire"), Ref.create("indexes/spells_by_element")),
-      Match.create(StringV("water"), Ref.create("indexes/spells_by_element"))
+    Union union = Union(ImmutableList.<Set>of(
+      Match(StringV("fire"), Ref("indexes/spells_by_element")),
+      Match(StringV("water"), Ref("indexes/spells_by_element"))
     ));
 
     assertThat(json.writeValueAsString(union), is("{\"union\":[{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"},{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"water\"}]}"));
 
-    Intersection intersection = Intersection.create(ImmutableList.<Set>of(
-      Match.create(StringV("fire"), Ref.create("indexes/spells_by_element")),
-      Match.create(StringV("water"), Ref.create("indexes/spells_by_element"))
+    Intersection intersection = Intersection(ImmutableList.<Set>of(
+      Match(StringV("fire"), Ref("indexes/spells_by_element")),
+      Match(StringV("water"), Ref("indexes/spells_by_element"))
     ));
 
     assertThat(json.writeValueAsString(intersection), is("{\"intersection\":[{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"},{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"water\"}]}"));
 
-    Difference difference = Difference.create(ImmutableList.<Set>of(
-      Match.create(StringV("fire"), Ref.create("indexes/spells_by_element")),
-      Match.create(StringV("water"), Ref.create("indexes/spells_by_element"))
+    Difference difference = Difference(ImmutableList.<Set>of(
+      Match(StringV("fire"), Ref("indexes/spells_by_element")),
+      Match(StringV("water"), Ref("indexes/spells_by_element"))
     ));
 
     assertThat(json.writeValueAsString(difference), is("{\"difference\":[{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"},{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"water\"}]}"));
 
-    Join join = Join.create(Match.create(StringV("fire"), Ref.create("indexes/spells_by_element")),
-      Lambda.create("spell", Get.create(Var.create("spell"))));
+    Join join = Join(Match(StringV("fire"), Ref("indexes/spells_by_element")),
+      Lambda("spell", Get(Var("spell"))));
 
     assertThat(json.writeValueAsString(join), is("{\"join\":{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"},\"with\":{\"lambda\":\"spell\",\"expr\":{\"get\":{\"var\":\"spell\"}}}}"));
   }
