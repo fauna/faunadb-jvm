@@ -133,40 +133,34 @@ public class SerializationSpec {
   }
 
   @Test
-  public void serializeMatch() throws JsonProcessingException {
-    Match m = Match.create(StringV("testTerm"), Ref.create("some/index"));
-    assertEquals("{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm\"}", json.writeValueAsString(m));
-  }
+  public void serializeSets() throws JsonProcessingException {
+    Match match = Match.create(StringV("fire"), Ref.create("indexes/spells_by_elements"));
+    assertThat(json.writeValueAsString(match), is("{\"index\":{\"@ref\":\"indexes/spells_by_elements\"},\"match\":\"fire\"}"));
 
-  @Test
-  public void serializeComplexSet() throws JsonProcessingException {
-    Match setTerm1 = Match.create(StringV("testTerm1"), Ref.create("some/index"));
-    Match setTerm2 = Match.create(StringV("testTerm2"), Ref.create("another/index"));
+    Union union = Union.create(ImmutableList.<Set>of(
+      Match.create(StringV("fire"), Ref.create("indexes/spells_by_element")),
+      Match.create(StringV("water"), Ref.create("indexes/spells_by_element"))
+    ));
 
-    Union union = Union.create(ImmutableList.<Set>of(setTerm1, setTerm2));
-    assertEquals("{\"union\":[{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm1\"},{\"index\":{\"@ref\":\"another/index\"},\"match\":\"testTerm2\"}]}", json.writeValueAsString(union));
+    assertThat(json.writeValueAsString(union), is("{\"union\":[{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"},{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"water\"}]}"));
 
-    Intersection intersection = Intersection.create(ImmutableList.<Set>of(setTerm1, setTerm2));
-    assertEquals("{\"intersection\":[{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm1\"},{\"index\":{\"@ref\":\"another/index\"},\"match\":\"testTerm2\"}]}", json.writeValueAsString(intersection));
+    Intersection intersection = Intersection.create(ImmutableList.<Set>of(
+      Match.create(StringV("fire"), Ref.create("indexes/spells_by_element")),
+      Match.create(StringV("water"), Ref.create("indexes/spells_by_element"))
+    ));
 
-    Difference difference = Difference.create(ImmutableList.<Set>of(setTerm1, setTerm2));
-    assertEquals("{\"difference\":[{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm1\"},{\"index\":{\"@ref\":\"another/index\"},\"match\":\"testTerm2\"}]}", json.writeValueAsString(difference));
+    assertThat(json.writeValueAsString(intersection), is("{\"intersection\":[{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"},{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"water\"}]}"));
 
-    Join join = Join.create(setTerm1, "some/target/_");
-    assertEquals("{\"join\":{\"index\":{\"@ref\":\"some/index\"},\"match\":\"testTerm1\"},\"with\":\"some/target/_\"}", json.writeValueAsString(join));
-  }
+    Difference difference = Difference.create(ImmutableList.<Set>of(
+      Match.create(StringV("fire"), Ref.create("indexes/spells_by_element")),
+      Match.create(StringV("water"), Ref.create("indexes/spells_by_element"))
+    ));
 
-  @Test
-  public void serializeEvents() throws JsonProcessingException {
-    Ref ref = Ref.create("some/ref");
-    Events events = Events.create(RefV(ref));
+    assertThat(json.writeValueAsString(difference), is("{\"difference\":[{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"},{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"water\"}]}"));
 
-    assertEquals("{\"events\":{\"@ref\":\"some/ref\"}}", json.writeValueAsString(events));
+    Join join = Join.create(Match.create(StringV("fire"), Ref.create("indexes/spells_by_element")),
+      Lambda.create("spell", Get.create(Var.create("spell"))));
 
-    Events events2 = events.withCursor(Before.create(Ref.create("another/ref")));
-    assertEquals("{\"events\":{\"@ref\":\"some/ref\"},\"before\":{\"@ref\":\"another/ref\"}}", json.writeValueAsString(events2));
-
-    Events events3 = events2.withSize(50L);
-    assertEquals("{\"events\":{\"@ref\":\"some/ref\"},\"before\":{\"@ref\":\"another/ref\"},\"size\":50}", json.writeValueAsString(events3));
+    assertThat(json.writeValueAsString(join), is("{\"join\":{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"},\"with\":{\"lambda\":\"spell\",\"expr\":{\"get\":{\"var\":\"spell\"}}}}"));
   }
 }
