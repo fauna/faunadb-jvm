@@ -44,27 +44,4 @@ public class Codec {
       jsonGenerator.writeEndObject();
     }
   }
-
-  public static class EventsSerializer extends JsonSerializer<Events> {
-    @Override
-    public void serialize(Events events, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-      jsonGenerator.writeStartObject();
-      jsonGenerator.writeObjectField("events", events.resource());
-
-      if (events.cursor().isPresent()) {
-        Cursor cursor = events.cursor().get();
-        if (cursor instanceof Before) {
-          jsonGenerator.writeObjectField("before", ((Before)cursor).ref());
-        } else if (cursor instanceof After) {
-          jsonGenerator.writeObjectField("after", ((After)cursor).ref());
-        }
-      }
-
-      if (events.size().isPresent()) {
-        jsonGenerator.writeNumberField("size", events.size().get());
-      }
-
-      jsonGenerator.writeEndObject();
-    }
-  }
 }

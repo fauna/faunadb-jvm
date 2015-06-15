@@ -33,20 +33,3 @@ class PaginateSerializer extends JsonSerializer[Paginate] {
   }
 }
 
-class EventsSerializer extends JsonSerializer[Events] {
-  override def serialize(t: Events, jsonGenerator: JsonGenerator, serializerProvider: SerializerProvider): Unit = {
-    jsonGenerator.writeStartObject()
-    jsonGenerator.writeObjectField("events", t.resource)
-
-    t.cursor.foreach {
-      case b: Before => jsonGenerator.writeObjectField("before", b.ref)
-      case a: After => jsonGenerator.writeObjectField("after", a.ref)
-    }
-
-    t.size.foreach { sNum =>
-      jsonGenerator.writeNumberField("size", sNum)
-    }
-
-    jsonGenerator.writeEndObject()
-  }
-}
