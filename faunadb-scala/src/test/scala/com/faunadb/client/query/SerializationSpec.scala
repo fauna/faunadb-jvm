@@ -92,36 +92,20 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(delete) shouldBe "{\"delete\":{\"@ref\":\"classes/spells/123456\"}}"
   }
 
-  it should "serialize a match" in {
-    val m = Match("testTerm", Ref("some/index"))
-    json.writeValueAsString(m) shouldBe "{\"match\":\"testTerm\",\"index\":{\"@ref\":\"some/index\"}}"
+  it should "serialize sets" in {
+    val matchSet = Match("fire", Ref("indexes/spells_by_elements"))
+    json.writeValueAsString(matchSet) shouldBe "{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_elements\"}}"
+
+    val union = Union(Seq(Match("fire", Ref("indexes/spells_by_element")), Match("water", Ref("indexes/spells_by_element"))))
+    json.writeValueAsString(union) shouldBe "{\"union\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"
+
+    val intersection = Intersection(Seq(Match("fire", Ref("indexes/spells_by_element")), Match("water", Ref("indexes/spells_by_element"))))
+    json.writeValueAsString(intersection) shouldBe "{\"intersection\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"
+
+    val difference = Difference(Seq(Match("fire", Ref("indexes/spells_by_element")), Match("water", Ref("indexes/spells_by_element"))))
+    json.writeValueAsString(difference) shouldBe "{\"difference\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"
+
+    val join = Join(Match("fire", Ref("indexes/spells_by_element")), Lambda("spell", Get(Var("spell"))))
+    json.writeValueAsString(join) shouldBe "{\"join\":{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},\"with\":{\"lambda\":\"spell\",\"expr\":{\"get\":{\"var\":\"spell\"}}}}"
   }
-
-  it should "serialize a complex set" in {
-    val setTerm1 = Match("testTerm1", Ref("some/index"))
-    val setTerm2 = Match("testTerm2", Ref("another/index"))
-
-    val union = Union(Array(setTerm1, setTerm2))
-    json.writeValueAsString(union) shouldBe "{\"union\":[{\"match\":\"testTerm1\",\"index\":{\"@ref\":\"some/index\"}},{\"match\":\"testTerm2\",\"index\":{\"@ref\":\"another/index\"}}]}"
-
-    val intersection = Intersection(Array(setTerm1, setTerm2))
-    json.writeValueAsString(intersection) shouldBe "{\"intersection\":[{\"match\":\"testTerm1\",\"index\":{\"@ref\":\"some/index\"}},{\"match\":\"testTerm2\",\"index\":{\"@ref\":\"another/index\"}}]}"
-
-    val difference = Difference(Array(setTerm1, setTerm2))
-    json.writeValueAsString(difference) shouldBe "{\"difference\":[{\"match\":\"testTerm1\",\"index\":{\"@ref\":\"some/index\"}},{\"match\":\"testTerm2\",\"index\":{\"@ref\":\"another/index\"}}]}"
-
-    val join = Join(setTerm1, "some/target/_")
-    json.writeValueAsString(join) shouldBe "{\"join\":{\"match\":\"testTerm1\",\"index\":{\"@ref\":\"some/index\"}},\"with\":\"some/target/_\"}"
-  }
-
-  it should "serialize events" in {
-    val ref = Ref("some/ref")
-    val events = Events(ref)
-
-    json.writeValueAsString(events) shouldBe "{\"events\":{\"@ref\":\"some/ref\"}}"
-
-    val events2 = Events(ref, cursor=Some(Before(Ref("another/ref"))), size=Some(50))
-    json.writeValueAsString(events2) shouldBe "{\"events\":{\"@ref\":\"some/ref\"},\"before\":{\"@ref\":\"another/ref\"},\"size\":50}"
-  }
-
 }

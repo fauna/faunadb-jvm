@@ -47,7 +47,7 @@ case class Intersection(@(JsonProperty @field @getter)("intersection") sets: Ite
 
 case class Difference(@(JsonProperty @field @getter)("difference") sets: Iterable[Set]) extends Set
 
-case class Join(@(JsonProperty @field)("join") source: Set, @(JsonProperty @field)("with") target: String) extends Set
+case class Join(@(JsonProperty @field)("join") source: Set, @(JsonProperty @field)("with") target: Lambda) extends Set
 
 case class Get(@(JsonProperty @field)("get") resource: Identifier) extends Identifier
 
@@ -63,9 +63,6 @@ case class Paginate(resource: Identifier,
 }
 
 case class Count(@(JsonProperty @field)("count") set: Set) extends Identifier
-
-@JsonSerialize(using = classOf[EventsSerializer])
-case class Events(resource: Identifier, cursor: Option[Cursor] = None, size: Option[Long] = None) extends Identifier
 
 case class Create(@(JsonProperty @field)("create") ref: Identifier, @(JsonProperty @field)("params") obj: ObjectV = ObjectV.empty) extends Identifier
 case class Replace(@(JsonProperty @field)("replace") ref: Identifier, @(JsonProperty @field)("params") obj: ObjectV) extends Identifier
