@@ -6,6 +6,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 public abstract class Language {
+  public static NullV NullV() {
+    return NullV.Null;
+  }
+
   public static Value.ObjectV ObjectV() {
     return ObjectV.empty();
   }
@@ -204,5 +208,9 @@ public abstract class Language {
 
   public static Cursor.After After(Ref ref) {
     return Cursor.After.create(ref);
+  }
+
+  public static Add Add(ImmutableList<Expression> terms) {
+    return Add.create(terms);
   }
 }

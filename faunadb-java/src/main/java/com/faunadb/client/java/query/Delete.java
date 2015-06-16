@@ -2,7 +2,7 @@ package com.faunadb.client.java.query;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Delete {
+public class Delete implements Expression {
   public static Delete create(Identifier ref) {
     return new Delete(ref);
   }

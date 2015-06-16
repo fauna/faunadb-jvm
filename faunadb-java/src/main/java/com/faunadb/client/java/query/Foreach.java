@@ -2,7 +2,7 @@ package com.faunadb.client.java.query;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Foreach {
+public class Foreach implements Expression {
   public static Foreach create(Lambda lambda, Expression collection) {
     return new Foreach(lambda, collection);
   }
