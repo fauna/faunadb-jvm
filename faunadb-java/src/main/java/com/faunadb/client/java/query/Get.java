@@ -1,6 +1,7 @@
 package com.faunadb.client.java.query;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.faunadb.client.java.types.Identifier;
 
 public class Get implements Expression {
   @JsonProperty("get")

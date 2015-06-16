@@ -1,8 +1,8 @@
-package com.faunadb.client.java.query;
+package com.faunadb.client.java.types;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Var implements Value, Identifier {
+public class Var extends Value implements Identifier {
   public static Var create(String variable) {
     return new Var(variable);
   }

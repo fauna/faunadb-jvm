@@ -1,10 +1,11 @@
 package com.faunadb.client.java.query;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.faunadb.client.java.types.Identifier;
 import com.google.common.base.Optional;
 
 @JsonSerialize(using=Codec.PaginateSerializer.class)
-public class Paginate implements Identifier {
+public class Paginate implements Identifier, Expression {
   public static Paginate create(Identifier resource) {
     return new Paginate(resource, Optional.<Long>absent(), Optional.<Cursor>absent(), Optional.<Integer>absent(), false, false);
   }

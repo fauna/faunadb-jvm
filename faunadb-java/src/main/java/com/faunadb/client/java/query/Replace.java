@@ -1,9 +1,10 @@
 package com.faunadb.client.java.query;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.faunadb.client.java.query.Value.*;
+import com.faunadb.client.java.types.Identifier;
+import com.faunadb.client.java.types.Value.*;
 
-public class Replace implements Identifier {
+public class Replace implements Identifier, Expression {
   public static Replace create(Identifier ref, ObjectV obj) {
     return new Replace(ref, obj);
   }

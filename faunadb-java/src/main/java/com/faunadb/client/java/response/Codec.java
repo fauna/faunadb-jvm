@@ -1,7 +1,6 @@
 package com.faunadb.client.java.response;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,7 +23,7 @@ public class Codec {
 
   public static class ResponseMapDeserializer extends JsonDeserializer<ResponseMap> {
     @Override
-    public ResponseMap deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+    public ResponseMap deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
       ObjectMapper json = (ObjectMapper) jsonParser.getCodec();
       JsonNode tree = json.readTree(jsonParser);
 

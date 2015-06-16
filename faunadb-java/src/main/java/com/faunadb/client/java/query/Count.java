@@ -1,6 +1,7 @@
 package com.faunadb.client.java.query;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.faunadb.client.java.types.Identifier;
 
 public class Count implements Identifier {
   public final static Count create(Set set) {
