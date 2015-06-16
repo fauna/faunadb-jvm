@@ -6,9 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.faunadb.client.java.types.Ref;
+import com.faunadb.client.java.types.Value;
 import com.google.common.collect.ImmutableList;
-
-import javax.activation.UnsupportedDataTypeException;
 
 @JsonDeserialize(using=Codec.ResponseNodeDeserializer.class)
 public class ResponseNode {

@@ -3,7 +3,7 @@ package com.faunadb.client.java.types;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Ref {
+public class Ref extends Value implements Identifier {
   public static Ref create(String value) {
     return new Ref(value);
   }

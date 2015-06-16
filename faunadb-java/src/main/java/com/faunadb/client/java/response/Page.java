@@ -2,20 +2,20 @@ package com.faunadb.client.java.response;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.faunadb.client.java.types.Ref;
+import com.faunadb.client.java.types.Value;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 public class Page {
   private final ImmutableList<ResponseNode> data;
-  private final Optional<Ref> before;
-  private final Optional<Ref> after;
+  private final Optional<ResponseNode> before;
+  private final Optional<ResponseNode> after;
 
   @JsonCreator
   Page(@JsonProperty("data") ImmutableList<ResponseNode> data,
-       @JsonProperty("before") Optional<Ref> before,
-       @JsonProperty("after") Optional<Ref> after) {
+       @JsonProperty("before") Optional<ResponseNode> before,
+       @JsonProperty("after") Optional<ResponseNode> after) {
     this.data = data;
     this.before = before;
     this.after = after;
@@ -25,11 +25,11 @@ public class Page {
     return data;
   }
 
-  public Optional<Ref> before() {
+  public Optional<ResponseNode> before() {
     return before;
   }
 
-  public Optional<Ref> after() {
+  public Optional<ResponseNode> after() {
     return after;
   }
 

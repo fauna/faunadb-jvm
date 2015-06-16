@@ -2,12 +2,10 @@ package com.faunadb.client.java;
 
 import com.faunadb.client.java.errors.BadQueryException;
 import com.faunadb.client.java.errors.NotFoundQueryException;
-import com.faunadb.client.java.query.Create;
-import com.faunadb.client.java.query.Expression;
-import com.faunadb.client.java.query.Match;
-import com.faunadb.client.java.query.Path;
+import com.faunadb.client.java.query.*;
 import com.faunadb.client.java.response.*;
 import com.faunadb.client.java.types.Ref;
+import com.faunadb.client.java.types.Value;
 import com.faunadb.httpclient.Connection;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -58,7 +56,7 @@ public class ClientSpec {
     ResponseNode dbCreateR = dbCreateF.get();
     Ref dbRef = dbCreateR.asDatabase().ref();
 
-    ListenableFuture<ResponseNode> keyCreateF = rootClient.query(Create(Ref("keys"), ObjectV("database", RefV(dbRef), "role", StringV("server"))));
+    ListenableFuture<ResponseNode> keyCreateF = rootClient.query(Create(Ref("keys"), ObjectV("database", dbRef, "role", StringV("server"))));
     ResponseNode keyCreateR = keyCreateF.get();
     Key key = keyCreateR.asKey();
 
@@ -70,7 +68,7 @@ public class ClientSpec {
 
     ListenableFuture<ResponseNode> indexCreateF = client.query(Create(Ref("indexes"), ObjectV(
         "name", StringV("spells_by_test"),
-        "source", RefV("classes/spells"),
+        "source", Ref("classes/spells"),
         "path", StringV("data.queryTest1"),
         "unique", BooleanV(false))));
 
@@ -78,7 +76,7 @@ public class ClientSpec {
 
     ListenableFuture<ResponseNode> setIndexF = client.query(Create(Ref("indexes"), ObjectV(
         "name", StringV("spells_instances"),
-        "source", RefV("classes/spells"),
+        "source", Ref("classes/spells"),
         "path", StringV("class"),
         "unique", BooleanV(false)
     )));
@@ -87,7 +85,7 @@ public class ClientSpec {
 
     ListenableFuture<ResponseNode> uniqueIndexF = client.query(Create(Ref("indexes"), ObjectV(
         "name", StringV("spells_by_unique_test"),
-        "source", RefV("classes/spells"),
+        "source", Ref("classes/spells"),
         "path", StringV("data.uniqueTest1"),
         "unique", BooleanV(true)
     )));
@@ -96,7 +94,7 @@ public class ClientSpec {
 
     ListenableFuture<ResponseNode> indexByElementF = client.query(Create(Ref("indexes"), ObjectV(
         "name", StringV("spells_by_element"),
-        "source", RefV("classes/spells"),
+        "source", Ref("classes/spells"),
         "path", StringV("data.element")
     )));
 
@@ -105,7 +103,7 @@ public class ClientSpec {
 
   @Test(expected = NotFoundQueryException.class)
   public void testLookupMissingInstance() throws Throwable {
-    ListenableFuture<ResponseNode> resp = client.query(Get(RefV("classes/spells/1234")));
+    ListenableFuture<ResponseNode> resp = client.query(Get(Ref("classes/spells/1234")));
     try {
       resp.get();
     } catch (ExecutionException ex) {
@@ -204,16 +202,16 @@ public class ClientSpec {
     Page resp1 = queryF.get().asPage();
 
     assertThat(resp1.data().size(), is(1));
-    assertThat(resp1.before(), not(Optional.<Ref>absent()));
-    assertThat(resp1.after(), is(Optional.<Ref>absent()));
+    assertThat(resp1.before(), not(Optional.<ResponseNode>absent()));
+    assertThat(resp1.after(), is(Optional.<ResponseNode>absent()));
 
-    ListenableFuture<ResponseNode> queryF2 = client.query(Paginate(Match(classRef, Ref("indexes/spells_instances"))).withSize(1).withCursor(Before(resp1.before().get())));
+    ListenableFuture<ResponseNode> queryF2 = client.query(Paginate(Match(classRef, Ref("indexes/spells_instances"))).withSize(1).withCursor(Before(resp1.before().get().asRef())));
     Page resp2 = queryF2.get().asPage();
 
     assertThat(resp2.data().size(), is(1));
     assertThat(resp2.data(), not(resp1.data()));
-    assertThat(resp2.before(), not(Optional.<Ref>absent()));
-    assertThat(resp2.after(), not(Optional.<Ref>absent()));
+    assertThat(resp2.before(), not(Optional.<ResponseNode>absent()));
+    assertThat(resp2.after(), not(Optional.<ResponseNode>absent()));
   }
 
   @Test
@@ -272,8 +270,8 @@ public class ClientSpec {
     Ref randomRef = Ref("classes/spells/" + randomRefNum);
 
     ListenableFuture<ResponseNode> doF = client.query(Do(ImmutableList.of(
-        Create(RefV(randomRef), ObjectV("data", ObjectV("name", StringV("Magic Missile")))),
-        Get(RefV(randomRef))
+        Create(randomRef, ObjectV("data", ObjectV("name", StringV("Magic Missile")))),
+        Get(randomRef)
     )));
     ResponseNode doNode = doF.get();
     Instance doInstance = doNode.asInstance();
@@ -317,7 +315,7 @@ public class ClientSpec {
     assertThat(createInstance.ref().value(), startsWith("classes/spells"));
     assertThat(createInstance.data().get("name").asString(), is("Magic Missile"));
 
-    ListenableFuture<ResponseNode> updateF = client.query(Update(RefV(createInstance.ref()), ObjectV("data", ObjectV("name", StringV("Faerie Fire"), "cost", NullV()))));
+    ListenableFuture<ResponseNode> updateF = client.query(Update(createInstance.ref(), ObjectV("data", ObjectV("name", StringV("Faerie Fire"), "cost", NullV()))));
     ResponseNode updateNode = updateF.get();
     Instance updateInstance = updateNode.asInstance();
     assertThat(updateInstance.ref(), is(createInstance.ref()));
@@ -325,7 +323,7 @@ public class ClientSpec {
     assertThat(updateInstance.data().get("element").asString(), is("arcane"));
     assertThat(updateInstance.data().get("cost"), nullValue());
 
-    ListenableFuture<ResponseNode> replaceF = client.query(Replace(RefV(createInstance.ref()), ObjectV("data", ObjectV("name", StringV("Volcano"), "element", ArrayV(StringV("fire"), StringV("earth")), "cost", NumberV(10)))));
+    ListenableFuture<ResponseNode> replaceF = client.query(Replace(createInstance.ref(), ObjectV("data", ObjectV("name", StringV("Volcano"), "element", ArrayV(StringV("fire"), StringV("earth")), "cost", NumberV(10)))));
     ResponseNode replaceNode = replaceF.get();
     Instance replaceInstance = replaceNode.asInstance();
     assertThat(replaceInstance.ref(), is(createInstance.ref()));
@@ -334,11 +332,11 @@ public class ClientSpec {
     assertThat(replaceInstance.data().get("element").asArray().get(1).asString(), is("earth"));
     assertThat(replaceInstance.data().get("cost").asNumber(), is(10L));
 
-    ListenableFuture<ResponseNode> deleteF = client.query(Delete(RefV(createInstance.ref())));
+    ListenableFuture<ResponseNode> deleteF = client.query(Delete(createInstance.ref()));
     deleteF.get();
 
     thrown.expectCause(isA(NotFoundQueryException.class));
-    ListenableFuture<ResponseNode> getF = client.query(Get(RefV(createInstance.ref())));
+    ListenableFuture<ResponseNode> getF = client.query(Get(createInstance.ref()));
     getF.get();
   }
 
@@ -360,7 +358,8 @@ public class ClientSpec {
 
     ListenableFuture<ResponseNode> matchEventsF = client.query(Paginate(Match(StringV("arcane"), Ref("indexes/spells_by_element"))).withEvents(true));
     ResponseNode matchEventsResponse = matchEventsF.get();
-    System.out.println(matchEventsResponse);
+    Page matchEventsPage = matchEventsResponse.asPage();
+    System.out.println(matchEventsPage);
   }
 
 }

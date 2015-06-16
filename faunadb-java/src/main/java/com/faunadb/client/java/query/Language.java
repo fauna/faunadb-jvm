@@ -1,7 +1,10 @@
 package com.faunadb.client.java.query;
 
-import com.faunadb.client.java.query.Value.*;
+import com.faunadb.client.java.types.Identifier;
+import com.faunadb.client.java.types.Value;
+import com.faunadb.client.java.types.Value.*;
 import com.faunadb.client.java.types.Ref;
+import com.faunadb.client.java.types.Var;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -74,17 +77,6 @@ public abstract class Language {
     return Ref.create(ref);
   }
 
-  public static RefV RefV(Ref ref) {
-    return RefV.create(ref);
-  }
-
-  public static RefV RefV(String value) {
-    return RefV.create(value);
-  }
-
-  public static VarV VarV(String value) {
-    return VarV.create(value);
-  }
 
   public static StringV StringV(String value) {
     return StringV.create(value);
@@ -202,12 +194,12 @@ public abstract class Language {
     return Var.create(variable);
   }
 
-  public static Cursor.Before Before(Ref ref) {
-    return Cursor.Before.create(ref);
+  public static Cursor.Before Before(Value value) {
+    return Cursor.Before.create(value);
   }
 
-  public static Cursor.After After(Ref ref) {
-    return Cursor.After.create(ref);
+  public static Cursor.After After(Value value) {
+    return Cursor.After.create(value);
   }
 
   public static Add Add(ImmutableList<Expression> terms) {

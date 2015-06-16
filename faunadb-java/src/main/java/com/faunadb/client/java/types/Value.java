@@ -1,14 +1,14 @@
-package com.faunadb.client.java.query;
+package com.faunadb.client.java.types;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.node.NullNode;
-import com.faunadb.client.java.types.Ref;
+import com.faunadb.client.java.query.Expression;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-public interface Value extends Expression {
-  public static class ObjectV implements Value {
+public class Value implements Expression {
+  public static class ObjectV extends Value {
     private final ImmutableMap<String, Value> values;
 
     public static ObjectV empty() {
@@ -16,23 +16,23 @@ public interface Value extends Expression {
     }
 
     public static ObjectV create(String k1, Value v1) {
-      return new ObjectV(ImmutableMap.<String, Value>of(k1, v1));
+      return new ObjectV(ImmutableMap.of(k1, v1));
     }
 
     public static ObjectV create(String k1, Value v1, String k2, Value v2) {
-      return new ObjectV(ImmutableMap.<String, Value>of(k1, v1, k2, v2));
+      return new ObjectV(ImmutableMap.of(k1, v1, k2, v2));
     }
 
     public static ObjectV create(String k1, Value v1, String k2, Value v2, String k3, Value v3) {
-      return new ObjectV(ImmutableMap.<String, Value>of(k1, v1, k2, v2, k3, v3));
+      return new ObjectV(ImmutableMap.of(k1, v1, k2, v2, k3, v3));
     }
 
     public static ObjectV create(String k1, Value v1, String k2, Value v2, String k3, Value v3, String k4, Value v4) {
-      return new ObjectV(ImmutableMap.<String, Value>of(k1, v1, k2, v2, k3, v3, k4, v4));
+      return new ObjectV(ImmutableMap.of(k1, v1, k2, v2, k3, v3, k4, v4));
     }
 
     public static ObjectV create(String k1, Value v1, String k2, Value v2, String k3, Value v3, String k4, Value v4, String k5, Value v5) {
-      return new ObjectV(ImmutableMap.<String, Value>of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5));
+      return new ObjectV(ImmutableMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5));
     }
 
     public static ObjectV create(ImmutableMap<String, Value> values) {
@@ -54,7 +54,7 @@ public interface Value extends Expression {
     }
   }
 
-  public static class ArrayV implements Value {
+  public static class ArrayV extends Value {
     private final ImmutableList<Value> values;
 
     public static ArrayV empty() {
@@ -104,7 +104,7 @@ public interface Value extends Expression {
     }
   }
 
-  public static class BooleanV implements Value {
+  public static class BooleanV extends Value {
     private final Boolean value;
 
     public final static BooleanV True = BooleanV.create(true);
@@ -129,7 +129,7 @@ public interface Value extends Expression {
     }
   }
 
-  public static class DoubleV implements Value {
+  public static class DoubleV extends Value {
     private final Double value;
 
     public static DoubleV create(double value) {
@@ -151,7 +151,7 @@ public interface Value extends Expression {
     }
   }
 
-  public static class NumberV implements Value {
+  public static class NumberV extends Value {
     private final Long value;
 
     public static NumberV create(long value) {
@@ -173,7 +173,7 @@ public interface Value extends Expression {
     }
   }
 
-  public static class StringV implements Value {
+  public static class StringV extends Value {
     private final String value;
 
     public static StringV create(String value) {
@@ -195,50 +195,7 @@ public interface Value extends Expression {
     }
   }
 
-  public static class RefV implements Value, Identifier {
-    private final Ref value;
-
-    public static RefV create(String value) {
-      return new RefV(Ref.create(value));
-    }
-
-    public static RefV create(Ref value) {
-      return new RefV(value);
-    }
-
-    RefV(Ref value) {
-      this.value = value;
-    }
-
-    @JsonValue
-    public Ref ref() {
-      return value;
-    }
-
-    @Override
-    public int hashCode() {
-      return value.hashCode();
-    }
-  }
-
-  public static class VarV implements Value, Identifier {
-    public static VarV create(String value) {
-      return new VarV(value);
-    }
-
-    @JsonProperty("var")
-    private final String value;
-
-    VarV(String value) {
-      this.value = value;
-    }
-
-    public String value() {
-      return value;
-    }
-  }
-
-  public static class NullV implements Value, Identifier {
+  public static class NullV extends Value implements Identifier {
     public static final NullV Null = new NullV();
 
     NullV() { }

@@ -23,9 +23,9 @@ public class Codec {
       if (paginate.cursor().isPresent()) {
         Cursor cursor = paginate.cursor().get();
         if (cursor instanceof Before) {
-          jsonGenerator.writeObjectField("before", ((Before)cursor).ref());
+          jsonGenerator.writeObjectField("before", ((Before)cursor).value());
         } else if (cursor instanceof After) {
-          jsonGenerator.writeObjectField("after", ((After)cursor).ref());
+          jsonGenerator.writeObjectField("after", ((After)cursor).value());
         }
       }
 

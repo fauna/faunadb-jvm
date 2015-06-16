@@ -2,8 +2,8 @@ package com.faunadb.client.java;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.faunadb.client.java.response.*;
 import com.faunadb.client.java.response.Class;
+import com.faunadb.client.java.response.*;
 import com.faunadb.client.java.types.Ref;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -196,8 +196,8 @@ public class DeserializationSpec {
     Page page = parsed.asPage();
     assertThat(page.data().size(), is(1));
     assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851646450565120")));
-    assertThat(page.after(), is(Optional.<Ref>absent()));
-    assertThat(page.before(), is(Optional.<Ref>absent()));
+    assertThat(page.after(), is(Optional.<ResponseNode>absent()));
+    assertThat(page.before(), is(Optional.<ResponseNode>absent()));
   }
 
   @Test
@@ -217,8 +217,8 @@ public class DeserializationSpec {
     Page page = parsed.asPage();
     assertThat(page.data().size(), is(1));
     assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851646450565120")));
-    assertThat(page.before(), is(Optional.of(Ref.create("classes/spells/102851646450565120"))));
-    assertThat(page.after(), is(Optional.<Ref>absent()));
+    assertThat(page.before().get().asRef(), is(Ref.create("classes/spells/102851646450565120")));
+    assertThat(page.after(), is(Optional.<ResponseNode>absent()));
   }
 
   @Test
@@ -241,8 +241,8 @@ public class DeserializationSpec {
     Page page = parsed.asPage();
     assertThat(page.data().size(), is(1));
     assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851646450565120")));
-    assertThat(page.after(), is(Optional.of(Ref.create("classes/spells/102852248441192448"))));
-    assertThat(page.before(), is(Optional.of(Ref.create("classes/spells/102851646450565120"))));
+    assertThat(page.after().get().asRef(), is(Ref.create("classes/spells/102852248441192448")));
+    assertThat(page.before().get().asRef(), is(Ref.create("classes/spells/102851646450565120")));
   }
 
   @Test
@@ -262,7 +262,7 @@ public class DeserializationSpec {
     Page page = parsed.asPage();
     assertThat(page.data().size(), is(1));
     assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851640310104064")));
-    assertThat(page.before(), is(Optional.<Ref>absent()));
-    assertThat(page.after(), is(Optional.of(Ref.create("classes/spells/102851646450565120"))));
+    assertThat(page.before(), is(Optional.<ResponseNode>absent()));
+    assertThat(page.after().get().asRef(), is(Ref.create("classes/spells/102851646450565120")));
   }
 }

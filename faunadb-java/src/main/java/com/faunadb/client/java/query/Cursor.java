@@ -1,36 +1,35 @@
 package com.faunadb.client.java.query;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.faunadb.client.java.types.Ref;
+import com.faunadb.client.java.types.Value;
 
 public abstract class Cursor {
   public static class Before extends Cursor {
-    public static Before create(Ref ref) {
-      return new Before(ref);
+    public static Before create(Value value) {
+      return new Before(value);
     }
 
-    private final Ref ref;
-    Before(Ref ref) {
-      this.ref = ref;
+    private final Value value;
+    Before(Value value) {
+      this.value = value;
     }
 
-    public Ref ref() {
-      return ref;
+    public Value value() {
+      return value;
     }
   }
 
   public static class After extends Cursor {
-    public static After create(Ref ref) {
-      return new After(ref);
+    public static After create(Value value) {
+      return new After(value);
     }
 
-    private final Ref ref;
-    After(Ref ref) {
-      this.ref = ref;
+    private final Value value;
+    After(Value value) {
+      this.value = value;
     }
 
-    public Ref ref() {
-      return ref;
+    public Value value() {
+      return value;
     }
   }
 }

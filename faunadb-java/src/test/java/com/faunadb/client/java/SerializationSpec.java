@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.java.query.*;
 import com.faunadb.client.java.query.Set;
-import com.faunadb.client.java.query.Value.*;
+import com.faunadb.client.java.types.Value.*;
 import com.faunadb.client.java.types.*;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -39,7 +39,7 @@ public class SerializationSpec {
     assertThat(json.writeValueAsString(value1), is("[1,\"test\"]"));
     ArrayV value2 = ArrayV(ArrayV(ObjectV("test", StringV("value")), NumberV(2323), BooleanV.True), StringV("hi"), ObjectV("test", StringV("yo"), "test2", NullV.Null));
     assertThat(json.writeValueAsString(value2), is("[[{\"object\":{\"test\":\"value\"}},2323,true],\"hi\",{\"object\":{\"test\":\"yo\",\"test2\":null}}]"));
-    ObjectV obj1 = ObjectV("test", NumberV(1), "test2", RefV("some/ref"));
+    ObjectV obj1 = ObjectV("test", NumberV(1), "test2", Ref("some/ref"));
     assertThat(json.writeValueAsString(obj1), is("{\"object\":{\"test\":1,\"test2\":{\"@ref\":\"some/ref\"}}}"));
   }
 
@@ -52,8 +52,8 @@ public class SerializationSpec {
     assertThat(json.writeValueAsString(ifForm), is("{\"if\":true,\"then\":\"was true\",\"else\":\"was false\"}"));
 
     Do doForm = Do(ImmutableList.of(
-      Create(RefV("some/ref/1"), ObjectV("data", ObjectV("name", StringV("Hen Wen")))),
-      Get(RefV("some/ref/1"))));
+      Create(Ref("some/ref/1"), ObjectV("data", ObjectV("name", StringV("Hen Wen")))),
+      Get(Ref("some/ref/1"))));
     assertThat(json.writeValueAsString(doForm), is("{\"do\":[{\"create\":{\"@ref\":\"some/ref/1\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Hen Wen\"}}}}},{\"get\":{\"@ref\":\"some/ref/1\"}}]}"));
 
     Select select = Select(ImmutableList.of(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
@@ -73,14 +73,14 @@ public class SerializationSpec {
     Map map = Map(Lambda("munchings", Var("munchings")), ArrayV(NumberV(1), NumberV(2), NumberV(3)));
     assertEquals(json.writeValueAsString(map), "{\"map\":{\"lambda\":\"munchings\",\"expr\":{\"var\":\"munchings\"}},\"collection\":[1,2,3]}");
 
-    Foreach foreach = Foreach(Lambda("creature", Create(RefV("some/ref"), ObjectV("data", ObjectV("some", VarV("creature"))))), ArrayV(RefV("another/ref/1"), RefV("another/ref/2")));
+    Foreach foreach = Foreach(Lambda("creature", Create(Ref("some/ref"), ObjectV("data", ObjectV("some", Var("creature"))))), ArrayV(Ref("another/ref/1"), Ref("another/ref/2")));
     assertEquals(json.writeValueAsString(foreach), "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":\"another/ref/1\"},{\"@ref\":\"another/ref/2\"}]}");
   }
 
   @Test
   public void serializeResourceRetrieval() throws JsonProcessingException {
     Ref ref = Ref("some/ref/1");
-    Get get = Get(RefV(ref));
+    Get get = Get(ref);
 
     assertThat(json.writeValueAsString(get), is("{\"get\":{\"@ref\":\"some/ref/1\"}}"));
 
@@ -118,16 +118,16 @@ public class SerializationSpec {
   public void serializeResourceModification() throws JsonProcessingException {
     Ref ref = Ref("classes/spells");
     ObjectV params = ObjectV("name", StringV("Mountainous Thunder"), "element", StringV("air"), "cost", NumberV(15));
-    Create create = Create(RefV(ref), ObjectV("data", params));
+    Create create = Create(ref, ObjectV("data", params));
     assertThat(json.writeValueAsString(create), is("{\"create\":{\"@ref\":\"classes/spells\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountainous Thunder\",\"element\":\"air\",\"cost\":15}}}}}"));
 
-    Update update = Update(RefV("classes/spells/123456"), ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "cost", NullV.Null)));
+    Update update = Update(Ref("classes/spells/123456"), ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "cost", NullV.Null)));
     assertThat(json.writeValueAsString(update), is("{\"update\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"cost\":null}}}}}"));
 
-    Replace replace = Replace(RefV("classes/spells/123456"), ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "element", ArrayV(StringV("air"), StringV("earth")), "cost", NumberV(10))));
+    Replace replace = Replace(Ref("classes/spells/123456"), ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "element", ArrayV(StringV("air"), StringV("earth")), "cost", NumberV(10))));
     assertThat(json.writeValueAsString(replace), is("{\"replace\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"element\":[\"air\",\"earth\"],\"cost\":10}}}}}"));
 
-    Delete delete = Delete(RefV("classes/spells/123456"));
+    Delete delete = Delete(Ref("classes/spells/123456"));
     assertThat(json.writeValueAsString(delete), is("{\"delete\":{\"@ref\":\"classes/spells/123456\"}}"));
   }
 
