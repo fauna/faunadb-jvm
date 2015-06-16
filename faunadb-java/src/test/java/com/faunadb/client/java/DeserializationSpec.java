@@ -1,6 +1,5 @@
 package com.faunadb.client.java;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.java.response.*;
@@ -163,6 +162,24 @@ public class DeserializationSpec {
     assertThat(idx.terms(), is(ImmutableList.of(ImmutableMap.of("path", "data.name"))));
     assertThat(idx.ts(), is(1434345216167501L));
     assertThat(idx.unique(), is(true));
+  }
+
+  @Test
+  public void deserializeEventResponse() throws IOException {
+    String toDeserialize = "{\n" +
+        "\t\t\t\"ts\": 1434477366352519,\n" +
+        "\t\t\t\"action\": \"create\",\n" +
+        "\t\t\t\"resource\": {\n" +
+        "\t\t\t\t\"@ref\": \"classes/spells/102989579003363328\"\n" +
+        "\t\t\t}\n" +
+        "\t\t}";
+
+    ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
+    Event event = parsed.asEvent();
+
+    assertThat(event.resource(), is(Ref.create("classes/spells/102989579003363328")));
+    assertThat(event.action(), is("create"));
+    assertThat(event.ts(), is(1434477366352519L));
   }
 
   @Test

@@ -89,6 +89,10 @@ public class ResponseNode {
     return json.convertValue(underlying, Index.class);
   }
 
+  public Event asEvent() {
+    return json.convertValue(underlying, Event.class);
+  }
+
   @Override
   public boolean equals(Object obj) {
     return (obj instanceof ResponseNode) && underlying.equals(((ResponseNode) obj).underlying);
