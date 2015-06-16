@@ -5,7 +5,6 @@ import com.faunadb.client.java.errors.NotFoundQueryException;
 import com.faunadb.client.java.query.*;
 import com.faunadb.client.java.response.*;
 import com.faunadb.client.java.types.Ref;
-import com.faunadb.client.java.types.Value;
 import com.faunadb.httpclient.Connection;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -342,25 +341,85 @@ public class ClientSpec {
 
   @Test
   public void testSets() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<ResponseNode> createF = client.query(Create(Ref("classes/spells"), ObjectV("data", ObjectV("name", StringV("Magic Missile"), "element", StringV("arcane"), "cost", NumberV(10)))));
-    ResponseNode createNode = createF.get();
-    Instance createInstance = createNode.asInstance();
+    ListenableFuture<ResponseNode> create1F = client.query(Create(Ref("classes/spells"), ObjectV("data", ObjectV("name", StringV("Magic Missile"), "element", StringV("arcane"), "cost", NumberV(10)))));
+    ListenableFuture<ResponseNode> create2F = client.query(Create(Ref("classes/spells"), ObjectV("data", ObjectV("name", StringV("Fireball"), "element", StringV("fire"), "cost", NumberV(10)))));
+    ListenableFuture<ResponseNode> create3F = client.query(Create(Ref("classes/spells"), ObjectV("data", ObjectV("name", StringV("Faerie Fire"), "element", ArrayV(StringV("arcane"), StringV("nature")), "cost", NumberV(10)))));
+    ListenableFuture<ResponseNode> create4F = client.query(Create(Ref("classes/spells"), ObjectV("data", ObjectV("name", StringV("Summon Animal Companion"), "element", StringV("nature"), "cost", NumberV(10)))));
+    ResponseNode createNode1 = create1F.get();
+    ResponseNode createNode2 = create2F.get();
+    ResponseNode createNode3 = create3F.get();
+    ResponseNode createNode4 = create4F.get();
+    Instance createInstance1 = createNode1.asInstance();
+    Instance createInstance2 = createNode2.asInstance();
+    Instance createInstance3 = createNode3.asInstance();
+    Instance createInstance4 = createNode4.asInstance();
 
     ListenableFuture<ResponseNode> matchF = client.query(Paginate(Match(StringV("arcane"), Ref("indexes/spells_by_element"))));
     ResponseNode matchResponse = matchF.get();
     Page matchList = matchResponse.asPage();
-    assertTrue(matchList.data().size() >= 1);
+    assertThat(matchList.data().size(), greaterThanOrEqualTo(1));
     ImmutableList.Builder<Ref> matchRefsBuilder = ImmutableList.builder();
     for (ResponseNode matchNode : matchList.data()) {
       matchRefsBuilder.add(matchNode.asRef());
     }
-    assertThat(matchRefsBuilder.build(), hasItem(createInstance.ref()));
+    assertThat(matchRefsBuilder.build(), hasItem(createInstance1.ref()));
 
     ListenableFuture<ResponseNode> matchEventsF = client.query(Paginate(Match(StringV("arcane"), Ref("indexes/spells_by_element"))).withEvents(true));
     ResponseNode matchEventsResponse = matchEventsF.get();
     Page matchEventsPage = matchEventsResponse.asPage();
-    System.out.println(matchEventsPage);
-  }
+    assertThat(matchEventsPage.data().size(), greaterThanOrEqualTo(1));
+    ImmutableList.Builder<Ref> matchRefEventsBuilder = ImmutableList.builder();
+    for (ResponseNode matchEventNode : matchEventsPage.data()) {
+      Event event = matchEventNode.asEvent();
+      if (event.action().contentEquals("create")) {
+        matchRefEventsBuilder.add(event.resource());
+      }
+    }
+    assertThat(matchRefEventsBuilder.build(), hasItem(createInstance1.ref()));
 
+    ListenableFuture<ResponseNode> unionF = client.query(Paginate(Union(ImmutableList.<Set>of(Match(StringV("arcane"), Ref("indexes/spells_by_element")), Match(StringV("fire"), Ref("indexes/spells_by_element"))))));
+    ResponseNode unionResponse = unionF.get();
+    Page unionPage = unionResponse.asPage();
+    assertThat(unionPage.data().size(), greaterThanOrEqualTo(2));
+    ImmutableList.Builder<Ref> unionRefsBuilder = ImmutableList.builder();
+    for (ResponseNode unionNode : unionPage.data()) {
+      unionRefsBuilder.add(unionNode.asRef());
+    }
+    assertThat(unionRefsBuilder.build(), hasItems(createInstance1.ref(), createInstance2.ref()));
+
+    ListenableFuture<ResponseNode> unionEventsF = client.query(Paginate(Union(ImmutableList.<Set>of(Match(StringV("arcane"), Ref("indexes/spells_by_element")), Match(StringV("fire"), Ref("indexes/spells_by_element"))))).withEvents(true));
+    ResponseNode unionEventsResponse = unionEventsF.get();
+    Page unionEventsPage = unionEventsResponse.asPage();
+    assertThat(unionEventsPage.data().size(), greaterThanOrEqualTo(2));
+    ImmutableList.Builder<Ref> unionEventsRefsBuilder = ImmutableList.builder();
+    for (ResponseNode unionEventsNode : unionEventsPage.data()) {
+      Event event = unionEventsNode.asEvent();
+      if (event.action().contentEquals("create")) {
+        unionEventsRefsBuilder.add(event.resource());
+      }
+    }
+    assertThat(unionEventsRefsBuilder.build(), hasItems(createInstance1.ref(), createInstance2.ref()));
+
+    ListenableFuture<ResponseNode> intersectionF = client.query(Paginate(Intersection(ImmutableList.<Set>of(Match(StringV("arcane"), Ref("indexes/spells_by_element")), Match(StringV("nature"), Ref("indexes/spells_by_element"))))));
+    ResponseNode intersectionResponse = intersectionF.get();
+    Page intersectionPage = intersectionResponse.asPage();
+    assertThat(intersectionPage.data().size(), greaterThanOrEqualTo(1));
+    ImmutableList.Builder<Ref> intersectionRefsBuilder = ImmutableList.builder();
+    for (ResponseNode intersectionNode : intersectionPage.data()) {
+      intersectionRefsBuilder.add(intersectionNode.asRef());
+    }
+    assertThat(intersectionRefsBuilder.build(), hasItem(createInstance3.ref()));
+
+    ListenableFuture<ResponseNode> differenceF = client.query(Paginate(Difference(ImmutableList.<Set>of(Match(StringV("nature"), Ref("indexes/spells_by_element")), Match(StringV("arcane"), Ref("indexes/spells_by_element"))))));
+    ResponseNode differenceResponse = differenceF.get();
+    Page differencePage = differenceResponse.asPage();
+    assertThat(differencePage.data().size(), greaterThanOrEqualTo(1));
+    ImmutableList.Builder<Ref> differenceRefsBuilder = ImmutableList.builder();
+    for (ResponseNode differenceNode : differencePage.data()) {
+      differenceRefsBuilder.add(differenceNode.asRef());
+    }
+    assertThat(differenceRefsBuilder.build(), hasItem(createInstance4.ref()));
+    assertThat(differenceRefsBuilder.build(), not(hasItem(createInstance3.ref())));
+  }
 }
 
