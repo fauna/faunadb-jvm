@@ -7,8 +7,8 @@ import com.faunadb.client.java.types.Ref;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-public abstract class Value implements Expression {
-  public static class ObjectV extends Value {
+public interface Value extends Expression {
+  public static class ObjectV implements Value {
     private final ImmutableMap<String, Value> values;
 
     public static ObjectV empty() {
@@ -54,7 +54,7 @@ public abstract class Value implements Expression {
     }
   }
 
-  public static class ArrayV extends Value {
+  public static class ArrayV implements Value {
     private final ImmutableList<Value> values;
 
     public static ArrayV empty() {
@@ -104,7 +104,7 @@ public abstract class Value implements Expression {
     }
   }
 
-  public static class BooleanV extends Value {
+  public static class BooleanV implements Value {
     private final Boolean value;
 
     public final static BooleanV True = BooleanV.create(true);
@@ -129,7 +129,7 @@ public abstract class Value implements Expression {
     }
   }
 
-  public static class DoubleV extends Value {
+  public static class DoubleV implements Value {
     private final Double value;
 
     public static DoubleV create(double value) {
@@ -151,7 +151,7 @@ public abstract class Value implements Expression {
     }
   }
 
-  public static class NumberV extends Value {
+  public static class NumberV implements Value {
     private final Long value;
 
     public static NumberV create(long value) {
@@ -173,7 +173,7 @@ public abstract class Value implements Expression {
     }
   }
 
-  public static class StringV extends Value {
+  public static class StringV implements Value {
     private final String value;
 
     public static StringV create(String value) {
@@ -195,7 +195,7 @@ public abstract class Value implements Expression {
     }
   }
 
-  public static class RefV extends Value implements Identifier {
+  public static class RefV implements Value, Identifier {
     private final Ref value;
 
     public static RefV create(String value) {
@@ -221,7 +221,7 @@ public abstract class Value implements Expression {
     }
   }
 
-  public static class VarV extends Value implements Identifier {
+  public static class VarV implements Value, Identifier {
     public static VarV create(String value) {
       return new VarV(value);
     }
@@ -238,7 +238,7 @@ public abstract class Value implements Expression {
     }
   }
 
-  public static class NullV extends Value implements Identifier {
+  public static class NullV implements Value, Identifier {
     public static final NullV Null = new NullV();
 
     NullV() { }

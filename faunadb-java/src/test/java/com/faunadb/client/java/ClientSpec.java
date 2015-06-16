@@ -12,14 +12,19 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import static com.faunadb.client.java.query.Language.*;
@@ -28,6 +33,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class ClientSpec {
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
   static ImmutableMap<String, String> config = readConfig("config/test.yml");
   ObjectMapper json = new ObjectMapper();
   static FaunaClient rootClient;
@@ -63,33 +71,41 @@ public class ClientSpec {
     classCreateF.get();
 
     ListenableFuture<ResponseNode> indexCreateF = client.query(Create(Ref("indexes"), ObjectV(
-      "name", StringV("spells_by_test"),
-      "source", RefV("classes/spells"),
-      "path", StringV("data.queryTest1"),
-      "unique", BooleanV(false))));
+        "name", StringV("spells_by_test"),
+        "source", RefV("classes/spells"),
+        "path", StringV("data.queryTest1"),
+        "unique", BooleanV(false))));
 
     indexCreateF.get();
 
     ListenableFuture<ResponseNode> setIndexF = client.query(Create(Ref("indexes"), ObjectV(
-      "name", StringV("spells_instances"),
-      "source", RefV("classes/spells"),
-      "path", StringV("class"),
-      "unique", BooleanV(false)
+        "name", StringV("spells_instances"),
+        "source", RefV("classes/spells"),
+        "path", StringV("class"),
+        "unique", BooleanV(false)
     )));
 
     setIndexF.get();
 
     ListenableFuture<ResponseNode> uniqueIndexF = client.query(Create(Ref("indexes"), ObjectV(
-      "name", StringV("spells_by_unique_test"),
-      "source", RefV("classes/spells"),
-      "path", StringV("data.uniqueTest1"),
-      "unique", BooleanV(true)
+        "name", StringV("spells_by_unique_test"),
+        "source", RefV("classes/spells"),
+        "path", StringV("data.uniqueTest1"),
+        "unique", BooleanV(true)
     )));
 
     uniqueIndexF.get();
+
+    ListenableFuture<ResponseNode> indexByElementF = client.query(Create(Ref("indexes"), ObjectV(
+        "name", StringV("spells_by_element"),
+        "source", RefV("classes/spells"),
+        "path", StringV("data.element")
+    )));
+
+    indexByElementF.get();
   }
 
-  @Test(expected=NotFoundQueryException.class)
+  @Test(expected = NotFoundQueryException.class)
   public void testLookupMissingInstance() throws Throwable {
     ListenableFuture<ResponseNode> resp = client.query(Get(RefV("classes/spells/1234")));
     try {
@@ -243,4 +259,89 @@ public class ClientSpec {
       assertThat(bqe.errors().get(0).parameters().get("data.uniqueTest1").error(), is("duplicate value"));
     }
   }
+
+  @Test
+  public void testBasicForms() throws IOException, ExecutionException, InterruptedException {
+    ListenableFuture<ResponseNode> letF = client.query(Let(ImmutableMap.<String, Expression>of("x", NumberV(1), "y", NumberV(2)), Var("x")));
+    ResponseNode let = letF.get();
+    assertThat(let.asNumber(), is(1L));
+
+    ListenableFuture<ResponseNode> ifF = client.query(If(BooleanV(true), StringV("was true"), StringV("was false")));
+    ResponseNode ifNode = ifF.get();
+    assertThat(ifNode.asString(), is("was true"));
+
+    Long randomRefNum = RandomUtils.nextLong(0, 250000);
+    Ref randomRef = Ref("classes/spells/" + randomRefNum);
+
+    ListenableFuture<ResponseNode> doF = client.query(Do(ImmutableList.of(
+        Create(RefV(randomRef), ObjectV("data", ObjectV("name", StringV("Magic Missile")))),
+        Get(RefV(randomRef))
+    )));
+    ResponseNode doNode = doF.get();
+    Instance doInstance = doNode.asInstance();
+    assertThat(doInstance.ref(), is(randomRef));
+
+    ListenableFuture<ResponseNode> objectF = client.query(ObjectV(ImmutableMap.of("name", StringV("Hen Wen"), "age", NumberV(123))));
+    ResponseNode objectNode = objectF.get();
+    ResponseMap objectMap = objectNode.asObject();
+    assertThat(objectMap.get("name").asString(), is("Hen Wen"));
+    assertThat(objectMap.get("age").asNumber(), is(123L));
+
+    ListenableFuture<ResponseNode> selectF = client.query(Select(ImmutableList.of(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
+        ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings"), StringV("lunchings"))))));
+    ResponseNode selectNode = selectF.get();
+    assertThat(selectNode.asString(), is("munchings"));
+  }
+
+  @Test
+  public void testCollections() throws IOException, ExecutionException, InterruptedException {
+    ListenableFuture<ResponseNode> mapF = client.query(Map(Lambda("munchings", Add(ImmutableList.<Expression>of(Var("munchings"), NumberV(1)))), ArrayV(NumberV(1), NumberV(2), NumberV(3))));
+    ResponseNode mapNode = mapF.get();
+    ImmutableList<ResponseNode> mapArray = mapNode.asArray();
+    assertThat(mapArray.size(), is(3));
+    assertThat(mapArray.get(0).asNumber(), is(2L));
+    assertThat(mapArray.get(1).asNumber(), is(3L));
+    assertThat(mapArray.get(2).asNumber(), is(4L));
+
+    ListenableFuture<ResponseNode> foreachF = client.query(Foreach(Lambda("spell", Create(Ref("classes/spells"), ObjectV("data", ObjectV("name", Var("spell"))))), ArrayV(StringV("Fireball Level 1"), StringV("Fireball Level 2"))));
+    ResponseNode foreachNode = foreachF.get();
+    ImmutableList<ResponseNode> foreachArray = foreachNode.asArray();
+    assertThat(foreachArray.size(), is(2));
+    assertThat(foreachArray.get(0).asString(), is("Fireball Level 1"));
+    assertThat(foreachArray.get(1).asString(), is("Fireball Level 2"));
+  }
+
+  @Test
+  public void testResourceModification() throws IOException, ExecutionException, InterruptedException {
+    ListenableFuture<ResponseNode> createF = client.query(Create(Ref("classes/spells"), ObjectV("data", ObjectV("name", StringV("Magic Missile"), "element", StringV("arcane"), "cost", NumberV(10)))));
+    ResponseNode createNode = createF.get();
+    Instance createInstance = createNode.asInstance();
+    assertThat(createInstance.ref().value(), startsWith("classes/spells"));
+    assertThat(createInstance.data().get("name").asString(), is("Magic Missile"));
+
+    ListenableFuture<ResponseNode> updateF = client.query(Update(RefV(createInstance.ref()), ObjectV("data", ObjectV("name", StringV("Faerie Fire"), "cost", NullV()))));
+    ResponseNode updateNode = updateF.get();
+    Instance updateInstance = updateNode.asInstance();
+    assertThat(updateInstance.ref(), is(createInstance.ref()));
+    assertThat(updateInstance.data().get("name").asString(), is("Faerie Fire"));
+    assertThat(updateInstance.data().get("element").asString(), is("arcane"));
+    assertThat(updateInstance.data().get("cost"), nullValue());
+
+    ListenableFuture<ResponseNode> replaceF = client.query(Replace(RefV(createInstance.ref()), ObjectV("data", ObjectV("name", StringV("Volcano"), "element", ArrayV(StringV("fire"), StringV("earth")), "cost", NumberV(10)))));
+    ResponseNode replaceNode = replaceF.get();
+    Instance replaceInstance = replaceNode.asInstance();
+    assertThat(replaceInstance.ref(), is(createInstance.ref()));
+    assertThat(replaceInstance.data().get("name").asString(), is("Volcano"));
+    assertThat(replaceInstance.data().get("element").asArray().get(0).asString(), is("fire"));
+    assertThat(replaceInstance.data().get("element").asArray().get(1).asString(), is("earth"));
+    assertThat(replaceInstance.data().get("cost").asNumber(), is(10L));
+
+    ListenableFuture<ResponseNode> deleteF = client.query(Delete(RefV(createInstance.ref())));
+    deleteF.get();
+
+    thrown.expectCause(isA(NotFoundQueryException.class));
+    ListenableFuture<ResponseNode> getF = client.query(Get(RefV(createInstance.ref())));
+    getF.get();
+  }
 }
+

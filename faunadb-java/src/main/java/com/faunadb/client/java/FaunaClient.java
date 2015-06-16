@@ -54,7 +54,7 @@ public class FaunaClient {
           handleQueryErrors(response);
 
           JsonNode responseBody = parseResponseBody(response);
-          ObjectNode resource = (ObjectNode) responseBody.get("resource");
+          JsonNode resource = responseBody.get("resource");
           return json.treeToValue(resource, ResponseNode.class);
         } catch (IOException ex) {
           throw new RuntimeException(ex);

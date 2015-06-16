@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.java.query.*;
-import com.faunadb.client.java.query.Cursor.*;
 import com.faunadb.client.java.query.Set;
 import com.faunadb.client.java.query.Value.*;
 import com.faunadb.client.java.types.*;
