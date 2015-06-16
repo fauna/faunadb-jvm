@@ -1,9 +1,11 @@
 package com.faunadb.client.java;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.java.errors.BadQueryException;
 import com.faunadb.client.java.errors.NotFoundQueryException;
-import com.faunadb.client.java.query.*;
+import com.faunadb.client.java.query.Create;
+import com.faunadb.client.java.query.Expression;
+import com.faunadb.client.java.query.Match;
+import com.faunadb.client.java.query.Path;
 import com.faunadb.client.java.response.*;
 import com.faunadb.client.java.types.Ref;
 import com.faunadb.httpclient.Connection;
@@ -17,18 +19,15 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import static com.faunadb.client.java.query.Language.*;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -37,14 +36,12 @@ public class ClientSpec {
   public ExpectedException thrown = ExpectedException.none();
 
   static ImmutableMap<String, String> config = readConfig("config/test.yml");
-  ObjectMapper json = new ObjectMapper();
   static FaunaClient rootClient;
   static FaunaClient client;
   static String testDbName = RandomStringUtils.randomAlphanumeric(8);
 
   static ImmutableMap<String, String> readConfig(String filename) {
     try {
-      System.out.println(new File(".").getCanonicalPath());
       FileInputStream reader = new FileInputStream(filename);
       ImmutableMap<String, String> rv = ImmutableMap.copyOf(new Yaml().loadAs(reader, Map.class));
       reader.close();
@@ -65,6 +62,7 @@ public class ClientSpec {
     ResponseNode keyCreateR = keyCreateF.get();
     Key key = keyCreateR.asKey();
 
+    System.out.println(key.secret());
     client = FaunaClient.create(Connection.builder().withFaunaRoot(config.get("root_url")).withAuthToken(key.secret()).build());
 
     ListenableFuture<ResponseNode> classCreateF = client.query(Create(Ref("classes"), ObjectV("name", StringV("spells"))));
@@ -343,5 +341,27 @@ public class ClientSpec {
     ListenableFuture<ResponseNode> getF = client.query(Get(RefV(createInstance.ref())));
     getF.get();
   }
+
+  @Test
+  public void testSets() throws IOException, ExecutionException, InterruptedException {
+    ListenableFuture<ResponseNode> createF = client.query(Create(Ref("classes/spells"), ObjectV("data", ObjectV("name", StringV("Magic Missile"), "element", StringV("arcane"), "cost", NumberV(10)))));
+    ResponseNode createNode = createF.get();
+    Instance createInstance = createNode.asInstance();
+
+    ListenableFuture<ResponseNode> matchF = client.query(Paginate(Match(StringV("arcane"), Ref("indexes/spells_by_element"))));
+    ResponseNode matchResponse = matchF.get();
+    Page matchList = matchResponse.asPage();
+    assertTrue(matchList.data().size() >= 1);
+    ImmutableList.Builder<Ref> matchRefsBuilder = ImmutableList.builder();
+    for (ResponseNode matchNode : matchList.data()) {
+      matchRefsBuilder.add(matchNode.asRef());
+    }
+    assertThat(matchRefsBuilder.build(), hasItem(createInstance.ref()));
+
+    ListenableFuture<ResponseNode> matchEventsF = client.query(Paginate(Match(StringV("arcane"), Ref("indexes/spells_by_element"))).withEvents(true));
+    ResponseNode matchEventsResponse = matchEventsF.get();
+    System.out.println(matchEventsResponse);
+  }
+
 }
 

@@ -61,7 +61,8 @@ lazy val java = project.in(file("faunadb-java"))
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
       "org.apache.commons" % "commons-lang3" % "3.4" % "test",
       "org.yaml" % "snakeyaml" % "1.14" % "test",
-      "com.novocode" % "junit-interface" % "0.9" % "test",
+      "com.novocode" % "junit-interface" % "0.11" % "test",
+      "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
       "junit" % "junit" % "4.12" % "test"
     )
   )
