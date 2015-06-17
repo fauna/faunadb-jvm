@@ -2,7 +2,7 @@ package com.faunadb.client.java.query;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Join {
+public class Join extends Set {
   public static Join create(Set source, Lambda target) {
     return new Join(source, target);
   }

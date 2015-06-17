@@ -43,7 +43,7 @@ public class Value implements Expression {
       this.values = values;
     }
 
-    @JsonProperty("object")
+    @JsonValue
     public ImmutableMap<String, Value> values() {
       return values;
     }

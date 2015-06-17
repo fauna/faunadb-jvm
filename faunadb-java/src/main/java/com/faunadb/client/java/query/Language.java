@@ -13,6 +13,14 @@ public abstract class Language {
     return NullV.Null;
   }
 
+  public static Object Object() {
+    return Object.create(ObjectV());
+  }
+
+  public static Object Object(ObjectV value) {
+    return Object.create(value);
+  }
+
   public static Value.ObjectV ObjectV() {
     return ObjectV.empty();
   }
@@ -102,7 +110,7 @@ public abstract class Language {
     return Create.create(ref);
   }
 
-  public static Create Create(Identifier ref, ObjectV params) {
+  public static Create Create(Identifier ref, Expression params) {
     return Create.create(ref, params);
   }
 
@@ -162,7 +170,7 @@ public abstract class Language {
     return Quote.create(expression);
   }
 
-  public static Replace Replace(Identifier ref, ObjectV obj) {
+  public static Replace Replace(Identifier ref, Expression obj) {
     return Replace.create(ref, obj);
   }
 
@@ -174,7 +182,7 @@ public abstract class Language {
     return Union.create(sets);
   }
 
-  public static Update Update(Identifier ref, ObjectV params) {
+  public static Update Update(Identifier ref, Expression params) {
     return Update.create(ref, params);
   }
 

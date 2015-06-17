@@ -55,7 +55,7 @@ lazy val java = project.in(file("faunadb-java"))
     autoScalaLibrary := false,
     compileOrder := CompileOrder.JavaThenScala,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
-    testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v"),
+    testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",

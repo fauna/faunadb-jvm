@@ -8,17 +8,17 @@ public class Create implements Identifier, Expression {
   @JsonProperty("create")
   private final Identifier ref;
   @JsonProperty("params")
-  private final ObjectV params;
+  private final Expression params;
 
   public static Create create(Identifier ref) {
     return new Create(ref, ObjectV.empty());
   }
 
-  public static Create create(Identifier ref, ObjectV params) {
+  public static Create create(Identifier ref, Expression params) {
     return new Create(ref, params);
   }
 
-  Create(Identifier ref, ObjectV params) {
+  Create(Identifier ref, Expression params) {
     this.ref = ref;
     this.params = params;
   }
