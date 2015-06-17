@@ -20,42 +20,100 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * The HTTP Connection adapter for FaunaDB clients.
+ *
+ * <p>Relies on <a href="https://github.com/AsyncHttpClient/async-http-client">async-http-client</a>
+ * for the underlying implementation.
+ *
+ * @author Fauna, Inc.
+ */
+
 public class Connection {
+  /**
+   * Returns a new {@link Connection.Builder}.
+   */
   public static Builder builder() {
     return new Builder();
   }
 
+  /**
+   * A builder for creating an instance of {@link Connection}. Use {@link Connection#builder} to obtain
+   * an instance of this builder.
+   */
   public static class Builder {
     private URL faunaRoot;
     private String authToken;
     private AsyncHttpClient client;
     private MetricRegistry metricRegistry;
 
+    private Builder() {
+    }
+
+    /**
+     * Sets the FaunaDB root URL for the built {@link Connection}.
+     *
+     * @param root the root URL, as a RFC 2396 formatted string. Example: https://rest.faunadb.com
+     * @return this {@link Builder} object
+     * @throws MalformedURLException if {@code root} is not RFC 2396.
+     */
     public Builder withFaunaRoot(String root) throws MalformedURLException {
       this.faunaRoot = new URL(root);
       return this;
     }
 
+    /**
+     * Sets the FaunaDB root URL for the built {@code Connection}.
+     *
+     * @param root the root URL
+     * @return this {@link Builder} object
+     */
     public Builder withFaunaRoot(URL root) {
       this.faunaRoot = root;
       return this;
     }
 
+    /**
+     * Sets the Auth Token that the built {@code Connection} will provide to FaunaDB. This must be provided in order
+     * for client to authenticate with FaunaDB.
+     *
+     * @param token the auth token.
+     * @return this {@link Builder} object
+     */
     public Builder withAuthToken(String token) {
       this.authToken = token;
       return this;
     }
 
+    /**
+     * Sets a custom {@link AsyncHttpClient} implementation that the built {@link Connection} will use. This custom implementation
+     * can be provided to control the behavior of the underlying HTTP transport.
+     *
+     * @param client the custom {@link AsyncHttpClient} instance
+     * @return this {@link Builder} object
+     */
     public Builder withHttpClient(AsyncHttpClient client) {
       this.client = client;
       return this;
     }
 
+    /**
+     * Sets a {@link MetricRegistry} that the {@link Connection} will use to register and track Connection-level statistics.
+     * @param registry the MetricRegistry instance.
+     * @return this {@link Builder} object
+     *
+     */
     public Builder withMetrics(MetricRegistry registry) {
       this.metricRegistry = registry;
       return this;
     }
 
+    /**
+     * Returns a newly constructed {@link Connection} with configuration based on the settings of this {@code Builder}.
+     *
+     * @throws UnsupportedEncodingException if the system does not support ASCII encoding for the Connection.
+     * @throws MalformedURLException if the default FaunaDB URL cannot be parsed.
+     */
     public Connection build() throws UnsupportedEncodingException, MalformedURLException {
       MetricRegistry r;
       if (metricRegistry == null)
