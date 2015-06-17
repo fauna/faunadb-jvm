@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.faunadb.client.java.types.Ref;
-import com.faunadb.client.java.types.Value;
 import com.google.common.collect.ImmutableList;
 
 @JsonDeserialize(using=Codec.ResponseNodeDeserializer.class)
@@ -90,6 +89,10 @@ public class ResponseNode {
 
   public Event asEvent() {
     return json.convertValue(underlying, Event.class);
+  }
+
+  public Set asSet() {
+    return json.convertValue(underlying, Set.class);
   }
 
   @Override

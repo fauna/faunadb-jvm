@@ -102,15 +102,7 @@ public abstract class Language {
     return Create.create(ref);
   }
 
-  public static Create Create(Ref ref) {
-    return Create.create(ref);
-  }
-
   public static Create Create(Identifier ref, ObjectV params) {
-    return Create.create(ref, params);
-  }
-
-  public static Create Create(Ref ref, ObjectV params) {
     return Create.create(ref, params);
   }
 
@@ -156,10 +148,6 @@ public abstract class Language {
 
   public static Map Map(Lambda lambda, Expression collection) {
     return Map.create(lambda, collection);
-  }
-
-  public static Match Match(Ref term, Ref index) {
-    return Match.create(term, index);
   }
 
   public static Match Match(Value term, Ref index) {
