@@ -3,7 +3,7 @@ package com.faunadb.client.java.query;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.java.types.Identifier;
 
-public class Count implements Identifier {
+public class Count implements Identifier, Expression {
   public final static Count create(Set set) {
     return new Count(set);
   }

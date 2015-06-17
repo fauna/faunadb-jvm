@@ -3,8 +3,9 @@ package com.faunadb.client.java;
 import com.faunadb.client.java.errors.BadQueryException;
 import com.faunadb.client.java.errors.NotFoundQueryException;
 import com.faunadb.client.java.query.*;
+import com.faunadb.client.java.query.Set;
 import com.faunadb.client.java.response.*;
-import com.faunadb.client.java.types.Ref;
+import com.faunadb.client.java.types.*;
 import com.faunadb.httpclient.Connection;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -134,6 +135,24 @@ public class ClientSpec {
   }
 
   @Test
+  public void testIssueBatchedQuery() throws IOException, ExecutionException, InterruptedException {
+    String randomText1 = RandomStringUtils.randomAlphanumeric(8);
+    String randomText2 = RandomStringUtils.randomAlphanumeric(8);
+
+    Ref classRef = Ref("classes/spells");
+
+    Create expr1 = Create(classRef, ObjectV("data", ObjectV("queryTest1", StringV(randomText1))));
+    Create expr2 = Create(classRef, ObjectV("data", ObjectV("queryTest1", StringV(randomText2))));
+
+    ListenableFuture<ImmutableList<ResponseNode>> createFuture = client.query(ImmutableList.of(expr1, expr2));
+    ImmutableList<ResponseNode> results = createFuture.get();
+
+    assertThat(results.size(), is(2));
+    assertThat(results.get(0).asInstance().data().get("queryTest1").asString(), is(randomText1));
+    assertThat(results.get(1).asInstance().data().get("queryTest1").asString(), is(randomText2));
+  }
+
+  @Test
   public void testIssueQuery() throws IOException, ExecutionException, InterruptedException {
     String randomText1 = RandomStringUtils.randomAlphanumeric(8);
     String randomText2 = RandomStringUtils.randomAlphanumeric(8);
@@ -164,25 +183,18 @@ public class ClientSpec {
   }
 
   @Test
-  public void testIssueBatchedQuery() throws IOException, ExecutionException, InterruptedException {
+  public void testGet() throws IOException, ExecutionException, InterruptedException {
     String randomText1 = RandomStringUtils.randomAlphanumeric(8);
-    String randomText2 = RandomStringUtils.randomAlphanumeric(8);
+    ListenableFuture<ResponseNode> createFuture1 = client.query(Create(Ref("classes/spells"), ObjectV("data", ObjectV("queryTest1", StringV(randomText1)))));
+    Instance create1 = createFuture1.get().asInstance();
 
-    Ref classRef = Ref("classes/spells");
-
-    Create expr1 = Create(classRef, ObjectV("data", ObjectV("queryTest1", StringV(randomText1))));
-    Create expr2 = Create(classRef, ObjectV("data", ObjectV("queryTest1", StringV(randomText2))));
-
-    ListenableFuture<ImmutableList<ResponseNode>> createFuture = client.query(ImmutableList.of(expr1, expr2));
-    ImmutableList<ResponseNode> results = createFuture.get();
-
-    assertThat(results.size(), is(2));
-    assertThat(results.get(0).asInstance().data().get("queryTest1").asString(), is(randomText1));
-    assertThat(results.get(1).asInstance().data().get("queryTest1").asString(), is(randomText2));
+    ListenableFuture<ResponseNode> queryF = client.query(Get(create1.ref()));
+    Instance result = queryF.get().asInstance();
+    assertThat(result.data().get("queryTest1").asString(), is(randomText1));
   }
 
   @Test
-  public void testIssuePagedQuery() throws IOException, ExecutionException, InterruptedException {
+  public void testPaginate() throws IOException, ExecutionException, InterruptedException {
     String randomText1 = RandomStringUtils.randomAlphanumeric(8);
     String randomText2 = RandomStringUtils.randomAlphanumeric(8);
     String randomText3 = RandomStringUtils.randomAlphanumeric(8);
@@ -193,45 +205,44 @@ public class ClientSpec {
     ListenableFuture<ResponseNode> createFuture2 = client.query(Create(classRef, ObjectV("data", ObjectV("queryTest1", StringV(randomText2)))));
     ListenableFuture<ResponseNode> createFuture3 = client.query(Create(classRef, ObjectV("data", ObjectV("queryTest1", StringV(randomText3)))));
 
-    createFuture1.get();
-    createFuture2.get();
-    createFuture3.get();
+    Instance create1 = createFuture1.get().asInstance();
+    Instance create2 = createFuture2.get().asInstance();
+    Instance create3 = createFuture3.get().asInstance();
 
-    ListenableFuture<ResponseNode> queryF = client.query(Paginate(Match(classRef, Ref("indexes/spells_instances"))).withSize(1));
-    Page resp1 = queryF.get().asPage();
+    ListenableFuture<ResponseNode> queryF1 = client.query(Paginate(Match(StringV(randomText1), Ref("indexes/spells_by_test"))));
+    Page page1 = queryF1.get().asPage();
+    assertThat(page1.data().size(), is(1));
+    assertThat(page1.data().get(0).asRef(), is(create1.ref()));
+
+    ListenableFuture<ResponseNode> queryF2 = client.query(Paginate(Match.create(classRef, Ref("indexes/spells_instances"))));
+    Page page = queryF2.get().asPage();
+
+    ImmutableList.Builder<Ref> refsBuilder = ImmutableList.builder();
+    for (ResponseNode node : page.data()) {
+      refsBuilder.add(node.asRef());
+    }
+
+    ImmutableList<Ref> refs = refsBuilder.build();
+    assertThat(refs, hasItems(create1.ref(), create2.ref()));
+
+    ListenableFuture<ResponseNode> countF1 = client.query(Count(Match(classRef, Ref("indexes/spells_instances"))));
+    ResponseNode countNode = countF1.get();
+    assertThat(countNode.asNumber(), is(3L));
+
+    ListenableFuture<ResponseNode> queryF3 = client.query(Paginate(Match(classRef, Ref("indexes/spells_instances"))).withSize(1));
+    Page resp1 = queryF3.get().asPage();
 
     assertThat(resp1.data().size(), is(1));
     assertThat(resp1.before(), not(Optional.<ResponseNode>absent()));
     assertThat(resp1.after(), is(Optional.<ResponseNode>absent()));
 
-    ListenableFuture<ResponseNode> queryF2 = client.query(Paginate(Match(classRef, Ref("indexes/spells_instances"))).withSize(1).withCursor(Before(resp1.before().get().asRef())));
-    Page resp2 = queryF2.get().asPage();
+    ListenableFuture<ResponseNode> queryF4 = client.query(Paginate(Match(classRef, Ref("indexes/spells_instances"))).withSize(1).withCursor(Before(resp1.before().get().asRef())));
+    Page resp2 = queryF4.get().asPage();
 
     assertThat(resp2.data().size(), is(1));
     assertThat(resp2.data(), not(resp1.data()));
     assertThat(resp2.before(), not(Optional.<ResponseNode>absent()));
     assertThat(resp2.after(), not(Optional.<ResponseNode>absent()));
-  }
-
-  @Test
-  public void testIssueLambdaQuery() throws IOException, ExecutionException, InterruptedException {
-    String randomText1 = RandomStringUtils.randomAlphanumeric(8);
-    String randomText2 = RandomStringUtils.randomAlphanumeric(8);
-
-    Ref classRef = Ref("classes/spells");
-
-    ListenableFuture<ResponseNode> createFuture1 = client.query(Create(classRef, ObjectV("data", ObjectV("queryTest1", StringV(randomText1)))));
-    ListenableFuture<ResponseNode> createFuture2 = client.query(Create(classRef, ObjectV("data", ObjectV("queryTest1", StringV(randomText2)))));
-
-    createFuture1.get();
-    createFuture2.get();
-
-    ListenableFuture<ResponseNode> queryF = client.query(Map(Lambda("x", Get(Var("x"))), Paginate(Match(Ref("classes/spells"), Ref("indexes/spells_instances"))).withSize(2)));
-    Page resp = queryF.get().asPage();
-
-    assertThat(resp.data().size(), is(2));
-    assertThat(resp.data().get(0).asInstance(), notNullValue());
-    assertThat(resp.data().get(1).asInstance(), notNullValue());
   }
 
   @Test
@@ -253,6 +264,15 @@ public class ClientSpec {
       assertThat(bqe.errors().get(0).code(), is("validation failed"));
       assertThat(bqe.errors().get(0).parameters().get("data.uniqueTest1").error(), is("duplicate value"));
     }
+  }
+
+  @Test
+  public void testTypes() throws IOException, ExecutionException, InterruptedException {
+    ListenableFuture<ResponseNode> setF = client.query(Match(StringV("arcane"), Ref("indexes/spells_by_element")));
+    ResponseNode setNode = setF.get();
+    com.faunadb.client.java.response.Set set = setNode.asSet();
+    assertThat(set.parameters().get("match").asString(), is("arcane"));
+    assertThat(set.parameters().get("index").asRef(), is(Ref("indexes/spells_by_element")));
   }
 
   @Test
