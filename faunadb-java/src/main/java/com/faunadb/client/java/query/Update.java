@@ -5,16 +5,16 @@ import com.faunadb.client.java.types.Identifier;
 import com.faunadb.client.java.types.Value.*;
 
 public class Update implements Identifier, Expression {
-  public static Update create(Identifier ref, ObjectV params) {
+  public static Update create(Identifier ref, Expression params) {
     return new Update(ref, params);
   }
 
   @JsonProperty("update")
   private final Identifier ref;
   @JsonProperty("params")
-  private final ObjectV params;
+  private final Expression params;
 
-  Update(Identifier ref, ObjectV params) {
+  Update(Identifier ref, Expression params) {
     this.ref = ref;
     this.params = params;
   }

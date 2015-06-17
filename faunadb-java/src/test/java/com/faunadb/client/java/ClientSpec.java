@@ -60,7 +60,6 @@ public class ClientSpec {
     ResponseNode keyCreateR = keyCreateF.get();
     Key key = keyCreateR.asKey();
 
-    System.out.println(key.secret());
     client = FaunaClient.create(Connection.builder().withFaunaRoot(config.get("root_url")).withAuthToken(key.secret()).build());
 
     ListenableFuture<ResponseNode> classCreateF = client.query(Create(Ref("classes"), ObjectV("name", StringV("spells"))));
@@ -101,14 +100,11 @@ public class ClientSpec {
     indexByElementF.get();
   }
 
-  @Test(expected = NotFoundQueryException.class)
+  @Test
   public void testLookupMissingInstance() throws Throwable {
+    thrown.expectCause(isA(NotFoundQueryException.class));
     ListenableFuture<ResponseNode> resp = client.query(Get(Ref("classes/spells/1234")));
-    try {
-      resp.get();
-    } catch (ExecutionException ex) {
-      throw ex.getCause();
-    }
+    resp.get();
   }
 
   @Test
