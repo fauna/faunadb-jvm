@@ -8,10 +8,7 @@ lazy val commonSettings = Seq(
 lazy val root = (project in file("."))
   .settings(commonSettings: _*)
   .settings(
-    name := "faunadb-jvm",
-    libraryDependencies ++= Seq(
-      "commons-beanutils" % "commons-beanutils" % "1.9.2"
-    )
+    name := "faunadb-jvm"
    ).aggregate(httpclient, scala, java)
 
 
@@ -23,6 +20,12 @@ lazy val httpclient = project.in(file("faunadb-httpclient"))
     autoScalaLibrary := false,
     compileOrder := CompileOrder.JavaThenScala,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
+    (javacOptions in doc) := Seq("-source", "1.7",
+      "-link", "http://docs.oracle.com/javase/7/docs/api/",
+      "-link", "http://docs.guava-libraries.googlecode.com/git-history/v18.0/javadoc/",
+      "-link", "http://fasterxml.github.io/jackson-databind/javadoc/2.5/",
+      "-link", "https://dropwizard.github.io/metrics/3.1.0/apidocs/",
+      "-linkoffline", "http://static.javadoc.io/com.ning/async-http-client/1.8.15", "./faunadb-httpclient/doc/com.ning/async-http-client/1.8.15"),
     libraryDependencies ++= Seq(
       "com.ning" % "async-http-client" % "1.8.15",
       "com.google.guava" % "guava" % "18.0",
@@ -55,6 +58,7 @@ lazy val java = project.in(file("faunadb-java"))
     autoScalaLibrary := false,
     compileOrder := CompileOrder.JavaThenScala,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
+    (javacOptions in doc) := Seq("-source", "1.7"),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,
