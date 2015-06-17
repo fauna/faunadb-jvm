@@ -63,7 +63,7 @@ public class Connection {
     }
 
     /**
-     * Sets the FaunaDB root URL for the built {@code Connection}.
+     * Sets the FaunaDB root URL for the built {@link Connection}.
      *
      * @param root the root URL
      * @return this {@link Builder} object
@@ -74,7 +74,7 @@ public class Connection {
     }
 
     /**
-     * Sets the Auth Token that the built {@code Connection} will provide to FaunaDB. This must be provided in order
+     * Sets the Auth Token that the built {@link Connection} will provide to FaunaDB. This must be provided in order
      * for client to authenticate with FaunaDB.
      *
      * @param token the auth token.
@@ -109,7 +109,7 @@ public class Connection {
     }
 
     /**
-     * Returns a newly constructed {@link Connection} with configuration based on the settings of this {@code Builder}.
+     * Returns a newly constructed {@link Connection} with configuration based on the settings of this {@link Builder}.
      *
      * @throws UnsupportedEncodingException if the system does not support ASCII encoding for the Connection.
      * @throws MalformedURLException if the default FaunaDB URL cannot be parsed.
@@ -157,6 +157,13 @@ public class Connection {
     this.registry = registry;
   }
 
+  /**
+   * Issues a {@code GET} request with no parameters.
+   *
+   * @param path the relative path of the resource.
+   * @return a {@code ListenableFuture} containing the HTTP Response.
+   * @throws IOException if the HTTP request cannot be issued.
+   */
   public ListenableFuture<Response> get(String path) throws IOException {
     Request request = new RequestBuilder("GET")
       .setUrl(mkUrl(path))
@@ -165,6 +172,14 @@ public class Connection {
     return performRequest(request);
   }
 
+  /**
+   * Issues a {@code GET} request with the provided request parameters.
+   *
+   * @param path the relative path of the resource.
+   * @param params a map containing the request parameters.
+   * @return a {@code ListenableFuture} containing the HTTP response.
+   * @throws IOException if the HTTP request cannot be issued.
+   */
   public ListenableFuture<Response> get(String path, Map<String, Collection<String>> params) throws IOException {
     Request request = new RequestBuilder("GET")
       .setUrl(mkUrl(path))
@@ -174,6 +189,14 @@ public class Connection {
     return performRequest(request);
   }
 
+  /**
+   * Issues a {@code POST} request with the provided JSON request body.
+   *
+   * @param path the relative path of the resource.
+   * @param body the JSON tree that will be serialized into the request body.
+   * @return a {@link ListenableFuture} containing the HTTP response.
+   * @throws IOException if the HTTP request cannot be issued.
+   */
   public ListenableFuture<Response> post(String path, JsonNode body) throws IOException {
     Request request = new RequestBuilder("POST")
       .setUrl(mkUrl(path))
@@ -184,6 +207,13 @@ public class Connection {
     return performRequest(request);
   }
 
+  /**
+   * Issues a {@code PUT} request with no body.
+   *
+   * @param path the relative path of the resource
+   * @return a {@link ListenableFuture} containing the HTTP response.
+   * @throws IOException if the HTTP request cannot be issued.
+   */
   public ListenableFuture<Response> put(String path) throws IOException {
     Request request = new RequestBuilder("PUT")
       .setUrl(mkUrl(path))
@@ -192,6 +222,14 @@ public class Connection {
     return performRequest(request);
   }
 
+  /**
+   * Issues a {@code PUT} request with the provided JSON request body.
+   *
+   * @param path the relative path of the resource.
+   * @param body the JSON tree that will be serialized into the request body.
+   * @return a {@link ListenableFuture} containing the HTTP response.
+   * @throws IOException if the HTTP request cannot be issued.
+   */
   public ListenableFuture<Response> put(String path, JsonNode body) throws IOException {
     Request request = new RequestBuilder("PUT")
       .setUrl(mkUrl(path))
@@ -202,6 +240,14 @@ public class Connection {
     return performRequest(request);
   }
 
+  /**
+   * Issues a {@code PATCH} request with the provided JSON request body.
+   *
+   * @param path the relative path of the resource.
+   * @param body the JSON tree that will be serialized into the request body.
+   * @return a {@link ListenableFuture} containing the HTTP response.
+   * @throws IOException if the HTTP request cannot be issued.
+   */
   public ListenableFuture<Response> patch(String path, JsonNode body) throws IOException {
     Request request = new RequestBuilder("PATCH")
       .setUrl(mkUrl(path))
@@ -212,6 +258,10 @@ public class Connection {
     return performRequest(request);
   }
 
+  /**
+   * Releases any resources being held by the HTTP client. Also closes the underlying
+   * {@link AsyncHttpClient}.
+   */
   public void close() {
     client.close();
   }
