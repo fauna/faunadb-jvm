@@ -41,7 +41,7 @@ public class ClientSpec {
   static ImmutableMap<String, String> readConfig(String filename) {
     try {
       FileInputStream reader = new FileInputStream(filename);
-      ImmutableMap<String, String> rv = ImmutableMap.copyOf(new Yaml().loadAs(reader, Map.class));
+      ImmutableMap<String, String> rv = ImmutableMap.<String, String>copyOf(new Yaml().loadAs(reader, Map.class));
       reader.close();
       return rv;
     } catch (IOException ex) {
