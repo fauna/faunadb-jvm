@@ -13,7 +13,7 @@ import com.google.common.base.Joiner;
  *
  * @see ResponseNode#asClass()
  */
-public class Class {
+public final class Class {
   @JsonProperty("ref")
   private final Ref ref;
   @JsonProperty("class")

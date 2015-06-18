@@ -12,7 +12,7 @@ import com.faunadb.client.java.types.Ref;
  *
  * @see ResponseNode#asDatabase()
  */
-public class Database {
+public final class Database {
   @JsonProperty("ref")
   private final Ref ref;
   @JsonProperty("class")

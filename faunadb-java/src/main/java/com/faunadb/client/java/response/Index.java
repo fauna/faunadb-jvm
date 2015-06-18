@@ -15,7 +15,7 @@ import com.google.common.collect.ImmutableMap;
  *
  * @see ResponseNode#asIndex()
  */
-public class Index {
+public final class Index {
   @JsonProperty("ref")
   private final Ref ref;
   @JsonProperty("class")

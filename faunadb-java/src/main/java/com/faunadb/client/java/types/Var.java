@@ -3,7 +3,7 @@ package com.faunadb.client.java.types;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * An immutable value-type representation of a FaunaDB variable identifier. Create an instance using the {@link Var#create} method.
+ * An immutable representation of a FaunaDB variable identifier. Create an instance using the {@link Var#create} method.
  *
  * <p><i>Example</i>: {@code { "var": "variable_name" }}.</p>
  *

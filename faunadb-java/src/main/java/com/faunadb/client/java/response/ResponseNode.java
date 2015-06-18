@@ -17,7 +17,7 @@ import com.google.common.collect.ImmutableList;
  * <p>Example: TBD</p>
  */
 @JsonDeserialize(using=Codec.ResponseNodeDeserializer.class)
-public class ResponseNode {
+public final class ResponseNode {
   public static ResponseNode create(JsonNode underlying, ObjectMapper json) {
     return new ResponseNode(underlying, json);
   }
