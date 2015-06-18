@@ -5,6 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.java.types.Ref;
 import com.google.common.base.Joiner;
 
+/**
+ * An immutable value-type representation of a FaunaDB Instance response. This, like other
+ * response types, is created by coercing a {@link ResponseNode} using its associated conversion
+ * method.
+ *
+ * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#guide-resource_types-instances">FaunaDB Resource Types</a></p>
+ *
+ * @see ResponseNode#asInstance()
+ */
 public class Instance {
   @JsonProperty("ref")
   private final Ref ref;
@@ -26,18 +35,30 @@ public class Instance {
     this.data = data;
   }
 
+  /**
+   * Returns the ref of this instance.
+   */
   public Ref ref() {
     return ref;
   }
 
+  /**
+   * Returns the ref of the class of this instance.
+   */
   public Ref classRef() {
     return classRef;
   }
 
+  /**
+   * Returns the timestamp of this instance.
+   */
   public Long ts() {
     return ts;
   }
 
+  /**
+   * Returns the data of this instance.
+   */
   public ResponseMap data() {
     return data;
   }

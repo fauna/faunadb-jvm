@@ -5,6 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.java.types.Ref;
 import com.google.common.base.Joiner;
 
+/**
+ * An immutable value-type representation of a FaunaDB Key response. This, like other response types,
+ * is obtained by coercing a {@link ResponseNode} using its associated conversion method.
+ *
+ * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#guide-resource_types-keys">FaunaDB Resource Types</a></p>
+ *
+ * @see ResponseNode#asKey()
+ */
 public class Key {
   @JsonProperty("ref")
   private final Ref ref;
@@ -43,34 +51,58 @@ public class Key {
     this.data = data;
   }
 
+  /**
+   * Returns the ref to this key.
+   */
   public Ref ref() {
     return ref;
   }
 
+  /**
+   * Returns the ref of the database that this key grants access to.
+   */
   public Ref database() {
     return database;
   }
 
+  /**
+   * Returns the ref of the class of this key. In this case, {@code keys}.
+   */
   public Ref classRef() {
     return classRef;
   }
 
+  /**
+   * Returns the key's secret.
+   */
   public String secret() {
     return secret;
   }
 
+  /**
+   * Returns a hash of the key's secret.
+   */
   public String hashedSecret() {
     return hashedSecret;
   }
 
+  /**
+   * Returns the timestamp of the key.
+   */
   public Long ts() {
     return ts;
   }
 
+  /**
+   * Returns the data contained by the key.
+   */
   public ResponseMap data() {
     return data;
   }
 
+  /**
+   * Returns the key's role.
+   */
   public String role() {
     return role;
   }
