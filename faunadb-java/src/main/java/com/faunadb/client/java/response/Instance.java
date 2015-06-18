@@ -14,7 +14,7 @@ import com.google.common.base.Joiner;
  *
  * @see ResponseNode#asInstance()
  */
-public class Instance {
+public final class Instance {
   @JsonProperty("ref")
   private final Ref ref;
   @JsonProperty("class")

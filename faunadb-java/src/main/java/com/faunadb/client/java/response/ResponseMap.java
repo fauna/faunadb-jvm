@@ -16,7 +16,7 @@ import java.util.Map;
  * @see ForwardingMap
  */
 @JsonDeserialize(using=Codec.ResponseMapDeserializer.class)
-public class ResponseMap extends ForwardingMap<String, ResponseNode> {
+public final class ResponseMap extends ForwardingMap<String, ResponseNode> {
   private final ImmutableMap<String, ResponseNode> underlying;
 
   @JsonCreator

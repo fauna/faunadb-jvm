@@ -15,7 +15,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @see ResponseNode#asPage()
  */
-public class Page {
+public final class Page {
   private final ImmutableList<ResponseNode> data;
   private final Optional<ResponseNode> before;
   private final Optional<ResponseNode> after;

@@ -13,7 +13,7 @@ import com.google.common.base.Joiner;
  *
  * @see ResponseNode#asEvent()
  */
-public class Event {
+public final class Event {
   @JsonProperty("ts")
   private final Long ts;
   @JsonProperty("action")
