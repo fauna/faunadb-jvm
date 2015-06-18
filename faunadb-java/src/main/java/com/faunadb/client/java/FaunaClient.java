@@ -23,9 +23,17 @@ import java.lang.reflect.Array;
 /**
  * The Java native client for FaunaDB.
  *
- * <p>Construct an instance of {@link FaunaClient} by calling one of the {@code create} methods.
+ * <p>This client is asynchronous, so all methods that perform latent operations return a {@link ListenableFuture}.</p>
  *
- * @author Fauna, Inc.
+ * <p><b>Example</b>:</p>
+ * <pre>{@code
+ * import static com.faunadb.client.query.Language.*;
+ * FaunaClient client = FaunaClient.create(Connection.builder().withAuthToken("someAuthToken").build());
+ * client.get(Get(Ref("some/ref")));
+ * }
+ * </pre>
+ *
+ * @see com.faunadb.client.java.query.Language
  */
 public class FaunaClient {
  /**
@@ -68,7 +76,8 @@ public class FaunaClient {
    * Issues a Query to FaunaDB.
    *
    * <p>Queries are modeled through the FaunaDB query language, represented by the classes in the
-   * {@link com.faunadb.client.java.query} package.
+   * {@link com.faunadb.client.java.query} package. See {@link com.faunadb.client.java.query.Language} for helpers
+   * and examples.
    *
    * <p>Responses are modeled as a general response tree. Each node is a {@link ResponseNode}, and
    * can be coerced to structured types through various methods on that class.
@@ -76,6 +85,9 @@ public class FaunaClient {
    * @param expr The query expression to be sent to FaunaDB.
    * @return A {@link ListenableFuture} containing the root node of the Response tree.
    * @throws IOException if the query cannot be issued.
+   * @see ResponseNode
+   * @see com.faunadb.client.java.query.Language
+   *
    */
   public ListenableFuture<ResponseNode> query(Expression expr) throws IOException {
     ObjectNode body = json.createObjectNode();

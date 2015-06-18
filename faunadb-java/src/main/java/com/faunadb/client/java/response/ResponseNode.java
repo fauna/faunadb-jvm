@@ -14,7 +14,19 @@ import com.google.common.collect.ImmutableList;
  *
  * <p>Coercion functions will return null if this node cannot be transformed into the requested type.
  *
- * <p>Example: TBD</p>
+ * <p><b>Example</b>: Consider the {@code ResponseNode node} modeling the root of the tree:</p>
+ * <pre>
+ * {
+ *   "ref": { "@ref": "some/ref" },
+ *   "data": { "someKey": "string1", "someKey2": 123 }
+ * }</pre>
+ *
+ * <p>The result tree can be accessed using:</p>
+ *
+ * <pre>
+ *   node.asObject().get("ref").asRef(); // {@link Ref}("some/ref")
+ *   node.asObject().get("data").asObject().get("someKey").asString() // "string1"
+ * </pre>
  */
 @JsonDeserialize(using=Codec.ResponseNodeDeserializer.class)
 public final class ResponseNode {
@@ -92,7 +104,7 @@ public final class ResponseNode {
   }
 
   /**
-   * Coerces this node into a Ref.
+   * Coerces this node into a {@link Ref}.
    * @return a Ref, or null.
    */
   public Ref asRef() {
@@ -100,7 +112,7 @@ public final class ResponseNode {
   }
 
   /**
-   * Coerces this node into a Page.
+   * Coerces this node into a {@link Page}.
    * @return a Page, or null.
    */
   public Page asPage() {
@@ -108,7 +120,7 @@ public final class ResponseNode {
   }
 
   /**
-   * Coerces this node into an Instance.
+   * Coerces this node into an {@link Instance}.
    * @return an Instance, or null.
    */
   public Instance asInstance() {
@@ -116,7 +128,7 @@ public final class ResponseNode {
   }
 
   /**
-   * Coerces this node into a Key.
+   * Coerces this node into a {@link Key}.
    * @return a Key, or null.
    */
   public Key asKey() {
@@ -124,7 +136,7 @@ public final class ResponseNode {
   }
 
   /**
-   * Coerces this node into a Database.
+   * Coerces this node into a {@link Database}.
    * @return a Database, or null.
    */
   public Database asDatabase() {
@@ -132,7 +144,7 @@ public final class ResponseNode {
   }
 
   /**
-   * Coerces this node into a Class.
+   * Coerces this node into a {@link Class}.
    * @return a Class, or null.
    */
   public Class asClass() {
@@ -140,7 +152,7 @@ public final class ResponseNode {
   }
 
   /**
-   * Coerces this node into an Index.
+   * Coerces this node into an {@link Index}.
    * @return an Index, or null.
    */
   public Index asIndex() {
@@ -148,7 +160,7 @@ public final class ResponseNode {
   }
 
   /**
-   * Coerces this node into an Event.
+   * Coerces this node into an {@link Event}.
    * @return an Event, or null.
    */
   public Event asEvent() {
@@ -156,7 +168,7 @@ public final class ResponseNode {
   }
 
   /**
-   * Coerces this node into a Set.
+   * Coerces this node into a {@link Set}.
    * @return a Set, or null.
    */
   public Set asSet() {
