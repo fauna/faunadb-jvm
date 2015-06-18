@@ -4,16 +4,14 @@ import com.faunadb.client.java.types.Value;
 
 /**
  * The base type for FaunaDB cursors. Instances of cursor classes can be obtained through the {@code create} method on
- * the concrete types.
+ * the concrete types, or through the helper functions in {@link Language}
  */
 public abstract class Cursor {
   /**
    * An immutable representation of a Before cursor.
+   * @see Language#Before(Value)
    */
-  public static class Before extends Cursor {
-    /**
-     * Obtains a new instance of this class.
-     */
+  public static final class Before extends Cursor {
     public static Before create(Value value) {
       return new Before(value);
     }
@@ -30,8 +28,9 @@ public abstract class Cursor {
 
   /**
    * An immutable representation of an After cursor.
+   * @see Language#After(Value)
    */
-  public static class After extends Cursor {
+  public static final class After extends Cursor {
     public static After create(Value value) {
       return new After(value);
     }

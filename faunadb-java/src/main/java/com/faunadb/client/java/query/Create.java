@@ -5,9 +5,11 @@ import com.faunadb.client.java.types.Identifier;
 import com.faunadb.client.java.types.Value.*;
 
 /**
- * An immutable value-type representation of a Create function.
+ * An immutable representation of a Create function.
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-modifying-resources">FaunaDB Resource Modification Functions</a>
+ *
+ * @see Language#Create(Identifier)
  */
 public class Create implements Identifier, Expression {
   @JsonProperty("create")
@@ -18,6 +20,7 @@ public class Create implements Identifier, Expression {
   /**
    * Obtains a new instance of this class with no parameters.
    * @param ref the ref of the class in which to create a new instance.
+   * @see Language#Create(Identifier)
    */
   public static Create create(Identifier ref) {
     return new Create(ref, ObjectV.empty());
@@ -27,6 +30,7 @@ public class Create implements Identifier, Expression {
    * Obtains a new instance of this class.
    * @param ref the ref of the class in which to create a new instance.
    * @param params The parameters for the create operation.
+   * @see Language#Create(Identifier, Expression)
    */
   public static Create create(Identifier ref, Expression params) {
     return new Create(ref, params);
@@ -37,16 +41,10 @@ public class Create implements Identifier, Expression {
     this.params = params;
   }
 
-  /**
-   * Returns the ref of the class in which the new instance will be created.
-   */
   public Identifier ref() {
     return ref;
   }
 
-  /**
-   * Returns the parameters for the create operation.
-   */
   public Expression params() {
     return params;
   }

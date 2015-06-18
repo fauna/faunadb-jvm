@@ -2,6 +2,13 @@ package com.faunadb.client.java.query;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * An immutable representation of a FaunaDB If function.
+ *
+ * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-basic_forms">FaunaDB Basic Forms</a></p>
+ *
+ * @see Language#If(Expression, Expression, Expression)
+ */
 public class If implements Expression {
   public static If create(Expression condition, Expression then, Expression elseExpression) {
     return new If(condition, then, elseExpression);
