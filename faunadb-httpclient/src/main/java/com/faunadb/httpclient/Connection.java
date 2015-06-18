@@ -25,8 +25,6 @@ import java.util.Map;
  *
  * <p>Relies on <a href="https://github.com/AsyncHttpClient/async-http-client">async-http-client</a>
  * for the underlying implementation.
- *
- * @author Fauna, Inc.
  */
 
 public class Connection {
