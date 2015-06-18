@@ -38,7 +38,7 @@ public class DeserializationSpec {
     assertEquals(instance.ref(), Ref.create("classes/derp/101192216816386048"));
     assertEquals(instance.classRef(), Ref.create("classes/derp"));
     assertEquals(instance.ts().longValue(), 1432763268186882L);
-    assertEquals(instance.data().get("test").asNumber().intValue(), 1);
+    assertEquals(instance.data().get("test").asLong().intValue(), 1);
   }
 
   @Test
@@ -98,7 +98,7 @@ public class DeserializationSpec {
     Key key = parsed.asKey();
     assertThat(key.classRef(), is(Ref.create("keys")));
     assertThat(key.database(), is(Ref.create("databases/spells")));
-    assertThat(key.data().get("some").asNumber(), is(123L));
+    assertThat(key.data().get("some").asLong(), is(123L));
     assertThat(key.data().get("data").asString(), is("yeah"));
     assertThat(key.hashedSecret(), is("$2a$05$LKJiF.hpkt40W9oMC/5atu2g03m2.cPGU9Srys5vmAdOgBaGYjfl2"));
     assertThat(key.ref(), is(Ref.create("keys/102850208874889216")));

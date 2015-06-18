@@ -90,17 +90,17 @@ public class ClientSpec {
     assertThat(resp.classRef().value(), is("classes/spells"));
     assertThat(resp.data().get("testField").asString(), is("testValue"));
 
-    ListenableFuture<ResponseNode> resp2F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("testField", ObjectV("array", ArrayV(NumberV(1), StringV("2"), DoubleV(3.4)), "bool", BooleanV(true), "num", NumberV(1234), "string", StringV("sup"), "float", DoubleV(1.234)))))));
+    ListenableFuture<ResponseNode> resp2F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("testField", ObjectV("array", ArrayV(LongV(1), StringV("2"), DoubleV(3.4)), "bool", BooleanV(true), "num", LongV(1234), "string", StringV("sup"), "float", DoubleV(1.234)))))));
     Instance resp2 = resp2F.get().asInstance();
 
     assertTrue(resp.data().containsKey("testField"));
     ResponseMap testFieldObj = resp2.data().get("testField").asObject();
     ImmutableList<ResponseNode> array = testFieldObj.get("array").asArray();
-    assertThat(array.get(0).asNumber(), is(1L));
+    assertThat(array.get(0).asLong(), is(1L));
     assertThat(array.get(1).asString(), is("2"));
     assertThat(array.get(2).asDouble(), is(3.4));
     assertThat(testFieldObj.get("string").asString(), is("sup"));
-    assertThat(testFieldObj.get("num").asNumber(), is(1234L));
+    assertThat(testFieldObj.get("num").asLong(), is(1234L));
     assertThat(testFieldObj.get("bool").asBoolean(), is(true));
   }
 
@@ -185,7 +185,7 @@ public class ClientSpec {
 
     ListenableFuture<ResponseNode> countF1 = client.query(Count(Match(classRef, randomClassIndex)));
     ResponseNode countNode = countF1.get();
-    assertThat(countNode.asNumber(), is(3L));
+    assertThat(countNode.asLong(), is(3L));
 
     ListenableFuture<ResponseNode> queryF3 = client.query(Paginate(Match(classRef, randomClassIndex)).withSize(1));
     Page resp1 = queryF3.get().asPage();
@@ -235,9 +235,9 @@ public class ClientSpec {
 
   @Test
   public void testBasicForms() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<ResponseNode> letF = client.query(Let(ImmutableMap.<String, Expression>of("x", NumberV(1), "y", NumberV(2)), Var("x")));
+    ListenableFuture<ResponseNode> letF = client.query(Let(ImmutableMap.<String, Expression>of("x", LongV(1), "y", LongV(2)), Var("x")));
     ResponseNode let = letF.get();
-    assertThat(let.asNumber(), is(1L));
+    assertThat(let.asLong(), is(1L));
 
     ListenableFuture<ResponseNode> ifF = client.query(If(BooleanV(true), StringV("was true"), StringV("was false")));
     ResponseNode ifNode = ifF.get();
@@ -254,11 +254,11 @@ public class ClientSpec {
     Instance doInstance = doNode.asInstance();
     assertThat(doInstance.ref(), is(randomRef));
 
-    ListenableFuture<ResponseNode> objectF = client.query(Quote(ObjectV(ImmutableMap.of("name", StringV("Hen Wen"), "age", NumberV(123)))));
+    ListenableFuture<ResponseNode> objectF = client.query(Quote(ObjectV(ImmutableMap.of("name", StringV("Hen Wen"), "age", LongV(123)))));
     ResponseNode objectNode = objectF.get();
     ResponseMap objectMap = objectNode.asObject();
     assertThat(objectMap.get("name").asString(), is("Hen Wen"));
-    assertThat(objectMap.get("age").asNumber(), is(123L));
+    assertThat(objectMap.get("age").asLong(), is(123L));
 
     ListenableFuture<ResponseNode> selectF = client.query(Select(ImmutableList.of(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
         Quote(ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings"), StringV("lunchings")))))));
@@ -268,13 +268,13 @@ public class ClientSpec {
 
   @Test
   public void testCollections() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<ResponseNode> mapF = client.query(Map(Lambda("munchings", Add(ImmutableList.<Expression>of(Var("munchings"), NumberV(1)))), ArrayV(NumberV(1), NumberV(2), NumberV(3))));
+    ListenableFuture<ResponseNode> mapF = client.query(Map(Lambda("munchings", Add(ImmutableList.<Expression>of(Var("munchings"), LongV(1)))), ArrayV(LongV(1), LongV(2), LongV(3))));
     ResponseNode mapNode = mapF.get();
     ImmutableList<ResponseNode> mapArray = mapNode.asArray();
     assertThat(mapArray.size(), is(3));
-    assertThat(mapArray.get(0).asNumber(), is(2L));
-    assertThat(mapArray.get(1).asNumber(), is(3L));
-    assertThat(mapArray.get(2).asNumber(), is(4L));
+    assertThat(mapArray.get(0).asLong(), is(2L));
+    assertThat(mapArray.get(1).asLong(), is(3L));
+    assertThat(mapArray.get(2).asLong(), is(4L));
 
     ListenableFuture<ResponseNode> foreachF = client.query(Foreach(Lambda("spell", Create(Ref("classes/spells"), Object(ObjectV("data", Object(ObjectV("name", Var("spell"))))))), ArrayV(StringV("Fireball Level 1"), StringV("Fireball Level 2"))));
     ResponseNode foreachNode = foreachF.get();
@@ -286,7 +286,7 @@ public class ClientSpec {
 
   @Test
   public void testResourceModification() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<ResponseNode> createF = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Magic Missile"), "element", StringV("arcane"), "cost", NumberV(10))))));
+    ListenableFuture<ResponseNode> createF = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Magic Missile"), "element", StringV("arcane"), "cost", LongV(10))))));
     ResponseNode createNode = createF.get();
     Instance createInstance = createNode.asInstance();
     assertThat(createInstance.ref().value(), startsWith("classes/spells"));
@@ -300,14 +300,14 @@ public class ClientSpec {
     assertThat(updateInstance.data().get("element").asString(), is("arcane"));
     assertThat(updateInstance.data().get("cost"), nullValue());
 
-    ListenableFuture<ResponseNode> replaceF = client.query(Replace(createInstance.ref(), Quote(ObjectV("data", ObjectV("name", StringV("Volcano"), "element", ArrayV(StringV("fire"), StringV("earth")), "cost", NumberV(10))))));
+    ListenableFuture<ResponseNode> replaceF = client.query(Replace(createInstance.ref(), Quote(ObjectV("data", ObjectV("name", StringV("Volcano"), "element", ArrayV(StringV("fire"), StringV("earth")), "cost", LongV(10))))));
     ResponseNode replaceNode = replaceF.get();
     Instance replaceInstance = replaceNode.asInstance();
     assertThat(replaceInstance.ref(), is(createInstance.ref()));
     assertThat(replaceInstance.data().get("name").asString(), is("Volcano"));
     assertThat(replaceInstance.data().get("element").asArray().get(0).asString(), is("fire"));
     assertThat(replaceInstance.data().get("element").asArray().get(1).asString(), is("earth"));
-    assertThat(replaceInstance.data().get("cost").asNumber(), is(10L));
+    assertThat(replaceInstance.data().get("cost").asLong(), is(10L));
 
     ListenableFuture<ResponseNode> deleteF = client.query(Delete(createInstance.ref()));
     deleteF.get();
@@ -319,10 +319,10 @@ public class ClientSpec {
 
   @Test
   public void testSets() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<ResponseNode> create1F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Magic Missile"), "element", StringV("arcane"), "cost", NumberV(10))))));
-    ListenableFuture<ResponseNode> create2F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Fireball"), "element", StringV("fire"), "cost", NumberV(10))))));
-    ListenableFuture<ResponseNode> create3F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Faerie Fire"), "element", ArrayV(StringV("arcane"), StringV("nature")), "cost", NumberV(10))))));
-    ListenableFuture<ResponseNode> create4F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Summon Animal Companion"), "element", StringV("nature"), "cost", NumberV(10))))));
+    ListenableFuture<ResponseNode> create1F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Magic Missile"), "element", StringV("arcane"), "cost", LongV(10))))));
+    ListenableFuture<ResponseNode> create2F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Fireball"), "element", StringV("fire"), "cost", LongV(10))))));
+    ListenableFuture<ResponseNode> create3F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Faerie Fire"), "element", ArrayV(StringV("arcane"), StringV("nature")), "cost", LongV(10))))));
+    ListenableFuture<ResponseNode> create4F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Summon Animal Companion"), "element", StringV("nature"), "cost", LongV(10))))));
     ResponseNode createNode1 = create1F.get();
     ResponseNode createNode2 = create2F.get();
     ResponseNode createNode3 = create3F.get();
