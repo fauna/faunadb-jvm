@@ -9,10 +9,10 @@ import java.io.IOException;
 
 import com.faunadb.client.java.query.Cursor.*;
 
-public class Codec {
+class Codec {
   public static class PaginateSerializer extends JsonSerializer<Paginate> {
     @Override
-    public void serialize(Paginate paginate, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+    public void serialize(Paginate paginate, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
       jsonGenerator.writeStartObject();
       jsonGenerator.writeObjectField("paginate", paginate.resource());
 

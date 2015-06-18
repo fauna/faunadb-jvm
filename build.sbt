@@ -58,7 +58,12 @@ lazy val java = project.in(file("faunadb-java"))
     autoScalaLibrary := false,
     compileOrder := CompileOrder.JavaThenScala,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
-    (javacOptions in doc) := Seq("-source", "1.7"),
+    (javacOptions in doc) := Seq("-source", "1.7",
+      "-link", "http://docs.oracle.com/javase/7/docs/api/",
+      "-link", "http://docs.guava-libraries.googlecode.com/git-history/v18.0/javadoc/",
+      "-link", "http://fasterxml.github.io/jackson-databind/javadoc/2.5/",
+      "-link", ((target in httpclient).value / "api").toString
+    ),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,

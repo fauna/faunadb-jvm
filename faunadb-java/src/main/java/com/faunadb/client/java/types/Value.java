@@ -1,13 +1,26 @@
 package com.faunadb.client.java.types;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.faunadb.client.java.query.Expression;
+import com.faunadb.client.java.response.Set;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-public class Value implements Expression {
+/**
+ * Represents any scalar or non-scalar value in the FaunaDB query language. FaunaDB value types consist of
+ * all of the JSON value types, as well as the FaunaDB-specific types, {@link Ref} and {@link Set}.
+ *
+ * <p>Scalar values are {@link NumberV}, {@link StringV}, {@link DoubleV}, {@link BooleanV}, {@link NullV},
+ * {@link Ref}, and {@link Set}.
+ *
+ * <p>Non-scalar values are {@link ObjectV} and {@link ArrayV}.</p>
+ */
+public abstract class Value implements Expression {
+  Value() {
+
+  }
+
   public static class ObjectV extends Value {
     private final ImmutableMap<String, Value> values;
 
@@ -195,7 +208,7 @@ public class Value implements Expression {
     }
   }
 
-  public static class NullV extends Value implements Identifier {
+  public static class NullV extends Value {
     public static final NullV Null = new NullV();
 
     NullV() { }

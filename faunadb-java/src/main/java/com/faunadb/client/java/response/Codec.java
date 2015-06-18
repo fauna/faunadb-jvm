@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 
-public class Codec {
+class Codec {
   public static class ResponseNodeDeserializer extends JsonDeserializer<ResponseNode> {
     @Override
     public ResponseNode deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {

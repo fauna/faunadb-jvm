@@ -20,13 +20,31 @@ import com.ning.http.client.Response;
 import java.io.IOException;
 import java.lang.reflect.Array;
 
+/**
+ * The Java native client for FaunaDB.
+ *
+ * <p>Construct an instance of {@link FaunaClient} by calling one of the {@code create} methods.
+ *
+ * @author Fauna, Inc.
+ */
 public class FaunaClient {
+ /**
+   * Returns a new {@link FaunaClient} instance.
+   *
+   * @param connection the underlying {@link Connection} adapter for the client to use.
+   */
   public static FaunaClient create(Connection connection) {
     ObjectMapper json = new ObjectMapper();
     json.registerModule(new GuavaModule());
     return new FaunaClient(connection, json);
   }
 
+  /**
+   * Returns a new {@link FaunaClient} instance.
+   *
+   * @param connection the underlying {@link Connection} adapter for the client to use.
+   * @param json a custom {@link ObjectMapper} to customize JSON serialization and deserialization behavior.
+   */
   public static FaunaClient create(Connection connection, ObjectMapper json) {
     return new FaunaClient(connection, json.copy().registerModule(new GuavaModule()));
   }
@@ -39,10 +57,26 @@ public class FaunaClient {
     this.json = json;
   }
 
+  /**
+   * Frees any resources held by the client. Also closes the underlying {@link Connection}.
+   */
   public void close() {
     connection.close();
   }
 
+  /**
+   * Issues a Query to FaunaDB.
+   *
+   * <p>Queries are modeled through the FaunaDB query language, represented by the classes in the
+   * {@link com.faunadb.client.java.query} package.
+   *
+   * <p>Responses are modeled as a general response tree. Each node is a {@link ResponseNode}, and
+   * can be coerced to structured types through various methods on that class.
+   *
+   * @param expr The query expression to be sent to FaunaDB.
+   * @return A {@link ListenableFuture} containing the root node of the Response tree.
+   * @throws IOException if the query cannot be issued.
+   */
   public ListenableFuture<ResponseNode> query(Expression expr) throws IOException {
     ObjectNode body = json.createObjectNode();
     body.set("q", json.valueToTree(expr));
@@ -63,6 +97,18 @@ public class FaunaClient {
     });
   }
 
+  /**
+   * Issues multiple queries to FaunaDB.
+   *
+   * <p>These queries are sent to FaunaDB in a single request, and are evaluated. The list of response nodes is returned
+   * in the same order as the issued queries.
+   *
+   * See {@link FaunaClient#query(Expression)} for more information on the individual queries.
+   *
+   * @param exprs the list of query expressions to be sent to FaunaDB.
+   * @return a {@link ListenableFuture} containing an ordered list of root response nodes.
+   * @throws IOException if the query cannot be issued.
+   */
   public <T extends Expression> ListenableFuture<ImmutableList<ResponseNode>> query(ImmutableList<T> exprs) throws IOException {
     ObjectNode body = json.createObjectNode();
     body.set("q", json.valueToTree(exprs));
