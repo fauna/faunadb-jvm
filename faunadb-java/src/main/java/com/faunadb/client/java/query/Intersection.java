@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @see Language#Intersection(ImmutableList)
  */
-public class Intersection extends Set {
+public final class Intersection extends Set {
   public static Intersection create(ImmutableList<Set> sets) {
     return new Intersection(sets);
   }

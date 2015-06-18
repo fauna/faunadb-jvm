@@ -13,9 +13,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * @see Select
  */
 public abstract class Path {
-  Path() {
-
-  }
+  Path() { }
 
   /**
    * Helper function to construct an {@link Object} path.
@@ -29,7 +27,7 @@ public abstract class Path {
   /**
    * An immutable representation of a path into a dictionary.
    */
-  public static class Object extends Path {
+  public static final class Object extends Path {
     public static Object create(String field) {
       return new Object(field);
     }
@@ -58,7 +56,7 @@ public abstract class Path {
   /**
    * An immutable representation of a path into an array.
    */
-  public static class Array extends Path {
+  public static final class Array extends Path {
     public static Array create(int index) {
       return new Array(index);
     }

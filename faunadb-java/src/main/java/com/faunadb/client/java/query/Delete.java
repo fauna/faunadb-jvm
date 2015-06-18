@@ -7,7 +7,7 @@ import com.faunadb.client.java.types.Identifier;
  *
  * @see Language#Delete(Identifier)
  */
-public class Delete implements Expression {
+public final class Delete implements Expression {
   public static Delete create(Identifier ref) {
     return new Delete(ref);
   }

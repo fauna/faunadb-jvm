@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @see Language#Union(ImmutableList)
  */
-public class Union extends Set {
+public final class Union extends Set {
   public static Union create(ImmutableList<Set> sets) {
     return new Union(sets);
   }

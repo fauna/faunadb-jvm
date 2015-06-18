@@ -10,7 +10,7 @@ import com.faunadb.client.java.types.Value;
  *
  * @see Language#Quote(Expression)
  */
-public class Quote extends Value {
+public final class Quote extends Value {
   public static Quote create(Expression expression) {
     return new Quote(expression);
   }

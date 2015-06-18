@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @see Language#Lambda(String, Expression)
  */
-public class Lambda {
+public final class Lambda {
   public static Lambda create(String argument, Expression expr) {
     return new Lambda(argument, expr);
   }

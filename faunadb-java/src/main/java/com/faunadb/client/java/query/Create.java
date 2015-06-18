@@ -11,7 +11,7 @@ import com.faunadb.client.java.types.Value.*;
  *
  * @see Language#Create(Identifier)
  */
-public class Create implements Identifier, Expression {
+public final class Create implements Identifier, Expression {
   @JsonProperty("create")
   private final Identifier ref;
   @JsonProperty("params")

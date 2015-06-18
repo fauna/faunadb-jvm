@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @see Language#Do(ImmutableList)
  */
-public class Do implements Expression {
+public final class Do implements Expression {
   public static Do create(ImmutableList<Expression> expressions) {
     return new Do(expressions);
   }

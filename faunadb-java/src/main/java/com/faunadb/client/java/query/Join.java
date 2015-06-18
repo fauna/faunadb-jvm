@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @see Language#Join(Set, Lambda)
  */
-public class Join extends Set {
+public final class Join extends Set {
   public static Join create(Set source, Lambda target) {
     return new Join(source, target);
   }

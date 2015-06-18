@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableMap;
  * @see Language#Let(ImmutableMap, Expression)
  */
 
-public class Let implements Expression {
+public final class Let implements Expression {
   public static Let create(ImmutableMap<String, Expression> vars, Expression in) {
     return new Let(vars, in);
   }

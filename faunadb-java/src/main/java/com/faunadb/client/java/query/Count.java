@@ -8,7 +8,7 @@ import com.faunadb.client.java.types.Identifier;
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-reading-resources">FaunaDB Resource Retrieval Functions</a>
  */
-public class Count implements Identifier, Expression {
+public final class Count implements Identifier, Expression {
   /**
    * Obtains a new instance of this class.
    *
