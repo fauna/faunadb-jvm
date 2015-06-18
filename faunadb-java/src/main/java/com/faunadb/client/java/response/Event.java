@@ -5,6 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.java.types.Ref;
 import com.google.common.base.Joiner;
 
+/**
+ * An immutable value-type representation of a FaunaDB event. This, like other response types,
+ * is created by coercing a {@link ResponseNode} using its associated conversion method.
+ *
+ * <p><i>Reference</i>: TBD</p>
+ *
+ * @see ResponseNode#asEvent()
+ */
 public class Event {
   @JsonProperty("ts")
   private final Long ts;
@@ -20,14 +28,23 @@ public class Event {
     this.ts = ts;
   }
 
+  /**
+   * Returns the Ref to the resource that this Event refers to.
+   */
   public Ref resource() {
     return resource;
   }
 
+  /**
+   * Returns the action of this event.
+   */
   public String action() {
     return action;
   }
 
+  /**
+   * Returns the timestamp of this event.
+   */
   public Long ts() {
     return ts;
   }

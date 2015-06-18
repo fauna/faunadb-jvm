@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * <p><i>Example</i>: {@code { "var": "variable_name" }}.</p>
  *
- * <p><i>Reference</i>: <a href=https://faunadb.com/documentation#queries-basic_forms>FaunaDB Basic Forms</a></p>
+ * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-basic_forms">FaunaDB Basic Forms</a>
  */
 public class Var extends Value implements Identifier {
   /**
