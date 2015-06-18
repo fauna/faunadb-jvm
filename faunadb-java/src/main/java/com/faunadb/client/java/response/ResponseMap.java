@@ -7,12 +7,20 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 
+/**
+ * An immutable dictionary of response nodes. FaunaDB responses can be polymorphic, so
+ * this dictionary allows individual entries to be coerced to concrete response types as required.
+ *
+ * <p></p>Example: TBD
+ *
+ * @see ForwardingMap
+ */
 @JsonDeserialize(using=Codec.ResponseMapDeserializer.class)
 public class ResponseMap extends ForwardingMap<String, ResponseNode> {
   private final ImmutableMap<String, ResponseNode> underlying;
 
   @JsonCreator
-  public ResponseMap(ImmutableMap<String, ResponseNode> underlying) {
+  ResponseMap(ImmutableMap<String, ResponseNode> underlying) {
     this.underlying = underlying;
   }
 

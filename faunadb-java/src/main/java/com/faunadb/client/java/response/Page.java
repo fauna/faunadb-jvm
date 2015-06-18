@@ -7,6 +7,14 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+/**
+ * An immutable value-type representation of a FaunaDB Page response. This, like other response types,
+ * is obtained by coercing a {@link ResponseNode} using its associated conversion method.
+ *
+ * <p><i>Reference</i>: TBD </p>
+ *
+ * @see ResponseNode#asPage()
+ */
 public class Page {
   private final ImmutableList<ResponseNode> data;
   private final Optional<ResponseNode> before;
@@ -21,14 +29,23 @@ public class Page {
     this.after = after;
   }
 
+  /**
+   * Returns an ordered list of the data in this page.
+   */
   public ImmutableList<ResponseNode> data() {
     return data;
   }
 
+  /**
+   * Returns an {@link Optional} that wraps the before cursor if it exists.
+   */
   public Optional<ResponseNode> before() {
     return before;
   }
 
+  /**
+   * Returns an {@link Optional} that wraps the after cursor if it exists.
+   */
   public Optional<ResponseNode> after() {
     return after;
   }

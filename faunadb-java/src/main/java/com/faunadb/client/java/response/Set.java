@@ -3,6 +3,9 @@ package com.faunadb.client.java.response;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * An immutable value-type representation of a FaunaDB set literal.
+ */
 public class Set {
   public static Set create(ResponseMap parameters) {
     return new Set(parameters);
