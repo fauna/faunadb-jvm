@@ -4,13 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.java.types.Identifier;
 
 /**
- * An immutable value-type representation of a Count function.
+ * An immutable representation of a Count function.
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-reading-resources">FaunaDB Resource Retrieval Functions</a>
  */
 public class Count implements Identifier, Expression {
   /**
    * Obtains a new instance of this class.
+   *
+   * @see Language#Count(Set)
    */
   public final static Count create(Set set) {
     return new Count(set);
