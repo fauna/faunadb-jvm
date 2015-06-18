@@ -11,8 +11,8 @@ import java.util.Map;
  * An immutable dictionary of response nodes. FaunaDB responses can be polymorphic, so
  * this dictionary allows individual entries to be coerced to concrete response types as required.
  *
- * <p></p>Example: TBD
  *
+ * @see ResponseNode
  * @see ForwardingMap
  */
 @JsonDeserialize(using=Codec.ResponseMapDeserializer.class)
