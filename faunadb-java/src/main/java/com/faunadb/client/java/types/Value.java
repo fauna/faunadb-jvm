@@ -17,9 +17,7 @@ import com.google.common.collect.ImmutableMap;
  * <p>Non-scalar values are {@link ObjectV} and {@link ArrayV}.</p>
  */
 public abstract class Value implements Expression {
-  Value() {
-
-  }
+  protected Value() { }
 
   public static class ObjectV extends Value {
     private final ImmutableMap<String, Value> values;
