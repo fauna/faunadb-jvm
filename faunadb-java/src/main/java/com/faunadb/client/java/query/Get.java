@@ -10,7 +10,7 @@ import com.faunadb.client.java.types.Identifier;
  *
  * @see Language#Get(Identifier)
  */
-public class Get implements Expression {
+public final class Get implements Expression {
   @JsonProperty("get")
   private final Identifier resource;
 

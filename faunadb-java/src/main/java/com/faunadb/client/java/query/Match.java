@@ -11,7 +11,7 @@ import com.faunadb.client.java.types.Value;
  *
  * @see Language#Match(Value, Ref)
  */
-public class Match extends Set {
+public final class Match extends Set {
   @JsonProperty
   private final Ref index;
   @JsonProperty("match")

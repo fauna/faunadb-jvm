@@ -15,7 +15,7 @@ import com.google.common.collect.ImmutableMap;
  *
  * <p>Calling these static methods is more concise than creating the various data types manually.</p>
  */
-public abstract class Language {
+public final class Language {
   Language() { }
 
   /**

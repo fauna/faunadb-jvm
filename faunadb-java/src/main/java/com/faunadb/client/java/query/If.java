@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @see Language#If(Expression, Expression, Expression)
  */
-public class If implements Expression {
+public final class If implements Expression {
   public static If create(Expression condition, Expression then, Expression elseExpression) {
     return new If(condition, then, elseExpression);
   }

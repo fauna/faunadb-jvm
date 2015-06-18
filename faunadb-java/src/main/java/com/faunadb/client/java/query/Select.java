@@ -12,7 +12,7 @@ import com.google.common.collect.ImmutableList;
  * @see Language#Select(ImmutableList, Value)
  * @see Path
  */
-public class Select implements Expression {
+public final class Select implements Expression {
   public static Select create(ImmutableList<Path> path, Value from) {
     return new Select(path, from);
   }

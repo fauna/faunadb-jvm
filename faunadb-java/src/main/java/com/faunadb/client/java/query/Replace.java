@@ -12,7 +12,7 @@ import com.faunadb.client.java.types.Value.*;
  * @see Language#Replace(Identifier, Expression)
  *
  */
-public class Replace implements Identifier, Expression {
+public final class Replace implements Identifier, Expression {
   public static Replace create(Identifier ref, Expression params) {
     return new Replace(ref, params);
   }

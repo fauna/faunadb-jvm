@@ -11,7 +11,7 @@ import com.faunadb.client.java.types.Value;
  * @see Language#Object()
  * @see com.faunadb.client.java.types.Value.ObjectV
  */
-public class Object extends Value {
+public final class Object extends Value {
   public static Object create(ObjectV value) {
     return new Object(value);
   }

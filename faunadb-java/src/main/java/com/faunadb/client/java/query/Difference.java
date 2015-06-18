@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @see Language#Difference(ImmutableList)
  */
-public class Difference extends Set {
+public final class Difference extends Set {
   public static Difference create(ImmutableList<Set> sets) {
     return new Difference(sets);
   }

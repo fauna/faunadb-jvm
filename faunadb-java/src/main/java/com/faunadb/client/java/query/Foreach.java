@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @see Language#Foreach(Lambda, Expression)
  */
-public class Foreach implements Expression {
+public final class Foreach implements Expression {
   public static Foreach create(Lambda lambda, Expression collection) {
     return new Foreach(lambda, collection);
   }

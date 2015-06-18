@@ -11,7 +11,7 @@ import com.faunadb.client.java.types.Value.*;
  *
  * @see Language#Update(Identifier, Expression)
  */
-public class Update implements Identifier, Expression {
+public final class Update implements Identifier, Expression {
   public static Update create(Identifier ref, Expression params) {
     return new Update(ref, params);
   }

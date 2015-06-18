@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @see Language#Map(Lambda, Expression)
  */
-public class Map implements Expression {
+public final class Map implements Expression {
   public static Map create(Lambda lambda, Expression collection) {
     return new Map(lambda, collection);
   }
