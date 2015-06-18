@@ -3,7 +3,19 @@ package com.faunadb.client.java.types;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * An immutable value-type representation of a FaunaDB ref type. Create an instance using the {@link Ref#create} method.
+ *
+ * <p><i>Example</i>: <code>{ "@ref": "classes/spells/102462014988746752" }</code>
+ *
+ * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-values-special_types">FaunaDB Special Types</a>
+ *
+ */
 public class Ref extends Value implements Identifier {
+  /**
+   * Creates a new {@link Ref} instance.
+   * @param value the value of the Ref.
+   */
   public static Ref create(String value) {
     return new Ref(value);
   }
@@ -16,6 +28,9 @@ public class Ref extends Value implements Identifier {
     this.value = value;
   }
 
+  /**
+   * Returns the String representation of the ref.
+   */
   public String value() {
     return value;
   }
@@ -31,6 +46,9 @@ public class Ref extends Value implements Identifier {
   }
 
   @Override
+  /**
+   * Returns the String representation of the ref. Equivalent to {@link value()}.
+   */
   public String toString() {
     return value;
   }
