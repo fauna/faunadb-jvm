@@ -12,7 +12,7 @@ import com.google.common.collect.ImmutableMap;
  * Represents any scalar or non-scalar value in the FaunaDB query language. FaunaDB value types consist of
  * all of the JSON value types, as well as the FaunaDB-specific types, {@link Ref} and {@link Set}.
  *
- * <p>Scalar values are {@link NumberV}, {@link StringV}, {@link DoubleV}, {@link BooleanV}, {@link NullV},
+ * <p>Scalar values are {@link LongV}, {@link StringV}, {@link DoubleV}, {@link BooleanV}, {@link NullV},
  * {@link Ref}, and {@link Set}.
  *
  * <p>Non-scalar values are {@link ObjectV} and {@link ArrayV}.</p>
@@ -251,14 +251,14 @@ public class Value implements Expression {
     }
   }
 
-  public static class NumberV extends Value {
+  public static class LongV extends Value {
     private final Long value;
 
-    public static NumberV create(long value) {
-      return new NumberV(value);
+    public static LongV create(long value) {
+      return new LongV(value);
     }
 
-    NumberV(long value) {
+    LongV(long value) {
       this.value = value;
     }
 

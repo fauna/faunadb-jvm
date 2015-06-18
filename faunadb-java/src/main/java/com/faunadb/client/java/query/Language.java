@@ -159,10 +159,10 @@ public final class Language {
   }
 
   /**
-   * Creates a new Number value.
+   * Creates a new Long value.
    */
-  public static NumberV NumberV(long value) {
-    return NumberV.create(value);
+  public static LongV LongV(long value) {
+    return LongV.create(value);
   }
 
   /**

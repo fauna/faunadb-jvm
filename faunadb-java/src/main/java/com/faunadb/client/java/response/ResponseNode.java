@@ -55,7 +55,7 @@ public final class ResponseNode {
    * Coerces this node into a {@link Long}.
    * @return the long value of this node, or null.
    */
-  public Long asNumber() {
+  public Long asLong() {
     if (underlying.isNumber()) {
       return underlying.asLong();
     } else {
