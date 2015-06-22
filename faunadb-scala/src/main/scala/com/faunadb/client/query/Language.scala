@@ -116,6 +116,9 @@ case class Var(@(JsonProperty @field)("var") variable: String) extends Value wit
 
 sealed trait Resource extends Response
 
+case class Event(@(JsonProperty @field)("resource") resource: Ref,
+                 @(JsonProperty @field)("action") action: String,
+                 @(JsonProperty @field)("ts") ts: Long) extends Value
 
 object Values {
   implicit def stringToValue(unwrapped: String) = StringV(unwrapped)

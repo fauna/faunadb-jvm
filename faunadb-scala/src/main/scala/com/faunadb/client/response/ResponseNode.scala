@@ -3,7 +3,7 @@ package com.faunadb.client.response
 import com.fasterxml.jackson.databind.`type`.TypeFactory
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
-import com.faunadb.client.query.Ref
+import com.faunadb.client.query.{Event, Ref}
 
 import scala.collection.AbstractMap
 
@@ -39,6 +39,9 @@ class ResponseNode(private val underlying: JsonNode, json: ObjectMapper) {
 
   def asIndexOpt: Option[Index] = Option(json.convertValue(underlying, classOf[Index]))
   def asIndex = asIndexOpt.get
+
+  def asEventOpt: Option[Event] = Option(json.convertValue(underlying, classOf[Event]))
+  def asEvent = asEventOpt.get
 
   override def toString: String = underlying.toString
 
