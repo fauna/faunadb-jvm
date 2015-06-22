@@ -11,8 +11,6 @@ import scala.collection.immutable
 class DeserializationSpec extends FlatSpec with Matchers {
   val json = new ObjectMapper()
   val module = new SimpleModule()
-//  module.addDeserializer[scala.collection.immutable.Map[_,_]](classOf[scala.collection.immutable.Map[_,_]],
-//    (new ObjectDeserializer).asInstanceOf[JsonDeserializer[scala.collection.immutable.Map[_,_]]])
 
   json.registerModule(new DefaultScalaModule)
   json.registerModule(module)
@@ -51,5 +49,116 @@ class DeserializationSpec extends FlatSpec with Matchers {
     val instance = parsed.asInstance
     val unwrappedField = instance.data("test").asObject("field1").asObject
     unwrappedField shouldBe immutable.Map("@name" -> toResponseNode("Test"))
+  }
+
+  it should "deserialize a database response" in {
+    val toDeserialize = "{\n" +
+      "        \"class\": {\n" +
+      "            \"@ref\": \"databases\"\n" +
+      "        },\n" +
+      "        \"name\": \"spells\",\n" +
+      "        \"ref\": {\n" +
+      "            \"@ref\": \"databases/spells\"\n" +
+      "        },\n" +
+      "        \"ts\": 1434343547025544\n" +
+      "    }\n";
+
+    val parsed = json.readValue(toDeserialize, classOf[ResponseNode])
+    val database = parsed.asDatabase
+    database.name shouldBe "spells"
+    database.classRef shouldBe Ref("databases")
+    database.ts shouldBe 1434343547025544L
+    database.ref shouldBe Ref("databases/spells")
+  }
+
+  it should "deserialize a key response" in {
+    val toDeserialize = " {\n" +
+      "        \"class\": {\n" +
+      "            \"@ref\": \"keys\"\n" +
+      "        },\n" +
+      "        \"data\": {\n" +
+      "            \"data\": \"yeah\",\n" +
+      "            \"some\": 123\n" +
+      "        },\n" +
+      "        \"database\": {\n" +
+      "            \"@ref\": \"databases/spells\"\n" +
+      "        },\n" +
+      "        \"hashed_secret\": \"$2a$05$LKJiF.hpkt40W9oMC/5atu2g03m2.cPGU9Srys5vmAdOgBaGYjfl2\",\n" +
+      "        \"ref\": {\n" +
+      "            \"@ref\": \"keys/102850208874889216\"\n" +
+      "        },\n" +
+      "        \"role\": \"server\",\n" +
+      "        \"secret\": \"kqoBbWW4VRAAAAACtCcfczgIhDni0TUjuk5RxoNwpgzx\",\n" +
+      "        \"ts\": 1434344452631179\n" +
+      "    }\n";
+
+    val parsed = json.readValue(toDeserialize, classOf[ResponseNode])
+    val key = parsed.asKey
+    key.classRef shouldBe Ref("keys")
+    key.database shouldBe Ref("databases/spells")
+    key.data("some").asNumber shouldBe 123L
+    key.data("data").asString shouldBe "yeah"
+    key.hashedSecret shouldBe "$2a$05$LKJiF.hpkt40W9oMC/5atu2g03m2.cPGU9Srys5vmAdOgBaGYjfl2"
+    key.ref shouldBe Ref("keys/102850208874889216")
+    key.role shouldBe "server"
+    key.secret shouldBe "kqoBbWW4VRAAAAACtCcfczgIhDni0TUjuk5RxoNwpgzx"
+    key.ts shouldBe 1434344452631179L
+  }
+
+  it should "deserialize class response" in {
+    val toDeserialize = " {\n" +
+        "        \"class\": {\n" +
+        "            \"@ref\": \"classes\"\n" +
+        "        },\n" +
+        "        \"history_days\": 30,\n" +
+        "        \"name\": \"spells\",\n" +
+        "        \"ref\": {\n" +
+        "            \"@ref\": \"classes/spells\"\n" +
+        "        },\n" +
+        "        \"ts\": 1434344944425065\n" +
+        "    }"
+
+    val parsed = json.readValue(toDeserialize, classOf[ResponseNode])
+    val cls = parsed.asClass
+    cls.classRef shouldBe Ref("classes")
+    cls.historyDays shouldBe 30L
+    cls.name shouldBe "spells"
+    cls.ref shouldBe Ref("classes/spells")
+    cls.ts shouldBe 1434344944425065L
+  }
+
+  it should "deserialize index response" in {
+    val toDeserialize = "{\n" +
+      "        \"active\": false,\n" +
+      "        \"class\": {\n" +
+      "            \"@ref\": \"indexes\"\n" +
+      "        },\n" +
+      "        \"name\": \"spells_by_name\",\n" +
+      "        \"ref\": {\n" +
+      "            \"@ref\": \"indexes/spells_by_name\"\n" +
+      "        },\n" +
+      "        \"source\": {\n" +
+      "            \"@ref\": \"classes/spells\"\n" +
+      "        },\n" +
+      "        \"terms\": [\n" +
+      "            {\n" +
+      "                \"path\": \"data.name\"\n" +
+      "            }\n" +
+      "        ],\n" +
+      "        \"ts\": 1434345216167501,\n" +
+      "        \"unique\": true\n" +
+      "    }"
+
+    val parsed = json.readValue(toDeserialize, classOf[ResponseNode])
+
+    val idx = parsed.asIndex
+    idx.active shouldBe false
+    idx.classRef shouldBe Ref("indexes")
+    idx.name shouldBe "spells_by_name"
+    idx.ref shouldBe Ref("indexes/spells_by_name")
+    idx.source shouldBe Ref("classes/spells")
+    idx.terms shouldBe Seq(immutable.Map("path" -> "data.name"))
+    idx.ts shouldBe 1434345216167501L
+    idx.unique shouldBe true
   }
 }

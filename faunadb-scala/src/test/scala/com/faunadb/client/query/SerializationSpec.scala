@@ -45,6 +45,9 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val select = Select(Seq("favorites", "foods", 1), ObjectV("favorites" -> ObjectV("foods" -> ArrayV("crunchings", "munchings", "lunchings"))))
     json.writeValueAsString(select) shouldBe "{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}"
+
+    val quote = Quote(ObjectV("name" -> "Hen Wen", "Age" -> 123))
+    println(json.writeValueAsString(quote))
   }
 
   it should "serialize collections" in {
