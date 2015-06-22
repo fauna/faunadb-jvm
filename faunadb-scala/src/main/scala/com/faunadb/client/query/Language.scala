@@ -26,7 +26,7 @@ case class Let(@(JsonProperty @field)("let") vars: collection.Map[String, Expres
 case class Do(@(JsonProperty @field @getter)("do") expressions: Iterable[Expression]) extends Expression
 
 case class If(@(JsonProperty @field)("if") condition: Expression, then: Expression, `else`: Expression) extends Expression
-case class Quote(quote: Expression) extends Expression
+case class Quote(@(JsonProperty @field)("quote") quote: Expression) extends Expression
 case class Select(@(JsonProperty @field)("select") path: Iterable[Path], from: Value) extends Expression
 
 case class Lambda(@(JsonProperty @field)("lambda") argument: String, expr: Expression)
