@@ -161,4 +161,101 @@ class DeserializationSpec extends FlatSpec with Matchers {
     idx.ts shouldBe 1434345216167501L
     idx.unique shouldBe true
   }
+
+  it should "deserialize event response" in {
+    val toDeserialize = "{\n" +
+      "\t\t\t\"ts\": 1434477366352519,\n" +
+      "\t\t\t\"action\": \"create\",\n" +
+      "\t\t\t\"resource\": {\n" +
+      "\t\t\t\t\"@ref\": \"classes/spells/102989579003363328\"\n" +
+      "\t\t\t}\n" +
+      "\t\t}"
+
+    val parsed = json.readValue(toDeserialize, classOf[ResponseNode])
+    val event = parsed.asEvent
+
+    event.resource shouldBe Ref("classes/spells/102989579003363328")
+    event.action shouldBe "create"
+    event.ts shouldBe 1434477366352519L
+  }
+
+  it should "deserialize page response with no before or after" in {
+    val toDeserialize = "{\n" +
+      "        \"data\": [\n" +
+      "            {\n" +
+      "                \"@ref\": \"classes/spells/102851646450565120\"\n" +
+      "            }\n" +
+      "        ]\n" +
+      "    }\n"
+
+    val parsed = json.readValue(toDeserialize, classOf[ResponseNode])
+    val page = parsed.asPage
+    page.data.size shouldBe 1
+    page.data(0).asRef shouldBe Ref("classes/spells/102851646450565120")
+    page.after shouldBe None
+    page.before shouldBe None
+  }
+
+  it should "deserialize page response with before" in {
+    val toDeserialize = "{\n" +
+      "        \"before\": {\n" +
+      "            \"@ref\": \"classes/spells/102851646450565120\"\n" +
+      "        },\n" +
+      "        \"data\": [\n" +
+      "            {\n" +
+      "                \"@ref\": \"classes/spells/102851646450565120\"\n" +
+      "            }\n" +
+      "        ]\n" +
+      "    }"
+
+    val parsed = json.readValue(toDeserialize, classOf[ResponseNode])
+    val page = parsed.asPage
+    page.data.size shouldBe 1
+    page.data(0).asRef shouldBe Ref("classes/spells/102851646450565120")
+    page.before.get.asRef shouldBe Ref("classes/spells/102851646450565120")
+    page.after shouldBe None
+  }
+
+  it should "deserialize page response with before and after" in {
+    val toDeserialize = "{\n" +
+      "        \"after\": {\n" +
+      "            \"@ref\": \"classes/spells/102852248441192448\"\n" +
+      "        },\n" +
+      "        \"before\": {\n" +
+      "            \"@ref\": \"classes/spells/102851646450565120\"\n" +
+      "        },\n" +
+      "        \"data\": [\n" +
+      "            {\n" +
+      "                \"@ref\": \"classes/spells/102851646450565120\"\n" +
+      "            }\n" +
+      "        ]\n" +
+      "    }"
+
+    val parsed = json.readValue(toDeserialize, classOf[ResponseNode])
+    val page = parsed.asPage
+    page.data.size shouldBe 1
+    page.data(0).asRef shouldBe Ref("classes/spells/102851646450565120")
+    page.before.get.asRef shouldBe Ref("classes/spells/102852248441192448")
+    page.after.get.asRef shouldBe Ref("classes/spells/102851646450565120")
+  }
+
+  it should "deserialize page response with after" in {
+    val toDeserialize = "{\n" +
+      "        \"after\": {\n" +
+      "            \"@ref\": \"classes/spells/102851646450565120\"\n" +
+      "        },\n" +
+      "        \"data\": [\n" +
+      "            {\n" +
+      "                \"@ref\": \"classes/spells/102851640310104064\"\n" +
+      "            }\n" +
+      "        ]\n" +
+      "    }"
+
+    val parsed = json.readValue(toDeserialize, classOf[ResponseNode])
+    val page = parsed.asPage
+    page.data.size shouldBe 1
+    page.data(0).asRef shouldBe Ref("classes/spells/102851640310104064")
+    page.before shouldBe None
+    page.after.get.asRef shouldBe Ref("classes/spells/102851646450565120")
+  }
 }
