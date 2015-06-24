@@ -243,5 +243,14 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     )))
     val doR = Await.result(doF, 1 second).asInstance
     doR.ref shouldBe randomRef
+
+    val objectF = client.query(Quote(ObjectV("name" -> "Hen Wen", "age" -> 123L)))
+    val objectR = Await.result(objectF, 1 second).asObject
+    objectR("name").asString shouldBe "Hen Wen"
+    objectR("age").asNumber shouldBe 123L
+
+    val selectF = client.query(Select(Seq("favorites", "foods", 1), Quote(ObjectV("favorites" -> ObjectV("foods" -> ArrayV("crunchings", "munchings", "lunchings"))))))
+    val selectR = Await.result(selectF, 1 second).asString
+    selectR shouldBe "munchings"
   }
 }
