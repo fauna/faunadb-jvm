@@ -44,6 +44,7 @@ lazy val scala = project.in(file("faunadb-scala"))
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
+      "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
       "org.yaml" % "snakeyaml" % "1.14" % "test",
       "org.scalatest" %% "scalatest" % "2.2.1" % "test"
     )
