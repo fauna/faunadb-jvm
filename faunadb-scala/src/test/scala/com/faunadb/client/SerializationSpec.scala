@@ -28,8 +28,8 @@ class SerializationSpec extends FlatSpec with Matchers {
 
   it should "serialize complex values" in {
     json.writeValueAsString(ArrayV(1, "test")) shouldBe "[1,\"test\"]"
-    json.writeValueAsString(ArrayV(ArrayV(ObjectV("test" -> "value"), 2323, true), "hi", ObjectV("test" -> "yo", "test2" -> NullV))) shouldBe "[[{\"object\":{\"test\":\"value\"}},2323,true],\"hi\",{\"object\":{\"test\":\"yo\",\"test2\":null}}]"
-    json.writeValueAsString(ObjectV("test" -> 1, "test2" -> Ref("some/ref"))) shouldBe "{\"object\":{\"test\":1,\"test2\":{\"@ref\":\"some/ref\"}}}"
+    json.writeValueAsString(ArrayV(ArrayV(Object(ObjectV("test" -> "value")), 2323, true), "hi", Object(ObjectV("test" -> "yo", "test2" -> NullV)))) shouldBe "[[{\"object\":{\"test\":\"value\"}},2323,true],\"hi\",{\"object\":{\"test\":\"yo\",\"test2\":null}}]"
+    json.writeValueAsString(Object(ObjectV("test" -> 1, "test2" -> Ref("some/ref")))) shouldBe "{\"object\":{\"test\":1,\"test2\":{\"@ref\":\"some/ref\"}}}"
   }
 
   it should "serialize basic forms" in {
@@ -40,22 +40,22 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(ifForm) shouldBe "{\"if\":true,\"then\":\"was true\",\"else\":\"was false\"}"
 
     val doForm = Do(Seq(
-      Create(Ref("some/ref/1"), ObjectV("data" -> ObjectV("name" -> "Hen Wen"))),
+      Create(Ref("some/ref/1"), Object(ObjectV("data" -> Object(ObjectV("name" -> "Hen Wen"))))),
       Get(Ref("some/ref/1"))))
     json.writeValueAsString(doForm) shouldBe "{\"do\":[{\"create\":{\"@ref\":\"some/ref/1\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Hen Wen\"}}}}},{\"get\":{\"@ref\":\"some/ref/1\"}}]}"
 
-    val select = Select(Seq("favorites", "foods", 1), ObjectV("favorites" -> ObjectV("foods" -> ArrayV("crunchings", "munchings", "lunchings"))))
+    val select = Select(Seq("favorites", "foods", 1), Object(ObjectV("favorites" -> Object(ObjectV("foods" -> ArrayV("crunchings", "munchings", "lunchings"))))))
     json.writeValueAsString(select) shouldBe "{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}"
 
     val quote = Quote(ObjectV("name" -> "Hen Wen", "Age" -> 123))
-    println(json.writeValueAsString(quote))
+    json.writeValueAsString(quote) shouldBe "{\"quote\":{\"name\":\"Hen Wen\",\"Age\":123}}"
   }
 
   it should "serialize collections" in {
     val map = Map(Lambda("munchings", Var("munchings")), ArrayV(1, 2, 3))
     json.writeValueAsString(map) shouldBe "{\"map\":{\"lambda\":\"munchings\",\"expr\":{\"var\":\"munchings\"}},\"collection\":[1,2,3]}"
 
-    val foreach = Foreach(Lambda("creature", Create(Ref("some/ref"), ObjectV("data" -> ObjectV("some" -> Var("creature"))))), ArrayV(Ref("another/ref/1"), Ref("another/ref/2")))
+    val foreach = Foreach(Lambda("creature", Create(Ref("some/ref"), Object(ObjectV("data" -> Object(ObjectV("some" -> Var("creature"))))))), ArrayV(Ref("another/ref/1"), Ref("another/ref/2")))
     json.writeValueAsString(foreach) shouldBe "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":\"another/ref/1\"},{\"@ref\":\"another/ref/2\"}]}"
   }
 
@@ -83,13 +83,13 @@ class SerializationSpec extends FlatSpec with Matchers {
   it should "serialize resource modifications" in {
     val ref = Ref("classes/spells")
     val params = ObjectV("name" -> "Mountainous Thunder", "element" -> "air", "cost" -> 15)
-    val create = Create(ref, ObjectV("data" -> params))
+    val create = Create(ref, Object(ObjectV("data" -> Object(params))))
     json.writeValueAsString(create) shouldBe "{\"create\":{\"@ref\":\"classes/spells\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountainous Thunder\",\"element\":\"air\",\"cost\":15}}}}}"
 
-    val update = Update(Ref("classes/spells/123456"), ObjectV("data" -> ObjectV("name" -> "Mountain's Thunder", "cost" -> NullV)))
+    val update = Update(Ref("classes/spells/123456"), Object(ObjectV("data" -> Object(ObjectV("name" -> "Mountain's Thunder", "cost" -> NullV)))))
     json.writeValueAsString(update) shouldBe "{\"update\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"cost\":null}}}}}"
 
-    val replace = Replace(Ref("classes/spells/123456"), ObjectV("data" -> ObjectV("name" -> "Mountain's Thunder", "element" -> ArrayV("air", "earth"), "cost" -> 10)))
+    val replace = Replace(Ref("classes/spells/123456"), Object(ObjectV("data" -> Object(ObjectV("name" -> "Mountain's Thunder", "element" -> ArrayV("air", "earth"), "cost" -> 10)))))
     json.writeValueAsString(replace) shouldBe "{\"replace\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"element\":[\"air\",\"earth\"],\"cost\":10}}}}}"
 
     val delete = Delete(Ref("classes/spells/123456"))
