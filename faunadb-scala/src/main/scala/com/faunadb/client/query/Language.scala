@@ -64,9 +64,9 @@ case class Paginate(resource: Identifier,
 
 case class Count(@(JsonProperty @field)("count") set: Set) extends Identifier
 
-case class Create(@(JsonProperty @field)("create") ref: Identifier, @(JsonProperty @field)("params") obj: ObjectV = ObjectV.empty) extends Identifier
-case class Replace(@(JsonProperty @field)("replace") ref: Identifier, @(JsonProperty @field)("params") obj: ObjectV) extends Identifier
-case class Update(@(JsonProperty @field)("update") ref: Identifier, @(JsonProperty @field)("params") obj: ObjectV) extends Identifier
+case class Create(@(JsonProperty @field)("create") ref: Identifier, @(JsonProperty @field)("params") params: Expression = ObjectV.empty) extends Identifier
+case class Replace(@(JsonProperty @field)("replace") ref: Identifier, @(JsonProperty @field)("params") params: Expression) extends Identifier
+case class Update(@(JsonProperty @field)("update") ref: Identifier, @(JsonProperty @field)("params") params: Expression) extends Identifier
 case class Delete(@(JsonProperty @field)("delete") ref: Identifier) extends Identifier
 
 
@@ -157,4 +157,6 @@ object ObjectV {
   def apply(pairs: (String, Value)*) = new ObjectV(pairs.toMap)
 }
 
-case class ObjectV(@(JsonProperty @field @getter)("object") values: collection.Map[String, Value]) extends Value
+case class ObjectV(@(JsonValue @getter) values: collection.Map[String, Value]) extends Value
+
+case class Object(@(JsonProperty @field)("object") value: ObjectV) extends Value

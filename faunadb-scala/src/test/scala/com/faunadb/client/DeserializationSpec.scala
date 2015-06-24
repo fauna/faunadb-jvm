@@ -236,8 +236,8 @@ class DeserializationSpec extends FlatSpec with Matchers {
     val page = parsed.asPage
     page.data.size shouldBe 1
     page.data(0).asRef shouldBe Ref("classes/spells/102851646450565120")
-    page.before.get.asRef shouldBe Ref("classes/spells/102852248441192448")
-    page.after.get.asRef shouldBe Ref("classes/spells/102851646450565120")
+    page.after.get.asRef shouldBe Ref("classes/spells/102852248441192448")
+    page.before.get.asRef shouldBe Ref("classes/spells/102851646450565120")
   }
 
   it should "deserialize page response with after" in {

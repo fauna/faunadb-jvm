@@ -27,7 +27,7 @@ class FaunaClient(connection: Connection, json: ObjectMapper) {
       handleSimpleErrors(resp)
       handleQueryErrors(resp)
       val respBody = parseResponseBody(resp)
-      val resource = respBody.get("resource").asInstanceOf[ObjectNode]
+      val resource = respBody.get("resource")
       json.treeToValue(resource, classOf[ResponseNode])
     }
   }
