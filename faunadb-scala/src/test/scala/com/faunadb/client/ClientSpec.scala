@@ -1,15 +1,16 @@
-package com.faunadb.httpclient
+package com.faunadb.client
 
-import java.io.FileInputStream
-import java.util.{Map => JMap}
+import _root_.java.io.FileInputStream
+import _root_.java.util.{Map => JMap}
+import scala.collection.JavaConverters._
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.faunadb.client.query.Values._
 import com.faunadb.client.query._
-import com.faunadb.client.{BadQueryException, FaunaClient, NotFoundQueryException}
+import com.faunadb.httpclient.Connection
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.yaml.snakeyaml.Yaml
 
-import scala.collection.JavaConverters._
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -54,6 +55,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val uniqueIndexFuture = client.query(Create(Ref("indexes"), ObjectV("name" -> "spells_by_unique_test", "source" -> Ref("classes/spells"), "path" -> "data.uniqueTest1", "unique" -> true)))
     Await.result(setIndexFuture, 1 second)
+
+    val indexByElementF = client.query(Create(Ref("indexes"), ObjectV("name" -> "spells_by_element", "source" -> Ref("classes/spells"), "path" -> "data.element")))
+    Await.result(indexByElementF, 1 second)
   }
 
   "Fauna Client" should "should not find an instance" in {
@@ -199,7 +203,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "handle a constraint violation" in {
-    import com.faunadb.client.query.Values._
     val randomText = Random.alphanumeric.take(8).mkString
     val classRef = Ref("classes/spells")
     val createFuture = client.query(Create(classRef, ObjectV("data" -> ObjectV("uniqueTest1" -> randomText))))
@@ -213,5 +216,11 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     exception.errors(0).code shouldBe "validation failed"
     exception.errors(0).parameters("data.uniqueTest1").error shouldBe "duplicate value"
+  }
+
+  it should "test types" in {
+    val setF = client.query(Match("arcane", Ref("indexes/spells_by_element")))
+    val set = Await.result(setF, 1 second).asSet
+    println(set)
   }
 }
