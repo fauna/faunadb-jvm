@@ -43,6 +43,9 @@ class ResponseNode(private val underlying: JsonNode, json: ObjectMapper) {
   def asEventOpt: Option[Event] = Option(json.convertValue(underlying, classOf[Event]))
   def asEvent = asEventOpt.get
 
+  def asSetOpt: Option[Set] = Option(json.convertValue(underlying, classOf[Set]))
+  def asSet = asSetOpt.get
+
   override def toString: String = underlying.toString
 
   override def equals(obj: scala.Any): Boolean = {

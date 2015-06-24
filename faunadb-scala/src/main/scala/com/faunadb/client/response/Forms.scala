@@ -40,3 +40,4 @@ case class Index(@JsonProperty("ref") ref: Ref,
                  @JsonProperty("path") path: String,
                  @JsonProperty("terms") terms: Seq[Map[String, String]])
 
+case class Set(@JsonProperty("@set") parameters: ResponseMap)

@@ -1,10 +1,11 @@
-package com.faunadb.client.query
+package com.faunadb.client
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.faunadb.client.query.Path._
+import com.faunadb.client.query.Values._
+import com.faunadb.client.query._
 import org.scalatest.{FlatSpec, Matchers}
-import Path._
-import Values._
 
 class SerializationSpec extends FlatSpec with Matchers {
   val json = new ObjectMapper()
