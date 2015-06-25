@@ -205,23 +205,25 @@ public class ClientSpec {
 
   @Test
   public void testHandleConstraintViolation() throws Throwable {
+    String randomClassName = RandomStringUtils.randomAlphanumeric(8);
+    ListenableFuture<ResponseNode> randomClassF = client.query(Create(Ref("classes"), Quote(ObjectV("name", StringV(randomClassName)))));
+    Ref classRef = randomClassF.get().asClass().ref();
+
+    ListenableFuture<ResponseNode> randomClassIndexF = client.query(Create(Ref("indexes"), Quote(ObjectV(
+        "name", StringV(randomClassName + "_class_index"),
+        "source", classRef,
+        "path", StringV("data.uniqueTest1"),
+        "unique", BooleanV(true)
+    ))));
+    randomClassIndexF.get();
+
     String randomText = RandomStringUtils.randomAlphanumeric(8);
-    Ref classRef = Ref("classes/spells");
     ListenableFuture<ResponseNode> createF = client.query(Create(classRef, Quote(ObjectV("data", ObjectV("uniqueTest1", StringV(randomText))))));
     createF.get();
 
     ListenableFuture<ResponseNode> createF2 = client.query(Create(classRef, Quote(ObjectV("data", ObjectV("uniqueTest1", StringV(randomText))))));
-    try {
-      createF2.get();
-    } catch (ExecutionException ex) {
-      Throwable t = ex.getCause();
-      assertThat(t, is(instanceOf(BadQueryException.class)));
-      BadQueryException bqe = (BadQueryException) t;
-
-      assertThat(bqe.errors().size(), is(1));
-      assertThat(bqe.errors().get(0).code(), is("validation failed"));
-      assertThat(bqe.errors().get(0).parameters().get("data.uniqueTest1").error(), is("duplicate value"));
-    }
+    thrown.expectCause(isA(BadQueryException.class));
+    createF2.get();
   }
 
   @Test
