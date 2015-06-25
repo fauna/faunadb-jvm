@@ -160,3 +160,5 @@ object ObjectV {
 case class ObjectV(@(JsonValue @getter) values: collection.Map[String, Value]) extends Value
 
 case class Object(@(JsonProperty @field)("object") value: ObjectV) extends Value
+
+case class Add(@(JsonProperty @field)("add") terms: Seq[Expression]) extends Value
