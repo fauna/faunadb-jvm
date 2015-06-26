@@ -29,7 +29,7 @@ import java.lang.reflect.Array;
  * <pre>{@code
  * import static com.faunadb.client.query.Language.*;
  * FaunaClient client = FaunaClient.create(Connection.builder().withAuthToken("someAuthToken").build());
- * client.get(Get(Ref("some/ref")));
+ * client.query(Get(Ref("some/ref")));
  * }
  * </pre>
  *

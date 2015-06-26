@@ -1,7 +1,7 @@
 package com.faunadb.client
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
+import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.client.query.Expression
 import com.faunadb.client.response.{Error, ResponseNode}
@@ -17,7 +17,20 @@ object FaunaClient {
   def apply(connection: Connection, json: ObjectMapper) = new FaunaClient(connection, json.copy())
 }
 
-class FaunaClient(connection: Connection, json: ObjectMapper) {
+/**
+ * The Scala native client for FaunaDB.
+ *
+ * Obtain an instance of the client using the methods on the companion object.
+ *
+ * The client is asynchronous, so all methods will return a [[scala.concurrent.Future]].
+ *
+ * Example:
+ * {{{
+ *  val client = FaunaClient(Connection.builder().withAuthToken("someAuthToken").build))
+ *  val response = client.query(Get(Ref("some/ref")))
+ * }}}
+ */
+class FaunaClient private (connection: Connection, json: ObjectMapper) {
   json.registerModule(new DefaultScalaModule)
 
   def query(expr: Expression)(implicit ec: ExecutionContext): Future[ResponseNode] = {

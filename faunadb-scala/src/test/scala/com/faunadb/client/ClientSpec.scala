@@ -5,7 +5,7 @@ import _root_.java.util.{Map => JMap}
 import scala.collection.JavaConverters._
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.faunadb.client.query.Values._
+import com.faunadb.client.query.Language._
 import com.faunadb.client.query._
 import com.faunadb.httpclient.Connection
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
@@ -34,7 +34,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   override protected def beforeAll(): Unit = {
-    import Values._
     val resultFuture = rootClient.query(Create(Ref("databases"), Quote(ObjectV("name" -> testDbName))))
     val result = Await.result(resultFuture, 1 second)
 
@@ -81,7 +80,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "issue a batched query" in {
-    import com.faunadb.client.query.Values._
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
     val classRef = Ref("classes/spells")
