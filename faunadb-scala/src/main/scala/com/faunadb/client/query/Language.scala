@@ -11,11 +11,18 @@ import scala.annotation.meta.{field, getter, param}
 sealed trait Expression
 sealed trait Identifier extends Expression
 
-
-
-object Path {
+object Language {
   implicit def stringToObjectPath(str: String) = ObjectPath(str)
   implicit def intToArrayPath(i: Int) = ArrayPath(i)
+  implicit def stringToValue(unwrapped: String) = StringV(unwrapped)
+  implicit def longToValue(unwrapped: Long) = NumberV(unwrapped)
+  implicit def boolToValue(unwrapped: Boolean) = BooleanV(unwrapped)
+  implicit def arrayToValue(unwrapped: Array[Value]) = ArrayV(unwrapped)
+  implicit def mapToValue(unwrapped: collection.Map[String, Value]) = ObjectV(unwrapped)
+  implicit def doubleToValue(unwrapped: Double) = DoubleV(unwrapped)
+  implicit def pairToValuePair[T](p: (String, T))(implicit convert: T => Value) = {
+    (p._1, convert(p._2))
+  }
 }
 
 sealed trait Path
@@ -32,7 +39,6 @@ case class Select(@(JsonProperty @field)("select") path: Iterable[Path], from: V
 case class Lambda(@(JsonProperty @field)("lambda") argument: String, expr: Expression)
 case class Map(@(JsonProperty @field)("map") lambda: Lambda, collection: Expression) extends Expression
 case class Foreach(@(JsonProperty @field)("foreach") lambda: Lambda, collection: Expression) extends Expression
-
 
 
 sealed trait Set extends Identifier
@@ -119,19 +125,6 @@ sealed trait Resource extends Response
 case class Event(@(JsonProperty @field)("resource") resource: Ref,
                  @(JsonProperty @field)("action") action: String,
                  @(JsonProperty @field)("ts") ts: Long) extends Value
-
-object Values {
-  implicit def stringToValue(unwrapped: String) = StringV(unwrapped)
-  implicit def longToValue(unwrapped: Long) = NumberV(unwrapped)
-  implicit def boolToValue(unwrapped: Boolean) = BooleanV(unwrapped)
-  implicit def arrayToValue(unwrapped: Array[Value]) = ArrayV(unwrapped)
-  implicit def mapToValue(unwrapped: collection.Map[String, Value]) = ObjectV(unwrapped)
-  implicit def doubleToValue(unwrapped: Double) = DoubleV(unwrapped)
-
-  implicit def pairToValuePair[T](p: (String, T))(implicit convert: T => Value) = {
-    (p._1, convert(p._2))
-  }
-}
 
 case object NullV extends Value {
   @(JsonValue @getter) val value = NullNode.instance;
