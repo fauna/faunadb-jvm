@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.node.ObjectNode
 
-class ResponseNodeDeserializer extends JsonDeserializer[ResponseNode] {
+private[response] class ResponseNodeDeserializer extends JsonDeserializer[ResponseNode] {
   override def deserialize(jsonParser: JsonParser, ctxt: DeserializationContext): ResponseNode = {
     val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
     val tree = json.readTree(jsonParser).asInstanceOf[JsonNode]
@@ -12,7 +12,7 @@ class ResponseNodeDeserializer extends JsonDeserializer[ResponseNode] {
   }
 }
 
-class ResponseMapDeserializer extends JsonDeserializer[ResponseMap] {
+private[response] class ResponseMapDeserializer extends JsonDeserializer[ResponseMap] {
   override def deserialize(jsonParser: JsonParser, ctxt: DeserializationContext): ResponseMap = {
     val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
     val tree = json.readTree(jsonParser).asInstanceOf[JsonNode]

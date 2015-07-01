@@ -3,7 +3,7 @@ package com.faunadb.client.query
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind._
 
-class PaginateSerializer extends JsonSerializer[Paginate] {
+private[query] class PaginateSerializer extends JsonSerializer[Paginate] {
   override def serialize(t: Paginate, jsonGenerator: JsonGenerator, serializerProvider: SerializerProvider): Unit = {
     jsonGenerator.writeStartObject()
     jsonGenerator.writeObjectField("paginate", t.resource)
