@@ -4,7 +4,7 @@ import com.google.common.util.concurrent.{FutureCallback, Futures, ListenableFut
 
 import scala.concurrent.{Future, Promise}
 
-object FutureImplicits {
+private[client] object FutureImplicits {
   implicit class RichListenableFuture[A](underlying: ListenableFuture[A]) {
     def asScalaFuture(): Future[A] = {
       val promise = Promise[A]()

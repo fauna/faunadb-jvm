@@ -5,6 +5,8 @@ lazy val commonSettings = Seq(
   version := "0.1-SNAPSHOT"
 )
 
+
+
 lazy val root = (project in file("."))
   .settings(commonSettings: _*)
   .settings(
@@ -47,7 +49,23 @@ lazy val scala = project.in(file("faunadb-scala"))
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
       "org.yaml" % "snakeyaml" % "1.14" % "test",
       "org.scalatest" %% "scalatest" % "2.2.1" % "test"
-    )
+    ),
+    autoAPIMappings := true,
+    apiMappings ++= {
+      val cp = (fullClasspath in Compile).value
+      def findDep(org: String, name: String) = {
+        for {
+          entry <- cp
+          module <- entry.get(moduleID.key)
+          if module.organization == org
+          if module.name.startsWith(name)
+          jarFile = entry.data
+        } yield jarFile
+      }.head
+      Map(
+        findDep("com.fasterxml.jackson.core", "jackson-databind") -> url("http://fasterxml.github.io/jackson-databind/javadoc/2.5/")
+      )
+    }
   )
   .dependsOn(httpclient)
 
