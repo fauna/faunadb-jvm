@@ -1,4 +1,4 @@
-package com.faunadb.client
+package com.faunadb.client.errors
 
 abstract class FaunaException(message: String) extends Exception(message)
 

@@ -13,8 +13,8 @@ private[query] class PaginateSerializer extends JsonSerializer[Paginate] {
     }
 
     t.cursor.foreach {
-      case b: Before => jsonGenerator.writeObjectField("before", b.ref)
-      case a: After => jsonGenerator.writeObjectField("after", a.ref)
+      case b: Before => jsonGenerator.writeObjectField("before", b.value)
+      case a: After => jsonGenerator.writeObjectField("after", a.value)
     }
 
     t.size.foreach { sNum =>

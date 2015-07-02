@@ -3,8 +3,9 @@ package com.faunadb.client
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.faunadb.client.errors.{UnauthorizedException, UnknownQueryException, NotFoundQueryException, BadQueryException}
 import com.faunadb.client.query.Expression
-import com.faunadb.client.response.{Error, ResponseNode}
+import com.faunadb.client.response.ResponseNode
 import com.faunadb.client.util.FutureImplicits._
 import com.faunadb.httpclient.Connection
 import com.ning.http.client.{Response => HttpResponse}
@@ -113,7 +114,7 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
     response.getStatusCode match {
       case x if x >= 300 =>
         val errors = parseResponseBody(response).get("errors").asInstanceOf[ArrayNode]
-        val parsedErrors = errors.iterator().asScala.map { json.treeToValue(_, classOf[Error]) }.toIndexedSeq
+        val parsedErrors = errors.iterator().asScala.map { json.treeToValue(_, classOf[QueryError]) }.toIndexedSeq
         val error = QueryErrorResponse(x, parsedErrors)
         x match {
           case 400 => throw new BadQueryException(error)
