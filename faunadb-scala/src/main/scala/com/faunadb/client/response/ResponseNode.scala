@@ -29,7 +29,7 @@ import scala.collection.AbstractMap
  * @define none [[scala.None]]
  */
 @JsonDeserialize(using=classOf[ResponseNodeDeserializer])
-class ResponseNode private[response] (private val underlying: JsonNode, json: ObjectMapper) {
+class ResponseNode private[client] (private val underlying: JsonNode, json: ObjectMapper) {
   /**
    * Coerces the node into a string.
    *
@@ -168,7 +168,7 @@ class ResponseNode private[response] (private val underlying: JsonNode, json: Ob
  * }}}
  */
 @JsonDeserialize(using=classOf[ResponseMapDeserializer])
-class ResponseMap private[response] (underlying: Map[String, ResponseNode]) extends AbstractMap[String, ResponseNode] {
+class ResponseMap private[client] (underlying: Map[String, ResponseNode]) extends AbstractMap[String, ResponseNode] {
   override def get(key: String): Option[ResponseNode] = underlying.get(key)
 
   override def +[B1 >: ResponseNode](kv: (String, B1)): collection.Map[String, B1] = underlying + kv

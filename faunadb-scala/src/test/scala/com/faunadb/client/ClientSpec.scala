@@ -2,6 +2,8 @@ package com.faunadb.client
 
 import _root_.java.io.FileInputStream
 import _root_.java.util.{Map => JMap}
+import com.faunadb.client.errors.{NotFoundQueryException, BadQueryException}
+
 import scala.collection.JavaConverters._
 
 import com.fasterxml.jackson.databind.ObjectMapper

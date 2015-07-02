@@ -31,17 +31,35 @@ case class Key(@JsonProperty("ref") ref: Ref,
                @JsonProperty("ts") ts: Long,
                @JsonProperty("data") data: ResponseMap)
 
+/**
+ * A FaunaDB database response.
+ *
+ * This, like other response types, is obtained by coercing a [[ResponseNode]] using its associated conversion methods,
+ * [[ResponseNode.asDatabase]] or [[ResponseNode.asDatabaseOpt]].
+ */
 case class Database(@JsonProperty("ref") ref: Ref,
                     @(JsonProperty @field @param)("class") classRef: Ref,
                     @JsonProperty("ts") ts: Long,
                     @JsonProperty("name") name: String)
 
+/**
+ * A FaunaDB class response.
+ *
+ * This, like other response types, is obtained by coercing a [[ResponseNode]] using its associated conversion methods,
+ * [[ResponseNode.asClass]] or [[ResponseNode.asClassOpt]].
+ */
 case class Class(@JsonProperty("ref") ref: Ref,
                  @(JsonProperty @field @param)("class") classRef: Ref,
                  @JsonProperty("ts") ts: Long,
                  @(JsonProperty @field @param)("history_days") historyDays: Long,
                  @JsonProperty("name") name: String)
 
+/**
+ * A FaunaDB index response.
+ *
+ * This, like other response types, is obtained by coercing a [[ResponseNode]] using its associated conversion methods,
+ * [[ResponseNode.asIndex]] or [[ResponseNode.asIndexOpt]]
+ */
 case class Index(@JsonProperty("ref") ref: Ref,
                  @(JsonProperty @field @param)("class") classRef: Ref,
                  @JsonProperty("ts") ts: Long,
@@ -52,4 +70,7 @@ case class Index(@JsonProperty("ref") ref: Ref,
                  @JsonProperty("path") path: String,
                  @JsonProperty("terms") terms: Seq[Map[String, String]])
 
+/**
+ * A FaunaDB set literal.
+ */
 case class Set(@JsonProperty("@set") parameters: ResponseMap)
