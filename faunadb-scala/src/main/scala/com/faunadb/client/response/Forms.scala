@@ -5,11 +5,23 @@ import com.faunadb.client.query.Ref
 
 import scala.annotation.meta.{field, param}
 
+/**
+ * A FaunaDB instance response.
+ *
+ * This, like other response types, is obtained  by coercing a [[ResponseNode]] using
+ * the conversion methods [[ResponseNode.asInstance]] or [[ResponseNode.asInstanceOpt]].
+ */
 case class Instance(@(JsonProperty)("ref") ref: Ref,
                     @(JsonProperty @field @param)("class") classRef: Ref,
                     @JsonProperty("ts") ts: Long,
                     @JsonProperty("data") data: ResponseMap)
 
+/**
+ * A FaunaDB key response.
+ *
+ * This, like other response types, is obtained by coercing a [[ResponseNode]] using
+ * the conversion methods [[ResponseNode.asKey]] or [[ResponseNode.asKeyOpt]].
+ */
 case class Key(@JsonProperty("ref") ref: Ref,
                @(JsonProperty @field @param)("class") classRef: Ref,
                @JsonProperty("database") database: Ref,

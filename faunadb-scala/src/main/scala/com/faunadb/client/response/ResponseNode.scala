@@ -29,7 +29,7 @@ import scala.collection.AbstractMap
  * @define none [[scala.None]]
  */
 @JsonDeserialize(using=classOf[ResponseNodeDeserializer])
-class ResponseNode(private val underlying: JsonNode, json: ObjectMapper) {
+class ResponseNode private[response] (private val underlying: JsonNode, json: ObjectMapper) {
   /**
    * Coerces the node into a string.
    *
@@ -137,7 +137,7 @@ class ResponseNode(private val underlying: JsonNode, json: ObjectMapper) {
   /**
    * Coerces the node into a [[Set]].
    *
-   * @return $soem if the coercion is possible, $none if not.
+   * @return $some if the coercion is possible, $none if not.
    */
   def asSetOpt: Option[Set] = Option(json.convertValue(underlying, classOf[Set]))
   def asSet = asSetOpt.get
@@ -151,8 +151,24 @@ class ResponseNode(private val underlying: JsonNode, json: ObjectMapper) {
   override def hashCode(): Int = underlying.hashCode()
 }
 
+/**
+ * An immutable dictionary of response nodes. FaunaDB responses can be polymorphic, so this
+ * dictionary allows individual entries to be coerced into concrete response types as required.
+ *
+ * ===Example===
+ *
+ * {{{
+ *   val response: ResponseNode // Some result from the FaunaDB client
+ *   val responseMap = response.asObject
+ *   responseMap("someKey").asString
+ *   responseMap("someNumberKey").asNumber
+ *
+ *   // these can be chained
+ *   response.asObject("someObjectKey").asObject("someNestedKey").asString
+ * }}}
+ */
 @JsonDeserialize(using=classOf[ResponseMapDeserializer])
-class ResponseMap(underlying: Map[String, ResponseNode]) extends AbstractMap[String, ResponseNode] {
+class ResponseMap private[response] (underlying: Map[String, ResponseNode]) extends AbstractMap[String, ResponseNode] {
   override def get(key: String): Option[ResponseNode] = underlying.get(key)
 
   override def +[B1 >: ResponseNode](kv: (String, B1)): collection.Map[String, B1] = underlying + kv
