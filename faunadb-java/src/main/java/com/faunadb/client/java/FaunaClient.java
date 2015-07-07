@@ -11,14 +11,11 @@ import com.faunadb.client.java.response.ResponseNode;
 import com.faunadb.httpclient.Connection;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.AsyncFunction;
-import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.ning.http.client.Response;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 
 /**
  * The Java native client for FaunaDB.
@@ -168,11 +165,11 @@ public class FaunaClient {
 
       switch(status) {
         case 400:
-          throw new BadQueryException(errorResponse);
+          throw new BadRequestException(errorResponse);
         case 404:
-          throw new NotFoundQueryException(errorResponse);
+          throw new NotFoundException(errorResponse);
         default:
-          throw new UnknownQueryException(errorResponse);
+          throw new UnknownException(errorResponse);
       }
     }
   }
