@@ -142,6 +142,26 @@ class ResponseNode private[client] (private val underlying: JsonNode, json: Obje
   def asSetOpt: Option[Set] = Option(json.convertValue(underlying, classOf[Set]))
   def asSet = asSetOpt.get
 
+  /**
+   * Accesses the value of the specified field if this is an object node.
+   */
+  def apply(key: String): ResponseNode = asObject(key)
+
+  /**
+   * Accesses the value of the specified element if this is an array node.
+   */
+  def apply(index: Int): ResponseNode = asArray(index)
+
+  /**
+   * Accesses the value of the specified field if this is an object node.
+   */
+  def get(key: String): Option[ResponseNode] = asObjectOpt.flatMap(_.get(key))
+
+  /**
+   * Accesses the value of the specified element if this is an array node.
+   */
+  def get(index: Int): Option[ResponseNode] = asArrayOpt.flatMap(_.lift(index))
+
   override def toString: String = underlying.toString
 
   override def equals(obj: scala.Any): Boolean = {

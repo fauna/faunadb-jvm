@@ -206,21 +206,6 @@ public class Connection {
   }
 
   /**
-   * Issues a {@code PUT} request with no body.
-   *
-   * @param path the relative path of the resource
-   * @return a {@link ListenableFuture} containing the HTTP response.
-   * @throws IOException if the HTTP request cannot be issued.
-   */
-  public ListenableFuture<Response> put(String path) throws IOException {
-    Request request = new RequestBuilder("PUT")
-      .setUrl(mkUrl(path))
-      .build();
-
-    return performRequest(request);
-  }
-
-  /**
    * Issues a {@code PUT} request with the provided JSON request body.
    *
    * @param path the relative path of the resource.
