@@ -1,7 +1,7 @@
 package com.faunadb.client.java;
 
-import com.faunadb.client.java.errors.BadQueryException;
-import com.faunadb.client.java.errors.NotFoundQueryException;
+import com.faunadb.client.java.errors.BadRequestException;
+import com.faunadb.client.java.errors.NotFoundException;
 import com.faunadb.client.java.query.*;
 import com.faunadb.client.java.query.Set;
 import com.faunadb.client.java.response.*;
@@ -76,7 +76,7 @@ public class ClientSpec {
 
   @Test
   public void testLookupMissingInstance() throws Throwable {
-    thrown.expectCause(isA(NotFoundQueryException.class));
+    thrown.expectCause(isA(NotFoundException.class));
     ListenableFuture<ResponseNode> resp = client.query(Get(Ref("classes/spells/1234")));
     resp.get();
   }
@@ -222,7 +222,7 @@ public class ClientSpec {
     createF.get();
 
     ListenableFuture<ResponseNode> createF2 = client.query(Create(classRef, Quote(ObjectV("data", ObjectV("uniqueTest1", StringV(randomText))))));
-    thrown.expectCause(isA(BadQueryException.class));
+    thrown.expectCause(isA(BadRequestException.class));
     createF2.get();
   }
 
@@ -314,7 +314,7 @@ public class ClientSpec {
     ListenableFuture<ResponseNode> deleteF = client.query(Delete(createInstance.ref()));
     deleteF.get();
 
-    thrown.expectCause(isA(NotFoundQueryException.class));
+    thrown.expectCause(isA(NotFoundException.class));
     ListenableFuture<ResponseNode> getF = client.query(Get(createInstance.ref()));
     getF.get();
   }
