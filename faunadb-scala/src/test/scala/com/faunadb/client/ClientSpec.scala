@@ -2,17 +2,16 @@ package com.faunadb.client
 
 import _root_.java.io.FileInputStream
 import _root_.java.util.{Map => JMap}
-import com.faunadb.client.errors.{NotFoundQueryException, BadQueryException}
-
-import scala.collection.JavaConverters._
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.faunadb.client.errors.{NotFoundException, BadRequestException}
 import com.faunadb.client.query.Language._
 import com.faunadb.client.query._
 import com.faunadb.httpclient.Connection
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.yaml.snakeyaml.Yaml
 
+import scala.collection.JavaConverters._
 import scala.collection.immutable
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -55,7 +54,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   "Fauna Client" should "should not find an instance" in {
     val resp = client.query(Get(Ref("classes/spells/1234")))
-    intercept[NotFoundQueryException] {
+    intercept[NotFoundException] {
       Await.result(resp, 1 second)
     }
   }
@@ -168,7 +167,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val createFuture2 = client.query(Create(classRef, Quote(ObjectV("data" -> ObjectV("uniqueTest1" -> randomText)))))
 
-    val exception = intercept[BadQueryException] {
+    val exception = intercept[BadRequestException] {
       Await.result(createFuture2, 1 second).asInstance
     }
 
@@ -246,7 +245,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val deleteF = client.query(Delete(createR.ref))
     Await.result(deleteF, 1 second)
     val getF = client.query(Get(createR.ref))
-    intercept[NotFoundQueryException] {
+    intercept[NotFoundException] {
       Await.result(getF, 1 second)
     }
   }
