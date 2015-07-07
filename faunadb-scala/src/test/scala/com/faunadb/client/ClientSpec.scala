@@ -74,9 +74,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val resp2 = Await.result(query2F, 5 seconds).asInstance
     resp2.data.contains("testField") shouldBe true
     val testFieldObject = resp2.data("testField").asObject
-    testFieldObject("array").asArray(0).asNumber shouldBe 1
-    testFieldObject("array").asArray(1).asString shouldBe "2"
-    testFieldObject("array").asArray(2).asDouble shouldBe 3.4
+    testFieldObject("array")(0).asNumber shouldBe 1
+    testFieldObject("array")(1).asString shouldBe "2"
+    testFieldObject("array")(2).asDouble shouldBe 3.4
     testFieldObject("string").asString shouldBe "sup"
     testFieldObject("num").asNumber shouldBe 1234
   }

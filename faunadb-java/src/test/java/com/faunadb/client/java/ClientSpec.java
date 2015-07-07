@@ -307,8 +307,8 @@ public class ClientSpec {
     Instance replaceInstance = replaceNode.asInstance();
     assertThat(replaceInstance.ref(), is(createInstance.ref()));
     assertThat(replaceInstance.data().get("name").asString(), is("Volcano"));
-    assertThat(replaceInstance.data().get("element").asArray().get(0).asString(), is("fire"));
-    assertThat(replaceInstance.data().get("element").asArray().get(1).asString(), is("earth"));
+    assertThat(replaceInstance.data().get("element").get(0).asString(), is("fire"));
+    assertThat(replaceInstance.data().get("element").get(1).asString(), is("earth"));
     assertThat(replaceInstance.data().get("cost").asLong(), is(10L));
 
     ListenableFuture<ResponseNode> deleteF = client.query(Delete(createInstance.ref()));

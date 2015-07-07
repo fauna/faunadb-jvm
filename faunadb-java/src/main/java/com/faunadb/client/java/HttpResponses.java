@@ -6,14 +6,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 public class HttpResponses {
-  public static class Param {
+  public static class ParamError {
     private final String error;
     private final String reason;
 
     @JsonCreator
-    public Param(
-        @JsonProperty("error") String error,
-        @JsonProperty("reason") String reason) {
+    public ParamError(
+      @JsonProperty("error") String error,
+      @JsonProperty("reason") String reason) {
       this.error = error;
       this.reason = reason;
     }
@@ -31,13 +31,13 @@ public class HttpResponses {
     private final ImmutableList<String> position;
     private final String code;
     private final String reason;
-    private final ImmutableMap<String, Param> parameters;
+    private final ImmutableMap<String, ParamError> parameters;
 
     @JsonCreator
     public QueryError(@JsonProperty("position") ImmutableList<String> position,
                       @JsonProperty("code") String code,
                       @JsonProperty("reason") String reason,
-                      @JsonProperty("parameters") ImmutableMap<String, Param> parameters) {
+                      @JsonProperty("parameters") ImmutableMap<String, ParamError> parameters) {
       this.position = position;
       this.code = code;
       this.reason = reason;
@@ -56,7 +56,7 @@ public class HttpResponses {
       return reason;
     }
 
-    public ImmutableMap<String, Param> parameters() {
+    public ImmutableMap<String, ParamError> parameters() {
       return parameters;
     }
   }

@@ -24,8 +24,8 @@ import com.google.common.collect.ImmutableList;
  * <p>The result tree can be accessed using:</p>
  *
  * <pre>
- *   node.asObject().get("ref").asRef(); // {@link Ref}("some/ref")
- *   node.asObject().get("data").asObject().get("someKey").asString() // "string1"
+ *   node.get("ref").asRef(); // {@link Ref}("some/ref")
+ *   node.get("data").get("someKey").asString() // "string1"
  * </pre>
  */
 @JsonDeserialize(using=Codec.ResponseNodeDeserializer.class)
@@ -173,6 +173,22 @@ public final class ResponseNode {
    */
   public Set asSet() {
     return json.convertValue(underlying, Set.class);
+  }
+
+  /**
+   * Accesses the value of the specified field if this is an object node.
+   * @return the value of the field, or null.
+   */
+  public ResponseNode get(String key) {
+    return asObject().get(key);
+  }
+
+  /**
+   * Accesses the value of the specified element if this is an array node.
+   * @return the value of the element, or null.
+   */
+  public ResponseNode get(int index) {
+    return asArray().get(index);
   }
 
   @Override

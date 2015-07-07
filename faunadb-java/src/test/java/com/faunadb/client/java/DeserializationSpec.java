@@ -47,7 +47,7 @@ public class DeserializationSpec {
     ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
     Instance instance = parsed.asInstance();
     System.out.println(instance);
-    ResponseMap unwrappedField = instance.data().get("test").asObject().get("field1").asObject();
+    ResponseMap unwrappedField = instance.data().get("test").get("field1").asObject();
     assertEquals("Test", unwrappedField.get("@name").asString());
   }
 
