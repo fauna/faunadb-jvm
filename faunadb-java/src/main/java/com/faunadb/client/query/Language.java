@@ -1,6 +1,5 @@
 package com.faunadb.client.query;
 
-import com.faunadb.client.types.Identifier;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.*;
 import com.faunadb.client.types.Ref;
@@ -189,27 +188,27 @@ public final class Language {
   /**
    * Creates a new Create function.
    *
-   * @see Create#create(Identifier)
+   * @see Create#create(Expression)
    */
-  public static Create Create(Identifier ref) {
+  public static Create Create(Expression ref) {
     return Create.create(ref);
   }
 
   /**
    * Creates a new Create function.
    *
-   * @see Create#create(Identifier, Expression)
+   * @see Create#create(Expression, Expression)
    */
-  public static Create Create(Identifier ref, Expression params) {
+  public static Create Create(Expression ref, Expression params) {
     return Create.create(ref, params);
   }
 
   /**
    * Creates a new Delete function.
    *
-   * @see Delete#create(Identifier)
+   * @see Delete#create(Expression)
    */
-  public static Delete Delete(Identifier ref) {
+  public static Delete Delete(Expression ref) {
     return Delete.create(ref);
   }
 
@@ -243,9 +242,9 @@ public final class Language {
   /**
    * Creates a new Get function.
    *
-   * @see Get#create(Identifier)
+   * @see Get#create(Expression)
    */
-  public static Get Get(Identifier resource) {
+  public static Get Get(Expression resource) {
     return Get.create(resource);
   }
 
@@ -315,9 +314,9 @@ public final class Language {
   /**
    * Obtains a new Paginate function representation.
    *
-   * @see Paginate#create(Identifier)
+   * @see Paginate#create(Expression)
    */
-  public static Paginate Paginate(Identifier resource) {
+  public static Paginate Paginate(Expression resource) {
     return Paginate.create(resource);
   }
 
@@ -333,9 +332,9 @@ public final class Language {
   /**
    * Obtains a new Replace function representation.
    *
-   * @see Replace#create(Identifier, Expression)
+   * @see Replace#create(Expression, Expression)
    */
-  public static Replace Replace(Identifier ref, Expression obj) {
+  public static Replace Replace(Expression ref, Expression obj) {
     return Replace.create(ref, obj);
   }
 
@@ -360,9 +359,9 @@ public final class Language {
   /**
    * Obtains a new Update function representation.
    *
-   * @see Update#create(Identifier, Expression)
+   * @see Update#create(Expression, Expression)
    */
-  public static Update Update(Identifier ref, Expression params) {
+  public static Update Update(Expression ref, Expression params) {
     return Update.create(ref, params);
   }
 

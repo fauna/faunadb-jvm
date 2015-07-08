@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-basic_forms">FaunaDB Basic Forms</a>
  */
-public class Var extends Value implements Identifier {
+public class Var extends Value {
   /**
    * Creates a new {@link Var} instance.
    * @param variable the name of the variable.
