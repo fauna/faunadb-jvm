@@ -46,7 +46,6 @@ public class DeserializationSpec {
     String toDeserialize = "{\n\"class\": {\n\"@ref\": \"classes/derp\"\n},\n\"data\": {\n\"test\": {\n\"field1\": {\n\"@obj\": {\n\"@name\": \"Test\"\n}\n}\n}\n},\n\"ref\": {\n\"@ref\": \"classes/derp/101727203651223552\"\n},\n\"ts\": 1433273471399755\n}";
     ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
     Instance instance = parsed.asInstance();
-    System.out.println(instance);
     ResponseMap unwrappedField = instance.data().get("test").get("field1").asObject();
     assertEquals("Test", unwrappedField.get("@name").asString());
   }

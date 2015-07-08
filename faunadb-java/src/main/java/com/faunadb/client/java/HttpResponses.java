@@ -8,39 +8,39 @@ import com.google.common.collect.ImmutableMap;
 public class HttpResponses {
   public static class ParamError {
     private final String error;
-    private final String reason;
+    private final String description;
 
     @JsonCreator
     public ParamError(
       @JsonProperty("error") String error,
-      @JsonProperty("reason") String reason) {
+      @JsonProperty("description") String description) {
       this.error = error;
-      this.reason = reason;
+      this.description = description;
     }
 
     public String error() {
       return error;
     }
 
-    public String reason() {
-      return reason;
+    public String description() {
+      return description;
     }
   }
 
   public static class QueryError {
     private final ImmutableList<String> position;
     private final String code;
-    private final String reason;
+    private final String description;
     private final ImmutableMap<String, ParamError> parameters;
 
     @JsonCreator
     public QueryError(@JsonProperty("position") ImmutableList<String> position,
                       @JsonProperty("code") String code,
-                      @JsonProperty("reason") String reason,
+                      @JsonProperty("description") String description,
                       @JsonProperty("parameters") ImmutableMap<String, ParamError> parameters) {
       this.position = position;
       this.code = code;
-      this.reason = reason;
+      this.description = description;
       this.parameters = parameters;
     }
 
@@ -52,8 +52,8 @@ public class HttpResponses {
       return code;
     }
 
-    public String reason() {
-      return reason;
+    public String description() {
+      return description;
     }
 
     public ImmutableMap<String, ParamError> parameters() {
