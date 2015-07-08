@@ -199,7 +199,7 @@ public class Connection {
     Request request = new RequestBuilder("POST")
       .setUrl(mkUrl(path))
       .setBody(json.writeValueAsString(body))
-      .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
+      .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json; charset=utf-8")
       .build();
 
     return performRequest(request);
@@ -217,7 +217,7 @@ public class Connection {
     Request request = new RequestBuilder("PUT")
       .setUrl(mkUrl(path))
       .setBody(json.writeValueAsString(body))
-      .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
+      .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json; charset=utf-8")
       .build();
 
     return performRequest(request);
@@ -235,7 +235,7 @@ public class Connection {
     Request request = new RequestBuilder("PATCH")
       .setUrl(mkUrl(path))
       .setBody(json.writeValueAsString(body))
-      .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
+      .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json; charset=utf-8")
       .build();
 
     return performRequest(request);
