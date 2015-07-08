@@ -48,7 +48,11 @@ public final class ResponseNode {
    * @return the string value of this node, or null.
    */
   public String asString() {
-    return underlying.asText();
+    if (underlying.isTextual()) {
+      return underlying.asText();
+    } else {
+      return null;
+    }
   }
 
   /**
@@ -92,7 +96,11 @@ public final class ResponseNode {
    * @return an ordered list of response nodes, or null.
    */
   public ImmutableList<ResponseNode> asArray() {
-    return json.convertValue(underlying, TypeFactory.defaultInstance().constructCollectionType(ImmutableList.class, ResponseNode.class));
+    try {
+      return json.convertValue(underlying, TypeFactory.defaultInstance().constructCollectionType(ImmutableList.class, ResponseNode.class));
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
   }
 
   /**
@@ -100,7 +108,13 @@ public final class ResponseNode {
    * @return a dictionary of nodes, or null.
    */
   public ResponseMap asObject() {
-    return json.convertValue(underlying, ResponseMap.class);
+    try {
+      return json.convertValue(underlying, ResponseMap.class);
+    } catch (ClassCastException ex) {
+      return null;
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
   }
 
   /**
@@ -108,7 +122,11 @@ public final class ResponseNode {
    * @return a Ref, or null.
    */
   public Ref asRef() {
-    return json.convertValue(underlying, Ref.class);
+    try {
+      return json.convertValue(underlying, Ref.class);
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
   }
 
   /**
@@ -116,7 +134,11 @@ public final class ResponseNode {
    * @return a Page, or null.
    */
   public Page asPage() {
-    return json.convertValue(underlying, Page.class);
+    try {
+      return json.convertValue(underlying, Page.class);
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
   }
 
   /**
@@ -124,7 +146,11 @@ public final class ResponseNode {
    * @return an Instance, or null.
    */
   public Instance asInstance() {
-    return json.convertValue(underlying, Instance.class);
+    try {
+      return json.convertValue(underlying, Instance.class);
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
   }
 
   /**
@@ -132,7 +158,11 @@ public final class ResponseNode {
    * @return a Key, or null.
    */
   public Key asKey() {
-    return json.convertValue(underlying, Key.class);
+    try {
+      return json.convertValue(underlying, Key.class);
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
   }
 
   /**
@@ -140,7 +170,11 @@ public final class ResponseNode {
    * @return a Database, or null.
    */
   public Database asDatabase() {
-    return json.convertValue(underlying, Database.class);
+    try {
+      return json.convertValue(underlying, Database.class);
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
   }
 
   /**
@@ -148,7 +182,11 @@ public final class ResponseNode {
    * @return a Class, or null.
    */
   public Class asClass() {
-    return json.convertValue(underlying, Class.class);
+    try {
+      return json.convertValue(underlying, Class.class);
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
   }
 
   /**
@@ -156,7 +194,11 @@ public final class ResponseNode {
    * @return an Index, or null.
    */
   public Index asIndex() {
-    return json.convertValue(underlying, Index.class);
+    try {
+      return json.convertValue(underlying, Index.class);
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
   }
 
   /**
@@ -164,7 +206,11 @@ public final class ResponseNode {
    * @return an Event, or null.
    */
   public Event asEvent() {
-    return json.convertValue(underlying, Event.class);
+    try {
+      return json.convertValue(underlying, Event.class);
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
   }
 
   /**
@@ -172,7 +218,11 @@ public final class ResponseNode {
    * @return a Set, or null.
    */
   public Set asSet() {
-    return json.convertValue(underlying, Set.class);
+    try {
+      return json.convertValue(underlying, Set.class);
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
   }
 
   /**
