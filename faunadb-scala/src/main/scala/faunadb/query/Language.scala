@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.node.NullNode
 import scala.annotation.meta.{field, getter, param}
 
 sealed trait Expression
-sealed trait Identifier extends Expression
 
 /**
  * Implicit conversions to FaunaDB value types.
@@ -94,7 +93,7 @@ case class Map(@(JsonProperty @field)("map") lambda: Lambda, collection: Express
  */
 case class Foreach(@(JsonProperty @field)("foreach") lambda: Lambda, collection: Expression) extends Expression
 
-sealed trait Set extends Identifier
+sealed trait Set extends Expression
 
 /**
  * A Match set.
@@ -138,7 +137,7 @@ case class Join(@(JsonProperty @field)("join") source: Set, @(JsonProperty @fiel
  *
  * '''Reference''': [[https://faunadb.com/documentation#queries-reading-resources FaunaDB Resource Retrieval Functions]]
  */
-case class Get(@(JsonProperty @field)("get") resource: Identifier) extends Identifier
+case class Get(@(JsonProperty @field)("get") resource: Expression) extends Expression
 
 /**
  * A Paginate function.
@@ -155,12 +154,12 @@ case class Get(@(JsonProperty @field)("get") resource: Identifier) extends Ident
  * }}}
  */
 @JsonSerialize(using = classOf[PaginateSerializer])
-case class Paginate(resource: Identifier,
+case class Paginate(resource: Expression,
                     ts: Option[Long] = None,
                     cursor: Option[Cursor] = None,
                     size: Option[Long] = None,
                     sources: Boolean = false,
-                    events: Boolean = false) extends Identifier {
+                    events: Boolean = false) extends Expression {
   /**
    * Returns a copy of this with the optional timestamp parameter set.
    */
@@ -187,35 +186,35 @@ case class Paginate(resource: Identifier,
  *
  * '''Reference''': [[https://faunadb.com/documentation#queries-reading-resources FaunaDB Resource Retrieval Functions]]
  */
-case class Count(@(JsonProperty @field)("count") set: Set) extends Identifier
+case class Count(@(JsonProperty @field)("count") set: Set) extends Expression
 
 /**
  * A Create function.
  *
  * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
  */
-case class Create(@(JsonProperty @field)("create") ref: Identifier, @(JsonProperty @field)("params") params: Expression = ObjectV.empty) extends Identifier
+case class Create(@(JsonProperty @field)("create") ref: Expression, @(JsonProperty @field)("params") params: Expression = ObjectV.empty) extends Expression
 
 /**
  * A Replace function.
  *
  * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
  */
-case class Replace(@(JsonProperty @field)("replace") ref: Identifier, @(JsonProperty @field)("params") params: Expression) extends Identifier
+case class Replace(@(JsonProperty @field)("replace") ref: Expression, @(JsonProperty @field)("params") params: Expression) extends Expression
 
 /**
  * An Update function.
  *
  * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
  */
-case class Update(@(JsonProperty @field)("update") ref: Identifier, @(JsonProperty @field)("params") params: Expression) extends Identifier
+case class Update(@(JsonProperty @field)("update") ref: Expression, @(JsonProperty @field)("params") params: Expression) extends Expression
 
 /**
  * A Delete function.
  *
  * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
  */
-case class Delete(@(JsonProperty @field)("delete") ref: Identifier) extends Identifier
+case class Delete(@(JsonProperty @field)("delete") ref: Expression) extends Expression
 
 
 sealed trait Value extends Expression
@@ -225,11 +224,11 @@ sealed trait Value extends Expression
  *
  * '''Reference''': [[https://faunadb.com/documentation#queries-values-special_types FaunaDB Special Types]]
  */
-case class Ref(@(JsonProperty @field @param)("@ref") value: String) extends Value with Identifier {
+case class Ref(@(JsonProperty @field @param)("@ref") value: String) extends Value with Expression {
   def this(parent: Ref, child: String) = this(parent.value + "/" + child)
 }
 
-case class Var(@(JsonProperty @field)("var") variable: String) extends Value with Identifier
+case class Var(@(JsonProperty @field)("var") variable: String) extends Value with Expression
 
 sealed trait Resource
 
