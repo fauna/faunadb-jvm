@@ -11,10 +11,8 @@ import scala.collection.immutable
 
 class DeserializationSpec extends FlatSpec with Matchers {
   val json = new ObjectMapper()
-  val module = new SimpleModule()
 
   json.registerModule(new DefaultScalaModule)
-  json.registerModule(module)
 
   def toResponseNode(ref: Ref) = {
     new ResponseNode(json.valueToTree(ref), json)

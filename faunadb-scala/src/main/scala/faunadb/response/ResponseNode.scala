@@ -35,8 +35,16 @@ class ResponseNode private[faunadb] (private val underlying: JsonNode, json: Obj
    *
    * @return $some if the coercion is possible, $none if not.
    */
-  def asStringOpt: Option[String] = Option(underlying.asText())
+  def asStringOpt: Option[String] = if (underlying.isTextual) Some(underlying.asText) else None
   def asString: String = asStringOpt.get
+
+  /**
+   * Coerces the node into a boolean
+   *
+   * @return $some if the coercion is possible, $none if not.
+   */
+  def asBooleanOpt: Option[Boolean] = if (underlying.isBoolean) Some(underlying.asBoolean()) else None
+  def asBoolean: Boolean = asBooleanOpt.get
 
   /**
    * Coerces the node into a long.
@@ -59,7 +67,13 @@ class ResponseNode private[faunadb] (private val underlying: JsonNode, json: Obj
    *
    * @return $some if the coercion is possible, $none if not.
    */
-  def asArrayOpt: Option[Array[ResponseNode]] = Option(json.convertValue(underlying, TypeFactory.defaultInstance().constructArrayType(classOf[ResponseNode])))
+  def asArrayOpt: Option[Array[ResponseNode]] = {
+    try {
+      Option(json.convertValue(underlying, TypeFactory.defaultInstance().constructArrayType(classOf[ResponseNode])))
+    } catch {
+      case _: IllegalArgumentException => None
+    }
+  }
   def asArray: Array[ResponseNode] = asArrayOpt.get
 
   /**
@@ -67,7 +81,14 @@ class ResponseNode private[faunadb] (private val underlying: JsonNode, json: Obj
    *
    * @return $some if the coercion is possible, $none if not.
    */
-  def asObjectOpt: Option[ResponseMap] = Option(json.convertValue(underlying, classOf[ResponseMap]))
+  def asObjectOpt: Option[ResponseMap] = {
+    try {
+      Option(json.convertValue(underlying, classOf[ResponseMap]))
+    } catch {
+      case _: ClassCastException => None
+      case _: IllegalArgumentException => None
+    }
+  }
   def asObject = asObjectOpt.get
 
   /**
@@ -75,7 +96,13 @@ class ResponseNode private[faunadb] (private val underlying: JsonNode, json: Obj
    *
    * @return $some if the coercion is possible, $none if not.
    */
-  def asRefOpt: Option[Ref] = Option(json.convertValue(underlying, classOf[Ref]))
+  def asRefOpt: Option[Ref] = {
+    try {
+      Option(json.convertValue(underlying, classOf[Ref]))
+    } catch {
+      case _: IllegalArgumentException => None
+    }
+  }
   def asRef: Ref = asRefOpt.get
 
   /**
@@ -83,7 +110,13 @@ class ResponseNode private[faunadb] (private val underlying: JsonNode, json: Obj
    *
    * @return $some if the coercion is possible, $none if not.
    */
-  def asPageOpt: Option[Page] = Option(json.convertValue(underlying, classOf[Page]))
+  def asPageOpt: Option[Page] ={
+    try {
+      Option(json.convertValue(underlying, classOf[Page]))
+    } catch {
+      case _: IllegalArgumentException => None
+    }
+  }
   def asPage = asPageOpt.get
 
   /**
@@ -91,7 +124,13 @@ class ResponseNode private[faunadb] (private val underlying: JsonNode, json: Obj
    *
    * @return $some if the coercion is possible, $none if not.
    */
-  def asInstanceOpt: Option[Instance] = Option(json.convertValue(underlying, classOf[Instance]))
+  def asInstanceOpt: Option[Instance] = {
+    try {
+      Option(json.convertValue(underlying, classOf[Instance]))
+    } catch {
+      case _: IllegalArgumentException => None
+    }
+  }
   def asInstance = asInstanceOpt.get
 
   /**
@@ -99,7 +138,13 @@ class ResponseNode private[faunadb] (private val underlying: JsonNode, json: Obj
    *
    * @return $some if the coercion is possible, $none if not.
    */
-  def asKeyOpt: Option[Key] = Option(json.convertValue(underlying, classOf[Key]))
+  def asKeyOpt: Option[Key] = {
+    try {
+      Option(json.convertValue(underlying, classOf[Key]))
+    } catch {
+      case _: IllegalArgumentException => None
+    }
+  }
   def asKey = asKeyOpt.get
 
   /**
@@ -107,7 +152,13 @@ class ResponseNode private[faunadb] (private val underlying: JsonNode, json: Obj
    *
    * @return $some if the coercion is possible, $none if not.
    */
-  def asDatabaseOpt: Option[Database] = Option(json.convertValue(underlying, classOf[Database]))
+  def asDatabaseOpt: Option[Database] = {
+    try {
+      Option(json.convertValue(underlying, classOf[Database]))
+    } catch {
+      case _: IllegalArgumentException => None
+    }
+  }
   def asDatabase = asDatabaseOpt.get
 
   /**
@@ -115,7 +166,13 @@ class ResponseNode private[faunadb] (private val underlying: JsonNode, json: Obj
    *
    * @return $some if the coercion is possible, $none if not.
    */
-  def asClassOpt: Option[Class] = Option(json.convertValue(underlying, classOf[Class]))
+  def asClassOpt: Option[Class] = {
+    try {
+      Option(json.convertValue(underlying, classOf[Class]))
+    } catch {
+      case _: IllegalArgumentException => None
+    }
+  }
   def asClass = asClassOpt.get
 
   /**
@@ -123,7 +180,13 @@ class ResponseNode private[faunadb] (private val underlying: JsonNode, json: Obj
    *
    * @return $some if the coercion is possible, $none if not.
    */
-  def asIndexOpt: Option[Index] = Option(json.convertValue(underlying, classOf[Index]))
+  def asIndexOpt: Option[Index] = {
+    try {
+      Option(json.convertValue(underlying, classOf[Index]))
+    } catch {
+      case _: IllegalArgumentException => None
+    }
+  }
   def asIndex = asIndexOpt.get
 
   /**
@@ -131,7 +194,13 @@ class ResponseNode private[faunadb] (private val underlying: JsonNode, json: Obj
    *
    * @return $some if the coercion is possible, $none if not.
    */
-  def asEventOpt: Option[Event] = Option(json.convertValue(underlying, classOf[Event]))
+  def asEventOpt: Option[Event] = {
+    try {
+      Option(json.convertValue(underlying, classOf[Event]))
+    } catch {
+      case _: IllegalArgumentException => None
+    }
+  }
   def asEvent = asEventOpt.get
 
   /**
@@ -139,7 +208,13 @@ class ResponseNode private[faunadb] (private val underlying: JsonNode, json: Obj
    *
    * @return $some if the coercion is possible, $none if not.
    */
-  def asSetOpt: Option[Set] = Option(json.convertValue(underlying, classOf[Set]))
+  def asSetOpt: Option[Set] = {
+    try {
+      Option(json.convertValue(underlying, classOf[Set]))
+    } catch {
+      case _: IllegalArgumentException => None
+    }
+  }
   def asSet = asSetOpt.get
 
   /**
