@@ -1,7 +1,6 @@
 package com.faunadb.client.query;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.faunadb.client.types.Identifier;
 import com.faunadb.client.types.Value.*;
 
 /**
@@ -9,20 +8,20 @@ import com.faunadb.client.types.Value.*;
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-modifying-resources">FaunaDB Resource Modification Functions</a>
  *
- * @see Language#Create(Identifier)
+ * @see Language#Create(Expression)
  */
-public final class Create implements Identifier, Expression {
+public final class Create implements Expression {
   @JsonProperty("create")
-  private final Identifier ref;
+  private final Expression ref;
   @JsonProperty("params")
   private final Expression params;
 
   /**
    * Obtains a new instance of this class with no parameters.
    * @param ref the ref of the class in which to create a new instance.
-   * @see Language#Create(Identifier)
+   * @see Language#Create(Expression)
    */
-  public static Create create(Identifier ref) {
+  public static Create create(Expression ref) {
     return new Create(ref, ObjectV.empty());
   }
 
@@ -30,18 +29,18 @@ public final class Create implements Identifier, Expression {
    * Obtains a new instance of this class.
    * @param ref the ref of the class in which to create a new instance.
    * @param params The parameters for the create operation.
-   * @see Language#Create(Identifier, Expression)
+   * @see Language#Create(Expression, Expression)
    */
-  public static Create create(Identifier ref, Expression params) {
+  public static Create create(Expression ref, Expression params) {
     return new Create(ref, params);
   }
 
-  Create(Identifier ref, Expression params) {
+  Create(Expression ref, Expression params) {
     this.ref = ref;
     this.params = params;
   }
 
-  public Identifier ref() {
+  public Expression ref() {
     return ref;
   }
 

@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-values-special_types">FaunaDB Special Types</a>
  *
  */
-public class Ref extends Value implements Identifier {
+public class Ref extends Value {
   /**
    * Creates a new {@link Ref} instance.
    * @param value the value of the Ref.

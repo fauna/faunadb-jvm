@@ -1,32 +1,31 @@
 package com.faunadb.client.query;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.faunadb.client.types.Identifier;
 
 /**
  * An immutable representation of a FaunaDB Replace function.
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-modifying-resources">FaunaDB Resource Modification Functions</a></p>
  *
- * @see Language#Replace(Identifier, Expression)
+ * @see Language#Replace(Expression, Expression)
  *
  */
-public final class Replace implements Identifier, Expression {
-  public static Replace create(Identifier ref, Expression params) {
+public final class Replace implements Expression {
+  public static Replace create(Expression ref, Expression params) {
     return new Replace(ref, params);
   }
 
   @JsonProperty("replace")
-  private final Identifier ref;
+  private final Expression ref;
   @JsonProperty("params")
   private final Expression params;
 
-  Replace(Identifier ref, Expression params) {
+  Replace(Expression ref, Expression params) {
     this.ref = ref;
     this.params = params;
   }
 
-  public Identifier ref() {
+  public Expression ref() {
     return ref;
   }
 

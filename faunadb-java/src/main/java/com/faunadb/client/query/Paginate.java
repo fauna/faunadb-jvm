@@ -1,7 +1,6 @@
 package com.faunadb.client.query;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.faunadb.client.types.Identifier;
 import com.google.common.base.Optional;
 
 /**
@@ -16,19 +15,19 @@ import com.google.common.base.Optional;
  *
  */
 @JsonSerialize(using=Codec.PaginateSerializer.class)
-public final class Paginate implements Identifier, Expression {
-  public static Paginate create(Identifier resource) {
+public final class Paginate implements Expression {
+  public static Paginate create(Expression resource) {
     return new Paginate(resource, Optional.<Long>absent(), Optional.<Cursor>absent(), Optional.<Integer>absent(), false, false);
   }
 
-  private final Identifier resource;
+  private final Expression resource;
   private final Optional<Long> ts;
   private final Optional<Cursor> cursor;
   private final Optional<Integer> size;
   private final boolean sources;
   private final boolean events;
 
-  Paginate(Identifier resource, Optional<Long> ts, Optional<Cursor> cursor, Optional<Integer> size, boolean sources, boolean events) {
+  Paginate(Expression resource, Optional<Long> ts, Optional<Cursor> cursor, Optional<Integer> size, boolean sources, boolean events) {
     this.resource = resource;
     this.ts = ts;
     this.cursor = cursor;
@@ -77,7 +76,7 @@ public final class Paginate implements Identifier, Expression {
     return new Paginate(resource, ts, cursor, size, sources, e);
   }
 
-  public Identifier resource() {
+  public Expression resource() {
     return resource;
   }
 

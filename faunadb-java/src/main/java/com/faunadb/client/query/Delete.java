@@ -1,25 +1,24 @@
 package com.faunadb.client.query;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.faunadb.client.types.Identifier;
 
 /** An immutable representation of a FaunaDB Delete function.
  *
- * @see Language#Delete(Identifier)
+ * @see Language#Delete(Expression)
  */
 public final class Delete implements Expression {
-  public static Delete create(Identifier ref) {
+  public static Delete create(Expression ref) {
     return new Delete(ref);
   }
 
   @JsonProperty("delete")
-  private final Identifier ref;
+  private final Expression ref;
 
-  Delete(Identifier ref) {
+  Delete(Expression ref) {
     this.ref = ref;
   }
 
-  public Identifier ref() {
+  public Expression ref() {
     return ref;
   }
 }
