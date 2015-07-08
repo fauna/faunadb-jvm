@@ -191,10 +191,10 @@ public class ClientSpec {
     Page resp1 = queryF3.get().asPage();
 
     assertThat(resp1.data().size(), is(1));
-    assertThat(resp1.before(), not(Optional.<ResponseNode>absent()));
-    assertThat(resp1.after(), is(Optional.<ResponseNode>absent()));
+    assertThat(resp1.after(), not(Optional.<ResponseNode>absent()));
+    assertThat(resp1.before(), is(Optional.<ResponseNode>absent()));
 
-    ListenableFuture<ResponseNode> queryF4 = client.query(Paginate(Match(classRef, randomClassIndex)).withSize(1).withCursor(Before(resp1.before().get().asRef())));
+    ListenableFuture<ResponseNode> queryF4 = client.query(Paginate(Match(classRef, randomClassIndex)).withSize(1).withCursor(After(resp1.after().get().asRef())));
     Page resp2 = queryF4.get().asPage();
 
     assertThat(resp2.data().size(), is(1));

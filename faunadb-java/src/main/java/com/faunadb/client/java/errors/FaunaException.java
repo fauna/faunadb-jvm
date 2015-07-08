@@ -38,7 +38,7 @@ public class FaunaException extends RuntimeException {
   private static String constructErrorMessage(ImmutableList<HttpResponses.QueryError> errors) {
     ImmutableList.Builder<String> messages = ImmutableList.builder();
     for (HttpResponses.QueryError error : errors) {
-      messages.add(error.code() + ": " + error.reason());
+      messages.add(error.code() + ": " + error.description());
     }
 
     return Joiner.on(", ").join(messages.build());
