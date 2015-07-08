@@ -1,4 +1,4 @@
-package com.faunadb.client.response
+package faunadb.response
 
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind._

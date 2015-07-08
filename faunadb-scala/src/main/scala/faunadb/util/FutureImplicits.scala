@@ -1,10 +1,10 @@
-package com.faunadb.client.util
+package faunadb.util
 
 import com.google.common.util.concurrent.{FutureCallback, Futures, ListenableFuture}
 
 import scala.concurrent.{Future, Promise}
 
-private[client] object FutureImplicits {
+private[faunadb] object FutureImplicits {
   implicit class RichListenableFuture[A](underlying: ListenableFuture[A]) {
     def asScalaFuture(): Future[A] = {
       val promise = Promise[A]()

@@ -1,10 +1,10 @@
-package com.faunadb.client.errors
+package faunadb.errors
 
-import com.faunadb.client.QueryErrorResponse
+import faunadb.QueryErrorResponse
 
 object FaunaException {
   private[errors] def respToError(response: QueryErrorResponse) = {
-    response.errors.map(r => r.code + ": " + r.reason).mkString(", ")
+    response.errors.map(r => r.code + ": " + r.description).mkString(", ")
   }
 }
 

@@ -1,4 +1,4 @@
-package com.faunadb.client
+package faunadb
 
 /**
  * Provides representations of the FaunaDB response format.
