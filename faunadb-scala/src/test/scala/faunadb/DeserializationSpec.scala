@@ -1,10 +1,10 @@
-package com.faunadb.client
+package faunadb
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.faunadb.client.query.Ref
-import com.faunadb.client.response.{Instance, ResponseMap, ResponseNode}
+import faunadb.query.Ref
+import faunadb.response.{Instance, ResponseMap, ResponseNode}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.collection.immutable

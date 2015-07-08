@@ -1,4 +1,4 @@
-package com.faunadb.client
+package faunadb
 
 /**
  * Classes modeling the FaunaDB Query language.

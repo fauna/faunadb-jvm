@@ -1,4 +1,4 @@
-package com.faunadb.client.query
+package faunadb.query
 
 import com.fasterxml.jackson.annotation.JsonValue
 

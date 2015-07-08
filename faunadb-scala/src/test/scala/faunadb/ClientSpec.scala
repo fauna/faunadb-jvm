@@ -1,12 +1,12 @@
-package com.faunadb.client
+package faunadb
 
 import _root_.java.io.FileInputStream
 import _root_.java.util.{Map => JMap}
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.faunadb.client.errors.{NotFoundException, BadRequestException}
-import com.faunadb.client.query.Language._
-import com.faunadb.client.query._
+import faunadb.errors.{NotFoundException, BadRequestException}
+import faunadb.query.Language._
+import faunadb.query._
 import com.faunadb.httpclient.Connection
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.yaml.snakeyaml.Yaml
@@ -140,11 +140,10 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     resp.after shouldNot be (None)
     resp.before shouldBe None
 
-    val query2F = client.query(Paginate(Match(classRef, randomClassIndex), size=Some(2), cursor=Some(After(resp.after.get.asRef))))
+    val query2F = client.query(Paginate(Match(classRef, randomClassIndex), size=Some(1), cursor=Some(After(resp.after.get.asRef))))
     val resp2 = Await.result(query2F, 5 seconds).asPage
 
-    resp2.data.size shouldBe 2
-    resp2.data.drop(1) shouldNot be (resp.data)
+    resp2.data.size shouldBe 1
     resp2.before shouldNot be (None)
     resp2.after shouldNot be (None)
 

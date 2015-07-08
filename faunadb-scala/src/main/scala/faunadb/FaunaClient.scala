@@ -1,12 +1,12 @@
-package com.faunadb.client
+package faunadb
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.faunadb.client.errors.{UnknownException, NotFoundException, BadRequestException, UnauthorizedException}
-import com.faunadb.client.query.Expression
-import com.faunadb.client.response.ResponseNode
-import com.faunadb.client.util.FutureImplicits._
+import faunadb.errors.{UnknownException, NotFoundException, BadRequestException, UnauthorizedException}
+import faunadb.query.Expression
+import faunadb.response.ResponseNode
+import faunadb.util.FutureImplicits._
 import com.faunadb.httpclient.Connection
 import com.ning.http.client.{Response => HttpResponse}
 

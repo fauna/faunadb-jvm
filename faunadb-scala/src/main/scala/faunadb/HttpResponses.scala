@@ -1,12 +1,12 @@
-package com.faunadb.client
+package faunadb
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 
 object QueryError {
-  case class Param(error: String, reason: String)
+  case class Param(error: String, description: String)
 }
-case class QueryError(position: Seq[String], code: String, reason: String, parameters: Map[String, QueryError.Param])
+case class QueryError(position: Seq[String], code: String, description: String, parameters: Map[String, QueryError.Param])
 
 sealed abstract class FaunaResponse
 

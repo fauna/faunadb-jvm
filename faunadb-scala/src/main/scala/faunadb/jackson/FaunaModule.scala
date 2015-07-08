@@ -1,9 +1,9 @@
-package com.faunadb.client.jackson
+package faunadb.jackson
 
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.{JsonSerializer, ObjectMapper, SerializerProvider}
-import com.faunadb.client.query.ObjectV
+import faunadb.query.ObjectV
 
 class ExternalObjectSerializer extends JsonSerializer[ObjectV] {
   override def serialize(value: ObjectV, gen: JsonGenerator, serializers: SerializerProvider): Unit = {

@@ -1,4 +1,4 @@
-package com.faunadb.client.query
+package faunadb.query
 
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind._

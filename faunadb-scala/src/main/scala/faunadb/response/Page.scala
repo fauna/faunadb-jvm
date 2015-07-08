@@ -1,4 +1,4 @@
-package com.faunadb.client.response
+package faunadb.response
 
 /**
  * Represents a FaunaDB Page response. This, like other response types, is obtained by coercing a

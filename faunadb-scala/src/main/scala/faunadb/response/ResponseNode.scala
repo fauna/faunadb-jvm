@@ -1,9 +1,9 @@
-package com.faunadb.client.response
+package faunadb.response
 
 import com.fasterxml.jackson.databind.`type`.TypeFactory
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
-import com.faunadb.client.query.{Event, Ref}
+import faunadb.query.{Event, Ref}
 
 import scala.collection.AbstractMap
 
@@ -29,7 +29,7 @@ import scala.collection.AbstractMap
  * @define none [[scala.None]]
  */
 @JsonDeserialize(using=classOf[ResponseNodeDeserializer])
-class ResponseNode private[client] (private val underlying: JsonNode, json: ObjectMapper) {
+class ResponseNode private[faunadb] (private val underlying: JsonNode, json: ObjectMapper) {
   /**
    * Coerces the node into a string.
    *
@@ -188,7 +188,7 @@ class ResponseNode private[client] (private val underlying: JsonNode, json: Obje
  * }}}
  */
 @JsonDeserialize(using=classOf[ResponseMapDeserializer])
-class ResponseMap private[client] (underlying: Map[String, ResponseNode]) extends AbstractMap[String, ResponseNode] {
+class ResponseMap private[faunadb] (underlying: Map[String, ResponseNode]) extends AbstractMap[String, ResponseNode] {
   override def get(key: String): Option[ResponseNode] = underlying.get(key)
 
   override def +[B1 >: ResponseNode](kv: (String, B1)): collection.Map[String, B1] = underlying + kv
