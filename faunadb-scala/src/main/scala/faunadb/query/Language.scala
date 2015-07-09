@@ -189,6 +189,13 @@ case class Paginate(resource: Expression,
 case class Count(@(JsonProperty @field)("count") set: Set) extends Expression
 
 /**
+ * An Exists function.
+ *
+ * '''Reference''': [[https://faunadb.com/documentation#queries-read_functions FaunaDB Read Functions]]
+ */
+case class Exists(@(JsonProperty @field)("exists") ref: Ref) extends Expression
+
+/**
  * A Create function.
  *
  * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
