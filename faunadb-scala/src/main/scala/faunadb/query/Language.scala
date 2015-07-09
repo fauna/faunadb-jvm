@@ -271,4 +271,51 @@ case class ObjectV(@(JsonValue @getter) values: collection.Map[String, Value]) e
 
 case class Object(@(JsonProperty @field)("object") value: ObjectV) extends Value
 
+/**
+ * An Add function.
+ *
+ * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+ */
 case class Add(@(JsonProperty @field)("add") terms: Seq[Expression]) extends Value
+
+/**
+ * An Equals function.
+ *
+ * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+ */
+case class Equals(@(JsonProperty @field)("equals") terms: Seq[Expression]) extends Value
+
+/**
+ * A Concat function.
+ *
+ * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+ */
+case class Concat(@(JsonProperty @field)("concat") terms: Seq[Expression]) extends Value
+
+/**
+ * A Contains function.
+ *
+ * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+ */
+case class Contains(@(JsonProperty @field)("contains") path: Seq[Path], in: Expression) extends Value
+
+/**
+ * A Multply function.
+ *
+ * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+ */
+case class Multiply(@(JsonProperty @field)("multiply") terms: Seq[Expression]) extends Value
+
+/**
+ * A Subtract function.
+ *
+ * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+ */
+case class Subtract(@(JsonProperty @field)("subtract") terms: Seq[Expression]) extends Value
+
+/**
+ * A Divide function.
+ *
+ * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+ */
+case class Divide(@(JsonProperty @field)("divide") terms: Seq[Expression]) extends Value
