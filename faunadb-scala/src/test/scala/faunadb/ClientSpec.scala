@@ -208,9 +208,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     objectR("name").asString shouldBe "Hen Wen"
     objectR("age").asNumber shouldBe 123L
 
-    val selectF = client.query(Select(Seq("favorites", "foods", 1), Quote(ObjectV("favorites" -> ObjectV("foods" -> ArrayV("crunchings", "munchings", "lunchings"))))))
-    val selectR = Await.result(selectF, 1 second).asString
-    selectR shouldBe "munchings"
   }
 
   it should "test collections" in {
@@ -286,5 +283,39 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val differenceF = client.query(Paginate(Difference(Seq(Match("nature", Ref("indexes/spells_by_element")), Match("arcane", Ref("indexes/spells_by_element"))))))
     val differenceR = Await.result(differenceF, 1 second).asPage
     differenceR.data.map(_.asRef) should contain (create4R.ref)
+  }
+
+  it should "test miscellaneous functions" in {
+    val equalsF = client.query(Equals(Seq("fire", "fire")))
+    val equalsR = Await.result(equalsF, 1 second).asBoolean
+    equalsR shouldBe true
+
+    val concatF = client.query(Concat(Seq("Magic", "Missile")))
+    val concatR = Await.result(concatF, 1 second).asString
+    concatR shouldBe "MagicMissile"
+
+    val containsF = client.query(Contains(Seq("favorites", "foods"), Quote(ObjectV("favorites" -> ObjectV("foods" -> ArrayV("crunchings", "munchings"))))))
+    val containsR = Await.result(containsF, 1 second).asBoolean
+    containsR shouldBe true
+
+    val selectF = client.query(Select(Seq("favorites", "foods", 1), Quote(ObjectV("favorites" -> ObjectV("foods" -> ArrayV("crunchings", "munchings", "lunchings"))))))
+    val selectR = Await.result(selectF, 1 second).asString
+    selectR shouldBe "munchings"
+
+    val addF = client.query(Add(Seq(100L, 10L)))
+    val addR = Await.result(addF, 1 second).asNumber
+    addR shouldBe 110L
+
+    val multiplyF = client.query(Multiply(Seq(100L, 10L)))
+    val multiplyR = Await.result(multiplyF, 1 second).asNumber
+    multiplyR shouldBe 1000L
+
+    val subtractF = client.query(Subtract(Seq(100L, 10L)))
+    val subtractR = Await.result(subtractF, 1 second).asNumber
+    subtractR shouldBe 90L
+
+    val divideF = client.query(Divide(Seq(100L, 10L)))
+    val divideR = Await.result(divideF, 1 second).asNumber
+    divideR shouldBe 10L
   }
 }
