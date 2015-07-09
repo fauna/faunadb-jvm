@@ -18,23 +18,116 @@ import com.google.common.collect.ImmutableMap;
  *
  * <p>Non-scalar values are {@link ObjectV} and {@link ArrayV}.</p>
  *
+ * <p>This interface itself does not have any directly accessible data. It must first be coerced into a type before
+ * its data can be accessed.
+ *
+ * <p>Coercion functions will return null if this node cannot be transformed into the requested type.
+ *
+ * <p><b>Example</b>: Consider the {@code LazyValue node} modeling the root of the tree:</p>
+ * <pre>
+ * {
+ *   "ref": { "@ref": "some/ref" },
+ *   "data": { "someKey": "string1", "someKey2": 123 }
+ * }</pre>
+ *
+ * <p>The result tree can be accessed using:</p>
+ *
+ * <pre>
+ *   node.get("ref").asRef(); // {@link Ref}("some/ref")
+ *   node.get("data").get("someKey").asString() // "string1"
+ * </pre>
+ *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Value Types</a></p>
  */
 public interface Value extends Expression {
+  /**
+   * Coerces this node into a {@link String}.
+   * @return the string value of this node, or null.
+   */
   String asString();
+
+  /**
+   * Coerces this node into a {@link Boolean}.
+   * @return the boolean value of this node, or null.
+   */
   Boolean asBoolean();
+
+  /**
+   * Coerces this node into a {@link Long}.
+   * @return the long value of this node, or null.
+   */
   Long asLong();
+
+  /**
+   * Coerces this node into a {@link Double}.
+   * @return the double value of this node, or null.
+   */
   Double asDouble();
+
+  /**
+   * Coerces this node into an ordered list of nodes.
+   * @return an ordered list of response nodes, or null.
+   */
   ImmutableList<Value> asArray();
+
+  /**
+   * Coerces this node into a dictionary of nodes.
+   * @return a dictionary of nodes, or null.
+   */
   ImmutableMap<String, Value> asObject();
+
+  /**
+   * Coerces this node into a {@link Ref}.
+   * @return a Ref, or null.
+   */
   Ref asRef();
+
+  /**
+   * Coerces this node into a {@link Set}.
+   * @return a Set, or null.
+   */
   Set asSet();
+
+  /**
+   * Coerces this node into a {@link Page}.
+   * @return a Page, or null.
+   */
   Page asPage();
+
+  /**
+   * Coerces this node into an {@link Instance}.
+   * @return an Instance, or null.
+   */
   Instance asInstance();
+
+  /**
+   * Coerces this node into a {@link Key}.
+   * @return a Key, or null.
+   */
   Key asKey();
+
+  /**
+   * Coerces this node into a {@link Database}.
+   * @return a Database, or null.
+   */
   Database asDatabase();
+
+  /**
+   * Coerces this node into a {@link Class}.
+   * @return a Class, or null.
+   */
   com.faunadb.client.response.Class asClass();
+
+  /**
+   * Coerces this node into an {@link Index}.
+   * @return an Index, or null.
+   */
   Index asIndex();
+
+  /**
+   * Coerces this node into an {@link Event}.
+   * @return an Event, or null.
+   */
   Event asEvent();
   Value get(String key);
   Value get(int index);

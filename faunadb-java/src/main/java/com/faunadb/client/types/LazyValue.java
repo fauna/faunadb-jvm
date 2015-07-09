@@ -10,26 +10,6 @@ import com.faunadb.client.response.Class;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-/**
- * An abstract node in a FaunaDB response tree. An instance of this class does not have any accessible data. It must
- * first be coerced into a concrete response type, or a concrete value type.
- *
- * <p>Coercion functions will return null if this node cannot be transformed into the requested type.
- *
- * <p><b>Example</b>: Consider the {@code LazyValue node} modeling the root of the tree:</p>
- * <pre>
- * {
- *   "ref": { "@ref": "some/ref" },
- *   "data": { "someKey": "string1", "someKey2": 123 }
- * }</pre>
- *
- * <p>The result tree can be accessed using:</p>
- *
- * <pre>
- *   node.get("ref").asRef(); // {@link Ref}("some/ref")
- *   node.get("data").get("someKey").asString() // "string1"
- * </pre>
- */
 @JsonDeserialize(using=Codec.LazyValueDeserializer.class)
 public final class LazyValue implements Value {
   public static LazyValue create(JsonNode underlying, ObjectMapper json) {
@@ -45,10 +25,6 @@ public final class LazyValue implements Value {
     this.json = json;
   }
 
-  /**
-   * Coerces this node into a {@link String}.
-   * @return the string value of this node, or null.
-   */
   public String asString() {
     if (underlying.isTextual()) {
       return underlying.asText();
@@ -57,10 +33,6 @@ public final class LazyValue implements Value {
     }
   }
 
-  /**
-   * Coerces this node into a {@link Boolean}.
-   * @return the boolean value of this node, or null.
-   */
   public Boolean asBoolean() {
     if (underlying.isBoolean()) {
       return underlying.asBoolean();
@@ -69,10 +41,6 @@ public final class LazyValue implements Value {
     }
   }
 
-  /**
-   * Coerces this node into a {@link Long}.
-   * @return the long value of this node, or null.
-   */
   public Long asLong() {
     if (underlying.isNumber()) {
       return underlying.asLong();
@@ -81,10 +49,6 @@ public final class LazyValue implements Value {
     }
   }
 
-  /**
-   * Coerces this node into a {@link Double}.
-   * @return the double value of this node, or null.
-   */
   public Double asDouble() {
     if (underlying.isDouble()) {
       return underlying.asDouble();
@@ -93,10 +57,6 @@ public final class LazyValue implements Value {
     }
   }
 
-  /**
-   * Coerces this node into an ordered list of nodes.
-   * @return an ordered list of response nodes, or null.
-   */
   public ImmutableList<Value> asArray() {
     try {
       return json.convertValue(underlying, TypeFactory.defaultInstance().constructCollectionType(ImmutableList.class, LazyValue.class));
@@ -105,10 +65,6 @@ public final class LazyValue implements Value {
     }
   }
 
-  /**
-   * Coerces this node into a dictionary of nodes.
-   * @return a dictionary of nodes, or null.
-   */
   public ImmutableMap<String, Value> asObject() {
     try {
       return ImmutableMap.copyOf(json.convertValue(underlying, LazyValueMap.class));
@@ -119,10 +75,6 @@ public final class LazyValue implements Value {
     }
   }
 
-  /**
-   * Coerces this node into a {@link Ref}.
-   * @return a Ref, or null.
-   */
   public Ref asRef() {
     try {
       return json.convertValue(underlying, Ref.class);
@@ -131,10 +83,6 @@ public final class LazyValue implements Value {
     }
   }
 
-  /**
-   * Coerces this node into a {@link Page}.
-   * @return a Page, or null.
-   */
   public Page asPage() {
     try {
       return json.convertValue(underlying, Page.class);
@@ -143,10 +91,6 @@ public final class LazyValue implements Value {
     }
   }
 
-  /**
-   * Coerces this node into an {@link Instance}.
-   * @return an Instance, or null.
-   */
   public Instance asInstance() {
     try {
       return json.convertValue(underlying, Instance.class);
@@ -155,10 +99,6 @@ public final class LazyValue implements Value {
     }
   }
 
-  /**
-   * Coerces this node into a {@link Key}.
-   * @return a Key, or null.
-   */
   public Key asKey() {
     try {
       return json.convertValue(underlying, Key.class);
@@ -167,10 +107,6 @@ public final class LazyValue implements Value {
     }
   }
 
-  /**
-   * Coerces this node into a {@link Database}.
-   * @return a Database, or null.
-   */
   public Database asDatabase() {
     try {
       return json.convertValue(underlying, Database.class);
@@ -179,10 +115,6 @@ public final class LazyValue implements Value {
     }
   }
 
-  /**
-   * Coerces this node into a {@link Class}.
-   * @return a Class, or null.
-   */
   public Class asClass() {
     try {
       return json.convertValue(underlying, Class.class);
@@ -191,10 +123,6 @@ public final class LazyValue implements Value {
     }
   }
 
-  /**
-   * Coerces this node into an {@link Index}.
-   * @return an Index, or null.
-   */
   public Index asIndex() {
     try {
       return json.convertValue(underlying, Index.class);
@@ -203,10 +131,6 @@ public final class LazyValue implements Value {
     }
   }
 
-  /**
-   * Coerces this node into an {@link Event}.
-   * @return an Event, or null.
-   */
   public Event asEvent() {
     try {
       return json.convertValue(underlying, Event.class);
@@ -215,10 +139,6 @@ public final class LazyValue implements Value {
     }
   }
 
-  /**
-   * Coerces this node into a {@link Set}.
-   * @return a Set, or null.
-   */
   public Set asSet() {
     try {
       return json.convertValue(underlying, Set.class);
