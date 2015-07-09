@@ -148,6 +148,9 @@ public class FaunaClient {
     if (status == 401) {
       String error = parseResponseBody(response).get("error").asText();
       throw new UnauthorizedException(error);
+    } else if (status == 500) {
+      String error = parseResponseBody(response).get("error").asText();
+      throw new InternalException(error);
     }
   }
 
