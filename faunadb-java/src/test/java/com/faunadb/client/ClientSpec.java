@@ -90,6 +90,9 @@ public class ClientSpec {
     assertThat(resp.classRef().value(), is("classes/spells"));
     assertThat(resp.data().get("testField").asString(), is("testValue"));
 
+    ListenableFuture<ResponseNode> existsF = client.query(Exists(resp.ref()));
+    assertThat(existsF.get().asBoolean(), is(true));
+
     ListenableFuture<ResponseNode> resp2F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("testField", ObjectV("array", ArrayV(LongV(1), StringV("2"), DoubleV(3.4)), "bool", BooleanV(true), "num", LongV(1234), "string", StringV("sup"), "float", DoubleV(1.234)))))));
     Instance resp2 = resp2F.get().asInstance();
 

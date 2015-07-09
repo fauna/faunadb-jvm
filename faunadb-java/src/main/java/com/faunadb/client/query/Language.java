@@ -179,6 +179,13 @@ public final class Language {
   }
 
   /**
+   * Creates a new Exists function.
+   */
+  public static Exists Exists(Ref ref) {
+    return Exists.create(ref);
+  }
+
+  /**
    * Creates a new Count function.
    */
   public static Count Count(Set set) {
