@@ -1,4 +1,4 @@
-package com.faunadb.client.response;
+package com.faunadb.client.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -11,20 +11,20 @@ import java.util.Map;
  * An immutable dictionary of response nodes. FaunaDB responses can be polymorphic, so
  * this dictionary allows individual entries to be coerced to concrete response types as required.
  *
- * @see ResponseNode
+ * @see LazyValue
  * @see ForwardingMap
  */
-@JsonDeserialize(using=Codec.ResponseMapDeserializer.class)
-public final class ResponseMap extends ForwardingMap<String, ResponseNode> {
-  private final ImmutableMap<String, ResponseNode> underlying;
+@JsonDeserialize(using=Codec.LazyValueMapDeserializer.class)
+public final class LazyValueMap extends ForwardingMap<String, Value> {
+  private final ImmutableMap<String, Value> underlying;
 
   @JsonCreator
-  ResponseMap(ImmutableMap<String, ResponseNode> underlying) {
+  LazyValueMap(ImmutableMap<String, Value> underlying) {
     this.underlying = underlying;
   }
 
   @Override
-  protected Map<String, ResponseNode> delegate() {
+  protected Map<String, Value> delegate() {
     return underlying;
   }
 }

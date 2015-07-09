@@ -1,12 +1,14 @@
-package com.faunadb.client.response;
+package com.faunadb.client.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.faunadb.client.types.Ref;
+import com.faunadb.client.response.*;
+import com.faunadb.client.response.Class;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * An abstract node in a FaunaDB response tree. An instance of this class does not have any accessible data. It must
@@ -14,7 +16,7 @@ import com.google.common.collect.ImmutableList;
  *
  * <p>Coercion functions will return null if this node cannot be transformed into the requested type.
  *
- * <p><b>Example</b>: Consider the {@code ResponseNode node} modeling the root of the tree:</p>
+ * <p><b>Example</b>: Consider the {@code LazyValue node} modeling the root of the tree:</p>
  * <pre>
  * {
  *   "ref": { "@ref": "some/ref" },
@@ -28,17 +30,17 @@ import com.google.common.collect.ImmutableList;
  *   node.get("data").get("someKey").asString() // "string1"
  * </pre>
  */
-@JsonDeserialize(using=Codec.ResponseNodeDeserializer.class)
-public final class ResponseNode {
-  public static ResponseNode create(JsonNode underlying, ObjectMapper json) {
-    return new ResponseNode(underlying, json);
+@JsonDeserialize(using=Codec.LazyValueDeserializer.class)
+public final class LazyValue implements Value {
+  public static LazyValue create(JsonNode underlying, ObjectMapper json) {
+    return new LazyValue(underlying, json);
   }
 
   private final JsonNode underlying;
   private final ObjectMapper json;
 
   @JsonCreator
-  ResponseNode(JsonNode underlying, ObjectMapper json) {
+  LazyValue(JsonNode underlying, ObjectMapper json) {
     this.underlying = underlying;
     this.json = json;
   }
@@ -95,9 +97,9 @@ public final class ResponseNode {
    * Coerces this node into an ordered list of nodes.
    * @return an ordered list of response nodes, or null.
    */
-  public ImmutableList<ResponseNode> asArray() {
+  public ImmutableList<Value> asArray() {
     try {
-      return json.convertValue(underlying, TypeFactory.defaultInstance().constructCollectionType(ImmutableList.class, ResponseNode.class));
+      return json.convertValue(underlying, TypeFactory.defaultInstance().constructCollectionType(ImmutableList.class, LazyValue.class));
     } catch (IllegalArgumentException ex) {
       return null;
     }
@@ -107,9 +109,9 @@ public final class ResponseNode {
    * Coerces this node into a dictionary of nodes.
    * @return a dictionary of nodes, or null.
    */
-  public ResponseMap asObject() {
+  public ImmutableMap<String, Value> asObject() {
     try {
-      return json.convertValue(underlying, ResponseMap.class);
+      return ImmutableMap.copyOf(json.convertValue(underlying, LazyValueMap.class));
     } catch (ClassCastException ex) {
       return null;
     } catch (IllegalArgumentException ex) {
@@ -229,7 +231,7 @@ public final class ResponseNode {
    * Accesses the value of the specified field if this is an object node.
    * @return the value of the field, or null.
    */
-  public ResponseNode get(String key) {
+  public Value get(String key) {
     return asObject().get(key);
   }
 
@@ -237,13 +239,13 @@ public final class ResponseNode {
    * Accesses the value of the specified element if this is an array node.
    * @return the value of the element, or null.
    */
-  public ResponseNode get(int index) {
+  public Value get(int index) {
     return asArray().get(index);
   }
 
   @Override
   public boolean equals(Object obj) {
-    return (obj instanceof ResponseNode) && underlying.equals(((ResponseNode) obj).underlying);
+    return (obj instanceof LazyValue) && underlying.equals(((LazyValue) obj).underlying);
   }
 
   @Override

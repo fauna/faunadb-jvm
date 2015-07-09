@@ -2,6 +2,7 @@ package com.faunadb.client.response;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.faunadb.client.types.LazyValue;
 import com.faunadb.client.types.Ref;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -9,11 +10,11 @@ import com.google.common.collect.ImmutableMap;
 
 /**
  * An immutable value-type representation of a FaunaDB Index response. This, like other
- * response types, is created by coercing a {@link ResponseNode} using one of the conversion methods.
+ * response types, is created by coercing a {@link LazyValue} using one of the conversion methods.
  *
  * <p><i>Reference:</i> <a href="https://faunadb.com/documentation#guide-resource_types-indexes">FaunaDB Resource Types</a></p>
  *
- * @see ResponseNode#asIndex()
+ * @see LazyValue#asIndex()
  */
 public final class Index {
   @JsonProperty("ref")

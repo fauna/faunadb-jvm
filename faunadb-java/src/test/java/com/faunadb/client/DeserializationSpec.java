@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.response.Class;
 import com.faunadb.client.response.*;
+import com.faunadb.client.types.LazyValue;
 import com.faunadb.client.types.Ref;
+import com.faunadb.client.types.Value;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -22,7 +24,7 @@ public class DeserializationSpec {
   @Test
   public void deserializeInstanceResponseWithRefs() throws IOException {
     String toDeserialize = "{\n\t\t\"ref\": {\n\t\t\t\"@ref\": \"classes/spells/93044099947429888\"\n\t\t},\n\t\t\"class\": {\n\t\t\t\"@ref\": \"classes/spells\"\n\t\t},\n\t\t\"ts\": 1424992618413105,\n\t\t\"data\": {\n\t\t\t\"refField\": {\n\t\t\t\t\"@ref\": \"classes/spells/93044099909681152\"\n\t\t\t}\n\t\t}\n\t}";
-    ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
     Instance instance = parsed.asInstance();
     assertEquals(instance.ref(), Ref.create("classes/spells/93044099947429888"));
     assertEquals(instance.classRef(), Ref.create("classes/spells"));
@@ -33,7 +35,7 @@ public class DeserializationSpec {
   @Test
   public void deserializeInstanceResponse() throws IOException {
     String toDeserialize = "{\n\"class\": {\n\"@ref\": \"classes/derp\"\n},\n\"data\": {\n\"test\": 1\n},\n\"ref\": {\n\"@ref\": \"classes/derp/101192216816386048\"\n},\n\"ts\": 1432763268186882\n}";
-    ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
     Instance instance = parsed.asInstance();
     assertEquals(instance.ref(), Ref.create("classes/derp/101192216816386048"));
     assertEquals(instance.classRef(), Ref.create("classes/derp"));
@@ -44,9 +46,9 @@ public class DeserializationSpec {
   @Test
   public void deserializeInstanceResponseWithObjectLiteral() throws IOException {
     String toDeserialize = "{\n\"class\": {\n\"@ref\": \"classes/derp\"\n},\n\"data\": {\n\"test\": {\n\"field1\": {\n\"@obj\": {\n\"@name\": \"Test\"\n}\n}\n}\n},\n\"ref\": {\n\"@ref\": \"classes/derp/101727203651223552\"\n},\n\"ts\": 1433273471399755\n}";
-    ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
     Instance instance = parsed.asInstance();
-    ResponseMap unwrappedField = instance.data().get("test").get("field1").asObject();
+    ImmutableMap<String, Value> unwrappedField = instance.data().get("test").get("field1").asObject();
     assertEquals("Test", unwrappedField.get("@name").asString());
   }
 
@@ -63,7 +65,7 @@ public class DeserializationSpec {
         "        \"ts\": 1434343547025544\n" +
         "    }\n";
 
-    ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
     Database database = parsed.asDatabase();
     assertThat(database.name(), is("spells"));
     assertThat(database.classRef(), is(Ref.create("databases")));
@@ -93,7 +95,7 @@ public class DeserializationSpec {
         "        \"ts\": 1434344452631179\n" +
         "    }\n";
 
-    ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
     Key key = parsed.asKey();
     assertThat(key.classRef(), is(Ref.create("keys")));
     assertThat(key.database(), is(Ref.create("databases/spells")));
@@ -119,7 +121,7 @@ public class DeserializationSpec {
         "        },\n" +
         "        \"ts\": 1434344944425065\n" +
         "    }";
-    ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
     Class cls = parsed.asClass();
     assertThat(cls.classRef(), is(Ref.create("classes")));
     assertThat(cls.historyDays(), is(30L));
@@ -151,7 +153,7 @@ public class DeserializationSpec {
         "        \"unique\": true\n" +
         "    }";
 
-    ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
     Index idx = parsed.asIndex();
     assertThat(idx.active(), is(false));
     assertThat(idx.classRef(), is(Ref.create("indexes")));
@@ -173,7 +175,7 @@ public class DeserializationSpec {
         "\t\t\t}\n" +
         "\t\t}";
 
-    ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
     Event event = parsed.asEvent();
 
     assertThat(event.resource(), is(Ref.create("classes/spells/102989579003363328")));
@@ -191,12 +193,12 @@ public class DeserializationSpec {
         "        ]\n" +
         "    }\n";
 
-    ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
     Page page = parsed.asPage();
     assertThat(page.data().size(), is(1));
     assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851646450565120")));
-    assertThat(page.after(), is(Optional.<ResponseNode>absent()));
-    assertThat(page.before(), is(Optional.<ResponseNode>absent()));
+    assertThat(page.after(), is(Optional.<LazyValue>absent()));
+    assertThat(page.before(), is(Optional.<LazyValue>absent()));
   }
 
   @Test
@@ -212,12 +214,12 @@ public class DeserializationSpec {
         "        ]\n" +
         "    }";
 
-    ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
     Page page = parsed.asPage();
     assertThat(page.data().size(), is(1));
     assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851646450565120")));
     assertThat(page.before().get().asRef(), is(Ref.create("classes/spells/102851646450565120")));
-    assertThat(page.after(), is(Optional.<ResponseNode>absent()));
+    assertThat(page.after(), is(Optional.<LazyValue>absent()));
   }
 
   @Test
@@ -236,7 +238,7 @@ public class DeserializationSpec {
         "        ]\n" +
         "    }";
 
-    ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
     Page page = parsed.asPage();
     assertThat(page.data().size(), is(1));
     assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851646450565120")));
@@ -257,11 +259,11 @@ public class DeserializationSpec {
         "        ]\n" +
         "    }";
 
-    ResponseNode parsed = json.readValue(toDeserialize, ResponseNode.class);
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
     Page page = parsed.asPage();
     assertThat(page.data().size(), is(1));
     assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851640310104064")));
-    assertThat(page.before(), is(Optional.<ResponseNode>absent()));
+    assertThat(page.before(), is(Optional.<LazyValue>absent()));
     assertThat(page.after().get().asRef(), is(Ref.create("classes/spells/102851646450565120")));
   }
 }

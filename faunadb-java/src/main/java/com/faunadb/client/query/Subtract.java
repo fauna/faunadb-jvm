@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableList;
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-misc_functions">FaunaDB Miscellaneous Functions</a>
  */
-public final class Subtract extends Value implements Expression {
+public final class Subtract implements Expression {
   /**
    * Obtains a new instance of this class.
    *

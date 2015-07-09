@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.faunadb.client.query.Expression;
 import com.faunadb.client.query.Language;
-import com.faunadb.client.response.Set;
+import com.faunadb.client.response.*;
+import com.faunadb.client.response.Class;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -19,16 +20,124 @@ import com.google.common.collect.ImmutableMap;
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Value Types</a></p>
  */
-public class Value implements Expression {
-  protected Value() { }
+public interface Value extends Expression {
+  String asString();
+  Boolean asBoolean();
+  Long asLong();
+  Double asDouble();
+  ImmutableList<Value> asArray();
+  ImmutableMap<String, Value> asObject();
+  Ref asRef();
+  Set asSet();
+  Page asPage();
+  Instance asInstance();
+  Key asKey();
+  Database asDatabase();
+  com.faunadb.client.response.Class asClass();
+  Index asIndex();
+  Event asEvent();
+  Value get(String key);
+  Value get(int index);
+
+  abstract class ConcreteValue implements Value {
+    @Override
+    public String asString() {
+      return null;
+    }
+
+    @Override
+    public Boolean asBoolean() {
+      return null;
+    }
+
+    @Override
+    public Long asLong() {
+      return null;
+    }
+
+    @Override
+    public Double asDouble() {
+      return null;
+    }
+
+    @Override
+    public ImmutableList<Value> asArray() {
+      return null;
+    }
+
+    @Override
+    public ImmutableMap<String, Value> asObject() {
+      return null;
+    }
+
+    @Override
+    public Ref asRef() {
+      return null;
+    }
+
+    @Override
+    public Value get(int index) {
+      return null;
+    }
+
+    @Override
+    public Value get(String key) {
+      return null;
+    }
+
+    @Override
+    public Page asPage() {
+      return null;
+    }
+
+    @Override
+    public Instance asInstance() {
+      return null;
+    }
+
+    @Override
+    public Key asKey() {
+      return null;
+    }
+
+    @Override
+    public Database asDatabase() {
+      return null;
+    }
+
+    @Override
+    public Class asClass() {
+      return null;
+    }
+
+    @Override
+    public Index asIndex() {
+      return null;
+    }
+
+    @Override
+    public Event asEvent() {
+      return null;
+    }
+
+    @Override
+    public Set asSet() {
+      return null;
+    }
+  }
 
   /**
    * Represents an Object value in the FaunaDB query language. Objects are polymorphic dictionaries.
    *
    * @see Language#ObjectV
    */
-  public final static class ObjectV extends Value {
+  final class ObjectV extends ConcreteValue {
     private final ImmutableMap<String, Value> values;
+
+    @Override
+    public ImmutableMap<String, Value> asObject() {
+      return values;
+    }
 
     /**
      * Constructs an empty object value.
@@ -96,6 +205,11 @@ public class Value implements Expression {
     }
 
     @Override
+    public Value get(String key) {
+      return values.get(key);
+    }
+
+    @Override
     public int hashCode() {
       return values.hashCode();
     }
@@ -104,8 +218,13 @@ public class Value implements Expression {
   /**
    * Represents an array value in the FaunaDB query language. Arrays are polymorphic ordered lists of other values.
    */
-  public static final class ArrayV extends Value {
+  final class ArrayV extends ConcreteValue {
     private final ImmutableList<Value> values;
+
+    @Override
+    public ImmutableList<Value> asArray() {
+      return values;
+    }
 
     /**
      * Returns an empty array value.
@@ -183,6 +302,11 @@ public class Value implements Expression {
       this.values = values;
     }
 
+    @Override
+    public Value get(int index) {
+      return values.get(index);
+    }
+
     @JsonValue
     public ImmutableList<Value> values() {
       return values;
@@ -199,7 +323,7 @@ public class Value implements Expression {
    *
    * @see Language#BooleanV(boolean)
    */
-  public static class BooleanV extends Value {
+  final class BooleanV extends ConcreteValue {
     private final Boolean value;
 
     public final static BooleanV True = BooleanV.create(true);
@@ -207,6 +331,16 @@ public class Value implements Expression {
 
     public static BooleanV create(boolean value) {
       return new BooleanV(value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return super.equals(obj);
+    }
+
+    @Override
+    public Boolean asBoolean() {
+      return value;
     }
 
     BooleanV(boolean value) {
@@ -229,11 +363,16 @@ public class Value implements Expression {
    *
    * @see Language#DoubleV(double)
    */
-  public static class DoubleV extends Value {
+  final class DoubleV extends ConcreteValue {
     private final Double value;
 
     public static DoubleV create(double value) {
       return new DoubleV(value);
+    }
+
+    @Override
+    public Double asDouble() {
+      return value;
     }
 
     DoubleV(double value) {
@@ -251,11 +390,16 @@ public class Value implements Expression {
     }
   }
 
-  public static class LongV extends Value {
+  final class LongV extends ConcreteValue {
     private final Long value;
 
     public static LongV create(long value) {
       return new LongV(value);
+    }
+
+    @Override
+    public Long asLong() {
+      return value;
     }
 
     LongV(long value) {
@@ -273,11 +417,16 @@ public class Value implements Expression {
     }
   }
 
-  public static class StringV extends Value {
+  final class StringV extends ConcreteValue {
     private final String value;
 
     public static StringV create(String value) {
       return new StringV(value);
+    }
+
+    @Override
+    public String asString() {
+      return value;
     }
 
     StringV(String value) {
@@ -295,7 +444,7 @@ public class Value implements Expression {
     }
   }
 
-  public static class NullV extends Value {
+  final class NullV extends ConcreteValue {
     public static final NullV Null = new NullV();
 
     NullV() { }

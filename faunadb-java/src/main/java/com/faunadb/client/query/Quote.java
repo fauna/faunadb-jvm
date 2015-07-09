@@ -10,7 +10,7 @@ import com.faunadb.client.types.Value;
  *
  * @see Language#Quote(Expression)
  */
-public final class Quote extends Value {
+public final class Quote extends Value.ConcreteValue implements Expression {
   public static Quote create(Expression expression) {
     return new Quote(expression);
   }

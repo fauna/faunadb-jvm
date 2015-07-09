@@ -7,7 +7,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expression;
-import com.faunadb.client.response.ResponseNode;
+import com.faunadb.client.types.LazyValue;
+import com.faunadb.client.types.Value;
 import com.faunadb.httpclient.Connection;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -76,29 +77,29 @@ public class FaunaClient {
    * {@link com.faunadb.client.java.query} package. See {@link com.faunadb.client.java.query.Language} for helpers
    * and examples.
    *
-   * <p>Responses are modeled as a general response tree. Each node is a {@link ResponseNode}, and
+   * <p>Responses are modeled as a general response tree. Each node is a {@link LazyValue}, and
    * can be coerced to structured types through various methods on that class.
    *
    * @param expr The query expression to be sent to FaunaDB.
    * @return A {@link ListenableFuture} containing the root node of the Response tree.
    * @throws IOException if the query cannot be issued.
-   * @see ResponseNode
+   * @see LazyValue
    * @see com.faunadb.client.java.query.Language
    *
    */
-  public ListenableFuture<ResponseNode> query(Expression expr) throws IOException {
+  public ListenableFuture<Value> query(Expression expr) throws IOException {
     ObjectNode body = json.createObjectNode();
     body.set("q", json.valueToTree(expr));
-    return Futures.transform(connection.post("/", body), new Function<Response, ResponseNode>() {
+    return Futures.transform(connection.post("/", body), new Function<Response, Value>() {
       @Override
-      public ResponseNode apply(Response response) {
+      public Value apply(Response response) {
         try {
           handleSimpleErrors(response);
           handleQueryErrors(response);
 
           JsonNode responseBody = parseResponseBody(response);
           JsonNode resource = responseBody.get("resource");
-          return json.treeToValue(resource, ResponseNode.class);
+          return json.treeToValue(resource, LazyValue.class);
         } catch (IOException ex) {
           throw new RuntimeException(ex);
         }
@@ -118,21 +119,21 @@ public class FaunaClient {
    * @return a {@link ListenableFuture} containing an ordered list of root response nodes.
    * @throws IOException if the query cannot be issued.
    */
-  public <T extends Expression> ListenableFuture<ImmutableList<ResponseNode>> query(ImmutableList<T> exprs) throws IOException {
+  public <T extends Expression> ListenableFuture<ImmutableList<Value>> query(ImmutableList<T> exprs) throws IOException {
     ObjectNode body = json.createObjectNode();
     body.set("q", json.valueToTree(exprs));
-    return Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<ResponseNode>>() {
+    return Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<Value>>() {
       @Override
-      public ImmutableList<ResponseNode> apply(Response resp) {
+      public ImmutableList<Value> apply(Response resp) {
         try {
           handleSimpleErrors(resp);
           handleQueryErrors(resp);
           JsonNode responseBody = parseResponseBody(resp);
           ArrayNode resources = ((ArrayNode)responseBody.get("resource"));
-          ImmutableList.Builder<ResponseNode> responseNodeBuilder = ImmutableList.builder();
+          ImmutableList.Builder<Value> responseNodeBuilder = ImmutableList.builder();
 
           for (JsonNode resource : resources) {
-            responseNodeBuilder.add(json.treeToValue(resource, ResponseNode.class));
+            responseNodeBuilder.add(json.treeToValue(resource, LazyValue.class));
           }
 
           return responseNodeBuilder.build();

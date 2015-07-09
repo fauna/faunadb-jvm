@@ -1,4 +1,4 @@
-package com.faunadb.client.response;
+package com.faunadb.client.types;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -12,18 +12,18 @@ import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 
 class Codec {
-  public static class ResponseNodeDeserializer extends JsonDeserializer<ResponseNode> {
+  public static class LazyValueDeserializer extends JsonDeserializer<LazyValue> {
     @Override
-    public ResponseNode deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    public LazyValue deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
       ObjectMapper json = (ObjectMapper) jsonParser.getCodec();
       JsonNode tree = json.readTree(jsonParser);
-      return ResponseNode.create(tree, json);
+      return LazyValue.create(tree, json);
     }
   }
 
-  public static class ResponseMapDeserializer extends JsonDeserializer<ResponseMap> {
+  public static class LazyValueMapDeserializer extends JsonDeserializer<LazyValueMap> {
     @Override
-    public ResponseMap deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    public LazyValueMap deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
       ObjectMapper json = (ObjectMapper) jsonParser.getCodec();
       JsonNode tree = json.readTree(jsonParser);
 
@@ -34,8 +34,8 @@ class Codec {
         innerTree = (ObjectNode) tree;
       }
 
-      MapLikeType t = deserializationContext.getTypeFactory().constructMapLikeType(ImmutableMap.class, String.class, ResponseNode.class);
-      return new ResponseMap(json.<ImmutableMap<String, ResponseNode>>convertValue(innerTree, t));
+      MapLikeType t = deserializationContext.getTypeFactory().constructMapLikeType(ImmutableMap.class, String.class, LazyValue.class);
+      return new LazyValueMap(json.<ImmutableMap<String, Value>>convertValue(innerTree, t));
     }
   }
 }

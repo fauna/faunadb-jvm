@@ -2,16 +2,19 @@ package com.faunadb.client.response;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.faunadb.client.types.LazyValue;
 import com.faunadb.client.types.Ref;
+import com.faunadb.client.types.Value;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * An immutable value-type representation of a FaunaDB Key response. This, like other response types,
- * is obtained by coercing a {@link ResponseNode} using its associated conversion method.
+ * is obtained by coercing a {@link LazyValue} using its associated conversion method.
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#guide-resource_types-keys">FaunaDB Resource Types</a></p>
  *
- * @see ResponseNode#asKey()
+ * @see LazyValue#asKey()
  */
 public final class Key {
   @JsonProperty("ref")
@@ -29,7 +32,7 @@ public final class Key {
   @JsonProperty("ts")
   private final Long ts;
   @JsonProperty("data")
-  private final ResponseMap data;
+  private final ImmutableMap<String, Value> data;
 
   @JsonCreator
   Key(@JsonProperty("ref") Ref ref,
@@ -39,7 +42,7 @@ public final class Key {
       @JsonProperty("secret") String secret,
       @JsonProperty("hashed_secret") String hashedSecret,
       @JsonProperty("ts") Long ts,
-      @JsonProperty("data") ResponseMap data) {
+      @JsonProperty("data") ImmutableMap<String, Value> data) {
 
     this.ref = ref;
     this.classRef = classRef;
@@ -96,7 +99,7 @@ public final class Key {
   /**
    * Returns the data contained by the key.
    */
-  public ResponseMap data() {
+  public ImmutableMap<String, Value> data() {
     return data;
   }
 
