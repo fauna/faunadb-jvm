@@ -5,24 +5,24 @@ import com.faunadb.client.types.Value;
 import com.google.common.collect.ImmutableList;
 
 /**
- * An add function.
+ * An Equals function.
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-misc_functions">FaunaDB Miscellaneous Functions</a>
  */
-public final class Add extends Value implements Expression {
+public final class Equals extends Value implements Expression {
   /**
    * Obtains a new instance of this class.
    *
-   * @see Language#Add(ImmutableList)
+   * @see Language#Equals(ImmutableList)
    */
-  public static Add create(ImmutableList<Expression> terms) {
-    return new Add(terms);
+  public static Equals create(ImmutableList<Expression> terms) {
+    return new Equals(terms);
   }
 
-  @JsonProperty("add")
-  private ImmutableList<Expression> terms;
+  @JsonProperty("equals")
+  private final ImmutableList<Expression> terms;
 
-  Add(ImmutableList<Expression> terms) {
+  Equals(ImmutableList<Expression> terms) {
     this.terms = terms;
   }
 

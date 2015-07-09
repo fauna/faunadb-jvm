@@ -230,7 +230,7 @@ public final class Language {
 
   /**
    * Creates a new Do function.
-   *
+
    * @see Do#create(ImmutableList)
    */
   public static Do Do(ImmutableList<Expression> expressions) {
@@ -399,7 +399,67 @@ public final class Language {
     return Cursor.After.create(value);
   }
 
+  /**
+   * Obtains a new Add function.
+   *
+   * @see Add#create(ImmutableList)
+   */
   public static Add Add(ImmutableList<Expression> terms) {
     return Add.create(terms);
+  }
+
+  /**
+   * Obtains aa new Subtract function.
+   *
+   * @see Subtract#create(ImmutableList)
+   */
+  public static Subtract Subtract(ImmutableList<Expression> terms) {
+    return Subtract.create(terms);
+  }
+
+  /**
+   * Obtains a new Divide function.
+   *
+   * @see Divide#create(ImmutableList)
+   */
+  public static Divide Divide(ImmutableList<Expression> terms) {
+    return Divide.create(terms);
+  }
+
+  /**
+   * Obtains a new Multiply function.
+   *
+   * @see Multiply#create(ImmutableList)
+   */
+  public static Multiply Multiply(ImmutableList<Expression> terms) {
+    return Multiply.create(terms);
+  }
+
+  /**
+   * Obtains a new Equals function.
+   *
+   * @see Equals#create(ImmutableList)
+   */
+  public static Equals Equals(ImmutableList<Expression> terms) {
+    return Equals.create(terms);
+  }
+
+  /**
+   * Obtains a new Concat function.
+   *
+   * @see Concat#create(ImmutableList)
+   * @return
+   */
+  public static Concat Concat(ImmutableList<Expression> terms) {
+    return Concat.create(terms);
+  }
+
+  /**
+   * Obtains a new Contains function.
+   *
+   * @see Contains#create(ImmutableList, Expression)
+   */
+  public static Contains Contains(ImmutableList<Path> path, Expression in) {
+    return Contains.create(path, in);
   }
 }
