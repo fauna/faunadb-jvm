@@ -5,28 +5,29 @@ import com.faunadb.client.types.Value;
 import com.google.common.collect.ImmutableList;
 
 /**
- * An add function.
+ * A Divide function.
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-misc_functions">FaunaDB Miscellaneous Functions</a>
  */
-public final class Add extends Value implements Expression {
+public final class Divide extends Value implements Expression {
   /**
    * Obtains a new instance of this class.
    *
-   * @see Language#Add(ImmutableList)
+   * @see Language#Divide(ImmutableList)
    */
-  public static Add create(ImmutableList<Expression> terms) {
-    return new Add(terms);
+  public static Divide create(ImmutableList<Expression> terms) {
+    return new Divide(terms);
   }
 
-  @JsonProperty("add")
+  @JsonProperty("divide")
   private ImmutableList<Expression> terms;
 
-  Add(ImmutableList<Expression> terms) {
+  Divide(ImmutableList<Expression> terms) {
     this.terms = terms;
   }
 
   public ImmutableList<Expression> terms() {
     return terms;
   }
+
 }
