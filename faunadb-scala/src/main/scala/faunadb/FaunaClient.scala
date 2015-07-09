@@ -3,7 +3,7 @@ package faunadb
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import faunadb.errors.{UnknownException, NotFoundException, BadRequestException, UnauthorizedException}
+import faunadb.errors._
 import faunadb.query.Expression
 import faunadb.response.ResponseNode
 import faunadb.util.FutureImplicits._
@@ -104,6 +104,9 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
           case 401 =>
             val error = parseResponseBody(response).get("error").asText()
             throw new UnauthorizedException(error)
+          case 500 =>
+            val error = parseResponseBody(response).get("error").asText()
+            throw new InternalException(error)
           case _ =>
         }
       case _ =>

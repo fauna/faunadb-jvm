@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-values-special_types">FaunaDB Special Types</a>
  *
  */
-public class Ref extends Value {
+public class Ref extends Value.ConcreteValue {
   /**
    * Creates a new {@link Ref} instance.
    * @param value the value of the Ref.
@@ -22,6 +22,11 @@ public class Ref extends Value {
 
   @JsonProperty("@ref")
   private final String value;
+
+  @Override
+  public Ref asRef() {
+    return this;
+  }
 
   @JsonCreator
   Ref(@JsonProperty("@ref") String value) {

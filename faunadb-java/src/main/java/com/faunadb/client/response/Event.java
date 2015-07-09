@@ -2,16 +2,17 @@ package com.faunadb.client.response;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.faunadb.client.types.LazyValue;
 import com.faunadb.client.types.Ref;
 import com.google.common.base.Joiner;
 
 /**
  * An immutable value-type representation of a FaunaDB event. This, like other response types,
- * is created by coercing a {@link ResponseNode} using its associated conversion method.
+ * is created by coercing a {@link LazyValue} using its associated conversion method.
  *
  * <p><i>Reference</i>: TBD</p>
  *
- * @see ResponseNode#asEvent()
+ * @see LazyValue#asEvent()
  */
 public final class Event {
   @JsonProperty("ts")

@@ -3,16 +3,19 @@ package com.faunadb.client.response;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.types.Ref;
+import com.faunadb.client.types.LazyValue;
+import com.faunadb.client.types.Value;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * An immutable value-type representation of a FaunaDB Instance response. This, like other
- * response types, is created by coercing a {@link ResponseNode} using its associated conversion
+ * response types, is created by coercing a {@link LazyValue} using its associated conversion
  * method.
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#guide-resource_types-instances">FaunaDB Resource Types</a></p>
  *
- * @see ResponseNode#asInstance()
+ * @see LazyValue#asInstance()
  */
 public final class Instance {
   @JsonProperty("ref")
@@ -22,13 +25,13 @@ public final class Instance {
   @JsonProperty("ts")
   private final Long ts;
   @JsonProperty("data")
-  private final ResponseMap data;
+  private final ImmutableMap<String, Value> data;
 
   @JsonCreator
   Instance(@JsonProperty("ref") Ref ref,
            @JsonProperty("class") Ref classRef,
            @JsonProperty("ts") Long ts,
-           @JsonProperty("data") ResponseMap data) {
+           @JsonProperty("data") ImmutableMap<String, Value> data) {
     this.ref = ref;
     this.classRef = classRef;
     this.ts = ts;
@@ -59,7 +62,7 @@ public final class Instance {
   /**
    * Returns the data of this instance.
    */
-  public ResponseMap data() {
+  public ImmutableMap<String, Value> data() {
     return data;
   }
 

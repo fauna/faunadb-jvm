@@ -2,15 +2,16 @@ package com.faunadb.client.response;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.faunadb.client.types.LazyValue;
 import com.faunadb.client.types.Ref;
 
 /**
  * An immutable value-type representation of a FaunaDB Database response. This, like other
- * response types, is created by coercing a {@link ResponseNode} using its associated conversion method.
+ * response types, is created by coercing a {@link LazyValue} using its associated conversion method.
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#guide-resource_types-databases">FaunaDB Resource Types</a></p>
  *
- * @see ResponseNode#asDatabase()
+ * @see LazyValue#asDatabase()
  */
 public final class Database {
   @JsonProperty("ref")
