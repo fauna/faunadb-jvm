@@ -197,8 +197,8 @@ public class DeserializationSpec {
     Page page = parsed.asPage();
     assertThat(page.data().size(), is(1));
     assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851646450565120")));
-    assertThat(page.after(), is(Optional.<LazyValue>absent()));
-    assertThat(page.before(), is(Optional.<LazyValue>absent()));
+    assertThat(page.after(), is(Optional.<Value>absent()));
+    assertThat(page.before(), is(Optional.<Value>absent()));
   }
 
   @Test
@@ -219,7 +219,7 @@ public class DeserializationSpec {
     assertThat(page.data().size(), is(1));
     assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851646450565120")));
     assertThat(page.before().get().asRef(), is(Ref.create("classes/spells/102851646450565120")));
-    assertThat(page.after(), is(Optional.<LazyValue>absent()));
+    assertThat(page.after(), is(Optional.<Value>absent()));
   }
 
   @Test
@@ -263,7 +263,7 @@ public class DeserializationSpec {
     Page page = parsed.asPage();
     assertThat(page.data().size(), is(1));
     assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851640310104064")));
-    assertThat(page.before(), is(Optional.<LazyValue>absent()));
+    assertThat(page.before(), is(Optional.<Value>absent()));
     assertThat(page.after().get().asRef(), is(Ref.create("classes/spells/102851646450565120")));
   }
 }

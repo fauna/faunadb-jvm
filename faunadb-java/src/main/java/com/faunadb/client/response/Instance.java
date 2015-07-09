@@ -31,11 +31,11 @@ public final class Instance {
   Instance(@JsonProperty("ref") Ref ref,
            @JsonProperty("class") Ref classRef,
            @JsonProperty("ts") Long ts,
-           @JsonProperty("data") ImmutableMap<String, Value> data) {
+           @JsonProperty("data") ImmutableMap<String, LazyValue> data) {
     this.ref = ref;
     this.classRef = classRef;
     this.ts = ts;
-    this.data = data;
+    this.data = ImmutableMap.<String, Value>copyOf(data);
   }
 
   /**
