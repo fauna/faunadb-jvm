@@ -252,8 +252,8 @@ public class ClientSpec {
     Ref randomRef = Ref("classes/spells/" + randomRefNum);
 
     ListenableFuture<ResponseNode> doF = client.query(Do(ImmutableList.of(
-        Create(randomRef, Quote(ObjectV("data", ObjectV("name", StringV("Magic Missile"))))),
-        Get(randomRef)
+      Create(randomRef, Quote(ObjectV("data", ObjectV("name", StringV("Magic Missile"))))),
+      Get(randomRef)
     )));
     ResponseNode doNode = doF.get();
     Instance doInstance = doNode.asInstance();
@@ -264,11 +264,6 @@ public class ClientSpec {
     ResponseMap objectMap = objectNode.asObject();
     assertThat(objectMap.get("name").asString(), is("Hen Wen"));
     assertThat(objectMap.get("age").asLong(), is(123L));
-
-    ListenableFuture<ResponseNode> selectF = client.query(Select(ImmutableList.of(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
-        Quote(ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings"), StringV("lunchings")))))));
-    ResponseNode selectNode = selectF.get();
-    assertThat(selectNode.asString(), is("munchings"));
   }
 
   @Test
@@ -404,5 +399,42 @@ public class ClientSpec {
     assertThat(differenceRefsBuilder.build(), hasItem(createInstance4.ref()));
     assertThat(differenceRefsBuilder.build(), not(hasItem(createInstance3.ref())));
   }
+
+  @Test
+  public void testMiscFunctions() throws IOException, ExecutionException, InterruptedException {
+    ListenableFuture<ResponseNode> equalsF = client.query(Equals(ImmutableList.<Expression>of(StringV("fire"), StringV("fire"))));
+    ResponseNode equalsR = equalsF.get();
+    assertThat(equalsR.asBoolean(), is(true));
+
+    ListenableFuture<ResponseNode> concatF = client.query(Concat(ImmutableList.<Expression>of(StringV("Magic"), StringV("Missile"))));
+    ResponseNode concatR = concatF.get();
+    assertThat(concatR.asString(), is("MagicMissile"));
+
+    ListenableFuture<ResponseNode> containsF = client.query(Contains(ImmutableList.<Path>of(Path.Object("favorites"), Path.Object("foods")), Quote(ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings")))))));
+    ResponseNode containsR = containsF.get();
+    assertThat(containsR.asBoolean(), is(true));
+
+    ListenableFuture<ResponseNode> selectF = client.query(Select(ImmutableList.of(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
+      Quote(ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings"), StringV("lunchings")))))));
+    ResponseNode selectNode = selectF.get();
+    assertThat(selectNode.asString(), is("munchings"));
+
+    ListenableFuture<ResponseNode> addF = client.query(Add(ImmutableList.<Expression>of(LongV(100), LongV(10))));
+    ResponseNode addR = addF.get();
+    assertThat(addR.asLong(), is(110L));
+
+    ListenableFuture<ResponseNode> multiplyF = client.query(Multiply(ImmutableList.<Expression>of(LongV(100), LongV(10))));
+    ResponseNode multiplyR = multiplyF.get();
+    assertThat(multiplyR.asLong(), is(1000L));
+
+    ListenableFuture<ResponseNode> subtractF = client.query(Subtract(ImmutableList.<Expression>of(LongV(100), LongV(10))));
+    ResponseNode subtractR = subtractF.get();
+    assertThat(subtractR.asLong(), is(90L));
+
+    ListenableFuture<ResponseNode> divideF = client.query(Divide(ImmutableList.<Expression>of(LongV(100), LongV(10))));
+    ResponseNode divideR = divideF.get();
+    assertThat(divideR.asLong(), is(10L));
+  }
 }
+
 
