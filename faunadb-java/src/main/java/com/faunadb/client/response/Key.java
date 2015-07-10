@@ -43,7 +43,6 @@ public final class Key {
       @JsonProperty("hashed_secret") String hashedSecret,
       @JsonProperty("ts") Long ts,
       @JsonProperty("data") ImmutableMap<String, LazyValue> data) {
-
     this.ref = ref;
     this.classRef = classRef;
     this.database = database;
@@ -51,7 +50,12 @@ public final class Key {
     this.secret = secret;
     this.hashedSecret = hashedSecret;
     this.ts = ts;
-    this.data = ImmutableMap.<String, Value>copyOf(data);
+
+    if (data == null) {
+      this.data = ImmutableMap.of();
+    } else {
+      this.data = ImmutableMap.<String, Value>copyOf(data);
+    }
   }
 
   /**

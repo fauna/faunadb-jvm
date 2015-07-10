@@ -65,6 +65,12 @@ public class ClientSpec {
     ListenableFuture<Value> classCreateF = client.query(Create(Ref("classes"), Quote(ObjectV("name", StringV("spells")))));
     classCreateF.get();
 
+    ListenableFuture<Value> createClass2F = client.query(Create(Ref("classes"), Quote(ObjectV("name", StringV("characters")))));
+    createClass2F.get();
+
+    ListenableFuture<Value> createClass3F = client.query(Create(Ref("classes"), Quote(ObjectV("name", StringV("spellbooks")))));
+    createClass3F.get();
+
     ListenableFuture<Value> indexByElementF = client.query(Create(Ref("indexes"), Quote(ObjectV(
       "name", StringV("spells_by_element"),
       "source", Ref("classes/spells"),
@@ -72,6 +78,22 @@ public class ClientSpec {
     ))));
 
     indexByElementF.get();
+
+    ListenableFuture<Value> indexSpellbookByOwnerF = client.query(Create(Ref("indexes"), Quote(ObjectV(
+      "name", StringV("spellbooks_by_owner"),
+      "source", Ref("classes/spellbooks"),
+      "path", StringV("data.owner")
+    ))));
+
+    indexSpellbookByOwnerF.get();
+
+    ListenableFuture<Value> indexBySpellbookF = client.query(Create(Ref("indexes"), Quote(ObjectV(
+      "name", StringV("spells_by_spellbook"),
+      "source", Ref("classes/spells"),
+      "path", StringV("data.spellbook")
+    ))));
+
+    indexBySpellbookF.get();
   }
 
   @Test
@@ -332,6 +354,17 @@ public class ClientSpec {
     Instance createInstance3 = createNode3.asInstance();
     Instance createInstance4 = createNode4.asInstance();
 
+    ListenableFuture<Value> createCharF = client.query(Create(Ref("classes/characters"), Quote(ObjectV("data", ObjectV()))));
+    Instance createCharR = createCharF.get().asInstance();
+
+    ListenableFuture<Value> createSpellbookF = client.query(Create(Ref("classes/spellbooks"), Quote(ObjectV("data", ObjectV("owner", createCharR.ref())))));
+    Instance createSpellbookR = createSpellbookF.get().asInstance();
+
+    ListenableFuture<Value> createSpellbookSpell1F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("spellbook", createSpellbookR.ref())))));
+    ListenableFuture<Value> createSpellbookSpell2F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("spellbook", createSpellbookR.ref())))));
+    Instance createSpellbookSpell1R = createSpellbookSpell1F.get().asInstance();
+    Instance createSpellbookSpell2R = createSpellbookSpell2F.get().asInstance();
+
     ListenableFuture<Value> matchF = client.query(Paginate(Match(StringV("arcane"), Ref("indexes/spells_by_element"))));
     Value matchResponse = matchF.get();
     Page matchList = matchResponse.asPage();
@@ -398,6 +431,16 @@ public class ClientSpec {
     }
     assertThat(differenceRefsBuilder.build(), hasItem(createInstance4.ref()));
     assertThat(differenceRefsBuilder.build(), not(hasItem(createInstance3.ref())));
+
+    ListenableFuture<Value> joinF = client.query(Paginate(Join(Match(createCharR.ref(), Ref("indexes/spellbooks_by_owner")), Lambda("spellbook", Match(Var("spellbook"), Ref("indexes/spells_by_spellbook"))))));
+    Page joinR = joinF.get().asPage();
+
+    assertThat(joinR.data().size(), is(2));
+    ImmutableList.Builder<Ref> joinRefsBuilder = ImmutableList.builder();
+    for (Value joinNode : joinR.data()) {
+      joinRefsBuilder.add(joinNode.asRef());
+    }
+    assertThat(joinRefsBuilder.build(), hasItems(createSpellbookSpell1R.ref(), createSpellbookSpell2R.ref()));
   }
 
   @Test
