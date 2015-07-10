@@ -1,19 +1,20 @@
 package com.faunadb.client.query;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.faunadb.client.types.Value;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * An immutable representation of a FaunaDB paginate function.
+ * A Builder for the FaunaDB Pagiunate function.
  *
  * <p>The paginate function takes optional parameters. These can be specified by the {@code withParameter} builder
  * style methods, each which returns a copy.</p>
  *
+ * <p>Call {@link PaginateBuilder#build()} to create the Paginate function value.</p>
+ *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-reading-resources">FaunaDB Resource Retrieval Functions</a>
  *
- * @see Language#Paginate(Identifier)
+ * @see Language#Paginate(Value)
  *
  */
 public final class PaginateBuilder {
@@ -101,6 +102,9 @@ public final class PaginateBuilder {
     return events;
   }
 
+  /**
+   * Builds the {@link Value} to be used to compose a Query.
+   */
   public Value build() {
     ImmutableMap.Builder<String, Value> rv = ImmutableMap.builder();
     rv.put("paginate", resource);

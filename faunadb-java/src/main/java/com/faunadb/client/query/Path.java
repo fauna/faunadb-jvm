@@ -2,6 +2,7 @@ package com.faunadb.client.query;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.faunadb.client.types.Value;
+import com.google.common.collect.ImmutableList;
 
 /**
  * The base type for FaunaDB path expressions. This is uesd to reference a path in a FaunaDB expression tree.
@@ -11,7 +12,9 @@ import com.faunadb.client.types.Value;
  *
  * <p>{@code import static com.faunadb.client.java.query.Path.*; }</p>
  *
- * @see Select
+ * @see Language#Path(Path)
+ * @see Language#Select(ImmutableList, Value)
+ * @see Language#Contains(ImmutableList, Value)
  */
 public abstract class Path {
   Path() { }
