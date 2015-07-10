@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.types.LazyValue;
 import com.faunadb.client.types.Ref;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * An immutable value-type representation of a FaunaDB Database response. This, like other
@@ -13,13 +14,7 @@ import com.faunadb.client.types.Ref;
  *
  * @see LazyValue#asDatabase()
  */
-public final class Database {
-  @JsonProperty("ref")
-  private final Ref ref;
-  @JsonProperty("class")
-  private final Ref classRef;
-  @JsonProperty("ts")
-  private final Long ts;
+public final class Database extends Instance {
   @JsonProperty("name")
   private final String name;
 
@@ -27,32 +22,10 @@ public final class Database {
   Database(@JsonProperty("ref") Ref ref,
            @JsonProperty("class") Ref classRef,
            @JsonProperty("ts") Long ts,
-           @JsonProperty("name") String name) {
-    this.ref = ref;
-    this.classRef = classRef;
-    this.ts = ts;
+           @JsonProperty("name") String name,
+           @JsonProperty("data") ImmutableMap<String, LazyValue> data) {
+    super(ref, classRef, ts, data);
     this.name = name;
-  }
-
-  /**
-   * Returns the ref to this database.
-   */
-  public Ref ref() {
-    return ref;
-  }
-
-  /**
-   * Returns the ref of this resource's class. In this case, {@code databases}.
-   */
-  public Ref classRef() {
-    return classRef;
-  }
-
-  /**
-   * Returns the timestamp of this resource.
-   */
-  public Long ts() {
-    return ts;
   }
 
   /**
