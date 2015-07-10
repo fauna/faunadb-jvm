@@ -12,7 +12,13 @@ import com.google.common.collect.ImmutableMap;
  *
  * <p>{@code import static com.faunadb.client.java.query.Language.*;}</p>
  *
- * <p>Calling these static methods is more concise than creating the various data types manually.</p>
+ * <p>Each of these helper methods constructs a {@link Value}, which can then be composed with other helper methods.
+ *
+ * <h3>Examples:</h3>
+ *
+ * TBD
+ *
+ * </p>
  */
 public final class Language {
   Language() { }
@@ -26,6 +32,8 @@ public final class Language {
 
   /**
    * Creates a new Object function, wrapping an empty object value.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-basic_forms">FaunaDB Basic Forms</a>
    */
   public static Value Object() {
     return ObjectV("object", ObjectV());
@@ -33,6 +41,8 @@ public final class Language {
 
   /**
    * Creates a new Object function, wrapping the provided object value.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-basic_forms">FaunaDB Basic Forms</a>
    */
   public static Value Object(ObjectV value) {
     return ObjectV("object", value);
@@ -40,6 +50,8 @@ public final class Language {
 
   /**
    * Returns an empty object value.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static Value.ObjectV ObjectV() {
     return ObjectV.empty();
@@ -47,6 +59,8 @@ public final class Language {
 
   /**
    * Creates a new object value, wrapping the provided dictionary of values.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static ObjectV ObjectV(ImmutableMap<String, Value> values) {
     return ObjectV.create(values);
@@ -54,6 +68,8 @@ public final class Language {
 
   /**
    * Creates a new object value containing the given entries.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static ObjectV ObjectV(String k1, Value v1) {
     return ObjectV.create(k1, v1);
@@ -61,6 +77,8 @@ public final class Language {
 
   /**
    * Creates a new object value containing the given entries.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static ObjectV ObjectV(String k1, Value v1, String k2, Value v2) {
     return ObjectV.create(k1, v1, k2, v2);
@@ -68,6 +86,8 @@ public final class Language {
 
   /**
    * Creates a new object value containing the given entries.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static ObjectV ObjectV(String k1, Value v1, String k2, Value v2, String k3, Value v3) {
     return ObjectV.create(k1, v1, k2, v2, k3, v3);
@@ -75,6 +95,8 @@ public final class Language {
 
   /**
    * Creates a new object value containing the given entries.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static ObjectV ObjectV(String k1, Value v1, String k2, Value v2, String k3, Value v3, String k4, Value v4) {
     return ObjectV.create(k1, v1, k2, v2, k3, v3, k4, v4);
@@ -82,6 +104,8 @@ public final class Language {
 
   /**
    * Creates a new object value containing the given entries.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static ObjectV ObjectV(String k1, Value v1, String k2, Value v2, String k3, Value v3, String k4, Value v4, String k5, Value v5) {
     return ObjectV.create(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
@@ -89,6 +113,8 @@ public final class Language {
 
   /**
    * Creates an empty array value.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV() {
     return ArrayV.empty();
@@ -96,6 +122,8 @@ public final class Language {
 
   /**
    * Creates a new array value containing the provided list of values.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV(ImmutableList<Value> values) {
     return ArrayV.create(values);
@@ -103,6 +131,8 @@ public final class Language {
 
   /**
    * Creates a new array value containing the given entry.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV(Value v1) {
     return ArrayV.create(v1);
@@ -110,6 +140,8 @@ public final class Language {
 
   /**
    * Creates a new array value containing the given entries.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV(Value v1, Value v2) {
     return ArrayV.create(v1, v2);
@@ -117,6 +149,8 @@ public final class Language {
 
   /**
    * Creates a new array value containing the given entries.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV(Value v1, Value v2, Value v3) {
     return ArrayV.create(v1, v2, v3);
@@ -124,6 +158,8 @@ public final class Language {
 
   /**
    * Creates a new array value containing the given entries.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV(Value v1, Value v2, Value v3, Value v4) {
     return ArrayV.create(v1, v2, v3, v4);
@@ -131,6 +167,8 @@ public final class Language {
 
   /**
    * Creates a new array value containing the given entries.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV(Value v1, Value v2, Value v3, Value v4, Value v5) {
     return ArrayV.create(v1, v2, v3, v4, v5);
@@ -138,6 +176,8 @@ public final class Language {
 
   /**
    * Creates a new array value containing the given entries.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV(Value v1, Value v2, Value v3, Value v4, Value v5, Value v6) {
     return ArrayV.create(v1, v2, v3, v4, v5, v6);
@@ -145,6 +185,8 @@ public final class Language {
 
   /**
    * Creates a new Ref value.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static Ref Ref(String ref) {
     return Ref.create(ref);
@@ -152,6 +194,8 @@ public final class Language {
 
   /**
    * Creates a new String value.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static StringV StringV(String value) {
     return StringV.create(value);
@@ -159,6 +203,8 @@ public final class Language {
 
   /**
    * Creates a new Long value.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static LongV LongV(long value) {
     return LongV.create(value);
@@ -166,6 +212,8 @@ public final class Language {
 
   /**
    * Create aa new Double value.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static DoubleV DoubleV(double value) {
     return DoubleV.create(value);
@@ -173,6 +221,8 @@ public final class Language {
 
   /**
    * Creates a new Boolean value.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
    */
   public static BooleanV BooleanV(boolean value) {
     return BooleanV.create(value);
@@ -180,6 +230,8 @@ public final class Language {
 
   /**
    * Creates a new Exists function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-read_functions">FaunaDB Read Functions</a></p>
    */
   public static Value Exists(Value ref) {
     return ObjectV("exists", ref);
@@ -187,6 +239,8 @@ public final class Language {
 
   /**
    * Creates a new Count function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-read_functions">FaunaDB Read Functions</a></p>
    */
   public static Value Count(Value set) {
     return ObjectV("count", set);
@@ -195,7 +249,7 @@ public final class Language {
   /**
    * Creates a new Create function.
    *
-   * @see Create#create(Expression)
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-write_functions">FaunaDB Write Functions</a></p>
    */
   public static Value Create(Value ref) {
     return ObjectV("create", ref);
@@ -204,7 +258,7 @@ public final class Language {
   /**
    * Creates a new Create function.
    *
-   * @see Create#create(Expression, Expression)
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-write_functions">FaunaDB Write Functions</a></p>
    */
   public static Value Create(Value ref, Value params) {
     return ObjectV("create", ref, "params", params);
@@ -213,7 +267,7 @@ public final class Language {
   /**
    * Creates a new Delete function.
    *
-   * @see Delete#create(Expression)
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-write_functions">FaunaDB Write Functions</a></p>
    */
   public static Value Delete(Value ref) {
     return ObjectV("delete", ref);
@@ -228,6 +282,30 @@ public final class Language {
     return ObjectV("difference", ArrayV(sets));
   }
 
+  public static Value Difference(Value set1) {
+    return Difference(ImmutableList.of(set1));
+  }
+
+  public static Value Difference(Value set1, Value set2) {
+    return Difference(ImmutableList.of(set1, set2));
+  }
+
+  public static Value Difference(Value set1, Value set2, Value set3) {
+    return Difference(ImmutableList.of(set1, set2, set3));
+  }
+
+  public static Value Difference(Value set1, Value set2, Value set3, Value set4) {
+    return Difference(ImmutableList.of(set1, set2, set3, set4));
+  }
+
+  public static Value Difference(Value set1, Value set2, Value set3, Value set4, Value set5) {
+    return Difference(ImmutableList.of(set1, set2, set3, set4, set5));
+  }
+
+  public static Value Difference(Value set1, Value set2, Value set3, Value set4, Value set5, Value set6) {
+    return Difference(ImmutableList.of(set1, set2, set3, set4, set5, set6));
+  }
+
   /**
    * Creates a new Do function.
 
@@ -235,6 +313,30 @@ public final class Language {
    */
   public static Value Do(ImmutableList<Value> expressions) {
     return ObjectV("do", ArrayV(expressions));
+  }
+
+  public static Value Do(Value expr1) {
+    return Do(ImmutableList.of(expr1));
+  }
+
+  public static Value Do(Value expr1, Value expr2) {
+    return Do(ImmutableList.of(expr1, expr2));
+  }
+
+  public static Value Do(Value expr1, Value expr2, Value expr3) {
+    return Do(ImmutableList.of(expr1, expr2, expr3));
+  }
+
+  public static Value Do(Value expr1, Value expr2, Value expr3, Value expr4) {
+    return Do(ImmutableList.of(expr1, expr2, expr3, expr4));
+  }
+
+  public static Value Do(Value expr1, Value expr2, Value expr3, Value expr4, Value expr5) {
+    return Do(ImmutableList.of(expr1, expr2, expr3, expr4, expr5));
+  }
+
+  public static Value Do(Value expr1, Value expr2, Value expr3, Value expr4, Value expr5, Value expr6) {
+    return Do(ImmutableList.of(expr1, expr2, expr3, expr4, expr5, expr6));
   }
 
   /**
@@ -273,6 +375,29 @@ public final class Language {
     return ObjectV("intersection", ArrayV(sets));
   }
 
+  public static Value Intersection(Value set1) {
+    return Intersection(ImmutableList.of(set1));
+  }
+
+  public static Value Intersection(Value set1, Value set2) {
+    return Intersection(ImmutableList.of(set1, set2));
+  }
+
+  public static Value Intersection(Value set1, Value set2, Value set3) {
+    return Intersection(ImmutableList.of(set1, set2, set3));
+  }
+
+  public static Value Intersection(Value set1, Value set2, Value set3, Value set4) {
+    return Intersection(ImmutableList.of(set1, set2, set3, set4));
+  }
+
+  public static Value Intersection(Value set1, Value set2, Value set3, Value set4, Value set5) {
+    return Intersection(ImmutableList.of(set1, set2, set3, set4, set5));
+  }
+
+  public static Value Intersection(Value set1, Value set2, Value set3, Value set4, Value set5, Value set6) {
+    return Intersection(ImmutableList.of(set1, set2, set3, set4, set5, set6));
+  }
   /**
    * Obtains a new Join set representation.
    *
@@ -368,6 +493,30 @@ public final class Language {
     return ObjectV("union", ArrayV(sets));
   }
 
+  public static Value Union(Value set1) {
+    return Union(ImmutableList.of(set1));
+  }
+
+  public static Value Union(Value set1, Value set2) {
+    return Union(ImmutableList.of(set1, set2));
+  }
+
+  public static Value Union(Value set1, Value set2, Value set3) {
+    return Union(ImmutableList.of(set1, set2, set3));
+  }
+
+  public static Value Union(Value set1, Value set2, Value set3, Value set4) {
+    return Union(ImmutableList.of(set1, set2, set3, set4));
+  }
+
+  public static Value Union(Value set1, Value set2, Value set3, Value set4, Value set5) {
+    return Union(ImmutableList.of(set1, set2, set3, set4, set5));
+  }
+
+  public static Value Union(Value set1, Value set2, Value set3, Value set4, Value set5, Value set6) {
+    return Union(ImmutableList.of(set1, set2, set3, set4, set5, set6));
+  }
+
   /**
    * Obtains a new Update function representation.
    *
@@ -413,6 +562,30 @@ public final class Language {
     return ObjectV("add", ArrayV(terms));
   }
 
+  public static Value Add(Value term1) {
+    return Add(ImmutableList.of(term1));
+  }
+
+  public static Value Add(Value term1, Value term2) {
+    return Add(ImmutableList.of(term1, term2));
+  }
+
+  public static Value Add(Value term1, Value term2, Value term3) {
+    return Add(ImmutableList.of(term1, term2, term3));
+  }
+
+  public static Value Add(Value term1, Value term2, Value term3, Value term4) {
+    return Add(ImmutableList.of(term1, term2, term3, term4));
+  }
+
+  public static Value Add(Value term1, Value term2, Value term3, Value term4, Value term5) {
+    return Add(ImmutableList.of(term1, term2, term3, term4, term5));
+  }
+
+  public static Value Add(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
+    return Add(ImmutableList.of(term1, term2, term3, term4, term5, term6));
+  }
+
   /**
    * Obtains aa new Subtract function.
    *
@@ -420,6 +593,30 @@ public final class Language {
    */
   public static Value Subtract(ImmutableList<Value> terms) {
     return ObjectV("subtract", ArrayV(terms));
+  }
+
+  public static Value Subtract(Value term1) {
+    return Subtract(ImmutableList.of(term1));
+  }
+
+  public static Value Subtract(Value term1, Value term2) {
+    return Subtract(ImmutableList.of(term1, term2));
+  }
+
+  public static Value Subtract(Value term1, Value term2, Value term3) {
+    return Subtract(ImmutableList.of(term1, term2, term3));
+  }
+
+  public static Value Subtract(Value term1, Value term2, Value term3, Value term4) {
+    return Subtract(ImmutableList.of(term1, term2, term3, term4));
+  }
+
+  public static Value Subtract(Value term1, Value term2, Value term3, Value term4, Value term5) {
+    return Subtract(ImmutableList.of(term1, term2, term3, term4, term5));
+  }
+
+  public static Value Subtract(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
+    return Subtract(ImmutableList.of(term1, term2, term3, term4, term5, term6));
   }
 
   /**
@@ -431,6 +628,29 @@ public final class Language {
     return ObjectV("divide", ArrayV(terms));
   }
 
+  public static Value Divide(Value term1) {
+    return Divide(ImmutableList.of(term1));
+  }
+
+  public static Value Divide(Value term1, Value term2) {
+    return Divide(ImmutableList.of(term1, term2));
+  }
+
+  public static Value Divide(Value term1, Value term2, Value term3) {
+    return Divide(ImmutableList.of(term1, term2, term3));
+  }
+
+  public static Value Divide(Value term1, Value term2, Value term3, Value term4) {
+    return Divide(ImmutableList.of(term1, term2, term3, term4));
+  }
+
+  public static Value Divide(Value term1, Value term2, Value term3, Value term4, Value term5) {
+    return Divide(ImmutableList.of(term1, term2, term3, term4, term5));
+  }
+
+  public static Value Divide(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
+    return Divide(ImmutableList.of(term1, term2, term3, term4, term5, term6));
+  }
   /**
    * Obtains a new Multiply function.
    *
@@ -438,6 +658,30 @@ public final class Language {
    */
   public static Value Multiply(ImmutableList<Value> terms) {
     return ObjectV("multiply", ArrayV(terms));
+  }
+
+  public static Value Multiply(Value term1) {
+    return Multiply(ImmutableList.of(term1));
+  }
+
+  public static Value Multiply(Value term1, Value term2) {
+    return Multiply(ImmutableList.of(term1, term2));
+  }
+
+  public static Value Multiply(Value term1, Value term2, Value term3) {
+    return Multiply(ImmutableList.of(term1, term2, term3));
+  }
+
+  public static Value Multiply(Value term1, Value term2, Value term3, Value term4) {
+    return Multiply(ImmutableList.of(term1, term2, term3, term4));
+  }
+
+  public static Value Multiply(Value term1, Value term2, Value term3, Value term4, Value term5) {
+    return Multiply(ImmutableList.of(term1, term2, term3, term4, term5));
+  }
+
+  public static Value Multiply(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
+    return Multiply(ImmutableList.of(term1, term2, term3, term4, term5, term6));
   }
 
   /**
@@ -449,6 +693,30 @@ public final class Language {
     return ObjectV("equals", ArrayV(terms));
   }
 
+  public static Value Equals(Value term1) {
+    return Equals(ImmutableList.of(term1));
+  }
+
+  public static Value Equals(Value term1, Value term2) {
+    return Equals(ImmutableList.of(term1, term2));
+  }
+
+  public static Value Equals(Value term1, Value term2, Value term3) {
+    return Equals(ImmutableList.of(term1, term2, term3));
+  }
+
+  public static Value Equals(Value term1, Value term2, Value term3, Value term4) {
+    return Equals(ImmutableList.of(term1, term2, term3, term4));
+  }
+
+  public static Value Equals(Value term1, Value term2, Value term3, Value term4, Value term5) {
+    return Equals(ImmutableList.of(term1, term2, term3, term4, term5));
+  }
+
+  public static Value Equals(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
+    return Equals(ImmutableList.of(term1, term2, term3, term4, term5, term6));
+  }
+
   /**
    * Obtains a new Concat function.
    *
@@ -456,6 +724,30 @@ public final class Language {
    */
   public static Value Concat(ImmutableList<Value> terms) {
     return ObjectV("concat", ArrayV(terms));
+  }
+
+  public static Value Concat(Value term1) {
+    return Concat(ImmutableList.of(term1));
+  }
+
+  public static Value Concat(Value term1, Value term2) {
+    return Concat(ImmutableList.of(term1, term2));
+  }
+
+  public static Value Concat(Value term1, Value term2, Value term3) {
+    return Concat(ImmutableList.of(term1, term2, term3));
+  }
+
+  public static Value Concat(Value term1, Value term2, Value term3, Value term4) {
+    return Concat(ImmutableList.of(term1, term2, term3, term4));
+  }
+
+  public static Value Concat(Value term1, Value term2, Value term3, Value term4, Value term5) {
+    return Concat(ImmutableList.of(term1, term2, term3, term4, term5));
+  }
+
+  public static Value Concat(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
+    return Concat(ImmutableList.of(term1, term2, term3, term4, term5, term6));
   }
 
   /**
