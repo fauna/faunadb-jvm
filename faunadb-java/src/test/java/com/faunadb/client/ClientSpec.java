@@ -280,7 +280,7 @@ public class ClientSpec {
     Instance doInstance = doNode.asInstance();
     assertThat(doInstance.ref(), is(randomRef));
 
-    ListenableFuture<Value> objectF = client.query(Quote(ObjectV(ImmutableMap.<String, Value>of("name", StringV("Hen Wen"), "age", LongV(123)))));
+    ListenableFuture<Value> objectF = client.query(Quote(ObjectV("name", StringV("Hen Wen"), "age", LongV(123))));
     Value objectNode = objectF.get();
     ImmutableMap<String, Value> objectMap = objectNode.asObject();
     assertThat(objectMap.get("name").asString(), is("Hen Wen"));
