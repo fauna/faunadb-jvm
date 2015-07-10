@@ -1,7 +1,9 @@
 package com.faunadb.client.query;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.faunadb.client.types.Value;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * An immutable representation of a FaunaDB paginate function.
@@ -14,20 +16,19 @@ import com.google.common.base.Optional;
  * @see Language#Paginate(Identifier)
  *
  */
-@JsonSerialize(using=Codec.PaginateSerializer.class)
-public final class Paginate implements Expression {
-  public static Paginate create(Expression resource) {
-    return new Paginate(resource, Optional.<Long>absent(), Optional.<Cursor>absent(), Optional.<Integer>absent(), false, false);
+public final class PaginateBuilder {
+  public static PaginateBuilder create(Value resource) {
+    return new PaginateBuilder(resource, Optional.<Long>absent(), Optional.<Cursor>absent(), Optional.<Integer>absent(), false, false);
   }
 
-  private final Expression resource;
+  private final Value resource;
   private final Optional<Long> ts;
   private final Optional<Cursor> cursor;
   private final Optional<Integer> size;
   private final boolean sources;
   private final boolean events;
 
-  Paginate(Expression resource, Optional<Long> ts, Optional<Cursor> cursor, Optional<Integer> size, boolean sources, boolean events) {
+  PaginateBuilder(Value resource, Optional<Long> ts, Optional<Cursor> cursor, Optional<Integer> size, boolean sources, boolean events) {
     this.resource = resource;
     this.ts = ts;
     this.cursor = cursor;
@@ -40,43 +41,43 @@ public final class Paginate implements Expression {
    * Returns a copy of this with the optional timestamp parameter set.
    * @param ts the timestamp parameter for the paginate function.
    */
-  public Paginate withTs(Long ts) {
-    return new Paginate(resource, Optional.of(ts), cursor, size, sources, events);
+  public PaginateBuilder withTs(Long ts) {
+    return new PaginateBuilder(resource, Optional.of(ts), cursor, size, sources, events);
   }
 
   /**
    * Returns a copy of this with the optional cursor parameter set.
    * @param cursor the cursor parameter for the paginate function.
    */
-  public Paginate withCursor(Cursor cursor) {
-    return new Paginate(resource, ts, Optional.of(cursor), size, sources, events);
+  public PaginateBuilder withCursor(Cursor cursor) {
+    return new PaginateBuilder(resource, ts, Optional.of(cursor), size, sources, events);
   }
 
   /**
    * Returns a copy of this with the optional size parameter set.
    * @param size the size parameter for the paginate function.
    */
-  public Paginate withSize(Integer size) {
-    return new Paginate(resource, ts, cursor, Optional.of(size), sources, events);
+  public PaginateBuilder withSize(Integer size) {
+    return new PaginateBuilder(resource, ts, cursor, Optional.of(size), sources, events);
   }
 
   /**
    * Returns a copy of this with the optional sources parameter set.
    * @param s the sources parameter for the paginate function.
    */
-  public Paginate withSources(boolean s) {
-    return new Paginate(resource, ts, cursor, size, s, events);
+  public PaginateBuilder withSources(boolean s) {
+    return new PaginateBuilder(resource, ts, cursor, size, s, events);
   }
 
   /**
    * Returns a copy of this with the optional events parameter set.
    * @param e the events parameter for the paginate function.
    */
-  public Paginate withEvents(boolean e) {
-    return new Paginate(resource, ts, cursor, size, sources, e);
+  public PaginateBuilder withEvents(boolean e) {
+    return new PaginateBuilder(resource, ts, cursor, size, sources, e);
   }
 
-  public Expression resource() {
+  public Value resource() {
     return resource;
   }
 
@@ -98,5 +99,36 @@ public final class Paginate implements Expression {
 
   public boolean events() {
     return events;
+  }
+
+  public Value build() {
+    ImmutableMap.Builder<String, Value> rv = ImmutableMap.builder();
+    rv.put("paginate", resource);
+    if (ts.isPresent()) {
+      rv.put("ts", Value.LongV.create(ts.get()));
+    }
+
+    if (cursor.isPresent()) {
+      Cursor c = cursor.get();
+      if (c instanceof Cursor.Before) {
+        rv.put("before", ((Cursor.Before)c).value());
+      } else if (c instanceof Cursor.After) {
+        rv.put("after", ((Cursor.After)c).value());
+      }
+    }
+
+    if (size.isPresent()) {
+      rv.put("size", Value.LongV.create(size.get()));
+    }
+
+    if (events) {
+      rv.put("events", Value.BooleanV.create(events));
+    }
+
+    if (sources) {
+      rv.put("sources", Value.BooleanV.create(sources));
+    }
+
+    return Value.ObjectV.create(rv.build());
   }
 }

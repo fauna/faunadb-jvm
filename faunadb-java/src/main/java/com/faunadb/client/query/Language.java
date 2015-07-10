@@ -27,15 +27,15 @@ public final class Language {
   /**
    * Creates a new Object function, wrapping an empty object value.
    */
-  public static Object Object() {
-    return Object.create(ObjectV());
+  public static Value Object() {
+    return ObjectV("object", ObjectV());
   }
 
   /**
    * Creates a new Object function, wrapping the provided object value.
    */
-  public static Object Object(ObjectV value) {
-    return Object.create(value);
+  public static Value Object(ObjectV value) {
+    return ObjectV("object", value);
   }
 
   /**
@@ -181,15 +181,15 @@ public final class Language {
   /**
    * Creates a new Exists function.
    */
-  public static Exists Exists(Ref ref) {
-    return Exists.create(ref);
+  public static Value Exists(Value ref) {
+    return ObjectV("exists", ref);
   }
 
   /**
    * Creates a new Count function.
    */
-  public static Count Count(Set set) {
-    return Count.create(set);
+  public static Value Count(Value set) {
+    return ObjectV("count", set);
   }
 
   /**
@@ -197,8 +197,8 @@ public final class Language {
    *
    * @see Create#create(Expression)
    */
-  public static Create Create(Expression ref) {
-    return Create.create(ref);
+  public static Value Create(Value ref) {
+    return ObjectV("create", ref);
   }
 
   /**
@@ -206,8 +206,8 @@ public final class Language {
    *
    * @see Create#create(Expression, Expression)
    */
-  public static Create Create(Expression ref, Expression params) {
-    return Create.create(ref, params);
+  public static Value Create(Value ref, Value params) {
+    return ObjectV("create", ref, "params", params);
   }
 
   /**
@@ -215,8 +215,8 @@ public final class Language {
    *
    * @see Delete#create(Expression)
    */
-  public static Delete Delete(Expression ref) {
-    return Delete.create(ref);
+  public static Value Delete(Value ref) {
+    return ObjectV("delete", ref);
   }
 
   /**
@@ -224,8 +224,8 @@ public final class Language {
    *
    * @see Difference#create
    */
-  public static Difference Difference(ImmutableList<Set> sets) {
-    return Difference.create(sets);
+  public static Value Difference(ImmutableList<Value> sets) {
+    return ObjectV("difference", ArrayV(sets));
   }
 
   /**
@@ -233,8 +233,8 @@ public final class Language {
 
    * @see Do#create(ImmutableList)
    */
-  public static Do Do(ImmutableList<Expression> expressions) {
-    return Do.create(expressions);
+  public static Value Do(ImmutableList<Value> expressions) {
+    return ObjectV("do", ArrayV(expressions));
   }
 
   /**
@@ -242,8 +242,8 @@ public final class Language {
    *
    * @see Foreach#create(Lambda, Expression)
    */
-  public static Foreach Foreach(Lambda lambda, Expression collection) {
-    return Foreach.create(lambda, collection);
+  public static Value Foreach(Value lambda, Value collection) {
+    return ObjectV("foreach", lambda, "collection", collection);
   }
 
   /**
@@ -251,8 +251,8 @@ public final class Language {
    *
    * @see Get#create(Expression)
    */
-  public static Get Get(Expression resource) {
-    return Get.create(resource);
+  public static ObjectV Get(Value resource) {
+    return ObjectV("get", resource);
   }
 
   /**
@@ -260,8 +260,8 @@ public final class Language {
    *
    * @see If#create
    */
-  public static If If(Expression condition, Expression then, Expression elseExpression) {
-    return If.create(condition, then, elseExpression);
+  public static ObjectV If(Value condition, Value then, Value elseExpression) {
+    return ObjectV("if", condition, "then", then, "else", elseExpression);
   }
 
   /**
@@ -269,8 +269,8 @@ public final class Language {
    *
    * @see Intersection#create(ImmutableList)
    */
-  public static Intersection Intersection(ImmutableList<Set> sets) {
-    return Intersection.create(sets);
+  public static Value Intersection(ImmutableList<Value> sets) {
+    return ObjectV("intersection", ArrayV(sets));
   }
 
   /**
@@ -278,8 +278,8 @@ public final class Language {
    *
    * @see Join#create(Set, Lambda)
    */
-  public static Join Join(Set source, Lambda target) {
-    return Join.create(source, target);
+  public static Value Join(Value source, Value target) {
+    return ObjectV("join", source, "with", target);
   }
 
   /**
@@ -287,8 +287,8 @@ public final class Language {
    *
    * @see Lambda#create(String, Expression)
    */
-  public static Lambda Lambda(String argument, Expression expr) {
-    return Lambda.create(argument, expr);
+  public static Value Lambda(String argument, Value expr) {
+    return ObjectV("lambda", StringV(argument), "expr", expr);
   }
 
   /**
@@ -296,8 +296,8 @@ public final class Language {
    *
    * @see Let#create(ImmutableMap, Expression)
    */
-  public static Let Let(ImmutableMap<String, Expression> vars, Expression in) {
-    return Let.create(vars, in);
+  public static Value Let(ImmutableMap<String, Value> vars, Value in) {
+    return ObjectV("let", ObjectV(vars), "in", in);
   }
 
   /**
@@ -305,8 +305,8 @@ public final class Language {
    *
    * @see Map#create(Lambda, Expression)
    */
-  public static Map Map(Lambda lambda, Expression collection) {
-    return Map.create(lambda, collection);
+  public static Value Map(Value lambda, Value collection) {
+    return ObjectV("map", lambda, "collection", collection);
   }
 
   /**
@@ -314,8 +314,8 @@ public final class Language {
    *
    * @see Match#create(Value, Ref)
    */
-  public static Match Match(Value term, Ref index) {
-    return Match.create(term, index);
+  public static Value Match(Value term, Ref index) {
+    return ObjectV("match", term, "index", index);
   }
 
   /**
@@ -323,8 +323,8 @@ public final class Language {
    *
    * @see Paginate#create(Expression)
    */
-  public static Paginate Paginate(Expression resource) {
-    return Paginate.create(resource);
+  public static PaginateBuilder Paginate(Value resource) {
+    return PaginateBuilder.create(resource);
   }
 
   /**
@@ -332,8 +332,8 @@ public final class Language {
    *
    * @see Quote#create(Expression)
    */
-  public static Quote Quote(Expression expression) {
-    return Quote.create(expression);
+  public static Value Quote(Value expression) {
+    return ObjectV("quote", expression);
   }
 
   /**
@@ -341,8 +341,8 @@ public final class Language {
    *
    * @see Replace#create(Expression, Expression)
    */
-  public static Replace Replace(Expression ref, Expression obj) {
-    return Replace.create(ref, obj);
+  public static Value Replace(Value ref, Value obj) {
+    return ObjectV("replace", ref, "params", obj);
   }
 
   /**
@@ -350,8 +350,13 @@ public final class Language {
    *
    * @see Select#create(ImmutableList, Value)
    */
-  public static Select Select(ImmutableList<Path> path, Value from) {
-    return Select.create(path, from);
+  public static Value Select(ImmutableList<Path> path, Value from) {
+    ImmutableList.Builder<Value> pathValueBuilder = ImmutableList.builder();
+    for (Path term : path) {
+      pathValueBuilder.add(term.value());
+    }
+
+    return ObjectV("select", ArrayV(pathValueBuilder.build()), "from", from);
   }
 
   /**
@@ -359,8 +364,8 @@ public final class Language {
    *
    * @see Union#create(ImmutableList)
    */
-  public static Union Union(ImmutableList<Set> sets) {
-    return Union.create(sets);
+  public static Value Union(ImmutableList<Value> sets) {
+    return ObjectV("union", ArrayV(sets));
   }
 
   /**
@@ -368,8 +373,8 @@ public final class Language {
    *
    * @see Update#create(Expression, Expression)
    */
-  public static Update Update(Expression ref, Expression params) {
-    return Update.create(ref, params);
+  public static Value Update(Value ref, Value params) {
+    return ObjectV("update", ref, "params", params);
   }
 
   /**
@@ -377,8 +382,8 @@ public final class Language {
    *
    * @see Var#create(String)
    */
-  public static Var Var(String variable) {
-    return Var.create(variable);
+  public static Value Var(String variable) {
+    return ObjectV("var", StringV(variable));
   }
 
   /**
@@ -404,8 +409,8 @@ public final class Language {
    *
    * @see Add#create(ImmutableList)
    */
-  public static Add Add(ImmutableList<Expression> terms) {
-    return Add.create(terms);
+  public static Value Add(ImmutableList<Value> terms) {
+    return ObjectV("add", ArrayV(terms));
   }
 
   /**
@@ -413,8 +418,8 @@ public final class Language {
    *
    * @see Subtract#create(ImmutableList)
    */
-  public static Subtract Subtract(ImmutableList<Expression> terms) {
-    return Subtract.create(terms);
+  public static Value Subtract(ImmutableList<Value> terms) {
+    return ObjectV("subtract", ArrayV(terms));
   }
 
   /**
@@ -422,8 +427,8 @@ public final class Language {
    *
    * @see Divide#create(ImmutableList)
    */
-  public static Divide Divide(ImmutableList<Expression> terms) {
-    return Divide.create(terms);
+  public static Value Divide(ImmutableList<Value> terms) {
+    return ObjectV("divide", ArrayV(terms));
   }
 
   /**
@@ -431,8 +436,8 @@ public final class Language {
    *
    * @see Multiply#create(ImmutableList)
    */
-  public static Multiply Multiply(ImmutableList<Expression> terms) {
-    return Multiply.create(terms);
+  public static Value Multiply(ImmutableList<Value> terms) {
+    return ObjectV("multiply", ArrayV(terms));
   }
 
   /**
@@ -440,18 +445,17 @@ public final class Language {
    *
    * @see Equals#create(ImmutableList)
    */
-  public static Equals Equals(ImmutableList<Expression> terms) {
-    return Equals.create(terms);
+  public static Value Equals(ImmutableList<Value> terms) {
+    return ObjectV("equals", ArrayV(terms));
   }
 
   /**
    * Obtains a new Concat function.
    *
    * @see Concat#create(ImmutableList)
-   * @return
    */
-  public static Concat Concat(ImmutableList<Expression> terms) {
-    return Concat.create(terms);
+  public static Value Concat(ImmutableList<Value> terms) {
+    return ObjectV("concat", ArrayV(terms));
   }
 
   /**
@@ -459,7 +463,12 @@ public final class Language {
    *
    * @see Contains#create(ImmutableList, Expression)
    */
-  public static Contains Contains(ImmutableList<Path> path, Expression in) {
-    return Contains.create(path, in);
+  public static Value Contains(ImmutableList<Path> path, Value in) {
+    ImmutableList.Builder<Value> pathValueBuilder = ImmutableList.builder();
+    for (Path term : path) {
+      pathValueBuilder.add(term.value());
+    }
+
+    return ObjectV("contains", ArrayV(pathValueBuilder.build()), "in", in);
   }
 }

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.errors.*;
-import com.faunadb.client.query.Expression;
 import com.faunadb.client.types.LazyValue;
 import com.faunadb.client.types.Value;
 import com.faunadb.httpclient.Connection;
@@ -87,7 +86,7 @@ public class FaunaClient {
    * @see com.faunadb.client.java.query.Language
    *
    */
-  public ListenableFuture<Value> query(Expression expr) throws IOException {
+  public ListenableFuture<Value> query(Value expr) throws IOException {
     ObjectNode body = json.createObjectNode();
     body.set("q", json.valueToTree(expr));
     return Futures.transform(connection.post("/", body), new Function<Response, Value>() {
@@ -119,7 +118,7 @@ public class FaunaClient {
    * @return a {@link ListenableFuture} containing an ordered list of root response nodes.
    * @throws IOException if the query cannot be issued.
    */
-  public <T extends Expression> ListenableFuture<ImmutableList<Value>> query(ImmutableList<T> exprs) throws IOException {
+  public <T extends Value> ListenableFuture<ImmutableList<Value>> query(ImmutableList<T> exprs) throws IOException {
     ObjectNode body = json.createObjectNode();
     body.set("q", json.valueToTree(exprs));
     return Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<Value>>() {
