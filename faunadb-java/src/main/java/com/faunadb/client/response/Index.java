@@ -54,7 +54,11 @@ public final class Index {
     this.name = name;
     this.source = source;
     this.path = path;
-    this.terms = terms;
+    if (terms == null) {
+      this.terms = ImmutableList.of();
+    } else {
+      this.terms = terms;
+    }
   }
 
   /**

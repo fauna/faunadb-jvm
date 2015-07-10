@@ -35,7 +35,11 @@ public final class Instance {
     this.ref = ref;
     this.classRef = classRef;
     this.ts = ts;
-    this.data = ImmutableMap.<String, Value>copyOf(data);
+    if (data == null) {
+      this.data = ImmutableMap.of();
+    } else {
+      this.data = ImmutableMap.<String, Value>copyOf(data);
+    }
   }
 
   /**
