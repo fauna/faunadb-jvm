@@ -763,4 +763,28 @@ public final class Language {
 
     return ObjectV("contains", ArrayV(pathValueBuilder.build()), "in", in);
   }
+
+  public static ImmutableList<Path> Path(Path term1) {
+    return ImmutableList.of(term1);
+  }
+
+  public static ImmutableList<Path> Path(Path term1, Path term2) {
+    return ImmutableList.of(term1, term2);
+  }
+
+  public static ImmutableList<Path> Path(Path term1, Path term2, Path term3) {
+    return ImmutableList.of(term1, term2, term3);
+  }
+
+  public static ImmutableList<Path> Path(Path term1, Path term2, Path term3, Path term4) {
+    return ImmutableList.of(term1, term2, term3, term4);
+  }
+
+  public static ImmutableList<Path> Path(Path term1, Path term2, Path term3, Path term4, Path term5) {
+    return ImmutableList.of(term1, term2, term3, term4, term5);
+  }
+
+  public static ImmutableList<Path> Path(Path term1, Path term2, Path term3, Path term4, Path term5, Path term6) {
+    return ImmutableList.of(term1, term2, term3, term4, term5, term6);
+  }
 }

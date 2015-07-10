@@ -452,11 +452,11 @@ public class ClientSpec {
     Value concatR = concatF.get();
     assertThat(concatR.asString(), is("MagicMissile"));
 
-    ListenableFuture<Value> containsF = client.query(Contains(ImmutableList.<Path>of(Path.Object("favorites"), Path.Object("foods")), Quote(ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings")))))));
+    ListenableFuture<Value> containsF = client.query(Contains(Path(Path.Object("favorites"), Path.Object("foods")), Quote(ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings")))))));
     Value containsR = containsF.get();
     assertThat(containsR.asBoolean(), is(true));
 
-    ListenableFuture<Value> selectF = client.query(Select(ImmutableList.of(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
+    ListenableFuture<Value> selectF = client.query(Select(Path(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
       Quote(ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings"), StringV("lunchings")))))));
     Value selectNode = selectF.get();
     assertThat(selectNode.asString(), is("munchings"));
