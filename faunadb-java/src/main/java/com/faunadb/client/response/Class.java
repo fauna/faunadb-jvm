@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.faunadb.client.types.LazyValue;
 import com.faunadb.client.types.Ref;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * An immutable value-type representation of a FaunaDB Class response. This, like other response
@@ -14,13 +15,7 @@ import com.google.common.base.Joiner;
  *
  * @see LazyValue#asClass()
  */
-public final class Class {
-  @JsonProperty("ref")
-  private final Ref ref;
-  @JsonProperty("class")
-  private final Ref classRef;
-  @JsonProperty("ts")
-  private final Long ts;
+public final class Class extends Instance {
   @JsonProperty("history_days")
   private final Long historyDays;
   @JsonProperty("name")
@@ -31,33 +26,11 @@ public final class Class {
         @JsonProperty("class") Ref classRef,
         @JsonProperty("ts") Long ts,
         @JsonProperty("history_days") Long historyDays,
-        @JsonProperty("name") String name) {
-    this.ref = ref;
-    this.classRef = classRef;
-    this.ts = ts;
+        @JsonProperty("name") String name,
+        @JsonProperty("data") ImmutableMap<String, LazyValue> data) {
+    super(ref, classRef, ts, data);
     this.historyDays = historyDays;
     this.name = name;
-  }
-
-  /**
-   * Returns the ref to this class.
-   */
-  public Ref ref() {
-    return ref;
-  }
-
-  /**
-   * Returns the ref of the class of the resource. In this case, {@code classes/}.
-   */
-  public Ref classRef() {
-    return classRef;
-  }
-
-  /**
-   * Returns the timestamp of this resource.
-   */
-  public Long ts() {
-    return ts;
   }
 
   /**

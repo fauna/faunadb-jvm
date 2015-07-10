@@ -17,7 +17,7 @@ import com.google.common.collect.ImmutableMap;
  *
  * @see LazyValue#asInstance()
  */
-public final class Instance {
+public class Instance {
   @JsonProperty("ref")
   private final Ref ref;
   @JsonProperty("class")

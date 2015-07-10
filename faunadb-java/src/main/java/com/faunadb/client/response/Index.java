@@ -16,13 +16,7 @@ import com.google.common.collect.ImmutableMap;
  *
  * @see LazyValue#asIndex()
  */
-public final class Index {
-  @JsonProperty("ref")
-  private final Ref ref;
-  @JsonProperty("class")
-  private final Ref classRef;
-  @JsonProperty("ts")
-  private final Long ts;
+public final class Index extends Instance {
   @JsonProperty("unique")
   private final Boolean unique;
   @JsonProperty("active")
@@ -45,10 +39,9 @@ public final class Index {
         @JsonProperty("name") String name,
         @JsonProperty("source") Ref source,
         @JsonProperty("path") String path,
-        @JsonProperty("terms") ImmutableList<ImmutableMap<String, String>> terms) {
-    this.ref = ref;
-    this.classRef = classRef;
-    this.ts = ts;
+        @JsonProperty("terms") ImmutableList<ImmutableMap<String, String>> terms,
+        @JsonProperty("data") ImmutableMap<String, LazyValue> data) {
+    super(ref, classRef, ts, data);
     this.unique = unique;
     this.active = active;
     this.name = name;
@@ -59,27 +52,6 @@ public final class Index {
     } else {
       this.terms = terms;
     }
-  }
-
-  /**
-   * Returns the ref of this Index
-   */
-  public Ref ref() {
-    return ref;
-  }
-
-  /**
-   * Returns the ref of the class of this resource. In this case, {@code indexes}.
-   */
-  public Ref classRef() {
-    return classRef;
-  }
-
-  /**
-   * Returns the timestamp of this Index.
-   */
-  public Long ts() {
-    return ts;
   }
 
   /**

@@ -16,11 +16,7 @@ import com.google.common.collect.ImmutableMap;
  *
  * @see LazyValue#asKey()
  */
-public final class Key {
-  @JsonProperty("ref")
-  private final Ref ref;
-  @JsonProperty("class")
-  private final Ref classRef;
+public final class Key extends Instance {
   @JsonProperty("database")
   private final Ref database;
   @JsonProperty("role")
@@ -29,10 +25,6 @@ public final class Key {
   private final String secret;
   @JsonProperty("hashed_secret")
   private final String hashedSecret;
-  @JsonProperty("ts")
-  private final Long ts;
-  @JsonProperty("data")
-  private final ImmutableMap<String, Value> data;
 
   @JsonCreator
   Key(@JsonProperty("ref") Ref ref,
@@ -43,26 +35,11 @@ public final class Key {
       @JsonProperty("hashed_secret") String hashedSecret,
       @JsonProperty("ts") Long ts,
       @JsonProperty("data") ImmutableMap<String, LazyValue> data) {
-    this.ref = ref;
-    this.classRef = classRef;
+    super(ref, classRef, ts, data);
     this.database = database;
     this.role = role;
     this.secret = secret;
     this.hashedSecret = hashedSecret;
-    this.ts = ts;
-
-    if (data == null) {
-      this.data = ImmutableMap.of();
-    } else {
-      this.data = ImmutableMap.<String, Value>copyOf(data);
-    }
-  }
-
-  /**
-   * Returns the ref to this key.
-   */
-  public Ref ref() {
-    return ref;
   }
 
   /**
@@ -70,13 +47,6 @@ public final class Key {
    */
   public Ref database() {
     return database;
-  }
-
-  /**
-   * Returns the ref of the class of this key. In this case, {@code keys}.
-   */
-  public Ref classRef() {
-    return classRef;
   }
 
   /**
@@ -94,20 +64,6 @@ public final class Key {
   }
 
   /**
-   * Returns the timestamp of the key.
-   */
-  public Long ts() {
-    return ts;
-  }
-
-  /**
-   * Returns the data contained by the key.
-   */
-  public ImmutableMap<String, Value> data() {
-    return data;
-  }
-
-  /**
    * Returns the key's role.
    */
   public String role() {
@@ -117,14 +73,14 @@ public final class Key {
   @Override
   public String toString() {
     return "Key(" + Joiner.on(", ").join(
-      "ref: " + ref,
-      "class: " + classRef,
-      "database: " + database,
-      "role: " + role,
-      "secret: "+ secret,
-      "hashedSecret: " +hashedSecret,
-      "ts: " + ts,
-      "data: " + data
+      "ref: " + ref(),
+      "class: " + classRef(),
+      "database: " + database(),
+      "role: " + role(),
+      "secret: "+ secret(),
+      "hashedSecret: " +hashedSecret(),
+      "ts: " + ts(),
+      "data: " + data()
     ) + ")";
   }
 }
