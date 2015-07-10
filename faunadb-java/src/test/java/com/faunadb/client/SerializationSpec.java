@@ -50,9 +50,9 @@ public class SerializationSpec {
     Value ifForm = If(BooleanV.True, StringV("was true"), StringV("was false"));
     assertThat(json.writeValueAsString(ifForm), is("{\"if\":true,\"then\":\"was true\",\"else\":\"was false\"}"));
 
-    Value doForm = Do(ImmutableList.of(
+    Value doForm = Do(
       Create(Ref("some/ref/1"), Quote(ObjectV("data", ObjectV("name", StringV("Hen Wen"))))),
-      Get(Ref("some/ref/1"))));
+      Get(Ref("some/ref/1")));
     assertThat(json.writeValueAsString(doForm), is("{\"do\":[{\"create\":{\"@ref\":\"some/ref/1\"},\"params\":{\"quote\":{\"data\":{\"name\":\"Hen Wen\"}}}},{\"get\":{\"@ref\":\"some/ref/1\"}}]}"));
 
     Value select = Select(ImmutableList.of(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
@@ -60,7 +60,7 @@ public class SerializationSpec {
 
     assertThat(json.writeValueAsString(select), is("{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"quote\":{\"favorites\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}"));
 
-    Value quote = Quote(ObjectV("name", StringV("Hen Wen"), "Age", Add(ImmutableList.<Value>of(LongV(100), LongV(10)))));
+    Value quote = Quote(ObjectV("name", StringV("Hen Wen"), "Age", Add(LongV(100), LongV(10))));
     System.out.println(json.writeValueAsString(quote));
   }
 
@@ -86,27 +86,27 @@ public class SerializationSpec {
 
     assertThat(json.writeValueAsString(get), is("{\"get\":{\"@ref\":\"some/ref/1\"}}"));
 
-    Value paginate1 = Paginate(Union(ImmutableList.of(
+    Value paginate1 = Paginate(Union(
       Match(StringV("term"), Ref("indexes/some_index")),
-      Match(StringV("term2"), Ref("indexes/some_index"))))).build();
+      Match(StringV("term2"), Ref("indexes/some_index")))).build();
 
     assertThat(json.writeValueAsString(paginate1), is("{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]}}"));
 
-    Value paginate2 = Paginate(Union(ImmutableList.of(
+    Value paginate2 = Paginate(Union(
       Match(StringV("term"), Ref("indexes/some_index")),
-      Match(StringV("term2"), Ref("indexes/some_index"))))).withSources(true).build();
+      Match(StringV("term2"), Ref("indexes/some_index")))).withSources(true).build();
 
     assertThat(json.writeValueAsString(paginate2), is("{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"sources\":true}"));
 
-    Value paginate3 = Paginate(Union(ImmutableList.of(
+    Value paginate3 = Paginate(Union(
       Match(StringV("term"), Ref("indexes/some_index")),
-      Match(StringV("term2"), Ref("indexes/some_index"))))).withEvents(true).build();
+      Match(StringV("term2"), Ref("indexes/some_index")))).withEvents(true).build();
 
     assertThat(json.writeValueAsString(paginate3), is("{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"events\":true}"));
 
-    Value paginate4 = Paginate(Union(ImmutableList.of(
+    Value paginate4 = Paginate(Union(
       Match(StringV("term"), Ref("indexes/some_index")),
-      Match(StringV("term2"), Ref("indexes/some_index")))))
+      Match(StringV("term2"), Ref("indexes/some_index"))))
       .withCursor(Before(Ref("some/ref/1")))
       .withSize(4).build();
 
@@ -138,24 +138,24 @@ public class SerializationSpec {
     Value match = Match(StringV("fire"), Ref("indexes/spells_by_elements"));
     assertThat(json.writeValueAsString(match), is("{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_elements\"}}"));
 
-    Value union = Union(ImmutableList.of(
+    Value union = Union(
       Match(StringV("fire"), Ref("indexes/spells_by_element")),
       Match(StringV("water"), Ref("indexes/spells_by_element"))
-    ));
+    );
 
     assertThat(json.writeValueAsString(union), is("{\"union\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"));
 
-    Value intersection = Intersection(ImmutableList.of(
+    Value intersection = Intersection(
       Match(StringV("fire"), Ref("indexes/spells_by_element")),
       Match(StringV("water"), Ref("indexes/spells_by_element"))
-    ));
+    );
 
     assertThat(json.writeValueAsString(intersection), is("{\"intersection\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"));
 
-    Value difference = Difference(ImmutableList.of(
+    Value difference = Difference(
       Match(StringV("fire"), Ref("indexes/spells_by_element")),
       Match(StringV("water"), Ref("indexes/spells_by_element"))
-    ));
+    );
 
     assertThat(json.writeValueAsString(difference), is("{\"difference\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"));
 
