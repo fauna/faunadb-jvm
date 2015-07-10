@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.query.*;
-import com.faunadb.client.query.Set;
 import com.faunadb.client.types.Value.*;
 import com.faunadb.client.types.*;
 
@@ -45,23 +44,23 @@ public class SerializationSpec {
 
   @Test
   public void serializeBasicForms() throws JsonProcessingException {
-    Let letAndVar = Let(ImmutableMap.<String, Expression>of("x", LongV(1), "y", StringV("2")), Var("x"));
+    Value letAndVar = Let(ImmutableMap.<String, Value>of("x", LongV(1), "y", StringV("2")), Var("x"));
     assertThat(json.writeValueAsString(letAndVar), is("{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"));
 
-    If ifForm = If(BooleanV.True, StringV("was true"), StringV("was false"));
+    Value ifForm = If(BooleanV.True, StringV("was true"), StringV("was false"));
     assertThat(json.writeValueAsString(ifForm), is("{\"if\":true,\"then\":\"was true\",\"else\":\"was false\"}"));
 
-    Do doForm = Do(ImmutableList.of(
+    Value doForm = Do(ImmutableList.of(
       Create(Ref("some/ref/1"), Quote(ObjectV("data", ObjectV("name", StringV("Hen Wen"))))),
       Get(Ref("some/ref/1"))));
     assertThat(json.writeValueAsString(doForm), is("{\"do\":[{\"create\":{\"@ref\":\"some/ref/1\"},\"params\":{\"quote\":{\"data\":{\"name\":\"Hen Wen\"}}}},{\"get\":{\"@ref\":\"some/ref/1\"}}]}"));
 
-    Select select = Select(ImmutableList.of(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
+    Value select = Select(ImmutableList.of(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
       Quote(ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings"), StringV("lunchings"))))));
 
     assertThat(json.writeValueAsString(select), is("{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"quote\":{\"favorites\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}"));
 
-    Quote quote = Quote(ObjectV("name", StringV("Hen Wen"), "Age", Add(ImmutableList.<Expression>of(LongV(100), LongV(10)))));
+    Value quote = Quote(ObjectV("name", StringV("Hen Wen"), "Age", Add(ImmutableList.<Value>of(LongV(100), LongV(10)))));
     System.out.println(json.writeValueAsString(quote));
   }
 
@@ -73,96 +72,96 @@ public class SerializationSpec {
 
   @Test
   public void serializeCollections() throws JsonProcessingException {
-    Map map = Map(Lambda("munchings", Var("munchings")), ArrayV(LongV(1), LongV(2), LongV(3)));
+    Value map = Map(Lambda("munchings", Var("munchings")), ArrayV(LongV(1), LongV(2), LongV(3)));
     assertEquals(json.writeValueAsString(map), "{\"map\":{\"lambda\":\"munchings\",\"expr\":{\"var\":\"munchings\"}},\"collection\":[1,2,3]}");
 
-    Foreach foreach = Foreach(Lambda("creature", Create(Ref("some/ref"), Object(ObjectV("data", Object(ObjectV("some", Var("creature"))))))), ArrayV(Ref("another/ref/1"), Ref("another/ref/2")));
+    Value foreach = Foreach(Lambda("creature", Create(Ref("some/ref"), Object(ObjectV("data", Object(ObjectV("some", Var("creature"))))))), ArrayV(Ref("another/ref/1"), Ref("another/ref/2")));
     assertEquals(json.writeValueAsString(foreach), "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":\"another/ref/1\"},{\"@ref\":\"another/ref/2\"}]}");
   }
 
   @Test
   public void serializeResourceRetrieval() throws JsonProcessingException {
     Ref ref = Ref("some/ref/1");
-    Get get = Get(ref);
+    Value get = Get(ref);
 
     assertThat(json.writeValueAsString(get), is("{\"get\":{\"@ref\":\"some/ref/1\"}}"));
 
-    Paginate paginate1 = Paginate(Union(ImmutableList.<Set>of(
+    Value paginate1 = Paginate(Union(ImmutableList.of(
       Match(StringV("term"), Ref("indexes/some_index")),
-      Match(StringV("term2"), Ref("indexes/some_index")))));
+      Match(StringV("term2"), Ref("indexes/some_index"))))).build();
 
-    assertThat(json.writeValueAsString(paginate1), is("{\"paginate\":{\"union\":[{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term\"},{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term2\"}]}}"));
+    assertThat(json.writeValueAsString(paginate1), is("{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]}}"));
 
-    Paginate paginate2 = Paginate(Union(ImmutableList.<Set>of(
+    Value paginate2 = Paginate(Union(ImmutableList.of(
       Match(StringV("term"), Ref("indexes/some_index")),
-      Match(StringV("term2"), Ref("indexes/some_index"))))).withSources(true);
+      Match(StringV("term2"), Ref("indexes/some_index"))))).withSources(true).build();
 
-    assertThat(json.writeValueAsString(paginate2), is("{\"paginate\":{\"union\":[{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term\"},{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term2\"}]},\"sources\":true}"));
+    assertThat(json.writeValueAsString(paginate2), is("{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"sources\":true}"));
 
-    Paginate paginate3 = Paginate(Union(ImmutableList.<Set>of(
+    Value paginate3 = Paginate(Union(ImmutableList.of(
       Match(StringV("term"), Ref("indexes/some_index")),
-      Match(StringV("term2"), Ref("indexes/some_index"))))).withEvents(true);
+      Match(StringV("term2"), Ref("indexes/some_index"))))).withEvents(true).build();
 
-    assertThat(json.writeValueAsString(paginate3), is("{\"paginate\":{\"union\":[{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term\"},{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term2\"}]},\"events\":true}"));
+    assertThat(json.writeValueAsString(paginate3), is("{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"events\":true}"));
 
-    Paginate paginate4 = Paginate(Union(ImmutableList.<Set>of(
+    Value paginate4 = Paginate(Union(ImmutableList.of(
       Match(StringV("term"), Ref("indexes/some_index")),
       Match(StringV("term2"), Ref("indexes/some_index")))))
       .withCursor(Before(Ref("some/ref/1")))
-      .withSize(4);
+      .withSize(4).build();
 
-    assertThat(json.writeValueAsString(paginate4), is("{\"paginate\":{\"union\":[{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term\"},{\"index\":{\"@ref\":\"indexes/some_index\"},\"match\":\"term2\"}]},\"before\":{\"@ref\":\"some/ref/1\"},\"size\":4}"));
+    assertThat(json.writeValueAsString(paginate4), is("{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"before\":{\"@ref\":\"some/ref/1\"},\"size\":4}"));
 
-    Count count = Count(Match(StringV("fire"), Ref("indexes/spells_by_element")));
-    assertThat(json.writeValueAsString(count), is("{\"count\":{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"}}"));
+    Value count = Count(Match(StringV("fire"), Ref("indexes/spells_by_element")));
+    assertThat(json.writeValueAsString(count), is("{\"count\":{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}}"));
   }
 
   @Test
   public void serializeResourceModification() throws JsonProcessingException {
     Ref ref = Ref("classes/spells");
     ObjectV params = ObjectV("name", StringV("Mountainous Thunder"), "element", StringV("air"), "cost", LongV(15));
-    Create create = Create(ref, Quote(ObjectV("data", params)));
+    Value create = Create(ref, Quote(ObjectV("data", params)));
     assertThat(json.writeValueAsString(create), is("{\"create\":{\"@ref\":\"classes/spells\"},\"params\":{\"quote\":{\"data\":{\"name\":\"Mountainous Thunder\",\"element\":\"air\",\"cost\":15}}}}"));
 
-    Update update = Update(Ref("classes/spells/123456"), Quote(ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "cost", NullV.Null))));
+    Value update = Update(Ref("classes/spells/123456"), Quote(ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "cost", NullV.Null))));
     assertThat(json.writeValueAsString(update), is("{\"update\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"quote\":{\"data\":{\"name\":\"Mountain's Thunder\",\"cost\":null}}}}"));
 
-    Replace replace = Replace(Ref("classes/spells/123456"), Quote(ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "element", ArrayV(StringV("air"), StringV("earth")), "cost", LongV(10)))));
+    Value replace = Replace(Ref("classes/spells/123456"), Quote(ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "element", ArrayV(StringV("air"), StringV("earth")), "cost", LongV(10)))));
     assertThat(json.writeValueAsString(replace), is("{\"replace\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"quote\":{\"data\":{\"name\":\"Mountain's Thunder\",\"element\":[\"air\",\"earth\"],\"cost\":10}}}}"));
 
-    Delete delete = Delete(Ref("classes/spells/123456"));
+    Value delete = Delete(Ref("classes/spells/123456"));
     assertThat(json.writeValueAsString(delete), is("{\"delete\":{\"@ref\":\"classes/spells/123456\"}}"));
   }
 
   @Test
   public void serializeSets() throws JsonProcessingException {
-    Match match = Match(StringV("fire"), Ref("indexes/spells_by_elements"));
-    assertThat(json.writeValueAsString(match), is("{\"index\":{\"@ref\":\"indexes/spells_by_elements\"},\"match\":\"fire\"}"));
+    Value match = Match(StringV("fire"), Ref("indexes/spells_by_elements"));
+    assertThat(json.writeValueAsString(match), is("{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_elements\"}}"));
 
-    Union union = Union(ImmutableList.<Set>of(
+    Value union = Union(ImmutableList.of(
       Match(StringV("fire"), Ref("indexes/spells_by_element")),
       Match(StringV("water"), Ref("indexes/spells_by_element"))
     ));
 
-    assertThat(json.writeValueAsString(union), is("{\"union\":[{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"},{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"water\"}]}"));
+    assertThat(json.writeValueAsString(union), is("{\"union\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"));
 
-    Intersection intersection = Intersection(ImmutableList.<Set>of(
+    Value intersection = Intersection(ImmutableList.of(
       Match(StringV("fire"), Ref("indexes/spells_by_element")),
       Match(StringV("water"), Ref("indexes/spells_by_element"))
     ));
 
-    assertThat(json.writeValueAsString(intersection), is("{\"intersection\":[{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"},{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"water\"}]}"));
+    assertThat(json.writeValueAsString(intersection), is("{\"intersection\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"));
 
-    Difference difference = Difference(ImmutableList.<Set>of(
+    Value difference = Difference(ImmutableList.of(
       Match(StringV("fire"), Ref("indexes/spells_by_element")),
       Match(StringV("water"), Ref("indexes/spells_by_element"))
     ));
 
-    assertThat(json.writeValueAsString(difference), is("{\"difference\":[{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"},{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"water\"}]}"));
+    assertThat(json.writeValueAsString(difference), is("{\"difference\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"));
 
-    Join join = Join(Match(StringV("fire"), Ref("indexes/spells_by_element")),
+    Value join = Join(Match(StringV("fire"), Ref("indexes/spells_by_element")),
       Lambda("spell", Get(Var("spell"))));
 
-    assertThat(json.writeValueAsString(join), is("{\"join\":{\"index\":{\"@ref\":\"indexes/spells_by_element\"},\"match\":\"fire\"},\"with\":{\"lambda\":\"spell\",\"expr\":{\"get\":{\"var\":\"spell\"}}}}"));
+    assertThat(json.writeValueAsString(join), is("{\"join\":{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},\"with\":{\"lambda\":\"spell\",\"expr\":{\"get\":{\"var\":\"spell\"}}}}"));
   }
 }

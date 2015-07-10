@@ -1,6 +1,7 @@
 package com.faunadb.client.query;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.faunadb.client.types.Value;
 
 /**
  * The base type for FaunaDB path expressions. This is uesd to reference a path in a FaunaDB expression tree.
@@ -14,6 +15,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public abstract class Path {
   Path() { }
+
+  public abstract Value value();
 
   /**
    * Helper function to construct an {@link Object} path.
@@ -41,6 +44,10 @@ public abstract class Path {
     @JsonValue
     public String field() {
       return field;
+    }
+
+    public Value value() {
+      return Value.StringV.create(field);
     }
   }
 
@@ -70,6 +77,10 @@ public abstract class Path {
     @JsonValue
     public int field() {
       return field;
+    }
+
+    public Value value() {
+      return Value.LongV.create(field);
     }
   }
 }

@@ -136,8 +136,8 @@ public class ClientSpec {
 
     Ref classRef = Ref("classes/spells");
 
-    Create expr1 = Create(classRef, Quote(ObjectV("data", ObjectV("queryTest1", StringV(randomText1)))));
-    Create expr2 = Create(classRef, Quote(ObjectV("data", ObjectV("queryTest1", StringV(randomText2)))));
+    Value expr1 = Create(classRef, Quote(ObjectV("data", ObjectV("queryTest1", StringV(randomText1)))));
+    Value expr2 = Create(classRef, Quote(ObjectV("data", ObjectV("queryTest1", StringV(randomText2)))));
 
     ListenableFuture<ImmutableList<Value>> createFuture = client.query(ImmutableList.of(expr1, expr2));
     ImmutableList<Value> results = createFuture.get();
@@ -192,12 +192,12 @@ public class ClientSpec {
     Instance create2 = createFuture2.get().asInstance();
     Instance create3 = createFuture3.get().asInstance();
 
-    ListenableFuture<Value> queryF1 = client.query(Paginate(Match(StringV(randomText1), testIndex)));
+    ListenableFuture<Value> queryF1 = client.query(Paginate(Match(StringV(randomText1), testIndex)).build());
     Page page1 = queryF1.get().asPage();
     assertThat(page1.data().size(), is(1));
     assertThat(page1.data().get(0).asRef(), is(create1.ref()));
 
-    ListenableFuture<Value> queryF2 = client.query(Paginate(Match.create(classRef, randomClassIndex)));
+    ListenableFuture<Value> queryF2 = client.query(Paginate(Match(classRef, randomClassIndex)).build());
     Page page = queryF2.get().asPage();
 
     ImmutableList.Builder<Ref> refsBuilder = ImmutableList.builder();
@@ -212,14 +212,14 @@ public class ClientSpec {
     Value countNode = countF1.get();
     assertThat(countNode.asLong(), is(3L));
 
-    ListenableFuture<Value> queryF3 = client.query(Paginate(Match(classRef, randomClassIndex)).withSize(1));
+    ListenableFuture<Value> queryF3 = client.query(Paginate(Match(classRef, randomClassIndex)).withSize(1).build());
     Page resp1 = queryF3.get().asPage();
 
     assertThat(resp1.data().size(), is(1));
     assertThat(resp1.after(), not(Optional.<Value>absent()));
     assertThat(resp1.before(), is(Optional.<Value>absent()));
 
-    ListenableFuture<Value> queryF4 = client.query(Paginate(Match(classRef, randomClassIndex)).withSize(1).withCursor(After(resp1.after().get().asRef())));
+    ListenableFuture<Value> queryF4 = client.query(Paginate(Match(classRef, randomClassIndex)).withSize(1).withCursor(After(resp1.after().get().asRef())).build());
     Page resp2 = queryF4.get().asPage();
 
     assertThat(resp2.data().size(), is(1));
@@ -262,7 +262,7 @@ public class ClientSpec {
 
   @Test
   public void testBasicForms() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<Value> letF = client.query(Let(ImmutableMap.<String, Expression>of("x", LongV(1), "y", LongV(2)), Var("x")));
+    ListenableFuture<Value> letF = client.query(Let(ImmutableMap.<String, Value>of("x", LongV(1), "y", LongV(2)), Var("x")));
     Value let = letF.get();
     assertThat(let.asLong(), is(1L));
 
@@ -290,7 +290,7 @@ public class ClientSpec {
 
   @Test
   public void testCollections() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<Value> mapF = client.query(Map(Lambda("munchings", Add(ImmutableList.<Expression>of(Var("munchings"), LongV(1)))), ArrayV(LongV(1), LongV(2), LongV(3))));
+    ListenableFuture<Value> mapF = client.query(Map(Lambda("munchings", Add(ImmutableList.of(Var("munchings"), LongV(1)))), ArrayV(LongV(1), LongV(2), LongV(3))));
     Value mapNode = mapF.get();
     ImmutableList<Value> mapArray = mapNode.asArray();
     assertThat(mapArray.size(), is(3));
@@ -365,7 +365,7 @@ public class ClientSpec {
     Instance createSpellbookSpell1R = createSpellbookSpell1F.get().asInstance();
     Instance createSpellbookSpell2R = createSpellbookSpell2F.get().asInstance();
 
-    ListenableFuture<Value> matchF = client.query(Paginate(Match(StringV("arcane"), Ref("indexes/spells_by_element"))));
+    ListenableFuture<Value> matchF = client.query(Paginate(Match(StringV("arcane"), Ref("indexes/spells_by_element"))).build());
     Value matchResponse = matchF.get();
     Page matchList = matchResponse.asPage();
     assertThat(matchList.data().size(), greaterThanOrEqualTo(1));
@@ -375,7 +375,7 @@ public class ClientSpec {
     }
     assertThat(matchRefsBuilder.build(), hasItem(createInstance1.ref()));
 
-    ListenableFuture<Value> matchEventsF = client.query(Paginate(Match(StringV("arcane"), Ref("indexes/spells_by_element"))).withEvents(true));
+    ListenableFuture<Value> matchEventsF = client.query(Paginate(Match(StringV("arcane"), Ref("indexes/spells_by_element"))).withEvents(true).build());
     Value matchEventsResponse = matchEventsF.get();
     Page matchEventsPage = matchEventsResponse.asPage();
     assertThat(matchEventsPage.data().size(), greaterThanOrEqualTo(1));
@@ -388,7 +388,7 @@ public class ClientSpec {
     }
     assertThat(matchRefEventsBuilder.build(), hasItem(createInstance1.ref()));
 
-    ListenableFuture<Value> unionF = client.query(Paginate(Union(ImmutableList.<Set>of(Match(StringV("arcane"), Ref("indexes/spells_by_element")), Match(StringV("fire"), Ref("indexes/spells_by_element"))))));
+    ListenableFuture<Value> unionF = client.query(Paginate(Union(ImmutableList.of(Match(StringV("arcane"), Ref("indexes/spells_by_element")), Match(StringV("fire"), Ref("indexes/spells_by_element"))))).build());
     Value unionResponse = unionF.get();
     Page unionPage = unionResponse.asPage();
     assertThat(unionPage.data().size(), greaterThanOrEqualTo(2));
@@ -398,7 +398,7 @@ public class ClientSpec {
     }
     assertThat(unionRefsBuilder.build(), hasItems(createInstance1.ref(), createInstance2.ref()));
 
-    ListenableFuture<Value> unionEventsF = client.query(Paginate(Union(ImmutableList.<Set>of(Match(StringV("arcane"), Ref("indexes/spells_by_element")), Match(StringV("fire"), Ref("indexes/spells_by_element"))))).withEvents(true));
+    ListenableFuture<Value> unionEventsF = client.query(Paginate(Union(ImmutableList.of(Match(StringV("arcane"), Ref("indexes/spells_by_element")), Match(StringV("fire"), Ref("indexes/spells_by_element"))))).withEvents(true).build());
     Value unionEventsResponse = unionEventsF.get();
     Page unionEventsPage = unionEventsResponse.asPage();
     assertThat(unionEventsPage.data().size(), greaterThanOrEqualTo(2));
@@ -411,7 +411,7 @@ public class ClientSpec {
     }
     assertThat(unionEventsRefsBuilder.build(), hasItems(createInstance1.ref(), createInstance2.ref()));
 
-    ListenableFuture<Value> intersectionF = client.query(Paginate(Intersection(ImmutableList.<Set>of(Match(StringV("arcane"), Ref("indexes/spells_by_element")), Match(StringV("nature"), Ref("indexes/spells_by_element"))))));
+    ListenableFuture<Value> intersectionF = client.query(Paginate(Intersection(ImmutableList.of(Match(StringV("arcane"), Ref("indexes/spells_by_element")), Match(StringV("nature"), Ref("indexes/spells_by_element"))))).build());
     Value intersectionResponse = intersectionF.get();
     Page intersectionPage = intersectionResponse.asPage();
     assertThat(intersectionPage.data().size(), greaterThanOrEqualTo(1));
@@ -421,7 +421,7 @@ public class ClientSpec {
     }
     assertThat(intersectionRefsBuilder.build(), hasItem(createInstance3.ref()));
 
-    ListenableFuture<Value> differenceF = client.query(Paginate(Difference(ImmutableList.<Set>of(Match(StringV("nature"), Ref("indexes/spells_by_element")), Match(StringV("arcane"), Ref("indexes/spells_by_element"))))));
+    ListenableFuture<Value> differenceF = client.query(Paginate(Difference(ImmutableList.of(Match(StringV("nature"), Ref("indexes/spells_by_element")), Match(StringV("arcane"), Ref("indexes/spells_by_element"))))).build());
     Value differenceResponse = differenceF.get();
     Page differencePage = differenceResponse.asPage();
     assertThat(differencePage.data().size(), greaterThanOrEqualTo(1));
@@ -432,7 +432,7 @@ public class ClientSpec {
     assertThat(differenceRefsBuilder.build(), hasItem(createInstance4.ref()));
     assertThat(differenceRefsBuilder.build(), not(hasItem(createInstance3.ref())));
 
-    ListenableFuture<Value> joinF = client.query(Paginate(Join(Match(createCharR.ref(), Ref("indexes/spellbooks_by_owner")), Lambda("spellbook", Match(Var("spellbook"), Ref("indexes/spells_by_spellbook"))))));
+    ListenableFuture<Value> joinF = client.query(Paginate(Join(Match(createCharR.ref(), Ref("indexes/spellbooks_by_owner")), Lambda("spellbook", Match(Var("spellbook"), Ref("indexes/spells_by_spellbook"))))).build());
     Page joinR = joinF.get().asPage();
 
     assertThat(joinR.data().size(), is(2));
@@ -445,11 +445,11 @@ public class ClientSpec {
 
   @Test
   public void testMiscFunctions() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<Value> equalsF = client.query(Equals(ImmutableList.<Expression>of(StringV("fire"), StringV("fire"))));
+    ListenableFuture<Value> equalsF = client.query(Equals(ImmutableList.<Value>of(StringV("fire"), StringV("fire"))));
     Value equalsR = equalsF.get();
     assertThat(equalsR.asBoolean(), is(true));
 
-    ListenableFuture<Value> concatF = client.query(Concat(ImmutableList.<Expression>of(StringV("Magic"), StringV("Missile"))));
+    ListenableFuture<Value> concatF = client.query(Concat(ImmutableList.<Value>of(StringV("Magic"), StringV("Missile"))));
     Value concatR = concatF.get();
     assertThat(concatR.asString(), is("MagicMissile"));
 
@@ -462,22 +462,20 @@ public class ClientSpec {
     Value selectNode = selectF.get();
     assertThat(selectNode.asString(), is("munchings"));
 
-    ListenableFuture<Value> addF = client.query(Add(ImmutableList.<Expression>of(LongV(100), LongV(10))));
+    ListenableFuture<Value> addF = client.query(Add(ImmutableList.<Value>of(LongV(100), LongV(10))));
     Value addR = addF.get();
     assertThat(addR.asLong(), is(110L));
 
-    ListenableFuture<Value> multiplyF = client.query(Multiply(ImmutableList.<Expression>of(LongV(100), LongV(10))));
+    ListenableFuture<Value> multiplyF = client.query(Multiply(ImmutableList.<Value>of(LongV(100), LongV(10))));
     Value multiplyR = multiplyF.get();
     assertThat(multiplyR.asLong(), is(1000L));
 
-    ListenableFuture<Value> subtractF = client.query(Subtract(ImmutableList.<Expression>of(LongV(100), LongV(10))));
+    ListenableFuture<Value> subtractF = client.query(Subtract(ImmutableList.<Value>of(LongV(100), LongV(10))));
     Value subtractR = subtractF.get();
     assertThat(subtractR.asLong(), is(90L));
 
-    ListenableFuture<Value> divideF = client.query(Divide(ImmutableList.<Expression>of(LongV(100), LongV(10))));
+    ListenableFuture<Value> divideF = client.query(Divide(ImmutableList.<Value>of(LongV(100), LongV(10))));
     Value divideR = divideF.get();
     assertThat(divideR.asLong(), is(100L));
   }
 }
-
-

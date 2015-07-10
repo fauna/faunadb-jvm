@@ -2,7 +2,6 @@ package com.faunadb.client.types;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.node.NullNode;
-import com.faunadb.client.query.Expression;
 import com.faunadb.client.query.Language;
 import com.faunadb.client.response.*;
 import com.faunadb.client.response.Class;
@@ -39,7 +38,7 @@ import com.google.common.collect.ImmutableMap;
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Value Types</a></p>
  */
-public interface Value extends Expression {
+public interface Value {
   /**
    * Coerces this node into a {@link String}.
    * @return the string value of this node, or null.
