@@ -9,10 +9,10 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * An immutable value-type representation of a FaunaDB Key response. This, like other response types,
- * is obtained by coercing a {@link LazyValue} using its associated conversion method.
+ * A FaunaDB Key response. This, like other response types, is obtained by coercing a {@link LazyValue} using
+ * its associated conversion method.
  *
- * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#guide-resource_types-keys">FaunaDB Resource Types</a></p>
+ * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#objects-keys">FaunaDB Key Object</a></p>
  *
  * @see LazyValue#asKey()
  */

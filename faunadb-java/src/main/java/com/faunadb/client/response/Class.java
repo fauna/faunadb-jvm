@@ -8,10 +8,10 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * An immutable value-type representation of a FaunaDB Class response. This, like other response
- * types, is created by coercing a {@link LazyValue} using one of the conversion methods.
+ * A FaunaDB Class response. This, like other response types, is created by coercing a {@link LazyValue} using
+ * one of the conversion methods.
  *
- * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#guide-resource_types-classes">FaunaDB Resource Types</a></p>
+ * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#objects-classes">FaunaDB Class Object</a></p>
  *
  * @see LazyValue#asClass()
  */

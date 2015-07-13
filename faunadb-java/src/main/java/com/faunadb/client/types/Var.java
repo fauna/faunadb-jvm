@@ -3,11 +3,13 @@ package com.faunadb.client.types;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * An immutable representation of a FaunaDB variable identifier. Create an instance using the {@link Var#create} method.
+ * An FaunaDB variable identifier. Create an instance using the {@link Var#create} method.
  *
  * <p><i>Example</i>: {@code { "var": "variable_name" }}.</p>
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-basic_forms">FaunaDB Basic Forms</a>
+ *
+ * @see com.faunadb.client.query.Language#Var(String)
  */
 public class Var extends Value.ConcreteValue {
   /**

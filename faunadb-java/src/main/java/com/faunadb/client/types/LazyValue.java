@@ -10,6 +10,10 @@ import com.faunadb.client.response.Class;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+/**
+ * A {@link Value} that wraps a JSON response tree. This Value does not convert to a concrete type until one of its
+ * type coercion methods is called.
+ */
 @JsonDeserialize(using=Codec.LazyValueDeserializer.class)
 public final class LazyValue implements Value {
   public static LazyValue create(JsonNode underlying, ObjectMapper json) {

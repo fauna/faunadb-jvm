@@ -9,11 +9,10 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * An immutable value-type representation of a FaunaDB Instance response. This, like other
- * response types, is created by coercing a {@link LazyValue} using its associated conversion
- * method.
+ * A FaunaDB Instance response. This, like other response types, is created by coercing
+ * a {@link LazyValue} using its associated conversion method.
  *
- * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#guide-resource_types-instances">FaunaDB Resource Types</a></p>
+ * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#objects">FaunaDB Objects</a></p>
  *
  * @see LazyValue#asInstance()
  */

@@ -31,7 +31,7 @@ public abstract class Path {
   }
 
   /**
-   * An immutable representation of a path into a dictionary.
+   * A path into a dictionary. Wraps a field name.
    */
   public static final class Object extends Path {
     public static Object create(String field) {
@@ -64,7 +64,7 @@ public abstract class Path {
   }
 
   /**
-   * An immutable representation of a path into an array.
+   * A path into an array. Wraps an array index.
    */
   public static final class Array extends Path {
     public static Array create(int index) {

@@ -5,7 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * An immutable value-type representation of a FaunaDB set literal.
+ * A FaunaDB set literal.
+ *
+ * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values-special_types">FaunaDB Special Types</a></p>
+ *
  */
 public class Set {
   public static Set create(ImmutableMap<String, Value> parameters) {

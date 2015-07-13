@@ -22,6 +22,8 @@ import java.io.IOException;
  *
  * <p>This client is asynchronous, so all methods that perform latent operations return a {@link ListenableFuture}.</p>
  *
+ * <p>Queries are constructed by using the static helpers in the {@link com.faunadb.client.query.Language} package.</p>
+ *
  * <p><b>Example</b>:</p>
  * <pre>{@code
  * import static com.faunadb.client.query.Language.*;
@@ -30,7 +32,7 @@ import java.io.IOException;
  * }
  * </pre>
  *
- * @see com.faunadb.client.java.query.Language
+ * @see com.faunadb.client.query.Language
  */
 public class FaunaClient {
  /**
