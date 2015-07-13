@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import faunadb.errors._
-import faunadb.query.Value
-import faunadb.response.ResponseNode
+import faunadb.types.{Value, LazyValue}
 import faunadb.util.FutureImplicits._
 import com.faunadb.httpclient.Connection
 import com.ning.http.client.{Response => HttpResponse}
@@ -55,10 +54,10 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
    * Queries are modeled through the FaunaDB query language, represented by the case
    * classes in the [[com.faunadb.client.query]] package.
    *
-   * Responses are modeled as a general response tree. Each node is a [[response.ResponseNode]],
+   * Responses are modeled as a general response tree. Each node is a [[Value]],
    * and can be coerced into structured types through various methods on that class.
    */
-  def query(expr: Value)(implicit ec: ExecutionContext): Future[ResponseNode] = {
+  def query(expr: Value)(implicit ec: ExecutionContext): Future[Value] = {
     val body = json.createObjectNode()
     body.set("q", json.valueToTree(expr))
     connection.post("/", body).asScalaFuture.map { resp =>
@@ -66,7 +65,7 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
       handleQueryErrors(resp)
       val respBody = parseResponseBody(resp)
       val resource = respBody.get("resource")
-      json.treeToValue(resource, classOf[ResponseNode])
+      json.treeToValue(resource, classOf[LazyValue])
     }
   }
 
@@ -77,7 +76,7 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
    * The list of responses is returned in the same order as the issued queries.
    *
    */
-  def query(exprs: Iterable[Value])(implicit ec: ExecutionContext): Future[IndexedSeq[ResponseNode]] = {
+  def query(exprs: Iterable[Value])(implicit ec: ExecutionContext): Future[IndexedSeq[LazyValue]] = {
     val body = json.createObjectNode()
     body.set("q", json.valueToTree(exprs))
     connection.post("/", body).asScalaFuture.map { resp =>
@@ -85,7 +84,7 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
       handleQueryErrors(resp)
       val respBody = parseResponseBody(resp)
       respBody.get("resource").asInstanceOf[ArrayNode].asScala.map { node =>
-        json.treeToValue(node, classOf[ResponseNode])
+        json.treeToValue(node, classOf[LazyValue])
       }.toIndexedSeq
     }
   }

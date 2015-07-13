@@ -1,26 +1,26 @@
 package faunadb.response
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import faunadb.query.Ref
+import faunadb.types.{LazyValueMap, LazyValue, Ref}
 
 import scala.annotation.meta.{field, param}
 
 /**
  * A FaunaDB instance response.
  *
- * This, like other response types, is obtained  by coercing a [[ResponseNode]] using
- * the conversion methods [[ResponseNode.asInstance]] or [[ResponseNode.asInstanceOpt]].
+ * This, like other response types, is obtained  by coercing a [[LazyValue]] using
+ * the conversion methods [[LazyValue.asInstance]] or [[LazyValue.asInstanceOpt]].
  */
 case class Instance(@(JsonProperty)("ref") ref: Ref,
                     @(JsonProperty @field @param)("class") classRef: Ref,
                     @JsonProperty("ts") ts: Long,
-                    @JsonProperty("data") data: ResponseMap)
+                    @JsonProperty("data") data: LazyValueMap)
 
 /**
  * A FaunaDB key response.
  *
- * This, like other response types, is obtained by coercing a [[ResponseNode]] using
- * the conversion methods [[ResponseNode.asKey]] or [[ResponseNode.asKeyOpt]].
+ * This, like other response types, is obtained by coercing a [[LazyValue]] using
+ * the conversion methods [[LazyValue.asKey]] or [[LazyValue.asKeyOpt]].
  */
 case class Key(@JsonProperty("ref") ref: Ref,
                @(JsonProperty @field @param)("class") classRef: Ref,
@@ -29,13 +29,13 @@ case class Key(@JsonProperty("ref") ref: Ref,
                @JsonProperty("secret") secret: String,
                @(JsonProperty @field @param)("hashed_secret") hashedSecret: String,
                @JsonProperty("ts") ts: Long,
-               @JsonProperty("data") data: ResponseMap)
+               @JsonProperty("data") data: LazyValueMap)
 
 /**
  * A FaunaDB database response.
  *
- * This, like other response types, is obtained by coercing a [[ResponseNode]] using its associated conversion methods,
- * [[ResponseNode.asDatabase]] or [[ResponseNode.asDatabaseOpt]].
+ * This, like other response types, is obtained by coercing a [[LazyValue]] using its associated conversion methods,
+ * [[LazyValue.asDatabase]] or [[LazyValue.asDatabaseOpt]].
  */
 case class Database(@JsonProperty("ref") ref: Ref,
                     @(JsonProperty @field @param)("class") classRef: Ref,
@@ -45,8 +45,8 @@ case class Database(@JsonProperty("ref") ref: Ref,
 /**
  * A FaunaDB class response.
  *
- * This, like other response types, is obtained by coercing a [[ResponseNode]] using its associated conversion methods,
- * [[ResponseNode.asClass]] or [[ResponseNode.asClassOpt]].
+ * This, like other response types, is obtained by coercing a [[LazyValue]] using its associated conversion methods,
+ * [[LazyValue.asClass]] or [[LazyValue.asClassOpt]].
  */
 case class Class(@JsonProperty("ref") ref: Ref,
                  @(JsonProperty @field @param)("class") classRef: Ref,
@@ -57,8 +57,8 @@ case class Class(@JsonProperty("ref") ref: Ref,
 /**
  * A FaunaDB index response.
  *
- * This, like other response types, is obtained by coercing a [[ResponseNode]] using its associated conversion methods,
- * [[ResponseNode.asIndex]] or [[ResponseNode.asIndexOpt]]
+ * This, like other response types, is obtained by coercing a [[LazyValue]] using its associated conversion methods,
+ * [[LazyValue.asIndex]] or [[LazyValue.asIndexOpt]]
  */
 case class Index(@JsonProperty("ref") ref: Ref,
                  @(JsonProperty @field @param)("class") classRef: Ref,
@@ -73,4 +73,4 @@ case class Index(@JsonProperty("ref") ref: Ref,
 /**
  * A FaunaDB set literal.
  */
-case class Set(@JsonProperty("@set") parameters: ResponseMap)
+case class Set(@JsonProperty("@set") parameters: LazyValueMap)

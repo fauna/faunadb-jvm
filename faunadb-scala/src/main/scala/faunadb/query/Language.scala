@@ -1,9 +1,9 @@
 package faunadb.query
 
 import com.fasterxml.jackson.annotation._
-import com.fasterxml.jackson.databind.node.NullNode
+import faunadb.types._
 
-import scala.annotation.meta.{field, getter, param}
+import scala.annotation.meta.{field, getter}
 
 /**
  * Implicit conversions to FaunaDB value types.
@@ -327,46 +327,5 @@ case class ArrayPath(@(JsonValue @getter) index: Int) extends Path {
   def value = NumberV(index)
 }
 
-sealed trait Value
 
-/**
- * A Ref.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-values-special_types FaunaDB Special Types]]
- */
-case class Ref(@(JsonProperty @field @param)("@ref") value: String) extends Value {
-  def this(parent: Ref, child: String) = this(parent.value + "/" + child)
-}
-
-case class Var(@(JsonProperty @field)("var") variable: String) extends Value
-
-case class Event(@(JsonProperty @field)("resource") resource: Ref,
-                 @(JsonProperty @field)("action") action: String,
-                 @(JsonProperty @field)("ts") ts: Long) extends Value
-
-case object NullV extends Value {
-  @(JsonValue @getter) val value = NullNode.instance;
-}
-
-case class StringV(@(JsonValue @getter) value: String) extends Value
-case class NumberV(@(JsonValue @getter) value: Long) extends Value
-case class DoubleV(@(JsonValue @getter) value: Double) extends Value
-case class BooleanV(@(JsonValue @getter) value: Boolean) extends Value
-
-object ArrayV {
-  val empty = new ArrayV(Array[Value]())
-
-  def apply(items: Value*) = {
-    new ArrayV(Array(items: _*))
-  }
-}
-
-case class ArrayV(@(JsonValue @getter) values: scala.Array[Value]) extends Value
-
-object ObjectV {
-  val empty = new ObjectV(scala.collection.Map.empty[String, Value])
-  def apply(pairs: (String, Value)*) = new ObjectV(pairs.toMap)
-}
-
-case class ObjectV(@(JsonValue @getter) values: collection.Map[String, Value]) extends Value
 
