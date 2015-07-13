@@ -7,10 +7,10 @@ import com.faunadb.client.types.Ref;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * An immutable value-type representation of a FaunaDB Database response. This, like other
- * response types, is created by coercing a {@link LazyValue} using its associated conversion method.
+ * A FaunaDB Database response. This, like other response types, is created by coercing a {@link LazyValue}
+ * using its associated conversion method.
  *
- * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#guide-resource_types-databases">FaunaDB Resource Types</a></p>
+ * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#objects-databases">FaunaDB Database Object</a></p>
  *
  * @see LazyValue#asDatabase()
  */

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * An immutable representation of a FaunaDB ref type. Create an instance using the {@link Ref#create} method.
+ * A FaunaDB ref type. Create an instance using the {@link Ref#create} method.
  *
  * <p><i>Example</i>: <code>{ "@ref": "classes/spells/102462014988746752" }</code>
  *

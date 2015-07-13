@@ -7,10 +7,10 @@ import com.faunadb.client.types.Ref;
 import com.google.common.base.Joiner;
 
 /**
- * An immutable value-type representation of a FaunaDB event. This, like other response types,
- * is created by coercing a {@link LazyValue} using its associated conversion method.
+ * A FaunaDB event. This, like other response types, is created by coercing a {@link LazyValue} using its associated
+ * conversion method.
  *
- * <p><i>Reference</i>: TBD</p>
+ * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-values-events">FaunaDB Event Value</a></p>
  *
  * @see LazyValue#asEvent()
  */

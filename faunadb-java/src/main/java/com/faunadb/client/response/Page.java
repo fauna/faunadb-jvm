@@ -9,10 +9,10 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 /**
- * An immutable value-type representation of a FaunaDB Page response. This, like other response types,
- * is obtained by coercing a {@link Value} using its associated conversion method.
+ * A FaunaDB Page response. This, like other response types, is obtained by coercing a {@link Value} using its
+ * associated conversion method.
  *
- * <p><i>Reference</i>: TBD </p>
+ * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-values-pages">FaunaDB Page Value</a> </p>
  *
  * @see Value#asPage()
  */
