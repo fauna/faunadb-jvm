@@ -2,7 +2,7 @@ package faunadb
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import faunadb.response.ResponseNode
+import faunadb.types.LazyValue
 import org.scalatest.{Matchers, FlatSpec}
 
 class ResponseNodeSpec extends FlatSpec with Matchers {
@@ -10,7 +10,7 @@ class ResponseNodeSpec extends FlatSpec with Matchers {
 
   "Response Node coercion" should "return None for invalid types" in {
     val tree = json.createObjectNode().put("some", "string")
-    val node = new ResponseNode(tree, json)
+    val node = new LazyValue(tree, json)
     node("some").asString shouldBe "string"
 
     node("some").asBooleanOpt shouldBe None
@@ -29,12 +29,12 @@ class ResponseNodeSpec extends FlatSpec with Matchers {
     node("some").asSetOpt shouldBe None
 
     val tree2 = json.createObjectNode().set("some", json.createArrayNode().add("array"))
-    val node2 = new ResponseNode(tree2, json)
+    val node2 = new LazyValue(tree2, json)
     node2("some").asObjectOpt shouldBe None
     node2("some").asStringOpt shouldBe None
 
     val tree3 = json.createObjectNode().set("some", json.createObjectNode().put("object", "key"))
-    val node3 = new ResponseNode(tree3, json)
+    val node3 = new LazyValue(tree3, json)
     node3("some").asArrayOpt shouldBe None
     node3("some").asStringOpt shouldBe None
   }

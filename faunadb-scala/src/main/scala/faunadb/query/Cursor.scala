@@ -1,6 +1,7 @@
 package faunadb.query
 
 import com.fasterxml.jackson.annotation.JsonValue
+import faunadb.types.Value
 
 import scala.annotation.meta.field
 

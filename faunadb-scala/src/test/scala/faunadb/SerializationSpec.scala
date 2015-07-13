@@ -2,8 +2,9 @@ package faunadb
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import faunadb.query.Language._
 import faunadb.query._
+import faunadb.query.Language._
+import faunadb.types._
 import org.scalatest.{FlatSpec, Matchers}
 
 class SerializationSpec extends FlatSpec with Matchers {

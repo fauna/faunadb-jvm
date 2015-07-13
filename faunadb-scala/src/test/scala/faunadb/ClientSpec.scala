@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import faunadb.errors.{NotFoundException, BadRequestException}
 import faunadb.query.Language._
 import faunadb.query._
+import faunadb.types._
 import com.faunadb.httpclient.Connection
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.yaml.snakeyaml.Yaml
