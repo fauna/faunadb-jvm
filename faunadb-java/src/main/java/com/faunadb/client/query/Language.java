@@ -834,8 +834,6 @@ public final class Language {
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
-  public static Value Equals(ImmutableList<Value> terms) {
-    return ObjectV("equals", ArrayV(terms));
   }
 
   /**
