@@ -1,14 +1,9 @@
 package faunadb.query
 
-import java.lang.{Iterable => JIterable}
-
 import com.fasterxml.jackson.annotation._
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.node.NullNode
 
 import scala.annotation.meta.{field, getter, param}
-
-sealed trait Expression
 
 /**
  * Implicit conversions to FaunaDB value types.
@@ -31,213 +26,319 @@ object Language {
   implicit def pairToValuePair[T](p: (String, T))(implicit convert: T => Value) = {
     (p._1, convert(p._2))
   }
+
+  def Let(vars: collection.Map[String, Value], in: Value): Value = {
+    ObjectV("let" -> ObjectV(vars), "in" -> in)
+  }
+
+  /**
+   * A Do expression.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-basic_forms FaunaDB Basic Forms]]
+   */
+  def Do(exprs: Iterable[Value]): Value = {
+    ObjectV("do" -> ArrayV(exprs.toArray))
+  }
+
+  /**
+   * An If function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-basic_forms FaunaDB Basic Forms]]
+   */
+  def If(condition: Value, then: Value, `else`: Value): Value = {
+    ObjectV("if" -> condition, "then" -> then, "else" -> `else`)
+  }
+
+  /**
+   * A Quote function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-basic_forms FaunaDB Basic Forms]]
+   */
+  def Quote(quote: Value): Value = {
+    ObjectV("quote" -> quote)
+  }
+
+  /**
+   * A Select function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-basic_forms FaunaDB Basic Forms]]
+   */
+  def Select(path: Iterable[Path], from: Value): Value = {
+    ObjectV("select" -> ArrayV(path.map(_.value).toArray), "from" -> from)
+  }
+
+  /**
+   * A Lambda expression.
+   *
+   * '''Reference''': TBD
+   */
+  def Lambda(argument: String, expr: Value): Value = {
+    ObjectV("lambda" -> StringV(argument), "expr" -> expr)
+  }
+
+  /**
+   * A Map function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Collection Functions]]
+   */
+  def Map(lambda: Value, collection: Value): Value = {
+    ObjectV("map" -> lambda, "collection" -> collection)
+  }
+
+  /**
+   * A Foreach function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Collection Functions]]
+   */
+  def Foreach(lambda: Value, collection: Value): Value = {
+    ObjectV("foreach" -> lambda, "collection" -> collection)
+  }
+
+  /**
+   * A Match set.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
+   */
+  def Match(term: Value, index: Ref): Value = {
+    ObjectV("match" -> term, "index" -> index)
+  }
+
+  /**
+   * A Union set.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
+   */
+  def Union(sets: Iterable[Value]): Value = {
+    ObjectV("union" -> ArrayV(sets.toArray))
+  }
+
+  /**
+   * An Intersection set.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
+   */
+  def Intersection(sets: Iterable[Value]): Value = {
+    ObjectV("intersection" -> ArrayV(sets.toArray))
+  }
+
+  /**
+   * A Difference set.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
+   */
+  def Difference(sets: Iterable[Value]): Value = {
+    ObjectV("difference" -> ArrayV(sets.toArray))
+  }
+
+  /**
+   * A Join set.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
+   */
+  def Join(source: Value, target: Value): Value = {
+    ObjectV("join" -> source, "with" -> target)
+  }
+
+  /**
+   * A Get function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-reading-resources FaunaDB Resource Retrieval Functions]]
+   */
+  def Get(resource: Value): Value = {
+    ObjectV("get" -> resource)
+  }
+
+  /**
+   * A Paginate function.
+   *
+   * The paginate function takes optional parameters. These can either be specified by named parameters on the constructor:
+   *
+   * {{{
+   *   Paginate(resource, ts, sources=true, cursor=Some(cursor))
+   * }}}
+   *
+   * or through the `with` methods:
+   * {{{
+   *   val paginate = Paginate(resource, ts).withCursor(cursor).withSize(size)
+   * }}}
+   */
+  def Paginate(resource: Value,
+               ts: Option[Long] = None,
+               cursor: Option[Cursor] = None,
+               size: Option[Long] = None,
+               sources: Boolean = false,
+               events: Boolean = false): Value = {
+    val builder = collection.immutable.Map.newBuilder[String, Value]
+    builder += "paginate" -> resource
+
+    ts foreach { builder += "ts" -> _}
+    size foreach { builder += "size" -> _ }
+
+    cursor foreach { c =>
+      c match {
+        case b: Before =>
+          builder += "before" -> b.value
+        case a: After =>
+          builder += "after" -> a.value
+      }
+    }
+
+    if (events) {
+      builder += "events" -> events
+    }
+
+    if (sources) {
+      builder += "sources" -> sources
+    }
+
+    ObjectV(builder.result())
+  }
+
+  /**
+   * A Count function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-reading-resources FaunaDB Resource Retrieval Functions]]
+   */
+  def Count(set: Value): Value = {
+    ObjectV("count" -> set)
+  }
+
+  /**
+   * An Exists function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-read_functions FaunaDB Read Functions]]
+   */
+  def Exists(ref: Value): Value = {
+    ObjectV("exists" -> ref)
+  }
+
+  /**
+   * A Create function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
+   */
+  def Create(ref: Value, params: Value): Value = {
+    ObjectV("create" -> ref, "params" -> params)
+  }
+
+  /**
+   * A Replace function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
+   */
+  def Replace(ref: Value, params: Value): Value = {
+    ObjectV("replace" -> ref, "params" -> params)
+  }
+
+  /**
+   * An Update function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
+   */
+  def Update(ref: Value, params: Value): Value = {
+    ObjectV("update" -> ref, "params" -> params)
+  }
+
+  /**
+   * A Delete function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
+   */
+  def Delete(ref: Value): Value = {
+    ObjectV("delete" -> ref)
+  }
+
+  def Object(value: ObjectV) = {
+    ObjectV("object" -> value)
+  }
+
+  /**
+   * An Add function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+   */
+  def Add(terms: Iterable[Value]): Value = {
+    ObjectV("add" -> ArrayV(terms.toArray))
+  }
+
+  /**
+   * An Equals function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+   */
+  def Equals(terms: Iterable[Value]): Value = {
+    ObjectV("equals" -> ArrayV(terms.toArray))
+  }
+
+  /**
+   * A Concat function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+   */
+  def Concat(terms: Iterable[Value]): Value = {
+    ObjectV("concat" -> ArrayV(terms.toArray))
+  }
+
+  /**
+   * A Contains function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+   */
+  def Contains(path: Iterable[Path], in: Value): Value = {
+    ObjectV("contains" -> ArrayV(path.map(_.value).toArray), "in" -> in)
+  }
+
+  /**
+   * A Multiply function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+   */
+  def Multiply(terms: Iterable[Value]): Value = {
+    ObjectV("multiply" -> ArrayV(terms.toArray))
+  }
+
+  /**
+   * A Divide function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+   */
+  def Divide(terms: Iterable[Value]): Value = {
+    ObjectV("divide" -> ArrayV(terms.toArray))
+  }
+
+
+  /**
+   * A Subtract function.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+   */
+  def Subtract(terms: Iterable[Value]): Value = {
+    ObjectV("subtract" -> ArrayV(terms.toArray))
+  }
 }
 
-sealed trait Path
-case class ObjectPath(@(JsonValue @getter) field: String) extends Path
-case class ArrayPath(@(JsonValue @getter) index: Int) extends Path
-
-/**
- * A Let expression.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-basic_forms FaunaDB Basic Forms]]
- */
-case class Let(@(JsonProperty @field)("let") vars: collection.Map[String, Expression], in: Expression) extends Expression
-
-/**
- * A Do expression.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-basic_forms FaunaDB Basic Forms]]
- */
-case class Do(@(JsonProperty @field @getter)("do") expressions: Iterable[Expression]) extends Expression
-
-/**
- * An If function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-basic_forms FaunaDB Basic Forms]]
- */
-case class If(@(JsonProperty @field)("if") condition: Expression, then: Expression, `else`: Expression) extends Expression
-
-/**
- * A Quote function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-basic_forms FaunaDB Basic Forms]]
- */
-case class Quote(@(JsonProperty @field)("quote") quote: Expression) extends Value
-
-/**
- * A Select function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-basic_forms FaunaDB Basic Forms]]
- */
-case class Select(@(JsonProperty @field)("select") path: Iterable[Path], from: Value) extends Expression
-
-/**
- * A Lambda expression.
- *
- * '''Reference''': TBD
- */
-case class Lambda(@(JsonProperty @field)("lambda") argument: String, expr: Expression)
-
-/**
- * A Map function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Collection Functions]]
- */
-case class Map(@(JsonProperty @field)("map") lambda: Lambda, collection: Expression) extends Expression
-
-/**
- * A Foreach function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Collection Functions]]
- */
-case class Foreach(@(JsonProperty @field)("foreach") lambda: Lambda, collection: Expression) extends Expression
-
-sealed trait Set extends Expression
-
-/**
- * A Match set.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
- */
-case class Match(@(JsonProperty @field)("match") term: Value, @(JsonProperty @field) index: Ref) extends Set {
-  def this(term: String, index: Ref) = this(StringV(term), index)
+sealed trait Path {
+  def value: Value
+}
+case class ObjectPath(@(JsonValue @getter) field: String) extends Path {
+  def value = StringV(field)
+}
+case class ArrayPath(@(JsonValue @getter) index: Int) extends Path {
+  def value = NumberV(index)
 }
 
-/**
- * A Union set.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
- */
-case class Union(@(JsonProperty @field @getter)("union") sets: Iterable[Set]) extends Set
-
-/**
- * An Intersection set.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
- */
-case class Intersection(@(JsonProperty @field @getter)("intersection") sets: Iterable[Set]) extends Set
-
-/**
- * A Difference set.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
- */
-case class Difference(@(JsonProperty @field @getter)("difference") sets: Iterable[Set]) extends Set
-
-/**
- * A Join set.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
- */
-case class Join(@(JsonProperty @field)("join") source: Set, @(JsonProperty @field)("with") target: Lambda) extends Set
-
-/**
- * A Get function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-reading-resources FaunaDB Resource Retrieval Functions]]
- */
-case class Get(@(JsonProperty @field)("get") resource: Expression) extends Expression
-
-/**
- * A Paginate function.
- *
- * The paginate function takes optional parameters. These can either be specified by named parameters on the constructor:
- *
- * {{{
- *   Paginate(resource, ts, sources=true, cursor=Some(cursor))
- * }}}
- *
- * or through the `with` methods:
- * {{{
- *   val paginate = Paginate(resource, ts).withCursor(cursor).withSize(size)
- * }}}
- */
-@JsonSerialize(using = classOf[PaginateSerializer])
-case class Paginate(resource: Expression,
-                    ts: Option[Long] = None,
-                    cursor: Option[Cursor] = None,
-                    size: Option[Long] = None,
-                    sources: Boolean = false,
-                    events: Boolean = false) extends Expression {
-  /**
-   * Returns a copy of this with the optional timestamp parameter set.
-   */
-  def withCursor(cursor: Cursor) = copy(cursor = Some(cursor))
-
-  /**
-   * Returns a copy of this with the optional cursor parameter set.
-   */
-  def withSize(size: Long) = copy(size = Some(size))
-
-  /**
-   * Returns a copy of this with the optional sources parameter set.
-   */
-  def withSources(sources: Boolean) = copy(sources = sources)
-
-  /**
-   * Returns a copy of this with the optional events parameter set.
-   */
-  def withEvents(events: Boolean) = copy(events = events)
-}
-
-/**
- * A Count function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-reading-resources FaunaDB Resource Retrieval Functions]]
- */
-case class Count(@(JsonProperty @field)("count") set: Set) extends Expression
-
-/**
- * An Exists function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-read_functions FaunaDB Read Functions]]
- */
-case class Exists(@(JsonProperty @field)("exists") ref: Ref) extends Expression
-
-/**
- * A Create function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
- */
-case class Create(@(JsonProperty @field)("create") ref: Expression, @(JsonProperty @field)("params") params: Expression = ObjectV.empty) extends Expression
-
-/**
- * A Replace function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
- */
-case class Replace(@(JsonProperty @field)("replace") ref: Expression, @(JsonProperty @field)("params") params: Expression) extends Expression
-
-/**
- * An Update function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
- */
-case class Update(@(JsonProperty @field)("update") ref: Expression, @(JsonProperty @field)("params") params: Expression) extends Expression
-
-/**
- * A Delete function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
- */
-case class Delete(@(JsonProperty @field)("delete") ref: Expression) extends Expression
-
-
-sealed trait Value extends Expression
+sealed trait Value
 
 /**
  * A Ref.
  *
  * '''Reference''': [[https://faunadb.com/documentation#queries-values-special_types FaunaDB Special Types]]
  */
-case class Ref(@(JsonProperty @field @param)("@ref") value: String) extends Value with Expression {
+case class Ref(@(JsonProperty @field @param)("@ref") value: String) extends Value {
   def this(parent: Ref, child: String) = this(parent.value + "/" + child)
 }
 
-case class Var(@(JsonProperty @field)("var") variable: String) extends Value with Expression
-
-sealed trait Resource
+case class Var(@(JsonProperty @field)("var") variable: String) extends Value
 
 case class Event(@(JsonProperty @field)("resource") resource: Ref,
                  @(JsonProperty @field)("action") action: String,
@@ -269,53 +370,3 @@ object ObjectV {
 
 case class ObjectV(@(JsonValue @getter) values: collection.Map[String, Value]) extends Value
 
-case class Object(@(JsonProperty @field)("object") value: ObjectV) extends Value
-
-/**
- * An Add function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
- */
-case class Add(@(JsonProperty @field)("add") terms: Seq[Expression]) extends Value
-
-/**
- * An Equals function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
- */
-case class Equals(@(JsonProperty @field)("equals") terms: Seq[Expression]) extends Value
-
-/**
- * A Concat function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
- */
-case class Concat(@(JsonProperty @field)("concat") terms: Seq[Expression]) extends Value
-
-/**
- * A Contains function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
- */
-case class Contains(@(JsonProperty @field)("contains") path: Seq[Path], in: Expression) extends Value
-
-/**
- * A Multply function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
- */
-case class Multiply(@(JsonProperty @field)("multiply") terms: Seq[Expression]) extends Value
-
-/**
- * A Subtract function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
- */
-case class Subtract(@(JsonProperty @field)("subtract") terms: Seq[Expression]) extends Value
-
-/**
- * A Divide function.
- *
- * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
- */
-case class Divide(@(JsonProperty @field)("divide") terms: Seq[Expression]) extends Value
