@@ -74,18 +74,18 @@ public class FaunaClient {
   /**
    * Issues a Query to FaunaDB.
    *
-   * <p>Queries are modeled through the FaunaDB query language, represented by the classes in the
-   * {@link com.faunadb.client.java.query} package. See {@link com.faunadb.client.java.query.Language} for helpers
+   * <p>Queries are modeled through the FaunaDB query language, represented by the helper functions in the
+   * {@link com.faunadb.client.query} package. See {@link com.faunadb.client.query.Language} for helpers
    * and examples.
    *
-   * <p>Responses are modeled as a general response tree. Each node is a {@link LazyValue}, and
+   * <p>Responses are modeled as a general response tree. Each node is a {@link Value}, and
    * can be coerced to structured types through various methods on that class.
    *
    * @param expr The query expression to be sent to FaunaDB.
    * @return A {@link ListenableFuture} containing the root node of the Response tree.
    * @throws IOException if the query cannot be issued.
-   * @see LazyValue
-   * @see com.faunadb.client.java.query.Language
+   * @see Value
+   * @see com.faunadb.client.query.Language
    *
    */
   public ListenableFuture<Value> query(Value expr) throws IOException {
@@ -114,7 +114,7 @@ public class FaunaClient {
    * <p>These queries are sent to FaunaDB in a single request, and are evaluated. The list of response nodes is returned
    * in the same order as the issued queries.
    *
-   * See {@link FaunaClient#query(Expression)} for more information on the individual queries.
+   * See {@link FaunaClient#query(Value)} for more information on the individual queries.
    *
    * @param exprs the list of query expressions to be sent to FaunaDB.
    * @return a {@link ListenableFuture} containing an ordered list of root response nodes.
