@@ -7,7 +7,7 @@ import com.faunadb.client.types.Ref;
 import com.google.common.base.Joiner;
 
 /**
- * A FaunaDB event. This, like other response types, is created by coercing a {@link LazyValue} using its associated
+ * A FaunaDB event. This, like other response types, is created by coercing a {@link com.faunadb.client.types.Value} using its associated
  * conversion method.
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-values-events">FaunaDB Event Value</a></p>

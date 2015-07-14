@@ -5,7 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * A Builder for the FaunaDB Pagiunate function.
+ * A Builder for the FaunaDB Paginate function.
  *
  * <p>The paginate function takes optional parameters. These can be specified by the {@code withParameter} builder
  * style methods, each which returns a copy.</p>

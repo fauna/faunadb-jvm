@@ -9,7 +9,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * A FaunaDB Key response. This, like other response types, is obtained by coercing a {@link LazyValue} using
+ * A FaunaDB Key response. This, like other response types, is obtained by coercing a {@link Value} using
  * its associated conversion method.
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#objects-keys">FaunaDB Key Object</a></p>
