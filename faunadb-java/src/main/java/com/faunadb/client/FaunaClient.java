@@ -83,29 +83,32 @@ public class FaunaClient {
    *
    * @param expr The query expression to be sent to FaunaDB.
    * @return A {@link ListenableFuture} containing the root node of the Response tree.
-   * @throws IOException if the query cannot be issued.
    * @see Value
    * @see com.faunadb.client.query.Language
    *
    */
-  public ListenableFuture<Value> query(Value expr) throws IOException {
+  public ListenableFuture<Value> query(Value expr) {
     ObjectNode body = json.createObjectNode();
     body.set("q", json.valueToTree(expr));
-    return Futures.transform(connection.post("/", body), new Function<Response, Value>() {
-      @Override
-      public Value apply(Response response) {
-        try {
-          handleSimpleErrors(response);
-          handleQueryErrors(response);
+    try {
+      return Futures.transform(connection.post("/", body), new Function<Response, Value>() {
+        @Override
+        public Value apply(Response response) {
+          try {
+            handleSimpleErrors(response);
+            handleQueryErrors(response);
 
-          JsonNode responseBody = parseResponseBody(response);
-          JsonNode resource = responseBody.get("resource");
-          return json.treeToValue(resource, LazyValue.class);
-        } catch (IOException ex) {
-          throw new RuntimeException(ex);
+            JsonNode responseBody = parseResponseBody(response);
+            JsonNode resource = responseBody.get("resource");
+            return json.treeToValue(resource, LazyValue.class);
+          } catch (IOException ex) {
+            throw new RuntimeException(ex);
+          }
         }
-      }
-    });
+      });
+    } catch (IOException ex) {
+      return Futures.immediateFailedFuture(ex);
+    }
   }
 
   /**
@@ -118,31 +121,34 @@ public class FaunaClient {
    *
    * @param exprs the list of query expressions to be sent to FaunaDB.
    * @return a {@link ListenableFuture} containing an ordered list of root response nodes.
-   * @throws IOException if the query cannot be issued.
    */
-  public <T extends Value> ListenableFuture<ImmutableList<Value>> query(ImmutableList<T> exprs) throws IOException {
+  public <T extends Value> ListenableFuture<ImmutableList<Value>> query(ImmutableList<T> exprs) {
     ObjectNode body = json.createObjectNode();
     body.set("q", json.valueToTree(exprs));
-    return Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<Value>>() {
-      @Override
-      public ImmutableList<Value> apply(Response resp) {
-        try {
-          handleSimpleErrors(resp);
-          handleQueryErrors(resp);
-          JsonNode responseBody = parseResponseBody(resp);
-          ArrayNode resources = ((ArrayNode)responseBody.get("resource"));
-          ImmutableList.Builder<Value> responseNodeBuilder = ImmutableList.builder();
+    try {
+      return Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<Value>>() {
+        @Override
+        public ImmutableList<Value> apply(Response resp) {
+          try {
+            handleSimpleErrors(resp);
+            handleQueryErrors(resp);
+            JsonNode responseBody = parseResponseBody(resp);
+            ArrayNode resources = ((ArrayNode) responseBody.get("resource"));
+            ImmutableList.Builder<Value> responseNodeBuilder = ImmutableList.builder();
 
-          for (JsonNode resource : resources) {
-            responseNodeBuilder.add(json.treeToValue(resource, LazyValue.class));
+            for (JsonNode resource : resources) {
+              responseNodeBuilder.add(json.treeToValue(resource, LazyValue.class));
+            }
+
+            return responseNodeBuilder.build();
+          } catch (IOException ex) {
+            throw new RuntimeException(ex);
           }
-
-          return responseNodeBuilder.build();
-        } catch (IOException ex) {
-          throw new RuntimeException(ex);
         }
-      }
-    });
+      });
+    } catch (IOException ex) {
+      return Futures.immediateFailedFuture(ex);
+    }
   }
 
   private void handleSimpleErrors(Response response) throws IOException, FaunaException {
