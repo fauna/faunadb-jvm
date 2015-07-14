@@ -7,7 +7,7 @@ import com.faunadb.client.types.Ref;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * A FaunaDB Database response. This, like other response types, is created by coercing a {@link LazyValue}
+ * A FaunaDB Database response. This, like other response types, is created by coercing a {@link com.faunadb.client.types.Value}
  * using its associated conversion method.
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#objects-databases">FaunaDB Database Object</a></p>

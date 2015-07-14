@@ -8,7 +8,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * A FaunaDB Class response. This, like other response types, is created by coercing a {@link LazyValue} using
+ * A FaunaDB Class response. This, like other response types, is created by coercing a {@link com.faunadb.client.types.Value} using
  * one of the conversion methods.
  *
  * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#objects-classes">FaunaDB Class Object</a></p>

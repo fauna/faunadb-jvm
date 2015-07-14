@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * A FaunaDB Index response. This, like other response types, is created by coercing a {@link LazyValue}
+ * A FaunaDB Index response. This, like other response types, is created by coercing a {@link com.faunadb.client.types.Value}
  * using one of the conversion methods.
  *
  * <p><i>Reference:</i> <a href="https://faunadb.com/documentation#objects-indexes">FaunaDB Index Object</a></p>
