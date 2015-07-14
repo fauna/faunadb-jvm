@@ -25,14 +25,22 @@ public class FaunaException extends RuntimeException {
    * Gets the list of errors that caused the query to fail.
    */
   public ImmutableList<HttpResponses.QueryError> errors() {
-    return response.get().errors();
+    if (response.isPresent()) {
+      return response.get().errors();
+    } else {
+      return ImmutableList.of();
+    }
   }
 
   /**
    * Gets the HTTP status code of the underlying error response.
    */
   public int status() {
-    return response.get().status();
+    if (response.isPresent()) {
+      return response.get().status();
+    } else {
+      return 0;
+    }
   }
 
   private static String constructErrorMessage(ImmutableList<HttpResponses.QueryError> errors) {
