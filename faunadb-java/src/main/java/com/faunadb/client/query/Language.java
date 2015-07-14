@@ -191,18 +191,6 @@ public final class Language {
   }
 
   /**
-   * Creates a Ref with the child value scoped to the parent ref.
-   *
-   * <p><b>Example</b>: {@code Ref(Ref("some/ref"), "12345")) // some/ref/12345 }</p>
-   *
-   * @param parent The parent ref
-   * @param child The child to scope to the parent ref
-   */
-  public static Ref Ref(Ref parent, String child) {
-    return Ref.create(parent.value() + "/" + child);
-  }
-
-  /**
    * Creates a new String value.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
