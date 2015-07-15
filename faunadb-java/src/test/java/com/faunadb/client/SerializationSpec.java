@@ -68,6 +68,9 @@ public class SerializationSpec {
   public void serializeRefAndSet() throws JsonProcessingException {
     Ref ref = Ref("some/ref");
     assertEquals(json.writeValueAsString(ref), "{\"@ref\":\"some/ref\"}");
+
+    Ref ref2 = Ref(Ref("some/ref"), "12345");
+    assertEquals(json.writeValueAsString(ref2), "{\"@ref\":\"some/ref/12345\"}");
   }
 
   @Test
