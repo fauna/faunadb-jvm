@@ -1,6 +1,8 @@
 package com.faunadb.client.types;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.faunadb.client.query.Language;
 import com.faunadb.client.response.*;
@@ -223,6 +225,7 @@ public interface Value {
    *
    * @see Language#ObjectV
    */
+  @JsonDeserialize(using=Codec.ObjectDeserializer.class)
   final class ObjectV extends ConcreteValue {
     private final ImmutableMap<String, Value> values;
 
@@ -304,6 +307,11 @@ public interface Value {
     @Override
     public int hashCode() {
       return values.hashCode();
+    }
+
+    @Override
+    public String toString() {
+      return "ObjectV(" + values + ")";
     }
   }
 

@@ -38,4 +38,13 @@ class Codec {
       return new LazyValueMap(json.<ImmutableMap<String, Value>>convertValue(innerTree, t));
     }
   }
+
+  public static class ObjectDeserializer extends JsonDeserializer<Value.ObjectV> {
+    @Override
+    public Value.ObjectV deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+      ObjectMapper codec = (ObjectMapper) jsonParser.getCodec();
+      ImmutableMap<String, Value> m = codec.readValue(jsonParser, deserializationContext.getTypeFactory().constructMapLikeType(ImmutableMap.class, String.class, LazyValue.class));
+      return Value.ObjectV.create(m);
+    }
+  }
 }
