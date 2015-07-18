@@ -1,6 +1,7 @@
 package com.faunadb.client.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -22,6 +23,11 @@ public final class LazyValue implements Value {
 
   private final JsonNode underlying;
   private final ObjectMapper json;
+
+  @JsonValue
+  private JsonNode underlying() {
+    return underlying;
+  }
 
   @JsonCreator
   LazyValue(JsonNode underlying, ObjectMapper json) {
