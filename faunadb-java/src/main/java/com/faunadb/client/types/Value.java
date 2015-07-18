@@ -311,7 +311,7 @@ public interface Value {
 
     @Override
     public String toString() {
-      return "ObjectV(" + values + ")";
+      return "ObjectV(" + values() + ")";
     }
   }
 
@@ -548,6 +548,11 @@ public interface Value {
     public static final NullV Null = new NullV();
 
     NullV() { }
+
+    @Override
+    public String toString() {
+      return "null";
+    }
 
     @JsonValue
     public NullNode value() {

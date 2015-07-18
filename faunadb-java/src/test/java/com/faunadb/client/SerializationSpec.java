@@ -2,9 +2,7 @@ package com.faunadb.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.query.*;
 import com.faunadb.client.types.Value.*;
 import com.faunadb.client.types.*;
@@ -31,18 +29,6 @@ public class SerializationSpec {
     assertThat(json.writeValueAsString(DoubleV(1.234)), is("1.234"));
 
     assertThat(json.writeValueAsString(NullV.Null), is("null"));
-  }
-
-  @Test
-  public void convertObject() {
-    ObjectMapper json2 = json.copy();
-    json2.registerModule(new GuavaModule());
-    ImmutableMap<String, String> someObj = ImmutableMap.of("test", "value");
-    ObjectV result = json2.convertValue(someObj, ObjectV.class);
-    assertThat(result.get("test").asString(), is("value"));
-
-    JsonNode node = json.valueToTree(result);
-    assertThat(node.get("test").asText(), is("value"));
   }
 
   @Test
