@@ -22,6 +22,7 @@ lazy val httpclient = project.in(file("faunadb-httpclient"))
     autoScalaLibrary := false,
     compileOrder := CompileOrder.JavaThenScala,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
+    apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-httpclient/api/")),
     (javacOptions in doc) := Seq("-source", "1.7",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
       "-link", "http://docs.guava-libraries.googlecode.com/git-history/v18.0/javadoc/",
@@ -51,6 +52,7 @@ lazy val scala = project.in(file("faunadb-scala"))
       "org.scalatest" %% "scalatest" % "2.2.1" % "test"
     ),
     autoAPIMappings := true,
+    apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-scala/api/")),
     apiMappings ++= {
       val cp = (fullClasspath in Compile).value
       def findDep(org: String, name: String) = {
@@ -77,6 +79,7 @@ lazy val java = project.in(file("faunadb-java"))
     autoScalaLibrary := false,
     compileOrder := CompileOrder.JavaThenScala,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
+    apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-java/api/")),
     (javacOptions in doc) := Seq("-source", "1.7",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
       "-link", "http://docs.guava-libraries.googlecode.com/git-history/v18.0/javadoc/",
