@@ -2,15 +2,24 @@ val jacksonVersion = "2.5.1"
 val metricsVersion = "3.1.0"
 
 lazy val commonSettings = Seq(
-  version := "0.1-SNAPSHOT"
+  version := "0.1-SNAPSHOT",
+  publishMavenStyle := true,
+  licenses := Seq("Mozilla Public License" -> url("https://www.mozilla.org/en-US/MPL/2.0/")),
+  homepage := Some(url("https://github.com/faunadb/faunadb-jvm")),
+  pomExtra := (
+    <scm>
+      <url>git@github.com:faunadb/faunadb-jvm.git</url>
+      <connection>scm:git:git@github.com:faunadb/faunadb-jvm.git</connection>
+    </scm>
+  )
 )
-
-
 
 lazy val root = (project in file("."))
   .settings(commonSettings: _*)
   .settings(
-    name := "faunadb-jvm"
+    name := "faunadb-jvm-parent",
+    crossPaths := false,
+    autoScalaLibrary := false
    ).aggregate(httpclient, scala, java)
 
 
