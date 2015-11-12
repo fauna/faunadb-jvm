@@ -475,6 +475,6 @@ public class ClientSpec {
 
     ListenableFuture<Value> divideF = client.query(Divide(LongV(100), LongV(10)));
     Value divideR = divideF.get();
-    assertThat(divideR.asLong(), is(100L));
+    assertThat(divideR.asLong(), is(10L));
   }
 }

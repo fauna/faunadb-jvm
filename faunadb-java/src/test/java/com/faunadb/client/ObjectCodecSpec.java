@@ -32,6 +32,7 @@ public class ObjectCodecSpec {
 
   @Test
   public void testSimpleMap() {
+    System.out.println("HI");
     ImmutableMap<String, String> someObj = ImmutableMap.of("test", "value");
     Value.ObjectV result = json.convertValue(someObj, Value.ObjectV.class);
     assertThat(result.get("test").asString(), is("value"));

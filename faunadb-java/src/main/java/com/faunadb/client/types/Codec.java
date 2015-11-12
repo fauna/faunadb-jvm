@@ -1,6 +1,8 @@
 package com.faunadb.client.types;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -8,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.MapLikeType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
@@ -38,6 +41,23 @@ class Codec {
 
       Value.ObjectV intermediate = json.convertValue(innerTree, Value.ObjectV.class);
       return new LazyValueMap(intermediate.asObject());
+    }
+  }
+
+  public static class SetDeserializer extends JsonDeserializer<Set> {
+
+    @Override
+    public Set deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+      ObjectMapper json = (ObjectMapper) jsonParser.getCodec();
+      TypeFactory tf = deserializationContext.getTypeFactory();
+      JsonNode tree = json.readTree(jsonParser);
+
+      if (tree.has("@set")) {
+        ImmutableMap<String, Value> values = json.convertValue(tree.get("@set"), tf.constructMapLikeType(ImmutableMap.class, String.class, LazyValue.class));
+        return new Set(values);
+      } else {
+        throw new JsonParseException("Cannot deserialize as a @set", jsonParser.getTokenLocation());
+      }
     }
   }
 

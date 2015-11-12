@@ -88,6 +88,7 @@ lazy val java = project.in(file("faunadb-java"))
     autoScalaLibrary := false,
     compileOrder := CompileOrder.JavaThenScala,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
+    testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
     apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-java/api/")),
     (javacOptions in doc) := Seq("-source", "1.7",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",

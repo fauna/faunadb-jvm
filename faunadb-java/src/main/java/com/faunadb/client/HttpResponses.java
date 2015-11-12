@@ -16,17 +16,24 @@ import java.io.IOException;
 
 public class HttpResponses {
   static class Codec {
-    static class ParamErrorDeserializer extends JsonDeserializer<ParamError> {
+    static class FailureDeserializer extends JsonDeserializer<Failure> {
       @Override
-      public ParamError deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+      public Failure deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         ObjectMapper json = (ObjectMapper) jsonParser.getCodec();
+        TypeFactory tf = deserializationContext.getTypeFactory();
         JsonNode tree = json.readTree(jsonParser);
 
-        if (!tree.has("error")) {
-          throw new JsonParseException("Cannot deserialize ParamError: no 'error' field.", jsonParser.getTokenLocation());
+        if (!tree.has("field")) {
+          throw new JsonParseException("Cannot deserialize Failure: no 'field' field.", jsonParser.getTokenLocation());
         }
 
-        String error = tree.get("error").asText();
+        ImmutableList<String> field = json.convertValue(tree.get("field"), tf.constructCollectionType(ImmutableList.class, String.class));
+
+        if (!tree.has("code")) {
+          throw new JsonParseException("Cannot deserialize Failure: no 'code' field.", jsonParser.getTokenLocation());
+        }
+
+        String code = tree.get("code").asText();
 
         String description;
         if (tree.has("description")) {
@@ -34,10 +41,10 @@ public class HttpResponses {
         } else if (tree.has("reason")) {
           description = tree.get("reason").asText();
         } else {
-          throw new JsonParseException("Cannot deserialize ParamError: no 'description' field.", jsonParser.getTokenLocation());
+          throw new JsonParseException("Cannot deserialize Failure: no 'description' field.", jsonParser.getTokenLocation());
         }
 
-        return new ParamError(error, description);
+        return new Failure(field, code, description);
       }
     }
 
@@ -65,38 +72,39 @@ public class HttpResponses {
         String description;
         if (tree.has("description")) {
           description = tree.get("description").asText();
-        } else if (tree.has("reason")) {
-          description = tree.get("reason").asText();
         } else {
           throw new JsonParseException("Cannot deserialize QueryError: no 'description' field.", jsonParser.getTokenLocation());
         }
 
-        ImmutableMap<String, ParamError> parameters;
-        if (tree.has("parameters")) {
-          parameters = json.convertValue(tree.get("parameters"), tf.constructMapLikeType(ImmutableMap.class, String.class, ParamError.class));
+        ImmutableList<Failure> failures;
+        if (tree.has("failures")) {
+          failures = json.convertValue(tree.get("failures"), tf.constructCollectionType(ImmutableList.class, Failure.class));
         } else {
-          parameters = ImmutableMap.of();
+          failures = ImmutableList.of();
         }
 
-        return new QueryError(position, code, description, parameters);
+        return new QueryError(position, code, description, failures);
       }
     }
   }
 
-  @JsonDeserialize(using = Codec.ParamErrorDeserializer.class)
-  public static class ParamError {
-    private final String error;
+  @JsonDeserialize(using = Codec.FailureDeserializer.class)
+  public static class Failure {
+    private final ImmutableList<String> field;
+    private final String code;
     private final String description;
 
-    public ParamError(
-      String error,
+    public Failure(
+      ImmutableList<String> field,
+      String code,
       String description) {
-      this.error = error;
+      this.field = field;
+      this.code = code;
       this.description = description;
     }
 
-    public String error() {
-      return error;
+    public String code() {
+      return code;
     }
 
     public String description() {
@@ -109,16 +117,16 @@ public class HttpResponses {
     private final ImmutableList<String> position;
     private final String code;
     private final String description;
-    private final ImmutableMap<String, ParamError> parameters;
+    private final ImmutableList<Failure> failures;
 
     public QueryError(ImmutableList<String> position,
                       String code,
                       String description,
-                      ImmutableMap<String, ParamError> parameters) {
+                      ImmutableList<Failure> failures) {
       this.position = position;
       this.code = code;
       this.description = description;
-      this.parameters = parameters;
+      this.failures = failures;
     }
 
     public ImmutableList<String> position() {
@@ -133,8 +141,8 @@ public class HttpResponses {
       return description;
     }
 
-    public ImmutableMap<String, ParamError> parameters() {
-      return parameters;
+    public ImmutableList<Failure> failures() {
+      return failures;
     }
   }
 

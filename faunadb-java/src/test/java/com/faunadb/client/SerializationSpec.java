@@ -60,7 +60,6 @@ public class SerializationSpec {
     assertThat(json.writeValueAsString(select), is("{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"quote\":{\"favorites\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}"));
 
     Value quote = Quote(ObjectV("name", StringV("Hen Wen"), "Age", Add(LongV(100), LongV(10))));
-    System.out.println(json.writeValueAsString(quote));
   }
 
   @Test

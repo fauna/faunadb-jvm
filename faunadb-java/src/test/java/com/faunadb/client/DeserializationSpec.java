@@ -1,6 +1,5 @@
 package com.faunadb.client;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.response.Class;
@@ -56,17 +55,6 @@ public class DeserializationSpec {
     assertThat(err.code() , is("invalid expression"));
     assertThat(err.description(), is("No query provided."));
     assertThat(err.position().isEmpty(), is(true));
-
-    String legacyToDeserialize = "{\n" +
-        "            \"code\": \"invalid expression\", \n" +
-        "            \"reason\": \"No query provided.\", \n" +
-        "            \"position\": []\n" +
-        "}\n" +
-        "\n";
-    HttpResponses.QueryError err2 = json.readValue(legacyToDeserialize, HttpResponses.QueryError.class);
-    assertThat(err2.code() , is("invalid expression"));
-    assertThat(err2.description(), is("No query provided."));
-    assertThat(err2.position().isEmpty(), is(true));
   }
 
   @Test
