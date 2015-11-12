@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 
 object QueryError {
-  case class Param(field: Seq[String], code: String, description: String)
+  case class Failure(field: Seq[String], code: String, description: String)
 }
-case class QueryError(position: Seq[String], code: String, description: String, failures: IndexedSeq[QueryError.Param])
+case class QueryError(position: Seq[String], code: String, description: String, failures: IndexedSeq[QueryError.Failure])
 
 sealed abstract class FaunaResponse
 
