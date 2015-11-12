@@ -176,7 +176,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     }
 
     exception.errors(0).code shouldBe "validation failed"
-    exception.errors(0).parameters("data.uniqueTest1").error shouldBe "duplicate value"
+    exception.errors(0).failures.find(_.field == Seq("data", "uniqueTest1")).get.code shouldBe "duplicate value"
   }
 
   it should "test types" in {

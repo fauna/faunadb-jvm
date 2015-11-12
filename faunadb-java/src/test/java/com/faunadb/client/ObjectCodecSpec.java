@@ -48,7 +48,7 @@ public class ObjectCodecSpec {
     Value.ObjectV result2 = json.convertValue(obj, Value.ObjectV.class);
 
     assertThat(result2.get("something").asString(), is("huh"));
-    assertThat(result2.get("another"), is(NullV()));
+    assertThat(result2.get("another"), is((Value) NullV()));
 
     JsonNode node = json.valueToTree(result2);
     assertThat(node.get("something").asText(), is("huh"));
@@ -67,7 +67,7 @@ public class ObjectCodecSpec {
 
     assertThat(result.get("aMap").asObject().get("some").asString(), is("value"));
     assertThat(result.get("nested").asObject().get("something").asString(), is("huh"));
-    assertThat(result.get("nested").asObject().get("another"), is(NullV()));
+    assertThat(result.get("nested").asObject().get("another"), is((Value) NullV()));
 
     JsonNode node = json.valueToTree(result);
     assertThat(node.get("aMap").isObject(), is(true));
