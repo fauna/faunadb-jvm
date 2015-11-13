@@ -18,6 +18,7 @@ object Language {
   implicit def stringToObjectPath(str: String) = ObjectPath(str)
   implicit def intToArrayPath(i: Int) = ArrayPath(i)
   implicit def stringToValue(unwrapped: String) = StringV(unwrapped)
+  implicit def intToValue(unwrapped: Int) = NumberV(unwrapped)
   implicit def longToValue(unwrapped: Long) = NumberV(unwrapped)
   implicit def boolToValue(unwrapped: Boolean) = BooleanV(unwrapped)
   implicit def arrayToValue(unwrapped: Array[Value]) = ArrayV(unwrapped)
@@ -92,6 +93,26 @@ object Language {
    */
   def Foreach(lambda: Value, collection: Value): Value = {
     ObjectV("foreach" -> lambda, "collection" -> collection)
+  }
+
+  def Filter(lambda: Value, collection: Value): Value = {
+    ObjectV("filter" -> lambda, "collection" -> collection)
+  }
+
+  def Take(num: Value, collection: Value): Value = {
+    ObjectV("take" -> num, "collection" -> collection)
+  }
+
+  def Drop(num: Value, collection: Value): Value = {
+    ObjectV("drop" -> num, "collection" -> collection)
+  }
+
+  def Prepend(elems: Value, collection: Value): Value = {
+    ObjectV("prepend" -> elems, "collection" -> collection)
+  }
+
+  def Append(elems: Value, collection: Value): Value = {
+    ObjectV("append" -> elems, "collection" -> collection)
   }
 
   /**
@@ -315,7 +336,41 @@ object Language {
   def Subtract(terms: Iterable[Value]): Value = {
     ObjectV("subtract" -> ArrayV(terms.toArray))
   }
+
+  def Login(ref: Value, params: Value): Value = {
+    ObjectV("login" -> ref, "params" -> params)
+  }
+
+  def Logout(invalidateAll: Boolean): Value = {
+    ObjectV("logout" -> invalidateAll)
+  }
+
+  def Identify(ref: Value, password: Value): Value = {
+    ObjectV("identify" -> ref, "password" -> password)
+  }
+
+  def Time(str: Value): Value = {
+    ObjectV("time" -> str)
+  }
+
+  def Epoch(num: Value, unit: TimeUnit) = {
+    ObjectV("epoch" -> num, "unit" -> unit.value)
+  }
+
+  def Epoch(num: Value, unit: String) = {
+    ObjectV("epoch" -> num, "unit" -> unit)
+  }
+
+  def Date(str: Value) = {
+    ObjectV("date" -> str)
+  }
 }
+
+sealed abstract class TimeUnit(val value: String)
+case object Second extends TimeUnit("second")
+case object Millisecond extends TimeUnit("millisecond")
+case object Microsecond extends TimeUnit("microsecond")
+case object Nanosecond extends TimeUnit("nanosecond")
 
 sealed trait Path {
   def value: Value

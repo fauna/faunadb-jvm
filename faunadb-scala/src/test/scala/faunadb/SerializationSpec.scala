@@ -60,6 +60,21 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val foreach = Foreach(Lambda("creature", Create(Ref("some/ref"), Object(ObjectV("data" -> Object(ObjectV("some" -> Var("creature"))))))), ArrayV(Ref("another/ref/1"), Ref("another/ref/2")))
     json.writeValueAsString(foreach) shouldBe "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":\"another/ref/1\"},{\"@ref\":\"another/ref/2\"}]}"
+
+    val filter = Filter(Lambda("i", Equals(Seq(1, Var("i")))), ArrayV(1,2,3))
+    json.writeValueAsString(filter) shouldBe "{\"filter\":{\"lambda\":\"i\",\"expr\":{\"equals\":[1,{\"var\":\"i\"}]}},\"collection\":[1,2,3]}"
+
+    val take = Take(NumberV(2), ArrayV(1,2,3))
+    json.writeValueAsString(take) shouldBe "{\"take\":2,\"collection\":[1,2,3]}"
+
+    val drop = Drop(NumberV(2), ArrayV(1,2,3))
+    json.writeValueAsString(drop) shouldBe "{\"drop\":2,\"collection\":[1,2,3]}"
+
+    val prepend = Prepend(ArrayV(1,2,3), ArrayV(4,5,6))
+    json.writeValueAsString(prepend) shouldBe "{\"prepend\":[1,2,3],\"collection\":[4,5,6]}"
+
+    val append = Append(ArrayV(4,5,6), ArrayV(1,2,3))
+    json.writeValueAsString(append) shouldBe "{\"append\":[4,5,6],\"collection\":[1,2,3]}"
   }
 
   it should "serialize resource retrievals" in {
@@ -120,7 +135,18 @@ class SerializationSpec extends FlatSpec with Matchers {
     val ts = Ts(Instant.EPOCH.plus(5, ChronoUnit.MINUTES))
     json.writeValueAsString(ts) shouldBe "{\"@ts\":\"1970-01-01T00:05:00Z\"}"
 
-    val date = Date(LocalDate.ofEpochDay(2))
+    val date = types.Date(LocalDate.ofEpochDay(2))
     json.writeValueAsString(date) shouldBe "{\"@date\":\"1970-01-03\"}"
+  }
+
+  it should "serialize authentication functions" in {
+    val login = Login(Ref("classes/characters/104979509695139637"), Quote(ObjectV("password" -> "abracadabra")))
+    json.writeValueAsString(login) shouldBe "{\"login\":{\"@ref\":\"classes/characters/104979509695139637\"},\"params\":{\"quote\":{\"password\":\"abracadabra\"}}}"
+
+    val logout = Logout(true)
+    json.writeValueAsString(logout) shouldBe "{\"logout\":true}"
+
+    val identify = Identify(Ref("classes/characters/104979509695139637"), "abracadabra")
+    json.writeValueAsString(identify) shouldBe "{\"identify\":{\"@ref\":\"classes/characters/104979509695139637\"},\"password\":\"abracadabra\"}"
   }
 }
