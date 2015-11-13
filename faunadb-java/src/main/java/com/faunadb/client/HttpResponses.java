@@ -10,27 +10,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 
 public class HttpResponses {
   static class Codec {
-    static class FailureDeserializer extends JsonDeserializer<Failure> {
+    static class ValidationFailureDeserializer extends JsonDeserializer<ValidationFailure> {
       @Override
-      public Failure deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+      public ValidationFailure deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         ObjectMapper json = (ObjectMapper) jsonParser.getCodec();
         TypeFactory tf = deserializationContext.getTypeFactory();
         JsonNode tree = json.readTree(jsonParser);
 
         if (!tree.has("field")) {
-          throw new JsonParseException("Cannot deserialize Failure: no 'field' field.", jsonParser.getTokenLocation());
+          throw new JsonParseException("Cannot deserialize ValidationFailure: no 'field' field.", jsonParser.getTokenLocation());
         }
 
         ImmutableList<String> field = json.convertValue(tree.get("field"), tf.constructCollectionType(ImmutableList.class, String.class));
 
         if (!tree.has("code")) {
-          throw new JsonParseException("Cannot deserialize Failure: no 'code' field.", jsonParser.getTokenLocation());
+          throw new JsonParseException("Cannot deserialize ValidationFailure: no 'code' field.", jsonParser.getTokenLocation());
         }
 
         String code = tree.get("code").asText();
@@ -41,10 +40,10 @@ public class HttpResponses {
         } else if (tree.has("reason")) {
           description = tree.get("reason").asText();
         } else {
-          throw new JsonParseException("Cannot deserialize Failure: no 'description' field.", jsonParser.getTokenLocation());
+          throw new JsonParseException("Cannot deserialize ValidationFailure: no 'description' field.", jsonParser.getTokenLocation());
         }
 
-        return new Failure(field, code, description);
+        return new ValidationFailure(field, code, description);
       }
     }
 
@@ -76,9 +75,9 @@ public class HttpResponses {
           throw new JsonParseException("Cannot deserialize QueryError: no 'description' field.", jsonParser.getTokenLocation());
         }
 
-        ImmutableList<Failure> failures;
+        ImmutableList<ValidationFailure> failures;
         if (tree.has("failures")) {
-          failures = json.convertValue(tree.get("failures"), tf.constructCollectionType(ImmutableList.class, Failure.class));
+          failures = json.convertValue(tree.get("failures"), tf.constructCollectionType(ImmutableList.class, ValidationFailure.class));
         } else {
           failures = ImmutableList.of();
         }
@@ -88,13 +87,13 @@ public class HttpResponses {
     }
   }
 
-  @JsonDeserialize(using = Codec.FailureDeserializer.class)
-  public static class Failure {
+  @JsonDeserialize(using = Codec.ValidationFailureDeserializer.class)
+  public static class ValidationFailure {
     private final ImmutableList<String> field;
     private final String code;
     private final String description;
 
-    public Failure(
+    public ValidationFailure(
       ImmutableList<String> field,
       String code,
       String description) {
@@ -117,12 +116,12 @@ public class HttpResponses {
     private final ImmutableList<String> position;
     private final String code;
     private final String description;
-    private final ImmutableList<Failure> failures;
+    private final ImmutableList<ValidationFailure> failures;
 
     public QueryError(ImmutableList<String> position,
                       String code,
                       String description,
-                      ImmutableList<Failure> failures) {
+                      ImmutableList<ValidationFailure> failures) {
       this.position = position;
       this.code = code;
       this.description = description;
@@ -141,7 +140,7 @@ public class HttpResponses {
       return description;
     }
 
-    public ImmutableList<Failure> failures() {
+    public ImmutableList<ValidationFailure> failures() {
       return failures;
     }
   }
