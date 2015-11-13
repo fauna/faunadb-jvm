@@ -1,5 +1,8 @@
 package faunadb
 
+import java.time.{LocalDate, Instant}
+import java.time.temporal.ChronoUnit
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import faunadb.query._
@@ -111,5 +114,13 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val join = Join(Match("fire", Ref("indexes/spells_by_element")), Lambda("spell", Get(Var("spell"))))
     json.writeValueAsString(join) shouldBe "{\"join\":{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},\"with\":{\"lambda\":\"spell\",\"expr\":{\"get\":{\"var\":\"spell\"}}}}"
+  }
+
+  it should "serialize date and ts" in {
+    val ts = Ts(Instant.EPOCH.plus(5, ChronoUnit.MINUTES))
+    json.writeValueAsString(ts) shouldBe "{\"@ts\":\"1970-01-01T00:05:00Z\"}"
+
+    val date = Date(LocalDate.ofEpochDay(2))
+    json.writeValueAsString(date) shouldBe "{\"@date\":\"1970-01-03\"}"
   }
 }

@@ -52,6 +52,12 @@ trait Value {
   def asSetOpt: Option[faunadb.response.Set] = None
   def asSet = asSetOpt.get
 
+  def asTsOpt: Option[Ts] = None
+  def asTs = asTsOpt.get
+
+  def asDateOpt: Option[Date] = None
+  def asDate = asDateOpt.get
+
   /**
    * Accesses the value of the specified field if this is an object node.
    */
@@ -112,5 +118,5 @@ case class ArrayV(@(JsonValue @getter) values: scala.Array[Value]) extends Value
 }
 
 case object NullV extends Value {
-  @(JsonValue @getter) val value = NullNode.instance;
+  @(JsonValue @getter) val value = NullNode.instance
 }

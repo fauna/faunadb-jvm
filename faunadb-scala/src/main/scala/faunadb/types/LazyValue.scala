@@ -202,6 +202,22 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
     }
   }
 
+  override def asTsOpt: Option[Ts] = {
+    try {
+      Option(json.convertValue(underlying, classOf[Ts]))
+    } catch {
+      case _: IllegalArgumentException => None
+    }
+  }
+
+  override def asDateOpt: Option[Date] = {
+    try {
+      Option(json.convertValue(underlying, classOf[Date]))
+    } catch {
+      case _: IllegalArgumentException => None
+    }
+  }
+
   override def toString: String = underlying.toString
 
   override def equals(obj: scala.Any): Boolean = {

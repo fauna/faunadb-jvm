@@ -1,10 +1,12 @@
 package faunadb
 
+import java.time.{LocalDate, Instant}
+import java.time.temporal.ChronoUnit
+
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import faunadb.response.Instance
-import faunadb.types.{LazyValueMap, LazyValue, Ref}
+import faunadb.types.{LazyValue, LazyValueMap, Ref}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.collection.immutable
@@ -256,5 +258,19 @@ class DeserializationSpec extends FlatSpec with Matchers {
     page.data(0).asRef shouldBe Ref("classes/spells/102851640310104064")
     page.before shouldBe None
     page.after.get.asRef shouldBe Ref("classes/spells/102851646450565120")
+  }
+
+  it should "deserialize ts" in {
+    val toDeserialize = "{ \"@ts\": \"1970-01-01T00:05:00Z\" }"
+    val parsed = json.readValue(toDeserialize, classOf[LazyValue])
+    val ts = parsed.asTs
+    ts.value shouldBe Instant.EPOCH.plus(5, ChronoUnit.MINUTES)
+  }
+
+  it should "deserialize date" in {
+    val toDeserialize = "{ \"@date\": \"1970-01-03\" }"
+    val parsed = json.readValue(toDeserialize, classOf[LazyValue])
+    val date = parsed.asDate
+    date.value shouldBe LocalDate.ofEpochDay(2)
   }
 }
