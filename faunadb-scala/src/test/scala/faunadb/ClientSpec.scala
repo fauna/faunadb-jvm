@@ -295,6 +295,10 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val concatR = Await.result(concatF, 1 second).asString
     concatR shouldBe "MagicMissile"
 
+    val concat2F = client.query(Concat(Seq("Magic", "Missile"), " "))
+    val concat2R = Await.result(concat2F, 1 second).asString
+    concat2R shouldBe "Magic Missile"
+
     val containsF = client.query(Contains(Seq("favorites", "foods"), Quote(ObjectV("favorites" -> ObjectV("foods" -> ArrayV("crunchings", "munchings"))))))
     val containsR = Await.result(containsF, 1 second).asBoolean
     containsR shouldBe true
@@ -318,5 +322,38 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val divideF = client.query(Divide(Seq(100L, 10L)))
     val divideR = Await.result(divideF, 1 second).asNumber
     divideR shouldBe 10L
+
+    val moduloF = client.query(Modulo(Seq(101L, 10L)))
+    val moduloR = Await.result(moduloF, 1 second).asNumber
+    moduloR shouldBe 1L
+
+    val andF = client.query(And(Seq(true, false)))
+    val andR = Await.result(andF, 1 second).asBoolean
+    andR shouldBe false
+
+    val orF = client.query(Or(Seq(true, false)))
+    val orR = Await.result(orF, 1 second).asBoolean
+    orR shouldBe true
+
+    val notF = client.query(Not(false))
+    val notR = Await.result(notF, 1 second).asBoolean
+    notR shouldBe true
+  }
+
+  it should "test date and time functions" in {
+//    val timeF = client.query(Time("1970-01-01T00:00:00+00:00"))
+//    val timeR = Await.result(timeF, 1 second)
+//    println(timeR)
+
+//    val epochF = client.query(Epoch(30, "seconds"))
+//    val epochR = Await.result(epochF, 1 second)
+//      println(epochR)
+
+//    val dateF = client.query("1970-01-02")
+//    val dateR = Await.result(dateF, 1 second)
+//    println(dateR)
+  }
+
+  it should "test authentication functions" in {
   }
 }
