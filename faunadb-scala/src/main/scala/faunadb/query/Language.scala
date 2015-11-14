@@ -15,6 +15,14 @@ import scala.annotation.meta.{field, getter}
  *
  */
 object Language {
+  sealed abstract class TimeUnit(val value: String)
+  object TimeUnit {
+    case object Second extends TimeUnit("second")
+    case object Millisecond extends TimeUnit("millisecond")
+    case object Microsecond extends TimeUnit("microsecond")
+    case object Nanosecond extends TimeUnit("nanosecond")
+  }
+
   implicit def stringToObjectPath(str: String) = ObjectPath(str)
   implicit def intToArrayPath(i: Int) = ArrayPath(i)
   implicit def stringToValue(unwrapped: String) = StringV(unwrapped)
@@ -300,6 +308,10 @@ object Language {
     ObjectV("concat" -> ArrayV(terms.toArray))
   }
 
+  def Concat(terms: Iterable[Value], separator: Value): Value = {
+    ObjectV("concat" -> ArrayV(terms.toArray), "separator" -> separator)
+  }
+
   /**
    * A Contains function.
    *
@@ -327,6 +339,9 @@ object Language {
     ObjectV("divide" -> ArrayV(terms.toArray))
   }
 
+  def Modulo(terms: Iterable[Value]): Value = {
+    ObjectV("modulo" -> ArrayV(terms.toArray))
+  }
 
   /**
    * A Subtract function.
@@ -364,13 +379,19 @@ object Language {
   def Date(str: Value) = {
     ObjectV("date" -> str)
   }
-}
 
-sealed abstract class TimeUnit(val value: String)
-case object Second extends TimeUnit("second")
-case object Millisecond extends TimeUnit("millisecond")
-case object Microsecond extends TimeUnit("microsecond")
-case object Nanosecond extends TimeUnit("nanosecond")
+  def And(terms: Iterable[Value]): Value = {
+    ObjectV("and" -> ArrayV(terms.toArray))
+  }
+
+  def Or(terms: Iterable[Value]): Value = {
+    ObjectV("or" -> ArrayV(terms.toArray))
+  }
+
+  def Not(term: Value): Value = {
+    ObjectV("not" -> term)
+  }
+}
 
 sealed trait Path {
   def value: Value

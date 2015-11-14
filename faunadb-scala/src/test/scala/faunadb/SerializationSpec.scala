@@ -149,4 +149,55 @@ class SerializationSpec extends FlatSpec with Matchers {
     val identify = Identify(Ref("classes/characters/104979509695139637"), "abracadabra")
     json.writeValueAsString(identify) shouldBe "{\"identify\":{\"@ref\":\"classes/characters/104979509695139637\"},\"password\":\"abracadabra\"}"
   }
+
+  it should "serialize date and time functions" in {
+    val time = Time("1970-01-01T00:00:00+00:00")
+    json.writeValueAsString(time) shouldBe "{\"time\":\"1970-01-01T00:00:00+00:00\"}"
+
+    val epoch = Epoch(10, TimeUnit.Second)
+    json.writeValueAsString(epoch) shouldBe "{\"epoch\":10,\"unit\":\"second\"}"
+
+    val epoch2 = Epoch(10, "millisecond")
+    json.writeValueAsString(epoch2) shouldBe "{\"epoch\":10,\"unit\":\"millisecond\"}"
+
+    val date = Language.Date("1970-01-02")
+    json.writeValueAsString(date) shouldBe "{\"date\":\"1970-01-02\"}"
+  }
+
+  it should "serialize misc and mathematical functions" in {
+    val equals = Equals(Seq("fire", "fire"))
+    json.writeValueAsString(equals) shouldBe "{\"equals\":[\"fire\",\"fire\"]}"
+
+    val concat = Concat(Seq("Hen", "Wen"))
+    json.writeValueAsString(concat) shouldBe "{\"concat\":[\"Hen\",\"Wen\"]}"
+
+    val concat2 = Concat(Seq("Hen", "Wen"), " ")
+    json.writeValueAsString(concat2) shouldBe "{\"concat\":[\"Hen\",\"Wen\"],\"separator\":\" \"}"
+
+    val add = Add(Seq(1,2))
+    json.writeValueAsString(add) shouldBe "{\"add\":[1,2]}"
+
+    val multiply = Multiply(Seq(1,2))
+    json.writeValueAsString(multiply) shouldBe "{\"multiply\":[1,2]}"
+
+    val subtract = Subtract(Seq(1,2))
+    json.writeValueAsString(subtract) shouldBe "{\"subtract\":[1,2]}"
+
+    val divide = Divide(Seq(1,2))
+    json.writeValueAsString(divide) shouldBe "{\"divide\":[1,2]}"
+
+    val modulo = Modulo(Seq(1,2))
+    json.writeValueAsString(modulo) shouldBe "{\"modulo\":[1,2]}"
+
+    val and = And(Seq(true, false))
+    json.writeValueAsString(and) shouldBe "{\"and\":[true,false]}"
+
+    val or = Or(Seq(true, false))
+    json.writeValueAsString(or) shouldBe "{\"or\":[true,false]}"
+
+    val not = Not(false)
+    json.writeValueAsString(not) shouldBe "{\"not\":false}"
+  }
+
+
 }
