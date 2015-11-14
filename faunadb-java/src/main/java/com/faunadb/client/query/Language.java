@@ -21,6 +21,23 @@ import com.google.common.collect.ImmutableMap;
 public final class Language {
   Language() { }
 
+  public static final class TimeUnit {
+    private final String value;
+
+    public final String getValue() {
+      return value;
+    }
+
+    TimeUnit(String value) {
+      this.value = value;
+    }
+
+    public final static TimeUnit SECOND = new TimeUnit("second");
+    public final static TimeUnit MILLISECOND = new TimeUnit("millisecond");
+    public final static TimeUnit MICROSECOND = new TimeUnit("microsecond");
+    public final static TimeUnit NANOSECOND = new TimeUnit("nanosecond");
+  }
+
   /**
    * Returns the Null value.
    */
@@ -380,6 +397,26 @@ public final class Language {
    */
   public static Value Foreach(Value lambda, Value collection) {
     return ObjectV("foreach", lambda, "collection", collection);
+  }
+
+  public static Value Filter(Value lambda, Value collection) {
+    return ObjectV("filter", lambda, "collection", collection);
+  }
+
+  public static Value Take(Value num, Value collection) {
+    return ObjectV("take", num, "collection", collection);
+  }
+
+  public static Value Drop(Value num, Value collection) {
+    return ObjectV("drop", num, "collection", collection);
+  }
+
+  public static Value Prepend(Value elems, Value collection) {
+    return ObjectV("prepend", elems, "collection", collection);
+  }
+
+  public static Value Append(Value elems, Value collection) {
+    return ObjectV("append", elems, "collection", collection);
   }
 
   /**
@@ -829,6 +866,22 @@ public final class Language {
     return Multiply(ImmutableList.of(term1, term2, term3, term4, term5, term6));
   }
 
+  public static Value Modulo(ImmutableList<Value> terms) {
+    return ObjectV("modulo", ArrayV(terms));
+  }
+
+  public static Value And(ImmutableList<Value> terms) {
+    return ObjectV("and", ArrayV(terms));
+  }
+
+  public static Value Or(ImmutableList<Value> terms) {
+    return ObjectV("or", ArrayV(terms));
+  }
+
+  public static Value Not(Value term) {
+    return ObjectV("not", term);
+  }
+
   /**
    * Creates a new Equals function.
    *
@@ -889,6 +942,10 @@ public final class Language {
     return ObjectV("concat", ArrayV(terms));
   }
 
+  public static Value Concat(ImmutableList<Value> terms, String separator) {
+    return ObjectV("concat", ArrayV(terms), "separator", StringV(separator));
+  }
+
   /**
    * Creates a new Concat function operating on the given terms.
    */
@@ -945,6 +1002,34 @@ public final class Language {
     return ObjectV("contains", ArrayV(pathValueBuilder.build()), "in", in);
   }
 
+  public static Value Login(Value ref, Value params) {
+    return ObjectV("login", ref, "params", params);
+  }
+
+  public static Value Logout(boolean invalidateAll) {
+    return ObjectV("logout", BooleanV(invalidateAll));
+  }
+
+  public static Value Identify(Value ref, String password) {
+    return ObjectV("identify", ref, "password", StringV(password));
+  }
+
+  public static Value Time(Value time) {
+    return ObjectV("time", time);
+  }
+
+  public static Value Epoch(Value num, TimeUnit unit) {
+    return ObjectV("epoch", num, "unit", StringV(unit.getValue()));
+  }
+
+  public static Value Epoch(Value num, String unit) {
+    return ObjectV("epoch", num, "unit", StringV(unit));
+  }
+
+  public static Value Date(Value date) {
+    return ObjectV("date", date);
+  }
+
   /**
    * Helper for constructing a Path list with the given path terms.
    *
@@ -998,4 +1083,6 @@ public final class Language {
   public static ImmutableList<Path> Path(Path term1, Path term2, Path term3, Path term4, Path term5, Path term6) {
     return ImmutableList.of(term1, term2, term3, term4, term5, term6);
   }
+
+
 }

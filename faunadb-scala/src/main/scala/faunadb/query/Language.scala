@@ -54,8 +54,8 @@ object Language {
    *
    * '''Reference''': [[https://faunadb.com/documentation#queries-basic_forms FaunaDB Basic Forms]]
    */
-  def If(condition: Value, then: Value, `else`: Value): Value = {
-    ObjectV("if" -> condition, "then" -> then, "else" -> `else`)
+  def If(condition: Value, `then`: Value, `else`: Value): Value = {
+    ObjectV("if" -> condition, "then" -> `then`, "else" -> `else`)
   }
 
   /**
