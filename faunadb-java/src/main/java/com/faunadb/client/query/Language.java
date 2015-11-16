@@ -870,12 +870,72 @@ public final class Language {
     return ObjectV("modulo", ArrayV(terms));
   }
 
+  public static Value Modulo(Value term1) {
+    return Modulo(ImmutableList.of(term1));
+  }
+
+  public static Value Modulo(Value term1, Value term2) {
+    return Modulo(ImmutableList.of(term1, term2));
+  }
+
+  public static Value Modulo(Value term1, Value term2, Value term3) {
+    return Modulo(ImmutableList.of(term1, term2, term3));
+  }
+
+  public static Value Modulo(Value term1, Value term2, Value term3, Value term4) {
+    return Modulo(ImmutableList.of(term1, term2, term3, term4));
+  }
+
+  public static Value Modulo(Value term1, Value term2, Value term3, Value term4, Value term5) {
+    return Modulo(ImmutableList.of(term1, term2, term3, term4, term5));
+  }
+
   public static Value And(ImmutableList<Value> terms) {
     return ObjectV("and", ArrayV(terms));
   }
 
+  public static Value And(Value term1) {
+    return And(ImmutableList.of(term1));
+  }
+
+  public static Value And(Value term1, Value term2) {
+    return And(ImmutableList.of(term1, term2));
+  }
+
+  public static Value And(Value term1, Value term2, Value term3) {
+    return And(ImmutableList.of(term1, term2, term3));
+  }
+
+  public static Value And(Value term1, Value term2, Value term3, Value term4) {
+    return And(ImmutableList.of(term1, term2, term3, term4));
+  }
+
+  public static Value And(Value term1, Value term2, Value term3, Value term4, Value term5) {
+    return And(ImmutableList.of(term1, term2, term3, term4, term5));
+  }
+
   public static Value Or(ImmutableList<Value> terms) {
     return ObjectV("or", ArrayV(terms));
+  }
+
+  public static Value Or(Value term1) {
+    return Or(ImmutableList.of(term1));
+  }
+
+  public static Value Or(Value term1, Value term2) {
+    return Or(ImmutableList.of(term1, term2));
+  }
+
+  public static Value Or(Value term1, Value term2, Value term3) {
+    return Or(ImmutableList.of(term1, term2, term3));
+  }
+
+  public static Value Or(Value term1, Value term2, Value term3, Value term4) {
+    return Or(ImmutableList.of(term1, term2, term3, term4));
+  }
+
+  public static Value Or(Value term1, Value term2, Value term3, Value term4, Value term5) {
+    return Or(ImmutableList.of(term1, term2, term3, term4, term5));
   }
 
   public static Value Not(Value term) {

@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static com.faunadb.client.query.Language.*;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
@@ -75,6 +76,23 @@ public class SerializationSpec {
 
     Value foreach = Foreach(Lambda("creature", Create(Ref("some/ref"), Object(ObjectV("data", Object(ObjectV("some", Var("creature"))))))), ArrayV(Ref("another/ref/1"), Ref("another/ref/2")));
     assertEquals(json.writeValueAsString(foreach), "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":\"another/ref/1\"},{\"@ref\":\"another/ref/2\"}]}");
+
+    Value filter = Filter(Lambda("i", Equals(LongV(1L), Var("i"))), ArrayV(LongV(1L), LongV(2L), LongV(3L)));
+    assertThat(json.writeValueAsString(filter), is("{\"filter\":{\"lambda\":\"i\",\"expr\":{\"equals\":[1,{\"var\":\"i\"}]}},\"collection\":[1,2,3]}"));
+
+    Value take = Take(LongV(2L), ArrayV(LongV(1L),LongV(2L),LongV(3L)));
+    assertThat(json.writeValueAsString(take), is("{\"take\":2,\"collection\":[1,2,3]}"));
+
+    Value drop = Drop(LongV(2L), ArrayV(LongV(1L), LongV(2L), LongV(3L)));
+    assertThat(json.writeValueAsString(drop), is("{\"drop\":2,\"collection\":[1,2,3]}"));
+
+    Value prepend = Prepend(ArrayV(LongV(1L), LongV(2L), LongV(3L)), ArrayV(LongV(4L), LongV(5L), LongV(6L)));
+    assertThat(json.writeValueAsString(prepend), is("{\"prepend\":[1,2,3],\"collection\":[4,5,6]}"));
+
+    Value append = Append(ArrayV(LongV(4L), LongV(5L), LongV(6L)), ArrayV(LongV(1L), LongV(2L), LongV(3L)));
+    assertThat(json.writeValueAsString(append), is("{\"append\":[4,5,6],\"collection\":[1,2,3]}"));
+
+
   }
 
   @Test
@@ -162,4 +180,68 @@ public class SerializationSpec {
 
     assertThat(json.writeValueAsString(join), is("{\"join\":{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},\"with\":{\"lambda\":\"spell\",\"expr\":{\"get\":{\"var\":\"spell\"}}}}"));
   }
+
+  @Test
+  public void serializeAuthentication() throws JsonProcessingException {
+    Value login = Login(Ref("classes/characters/104979509695139637"), Quote(ObjectV("password", StringV("abracadabra"))));
+    assertThat(json.writeValueAsString(login), is("{\"login\":{\"@ref\":\"classes/characters/104979509695139637\"},\"params\":{\"quote\":{\"password\":\"abracadabra\"}}}"));
+
+    Value logout = Logout(true);
+    assertThat(json.writeValueAsString(logout), is("{\"logout\":true}"));
+
+    Value identify = Identify(Ref("classes/characters/104979509695139637"), "abracadabra");
+    assertThat(json.writeValueAsString(identify), is("{\"identify\":{\"@ref\":\"classes/characters/104979509695139637\"},\"password\":\"abracadabra\"}"));
+  }
+
+  @Test
+  public void serializeDateAndTime() throws JsonProcessingException {
+    Value time = Time(StringV("1970-01-01T00:00:00+00:00"));
+    assertThat(json.writeValueAsString(time), is("{\"time\":\"1970-01-01T00:00:00+00:00\"}"));
+
+    Value epoch = Epoch(LongV(10L), TimeUnit.SECOND);
+    assertThat(json.writeValueAsString(epoch), is("{\"epoch\":10,\"unit\":\"second\"}"));
+
+    Value epoch2 = Epoch(LongV(10L), "millisecond");
+    assertThat(json.writeValueAsString(epoch2), is("{\"epoch\":10,\"unit\":\"millisecond\"}"));
+
+    Value date = Date(StringV("1970-01-02"));
+    assertThat(json.writeValueAsString(date), is("{\"date\":\"1970-01-02\"}"));
+  }
+
+  @Test
+  public void serializeMiscAndMath() throws JsonProcessingException {
+    Value equals = Equals(StringV("fire"), StringV("fire"));
+    assertThat(json.writeValueAsString(equals), is("{\"equals\":[\"fire\",\"fire\"]}"));
+
+    Value concat = Concat(StringV("Hen"), StringV("Wen"));
+    assertThat(json.writeValueAsString(concat), is("{\"concat\":[\"Hen\",\"Wen\"]}"));
+
+    Value concat2 = Concat(ImmutableList.<Value>of(StringV("Hen"), StringV("Wen")), " ");
+    assertThat(json.writeValueAsString(concat2), is("{\"concat\":[\"Hen\",\"Wen\"],\"separator\":\" \"}"));
+
+    Value add = Add(LongV(1L), LongV(2L));
+    assertThat(json.writeValueAsString(add), is("{\"add\":[1,2]}"));
+
+    Value multiply = Multiply(LongV(1L), LongV(2L));
+    assertThat(json.writeValueAsString(multiply), is("{\"multiply\":[1,2]}"));
+
+    Value subtract = Subtract(LongV(1L), LongV(2L));
+    assertThat(json.writeValueAsString(subtract), is("{\"subtract\":[1,2]}"));
+
+    Value divide = Divide(LongV(1L), LongV(2L));
+    assertThat(json.writeValueAsString(divide), is("{\"divide\":[1,2]}"));
+
+    Value modulo = Modulo(LongV(1L), LongV(2L));
+    assertThat(json.writeValueAsString(modulo), is("{\"modulo\":[1,2]}"));
+
+    Value and = And(BooleanV(true), BooleanV(false));
+    assertThat(json.writeValueAsString(and), is("{\"and\":[true,false]}"));
+
+    Value or = Or(BooleanV(true), BooleanV(false));
+    assertThat(json.writeValueAsString(or), is("{\"or\":[true,false]}"));
+
+    Value not = Not(BooleanV(false));
+    assertThat(json.writeValueAsString(not), is("{\"not\":false}"));
+  }
+
 }
