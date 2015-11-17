@@ -23,6 +23,13 @@ object Language {
     case object Nanosecond extends TimeUnit("nanosecond")
   }
 
+  sealed abstract class Action(val value: String)
+  object Action {
+    case object Create extends Action("create")
+    case object Delete extends Action("delete")
+  }
+
+
   implicit def stringToObjectPath(str: String) = ObjectPath(str)
   implicit def intToArrayPath(i: Int) = ArrayPath(i)
   implicit def stringToValue(unwrapped: String) = StringV(unwrapped)
@@ -277,6 +284,14 @@ object Language {
     ObjectV("delete" -> ref)
   }
 
+  def Insert(ref: Value, ts: Long, action: Action, params: Value): Value = {
+    ObjectV("insert" -> ref, "ts" -> ts, "action" -> action.value, "params" -> params)
+  }
+
+  def Remove(ref: Value, ts: Long, action: Action): Value = {
+    ObjectV("remove" -> ref, "ts" -> ts, "action" -> action.value)
+  }
+
   def Object(value: ObjectV) = {
     ObjectV("object" -> value)
   }
@@ -402,6 +417,4 @@ case class ObjectPath(@(JsonValue @getter) field: String) extends Path {
 case class ArrayPath(@(JsonValue @getter) index: Int) extends Path {
   def value = NumberV(index)
 }
-
-
 

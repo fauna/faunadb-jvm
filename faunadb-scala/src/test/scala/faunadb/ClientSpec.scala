@@ -245,6 +245,16 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     replaceR.data("element").asArray.toSeq.map(_.asString) shouldBe Seq("fire", "earth")
     replaceR.data("cost").asNumber shouldBe 10L
 
+    val insertF = client.query(Insert(createR.ref, 1L, Action.Create, Quote(ObjectV("data" -> ObjectV("cooldown" -> 5L)))))
+    val insertR = Await.result(insertF, 1 second).asInstance
+    insertR.ref shouldBe createR.ref
+    insertR.data.size shouldBe 1
+    insertR.data("cooldown").asNumber shouldBe 5
+
+    val removeF = client.query(Remove(createR.ref, 2L, Action.Delete))
+    val removeR = Await.result(removeF, 1 second)
+    removeR shouldBe null
+
     val deleteF = client.query(Delete(createR.ref))
     Await.result(deleteF, 1 second)
     val getF = client.query(Get(createR.ref))
