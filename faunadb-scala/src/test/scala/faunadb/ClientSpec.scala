@@ -367,5 +367,19 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test authentication functions" in {
+    val createF = client.query(Create(Ref("classes/spells"), Quote(ObjectV("credentials" -> ObjectV("password" -> "abcdefg")))))
+    val createR = Await.result(createF, 1 second).asInstance
+
+    val loginF = client.query(Login(createR.ref, Quote(ObjectV("password" -> "abcdefg"))))
+    val loginR = Await.result(loginF, 1 second).asToken
+
+    val sessionClient = FaunaClient(Connection.builder().withFaunaRoot(config("root_url")).withAuthToken(loginR.secret).build())
+    val logoutF = sessionClient.query(Logout(false))
+    val logoutR = Await.result(logoutF, 1 second)
+    logoutR.asBoolean shouldBe true
+
+    val identifyF = client.query(Identify(createR.ref, "abcdefg"))
+    val identifyR = Await.result(identifyF, 1 second)
+    identifyR.asBoolean shouldBe true
   }
 }

@@ -42,6 +42,12 @@ case class Database(@JsonProperty("ref") ref: Ref,
                     @JsonProperty("ts") ts: Long,
                     @JsonProperty("name") name: String)
 
+case class Token(@JsonProperty("ref") ref: Ref,
+                 @(JsonProperty @field @param)("class") classRef: Ref,
+                 @JsonProperty("ts") ts: Long,
+                 @JsonProperty("credentials") credentials: Ref,
+                 @JsonProperty("secret") secret: String)
+
 /**
  * A FaunaDB class response.
  *

@@ -150,6 +150,14 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
     }
   }
 
+  override def asTokenOpt: Option[Token] = {
+    try {
+      Option(json.convertValue(underlying, classOf[Token]))
+    } catch {
+      case _: IllegalArgumentException => None
+    }
+  }
+
   /**
    * Coerces the node into a [[Class]]
    *

@@ -273,4 +273,15 @@ class DeserializationSpec extends FlatSpec with Matchers {
     val date = parsed.asDate
     date.value shouldBe LocalDate.ofEpochDay(2)
   }
+
+  it should "deserialize a token response" in {
+    val toDeserialize = "{\"ref\":{\"@ref\":\"tokens/116957992316829696\"},\"class\":{\"@ref\":\"tokens\"},\"ts\":1447798683342861,\"credentials\":{\"@ref\":\"credentials/116957992274886656\"},\"secret\":\"k6oBn4SsobAAAAADoQS0L5P7oOt-_GnVDxRNPGFjVEWTMK4\"}"
+    val parsed = json.readValue(toDeserialize, classOf[LazyValue])
+    val token = parsed.asToken
+    token.ref shouldBe Ref("tokens/116957992316829696")
+    token.classRef shouldBe Ref("tokens")
+    token.ts shouldBe 1447798683342861L
+    token.credentials shouldBe Ref("credentials/116957992274886656")
+    token.secret shouldBe "k6oBn4SsobAAAAADoQS0L5P7oOt-_GnVDxRNPGFjVEWTMK4"
+  }
 }

@@ -37,6 +37,9 @@ trait Value {
   def asKeyOpt: Option[Key] = None
   def asKey = asKeyOpt.get
 
+  def asTokenOpt: Option[Token] = None
+  def asToken = asTokenOpt.get
+
   def asDatabaseOpt: Option[Database] = None
   def asDatabase = asDatabaseOpt.get
 
