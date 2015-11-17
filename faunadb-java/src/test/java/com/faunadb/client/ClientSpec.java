@@ -23,11 +23,13 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import static com.faunadb.client.query.Language.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -332,6 +334,16 @@ public class ClientSpec {
     assertThat(replaceInstance.data().get("element").get(0).asString(), is("fire"));
     assertThat(replaceInstance.data().get("element").get(1).asString(), is("earth"));
     assertThat(replaceInstance.data().get("cost").asLong(), is(10L));
+
+    ListenableFuture<Value> insertF = client.query(Insert(createInstance.ref(), 1L, Action.CREATE, Quote(ObjectV("data", ObjectV("cooldown", LongV(5L))))));
+    Instance insertR = insertF.get().asInstance();
+    assertThat(insertR.ref(), is(createInstance.ref()));
+    assertThat(insertR.data().size(), is(1));
+    assertThat(insertR.data().get("cooldown").asLong(), is(5L));
+
+    ListenableFuture<Value> removeF = client.query(Remove(createInstance.ref(), 2L, Action.DELETE));
+    Value removeR = removeF.get();
+    assertNull(removeR);
 
     ListenableFuture<Value> deleteF = client.query(Delete(createInstance.ref()));
     deleteF.get();

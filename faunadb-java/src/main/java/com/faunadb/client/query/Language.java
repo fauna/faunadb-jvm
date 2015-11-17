@@ -41,6 +41,18 @@ public final class Language {
     public final static TimeUnit NANOSECOND = new TimeUnit("nanosecond");
   }
 
+  public static final class Action {
+    private final String value;
+    public final String getValue() { return value; }
+
+    Action(String value) {
+      this.value = value;
+    }
+
+    public final static Action CREATE = new Action("create");
+    public final static Action DELETE = new Action("delete");
+  }
+
   /**
    * Returns the Null value.
    */
@@ -279,6 +291,14 @@ public final class Language {
    */
   public static Value Create(Value ref) {
     return ObjectV("create", ref);
+  }
+
+  public static Value Insert(Value ref, long ts, Action action, Value params) {
+    return ObjectV("insert", ref, "ts", LongV(ts), "action", StringV(action.getValue()), "params", params);
+  }
+
+  public static Value Remove(Value ref, long ts, Action action) {
+    return ObjectV("remove", ref, "ts", LongV(ts), "action", StringV(action.getValue()));
   }
 
   /**

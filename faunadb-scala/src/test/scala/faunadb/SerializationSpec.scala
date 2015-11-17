@@ -113,8 +113,8 @@ class SerializationSpec extends FlatSpec with Matchers {
     val delete = Delete(Ref("classes/spells/123456"))
     json.writeValueAsString(delete) shouldBe "{\"delete\":{\"@ref\":\"classes/spells/123456\"}}"
 
-    val insert = Insert(Ref("classes/spells/123456"), 1L, Action.Create, Quote(ObjectV("data" -> ObjectV("data" -> ObjectV("name" -> "Mountain's Thunder", "cost" -> 10, "element" -> ArrayV("air", "earth"))))))
-    json.writeValueAsString(insert) shouldBe "{\"insert\":{\"@ref\":\"classes/spells/123456\"},\"ts\":1,\"action\":\"create\",\"params\":{\"quote\":{\"data\":{\"data\":{\"name\":\"Mountain's Thunder\",\"cost\":10,\"element\":[\"air\",\"earth\"]}}}}}"
+    val insert = Insert(Ref("classes/spells/123456"), 1L, Action.Create, Quote(ObjectV("data" -> ObjectV("name" -> "Mountain's Thunder", "cost" -> 10, "element" -> ArrayV("air", "earth"))))))
+    json.writeValueAsString(insert) shouldBe "{\"insert\":{\"@ref\":\"classes/spells/123456\"},\"ts\":1,\"action\":\"create\",\"params\":{\"quote\":{\"data\":{\"name\":\"Mountain's Thunder\",\"cost\":10,\"element\":[\"air\",\"earth\"]}}}}"
 
     val remove = Remove(Ref("classes/spells/123456"), 1L, Action.Delete)
     json.writeValueAsString(remove) shouldBe "{\"remove\":{\"@ref\":\"classes/spells/123456\"},\"ts\":1,\"action\":\"delete\"}"

@@ -149,6 +149,12 @@ public class SerializationSpec {
 
     Value delete = Delete(Ref("classes/spells/123456"));
     assertThat(json.writeValueAsString(delete), is("{\"delete\":{\"@ref\":\"classes/spells/123456\"}}"));
+
+    Value insert = Insert(Ref("classes/spells/123456"), 1L, Action.CREATE, Quote(ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "cost", LongV(10), "element", ArrayV(StringV("air"), StringV("earth"))))));
+    assertThat(json.writeValueAsString(insert), is("{\"insert\":{\"@ref\":\"classes/spells/123456\"},\"ts\":1,\"action\":\"create\",\"params\":{\"quote\":{\"data\":{\"name\":\"Mountain's Thunder\",\"cost\":10,\"element\":[\"air\",\"earth\"]}}}}"));
+
+    Value remove = Remove(Ref("classes/spells/123456"), 1L, Action.DELETE);
+    assertThat(json.writeValueAsString(remove), is("{\"remove\":{\"@ref\":\"classes/spells/123456\"},\"ts\":1,\"action\":\"delete\"}"));
   }
 
   @Test
