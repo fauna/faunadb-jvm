@@ -12,7 +12,7 @@ import com.google.common.collect.ImmutableList;
  * A FaunaDB Page response. This, like other response types, is obtained by coercing a {@link Value} using its
  * associated conversion method.
  *
- * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-values-pages">FaunaDB Page Value</a> </p>
+ * <p><i>Reference</i>: <a href="https://faunadb.com/documentation/queries#values-pages">FaunaDB Page Value</a> </p>
  *
  * @see Value#asPage()
  */

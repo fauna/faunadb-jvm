@@ -9,15 +9,15 @@ package faunadb
  *
  * ==Forms==
  *
- * [[com.faunadb.client.response.Class]] - [[https://faunadb.com/documentation#guide-resource_types-classes Reference]]
+ * [[com.faunadb.client.response.Class]] - [[https://faunadb.com/documentation/objects#classes]]
  *
- * [[com.faunadb.client.response.Database]] - [[https://faunadb.com/documentation#guide-resource_types-database Reference]]
+ * [[com.faunadb.client.response.Database]] - [[https://faunadb.com/documentation/objects#databases]]
  *
- * [[com.faunadb.client.response.Index]] - [[https://faunadb.com/documentation#guide-resource_types-indexes Reference]]
+ * [[com.faunadb.client.response.Index]] - [[https://faunadb.com/documentation/objects#indexes]]
  *
- * [[com.faunadb.client.response.Instance]] - [[https://faunadb.com/documentation#guide-resource_types-instances Reference]]
+ * [[com.faunadb.client.response.Instance]] - [[https://faunadb.com/documentation/objects]]
  *
- * [[com.faunadb.client.response.Key]] - [[https://faunadb.com/documentation#guide-resource_types-keys Reference]]
+ * [[com.faunadb.client.response.Key]] - [[https://faunadb.com/documentation/objects#keys]]
  *
  */
 package object response {

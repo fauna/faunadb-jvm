@@ -44,7 +44,7 @@ import java.time.format.DateTimeFormatter;
  *   node.get("data").get("someKey").asString() // "string1"
  * </pre>
  *
- * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Value Types</a></p>
+ * <p><i>Reference</i>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Value Types</a></p>
  */
 public interface Value {
   /**

@@ -50,7 +50,7 @@ object Language {
   /**
    * A Do expression.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-basic_forms FaunaDB Basic Forms]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
    */
   def Do(exprs: Iterable[Value]): Value = {
     ObjectV("do" -> ArrayV(exprs.toArray))
@@ -59,7 +59,7 @@ object Language {
   /**
    * An If function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-basic_forms FaunaDB Basic Forms]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
    */
   def If(condition: Value, `then`: Value, `else`: Value): Value = {
     ObjectV("if" -> condition, "then" -> `then`, "else" -> `else`)
@@ -68,7 +68,7 @@ object Language {
   /**
    * A Quote function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-basic_forms FaunaDB Basic Forms]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
    */
   def Quote(quote: Value): Value = {
     ObjectV("quote" -> quote)
@@ -77,7 +77,7 @@ object Language {
   /**
    * A Select function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-basic_forms FaunaDB Basic Forms]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
    */
   def Select(path: Iterable[Path], from: Value): Value = {
     ObjectV("select" -> ArrayV(path.map(_.value).toArray), "from" -> from)
@@ -95,7 +95,7 @@ object Language {
   /**
    * A Map function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Collection Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
    */
   def Map(lambda: Value, collection: Value): Value = {
     ObjectV("map" -> lambda, "collection" -> collection)
@@ -104,7 +104,7 @@ object Language {
   /**
    * A Foreach function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Collection Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
    */
   def Foreach(lambda: Value, collection: Value): Value = {
     ObjectV("foreach" -> lambda, "collection" -> collection)
@@ -133,7 +133,7 @@ object Language {
   /**
    * A Match set.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#sets]]
    */
   def Match(term: Value, index: Ref): Value = {
     ObjectV("match" -> term, "index" -> index)
@@ -142,7 +142,7 @@ object Language {
   /**
    * A Union set.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#sets]]
    */
   def Union(sets: Iterable[Value]): Value = {
     ObjectV("union" -> ArrayV(sets.toArray))
@@ -151,7 +151,7 @@ object Language {
   /**
    * An Intersection set.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#sets]]
    */
   def Intersection(sets: Iterable[Value]): Value = {
     ObjectV("intersection" -> ArrayV(sets.toArray))
@@ -160,7 +160,7 @@ object Language {
   /**
    * A Difference set.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#sets]]
    */
   def Difference(sets: Iterable[Value]): Value = {
     ObjectV("difference" -> ArrayV(sets.toArray))
@@ -169,7 +169,7 @@ object Language {
   /**
    * A Join set.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-collection_functions FaunaDB Sets]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#sets]]
    */
   def Join(source: Value, target: Value): Value = {
     ObjectV("join" -> source, "with" -> target)
@@ -178,7 +178,7 @@ object Language {
   /**
    * A Get function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-reading-resources FaunaDB Resource Retrieval Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#read_functions]]
    */
   def Get(resource: Value): Value = {
     ObjectV("get" -> resource)
@@ -233,7 +233,7 @@ object Language {
   /**
    * A Count function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-reading-resources FaunaDB Resource Retrieval Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#read_functions]]
    */
   def Count(set: Value): Value = {
     ObjectV("count" -> set)
@@ -242,7 +242,7 @@ object Language {
   /**
    * An Exists function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-read_functions FaunaDB Read Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#read_functions]]
    */
   def Exists(ref: Value): Value = {
     ObjectV("exists" -> ref)
@@ -251,7 +251,7 @@ object Language {
   /**
    * A Create function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
    */
   def Create(ref: Value, params: Value): Value = {
     ObjectV("create" -> ref, "params" -> params)
@@ -260,7 +260,7 @@ object Language {
   /**
    * A Replace function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
    */
   def Replace(ref: Value, params: Value): Value = {
     ObjectV("replace" -> ref, "params" -> params)
@@ -269,7 +269,7 @@ object Language {
   /**
    * An Update function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
    */
   def Update(ref: Value, params: Value): Value = {
     ObjectV("update" -> ref, "params" -> params)
@@ -278,7 +278,7 @@ object Language {
   /**
    * A Delete function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-modifying-resources FaunaDB Resource Modification Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
    */
   def Delete(ref: Value): Value = {
     ObjectV("delete" -> ref)
@@ -299,7 +299,7 @@ object Language {
   /**
    * An Add function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
   def Add(terms: Iterable[Value]): Value = {
     ObjectV("add" -> ArrayV(terms.toArray))
@@ -308,7 +308,7 @@ object Language {
   /**
    * An Equals function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
   def Equals(terms: Iterable[Value]): Value = {
     ObjectV("equals" -> ArrayV(terms.toArray))
@@ -317,7 +317,7 @@ object Language {
   /**
    * A Concat function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
   def Concat(terms: Iterable[Value]): Value = {
     ObjectV("concat" -> ArrayV(terms.toArray))
@@ -330,7 +330,7 @@ object Language {
   /**
    * A Contains function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
   def Contains(path: Iterable[Path], in: Value): Value = {
     ObjectV("contains" -> ArrayV(path.map(_.value).toArray), "in" -> in)
@@ -339,7 +339,7 @@ object Language {
   /**
    * A Multiply function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
   def Multiply(terms: Iterable[Value]): Value = {
     ObjectV("multiply" -> ArrayV(terms.toArray))
@@ -348,7 +348,7 @@ object Language {
   /**
    * A Divide function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
   def Divide(terms: Iterable[Value]): Value = {
     ObjectV("divide" -> ArrayV(terms.toArray))
@@ -361,7 +361,7 @@ object Language {
   /**
    * A Subtract function.
    *
-   * '''Reference''': [[https://faunadb.com/documentation#queries-misc_functions FaunaDB Miscellaneous Functions]]
+   * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
   def Subtract(terms: Iterable[Value]): Value = {
     ObjectV("subtract" -> ArrayV(terms.toArray))

@@ -63,7 +63,7 @@ public final class Language {
   /**
    * Creates a new Object function, wrapping an empty object value.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-basic_forms">FaunaDB Basic Forms</a>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
   public static Value Object() {
     return ObjectV("object", ObjectV());
@@ -72,7 +72,7 @@ public final class Language {
   /**
    * Creates a new Object function, wrapping the provided object value.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-basic_forms">FaunaDB Basic Forms</a>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
   public static Value Object(ObjectV value) {
     return ObjectV("object", value);
@@ -81,7 +81,7 @@ public final class Language {
   /**
    * Returns an empty object value.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static Value.ObjectV ObjectV() {
     return ObjectV.empty();
@@ -90,7 +90,7 @@ public final class Language {
   /**
    * Creates a new object value, wrapping the provided dictionary of values.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static ObjectV ObjectV(ImmutableMap<String, Value> values) {
     return ObjectV.create(values);
@@ -99,7 +99,7 @@ public final class Language {
   /**
    * Creates a new object value containing the given entries.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static ObjectV ObjectV(String k1, Value v1) {
     return ObjectV.create(k1, v1);
@@ -108,7 +108,7 @@ public final class Language {
   /**
    * Creates a new object value containing the given entries.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static ObjectV ObjectV(String k1, Value v1, String k2, Value v2) {
     return ObjectV.create(k1, v1, k2, v2);
@@ -117,7 +117,7 @@ public final class Language {
   /**
    * Creates a new object value containing the given entries.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static ObjectV ObjectV(String k1, Value v1, String k2, Value v2, String k3, Value v3) {
     return ObjectV.create(k1, v1, k2, v2, k3, v3);
@@ -126,7 +126,7 @@ public final class Language {
   /**
    * Creates a new object value containing the given entries.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static ObjectV ObjectV(String k1, Value v1, String k2, Value v2, String k3, Value v3, String k4, Value v4) {
     return ObjectV.create(k1, v1, k2, v2, k3, v3, k4, v4);
@@ -135,7 +135,7 @@ public final class Language {
   /**
    * Creates a new object value containing the given entries.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static ObjectV ObjectV(String k1, Value v1, String k2, Value v2, String k3, Value v3, String k4, Value v4, String k5, Value v5) {
     return ObjectV.create(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
@@ -144,7 +144,7 @@ public final class Language {
   /**
    * Creates an empty array value.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV() {
     return ArrayV.empty();
@@ -153,7 +153,7 @@ public final class Language {
   /**
    * Creates a new array value containing the provided list of values.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV(ImmutableList<Value> values) {
     return ArrayV.create(values);
@@ -162,7 +162,7 @@ public final class Language {
   /**
    * Creates a new array value containing the given entry.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV(Value v1) {
     return ArrayV.create(v1);
@@ -171,7 +171,7 @@ public final class Language {
   /**
    * Creates a new array value containing the given entries.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV(Value v1, Value v2) {
     return ArrayV.create(v1, v2);
@@ -180,7 +180,7 @@ public final class Language {
   /**
    * Creates a new array value containing the given entries.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV(Value v1, Value v2, Value v3) {
     return ArrayV.create(v1, v2, v3);
@@ -189,7 +189,7 @@ public final class Language {
   /**
    * Creates a new array value containing the given entries.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV(Value v1, Value v2, Value v3, Value v4) {
     return ArrayV.create(v1, v2, v3, v4);
@@ -198,7 +198,7 @@ public final class Language {
   /**
    * Creates a new array value containing the given entries.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV(Value v1, Value v2, Value v3, Value v4, Value v5) {
     return ArrayV.create(v1, v2, v3, v4, v5);
@@ -207,7 +207,7 @@ public final class Language {
   /**
    * Creates a new array value containing the given entries.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static ArrayV ArrayV(Value v1, Value v2, Value v3, Value v4, Value v5, Value v6) {
     return ArrayV.create(v1, v2, v3, v4, v5, v6);
@@ -216,7 +216,7 @@ public final class Language {
   /**
    * Creates a new Ref value.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static Ref Ref(String ref) {
     return Ref.create(ref);
@@ -225,7 +225,7 @@ public final class Language {
   /**
    * Creates a new String value.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static StringV StringV(String value) {
     return StringV.create(value);
@@ -234,7 +234,7 @@ public final class Language {
   /**
    * Creates a new Long value.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static LongV LongV(long value) {
     return LongV.create(value);
@@ -243,7 +243,7 @@ public final class Language {
   /**
    * Create aa new Double value.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static DoubleV DoubleV(double value) {
     return DoubleV.create(value);
@@ -252,7 +252,7 @@ public final class Language {
   /**
    * Creates a new Boolean value.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values">FaunaDB Values</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
   public static BooleanV BooleanV(boolean value) {
     return BooleanV.create(value);
@@ -269,7 +269,7 @@ public final class Language {
   /**
    * Creates a new Exists function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-read_functions">FaunaDB Read Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a></p>
    */
   public static Value Exists(Value ref) {
     return ObjectV("exists", ref);
@@ -278,7 +278,7 @@ public final class Language {
   /**
    * Creates a new Count function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-read_functions">FaunaDB Read Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a></p>
    */
   public static Value Count(Value set) {
     return ObjectV("count", set);
@@ -287,7 +287,7 @@ public final class Language {
   /**
    * Creates a new Create function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-write_functions">FaunaDB Write Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions">FaunaDB Write Functions</a></p>
    */
   public static Value Create(Value ref) {
     return ObjectV("create", ref);
@@ -304,7 +304,7 @@ public final class Language {
   /**
    * Creates a new Create function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-write_functions">FaunaDB Write Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions">FaunaDB Write Functions</a></p>
    */
   public static Value Create(Value ref, Value params) {
     return ObjectV("create", ref, "params", params);
@@ -313,7 +313,7 @@ public final class Language {
   /**
    * Creates a new Delete function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-write_functions">FaunaDB Write Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions">FaunaDB Write Functions</a></p>
    */
   public static Value Delete(Value ref) {
     return ObjectV("delete", ref);
@@ -322,7 +322,7 @@ public final class Language {
   /**
    * Creates a new Difference set.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-sets">FaunaDB Set Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#sets">FaunaDB Set Functions</a></p>
    */
   public static Value Difference(ImmutableList<Value> sets) {
     return ObjectV("difference", ArrayV(sets));
@@ -373,7 +373,7 @@ public final class Language {
   /**
    * Creates a new Do function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-basic_forms">FaunaDB Basic Forms</a>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
   public static Value Do(ImmutableList<Value> expressions) {
     return ObjectV("do", ArrayV(expressions));
@@ -424,7 +424,7 @@ public final class Language {
   /**
    * Creates a new Foreach function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-collection_functions">FaunaDB Collection Functions</a>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
    */
   public static Value Foreach(Value lambda, Value collection) {
     return ObjectV("foreach", lambda, "collection", collection);
@@ -453,7 +453,7 @@ public final class Language {
   /**
    * Creates a new Get function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-read_functions">FaunaDB Read Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a></p>
    */
   public static ObjectV Get(Value resource) {
     return ObjectV("get", resource);
@@ -462,7 +462,7 @@ public final class Language {
   /**
    * Creates a new If function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-basic_forms">FaunaDB Basic Forms</a>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
   public static ObjectV If(Value condition, Value then, Value elseExpression) {
     return ObjectV("if", condition, "then", then, "else", elseExpression);
@@ -471,7 +471,7 @@ public final class Language {
   /**
    * Creates a new Intersection function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-sets">FaunaDB Set Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#sets">FaunaDB Set Functions</a></p>
    */
   public static Value Intersection(ImmutableList<Value> sets) {
     return ObjectV("intersection", ArrayV(sets));
@@ -522,7 +522,7 @@ public final class Language {
   /**
    * Creates a new Join function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-sets">FaunaDB Set Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#sets">FaunaDB Set Functions</a></p>
    */
   public static Value Join(Value source, Value target) {
     return ObjectV("join", source, "with", target);
@@ -531,7 +531,7 @@ public final class Language {
   /**
    * Creates a new Lambda function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-basic_forms">FaunaDB Basic Forms</a>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
   public static Value Lambda(String argument, Value expr) {
     return ObjectV("lambda", StringV(argument), "expr", expr);
@@ -540,7 +540,7 @@ public final class Language {
   /**
    * Creates a new Let function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-basic_forms">FaunaDB Basic Forms</a>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
   public static Value Let(ImmutableMap<String, Value> vars, Value in) {
     return ObjectV("let", ObjectV(vars), "in", in);
@@ -549,7 +549,7 @@ public final class Language {
   /**
    * Creates a new Map function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-collection_functions">FaunaDB Collection Functions</a>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
    */
   public static Value Map(Value lambda, Value collection) {
     return ObjectV("map", lambda, "collection", collection);
@@ -558,7 +558,7 @@ public final class Language {
   /**
    * Creates a new Match function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-sets">FaunaDB Set Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#sets">FaunaDB Set Functions</a></p>
    */
   public static Value Match(Value term, Ref index) {
     return ObjectV("match", term, "index", index);
@@ -569,7 +569,7 @@ public final class Language {
    *
    * @see PaginateBuilder
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-read_functions">FaunaDB Read Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a></p>
    */
   public static PaginateBuilder Paginate(Value resource) {
     return PaginateBuilder.create(resource);
@@ -578,7 +578,7 @@ public final class Language {
   /**
    * Creates a new Quote function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-basic_forms">FaunaDB Basic Forms</a>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
   public static Value Quote(Value expression) {
     return ObjectV("quote", expression);
@@ -587,7 +587,7 @@ public final class Language {
   /**
    * Creates a new Replace function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-write_functions">FaunaDB Write Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions">FaunaDB Write Functions</a></p>
    */
   public static Value Replace(Value ref, Value obj) {
     return ObjectV("replace", ref, "params", obj);
@@ -596,7 +596,7 @@ public final class Language {
   /**
    * Creates a new Select function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions">FaunaDB Miscellaneous Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
   public static Value Select(ImmutableList<Path> path, Value from) {
     ImmutableList.Builder<Value> pathValueBuilder = ImmutableList.builder();
@@ -610,7 +610,7 @@ public final class Language {
   /**
    * Creates a new Union function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-sets">FaunaDB Set Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#sets">FaunaDB Set Functions</a></p>
    */
   public static Value Union(ImmutableList<Value> sets) {
     return ObjectV("union", ArrayV(sets));
@@ -661,7 +661,7 @@ public final class Language {
   /**
    * Creates a new Update function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-write_functions">FaunaDB Write Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions">FaunaDB Write Functions</a></p>
    */
   public static Value Update(Value ref, Value params) {
     return ObjectV("update", ref, "params", params);
@@ -670,7 +670,7 @@ public final class Language {
   /**
    * Creates a new Var type.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-basic_forms">FaunaDB Basic Forms</a>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
   public static Value Var(String variable) {
     return ObjectV("var", StringV(variable));
@@ -697,7 +697,7 @@ public final class Language {
   /**
    * Creates a new Add function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions">FaunaDB Miscellaneous Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
   public static Value Add(ImmutableList<Value> terms) {
     return ObjectV("add", ArrayV(terms));
@@ -748,7 +748,7 @@ public final class Language {
   /**
    * Creates a new Subtract function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions">FaunaDB Miscellaneous Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
   public static Value Subtract(ImmutableList<Value> terms) {
     return ObjectV("subtract", ArrayV(terms));
@@ -799,7 +799,7 @@ public final class Language {
   /**
    * Creates a new Divide function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions">FaunaDB Miscellaneous Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
   public static Value Divide(ImmutableList<Value> terms) {
     return ObjectV("divide", ArrayV(terms));
@@ -849,7 +849,7 @@ public final class Language {
   /**
    * Creates a new Multiply function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions">FaunaDB Miscellaneous Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
   public static Value Multiply(ImmutableList<Value> terms) {
     return ObjectV("multiply", ArrayV(terms));
@@ -976,7 +976,7 @@ public final class Language {
   /**
    * Creates a new Equals function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions">FaunaDB Miscellaneous Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
   public static Value Equals(ImmutableList<Value> terms) {
     return ObjectV("equals", ArrayV(terms));
@@ -1027,7 +1027,7 @@ public final class Language {
   /**
    * Creates a new Concat function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions">FaunaDB Miscellaneous Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
   public static Value Concat(ImmutableList<Value> terms) {
     return ObjectV("concat", ArrayV(terms));
@@ -1082,7 +1082,7 @@ public final class Language {
   /**
    * Creates a new Contains function.
    *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions">FaunaDB Miscellaneous Functions</a></p>
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
   public static Value Contains(ImmutableList<Path> path, Value in) {
     ImmutableList.Builder<Value> pathValueBuilder = ImmutableList.builder();

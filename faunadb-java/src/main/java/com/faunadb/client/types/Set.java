@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableMap;
 /**
  * A FaunaDB set literal.
  *
- * <p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values-special_types">FaunaDB Special Types</a></p>
+ * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a></p>
  *
  */
 @JsonDeserialize(using=Codec.SetDeserializer.class)

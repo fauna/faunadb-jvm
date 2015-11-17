@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * <p><i>Example</i>: <code>{ "@ref": "classes/spells/102462014988746752" }</code>
  *
- * <p><i>Reference</i>: <a href="https://faunadb.com/documentation#queries-values-special_types">FaunaDB Special Types</a>
+ * <p><i>Reference</i>: <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
  *
  */
 public class Ref extends Value.ConcreteValue {
