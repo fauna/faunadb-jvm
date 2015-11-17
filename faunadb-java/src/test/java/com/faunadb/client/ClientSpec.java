@@ -527,4 +527,26 @@ public class ClientSpec {
     Value dateR = dateF.get();
     assertThat(dateR.asDate(), is(LocalDate.ofEpochDay(1)));
   }
+
+  @Test
+  public void testAuthenticationFunctions() throws IOException, ExecutionException, InterruptedException {
+    ListenableFuture<Value> createF = client.query(Create(Ref("classes/spells"), Quote(ObjectV("credentials", ObjectV("password", StringV("abcdefg"))))));
+    Instance createR = createF.get().asInstance();
+
+    ListenableFuture<Value> loginF = client.query(Login(createR.ref(), Quote(ObjectV("password", StringV("abcdefg")))));
+    Token loginR = loginF.get().asToken();
+
+    FaunaClient sessionClient = FaunaClient.create(Connection.builder().withFaunaRoot(config.get("root_url")).withAuthToken(loginR.secret()).build());
+    ListenableFuture<Value> logoutF = sessionClient.query(Logout(false));
+    Boolean logoutR = logoutF.get().asBoolean();
+    assertThat(logoutR, is(true));
+
+    ListenableFuture<Value> identifyF = client.query(Identify(createR.ref(), StringV("abcdefgfd")));
+    Boolean identifyR = identifyF.get().asBoolean();
+    assertThat(identifyR, is(false));
+
+    sessionClient.close();
+
+
+  }
 }

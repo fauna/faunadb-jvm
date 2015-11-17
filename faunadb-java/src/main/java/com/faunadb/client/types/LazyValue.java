@@ -136,6 +136,14 @@ public final class LazyValue implements Value {
     }
   }
 
+  public Token asToken() {
+    try {
+      return json.convertValue(underlying, Token.class);
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
+  }
+
   public Database asDatabase() {
     try {
       return json.convertValue(underlying, Database.class);

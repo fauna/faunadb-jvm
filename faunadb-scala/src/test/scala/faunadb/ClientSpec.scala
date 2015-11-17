@@ -381,5 +381,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val identifyF = client.query(Identify(createR.ref, "abcdefg"))
     val identifyR = Await.result(identifyF, 1 second)
     identifyR.asBoolean shouldBe true
+
+    sessionClient.close()
   }
 }

@@ -117,6 +117,8 @@ public interface Value {
    */
   Key asKey();
 
+  Token asToken();
+
   /**
    * Coerces this node into a {@link Database}.
    * @return a Database, or null.
@@ -211,6 +213,11 @@ public interface Value {
 
     @Override
     public Key asKey() {
+      return null;
+    }
+
+    @Override
+    public Token asToken() {
       return null;
     }
 

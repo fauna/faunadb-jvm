@@ -197,7 +197,7 @@ public class SerializationSpec {
     Value logout = Logout(true);
     assertThat(json.writeValueAsString(logout), is("{\"logout\":true}"));
 
-    Value identify = Identify(Ref("classes/characters/104979509695139637"), "abracadabra");
+    Value identify = Identify(Ref("classes/characters/104979509695139637"), StringV("abracadabra"));
     assertThat(json.writeValueAsString(identify), is("{\"identify\":{\"@ref\":\"classes/characters/104979509695139637\"},\"password\":\"abracadabra\"}"));
   }
 

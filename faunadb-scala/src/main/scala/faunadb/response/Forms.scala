@@ -18,7 +18,7 @@ case class Instance(@(JsonProperty)("ref") ref: Ref,
 
 /**
  * A FaunaDB key response.
- *
+
  * This, like other response types, is obtained by coercing a [[LazyValue]] using
  * the conversion methods [[LazyValue.asKey]] or [[LazyValue.asKeyOpt]].
  */

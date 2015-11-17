@@ -1101,8 +1101,8 @@ public final class Language {
     return ObjectV("logout", BooleanV(invalidateAll));
   }
 
-  public static Value Identify(Value ref, String password) {
-    return ObjectV("identify", ref, "password", StringV(password));
+  public static Value Identify(Value ref, Value password) {
+    return ObjectV("identify", ref, "password", password);
   }
 
   public static Value Time(Value time) {

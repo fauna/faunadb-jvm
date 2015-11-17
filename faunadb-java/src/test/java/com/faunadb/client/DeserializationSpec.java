@@ -299,4 +299,16 @@ public class DeserializationSpec {
     LocalDate date = parsed.asDate();
     assertThat(date, is(LocalDate.ofEpochDay(2)));
   }
+
+  @Test
+  public void deserializeTokenResponse() throws IOException {
+    String toDeserialize = "{\"ref\":{\"@ref\":\"tokens/116957992316829696\"},\"class\":{\"@ref\":\"tokens\"},\"ts\":1447798683342861,\"credentials\":{\"@ref\":\"credentials/116957992274886656\"},\"secret\":\"k6oBn4SsobAAAAADoQS0L5P7oOt-_GnVDxRNPGFjVEWTMK4\"}";
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
+    Token token = parsed.asToken();
+    assertThat(token.ref(), is(Ref.create("tokens/116957992316829696")));
+    assertThat(token.classRef(), is(Ref.create("tokens")));
+    assertThat(token.ts(), is(1447798683342861L));
+    assertThat(token.credentials(), is(Ref.create("credentials/116957992274886656")));
+    assertThat(token.secret(), is("k6oBn4SsobAAAAADoQS0L5P7oOt-_GnVDxRNPGFjVEWTMK4"));
+  }
 }
