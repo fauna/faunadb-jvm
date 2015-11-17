@@ -2,6 +2,8 @@ package faunadb
 
 import _root_.java.io.FileInputStream
 import _root_.java.util.{Map => JMap}
+import java.time.{LocalDate, Instant}
+import java.time.temporal.ChronoUnit
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import faunadb.errors.{NotFoundException, BadRequestException}
@@ -341,17 +343,17 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test date and time functions" in {
-//    val timeF = client.query(Time("1970-01-01T00:00:00+00:00"))
-//    val timeR = Await.result(timeF, 1 second)
-//    println(timeR)
+    val timeF = client.query(Time("1970-01-01T00:00:00-04:00"))
+    val timeR = Await.result(timeF, 1 second)
+    timeR.asTs.value shouldBe Instant.EPOCH.plus(4, ChronoUnit.HOURS)
 
-//    val epochF = client.query(Epoch(30, "seconds"))
-//    val epochR = Await.result(epochF, 1 second)
-//      println(epochR)
+    val epochF = client.query(Epoch(30, "second"))
+    val epochR = Await.result(epochF, 1 second)
+    epochR.asTs.value shouldBe Instant.EPOCH.plus(30, ChronoUnit.SECONDS)
 
-//    val dateF = client.query("1970-01-02")
-//    val dateR = Await.result(dateF, 1 second)
-//    println(dateR)
+    val dateF = client.query(Language.Date("1970-01-02"))
+    val dateR = Await.result(dateF, 1 second)
+    dateR.asDate.value shouldBe LocalDate.ofEpochDay(1)
   }
 
   it should "test authentication functions" in {

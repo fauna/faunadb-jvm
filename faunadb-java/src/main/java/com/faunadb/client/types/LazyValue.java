@@ -11,6 +11,9 @@ import com.faunadb.client.response.Class;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import java.time.Instant;
+import java.time.LocalDate;
+
 /**
  * A {@link Value} that wraps a JSON response tree. This Value does not convert to a concrete type until one of its
  * type coercion methods is called.
@@ -63,6 +66,22 @@ public final class LazyValue implements Value {
     if (underlying.isDouble()) {
       return underlying.asDouble();
     } else {
+      return null;
+    }
+  }
+
+  public Instant asTs() {
+    try {
+      return json.convertValue(underlying, TsV.class).asTs();
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
+  }
+
+  public LocalDate asDate() {
+    try {
+      return json.convertValue(underlying, DateV.class).asDate();
+    } catch (IllegalArgumentException ex) {
       return null;
     }
   }

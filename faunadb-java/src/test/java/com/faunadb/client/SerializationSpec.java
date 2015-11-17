@@ -15,6 +15,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
 public class SerializationSpec {
   ObjectMapper json = new ObjectMapper();
 
@@ -91,8 +95,6 @@ public class SerializationSpec {
 
     Value append = Append(ArrayV(LongV(4L), LongV(5L), LongV(6L)), ArrayV(LongV(1L), LongV(2L), LongV(3L)));
     assertThat(json.writeValueAsString(append), is("{\"append\":[4,5,6],\"collection\":[1,2,3]}"));
-
-
   }
 
   @Test
@@ -191,6 +193,15 @@ public class SerializationSpec {
 
     Value identify = Identify(Ref("classes/characters/104979509695139637"), "abracadabra");
     assertThat(json.writeValueAsString(identify), is("{\"identify\":{\"@ref\":\"classes/characters/104979509695139637\"},\"password\":\"abracadabra\"}"));
+  }
+
+  @Test
+  public void serializeTsAndDateValues() throws JsonProcessingException {
+    Value ts = TsV(Instant.EPOCH.plus(5, ChronoUnit.MINUTES));
+    assertThat(json.writeValueAsString(ts), is("{\"@ts\":\"1970-01-01T00:05:00Z\"}"));
+
+    Value date = DateV(LocalDate.ofEpochDay(2));
+    assertThat(json.writeValueAsString(date), is("{\"@date\":\"1970-01-03\"}"));
   }
 
   @Test

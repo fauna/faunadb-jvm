@@ -13,6 +13,9 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -279,5 +282,21 @@ public class DeserializationSpec {
     assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851640310104064")));
     assertThat(page.before(), is(Optional.<Value>absent()));
     assertThat(page.after().get().asRef(), is(Ref.create("classes/spells/102851646450565120")));
+  }
+
+  @Test
+  public void deserializeTs() throws IOException {
+    String toDeserialize = "{ \"@ts\": \"1970-01-01T00:05:00Z\" }";
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
+    Instant instant = parsed.asTs();
+    assertThat(instant, is(Instant.EPOCH.plus(5, ChronoUnit.MINUTES)));
+  }
+
+  @Test
+  public void deserializeDate() throws IOException {
+    String toDeserialize = "{ \"@date\": \"1970-01-03\" }";
+    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
+    LocalDate date = parsed.asDate();
+    assertThat(date, is(LocalDate.ofEpochDay(2)));
   }
 }

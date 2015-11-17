@@ -20,6 +20,9 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -452,6 +455,10 @@ public class ClientSpec {
     Value concatR = concatF.get();
     assertThat(concatR.asString(), is("MagicMissile"));
 
+    ListenableFuture<Value> concat2F = client.query(Concat(ImmutableList.<Value>of(StringV("Magic"), StringV("Missile")), " "));
+    Value concat2R = concat2F.get();
+    assertThat(concat2R.asString(), is("Magic Missile"));
+
     ListenableFuture<Value> containsF = client.query(Contains(Path(Path.Object("favorites"), Path.Object("foods")), Quote(ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings")))))));
     Value containsR = containsF.get();
     assertThat(containsR.asBoolean(), is(true));
@@ -476,5 +483,36 @@ public class ClientSpec {
     ListenableFuture<Value> divideF = client.query(Divide(LongV(100), LongV(10)));
     Value divideR = divideF.get();
     assertThat(divideR.asLong(), is(10L));
+
+    ListenableFuture<Value> moduloF = client.query(Modulo(LongV(101), LongV(10)));
+    Value moduloR = moduloF.get();
+    assertThat(moduloR.asLong(), is(1L));
+
+    ListenableFuture<Value> andF = client.query(And(ImmutableList.<Value>of(BooleanV(true), BooleanV(false))));
+    Value andR = andF.get();
+    assertThat(andR.asBoolean(), is(false));
+
+    ListenableFuture<Value> orF = client.query(Or(ImmutableList.<Value>of(BooleanV(true), BooleanV(false))));
+    Value orR = orF.get();
+    assertThat(orR.asBoolean(), is(true));
+
+    ListenableFuture<Value> notF = client.query(Not(BooleanV(false)));
+    Value notR = notF.get();
+    assertThat(notR.asBoolean(), is(true));
+  }
+
+  @Test
+  public void testDateTimeFunctions() throws IOException, ExecutionException, InterruptedException {
+    ListenableFuture<Value> timeF = client.query(Time(StringV("1970-01-01T00:00:00-04:00")));
+    Value timeR = timeF.get();
+    assertThat(timeR.asTs(), is(Instant.EPOCH.plus(4, ChronoUnit.HOURS)));
+
+    ListenableFuture<Value> epochF = client.query(Epoch(LongV(30), TimeUnit.SECOND));
+    Value epochR = epochF.get();
+    assertThat(epochR.asTs(), is(Instant.EPOCH.plus(30, ChronoUnit.SECONDS)));
+
+    ListenableFuture<Value> dateF = client.query(Date(StringV("1970-01-02")));
+    Value dateR = dateF.get();
+    assertThat(dateR.asDate(), is(LocalDate.ofEpochDay(1)));
   }
 }

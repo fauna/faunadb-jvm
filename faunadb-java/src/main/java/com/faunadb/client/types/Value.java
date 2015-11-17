@@ -1,6 +1,7 @@
 package com.faunadb.client.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.NullNode;
@@ -9,6 +10,11 @@ import com.faunadb.client.response.*;
 import com.faunadb.client.response.Class;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Represents any scalar or non-scalar value in the FaunaDB query language. FaunaDB value types consist of
@@ -64,6 +70,10 @@ public interface Value {
    * @return the double value of this node, or null.
    */
   Double asDouble();
+
+  Instant asTs();
+
+  LocalDate asDate();
 
   /**
    * Coerces this node into an ordered list of nodes.
@@ -151,6 +161,16 @@ public interface Value {
 
     @Override
     public Double asDouble() {
+      return null;
+    }
+
+    @Override
+    public Instant asTs() {
+      return null;
+    }
+
+    @Override
+    public LocalDate asDate() {
       return null;
     }
 
@@ -557,6 +577,67 @@ public interface Value {
     @JsonValue
     public NullNode value() {
       return NullNode.getInstance();
+    }
+  }
+
+  final class TsV extends ConcreteValue {
+    private final Instant value;
+
+    public static TsV create(Instant value) {
+      return new TsV(value);
+    }
+
+    @JsonProperty("@ts")
+    private String strValue() {
+      return value.toString();
+    }
+
+    @JsonCreator
+    TsV(@JsonProperty("@ts") String value) {
+      this.value = ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant();
+    }
+
+    TsV(Instant ts) {
+      this.value = ts;
+    }
+
+    @Override
+    public int hashCode() { return value.hashCode(); }
+
+    @Override
+    public Instant asTs() {
+      return value;
+    }
+  }
+
+  final class DateV extends ConcreteValue {
+    private final LocalDate value;
+
+    public static DateV create(LocalDate value) {
+      return new DateV(value);
+    }
+
+    DateV(LocalDate value) {
+      this.value = value;
+    }
+
+    DateV(@JsonProperty("@date") String value) {
+      this.value = LocalDate.parse(value);
+    }
+
+    @JsonProperty("@date")
+    private String strValue() {
+      return value.toString();
+    }
+
+    @Override
+    public int hashCode() {
+      return value.hashCode();
+    }
+
+    @Override
+    public LocalDate asDate() {
+      return value;
     }
   }
 }

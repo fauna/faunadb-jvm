@@ -6,6 +6,9 @@ import com.faunadb.client.types.Ref;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import java.time.Instant;
+import java.time.LocalDate;
+
 /**
  * Helper methods for the FaunaDB query language. This class is intended to be statically imported into your code:
  *
@@ -241,6 +244,14 @@ public final class Language {
    */
   public static BooleanV BooleanV(boolean value) {
     return BooleanV.create(value);
+  }
+
+  public static TsV TsV(Instant value) {
+    return TsV.create(value);
+  }
+
+  public static DateV DateV(LocalDate value) {
+    return DateV.create(value);
   }
 
   /**
