@@ -42,6 +42,12 @@ case class Database(@JsonProperty("ref") ref: Ref,
                     @JsonProperty("ts") ts: Long,
                     @JsonProperty("name") name: String)
 
+/**
+  * A FaunaDB token response.
+  *
+  * This, like other response types, is obtained by coercing a [[LazyValue]] using its associated conversion methods,
+  * [[LazyValue.asToken]] or [[LazyValue.asTokenOpt]].
+  */
 case class Token(@JsonProperty("ref") ref: Ref,
                  @(JsonProperty @field @param)("class") classRef: Ref,
                  @JsonProperty("ts") ts: Long,

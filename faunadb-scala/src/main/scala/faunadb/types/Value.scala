@@ -1,10 +1,13 @@
 package faunadb.types
 
-import com.fasterxml.jackson.annotation.JsonValue
+import java.time.format.DateTimeFormatter
+import java.time.{LocalDate, ZonedDateTime, Instant}
+
+import com.fasterxml.jackson.annotation.{JsonProperty, JsonCreator, JsonIgnore, JsonValue}
 import com.fasterxml.jackson.databind.node.NullNode
 import faunadb.response._
 
-import scala.annotation.meta.getter
+import scala.annotation.meta.{field, getter}
 
 trait Value {
   def asStringOpt: Option[String] = None
@@ -122,4 +125,32 @@ case class ArrayV(@(JsonValue @getter) values: scala.Array[Value]) extends Value
 
 case object NullV extends Value {
   @(JsonValue @getter) val value = NullNode.instance
+}
+
+object Ts {
+  def apply(value: String) = new Ts(value)
+}
+
+case class Ts(@(JsonIgnore @field @getter) value: Instant) extends Value {
+  @JsonCreator
+  def this(@JsonProperty("@ts") value: String) = this(ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant)
+
+  @JsonProperty("@ts")
+  val strValue = value.toString
+
+  override def asTsOpt = Some(this)
+}
+
+object Date {
+  def apply(value: String) = new Date(value)
+}
+
+case class Date(@(JsonIgnore @field @getter) value: LocalDate) extends Value {
+  @JsonCreator
+  def this(@JsonProperty("@date") value: String) = this(LocalDate.parse(value))
+
+  @JsonProperty("@date")
+  val strValue = value.toString
+
+  override def asDateOpt = Some(this)
 }

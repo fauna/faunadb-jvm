@@ -204,6 +204,4 @@ class SerializationSpec extends FlatSpec with Matchers {
     val not = Not(false)
     json.writeValueAsString(not) shouldBe "{\"not\":false}"
   }
-
-
 }

@@ -16,6 +16,10 @@ import scala.annotation.meta.{field, getter}
  */
 object Language {
   sealed abstract class TimeUnit(val value: String)
+
+  /**
+    * Enumeration for time units. Used by [[https://faunadb.com/documentation/queries#time_functions]].
+    */
   object TimeUnit {
     case object Second extends TimeUnit("second")
     case object Millisecond extends TimeUnit("millisecond")
@@ -23,12 +27,14 @@ object Language {
     case object Nanosecond extends TimeUnit("nanosecond")
   }
 
+  /**
+    * Enumeration for event action types.
+    */
   sealed abstract class Action(val value: String)
   object Action {
     case object Create extends Action("create")
     case object Delete extends Action("delete")
   }
-
 
   implicit def stringToObjectPath(str: String) = ObjectPath(str)
   implicit def intToArrayPath(i: Int) = ArrayPath(i)
@@ -43,6 +49,11 @@ object Language {
     (p._1, convert(p._2))
   }
 
+  /**
+    * A Let expression.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
+    */
   def Let(vars: collection.Map[String, Value], in: Value): Value = {
     ObjectV("let" -> ObjectV(vars), "in" -> in)
   }
@@ -110,22 +121,47 @@ object Language {
     ObjectV("foreach" -> lambda, "collection" -> collection)
   }
 
+  /**
+    * A Filter function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
+    */
   def Filter(lambda: Value, collection: Value): Value = {
     ObjectV("filter" -> lambda, "collection" -> collection)
   }
 
+  /**
+    * A Take function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
+    */
   def Take(num: Value, collection: Value): Value = {
     ObjectV("take" -> num, "collection" -> collection)
   }
 
+  /**
+    * A Drop function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
+    */
   def Drop(num: Value, collection: Value): Value = {
     ObjectV("drop" -> num, "collection" -> collection)
   }
 
+  /**
+    * A Prepend function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
+    */
   def Prepend(elems: Value, collection: Value): Value = {
     ObjectV("prepend" -> elems, "collection" -> collection)
   }
 
+  /**
+    * An Append function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
+    */
   def Append(elems: Value, collection: Value): Value = {
     ObjectV("append" -> elems, "collection" -> collection)
   }
@@ -284,10 +320,20 @@ object Language {
     ObjectV("delete" -> ref)
   }
 
+  /**
+    * An Insert function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
+    */
   def Insert(ref: Value, ts: Long, action: Action, params: Value): Value = {
     ObjectV("insert" -> ref, "ts" -> ts, "action" -> action.value, "params" -> params)
   }
 
+  /**
+    * A Remove function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
+    */
   def Remove(ref: Value, ts: Long, action: Action): Value = {
     ObjectV("remove" -> ref, "ts" -> ts, "action" -> action.value)
   }
@@ -354,6 +400,11 @@ object Language {
     ObjectV("divide" -> ArrayV(terms.toArray))
   }
 
+  /**
+    * A Modulo function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
+    */
   def Modulo(terms: Iterable[Value]): Value = {
     ObjectV("modulo" -> ArrayV(terms.toArray))
   }
@@ -367,22 +418,74 @@ object Language {
     ObjectV("subtract" -> ArrayV(terms.toArray))
   }
 
+  /**
+    * An And function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
+    */
+  def And(terms: Iterable[Value]): Value = {
+    ObjectV("and" -> ArrayV(terms.toArray))
+  }
+
+  /**
+    * An Or function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
+    */
+  def Or(terms: Iterable[Value]): Value = {
+    ObjectV("or" -> ArrayV(terms.toArray))
+  }
+
+  /**
+    * A Not function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
+    */
+  def Not(term: Value): Value = {
+    ObjectV("not" -> term)
+  }
+
+  /**
+    * A Login function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#auth_functions]]
+    */
   def Login(ref: Value, params: Value): Value = {
     ObjectV("login" -> ref, "params" -> params)
   }
 
+  /**
+    * A Logout function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#auth_functions]]
+    */
   def Logout(invalidateAll: Boolean): Value = {
     ObjectV("logout" -> invalidateAll)
   }
 
+  /**
+    * An Identify function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#auth_functions]]
+    */
   def Identify(ref: Value, password: Value): Value = {
     ObjectV("identify" -> ref, "password" -> password)
   }
 
+  /**
+    * A Time function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#time_functions]]
+    */
   def Time(str: Value): Value = {
     ObjectV("time" -> str)
   }
 
+  /**
+    * An Epoch function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#time_functions]]
+    */
   def Epoch(num: Value, unit: TimeUnit) = {
     ObjectV("epoch" -> num, "unit" -> unit.value)
   }
@@ -391,20 +494,13 @@ object Language {
     ObjectV("epoch" -> num, "unit" -> unit)
   }
 
+  /**
+    * A Date function.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#time_functions]]
+    */
   def Date(str: Value) = {
     ObjectV("date" -> str)
-  }
-
-  def And(terms: Iterable[Value]): Value = {
-    ObjectV("and" -> ArrayV(terms.toArray))
-  }
-
-  def Or(terms: Iterable[Value]): Value = {
-    ObjectV("or" -> ArrayV(terms.toArray))
-  }
-
-  def Not(term: Value): Value = {
-    ObjectV("not" -> term)
   }
 }
 
