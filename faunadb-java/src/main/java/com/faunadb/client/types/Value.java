@@ -71,8 +71,16 @@ public interface Value {
    */
   Double asDouble();
 
+  /**
+   * Coerces this node into a {@link Instant}, if it is a {@link TsV}.
+   * @return the instant value of this node, or null.
+   */
   Instant asTs();
 
+  /**
+   * Coerces this node into a {@link LocalDate}, if it is a {@link DateV}.
+   * @return the date value of this node, or null.
+   */
   LocalDate asDate();
 
   /**
@@ -117,6 +125,10 @@ public interface Value {
    */
   Key asKey();
 
+  /**
+   * Coerces this node into a {@link Token}.
+   * @return a Token, or null.
+   */
   Token asToken();
 
   /**

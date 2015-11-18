@@ -24,6 +24,9 @@ import java.time.LocalDate;
 public final class Language {
   Language() { }
 
+  /**
+   * Enumeration for time units. Used by <a href="https://faunadb.com/documentation/queries#time_functions">FaunaDB Time Functions</a>.
+   */
   public static final class TimeUnit {
     private final String value;
 
@@ -41,6 +44,9 @@ public final class Language {
     public final static TimeUnit NANOSECOND = new TimeUnit("nanosecond");
   }
 
+  /**
+   * Enumeration for event action types.
+   */
   public static final class Action {
     private final String value;
     public final String getValue() { return value; }
@@ -258,10 +264,20 @@ public final class Language {
     return BooleanV.create(value);
   }
 
+  /**
+   * Creates a new Timestamp value.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
+   */
   public static TsV TsV(Instant value) {
     return TsV.create(value);
   }
 
+  /**
+   * Creates a new Date value.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
+   */
   public static DateV DateV(LocalDate value) {
     return DateV.create(value);
   }
@@ -293,14 +309,6 @@ public final class Language {
     return ObjectV("create", ref);
   }
 
-  public static Value Insert(Value ref, long ts, Action action, Value params) {
-    return ObjectV("insert", ref, "ts", LongV(ts), "action", StringV(action.getValue()), "params", params);
-  }
-
-  public static Value Remove(Value ref, long ts, Action action) {
-    return ObjectV("remove", ref, "ts", LongV(ts), "action", StringV(action.getValue()));
-  }
-
   /**
    * Creates a new Create function.
    *
@@ -308,6 +316,24 @@ public final class Language {
    */
   public static Value Create(Value ref, Value params) {
     return ObjectV("create", ref, "params", params);
+  }
+
+  /**
+   * Creates a new Insert function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions">FaunaDB Write Functions</a></p>
+   */
+  public static Value Insert(Value ref, long ts, Action action, Value params) {
+    return ObjectV("insert", ref, "ts", LongV(ts), "action", StringV(action.getValue()), "params", params);
+  }
+
+  /**
+   * Creates a new Remove function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions">FaunaDB Write Functions</a></p>
+   */
+  public static Value Remove(Value ref, long ts, Action action) {
+    return ObjectV("remove", ref, "ts", LongV(ts), "action", StringV(action.getValue()));
   }
 
   /**
@@ -430,22 +456,47 @@ public final class Language {
     return ObjectV("foreach", lambda, "collection", collection);
   }
 
+  /**
+   * Creates a new Filter function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   */
   public static Value Filter(Value lambda, Value collection) {
     return ObjectV("filter", lambda, "collection", collection);
   }
 
+  /**
+   * Creates a new Take function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   */
   public static Value Take(Value num, Value collection) {
     return ObjectV("take", num, "collection", collection);
   }
 
+  /**
+   * Creates a new Drop function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   */
   public static Value Drop(Value num, Value collection) {
     return ObjectV("drop", num, "collection", collection);
   }
 
+  /**
+   * Creates a new Prepend function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   */
   public static Value Prepend(Value elems, Value collection) {
     return ObjectV("prepend", elems, "collection", collection);
   }
 
+  /**
+   * Creates a new Append function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   */
   public static Value Append(Value elems, Value collection) {
     return ObjectV("append", elems, "collection", collection);
   }
@@ -897,78 +948,143 @@ public final class Language {
     return Multiply(ImmutableList.of(term1, term2, term3, term4, term5, term6));
   }
 
+  /**
+   * Creates a new Modulo function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
+   */
   public static Value Modulo(ImmutableList<Value> terms) {
     return ObjectV("modulo", ArrayV(terms));
   }
 
+  /**
+   * Creates a new Modulo function operating on the given terms.
+   */
   public static Value Modulo(Value term1) {
     return Modulo(ImmutableList.of(term1));
   }
 
+  /**
+   * Creates a new Modulo function operating on the given terms.
+   */
   public static Value Modulo(Value term1, Value term2) {
     return Modulo(ImmutableList.of(term1, term2));
   }
 
+  /**
+   * Creates a new Modulo function operating on the given terms.
+   */
   public static Value Modulo(Value term1, Value term2, Value term3) {
     return Modulo(ImmutableList.of(term1, term2, term3));
   }
 
+  /**
+   * Creates a new Modulo function operating on the given terms.
+   */
   public static Value Modulo(Value term1, Value term2, Value term3, Value term4) {
     return Modulo(ImmutableList.of(term1, term2, term3, term4));
   }
 
+  /**
+   * Creates a new Modulo function operating on the given terms.
+   */
   public static Value Modulo(Value term1, Value term2, Value term3, Value term4, Value term5) {
     return Modulo(ImmutableList.of(term1, term2, term3, term4, term5));
   }
 
+  /**
+   * Creates a new And function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
+   */
   public static Value And(ImmutableList<Value> terms) {
     return ObjectV("and", ArrayV(terms));
   }
 
+  /**
+   * Creates a new And function operating on the given terms.
+   */
   public static Value And(Value term1) {
     return And(ImmutableList.of(term1));
   }
 
+  /**
+   * Creates a new And function operating on the given terms.
+   */
   public static Value And(Value term1, Value term2) {
     return And(ImmutableList.of(term1, term2));
   }
 
+  /**
+   * Creates a new And function operating on the given terms.
+   */
   public static Value And(Value term1, Value term2, Value term3) {
     return And(ImmutableList.of(term1, term2, term3));
   }
 
+  /**
+   * Creates a new And function operating on the given terms.
+   */
   public static Value And(Value term1, Value term2, Value term3, Value term4) {
     return And(ImmutableList.of(term1, term2, term3, term4));
   }
 
+  /**
+   * Creates a new And function operating on the given terms.
+   */
   public static Value And(Value term1, Value term2, Value term3, Value term4, Value term5) {
     return And(ImmutableList.of(term1, term2, term3, term4, term5));
   }
 
+  /**
+   * Creates a new Or function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
+   */
   public static Value Or(ImmutableList<Value> terms) {
     return ObjectV("or", ArrayV(terms));
   }
 
+  /**
+   * Creates a new Or function operating on the given terms.
+   */
   public static Value Or(Value term1) {
     return Or(ImmutableList.of(term1));
   }
 
+  /**
+   * Creates a new Or function operating on the given terms.
+   */
   public static Value Or(Value term1, Value term2) {
     return Or(ImmutableList.of(term1, term2));
   }
 
+  /**
+   * Creates a new Or function operating on the given terms.
+   */
   public static Value Or(Value term1, Value term2, Value term3) {
     return Or(ImmutableList.of(term1, term2, term3));
   }
 
+  /**
+   * Creates a new Or function operating on the given terms.
+   */
   public static Value Or(Value term1, Value term2, Value term3, Value term4) {
     return Or(ImmutableList.of(term1, term2, term3, term4));
   }
 
+  /**
+   * Creates a new Or function operating on the given terms.
+   */
   public static Value Or(Value term1, Value term2, Value term3, Value term4, Value term5) {
     return Or(ImmutableList.of(term1, term2, term3, term4, term5));
   }
 
+  /**
+   * Creates a new Not function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
+   */
   public static Value Not(Value term) {
     return ObjectV("not", term);
   }
@@ -1093,30 +1209,65 @@ public final class Language {
     return ObjectV("contains", ArrayV(pathValueBuilder.build()), "in", in);
   }
 
+  /**
+   * Creates a new Login function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a></p>
+   */
   public static Value Login(Value ref, Value params) {
     return ObjectV("login", ref, "params", params);
   }
 
+  /**
+   * Creates a new Logout function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a></p>
+   */
   public static Value Logout(boolean invalidateAll) {
     return ObjectV("logout", BooleanV(invalidateAll));
   }
 
+  /**
+   * Creates a new Identify function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a></p>
+   */
   public static Value Identify(Value ref, Value password) {
     return ObjectV("identify", ref, "password", password);
   }
 
+  /**
+   * Creates a new Time function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#time_functions">FaunaDB Time and Date Functions</a></p>
+   */
   public static Value Time(Value time) {
     return ObjectV("time", time);
   }
 
+  /**
+   * Creates a new Epoch function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#time_functions">FaunaDB Time and Date Functions</a></p>
+   */
   public static Value Epoch(Value num, TimeUnit unit) {
     return ObjectV("epoch", num, "unit", StringV(unit.getValue()));
   }
 
+  /**
+   * Creates a new Epoch function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#time_functions">FaunaDB Time and Date Functions</a></p>
+   */
   public static Value Epoch(Value num, String unit) {
     return ObjectV("epoch", num, "unit", StringV(unit));
   }
 
+  /**
+   * Creates a new Date function.
+   *
+   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#time_functions">FaunaDB Time and Date Functions</a></p>
+   */
   public static Value Date(Value date) {
     return ObjectV("date", date);
   }
@@ -1174,6 +1325,4 @@ public final class Language {
   public static ImmutableList<Path> Path(Path term1, Path term2, Path term3, Path term4, Path term5, Path term6) {
     return ImmutableList.of(term1, term2, term3, term4, term5, term6);
   }
-
-
 }
