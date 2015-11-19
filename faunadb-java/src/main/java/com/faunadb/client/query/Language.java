@@ -166,57 +166,12 @@ public final class Language {
   }
 
   /**
-   * Creates a new array value containing the given entry.
-   *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
-   */
-  public static ArrayV ArrayV(Value v1) {
-    return ArrayV.create(v1);
-  }
-
-  /**
    * Creates a new array value containing the given entries.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
    */
-  public static ArrayV ArrayV(Value v1, Value v2) {
-    return ArrayV.create(v1, v2);
-  }
-
-  /**
-   * Creates a new array value containing the given entries.
-   *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
-   */
-  public static ArrayV ArrayV(Value v1, Value v2, Value v3) {
-    return ArrayV.create(v1, v2, v3);
-  }
-
-  /**
-   * Creates a new array value containing the given entries.
-   *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
-   */
-  public static ArrayV ArrayV(Value v1, Value v2, Value v3, Value v4) {
-    return ArrayV.create(v1, v2, v3, v4);
-  }
-
-  /**
-   * Creates a new array value containing the given entries.
-   *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
-   */
-  public static ArrayV ArrayV(Value v1, Value v2, Value v3, Value v4, Value v5) {
-    return ArrayV.create(v1, v2, v3, v4, v5);
-  }
-
-  /**
-   * Creates a new array value containing the given entries.
-   *
-   * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a></p>
-   */
-  public static ArrayV ArrayV(Value v1, Value v2, Value v3, Value v4, Value v5, Value v6) {
-    return ArrayV.create(v1, v2, v3, v4, v5, v6);
+  public static ArrayV ArrayV(Value... values) {
+    return ArrayV.create(ImmutableList.copyOf(values));
   }
 
   /**
@@ -357,43 +312,8 @@ public final class Language {
   /**
    * Creates a new Difference set expression operating on the given sets.
    */
-  public static Value Difference(Value set1) {
-    return Difference(ImmutableList.of(set1));
-  }
-
-  /**
-   * Creates a new Difference set expression operating on the given sets.
-   */
-  public static Value Difference(Value set1, Value set2) {
-    return Difference(ImmutableList.of(set1, set2));
-  }
-
-  /**
-   * Creates a new Difference set expression operating on the given sets.
-   */
-  public static Value Difference(Value set1, Value set2, Value set3) {
-    return Difference(ImmutableList.of(set1, set2, set3));
-  }
-
-  /**
-   * Creates a new Difference set expression operating on the given sets.
-   */
-  public static Value Difference(Value set1, Value set2, Value set3, Value set4) {
-    return Difference(ImmutableList.of(set1, set2, set3, set4));
-  }
-
-  /**
-   * Creates a new Difference set expression operating on the given sets.
-   */
-  public static Value Difference(Value set1, Value set2, Value set3, Value set4, Value set5) {
-    return Difference(ImmutableList.of(set1, set2, set3, set4, set5));
-  }
-
-  /**
-   * Creates a new Difference set expression operating on the given sets.
-   */
-  public static Value Difference(Value set1, Value set2, Value set3, Value set4, Value set5, Value set6) {
-    return Difference(ImmutableList.of(set1, set2, set3, set4, set5, set6));
+  public static Value Difference(Value... sets) {
+    return Difference(ImmutableList.copyOf(sets));
   }
 
   /**
@@ -408,43 +328,8 @@ public final class Language {
   /**
    * Creates a new Do expression with the given terms.
    */
-  public static Value Do(Value expr1) {
-    return Do(ImmutableList.of(expr1));
-  }
-
-  /**
-   * Creates a new Do expression with the given terms.
-   */
-  public static Value Do(Value expr1, Value expr2) {
-    return Do(ImmutableList.of(expr1, expr2));
-  }
-
-  /**
-   * Creates a new Do expression with the given terms.
-   */
-  public static Value Do(Value expr1, Value expr2, Value expr3) {
-    return Do(ImmutableList.of(expr1, expr2, expr3));
-  }
-
-  /**
-   * Creates a new Do expression with the given terms.
-   */
-  public static Value Do(Value expr1, Value expr2, Value expr3, Value expr4) {
-    return Do(ImmutableList.of(expr1, expr2, expr3, expr4));
-  }
-
-  /**
-   * Creates a new Do expression with the given terms.
-   */
-  public static Value Do(Value expr1, Value expr2, Value expr3, Value expr4, Value expr5) {
-    return Do(ImmutableList.of(expr1, expr2, expr3, expr4, expr5));
-  }
-
-  /**
-   * Creates a new Do expression with the given terms.
-   */
-  public static Value Do(Value expr1, Value expr2, Value expr3, Value expr4, Value expr5, Value expr6) {
-    return Do(ImmutableList.of(expr1, expr2, expr3, expr4, expr5, expr6));
+  public static Value Do(Value... exprs) {
+    return Do(ImmutableList.copyOf(exprs));
   }
 
   /**
@@ -531,43 +416,8 @@ public final class Language {
   /**
    * Creates a new Intersection set expression operating on the given sets.
    */
-  public static Value Intersection(Value set1) {
-    return Intersection(ImmutableList.of(set1));
-  }
-
-  /**
-   * Creates a new Intersection set expression operating on the given sets.
-   */
-  public static Value Intersection(Value set1, Value set2) {
-    return Intersection(ImmutableList.of(set1, set2));
-  }
-
-  /**
-   * Creates a new Intersection set expression operating on the given sets.
-   */
-  public static Value Intersection(Value set1, Value set2, Value set3) {
-    return Intersection(ImmutableList.of(set1, set2, set3));
-  }
-
-  /**
-   * Creates a new Intersection set expression operating on the given sets.
-   */
-  public static Value Intersection(Value set1, Value set2, Value set3, Value set4) {
-    return Intersection(ImmutableList.of(set1, set2, set3, set4));
-  }
-
-  /**
-   * Creates a new Intersection set expression operating on the given sets.
-   */
-  public static Value Intersection(Value set1, Value set2, Value set3, Value set4, Value set5) {
-    return Intersection(ImmutableList.of(set1, set2, set3, set4, set5));
-  }
-
-  /**
-   * Creates a new Intersection set expression operating on the given sets.
-   */
-  public static Value Intersection(Value set1, Value set2, Value set3, Value set4, Value set5, Value set6) {
-    return Intersection(ImmutableList.of(set1, set2, set3, set4, set5, set6));
+  public static Value Intersection(Value... sets) {
+    return Intersection(ImmutableList.copyOf(sets));
   }
 
   /**
@@ -670,43 +520,8 @@ public final class Language {
   /**
    * Creates a new Union expression operating on the given sets.
    */
-  public static Value Union(Value set1) {
-    return Union(ImmutableList.of(set1));
-  }
-
-  /**
-   * Creates a new Union expression operating on the given sets.
-   */
-  public static Value Union(Value set1, Value set2) {
-    return Union(ImmutableList.of(set1, set2));
-  }
-
-  /**
-   * Creates a new Union expression operating on the given sets.
-   */
-  public static Value Union(Value set1, Value set2, Value set3) {
-    return Union(ImmutableList.of(set1, set2, set3));
-  }
-
-  /**
-   * Creates a new Union expression operating on the given sets.
-   */
-  public static Value Union(Value set1, Value set2, Value set3, Value set4) {
-    return Union(ImmutableList.of(set1, set2, set3, set4));
-  }
-
-  /**
-   * Creates a new Union expression operating on the given sets.
-   */
-  public static Value Union(Value set1, Value set2, Value set3, Value set4, Value set5) {
-    return Union(ImmutableList.of(set1, set2, set3, set4, set5));
-  }
-
-  /**
-   * Creates a new Union expression operating on the given sets.
-   */
-  public static Value Union(Value set1, Value set2, Value set3, Value set4, Value set5, Value set6) {
-    return Union(ImmutableList.of(set1, set2, set3, set4, set5, set6));
+  public static Value Union(Value... sets) {
+    return Union(ImmutableList.copyOf(sets));
   }
 
   /**
@@ -757,43 +572,8 @@ public final class Language {
   /**
    * Creates a new Add expression operating on the given terms.
    */
-  public static Value Add(Value term1) {
-    return Add(ImmutableList.of(term1));
-  }
-
-  /**
-   * Creates a new Add expression operating on the given terms.
-   */
-  public static Value Add(Value term1, Value term2) {
-    return Add(ImmutableList.of(term1, term2));
-  }
-
-  /**
-   * Creates a new Add expression operating on the given terms.
-   */
-  public static Value Add(Value term1, Value term2, Value term3) {
-    return Add(ImmutableList.of(term1, term2, term3));
-  }
-
-  /**
-   * Creates a new Add expression operating on the given terms.
-   */
-  public static Value Add(Value term1, Value term2, Value term3, Value term4) {
-    return Add(ImmutableList.of(term1, term2, term3, term4));
-  }
-
-  /**
-   * Creates a new Add expression operating on the given terms.
-   */
-  public static Value Add(Value term1, Value term2, Value term3, Value term4, Value term5) {
-    return Add(ImmutableList.of(term1, term2, term3, term4, term5));
-  }
-
-  /**
-   * Creates a new Add expression operating on the given terms.
-   */
-  public static Value Add(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
-    return Add(ImmutableList.of(term1, term2, term3, term4, term5, term6));
+  public static Value Add(Value... terms) {
+    return Add(ImmutableList.copyOf(terms));
   }
 
   /**
@@ -808,45 +588,9 @@ public final class Language {
   /**
    * Creates a new Subtract expression operating on the given terms.
    */
-  public static Value Subtract(Value term1) {
-    return Subtract(ImmutableList.of(term1));
+  public static Value Subtract(Value... terms) {
+    return Subtract(ImmutableList.copyOf(terms));
   }
-
-  /**
-   * Creates a new Subtract expression operating on the given terms.
-   */
-  public static Value Subtract(Value term1, Value term2) {
-    return Subtract(ImmutableList.of(term1, term2));
-  }
-
-  /**
-   * Creates a new Subtract expression operating on the given terms.
-   */
-  public static Value Subtract(Value term1, Value term2, Value term3) {
-    return Subtract(ImmutableList.of(term1, term2, term3));
-  }
-
-  /**
-   * Creates a new Subtract expression operating on the given terms.
-   */
-  public static Value Subtract(Value term1, Value term2, Value term3, Value term4) {
-    return Subtract(ImmutableList.of(term1, term2, term3, term4));
-  }
-
-  /**
-   * Creates a new Subtract expression operating on the given terms.
-   */
-  public static Value Subtract(Value term1, Value term2, Value term3, Value term4, Value term5) {
-    return Subtract(ImmutableList.of(term1, term2, term3, term4, term5));
-  }
-
-  /**
-   * Creates a new Subtract expression operating on the given terms.
-   */
-  public static Value Subtract(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
-    return Subtract(ImmutableList.of(term1, term2, term3, term4, term5, term6));
-  }
-
   /**
    * Creates a new Divide expression.
    *
@@ -859,43 +603,8 @@ public final class Language {
   /**
    * Creates a new Divide expression operating on the given terms.
    */
-  public static Value Divide(Value term1) {
-    return Divide(ImmutableList.of(term1));
-  }
-
-  /**
-   * Creates a new Divide expression operating on the given terms.
-   */
-  public static Value Divide(Value term1, Value term2) {
-    return Divide(ImmutableList.of(term1, term2));
-  }
-
-  /**
-   * Creates a new Divide expression operating on the given terms.
-   */
-  public static Value Divide(Value term1, Value term2, Value term3) {
-    return Divide(ImmutableList.of(term1, term2, term3));
-  }
-
-  /**
-   * Creates a new Divide expression operating on the given terms.
-   */
-  public static Value Divide(Value term1, Value term2, Value term3, Value term4) {
-    return Divide(ImmutableList.of(term1, term2, term3, term4));
-  }
-
-  /**
-   * Creates a new Divide expression operating on the given terms.
-   */
-  public static Value Divide(Value term1, Value term2, Value term3, Value term4, Value term5) {
-    return Divide(ImmutableList.of(term1, term2, term3, term4, term5));
-  }
-
-  /**
-   * Creates a new Divide expression operating on the given terms.
-   */
-  public static Value Divide(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
-    return Divide(ImmutableList.of(term1, term2, term3, term4, term5, term6));
+  public static Value Divide(Value... terms) {
+    return Divide(ImmutableList.copyOf(terms));
   }
 
   /**
@@ -910,43 +619,8 @@ public final class Language {
   /**
    * Creates a new Multiply expression operating on the given terms.
    */
-  public static Value Multiply(Value term1) {
-    return Multiply(ImmutableList.of(term1));
-  }
-
-  /**
-   * Creates a new Multiply expression operating on the given terms.
-   */
-  public static Value Multiply(Value term1, Value term2) {
-    return Multiply(ImmutableList.of(term1, term2));
-  }
-
-  /**
-   * Creates a new Multiply expression operating on the given terms.
-   */
-  public static Value Multiply(Value term1, Value term2, Value term3) {
-    return Multiply(ImmutableList.of(term1, term2, term3));
-  }
-
-  /**
-   * Creates a new Multiply expression operating on the given terms.
-   */
-  public static Value Multiply(Value term1, Value term2, Value term3, Value term4) {
-    return Multiply(ImmutableList.of(term1, term2, term3, term4));
-  }
-
-  /**
-   * Creates a new Multiply expression operating on the given terms.
-   */
-  public static Value Multiply(Value term1, Value term2, Value term3, Value term4, Value term5) {
-    return Multiply(ImmutableList.of(term1, term2, term3, term4, term5));
-  }
-
-  /**
-   * Creates a new Multiply expression operating on the given terms.
-   */
-  public static Value Multiply(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
-    return Multiply(ImmutableList.of(term1, term2, term3, term4, term5, term6));
+  public static Value Multiply(Value... terms) {
+    return Multiply(ImmutableList.copyOf(terms));
   }
 
   /**
@@ -961,36 +635,8 @@ public final class Language {
   /**
    * Creates a new Modulo expression operating on the given terms.
    */
-  public static Value Modulo(Value term1) {
-    return Modulo(ImmutableList.of(term1));
-  }
-
-  /**
-   * Creates a new Modulo expression operating on the given terms.
-   */
-  public static Value Modulo(Value term1, Value term2) {
-    return Modulo(ImmutableList.of(term1, term2));
-  }
-
-  /**
-   * Creates a new Modulo expression operating on the given terms.
-   */
-  public static Value Modulo(Value term1, Value term2, Value term3) {
-    return Modulo(ImmutableList.of(term1, term2, term3));
-  }
-
-  /**
-   * Creates a new Modulo expression operating on the given terms.
-   */
-  public static Value Modulo(Value term1, Value term2, Value term3, Value term4) {
-    return Modulo(ImmutableList.of(term1, term2, term3, term4));
-  }
-
-  /**
-   * Creates a new Modulo expression operating on the given terms.
-   */
-  public static Value Modulo(Value term1, Value term2, Value term3, Value term4, Value term5) {
-    return Modulo(ImmutableList.of(term1, term2, term3, term4, term5));
+  public static Value Modulo(Value... terms) {
+    return Modulo(ImmutableList.copyOf(terms));
   }
 
   /**
@@ -1005,36 +651,8 @@ public final class Language {
   /**
    * Creates a new And expression operating on the given terms.
    */
-  public static Value And(Value term1) {
-    return And(ImmutableList.of(term1));
-  }
-
-  /**
-   * Creates a new And expression operating on the given terms.
-   */
-  public static Value And(Value term1, Value term2) {
-    return And(ImmutableList.of(term1, term2));
-  }
-
-  /**
-   * Creates a new And expression operating on the given terms.
-   */
-  public static Value And(Value term1, Value term2, Value term3) {
-    return And(ImmutableList.of(term1, term2, term3));
-  }
-
-  /**
-   * Creates a new And expression operating on the given terms.
-   */
-  public static Value And(Value term1, Value term2, Value term3, Value term4) {
-    return And(ImmutableList.of(term1, term2, term3, term4));
-  }
-
-  /**
-   * Creates a new And expression operating on the given terms.
-   */
-  public static Value And(Value term1, Value term2, Value term3, Value term4, Value term5) {
-    return And(ImmutableList.of(term1, term2, term3, term4, term5));
+  public static Value And(Value... terms) {
+    return And(ImmutableList.copyOf(terms));
   }
 
   /**
@@ -1049,36 +667,8 @@ public final class Language {
   /**
    * Creates a new Or expression operating on the given terms.
    */
-  public static Value Or(Value term1) {
-    return Or(ImmutableList.of(term1));
-  }
-
-  /**
-   * Creates a new Or expression operating on the given terms.
-   */
-  public static Value Or(Value term1, Value term2) {
-    return Or(ImmutableList.of(term1, term2));
-  }
-
-  /**
-   * Creates a new Or expression operating on the given terms.
-   */
-  public static Value Or(Value term1, Value term2, Value term3) {
-    return Or(ImmutableList.of(term1, term2, term3));
-  }
-
-  /**
-   * Creates a new Or expression operating on the given terms.
-   */
-  public static Value Or(Value term1, Value term2, Value term3, Value term4) {
-    return Or(ImmutableList.of(term1, term2, term3, term4));
-  }
-
-  /**
-   * Creates a new Or expression operating on the given terms.
-   */
-  public static Value Or(Value term1, Value term2, Value term3, Value term4, Value term5) {
-    return Or(ImmutableList.of(term1, term2, term3, term4, term5));
+  public static Value Or(Value... terms) {
+    return Or(ImmutableList.copyOf(terms));
   }
 
   /**
@@ -1102,43 +692,8 @@ public final class Language {
   /**
    * Creates a new Equals expression operating on the given terms.
    */
-  public static Value Equals(Value term1) {
-    return Equals(ImmutableList.of(term1));
-  }
-
-  /**
-   * Creates a new Equals expression operating on the given terms.
-   */
-  public static Value Equals(Value term1, Value term2) {
-    return Equals(ImmutableList.of(term1, term2));
-  }
-
-  /**
-   * Creates a new Equals expression operating on the given terms.
-   */
-  public static Value Equals(Value term1, Value term2, Value term3) {
-    return Equals(ImmutableList.of(term1, term2, term3));
-  }
-
-  /**
-   * Creates a new Equals expression operating on the given terms.
-   */
-  public static Value Equals(Value term1, Value term2, Value term3, Value term4) {
-    return Equals(ImmutableList.of(term1, term2, term3, term4));
-  }
-
-  /**
-   * Creates a new Equals expression operating on the given terms.
-   */
-  public static Value Equals(Value term1, Value term2, Value term3, Value term4, Value term5) {
-    return Equals(ImmutableList.of(term1, term2, term3, term4, term5));
-  }
-
-  /**
-   * Creates a new Equals expression operating on the given terms.
-   */
-  public static Value Equals(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
-    return Equals(ImmutableList.of(term1, term2, term3, term4, term5, term6));
+  public static Value Equals(Value... terms) {
+    return Equals(ImmutableList.copyOf(terms));
   }
 
   /**
@@ -1157,43 +712,8 @@ public final class Language {
   /**
    * Creates a new Concat expression operating on the given terms.
    */
-  public static Value Concat(Value term1) {
-    return Concat(ImmutableList.of(term1));
-  }
-
-  /**
-   * Creates a new Concat expression operating on the given terms.
-   */
-  public static Value Concat(Value term1, Value term2) {
-    return Concat(ImmutableList.of(term1, term2));
-  }
-
-  /**
-   * Creates a new Concat expression operating on the given terms.
-   */
-  public static Value Concat(Value term1, Value term2, Value term3) {
-    return Concat(ImmutableList.of(term1, term2, term3));
-  }
-
-  /**
-   * Creates a new Concat expression operating on the given terms.
-   */
-  public static Value Concat(Value term1, Value term2, Value term3, Value term4) {
-    return Concat(ImmutableList.of(term1, term2, term3, term4));
-  }
-
-  /**
-   * Creates a new Concat expression operating on the given terms.
-   */
-  public static Value Concat(Value term1, Value term2, Value term3, Value term4, Value term5) {
-    return Concat(ImmutableList.of(term1, term2, term3, term4, term5));
-  }
-
-  /**
-   * Creates a new Concat expression operating on the given terms.
-   */
-  public static Value Concat(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
-    return Concat(ImmutableList.of(term1, term2, term3, term4, term5, term6));
+  public static Value Concat(Value... terms) {
+    return Concat(ImmutableList.copyOf(terms));
   }
 
   /**
@@ -1278,52 +798,7 @@ public final class Language {
    *
    * @see Path
    */
-  public static ImmutableList<Path> Path(Path term1) {
-    return ImmutableList.of(term1);
-  }
-
-  /**
-   * Helper for constructing a Path list with the given path terms.
-   *
-   * @see Path
-   */
-  public static ImmutableList<Path> Path(Path term1, Path term2) {
-    return ImmutableList.of(term1, term2);
-  }
-
-  /**
-   * Helper for constructing a Path list with the given path terms.
-   *
-   * @see Path
-   */
-  public static ImmutableList<Path> Path(Path term1, Path term2, Path term3) {
-    return ImmutableList.of(term1, term2, term3);
-  }
-
-  /**
-   * Helper for constructing a Path list with the given path terms.
-   *
-   * @see Path
-   */
-  public static ImmutableList<Path> Path(Path term1, Path term2, Path term3, Path term4) {
-    return ImmutableList.of(term1, term2, term3, term4);
-  }
-
-  /**
-   * Helper for constructing a Path list with the given path terms.
-   *
-   * @see Path
-   */
-  public static ImmutableList<Path> Path(Path term1, Path term2, Path term3, Path term4, Path term5) {
-    return ImmutableList.of(term1, term2, term3, term4, term5);
-  }
-
-  /**
-   * Helper for constructing a Path list with the given path terms.
-   *
-   * @see Path
-   */
-  public static ImmutableList<Path> Path(Path term1, Path term2, Path term3, Path term4, Path term5, Path term6) {
-    return ImmutableList.of(term1, term2, term3, term4, term5, term6);
+  public static ImmutableList<Path> Path(Path... terms) {
+    return ImmutableList.copyOf(terms);
   }
 }
