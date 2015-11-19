@@ -68,7 +68,7 @@ object Language {
   }
 
   /**
-   * An If function.
+   * An If expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
    */
@@ -77,7 +77,7 @@ object Language {
   }
 
   /**
-   * A Quote function.
+   * A Quote expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
    */
@@ -86,7 +86,7 @@ object Language {
   }
 
   /**
-   * A Select function.
+   * A Select expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
    */
@@ -104,7 +104,7 @@ object Language {
   }
 
   /**
-   * A Map function.
+   * A Map expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
    */
@@ -113,7 +113,7 @@ object Language {
   }
 
   /**
-   * A Foreach function.
+   * A Foreach expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
    */
@@ -122,7 +122,7 @@ object Language {
   }
 
   /**
-    * A Filter function.
+    * A Filter expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
     */
@@ -131,7 +131,7 @@ object Language {
   }
 
   /**
-    * A Take function.
+    * A Take expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
     */
@@ -140,7 +140,7 @@ object Language {
   }
 
   /**
-    * A Drop function.
+    * A Drop expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
     */
@@ -149,7 +149,7 @@ object Language {
   }
 
   /**
-    * A Prepend function.
+    * A Prepend expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
     */
@@ -158,7 +158,7 @@ object Language {
   }
 
   /**
-    * An Append function.
+    * An Append expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
     */
@@ -212,7 +212,7 @@ object Language {
   }
 
   /**
-   * A Get function.
+   * A Get expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#read_functions]]
    */
@@ -221,9 +221,9 @@ object Language {
   }
 
   /**
-   * A Paginate function.
+   * A Paginate expression.
    *
-   * The paginate function takes optional parameters. These can either be specified by named parameters on the constructor:
+   * The paginate expression takes optional parameters. These can either be specified by named parameters on the constructor:
    *
    * {{{
    *   Paginate(resource, ts, sources=true, cursor=Some(cursor))
@@ -267,7 +267,7 @@ object Language {
   }
 
   /**
-   * A Count function.
+   * A Count expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#read_functions]]
    */
@@ -276,7 +276,7 @@ object Language {
   }
 
   /**
-   * An Exists function.
+   * An Exists expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#read_functions]]
    */
@@ -285,7 +285,7 @@ object Language {
   }
 
   /**
-   * A Create function.
+   * A Create expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
    */
@@ -294,7 +294,7 @@ object Language {
   }
 
   /**
-   * A Replace function.
+   * A Replace expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
    */
@@ -303,7 +303,7 @@ object Language {
   }
 
   /**
-   * An Update function.
+   * An Update expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
    */
@@ -312,7 +312,7 @@ object Language {
   }
 
   /**
-   * A Delete function.
+   * A Delete expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
    */
@@ -321,7 +321,7 @@ object Language {
   }
 
   /**
-    * An Insert function.
+    * An Insert expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
     */
@@ -330,7 +330,7 @@ object Language {
   }
 
   /**
-    * A Remove function.
+    * A Remove expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
     */
@@ -343,7 +343,7 @@ object Language {
   }
 
   /**
-   * An Add function.
+   * An Add expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
@@ -352,7 +352,7 @@ object Language {
   }
 
   /**
-   * An Equals function.
+   * An Equals expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
@@ -361,7 +361,7 @@ object Language {
   }
 
   /**
-   * A Concat function.
+   * A Concat expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
@@ -374,7 +374,7 @@ object Language {
   }
 
   /**
-   * A Contains function.
+   * A Contains expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
@@ -383,7 +383,7 @@ object Language {
   }
 
   /**
-   * A Multiply function.
+   * A Multiply expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
@@ -392,7 +392,7 @@ object Language {
   }
 
   /**
-   * A Divide function.
+   * A Divide expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
@@ -401,7 +401,7 @@ object Language {
   }
 
   /**
-    * A Modulo function.
+    * A Modulo expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
     */
@@ -410,7 +410,7 @@ object Language {
   }
 
   /**
-   * A Subtract function.
+   * A Subtract expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
@@ -419,7 +419,7 @@ object Language {
   }
 
   /**
-    * An And function.
+    * An And expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
     */
@@ -428,7 +428,7 @@ object Language {
   }
 
   /**
-    * An Or function.
+    * An Or expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
     */
@@ -437,7 +437,7 @@ object Language {
   }
 
   /**
-    * A Not function.
+    * A Not expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
     */
@@ -446,7 +446,7 @@ object Language {
   }
 
   /**
-    * A Login function.
+    * A Login expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#auth_functions]]
     */
@@ -455,7 +455,7 @@ object Language {
   }
 
   /**
-    * A Logout function.
+    * A Logout expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#auth_functions]]
     */
@@ -464,7 +464,7 @@ object Language {
   }
 
   /**
-    * An Identify function.
+    * An Identify expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#auth_functions]]
     */
@@ -473,7 +473,7 @@ object Language {
   }
 
   /**
-    * A Time function.
+    * A Time expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#time_functions]]
     */
@@ -482,7 +482,7 @@ object Language {
   }
 
   /**
-    * An Epoch function.
+    * An Epoch expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#time_functions]]
     */
@@ -495,7 +495,7 @@ object Language {
   }
 
   /**
-    * A Date function.
+    * A Date expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#time_functions]]
     */

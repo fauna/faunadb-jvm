@@ -67,7 +67,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Object function, wrapping an empty object value.
+   * Creates a new Object expression, wrapping an empty object value.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
@@ -76,7 +76,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Object function, wrapping the provided object value.
+   * Creates a new Object expression, wrapping the provided object value.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
@@ -283,7 +283,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Exists function.
+   * Creates a new Exists expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a></p>
    */
@@ -292,7 +292,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Count function.
+   * Creates a new Count expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a></p>
    */
@@ -301,7 +301,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Create function.
+   * Creates a new Create expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions">FaunaDB Write Functions</a></p>
    */
@@ -310,7 +310,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Create function.
+   * Creates a new Create expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions">FaunaDB Write Functions</a></p>
    */
@@ -319,7 +319,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Insert function.
+   * Creates a new Insert expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions">FaunaDB Write Functions</a></p>
    */
@@ -328,7 +328,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Remove function.
+   * Creates a new Remove expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions">FaunaDB Write Functions</a></p>
    */
@@ -337,7 +337,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Delete function.
+   * Creates a new Delete expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions">FaunaDB Write Functions</a></p>
    */
@@ -355,49 +355,49 @@ public final class Language {
   }
 
   /**
-   * Creates a new Difference set function operating on the given sets.
+   * Creates a new Difference set expression operating on the given sets.
    */
   public static Value Difference(Value set1) {
     return Difference(ImmutableList.of(set1));
   }
 
   /**
-   * Creates a new Difference set function operating on the given sets.
+   * Creates a new Difference set expression operating on the given sets.
    */
   public static Value Difference(Value set1, Value set2) {
     return Difference(ImmutableList.of(set1, set2));
   }
 
   /**
-   * Creates a new Difference set function operating on the given sets.
+   * Creates a new Difference set expression operating on the given sets.
    */
   public static Value Difference(Value set1, Value set2, Value set3) {
     return Difference(ImmutableList.of(set1, set2, set3));
   }
 
   /**
-   * Creates a new Difference set function operating on the given sets.
+   * Creates a new Difference set expression operating on the given sets.
    */
   public static Value Difference(Value set1, Value set2, Value set3, Value set4) {
     return Difference(ImmutableList.of(set1, set2, set3, set4));
   }
 
   /**
-   * Creates a new Difference set function operating on the given sets.
+   * Creates a new Difference set expression operating on the given sets.
    */
   public static Value Difference(Value set1, Value set2, Value set3, Value set4, Value set5) {
     return Difference(ImmutableList.of(set1, set2, set3, set4, set5));
   }
 
   /**
-   * Creates a new Difference set function operating on the given sets.
+   * Creates a new Difference set expression operating on the given sets.
    */
   public static Value Difference(Value set1, Value set2, Value set3, Value set4, Value set5, Value set6) {
     return Difference(ImmutableList.of(set1, set2, set3, set4, set5, set6));
   }
 
   /**
-   * Creates a new Do function.
+   * Creates a new Do expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
@@ -406,49 +406,49 @@ public final class Language {
   }
 
   /**
-   * Creates a new Do function with the given terms.
+   * Creates a new Do expression with the given terms.
    */
   public static Value Do(Value expr1) {
     return Do(ImmutableList.of(expr1));
   }
 
   /**
-   * Creates a new Do function with the given terms.
+   * Creates a new Do expression with the given terms.
    */
   public static Value Do(Value expr1, Value expr2) {
     return Do(ImmutableList.of(expr1, expr2));
   }
 
   /**
-   * Creates a new Do function with the given terms.
+   * Creates a new Do expression with the given terms.
    */
   public static Value Do(Value expr1, Value expr2, Value expr3) {
     return Do(ImmutableList.of(expr1, expr2, expr3));
   }
 
   /**
-   * Creates a new Do function with the given terms.
+   * Creates a new Do expression with the given terms.
    */
   public static Value Do(Value expr1, Value expr2, Value expr3, Value expr4) {
     return Do(ImmutableList.of(expr1, expr2, expr3, expr4));
   }
 
   /**
-   * Creates a new Do function with the given terms.
+   * Creates a new Do expression with the given terms.
    */
   public static Value Do(Value expr1, Value expr2, Value expr3, Value expr4, Value expr5) {
     return Do(ImmutableList.of(expr1, expr2, expr3, expr4, expr5));
   }
 
   /**
-   * Creates a new Do function with the given terms.
+   * Creates a new Do expression with the given terms.
    */
   public static Value Do(Value expr1, Value expr2, Value expr3, Value expr4, Value expr5, Value expr6) {
     return Do(ImmutableList.of(expr1, expr2, expr3, expr4, expr5, expr6));
   }
 
   /**
-   * Creates a new Foreach function.
+   * Creates a new Foreach expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
    */
@@ -457,7 +457,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Filter function.
+   * Creates a new Filter expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
    */
@@ -466,7 +466,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Take function.
+   * Creates a new Take expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
    */
@@ -475,7 +475,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Drop function.
+   * Creates a new Drop expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
    */
@@ -484,7 +484,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Prepend function.
+   * Creates a new Prepend expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
    */
@@ -493,7 +493,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Append function.
+   * Creates a new Append expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
    */
@@ -502,7 +502,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Get function.
+   * Creates a new Get expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a></p>
    */
@@ -511,7 +511,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new If function.
+   * Creates a new If expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
@@ -520,7 +520,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Intersection function.
+   * Creates a new Intersection expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#sets">FaunaDB Set Functions</a></p>
    */
@@ -529,49 +529,49 @@ public final class Language {
   }
 
   /**
-   * Creates a new Intersection set function operating on the given sets.
+   * Creates a new Intersection set expression operating on the given sets.
    */
   public static Value Intersection(Value set1) {
     return Intersection(ImmutableList.of(set1));
   }
 
   /**
-   * Creates a new Intersection set function operating on the given sets.
+   * Creates a new Intersection set expression operating on the given sets.
    */
   public static Value Intersection(Value set1, Value set2) {
     return Intersection(ImmutableList.of(set1, set2));
   }
 
   /**
-   * Creates a new Intersection set function operating on the given sets.
+   * Creates a new Intersection set expression operating on the given sets.
    */
   public static Value Intersection(Value set1, Value set2, Value set3) {
     return Intersection(ImmutableList.of(set1, set2, set3));
   }
 
   /**
-   * Creates a new Intersection set function operating on the given sets.
+   * Creates a new Intersection set expression operating on the given sets.
    */
   public static Value Intersection(Value set1, Value set2, Value set3, Value set4) {
     return Intersection(ImmutableList.of(set1, set2, set3, set4));
   }
 
   /**
-   * Creates a new Intersection set function operating on the given sets.
+   * Creates a new Intersection set expression operating on the given sets.
    */
   public static Value Intersection(Value set1, Value set2, Value set3, Value set4, Value set5) {
     return Intersection(ImmutableList.of(set1, set2, set3, set4, set5));
   }
 
   /**
-   * Creates a new Intersection set function operating on the given sets.
+   * Creates a new Intersection set expression operating on the given sets.
    */
   public static Value Intersection(Value set1, Value set2, Value set3, Value set4, Value set5, Value set6) {
     return Intersection(ImmutableList.of(set1, set2, set3, set4, set5, set6));
   }
 
   /**
-   * Creates a new Join function.
+   * Creates a new Join expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#sets">FaunaDB Set Functions</a></p>
    */
@@ -580,7 +580,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Lambda function.
+   * Creates a new Lambda expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
@@ -589,7 +589,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Let function.
+   * Creates a new Let expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
@@ -598,7 +598,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Map function.
+   * Creates a new Map expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
    */
@@ -607,7 +607,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Match function.
+   * Creates a new Match expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#sets">FaunaDB Set Functions</a></p>
    */
@@ -616,7 +616,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Paginate function builder.
+   * Creates a new Paginate expression builder.
    *
    * @see PaginateBuilder
    *
@@ -627,7 +627,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Quote function.
+   * Creates a new Quote expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
@@ -636,7 +636,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Replace function.
+   * Creates a new Replace expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions">FaunaDB Write Functions</a></p>
    */
@@ -645,7 +645,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Select function.
+   * Creates a new Select expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
@@ -659,7 +659,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Union function.
+   * Creates a new Union expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#sets">FaunaDB Set Functions</a></p>
    */
@@ -668,49 +668,49 @@ public final class Language {
   }
 
   /**
-   * Creates a new Union function operating on the given sets.
+   * Creates a new Union expression operating on the given sets.
    */
   public static Value Union(Value set1) {
     return Union(ImmutableList.of(set1));
   }
 
   /**
-   * Creates a new Union function operating on the given sets.
+   * Creates a new Union expression operating on the given sets.
    */
   public static Value Union(Value set1, Value set2) {
     return Union(ImmutableList.of(set1, set2));
   }
 
   /**
-   * Creates a new Union function operating on the given sets.
+   * Creates a new Union expression operating on the given sets.
    */
   public static Value Union(Value set1, Value set2, Value set3) {
     return Union(ImmutableList.of(set1, set2, set3));
   }
 
   /**
-   * Creates a new Union function operating on the given sets.
+   * Creates a new Union expression operating on the given sets.
    */
   public static Value Union(Value set1, Value set2, Value set3, Value set4) {
     return Union(ImmutableList.of(set1, set2, set3, set4));
   }
 
   /**
-   * Creates a new Union function operating on the given sets.
+   * Creates a new Union expression operating on the given sets.
    */
   public static Value Union(Value set1, Value set2, Value set3, Value set4, Value set5) {
     return Union(ImmutableList.of(set1, set2, set3, set4, set5));
   }
 
   /**
-   * Creates a new Union function operating on the given sets.
+   * Creates a new Union expression operating on the given sets.
    */
   public static Value Union(Value set1, Value set2, Value set3, Value set4, Value set5, Value set6) {
     return Union(ImmutableList.of(set1, set2, set3, set4, set5, set6));
   }
 
   /**
-   * Creates a new Update function.
+   * Creates a new Update expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions">FaunaDB Write Functions</a></p>
    */
@@ -719,7 +719,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Var type.
+   * Creates a new Var expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
@@ -746,7 +746,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Add function.
+   * Creates a new Add expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
@@ -755,49 +755,49 @@ public final class Language {
   }
 
   /**
-   * Creates a new Add function operating on the given terms.
+   * Creates a new Add expression operating on the given terms.
    */
   public static Value Add(Value term1) {
     return Add(ImmutableList.of(term1));
   }
 
   /**
-   * Creates a new Add function operating on the given terms.
+   * Creates a new Add expression operating on the given terms.
    */
   public static Value Add(Value term1, Value term2) {
     return Add(ImmutableList.of(term1, term2));
   }
 
   /**
-   * Creates a new Add function operating on the given terms.
+   * Creates a new Add expression operating on the given terms.
    */
   public static Value Add(Value term1, Value term2, Value term3) {
     return Add(ImmutableList.of(term1, term2, term3));
   }
 
   /**
-   * Creates a new Add function operating on the given terms.
+   * Creates a new Add expression operating on the given terms.
    */
   public static Value Add(Value term1, Value term2, Value term3, Value term4) {
     return Add(ImmutableList.of(term1, term2, term3, term4));
   }
 
   /**
-   * Creates a new Add function operating on the given terms.
+   * Creates a new Add expression operating on the given terms.
    */
   public static Value Add(Value term1, Value term2, Value term3, Value term4, Value term5) {
     return Add(ImmutableList.of(term1, term2, term3, term4, term5));
   }
 
   /**
-   * Creates a new Add function operating on the given terms.
+   * Creates a new Add expression operating on the given terms.
    */
   public static Value Add(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
     return Add(ImmutableList.of(term1, term2, term3, term4, term5, term6));
   }
 
   /**
-   * Creates a new Subtract function.
+   * Creates a new Subtract expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
@@ -806,49 +806,49 @@ public final class Language {
   }
 
   /**
-   * Creates a new Subtract function operating on the given terms.
+   * Creates a new Subtract expression operating on the given terms.
    */
   public static Value Subtract(Value term1) {
     return Subtract(ImmutableList.of(term1));
   }
 
   /**
-   * Creates a new Subtract function operating on the given terms.
+   * Creates a new Subtract expression operating on the given terms.
    */
   public static Value Subtract(Value term1, Value term2) {
     return Subtract(ImmutableList.of(term1, term2));
   }
 
   /**
-   * Creates a new Subtract function operating on the given terms.
+   * Creates a new Subtract expression operating on the given terms.
    */
   public static Value Subtract(Value term1, Value term2, Value term3) {
     return Subtract(ImmutableList.of(term1, term2, term3));
   }
 
   /**
-   * Creates a new Subtract function operating on the given terms.
+   * Creates a new Subtract expression operating on the given terms.
    */
   public static Value Subtract(Value term1, Value term2, Value term3, Value term4) {
     return Subtract(ImmutableList.of(term1, term2, term3, term4));
   }
 
   /**
-   * Creates a new Subtract function operating on the given terms.
+   * Creates a new Subtract expression operating on the given terms.
    */
   public static Value Subtract(Value term1, Value term2, Value term3, Value term4, Value term5) {
     return Subtract(ImmutableList.of(term1, term2, term3, term4, term5));
   }
 
   /**
-   * Creates a new Subtract function operating on the given terms.
+   * Creates a new Subtract expression operating on the given terms.
    */
   public static Value Subtract(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
     return Subtract(ImmutableList.of(term1, term2, term3, term4, term5, term6));
   }
 
   /**
-   * Creates a new Divide function.
+   * Creates a new Divide expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
@@ -857,48 +857,49 @@ public final class Language {
   }
 
   /**
-   * Creates a new Divide function operating on the given terms.
+   * Creates a new Divide expression operating on the given terms.
    */
   public static Value Divide(Value term1) {
     return Divide(ImmutableList.of(term1));
   }
 
   /**
-   * Creates a new Divide function operating on the given terms.
+   * Creates a new Divide expression operating on the given terms.
    */
   public static Value Divide(Value term1, Value term2) {
     return Divide(ImmutableList.of(term1, term2));
   }
 
   /**
-   * Creates a new Divide function operating on the given terms.
+   * Creates a new Divide expression operating on the given terms.
    */
   public static Value Divide(Value term1, Value term2, Value term3) {
     return Divide(ImmutableList.of(term1, term2, term3));
   }
 
   /**
-   * Creates a new Divide function operating on the given terms.
+   * Creates a new Divide expression operating on the given terms.
    */
   public static Value Divide(Value term1, Value term2, Value term3, Value term4) {
     return Divide(ImmutableList.of(term1, term2, term3, term4));
   }
 
   /**
-   * Creates a new Divide function operating on the given terms.
+   * Creates a new Divide expression operating on the given terms.
    */
   public static Value Divide(Value term1, Value term2, Value term3, Value term4, Value term5) {
     return Divide(ImmutableList.of(term1, term2, term3, term4, term5));
   }
 
   /**
-   * Creates a new Divide function operating on the given terms.
+   * Creates a new Divide expression operating on the given terms.
    */
   public static Value Divide(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
     return Divide(ImmutableList.of(term1, term2, term3, term4, term5, term6));
   }
+
   /**
-   * Creates a new Multiply function.
+   * Creates a new Multiply expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
@@ -907,49 +908,49 @@ public final class Language {
   }
 
   /**
-   * Creates a new Multiply function operating on the given terms.
+   * Creates a new Multiply expression operating on the given terms.
    */
   public static Value Multiply(Value term1) {
     return Multiply(ImmutableList.of(term1));
   }
 
   /**
-   * Creates a new Multiply function operating on the given terms.
+   * Creates a new Multiply expression operating on the given terms.
    */
   public static Value Multiply(Value term1, Value term2) {
     return Multiply(ImmutableList.of(term1, term2));
   }
 
   /**
-   * Creates a new Multiply function operating on the given terms.
+   * Creates a new Multiply expression operating on the given terms.
    */
   public static Value Multiply(Value term1, Value term2, Value term3) {
     return Multiply(ImmutableList.of(term1, term2, term3));
   }
 
   /**
-   * Creates a new Multiply function operating on the given terms.
+   * Creates a new Multiply expression operating on the given terms.
    */
   public static Value Multiply(Value term1, Value term2, Value term3, Value term4) {
     return Multiply(ImmutableList.of(term1, term2, term3, term4));
   }
 
   /**
-   * Creates a new Multiply function operating on the given terms.
+   * Creates a new Multiply expression operating on the given terms.
    */
   public static Value Multiply(Value term1, Value term2, Value term3, Value term4, Value term5) {
     return Multiply(ImmutableList.of(term1, term2, term3, term4, term5));
   }
 
   /**
-   * Creates a new Multiply function operating on the given terms.
+   * Creates a new Multiply expression operating on the given terms.
    */
   public static Value Multiply(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
     return Multiply(ImmutableList.of(term1, term2, term3, term4, term5, term6));
   }
 
   /**
-   * Creates a new Modulo function.
+   * Creates a new Modulo expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
@@ -958,42 +959,42 @@ public final class Language {
   }
 
   /**
-   * Creates a new Modulo function operating on the given terms.
+   * Creates a new Modulo expression operating on the given terms.
    */
   public static Value Modulo(Value term1) {
     return Modulo(ImmutableList.of(term1));
   }
 
   /**
-   * Creates a new Modulo function operating on the given terms.
+   * Creates a new Modulo expression operating on the given terms.
    */
   public static Value Modulo(Value term1, Value term2) {
     return Modulo(ImmutableList.of(term1, term2));
   }
 
   /**
-   * Creates a new Modulo function operating on the given terms.
+   * Creates a new Modulo expression operating on the given terms.
    */
   public static Value Modulo(Value term1, Value term2, Value term3) {
     return Modulo(ImmutableList.of(term1, term2, term3));
   }
 
   /**
-   * Creates a new Modulo function operating on the given terms.
+   * Creates a new Modulo expression operating on the given terms.
    */
   public static Value Modulo(Value term1, Value term2, Value term3, Value term4) {
     return Modulo(ImmutableList.of(term1, term2, term3, term4));
   }
 
   /**
-   * Creates a new Modulo function operating on the given terms.
+   * Creates a new Modulo expression operating on the given terms.
    */
   public static Value Modulo(Value term1, Value term2, Value term3, Value term4, Value term5) {
     return Modulo(ImmutableList.of(term1, term2, term3, term4, term5));
   }
 
   /**
-   * Creates a new And function.
+   * Creates a new And expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
@@ -1002,42 +1003,42 @@ public final class Language {
   }
 
   /**
-   * Creates a new And function operating on the given terms.
+   * Creates a new And expression operating on the given terms.
    */
   public static Value And(Value term1) {
     return And(ImmutableList.of(term1));
   }
 
   /**
-   * Creates a new And function operating on the given terms.
+   * Creates a new And expression operating on the given terms.
    */
   public static Value And(Value term1, Value term2) {
     return And(ImmutableList.of(term1, term2));
   }
 
   /**
-   * Creates a new And function operating on the given terms.
+   * Creates a new And expression operating on the given terms.
    */
   public static Value And(Value term1, Value term2, Value term3) {
     return And(ImmutableList.of(term1, term2, term3));
   }
 
   /**
-   * Creates a new And function operating on the given terms.
+   * Creates a new And expression operating on the given terms.
    */
   public static Value And(Value term1, Value term2, Value term3, Value term4) {
     return And(ImmutableList.of(term1, term2, term3, term4));
   }
 
   /**
-   * Creates a new And function operating on the given terms.
+   * Creates a new And expression operating on the given terms.
    */
   public static Value And(Value term1, Value term2, Value term3, Value term4, Value term5) {
     return And(ImmutableList.of(term1, term2, term3, term4, term5));
   }
 
   /**
-   * Creates a new Or function.
+   * Creates a new Or expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
@@ -1046,42 +1047,42 @@ public final class Language {
   }
 
   /**
-   * Creates a new Or function operating on the given terms.
+   * Creates a new Or expression operating on the given terms.
    */
   public static Value Or(Value term1) {
     return Or(ImmutableList.of(term1));
   }
 
   /**
-   * Creates a new Or function operating on the given terms.
+   * Creates a new Or expression operating on the given terms.
    */
   public static Value Or(Value term1, Value term2) {
     return Or(ImmutableList.of(term1, term2));
   }
 
   /**
-   * Creates a new Or function operating on the given terms.
+   * Creates a new Or expression operating on the given terms.
    */
   public static Value Or(Value term1, Value term2, Value term3) {
     return Or(ImmutableList.of(term1, term2, term3));
   }
 
   /**
-   * Creates a new Or function operating on the given terms.
+   * Creates a new Or expression operating on the given terms.
    */
   public static Value Or(Value term1, Value term2, Value term3, Value term4) {
     return Or(ImmutableList.of(term1, term2, term3, term4));
   }
 
   /**
-   * Creates a new Or function operating on the given terms.
+   * Creates a new Or expression operating on the given terms.
    */
   public static Value Or(Value term1, Value term2, Value term3, Value term4, Value term5) {
     return Or(ImmutableList.of(term1, term2, term3, term4, term5));
   }
 
   /**
-   * Creates a new Not function.
+   * Creates a new Not expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
@@ -1090,7 +1091,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Equals function.
+   * Creates a new Equals expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
@@ -1099,49 +1100,49 @@ public final class Language {
   }
 
   /**
-   * Creates a new Equals function operating on the given terms.
+   * Creates a new Equals expression operating on the given terms.
    */
   public static Value Equals(Value term1) {
     return Equals(ImmutableList.of(term1));
   }
 
   /**
-   * Creates a new Equals function operating on the given terms.
+   * Creates a new Equals expression operating on the given terms.
    */
   public static Value Equals(Value term1, Value term2) {
     return Equals(ImmutableList.of(term1, term2));
   }
 
   /**
-   * Creates a new Equals function operating on the given terms.
+   * Creates a new Equals expression operating on the given terms.
    */
   public static Value Equals(Value term1, Value term2, Value term3) {
     return Equals(ImmutableList.of(term1, term2, term3));
   }
 
   /**
-   * Creates a new Equals function operating on the given terms.
+   * Creates a new Equals expression operating on the given terms.
    */
   public static Value Equals(Value term1, Value term2, Value term3, Value term4) {
     return Equals(ImmutableList.of(term1, term2, term3, term4));
   }
 
   /**
-   * Creates a new Equals function operating on the given terms.
+   * Creates a new Equals expression operating on the given terms.
    */
   public static Value Equals(Value term1, Value term2, Value term3, Value term4, Value term5) {
     return Equals(ImmutableList.of(term1, term2, term3, term4, term5));
   }
 
   /**
-   * Creates a new Equals function operating on the given terms.
+   * Creates a new Equals expression operating on the given terms.
    */
   public static Value Equals(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
     return Equals(ImmutableList.of(term1, term2, term3, term4, term5, term6));
   }
 
   /**
-   * Creates a new Concat function.
+   * Creates a new Concat expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
@@ -1154,49 +1155,49 @@ public final class Language {
   }
 
   /**
-   * Creates a new Concat function operating on the given terms.
+   * Creates a new Concat expression operating on the given terms.
    */
   public static Value Concat(Value term1) {
     return Concat(ImmutableList.of(term1));
   }
 
   /**
-   * Creates a new Concat function operating on the given terms.
+   * Creates a new Concat expression operating on the given terms.
    */
   public static Value Concat(Value term1, Value term2) {
     return Concat(ImmutableList.of(term1, term2));
   }
 
   /**
-   * Creates a new Concat function operating on the given terms.
+   * Creates a new Concat expression operating on the given terms.
    */
   public static Value Concat(Value term1, Value term2, Value term3) {
     return Concat(ImmutableList.of(term1, term2, term3));
   }
 
   /**
-   * Creates a new Concat function operating on the given terms.
+   * Creates a new Concat expression operating on the given terms.
    */
   public static Value Concat(Value term1, Value term2, Value term3, Value term4) {
     return Concat(ImmutableList.of(term1, term2, term3, term4));
   }
 
   /**
-   * Creates a new Concat function operating on the given terms.
+   * Creates a new Concat expression operating on the given terms.
    */
   public static Value Concat(Value term1, Value term2, Value term3, Value term4, Value term5) {
     return Concat(ImmutableList.of(term1, term2, term3, term4, term5));
   }
 
   /**
-   * Creates a new Concat function operating on the given terms.
+   * Creates a new Concat expression operating on the given terms.
    */
   public static Value Concat(Value term1, Value term2, Value term3, Value term4, Value term5, Value term6) {
     return Concat(ImmutableList.of(term1, term2, term3, term4, term5, term6));
   }
 
   /**
-   * Creates a new Contains function.
+   * Creates a new Contains expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a></p>
    */
@@ -1210,7 +1211,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Login function.
+   * Creates a new Login expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a></p>
    */
@@ -1219,7 +1220,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Logout function.
+   * Creates a new Logout expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a></p>
    */
@@ -1228,7 +1229,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Identify function.
+   * Creates a new Identify expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a></p>
    */
@@ -1237,7 +1238,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Time function.
+   * Creates a new Time expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#time_functions">FaunaDB Time and Date Functions</a></p>
    */
@@ -1246,7 +1247,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Epoch function.
+   * Creates a new Epoch expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#time_functions">FaunaDB Time and Date Functions</a></p>
    */
@@ -1255,7 +1256,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Epoch function.
+   * Creates a new Epoch expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#time_functions">FaunaDB Time and Date Functions</a></p>
    */
@@ -1264,7 +1265,7 @@ public final class Language {
   }
 
   /**
-   * Creates a new Date function.
+   * Creates a new Date expression.
    *
    * <p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#time_functions">FaunaDB Time and Date Functions</a></p>
    */
