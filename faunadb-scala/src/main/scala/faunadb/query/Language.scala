@@ -6,7 +6,7 @@ import faunadb.types._
 import scala.annotation.meta.{field, getter}
 
 /**
- * Implicit conversions to FaunaDB value types.
+ * Implicit conversions to FaunaDB value types, as well as helper functions to construct queries.
  *
  * These can be used by adding:
  * {{{

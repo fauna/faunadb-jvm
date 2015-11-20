@@ -8,61 +8,16 @@ import faunadb.response._
 import scala.collection.AbstractMap
 
 /**
- * An abstract node in a FaunaDB response tree. An instance of this class does not have any
- * accessible data. It must first be coerced into a concrete type.
- *
- * @example Consider the ResponseNode modeling the root of the following tree:
- * {{{
- * {
- *   "ref": {"@ref": "some/ref" },
- *   "data": { "someKey": "string1", "someKey2": 123 }
- * }
- * }}}
- *
- * The data in this tree can be accessed using:
- * {{{
- *   node.asObject("ref").asRef // Ref("some/ref")
- *   node.asObject("data").asObject("someKey").asString // "string1"
- * }}}
- *
- * @define some [[scala.Some]]
- * @define none [[scala.None]]
- */
+  * A [[Value]] that wraps a JSON response tree. This Value does not convert into a concrete
+  * type until one of the type coercion methods is called.
+  */
 @JsonDeserialize(using=classOf[LazyValueDeserializer])
 class LazyValue private[faunadb] (private val underlying: JsonNode, json: ObjectMapper) extends Value {
-  /**
-   * Coerces the node into a string.
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asStringOpt: Option[String] = if (underlying.isTextual) Some(underlying.asText) else None
-
-  /**
-   * Coerces the node into a boolean
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asBooleanOpt: Option[Boolean] = if (underlying.isBoolean) Some(underlying.asBoolean()) else None
-
-  /**
-   * Coerces the node into a long.
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asNumberOpt: Option[Long] = if (underlying.isNumber) Some(underlying.asLong()) else None
-
-  /**
-   * Coerces the node into a double.
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asDoubleOpt: Option[Double] = if (underlying.isDouble) Some(underlying.asDouble()) else None
 
-  /**
-   * Coerces the node into an array.
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asArrayOpt: Option[Array[Value]] = {
     try {
       Option(json.convertValue(underlying, TypeFactory.defaultInstance().constructArrayType(classOf[LazyValue])))
@@ -70,12 +25,6 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
       case _: IllegalArgumentException => None
     }
   }
-
-  /**
-   * Coerces the node into a [[LazyValueMap]].
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asObjectOpt: Option[collection.Map[String, Value]] = {
     try {
       Option(json.convertValue(underlying, classOf[LazyValueMap]))
@@ -85,11 +34,6 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
     }
   }
 
-  /**
-   * Coerces the node into a [[Ref]].
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asRefOpt: Option[Ref] = {
     try {
       Option(json.convertValue(underlying, classOf[Ref]))
@@ -98,11 +42,6 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
     }
   }
 
-  /**
-   * Coerces the node into a [[Page]].
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asPageOpt: Option[Page] ={
     try {
       Option(json.convertValue(underlying, classOf[Page]))
@@ -111,11 +50,6 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
     }
   }
 
-  /**
-   * Coerces the node into an [[Instance]].
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asInstanceOpt: Option[Instance] = {
     try {
       Option(json.convertValue(underlying, classOf[Instance]))
@@ -124,11 +58,6 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
     }
   }
 
-  /**
-   * Coerces the node into a [[Key]].
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asKeyOpt: Option[Key] = {
     try {
       Option(json.convertValue(underlying, classOf[Key]))
@@ -137,11 +66,6 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
     }
   }
 
-  /**
-   * Coerces the node into a [[Database]]
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asDatabaseOpt: Option[Database] = {
     try {
       Option(json.convertValue(underlying, classOf[Database]))
@@ -150,11 +74,6 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
     }
   }
 
-  /**
-    * Coerces the node into a [[Token]]
-    *
-    * @return $some if the coercion is possible, $none if not.
-    */
   override def asTokenOpt: Option[Token] = {
     try {
       Option(json.convertValue(underlying, classOf[Token]))
@@ -163,11 +82,6 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
     }
   }
 
-  /**
-   * Coerces the node into a [[Class]]
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asClassOpt: Option[Class] = {
     try {
       Option(json.convertValue(underlying, classOf[Class]))
@@ -176,11 +90,6 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
     }
   }
 
-  /**
-   * Coerces the node into an [[Index]]
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asIndexOpt: Option[Index] = {
     try {
       Option(json.convertValue(underlying, classOf[Index]))
@@ -189,11 +98,6 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
     }
   }
 
-  /**
-   * Coerces the node into an [[Event]].
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asEventOpt: Option[Event] = {
     try {
       Option(json.convertValue(underlying, classOf[Event]))
@@ -202,11 +106,6 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
     }
   }
 
-  /**
-   * Coerces the node into a [[Set]].
-   *
-   * @return $some if the coercion is possible, $none if not.
-   */
   override def asSetOpt: Option[Set] = {
     try {
       Option(json.convertValue(underlying, classOf[Set]))

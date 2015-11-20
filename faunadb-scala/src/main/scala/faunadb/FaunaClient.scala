@@ -52,9 +52,9 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
    * Issues a query to FaunaDB.
    *
    * Queries are modeled through the FaunaDB query language, represented by the case
-   * classes in the [[com.faunadb.client.query]] package.
+   * classes in the [[faunadb.query]] package.
    *
-   * Responses are modeled as a general response tree. Each node is a [[Value]],
+   * Responses are modeled as a general response tree. Each node is a [[faunadb.types.Value]],
    * and can be coerced into structured types through various methods on that class.
    */
   def query(expr: Value)(implicit ec: ExecutionContext): Future[Value] = {

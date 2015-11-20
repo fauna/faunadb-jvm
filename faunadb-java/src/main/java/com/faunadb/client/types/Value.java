@@ -30,7 +30,7 @@ import java.time.format.DateTimeFormatter;
  *
  * <p>Coercion functions will return null if this node cannot be transformed into the requested type.
  *
- * <p><b>Example</b>: Consider the {@code LazyValue node} modeling the root of the tree:</p>
+ * <p><b>Example</b>: Consider the {@code Value node} modeling the root of the tree:</p>
  * <pre>
  * {
  *   "ref": { "@ref": "some/ref" },
@@ -377,55 +377,10 @@ public interface Value {
     /**
      * Constructs an array value containing the specified value.
      *
-     * @see Language#ArrayV(Value)
+     * @see Language#ArrayV(Value...)
      */
-    public static ArrayV create(Value v1) {
-      return new ArrayV(ImmutableList.of(v1));
-    }
-
-    /**
-     * Constructs an array value containing the specified values.
-     *
-     * @see Language#ArrayV(Value, Value)
-     */
-    public static ArrayV create(Value v1, Value v2) {
-      return new ArrayV(ImmutableList.of(v1, v2));
-    }
-
-    /**
-     * Constructs an array value containing the specified values.
-     *
-     * @see Language#ArrayV(Value, Value, Value)
-     */
-    public static ArrayV create(Value v1, Value v2, Value v3) {
-      return new ArrayV(ImmutableList.of(v1, v2, v3));
-    }
-
-    /**
-     * Constructs an array value containing the specified values.
-     *
-     * @see Language#ArrayV(Value, Value, Value, Value)
-     */
-    public static ArrayV create(Value v1, Value v2, Value v3, Value v4) {
-      return new ArrayV(ImmutableList.of(v1, v2, v3, v4));
-    }
-
-    /**
-     * Constructs an array value containing the specified values.
-     *
-     * @see Language#ArrayV(Value, Value, Value, Value, Value)
-     */
-    public static ArrayV create(Value v1, Value v2, Value v3, Value v4, Value v5) {
-      return new ArrayV(ImmutableList.<Value>of(v1, v2, v3, v4, v5));
-    }
-
-    /**
-     * Constructs an array value containing the specified values.
-     *
-     * @see Language#ArrayV(Value, Value, Value, Value, Value, Value)
-     */
-    public static ArrayV create(Value v1, Value v2, Value v3, Value v4, Value v5, Value v6) {
-      return new ArrayV(ImmutableList.<Value>of(v1, v2, v3, v4, v5, v6));
+    public static ArrayV create(Value... values) {
+      return new ArrayV(ImmutableList.copyOf(values));
     }
 
     /**

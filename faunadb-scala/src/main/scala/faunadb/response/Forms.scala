@@ -8,8 +8,8 @@ import scala.annotation.meta.{field, param}
 /**
  * A FaunaDB instance response.
  *
- * This, like other response types, is obtained  by coercing a [[LazyValue]] using
- * the conversion methods [[LazyValue.asInstance]] or [[LazyValue.asInstanceOpt]].
+ * This, like other response types, is obtained  by coercing a [[faunadb.types.LazyValue]] using
+ * the conversion methods [[faunadb.types.LazyValue.asInstance]] or [[faunadb.types.LazyValue.asInstanceOpt]].
  */
 case class Instance(@(JsonProperty)("ref") ref: Ref,
                     @(JsonProperty @field @param)("class") classRef: Ref,
@@ -19,8 +19,8 @@ case class Instance(@(JsonProperty)("ref") ref: Ref,
 /**
  * A FaunaDB key response.
 
- * This, like other response types, is obtained by coercing a [[LazyValue]] using
- * the conversion methods [[LazyValue.asKey]] or [[LazyValue.asKeyOpt]].
+ * This, like other response types, is obtained by coercing a [[faunadb.types.LazyValue]] using
+ * the conversion methods [[faunadb.types.LazyValue.asKey]] or [[faunadb.types.LazyValue.asKeyOpt]].
  */
 case class Key(@JsonProperty("ref") ref: Ref,
                @(JsonProperty @field @param)("class") classRef: Ref,
@@ -34,8 +34,8 @@ case class Key(@JsonProperty("ref") ref: Ref,
 /**
  * A FaunaDB database response.
  *
- * This, like other response types, is obtained by coercing a [[LazyValue]] using its associated conversion methods,
- * [[LazyValue.asDatabase]] or [[LazyValue.asDatabaseOpt]].
+ * This, like other response types, is obtained by coercing a [[faunadb.types.LazyValue]] using its associated conversion methods,
+ * [[faunadb.types.LazyValue.asDatabase]] or [[faunadb.types.LazyValue.asDatabaseOpt]].
  */
 case class Database(@JsonProperty("ref") ref: Ref,
                     @(JsonProperty @field @param)("class") classRef: Ref,
@@ -45,8 +45,8 @@ case class Database(@JsonProperty("ref") ref: Ref,
 /**
   * A FaunaDB token response.
   *
-  * This, like other response types, is obtained by coercing a [[LazyValue]] using its associated conversion methods,
-  * [[LazyValue.asToken]] or [[LazyValue.asTokenOpt]].
+  * This, like other response types, is obtained by coercing a [[faunadb.types.LazyValue]] using its associated conversion methods,
+  * [[faunadb.types.LazyValue.asToken]] or [[faunadb.types.LazyValue.asTokenOpt]].
   */
 case class Token(@JsonProperty("ref") ref: Ref,
                  @(JsonProperty @field @param)("class") classRef: Ref,
@@ -57,8 +57,8 @@ case class Token(@JsonProperty("ref") ref: Ref,
 /**
  * A FaunaDB class response.
  *
- * This, like other response types, is obtained by coercing a [[LazyValue]] using its associated conversion methods,
- * [[LazyValue.asClass]] or [[LazyValue.asClassOpt]].
+ * This, like other response types, is obtained by coercing a [[faunadb.types.LazyValue]] using its associated conversion methods,
+ * [[faunadb.types.LazyValue.asClass]] or [[faunadb.types.LazyValue.asClassOpt]].
  */
 case class Class(@JsonProperty("ref") ref: Ref,
                  @(JsonProperty @field @param)("class") classRef: Ref,
@@ -69,8 +69,8 @@ case class Class(@JsonProperty("ref") ref: Ref,
 /**
  * A FaunaDB index response.
  *
- * This, like other response types, is obtained by coercing a [[LazyValue]] using its associated conversion methods,
- * [[LazyValue.asIndex]] or [[LazyValue.asIndexOpt]]
+ * This, like other response types, is obtained by coercing a [[faunadb.types.LazyValue]] using its associated conversion methods,
+ * [[faunadb.types.LazyValue.asIndex]] or [[faunadb.types.LazyValue.asIndexOpt]]
  */
 case class Index(@JsonProperty("ref") ref: Ref,
                  @(JsonProperty @field @param)("class") classRef: Ref,
