@@ -12,7 +12,7 @@ import com.google.common.collect.ImmutableList;
  *
  * <p>{@code import static com.faunadb.client.java.query.Path.*; }</p>
  *
- * @see Language#Path(Path)
+ * @see Language#Path(Path...)
  * @see Language#Select(ImmutableList, Value)
  * @see Language#Contains(ImmutableList, Value)
  */
