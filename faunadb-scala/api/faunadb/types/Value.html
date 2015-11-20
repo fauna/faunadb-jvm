@@ -49,12 +49,20 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>An abstract node in a FaunaDB response tree. Something conforming to this trait should be
+coerced into a concrete type before data can be accessed.
+</p></div><dl class="attributes block"> <div class="block">Example:
+               <ol><li class="cmt"><p>Consider the Value modeling the root of the following tree:</p><pre>{
+  <span class="lit">"ref"</span>: {<span class="lit">"@ref"</span>: <span class="lit">"some/ref"</span> },
+  <span class="lit">"data"</span>: { <span class="lit">"someKey"</span>: <span class="lit">"string1"</span>, <span class="lit">"someKey2"</span>: <span class="num">123</span> }
+}</pre><p>The data in this tree can be accessed using:</p><pre>value.asObject(<span class="lit">"ref"</span>).asRef <span class="cmt">// Ref("some/ref")</span>
+value.asObject(<span class="lit">"data"</span>).asObject(<span class="lit">"someKey"</span>).asString <span class="cmt">// "string1"</span></pre></li></ol>
+            </div></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">
             <span class="toggle">Known Subclasses</span>
-            <div class="subClasses hiddenContent"><a href="ArrayV.html" class="extype" name="faunadb.types.ArrayV">ArrayV</a>, <a href="BooleanV.html" class="extype" name="faunadb.types.BooleanV">BooleanV</a>, <a href="DoubleV.html" class="extype" name="faunadb.types.DoubleV">DoubleV</a>, <a href="LazyValue.html" class="extype" name="faunadb.types.LazyValue">LazyValue</a>, <a href="NullV$.html" class="extype" name="faunadb.types.NullV">NullV</a>, <a href="NumberV.html" class="extype" name="faunadb.types.NumberV">NumberV</a>, <a href="ObjectV.html" class="extype" name="faunadb.types.ObjectV">ObjectV</a>, <a href="Ref.html" class="extype" name="faunadb.types.Ref">Ref</a>, <a href="StringV.html" class="extype" name="faunadb.types.StringV">StringV</a>, <a href="Var.html" class="extype" name="faunadb.types.Var">Var</a></div>
+            <div class="subClasses hiddenContent"><a href="ArrayV.html" class="extype" name="faunadb.types.ArrayV">ArrayV</a>, <a href="BooleanV.html" class="extype" name="faunadb.types.BooleanV">BooleanV</a>, <a href="Date.html" class="extype" name="faunadb.types.Date">Date</a>, <a href="DoubleV.html" class="extype" name="faunadb.types.DoubleV">DoubleV</a>, <a href="LazyValue.html" class="extype" name="faunadb.types.LazyValue">LazyValue</a>, <a href="NullV$.html" class="extype" name="faunadb.types.NullV">NullV</a>, <a href="NumberV.html" class="extype" name="faunadb.types.NumberV">NumberV</a>, <a href="ObjectV.html" class="extype" name="faunadb.types.ObjectV">ObjectV</a>, <a href="Ref.html" class="extype" name="faunadb.types.Ref">Ref</a>, <a href="StringV.html" class="extype" name="faunadb.types.StringV">StringV</a>, <a href="Ts.html" class="extype" name="faunadb.types.Ts">Ts</a>, <a href="Var.html" class="extype" name="faunadb.types.Var">Var</a></div>
           </div></div>
         
 
@@ -200,7 +208,7 @@
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value#asArrayOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asArrayOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asArrayOpt:Option[Array[faunadb.types.Value]]"></a>
       <a id="asArrayOpt:Option[Array[Value]]"></a>
       <h4 class="signature">
@@ -216,7 +224,9 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Coerces the node into an array.</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into an array.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="faunadb.types.Value#asBoolean" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="asBoolean:Boolean"></a>
       <a id="asBoolean:Boolean"></a>
@@ -234,7 +244,7 @@
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value#asBooleanOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asBooleanOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asBooleanOpt:Option[Boolean]"></a>
       <a id="asBooleanOpt:Option[Boolean]"></a>
       <h4 class="signature">
@@ -250,7 +260,10 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Coerces the node into a boolean
+</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into a boolean
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="faunadb.types.Value#asClass" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="asClass:faunadb.response.Class"></a>
       <a id="asClass:Class"></a>
@@ -268,7 +281,7 @@
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value#asClassOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asClassOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asClassOpt:Option[faunadb.response.Class]"></a>
       <a id="asClassOpt:Option[Class]"></a>
       <h4 class="signature">
@@ -284,7 +297,10 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Coerces the node into a <a href="../response/Class.html" class="extype" name="faunadb.response.Class">faunadb.response.Class</a>
+</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into a <a href="../response/Class.html" class="extype" name="faunadb.response.Class">faunadb.response.Class</a>
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="faunadb.types.Value#asDatabase" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="asDatabase:faunadb.response.Database"></a>
       <a id="asDatabase:Database"></a>
@@ -302,7 +318,7 @@
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value#asDatabaseOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asDatabaseOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asDatabaseOpt:Option[faunadb.response.Database]"></a>
       <a id="asDatabaseOpt:Option[Database]"></a>
       <h4 class="signature">
@@ -318,7 +334,46 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
+      <p class="shortcomment cmt">Coerces the node into a <a href="../response/Database.html" class="extype" name="faunadb.response.Database">faunadb.response.Database</a>
+</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into a <a href="../response/Database.html" class="extype" name="faunadb.response.Database">faunadb.response.Database</a>
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
+    </li><li name="faunadb.types.Value#asDate" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="asDate:faunadb.types.Date"></a>
+      <a id="asDate:Date"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asDate</span><span class="result">: <a href="Date.html" class="extype" name="faunadb.types.Date">Date</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.types.Value@asDate:faunadb.types.Date" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
       
+    </li><li name="faunadb.types.Value#asDateOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asDateOpt:Option[faunadb.types.Date]"></a>
+      <a id="asDateOpt:Option[Date]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asDateOpt</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="Date.html" class="extype" name="faunadb.types.Date">Date</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.types.Value@asDateOpt:Option[faunadb.types.Date]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Coerces the node into a <a href="Date.html" class="extype" name="faunadb.types.Date">faunadb.types.Date</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into a <a href="Date.html" class="extype" name="faunadb.types.Date">faunadb.types.Date</a>.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="faunadb.types.Value#asDouble" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="asDouble:Double"></a>
       <a id="asDouble:Double"></a>
@@ -336,7 +391,7 @@
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value#asDoubleOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asDoubleOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asDoubleOpt:Option[Double]"></a>
       <a id="asDoubleOpt:Option[Double]"></a>
       <h4 class="signature">
@@ -352,7 +407,9 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Coerces the node into a double.</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into a double.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="faunadb.types.Value#asEvent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="asEvent:faunadb.response.Event"></a>
       <a id="asEvent:Event"></a>
@@ -370,7 +427,7 @@
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value#asEventOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asEventOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asEventOpt:Option[faunadb.response.Event]"></a>
       <a id="asEventOpt:Option[Event]"></a>
       <h4 class="signature">
@@ -386,7 +443,9 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Coerces the node into an <a href="../response/Event.html" class="extype" name="faunadb.response.Event">faunadb.response.Event</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into an <a href="../response/Event.html" class="extype" name="faunadb.response.Event">faunadb.response.Event</a>.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="faunadb.types.Value#asIndex" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="asIndex:faunadb.response.Index"></a>
       <a id="asIndex:Index"></a>
@@ -404,7 +463,7 @@
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value#asIndexOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asIndexOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asIndexOpt:Option[faunadb.response.Index]"></a>
       <a id="asIndexOpt:Option[Index]"></a>
       <h4 class="signature">
@@ -420,7 +479,10 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Coerces the node into an <a href="../response/Index.html" class="extype" name="faunadb.response.Index">faunadb.response.Index</a>
+</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into an <a href="../response/Index.html" class="extype" name="faunadb.response.Index">faunadb.response.Index</a>
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="faunadb.types.Value#asInstance" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="asInstance:faunadb.response.Instance"></a>
       <a id="asInstance:Instance"></a>
@@ -455,7 +517,7 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="faunadb.types.Value#asInstanceOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asInstanceOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOpt:Option[faunadb.response.Instance]"></a>
       <a id="asInstanceOpt:Option[Instance]"></a>
       <h4 class="signature">
@@ -471,7 +533,9 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Coerces the node into an <a href="../response/Instance.html" class="extype" name="faunadb.response.Instance">faunadb.response.Instance</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into an <a href="../response/Instance.html" class="extype" name="faunadb.response.Instance">faunadb.response.Instance</a>.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="faunadb.types.Value#asKey" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="asKey:faunadb.response.Key"></a>
       <a id="asKey:Key"></a>
@@ -489,7 +553,7 @@
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value#asKeyOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asKeyOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asKeyOpt:Option[faunadb.response.Key]"></a>
       <a id="asKeyOpt:Option[Key]"></a>
       <h4 class="signature">
@@ -505,7 +569,9 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Coerces the node into a <a href="../response/Key.html" class="extype" name="faunadb.response.Key">faunadb.response.Key</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into a <a href="../response/Key.html" class="extype" name="faunadb.response.Key">faunadb.response.Key</a>.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="faunadb.types.Value#asNumber" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="asNumber:Long"></a>
       <a id="asNumber:Long"></a>
@@ -523,7 +589,7 @@
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value#asNumberOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asNumberOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asNumberOpt:Option[Long]"></a>
       <a id="asNumberOpt:Option[Long]"></a>
       <h4 class="signature">
@@ -539,7 +605,9 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Coerces the node into a long.</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into a long.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="faunadb.types.Value#asObject" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="asObject:scala.collection.Map[String,faunadb.types.Value]"></a>
       <a id="asObject:Map[String,Value]"></a>
@@ -557,7 +625,7 @@
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value#asObjectOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asObjectOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asObjectOpt:Option[scala.collection.Map[String,faunadb.types.Value]]"></a>
       <a id="asObjectOpt:Option[Map[String,Value]]"></a>
       <h4 class="signature">
@@ -573,7 +641,9 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Coerces the node into a map.</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into a map.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="faunadb.types.Value#asPage" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="asPage:faunadb.response.Page"></a>
       <a id="asPage:Page"></a>
@@ -591,7 +661,7 @@
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value#asPageOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asPageOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asPageOpt:Option[faunadb.response.Page]"></a>
       <a id="asPageOpt:Option[Page]"></a>
       <h4 class="signature">
@@ -607,7 +677,9 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Coerces the node into a <a href="../response/Page.html" class="extype" name="faunadb.response.Page">faunadb.response.Page</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into a <a href="../response/Page.html" class="extype" name="faunadb.response.Page">faunadb.response.Page</a>.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="faunadb.types.Value#asRef" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="asRef:faunadb.types.Ref"></a>
       <a id="asRef:Ref"></a>
@@ -625,7 +697,7 @@
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value#asRefOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asRefOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asRefOpt:Option[faunadb.types.Ref]"></a>
       <a id="asRefOpt:Option[Ref]"></a>
       <h4 class="signature">
@@ -641,7 +713,9 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Coerces the node into a <a href="Ref.html" class="extype" name="faunadb.types.Ref">Ref</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into a <a href="Ref.html" class="extype" name="faunadb.types.Ref">Ref</a>.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="faunadb.types.Value#asSet" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="asSet:faunadb.response.Set"></a>
       <a id="asSet:Set"></a>
@@ -659,7 +733,7 @@
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value#asSetOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asSetOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asSetOpt:Option[faunadb.response.Set]"></a>
       <a id="asSetOpt:Option[Set]"></a>
       <h4 class="signature">
@@ -675,7 +749,9 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Coerces the node into a <a href="../response/Set.html" class="extype" name="faunadb.response.Set">faunadb.response.Set</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into a <a href="../response/Set.html" class="extype" name="faunadb.response.Set">faunadb.response.Set</a>.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="faunadb.types.Value#asString" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="asString:String"></a>
       <a id="asString:String"></a>
@@ -693,7 +769,7 @@
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value#asStringOpt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Value#asStringOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asStringOpt:Option[String]"></a>
       <a id="asStringOpt:Option[String]"></a>
       <h4 class="signature">
@@ -709,7 +785,82 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
+      <p class="shortcomment cmt">Coerces the node into a string.</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into a string.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
+    </li><li name="faunadb.types.Value#asToken" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="asToken:faunadb.response.Token"></a>
+      <a id="asToken:Token"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asToken</span><span class="result">: <a href="../response/Token.html" class="extype" name="faunadb.response.Token">Token</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.types.Value@asToken:faunadb.response.Token" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
       
+    </li><li name="faunadb.types.Value#asTokenOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asTokenOpt:Option[faunadb.response.Token]"></a>
+      <a id="asTokenOpt:Option[Token]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asTokenOpt</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="../response/Token.html" class="extype" name="faunadb.response.Token">Token</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.types.Value@asTokenOpt:Option[faunadb.response.Token]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Coerces the node into a <a href="../response/Token.html" class="extype" name="faunadb.response.Token">faunadb.response.Token</a>
+</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into a <a href="../response/Token.html" class="extype" name="faunadb.response.Token">faunadb.response.Token</a>
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
+    </li><li name="faunadb.types.Value#asTs" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="asTs:faunadb.types.Ts"></a>
+      <a id="asTs:Ts"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asTs</span><span class="result">: <a href="Ts.html" class="extype" name="faunadb.types.Ts">Ts</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.types.Value@asTs:faunadb.types.Ts" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="faunadb.types.Value#asTsOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asTsOpt:Option[faunadb.types.Ts]"></a>
+      <a id="asTsOpt:Option[Ts]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asTsOpt</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="Ts.html" class="extype" name="faunadb.types.Ts">Ts</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.types.Value@asTsOpt:Option[faunadb.types.Ts]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Coerces the node into a <a href="Ts.html" class="extype" name="faunadb.types.Ts">faunadb.types.Ts</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Coerces the node into a <a href="Ts.html" class="extype" name="faunadb.types.Ts">faunadb.types.Ts</a>.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Some$" class="extype" target="_top">scala.Some$</a> if the coercion is possible, <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.None$" class="extype" target="_top">scala.None</a> if not.
+</p></dd></dl></div>
     </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a>
       <a id="clone():AnyRef"></a>

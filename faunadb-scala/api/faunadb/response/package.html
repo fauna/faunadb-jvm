@@ -47,9 +47,9 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Provides representations of the FaunaDB response format.</p><p>Most calls to <a href="../FaunaClient.html" class="extype" name="faunadb.FaunaClient">FaunaClient</a> will return a <span class="extype" name="com.faunadb.client.response.ResponseNode">com.faunadb.client.response.ResponseNode</span>. This represents an abstract
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Provides representations of the FaunaDB response format.</p><p>Most calls to <a href="../FaunaClient.html" class="extype" name="faunadb.FaunaClient">FaunaClient</a> will return a <a href="../types/Value.html" class="extype" name="faunadb.types.Value">faunadb.types.Value</a>. This represents an abstract
 node in the FaunaDB response tree. These nodes can be converted into basic FaunaDB types, as well as various structured
-response forms.</p><h4>Forms</h4><p><span class="extype" name="com.faunadb.client.response.Class">com.faunadb.client.response.Class</span> - <a href="https://faunadb.com/documentation#guide-resource_types-classes" target="_blank">Reference</a></p><p><span class="extype" name="com.faunadb.client.response.Database">com.faunadb.client.response.Database</span> - <a href="https://faunadb.com/documentation#guide-resource_types-database" target="_blank">Reference</a></p><p><span class="extype" name="com.faunadb.client.response.Index">com.faunadb.client.response.Index</span> - <a href="https://faunadb.com/documentation#guide-resource_types-indexes" target="_blank">Reference</a></p><p><span class="extype" name="com.faunadb.client.response.Instance">com.faunadb.client.response.Instance</span> - <a href="https://faunadb.com/documentation#guide-resource_types-instances" target="_blank">Reference</a></p><p><span class="extype" name="com.faunadb.client.response.Key">com.faunadb.client.response.Key</span> - <a href="https://faunadb.com/documentation#guide-resource_types-keys" target="_blank">Reference</a></p></div><div class="toggleContainer block">
+response forms.</p><h4>Forms</h4><p><a href="Class.html" class="extype" name="faunadb.response.Class">faunadb.response.Class</a> - <a href="https://faunadb.com/documentation/objects#classes" target="_blank">https://faunadb.com/documentation/objects#classes</a></p><p><a href="Database.html" class="extype" name="faunadb.response.Database">faunadb.response.Database</a> - <a href="https://faunadb.com/documentation/objects#databases" target="_blank">https://faunadb.com/documentation/objects#databases</a></p><p><a href="Index.html" class="extype" name="faunadb.response.Index">faunadb.response.Index</a> - <a href="https://faunadb.com/documentation/objects#indexes" target="_blank">https://faunadb.com/documentation/objects#indexes</a></p><p><a href="Instance.html" class="extype" name="faunadb.response.Instance">faunadb.response.Instance</a> - <a href="https://faunadb.com/documentation/objects" target="_blank">https://faunadb.com/documentation/objects</a></p><p><a href="Key.html" class="extype" name="faunadb.response.Key">faunadb.response.Key</a> - <a href="https://faunadb.com/documentation/objects#keys" target="_blank">https://faunadb.com/documentation/objects#keys</a></p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -107,8 +107,8 @@ response forms.</p><h4>Forms</h4><p><span class="extype" name="com.faunadb.clien
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A FaunaDB class response.</p><div class="fullcomment"><div class="comment cmt"><p>A FaunaDB class response.</p><p>This, like other response types, is obtained by coercing a <span class="extype" name="LazyValue">LazyValue</span> using its associated conversion methods,
-<span class="extype" name="LazyValue.asClass">LazyValue.asClass</span> or <span class="extype" name="LazyValue.asClassOpt">LazyValue.asClassOpt</span>.
+      <p class="shortcomment cmt">A FaunaDB class response.</p><div class="fullcomment"><div class="comment cmt"><p>A FaunaDB class response.</p><p>This, like other response types, is obtained by coercing a <a href="../types/LazyValue.html" class="extype" name="faunadb.types.LazyValue">faunadb.types.LazyValue</a> using its associated conversion methods,
+<a href="../types/LazyValue.html#asClass:faunadb.response.Class" class="extmbr" name="faunadb.types.LazyValue#asClass">faunadb.types.LazyValue.asClass</a> or <a href="../types/LazyValue.html#asClassOpt:Option[faunadb.response.Class]" class="extmbr" name="faunadb.types.LazyValue#asClassOpt">faunadb.types.LazyValue.asClassOpt</a>.
 </p></div></div>
     </li><li name="faunadb.response.Database" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="DatabaseextendsProductwithSerializable"></a>
@@ -126,8 +126,8 @@ response forms.</p><h4>Forms</h4><p><span class="extype" name="com.faunadb.clien
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A FaunaDB database response.</p><div class="fullcomment"><div class="comment cmt"><p>A FaunaDB database response.</p><p>This, like other response types, is obtained by coercing a <span class="extype" name="LazyValue">LazyValue</span> using its associated conversion methods,
-<span class="extype" name="LazyValue.asDatabase">LazyValue.asDatabase</span> or <span class="extype" name="LazyValue.asDatabaseOpt">LazyValue.asDatabaseOpt</span>.
+      <p class="shortcomment cmt">A FaunaDB database response.</p><div class="fullcomment"><div class="comment cmt"><p>A FaunaDB database response.</p><p>This, like other response types, is obtained by coercing a <a href="../types/LazyValue.html" class="extype" name="faunadb.types.LazyValue">faunadb.types.LazyValue</a> using its associated conversion methods,
+<a href="../types/LazyValue.html#asDatabase:faunadb.response.Database" class="extmbr" name="faunadb.types.LazyValue#asDatabase">faunadb.types.LazyValue.asDatabase</a> or <a href="../types/LazyValue.html#asDatabaseOpt:Option[faunadb.response.Database]" class="extmbr" name="faunadb.types.LazyValue#asDatabaseOpt">faunadb.types.LazyValue.asDatabaseOpt</a>.
 </p></div></div>
     </li><li name="faunadb.response.Event" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="EventextendsProductwithSerializable"></a>
@@ -162,8 +162,8 @@ response forms.</p><h4>Forms</h4><p><span class="extype" name="com.faunadb.clien
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A FaunaDB index response.</p><div class="fullcomment"><div class="comment cmt"><p>A FaunaDB index response.</p><p>This, like other response types, is obtained by coercing a <span class="extype" name="LazyValue">LazyValue</span> using its associated conversion methods,
-<span class="extype" name="LazyValue.asIndex">LazyValue.asIndex</span> or <span class="extype" name="LazyValue.asIndexOpt">LazyValue.asIndexOpt</span>
+      <p class="shortcomment cmt">A FaunaDB index response.</p><div class="fullcomment"><div class="comment cmt"><p>A FaunaDB index response.</p><p>This, like other response types, is obtained by coercing a <a href="../types/LazyValue.html" class="extype" name="faunadb.types.LazyValue">faunadb.types.LazyValue</a> using its associated conversion methods,
+<a href="../types/LazyValue.html#asIndex:faunadb.response.Index" class="extmbr" name="faunadb.types.LazyValue#asIndex">faunadb.types.LazyValue.asIndex</a> or <a href="../types/LazyValue.html#asIndexOpt:Option[faunadb.response.Index]" class="extmbr" name="faunadb.types.LazyValue#asIndexOpt">faunadb.types.LazyValue.asIndexOpt</a>
 </p></div></div>
     </li><li name="faunadb.response.Instance" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="InstanceextendsProductwithSerializable"></a>
@@ -181,8 +181,8 @@ response forms.</p><h4>Forms</h4><p><span class="extype" name="com.faunadb.clien
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A FaunaDB instance response.</p><div class="fullcomment"><div class="comment cmt"><p>A FaunaDB instance response.</p><p>This, like other response types, is obtained  by coercing a <span class="extype" name="LazyValue">LazyValue</span> using
-the conversion methods <span class="extype" name="LazyValue.asInstance">LazyValue.asInstance</span> or <span class="extype" name="LazyValue.asInstanceOpt">LazyValue.asInstanceOpt</span>.
+      <p class="shortcomment cmt">A FaunaDB instance response.</p><div class="fullcomment"><div class="comment cmt"><p>A FaunaDB instance response.</p><p>This, like other response types, is obtained  by coercing a <a href="../types/LazyValue.html" class="extype" name="faunadb.types.LazyValue">faunadb.types.LazyValue</a> using
+the conversion methods <a href="../types/LazyValue.html#asInstance:faunadb.response.Instance" class="extmbr" name="faunadb.types.LazyValue#asInstance">faunadb.types.LazyValue.asInstance</a> or <a href="../types/LazyValue.html#asInstanceOpt:Option[faunadb.response.Instance]" class="extmbr" name="faunadb.types.LazyValue#asInstanceOpt">faunadb.types.LazyValue.asInstanceOpt</a>.
 </p></div></div>
     </li><li name="faunadb.response.Key" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="KeyextendsProductwithSerializable"></a>
@@ -200,8 +200,8 @@ the conversion methods <span class="extype" name="LazyValue.asInstance">LazyValu
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A FaunaDB key response.</p><div class="fullcomment"><div class="comment cmt"><p>A FaunaDB key response.</p><p>This, like other response types, is obtained by coercing a <span class="extype" name="LazyValue">LazyValue</span> using
-the conversion methods <span class="extype" name="LazyValue.asKey">LazyValue.asKey</span> or <span class="extype" name="LazyValue.asKeyOpt">LazyValue.asKeyOpt</span>.
+      <p class="shortcomment cmt">A FaunaDB key response.</p><div class="fullcomment"><div class="comment cmt"><p>A FaunaDB key response.</p><p>This, like other response types, is obtained by coercing a <a href="../types/LazyValue.html" class="extype" name="faunadb.types.LazyValue">faunadb.types.LazyValue</a> using
+the conversion methods <a href="../types/LazyValue.html#asKey:faunadb.response.Key" class="extmbr" name="faunadb.types.LazyValue#asKey">faunadb.types.LazyValue.asKey</a> or <a href="../types/LazyValue.html#asKeyOpt:Option[faunadb.response.Key]" class="extmbr" name="faunadb.types.LazyValue#asKeyOpt">faunadb.types.LazyValue.asKeyOpt</a>.
 </p></div></div>
     </li><li name="faunadb.response.Page" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="PageextendsProductwithSerializable"></a>
@@ -220,7 +220,7 @@ the conversion methods <span class="extype" name="LazyValue.asKey">LazyValue.asK
       </a>
     </span>
       <p class="shortcomment cmt">Represents a FaunaDB Page response.</p><div class="fullcomment"><div class="comment cmt"><p>Represents a FaunaDB Page response. This, like other response types, is obtained by coercing a
-<span class="extype" name="LazyValue">LazyValue</span> using its associated conversion method: <span class="extype" name="LazyValue.asPage">LazyValue.asPage</span> or <span class="extype" name="LazyValue.asPageOpt">LazyValue.asPageOpt</span>.</p></div></div>
+<a href="../types/LazyValue.html" class="extype" name="faunadb.types.LazyValue">faunadb.types.LazyValue</a> using its associated conversion method: <a href="../types/LazyValue.html#asPage:faunadb.response.Page" class="extmbr" name="faunadb.types.LazyValue#asPage">faunadb.types.LazyValue.asPage</a> or <a href="../types/LazyValue.html#asPageOpt:Option[faunadb.response.Page]" class="extmbr" name="faunadb.types.LazyValue#asPageOpt">faunadb.types.LazyValue.asPageOpt</a>.</p></div></div>
     </li><li name="faunadb.response.Set" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="SetextendsProductwithSerializable"></a>
       <a id="Set:Set"></a>
@@ -238,6 +238,25 @@ the conversion methods <span class="extype" name="LazyValue.asKey">LazyValue.asK
       </a>
     </span>
       <p class="shortcomment cmt">A FaunaDB set literal.</p>
+    </li><li name="faunadb.response.Token" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="TokenextendsProductwithSerializable"></a>
+      <a id="Token:Token"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Token.html"><span class="name">Token</span></a><span class="params">(<span name="ref">ref: <a href="../types/Ref.html" class="extype" name="faunadb.types.Ref">Ref</a></span>, <span name="classRef">classRef: <a href="../types/Ref.html" class="extype" name="faunadb.types.Ref">Ref</a></span>, <span name="ts">ts: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Long" class="extype" target="_top">Long</a></span>, <span name="credentials">credentials: <a href="../types/Ref.html" class="extype" name="faunadb.types.Ref">Ref</a></span>, <span name="secret">secret: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.response.package@TokenextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A FaunaDB token response.</p><div class="fullcomment"><div class="comment cmt"><p>A FaunaDB token response.</p><p>This, like other response types, is obtained by coercing a <a href="../types/LazyValue.html" class="extype" name="faunadb.types.LazyValue">faunadb.types.LazyValue</a> using its associated conversion methods,
+<a href="../types/LazyValue.html#asToken:faunadb.response.Token" class="extmbr" name="faunadb.types.LazyValue#asToken">faunadb.types.LazyValue.asToken</a> or <a href="../types/LazyValue.html#asTokenOpt:Option[faunadb.response.Token]" class="extmbr" name="faunadb.types.LazyValue#asTokenOpt">faunadb.types.LazyValue.asTokenOpt</a>.
+</p></div></div>
     </li></ol>
             </div>
 

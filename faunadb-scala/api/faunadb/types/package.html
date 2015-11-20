@@ -100,6 +100,23 @@
       </a>
     </span>
       
+    </li><li name="faunadb.types.Date" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DateextendsValuewithProductwithSerializable"></a>
+      <a id="Date:Date"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Date.html"><span class="name">Date</span></a><span class="params">(<span name="value">value: <span class="extype" name="java.time.LocalDate">LocalDate</span></span>)</span><span class="result"> extends <a href="Value.html" class="extype" name="faunadb.types.Value">Value</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.types.package@DateextendsValuewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
     </li><li name="faunadb.types.DoubleV" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="DoubleVextendsValuewithProductwithSerializable"></a>
       <a id="DoubleV:DoubleV"></a>
@@ -133,18 +150,12 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">An abstract node in a FaunaDB response tree.</p><div class="fullcomment"><div class="comment cmt"><p>An abstract node in a FaunaDB response tree. An instance of this class does not have any
-accessible data. It must first be coerced into a concrete type.
+      <p class="shortcomment cmt">A <a href="Value.html" class="extype" name="faunadb.types.Value">Value</a> that wraps a JSON response tree.</p><div class="fullcomment"><div class="comment cmt"><p>A <a href="Value.html" class="extype" name="faunadb.types.Value">Value</a> that wraps a JSON response tree. This Value does not convert into a concrete
+type until one of the type coercion methods is called.
 </p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
                 <span class="name">@JsonDeserialize</span><span class="args">()</span>
               
-        </dd><div class="block">Example:
-               <ol><li class="cmt"><p>Consider the ResponseNode modeling the root of the following tree:</p><pre>{
-  <span class="lit">"ref"</span>: {<span class="lit">"@ref"</span>: <span class="lit">"some/ref"</span> },
-  <span class="lit">"data"</span>: { <span class="lit">"someKey"</span>: <span class="lit">"string1"</span>, <span class="lit">"someKey2"</span>: <span class="num">123</span> }
-}</pre><p>The data in this tree can be accessed using:</p><pre>node.asObject(<span class="lit">"ref"</span>).asRef <span class="cmt">// Ref("some/ref")</span>
-node.asObject(<span class="lit">"data"</span>).asObject(<span class="lit">"someKey"</span>).asString <span class="cmt">// "string1"</span></pre></li></ol>
-            </div></dl></div>
+        </dd></dl></div>
     </li><li name="faunadb.types.LazyValueMap" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="LazyValueMapextendsAbstractMap[String,faunadb.types.LazyValue]"></a>
       <a id="LazyValueMap:LazyValueMap"></a>
@@ -222,7 +233,7 @@ response.asObject(<span class="lit">"someObjectKey"</span>).asObject(<span class
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Ref.</p><div class="fullcomment"><div class="comment cmt"><p>A Ref.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-values-special_types" target="_blank">FaunaDB Special Types</a>
+      <p class="shortcomment cmt">A Ref.</p><div class="fullcomment"><div class="comment cmt"><p>A Ref.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#values-special_types" target="_blank">FaunaDB Special Types</a>
 </p></div></div>
     </li><li name="faunadb.types.StringV" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="StringVextendsValuewithProductwithSerializable"></a>
@@ -241,7 +252,24 @@ response.asObject(<span class="lit">"someObjectKey"</span>).asObject(<span class
       </a>
     </span>
       
-    </li><li name="faunadb.types.Value" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.types.Ts" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TsextendsValuewithProductwithSerializable"></a>
+      <a id="Ts:Ts"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Ts.html"><span class="name">Ts</span></a><span class="params">(<span name="value">value: <span class="extype" name="java.time.Instant">Instant</span></span>)</span><span class="result"> extends <a href="Value.html" class="extype" name="faunadb.types.Value">Value</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.types.package@TsextendsValuewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="faunadb.types.Value" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="ValueextendsAnyRef"></a>
       <a id="Value:Value"></a>
       <h4 class="signature">
@@ -257,7 +285,15 @@ response.asObject(<span class="lit">"someObjectKey"</span>).asObject(<span class
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">An abstract node in a FaunaDB response tree.</p><div class="fullcomment"><div class="comment cmt"><p>An abstract node in a FaunaDB response tree. Something conforming to this trait should be
+coerced into a concrete type before data can be accessed.
+</p></div><dl class="attributes block"> <div class="block">Example:
+               <ol><li class="cmt"><p>Consider the Value modeling the root of the following tree:</p><pre>{
+  <span class="lit">"ref"</span>: {<span class="lit">"@ref"</span>: <span class="lit">"some/ref"</span> },
+  <span class="lit">"data"</span>: { <span class="lit">"someKey"</span>: <span class="lit">"string1"</span>, <span class="lit">"someKey2"</span>: <span class="num">123</span> }
+}</pre><p>The data in this tree can be accessed using:</p><pre>value.asObject(<span class="lit">"ref"</span>).asRef <span class="cmt">// Ref("some/ref")</span>
+value.asObject(<span class="lit">"data"</span>).asObject(<span class="lit">"someKey"</span>).asString <span class="cmt">// "string1"</span></pre></li></ol>
+            </div></dl></div>
     </li><li name="faunadb.types.Var" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="VarextendsValuewithProductwithSerializable"></a>
       <a id="Var:Var"></a>
@@ -299,6 +335,23 @@ response.asObject(<span class="lit">"someObjectKey"</span>).asObject(<span class
       </a>
     </span>
       
+    </li><li name="faunadb.types.Date" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Date"></a>
+      <a id="Date:Date"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Date$.html"><span class="name">Date</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.types.package@Date" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
     </li><li name="faunadb.types.NullV" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="NullV"></a>
       <a id="NullV:NullV"></a>
@@ -329,6 +382,23 @@ response.asObject(<span class="lit">"someObjectKey"</span>).asObject(<span class
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#faunadb.types.package@ObjectV" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="faunadb.types.Ts" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Ts"></a>
+      <a id="Ts:Ts"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Ts$.html"><span class="name">Ts</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.types.package@Ts" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" />
       </a>
     </span>

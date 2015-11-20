@@ -48,7 +48,7 @@
       </h4>
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Classes modeling the FaunaDB Query language.</p><p>Instances of these classes can be composed to model a query expression, which can then be passed to
-<a href="../FaunaClient.html#query(exprs:Iterable[faunadb.types.Value])(implicitec:scala.concurrent.ExecutionContext):scala.concurrent.Future[IndexedSeq[faunadb.types.LazyValue]]" class="extmbr" name="faunadb.FaunaClient#query">FaunaClient.query</a> in order to execute the query.</p><p><a href="Language$.html" class="extype" name="faunadb.query.Language">query.Language</a> contains implicit functions to aid in type conversions when creating a query expression.</p><h5>Example</h5><pre><span class="kw">val</span> query = Create(Ref(<span class="lit">"classes/spells"</span>), Quote(ObjectV(<span class="lit">"data"</span> -&gt; <span class="std">Object</span>(<span class="lit">"name"</span> -&gt; <span class="lit">"Magic Missile"</span>))))</pre></div><div class="toggleContainer block">
+  <a href="../FaunaClient.html#query(expr:faunadb.types.Value)(implicitec:scala.concurrent.ExecutionContext):scala.concurrent.Future[faunadb.types.Value]" class="extmbr" name="faunadb.FaunaClient#query">FaunaClient!.query(expr:faunadb\.types\.Value)*</a> in order to execute the query.</p><p><a href="Language$.html" class="extype" name="faunadb.query.Language">query.Language</a> contains implicit functions to aid in type conversions when creating a query expression.</p><h5>Example</h5><pre><span class="kw">val</span> query = Create(Ref(<span class="lit">"classes/spells"</span>), Quote(ObjectV(<span class="lit">"data"</span> -&gt; <span class="std">Object</span>(<span class="lit">"name"</span> -&gt; <span class="lit">"Magic Missile"</span>))))</pre></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -216,7 +216,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">Implicit conversions to FaunaDB value types.</p><div class="fullcomment"><div class="comment cmt"><p>Implicit conversions to FaunaDB value types.</p><p>These can be used by adding:</p><pre><span class="kw">import</span> com.faunadb.client.query.Language._</pre></div></div>
+      <p class="shortcomment cmt">Implicit conversions to FaunaDB value types, as well as helper functions to construct queries.</p><div class="fullcomment"><div class="comment cmt"><p>Implicit conversions to FaunaDB value types, as well as helper functions to construct queries.</p><p>These can be used by adding:</p><pre><span class="kw">import</span> com.faunadb.client.query.Language._</pre></div></div>
     </li></ol>
             </div>
 

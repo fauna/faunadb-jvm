@@ -49,7 +49,7 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Implicit conversions to FaunaDB value types.</p><p>These can be used by adding:</p><pre><span class="kw">import</span> com.faunadb.client.query.Language._</pre></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Implicit conversions to FaunaDB value types, as well as helper functions to construct queries.</p><p>These can be used by adding:</p><pre><span class="kw">import</span> com.faunadb.client.query.Language._</pre></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -89,7 +89,44 @@
         <div id="allMembers">
         
 
-        
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="faunadb.query.Language.Action" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ActionextendsAnyRef"></a>
+      <a id="Action:Action"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Language$$Action.html"><span class="name">Action</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@ActionextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Enumeration for event action types.</p>
+    </li><li name="faunadb.query.Language.TimeUnit" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="TimeUnitextendsAnyRef"></a>
+      <a id="TimeUnit:TimeUnit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Language$$TimeUnit.html"><span class="name">TimeUnit</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@TimeUnitextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
 
         
 
@@ -146,6 +183,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="faunadb.query.Language.Action" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Action"></a>
+      <a id="Action:Action"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Language$$Action$.html"><span class="name">Action</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Action" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
     </li><li name="faunadb.query.Language#Add" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Add(terms:Iterable[faunadb.types.Value]):faunadb.types.Value"></a>
       <a id="Add(Iterable[Value]):Value"></a>
@@ -162,8 +216,61 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">An Add function.</p><div class="fullcomment"><div class="comment cmt"><p>An Add function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions" target="_blank">FaunaDB Miscellaneous Functions</a>
+      <p class="shortcomment cmt">An Add expression.</p><div class="fullcomment"><div class="comment cmt"><p>An Add expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions" target="_blank">https://faunadb.com/documentation/queries#misc_functions</a>
 </p></div></div>
+    </li><li name="faunadb.query.Language#And" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="And(terms:Iterable[faunadb.types.Value]):faunadb.types.Value"></a>
+      <a id="And(Iterable[Value]):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">And</span><span class="params">(<span name="terms">terms: <span class="extype" name="scala.Iterable">Iterable</span>[<a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a>]</span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@And(terms:Iterable[faunadb.types.Value]):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">An And expression.</p><div class="fullcomment"><div class="comment cmt"><p>An And expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions" target="_blank">https://faunadb.com/documentation/queries#misc_functions</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Append" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Append(elems:faunadb.types.Value,collection:faunadb.types.Value):faunadb.types.Value"></a>
+      <a id="Append(Value,Value):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Append</span><span class="params">(<span name="elems">elems: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>, <span name="collection">collection: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Append(elems:faunadb.types.Value,collection:faunadb.types.Value):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">An Append expression.</p><div class="fullcomment"><div class="comment cmt"><p>An Append expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions" target="_blank">https://faunadb.com/documentation/queries#collection_functions</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Concat" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Concat(terms:Iterable[faunadb.types.Value],separator:faunadb.types.Value):faunadb.types.Value"></a>
+      <a id="Concat(Iterable[Value],Value):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Concat</span><span class="params">(<span name="terms">terms: <span class="extype" name="scala.Iterable">Iterable</span>[<a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a>]</span>, <span name="separator">separator: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Concat(terms:Iterable[faunadb.types.Value],separator:faunadb.types.Value):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
     </li><li name="faunadb.query.Language#Concat" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Concat(terms:Iterable[faunadb.types.Value]):faunadb.types.Value"></a>
       <a id="Concat(Iterable[Value]):Value"></a>
@@ -180,7 +287,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Concat function.</p><div class="fullcomment"><div class="comment cmt"><p>A Concat function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions" target="_blank">FaunaDB Miscellaneous Functions</a>
+      <p class="shortcomment cmt">A Concat expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Concat expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions" target="_blank">https://faunadb.com/documentation/queries#misc_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Contains" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Contains(path:Iterable[faunadb.query.Path],in:faunadb.types.Value):faunadb.types.Value"></a>
@@ -198,7 +305,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Contains function.</p><div class="fullcomment"><div class="comment cmt"><p>A Contains function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions" target="_blank">FaunaDB Miscellaneous Functions</a>
+      <p class="shortcomment cmt">A Contains expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Contains expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions" target="_blank">https://faunadb.com/documentation/queries#misc_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Count" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Count(set:faunadb.types.Value):faunadb.types.Value"></a>
@@ -216,7 +323,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Count function.</p><div class="fullcomment"><div class="comment cmt"><p>A Count function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-reading-resources" target="_blank">FaunaDB Resource Retrieval Functions</a>
+      <p class="shortcomment cmt">A Count expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Count expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#read_functions" target="_blank">https://faunadb.com/documentation/queries#read_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Create" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Create(ref:faunadb.types.Value,params:faunadb.types.Value):faunadb.types.Value"></a>
@@ -234,7 +341,25 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Create function.</p><div class="fullcomment"><div class="comment cmt"><p>A Create function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-modifying-resources" target="_blank">FaunaDB Resource Modification Functions</a>
+      <p class="shortcomment cmt">A Create expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Create expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions" target="_blank">https://faunadb.com/documentation/queries#write_functions</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Date" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Date(str:faunadb.types.Value):faunadb.types.ObjectV"></a>
+      <a id="Date(Value):ObjectV"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Date</span><span class="params">(<span name="str">str: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>)</span><span class="result">: <a href="../types/ObjectV.html" class="extype" name="faunadb.types.ObjectV">ObjectV</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Date(str:faunadb.types.Value):faunadb.types.ObjectV" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A Date expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Date expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#time_functions" target="_blank">https://faunadb.com/documentation/queries#time_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Delete" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Delete(ref:faunadb.types.Value):faunadb.types.Value"></a>
@@ -252,7 +377,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Delete function.</p><div class="fullcomment"><div class="comment cmt"><p>A Delete function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-modifying-resources" target="_blank">FaunaDB Resource Modification Functions</a>
+      <p class="shortcomment cmt">A Delete expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Delete expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions" target="_blank">https://faunadb.com/documentation/queries#write_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Difference" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Difference(sets:Iterable[faunadb.types.Value]):faunadb.types.Value"></a>
@@ -270,7 +395,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Difference set.</p><div class="fullcomment"><div class="comment cmt"><p>A Difference set.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-collection_functions" target="_blank">FaunaDB Sets</a>
+      <p class="shortcomment cmt">A Difference set.</p><div class="fullcomment"><div class="comment cmt"><p>A Difference set.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#sets" target="_blank">https://faunadb.com/documentation/queries#sets</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Divide" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Divide(terms:Iterable[faunadb.types.Value]):faunadb.types.Value"></a>
@@ -288,7 +413,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Divide function.</p><div class="fullcomment"><div class="comment cmt"><p>A Divide function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions" target="_blank">FaunaDB Miscellaneous Functions</a>
+      <p class="shortcomment cmt">A Divide expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Divide expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions" target="_blank">https://faunadb.com/documentation/queries#misc_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Do" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Do(exprs:Iterable[faunadb.types.Value]):faunadb.types.Value"></a>
@@ -306,7 +431,60 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Do expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Do expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-basic_forms" target="_blank">FaunaDB Basic Forms</a>
+      <p class="shortcomment cmt">A Do expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Do expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms" target="_blank">https://faunadb.com/documentation/queries#basic_forms</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Drop" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Drop(num:faunadb.types.Value,collection:faunadb.types.Value):faunadb.types.Value"></a>
+      <a id="Drop(Value,Value):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Drop</span><span class="params">(<span name="num">num: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>, <span name="collection">collection: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Drop(num:faunadb.types.Value,collection:faunadb.types.Value):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A Drop expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Drop expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions" target="_blank">https://faunadb.com/documentation/queries#collection_functions</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Epoch" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Epoch(num:faunadb.types.Value,unit:String):faunadb.types.ObjectV"></a>
+      <a id="Epoch(Value,String):ObjectV"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Epoch</span><span class="params">(<span name="num">num: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>, <span name="unit">unit: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="../types/ObjectV.html" class="extype" name="faunadb.types.ObjectV">ObjectV</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Epoch(num:faunadb.types.Value,unit:String):faunadb.types.ObjectV" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="faunadb.query.Language#Epoch" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Epoch(num:faunadb.types.Value,unit:faunadb.query.Language.TimeUnit):faunadb.types.ObjectV"></a>
+      <a id="Epoch(Value,TimeUnit):ObjectV"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Epoch</span><span class="params">(<span name="num">num: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>, <span name="unit">unit: <a href="Language$$TimeUnit.html" class="extype" name="faunadb.query.Language.TimeUnit">TimeUnit</a></span>)</span><span class="result">: <a href="../types/ObjectV.html" class="extype" name="faunadb.types.ObjectV">ObjectV</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Epoch(num:faunadb.types.Value,unit:faunadb.query.Language.TimeUnit):faunadb.types.ObjectV" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">An Epoch expression.</p><div class="fullcomment"><div class="comment cmt"><p>An Epoch expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#time_functions" target="_blank">https://faunadb.com/documentation/queries#time_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Equals(terms:Iterable[faunadb.types.Value]):faunadb.types.Value"></a>
@@ -324,7 +502,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">An Equals function.</p><div class="fullcomment"><div class="comment cmt"><p>An Equals function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions" target="_blank">FaunaDB Miscellaneous Functions</a>
+      <p class="shortcomment cmt">An Equals expression.</p><div class="fullcomment"><div class="comment cmt"><p>An Equals expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions" target="_blank">https://faunadb.com/documentation/queries#misc_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Exists" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Exists(ref:faunadb.types.Value):faunadb.types.Value"></a>
@@ -342,7 +520,25 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">An Exists function.</p><div class="fullcomment"><div class="comment cmt"><p>An Exists function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-read_functions" target="_blank">FaunaDB Read Functions</a>
+      <p class="shortcomment cmt">An Exists expression.</p><div class="fullcomment"><div class="comment cmt"><p>An Exists expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#read_functions" target="_blank">https://faunadb.com/documentation/queries#read_functions</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Filter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Filter(lambda:faunadb.types.Value,collection:faunadb.types.Value):faunadb.types.Value"></a>
+      <a id="Filter(Value,Value):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Filter</span><span class="params">(<span name="lambda">lambda: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>, <span name="collection">collection: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Filter(lambda:faunadb.types.Value,collection:faunadb.types.Value):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A Filter expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Filter expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions" target="_blank">https://faunadb.com/documentation/queries#collection_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Foreach" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Foreach(lambda:faunadb.types.Value,collection:faunadb.types.Value):faunadb.types.Value"></a>
@@ -360,7 +556,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Foreach function.</p><div class="fullcomment"><div class="comment cmt"><p>A Foreach function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-collection_functions" target="_blank">FaunaDB Collection Functions</a>
+      <p class="shortcomment cmt">A Foreach expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Foreach expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions" target="_blank">https://faunadb.com/documentation/queries#collection_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Get" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Get(resource:faunadb.types.Value):faunadb.types.Value"></a>
@@ -378,7 +574,25 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Get function.</p><div class="fullcomment"><div class="comment cmt"><p>A Get function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-reading-resources" target="_blank">FaunaDB Resource Retrieval Functions</a>
+      <p class="shortcomment cmt">A Get expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Get expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#read_functions" target="_blank">https://faunadb.com/documentation/queries#read_functions</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Identify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Identify(ref:faunadb.types.Value,password:faunadb.types.Value):faunadb.types.Value"></a>
+      <a id="Identify(Value,Value):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Identify</span><span class="params">(<span name="ref">ref: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>, <span name="password">password: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Identify(ref:faunadb.types.Value,password:faunadb.types.Value):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">An Identify expression.</p><div class="fullcomment"><div class="comment cmt"><p>An Identify expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#auth_functions" target="_blank">https://faunadb.com/documentation/queries#auth_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#If" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="If(condition:faunadb.types.Value,then:faunadb.types.Value,else:faunadb.types.Value):faunadb.types.Value"></a>
@@ -396,7 +610,25 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">An If function.</p><div class="fullcomment"><div class="comment cmt"><p>An If function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-basic_forms" target="_blank">FaunaDB Basic Forms</a>
+      <p class="shortcomment cmt">An If expression.</p><div class="fullcomment"><div class="comment cmt"><p>An If expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms" target="_blank">https://faunadb.com/documentation/queries#basic_forms</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Insert" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Insert(ref:faunadb.types.Value,ts:Long,action:faunadb.query.Language.Action,params:faunadb.types.Value):faunadb.types.Value"></a>
+      <a id="Insert(Value,Long,Action,Value):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Insert</span><span class="params">(<span name="ref">ref: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>, <span name="ts">ts: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Long" class="extype" target="_top">Long</a></span>, <span name="action">action: <a href="Language$$Action.html" class="extype" name="faunadb.query.Language.Action">Action</a></span>, <span name="params">params: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Insert(ref:faunadb.types.Value,ts:Long,action:faunadb.query.Language.Action,params:faunadb.types.Value):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">An Insert expression.</p><div class="fullcomment"><div class="comment cmt"><p>An Insert expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions" target="_blank">https://faunadb.com/documentation/queries#write_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Intersection" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Intersection(sets:Iterable[faunadb.types.Value]):faunadb.types.Value"></a>
@@ -414,7 +646,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">An Intersection set.</p><div class="fullcomment"><div class="comment cmt"><p>An Intersection set.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-collection_functions" target="_blank">FaunaDB Sets</a>
+      <p class="shortcomment cmt">An Intersection set.</p><div class="fullcomment"><div class="comment cmt"><p>An Intersection set.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#sets" target="_blank">https://faunadb.com/documentation/queries#sets</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Join" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Join(source:faunadb.types.Value,target:faunadb.types.Value):faunadb.types.Value"></a>
@@ -432,7 +664,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Join set.</p><div class="fullcomment"><div class="comment cmt"><p>A Join set.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-collection_functions" target="_blank">FaunaDB Sets</a>
+      <p class="shortcomment cmt">A Join set.</p><div class="fullcomment"><div class="comment cmt"><p>A Join set.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#sets" target="_blank">https://faunadb.com/documentation/queries#sets</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Lambda" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Lambda(argument:String,expr:faunadb.types.Value):faunadb.types.Value"></a>
@@ -452,7 +684,7 @@
     </span>
       <p class="shortcomment cmt">A Lambda expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Lambda expression.</p><p><b>Reference</b>: TBD
 </p></div></div>
-    </li><li name="faunadb.query.Language#Let" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.query.Language#Let" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Let(vars:scala.collection.Map[String,faunadb.types.Value],in:faunadb.types.Value):faunadb.types.Value"></a>
       <a id="Let(Map[String,Value],Value):Value"></a>
       <h4 class="signature">
@@ -468,7 +700,44 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">A Let expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Let expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms" target="_blank">https://faunadb.com/documentation/queries#basic_forms</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Login" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Login(ref:faunadb.types.Value,params:faunadb.types.Value):faunadb.types.Value"></a>
+      <a id="Login(Value,Value):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Login</span><span class="params">(<span name="ref">ref: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>, <span name="params">params: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Login(ref:faunadb.types.Value,params:faunadb.types.Value):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A Login expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Login expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#auth_functions" target="_blank">https://faunadb.com/documentation/queries#auth_functions</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Logout" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Logout(invalidateAll:Boolean):faunadb.types.Value"></a>
+      <a id="Logout(Boolean):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Logout</span><span class="params">(<span name="invalidateAll">invalidateAll: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Logout(invalidateAll:Boolean):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A Logout expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Logout expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#auth_functions" target="_blank">https://faunadb.com/documentation/queries#auth_functions</a>
+</p></div></div>
     </li><li name="faunadb.query.Language#Map" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Map(lambda:faunadb.types.Value,collection:faunadb.types.Value):faunadb.types.Value"></a>
       <a id="Map(Value,Value):Value"></a>
@@ -485,7 +754,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Map function.</p><div class="fullcomment"><div class="comment cmt"><p>A Map function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-collection_functions" target="_blank">FaunaDB Collection Functions</a>
+      <p class="shortcomment cmt">A Map expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Map expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions" target="_blank">https://faunadb.com/documentation/queries#collection_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Match" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Match(term:faunadb.types.Value,index:faunadb.types.Ref):faunadb.types.Value"></a>
@@ -503,7 +772,25 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Match set.</p><div class="fullcomment"><div class="comment cmt"><p>A Match set.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-collection_functions" target="_blank">FaunaDB Sets</a>
+      <p class="shortcomment cmt">A Match set.</p><div class="fullcomment"><div class="comment cmt"><p>A Match set.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#sets" target="_blank">https://faunadb.com/documentation/queries#sets</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Modulo" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Modulo(terms:Iterable[faunadb.types.Value]):faunadb.types.Value"></a>
+      <a id="Modulo(Iterable[Value]):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Modulo</span><span class="params">(<span name="terms">terms: <span class="extype" name="scala.Iterable">Iterable</span>[<a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a>]</span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Modulo(terms:Iterable[faunadb.types.Value]):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A Modulo expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Modulo expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions" target="_blank">https://faunadb.com/documentation/queries#misc_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Multiply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Multiply(terms:Iterable[faunadb.types.Value]):faunadb.types.Value"></a>
@@ -521,7 +808,25 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Multiply function.</p><div class="fullcomment"><div class="comment cmt"><p>A Multiply function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions" target="_blank">FaunaDB Miscellaneous Functions</a>
+      <p class="shortcomment cmt">A Multiply expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Multiply expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions" target="_blank">https://faunadb.com/documentation/queries#misc_functions</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Not" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Not(term:faunadb.types.Value):faunadb.types.Value"></a>
+      <a id="Not(Value):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Not</span><span class="params">(<span name="term">term: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Not(term:faunadb.types.Value):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A Not expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Not expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions" target="_blank">https://faunadb.com/documentation/queries#misc_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Object" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="Object(value:faunadb.types.ObjectV):faunadb.types.ObjectV"></a>
@@ -540,6 +845,24 @@
       </a>
     </span>
       
+    </li><li name="faunadb.query.Language#Or" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Or(terms:Iterable[faunadb.types.Value]):faunadb.types.Value"></a>
+      <a id="Or(Iterable[Value]):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Or</span><span class="params">(<span name="terms">terms: <span class="extype" name="scala.Iterable">Iterable</span>[<a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a>]</span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Or(terms:Iterable[faunadb.types.Value]):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">An Or expression.</p><div class="fullcomment"><div class="comment cmt"><p>An Or expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions" target="_blank">https://faunadb.com/documentation/queries#misc_functions</a>
+</p></div></div>
     </li><li name="faunadb.query.Language#Paginate" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Paginate(resource:faunadb.types.Value,ts:Option[Long],cursor:Option[faunadb.query.Cursor],size:Option[Long],sources:Boolean,events:Boolean):faunadb.types.Value"></a>
       <a id="Paginate(Value,Option[Long],Option[Cursor],Option[Long],Boolean,Boolean):Value"></a>
@@ -556,7 +879,25 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Paginate function.</p><div class="fullcomment"><div class="comment cmt"><p>A Paginate function.</p><p>The paginate function takes optional parameters. These can either be specified by named parameters on the constructor:</p><pre>Paginate(resource, ts, sources=<span class="kw">true</span>, cursor=<span class="std">Some</span>(cursor))</pre><p>or through the <code>with</code> methods:</p><pre><span class="kw">val</span> paginate = Paginate(resource, ts).withCursor(cursor).withSize(size)</pre></div></div>
+      <p class="shortcomment cmt">A Paginate expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Paginate expression.</p><p>The paginate expression takes optional parameters. These can either be specified by named parameters on the constructor:</p><pre>Paginate(resource, ts, sources=<span class="kw">true</span>, cursor=<span class="std">Some</span>(cursor))</pre><p>or through the <code>with</code> methods:</p><pre><span class="kw">val</span> paginate = Paginate(resource, ts).withCursor(cursor).withSize(size)</pre></div></div>
+    </li><li name="faunadb.query.Language#Prepend" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Prepend(elems:faunadb.types.Value,collection:faunadb.types.Value):faunadb.types.Value"></a>
+      <a id="Prepend(Value,Value):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Prepend</span><span class="params">(<span name="elems">elems: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>, <span name="collection">collection: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Prepend(elems:faunadb.types.Value,collection:faunadb.types.Value):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A Prepend expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Prepend expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions" target="_blank">https://faunadb.com/documentation/queries#collection_functions</a>
+</p></div></div>
     </li><li name="faunadb.query.Language#Quote" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Quote(quote:faunadb.types.Value):faunadb.types.Value"></a>
       <a id="Quote(Value):Value"></a>
@@ -573,7 +914,25 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Quote function.</p><div class="fullcomment"><div class="comment cmt"><p>A Quote function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-basic_forms" target="_blank">FaunaDB Basic Forms</a>
+      <p class="shortcomment cmt">A Quote expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Quote expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms" target="_blank">https://faunadb.com/documentation/queries#basic_forms</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Remove" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Remove(ref:faunadb.types.Value,ts:Long,action:faunadb.query.Language.Action):faunadb.types.Value"></a>
+      <a id="Remove(Value,Long,Action):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Remove</span><span class="params">(<span name="ref">ref: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>, <span name="ts">ts: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Long" class="extype" target="_top">Long</a></span>, <span name="action">action: <a href="Language$$Action.html" class="extype" name="faunadb.query.Language.Action">Action</a></span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Remove(ref:faunadb.types.Value,ts:Long,action:faunadb.query.Language.Action):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A Remove expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Remove expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions" target="_blank">https://faunadb.com/documentation/queries#write_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Replace" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Replace(ref:faunadb.types.Value,params:faunadb.types.Value):faunadb.types.Value"></a>
@@ -591,7 +950,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Replace function.</p><div class="fullcomment"><div class="comment cmt"><p>A Replace function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-modifying-resources" target="_blank">FaunaDB Resource Modification Functions</a>
+      <p class="shortcomment cmt">A Replace expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Replace expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions" target="_blank">https://faunadb.com/documentation/queries#write_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Select" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Select(path:Iterable[faunadb.query.Path],from:faunadb.types.Value):faunadb.types.Value"></a>
@@ -609,7 +968,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Select function.</p><div class="fullcomment"><div class="comment cmt"><p>A Select function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-basic_forms" target="_blank">FaunaDB Basic Forms</a>
+      <p class="shortcomment cmt">A Select expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Select expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#basic_forms" target="_blank">https://faunadb.com/documentation/queries#basic_forms</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Subtract" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Subtract(terms:Iterable[faunadb.types.Value]):faunadb.types.Value"></a>
@@ -627,7 +986,61 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Subtract function.</p><div class="fullcomment"><div class="comment cmt"><p>A Subtract function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-misc_functions" target="_blank">FaunaDB Miscellaneous Functions</a>
+      <p class="shortcomment cmt">A Subtract expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Subtract expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#misc_functions" target="_blank">https://faunadb.com/documentation/queries#misc_functions</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Take" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Take(num:faunadb.types.Value,collection:faunadb.types.Value):faunadb.types.Value"></a>
+      <a id="Take(Value,Value):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Take</span><span class="params">(<span name="num">num: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>, <span name="collection">collection: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Take(num:faunadb.types.Value,collection:faunadb.types.Value):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A Take expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Take expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#collection_functions" target="_blank">https://faunadb.com/documentation/queries#collection_functions</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language#Time" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Time(str:faunadb.types.Value):faunadb.types.Value"></a>
+      <a id="Time(Value):Value"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Time</span><span class="params">(<span name="str">str: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>)</span><span class="result">: <a href="../types/Value.html" class="extype" name="faunadb.types.Value">Value</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@Time(str:faunadb.types.Value):faunadb.types.Value" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A Time expression.</p><div class="fullcomment"><div class="comment cmt"><p>A Time expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#time_functions" target="_blank">https://faunadb.com/documentation/queries#time_functions</a>
+</p></div></div>
+    </li><li name="faunadb.query.Language.TimeUnit" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="TimeUnit"></a>
+      <a id="TimeUnit:TimeUnit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Language$$TimeUnit$.html"><span class="name">TimeUnit</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@TimeUnit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Enumeration for time units.</p><div class="fullcomment"><div class="comment cmt"><p>Enumeration for time units. Used by <a href="https://faunadb.com/documentation/queries#time_functions" target="_blank">https://faunadb.com/documentation/queries#time_functions</a>.
 </p></div></div>
     </li><li name="faunadb.query.Language#Union" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Union(sets:Iterable[faunadb.types.Value]):faunadb.types.Value"></a>
@@ -645,7 +1058,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A Union set.</p><div class="fullcomment"><div class="comment cmt"><p>A Union set.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-collection_functions" target="_blank">FaunaDB Sets</a>
+      <p class="shortcomment cmt">A Union set.</p><div class="fullcomment"><div class="comment cmt"><p>A Union set.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#sets" target="_blank">https://faunadb.com/documentation/queries#sets</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#Update" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Update(ref:faunadb.types.Value,params:faunadb.types.Value):faunadb.types.Value"></a>
@@ -663,7 +1076,7 @@
         <img src="../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">An Update function.</p><div class="fullcomment"><div class="comment cmt"><p>An Update function.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation#queries-modifying-resources" target="_blank">FaunaDB Resource Modification Functions</a>
+      <p class="shortcomment cmt">An Update expression.</p><div class="fullcomment"><div class="comment cmt"><p>An Update expression.</p><p><b>Reference</b>: <a href="https://faunadb.com/documentation/queries#write_functions" target="_blank">https://faunadb.com/documentation/queries#write_functions</a>
 </p></div></div>
     </li><li name="faunadb.query.Language#arrayToValue" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="arrayToValue(unwrapped:Array[faunadb.types.Value]):faunadb.types.ArrayV"></a>
@@ -860,6 +1273,23 @@
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#faunadb.query.Language$@intToArrayPath(i:Int):faunadb.query.ArrayPath" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="faunadb.query.Language#intToValue" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="intToValue(unwrapped:Int):faunadb.types.NumberV"></a>
+      <a id="intToValue(Int):NumberV"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">intToValue</span><span class="params">(<span name="unwrapped">unwrapped: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <a href="../types/NumberV.html" class="extype" name="faunadb.types.NumberV">NumberV</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#faunadb.query.Language$@intToValue(unwrapped:Int):faunadb.types.NumberV" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" />
       </a>
     </span>
