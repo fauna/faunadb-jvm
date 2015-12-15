@@ -51,7 +51,7 @@ case class Database(@JsonProperty("ref") ref: Ref,
 case class Token(@JsonProperty("ref") ref: Ref,
                  @(JsonProperty @field @param)("class") classRef: Ref,
                  @JsonProperty("ts") ts: Long,
-                 @JsonProperty("credentials") credentials: Ref,
+                 @JsonProperty("instance") instance: Ref,
                  @JsonProperty("secret") secret: String)
 
 /**

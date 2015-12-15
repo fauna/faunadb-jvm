@@ -260,8 +260,8 @@ public class ClientSpec {
     ListenableFuture<Value> setF = client.query(Match(StringV("arcane"), Ref("indexes/spells_by_element")));
     Value setNode = setF.get();
     com.faunadb.client.types.Set set = setNode.asSet();
-    assertThat(set.parameters().get("match").asString(), is("arcane"));
-    assertThat(set.parameters().get("index").asRef(), is(Ref("indexes/spells_by_element")));
+    assertThat(set.parameters().get("terms").asString(), is("arcane"));
+    assertThat(set.parameters().get("match").asRef(), is(Ref("indexes/spells_by_element")));
   }
 
   @Test
