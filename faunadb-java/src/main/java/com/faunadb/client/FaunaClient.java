@@ -95,7 +95,6 @@ public class FaunaClient {
         @Override
         public Value apply(Response response) {
           try {
-            handleSimpleErrors(response);
             handleQueryErrors(response);
 
             JsonNode responseBody = parseResponseBody(response);
@@ -130,7 +129,6 @@ public class FaunaClient {
         @Override
         public ImmutableList<Value> apply(Response resp) {
           try {
-            handleSimpleErrors(resp);
             handleQueryErrors(resp);
             JsonNode responseBody = parseResponseBody(resp);
             ArrayNode resources = ((ArrayNode) responseBody.get("resource"));
@@ -151,17 +149,6 @@ public class FaunaClient {
     }
   }
 
-  private void handleSimpleErrors(Response response) throws IOException, FaunaException {
-    int status = response.getStatusCode();
-    if (status == 401) {
-      String error = parseResponseBody(response).get("error").asText();
-      throw new UnauthorizedException(error);
-    } else if (status == 500) {
-      String error = parseResponseBody(response).get("error").asText();
-      throw new InternalException(error);
-    }
-  }
-
   private void handleQueryErrors(Response response) throws IOException, FaunaException {
     int status = response.getStatusCode();
     if (status >= 300) {
@@ -177,8 +164,12 @@ public class FaunaClient {
       switch(status) {
         case 400:
           throw new BadRequestException(errorResponse);
+        case 401:
+          throw new UnauthorizedException(errorResponse);
         case 404:
           throw new NotFoundException(errorResponse);
+        case 500:
+          throw new InternalException(errorResponse);
         default:
           throw new UnknownException(errorResponse);
       }
