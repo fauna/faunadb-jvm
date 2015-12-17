@@ -109,6 +109,10 @@ public class HttpResponses {
     public String description() {
       return description;
     }
+
+    public ImmutableList<String> field() {
+      return field;
+    }
   }
 
   @JsonDeserialize(using = Codec.QueryErrorDeserializer.class)
