@@ -61,7 +61,6 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
     val body = json.createObjectNode()
     body.set("q", json.valueToTree(expr))
     connection.post("/", body).asScalaFuture.map { resp =>
-      handleSimpleErrors(resp)
       handleQueryErrors(resp)
       val respBody = parseResponseBody(resp)
       val resource = respBody.get("resource")
@@ -80,7 +79,6 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
     val body = json.createObjectNode()
     body.set("q", json.valueToTree(exprs))
     connection.post("/", body).asScalaFuture.map { resp =>
-      handleSimpleErrors(resp)
       handleQueryErrors(resp)
       val respBody = parseResponseBody(resp)
       respBody.get("resource").asInstanceOf[ArrayNode].asScala.map { node =>
@@ -96,22 +94,6 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
     connection.close()
   }
 
-  private def handleSimpleErrors(response: HttpResponse) = {
-    response.getStatusCode match {
-      case x if x >= 300 =>
-        x match {
-          case 401 =>
-            val error = parseResponseBody(response).get("error").asText()
-            throw new UnauthorizedException(error)
-          case 500 =>
-            val error = parseResponseBody(response).get("error").asText()
-            throw new InternalException(error)
-          case _ =>
-        }
-      case _ =>
-    }
-  }
-
   private def handleQueryErrors(response: HttpResponse) = {
     response.getStatusCode match {
       case x if x >= 300 =>
@@ -120,7 +102,9 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
         val error = QueryErrorResponse(x, parsedErrors)
         x match {
           case 400 => throw new BadRequestException(error)
+          case 401 => throw new UnauthorizedException(error)
           case 404 => throw new NotFoundException(error)
+          case 500 => throw new InternalException(error)
           case _ => throw new UnknownException(error)
         }
       case _ =>

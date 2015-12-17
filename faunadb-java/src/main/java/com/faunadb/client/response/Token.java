@@ -8,8 +8,8 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 
 public final class Token extends Instance {
-  @JsonProperty("credentials")
-  private final Ref credentials;
+  @JsonProperty("instance")
+  private final Ref instance;
   @JsonProperty("secret")
   private final String secret;
 
@@ -17,16 +17,16 @@ public final class Token extends Instance {
   Token(@JsonProperty("ref") Ref ref,
         @JsonProperty("class") Ref classRef,
         @JsonProperty("ts") Long ts,
-        @JsonProperty("credentials") Ref credentials,
+        @JsonProperty("instance") Ref instance,
         @JsonProperty("secret") String secret,
         @JsonProperty("data") ImmutableMap<String, LazyValue> data) {
     super(ref, classRef, ts, data);
-    this.credentials = credentials;
+    this.instance = instance;
     this.secret = secret;
   }
 
-  public Ref credentials() {
-    return credentials;
+  public Ref instance() {
+    return instance;
   }
 
   public String secret() {
@@ -38,7 +38,7 @@ public final class Token extends Instance {
     return "Token(" + Joiner.on(", ").join(
       "ref: " + ref(),
       "class: "+ classRef(),
-      "credentials: " + credentials(),
+      "instance: " + instance(),
       "secret: " + secret(),
       "ts: "+ ts(),
       "data: " +data()

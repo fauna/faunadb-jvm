@@ -6,7 +6,7 @@ import java.time.{LocalDate, Instant}
 import java.time.temporal.ChronoUnit
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import faunadb.errors.{NotFoundException, BadRequestException}
+import faunadb.errors.{UnauthorizedException, NotFoundException, BadRequestException}
 import faunadb.query.Language._
 import faunadb.query._
 import faunadb.types._
@@ -58,6 +58,14 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   "Fauna Client" should "should not find an instance" in {
     val resp = client.query(Get(Ref("classes/spells/1234")))
     intercept[NotFoundException] {
+      Await.result(resp, 1 second)
+    }
+  }
+
+  it should "fail with unauthorized" in {
+    val badClient = FaunaClient(Connection.builder().withFaunaRoot(config("root_url")).withAuthToken("notavalidsecret").build())
+    val resp = badClient.query(Get(Ref("classes/spells/12345")))
+    intercept[UnauthorizedException] {
       Await.result(resp, 1 second)
     }
   }
@@ -184,8 +192,8 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "test types" in {
     val setF = client.query(Match("arcane", Ref("indexes/spells_by_element")))
     val set = Await.result(setF, 1 second).asSet
-    set.parameters("match").asString shouldBe "arcane"
-    set.parameters("index").asRef shouldBe Ref("indexes/spells_by_element")
+    set.parameters("match").asRef shouldBe Ref("indexes/spells_by_element")
+    set.parameters("terms").asString shouldBe "arcane"
   }
 
   it should "test basic forms" in {

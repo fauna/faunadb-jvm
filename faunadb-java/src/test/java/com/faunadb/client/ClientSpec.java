@@ -2,6 +2,7 @@ package com.faunadb.client;
 
 import com.faunadb.client.errors.BadRequestException;
 import com.faunadb.client.errors.NotFoundException;
+import com.faunadb.client.errors.UnauthorizedException;
 import com.faunadb.client.query.*;
 import com.faunadb.client.response.*;
 import com.faunadb.client.types.*;
@@ -104,6 +105,14 @@ public class ClientSpec {
   public void testLookupMissingInstance() throws Throwable {
     thrown.expectCause(isA(NotFoundException.class));
     ListenableFuture<Value> resp = client.query(Get(Ref("classes/spells/1234")));
+    resp.get();
+  }
+
+  @Test
+  public void testUnauthorizedExcpetion() throws Throwable {
+    thrown.expectCause(isA(UnauthorizedException.class));
+    FaunaClient badClient = FaunaClient.create(Connection.builder().withFaunaRoot(config.get("root_url")).withAuthToken("notavalidsecret").build());
+    ListenableFuture<Value> resp = badClient.query(Get(Ref("classes/spells/1234")));
     resp.get();
   }
 
@@ -260,8 +269,8 @@ public class ClientSpec {
     ListenableFuture<Value> setF = client.query(Match(StringV("arcane"), Ref("indexes/spells_by_element")));
     Value setNode = setF.get();
     com.faunadb.client.types.Set set = setNode.asSet();
-    assertThat(set.parameters().get("match").asString(), is("arcane"));
-    assertThat(set.parameters().get("index").asRef(), is(Ref("indexes/spells_by_element")));
+    assertThat(set.parameters().get("terms").asString(), is("arcane"));
+    assertThat(set.parameters().get("match").asRef(), is(Ref("indexes/spells_by_element")));
   }
 
   @Test
