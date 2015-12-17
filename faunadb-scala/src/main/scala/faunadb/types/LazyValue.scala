@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.`type`.TypeFactory
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import faunadb.response._
+import faunadb.query._
 
 import scala.collection.AbstractMap
 
@@ -13,6 +14,9 @@ import scala.collection.AbstractMap
   */
 @JsonDeserialize(using=classOf[LazyValueDeserializer])
 class LazyValue private[faunadb] (private val underlying: JsonNode, json: ObjectMapper) extends Value {
+  def asBefore = Before(RawV(underlying))
+  def asAfter = After(RawV(underlying))
+
   override def asStringOpt: Option[String] = if (underlying.isTextual) Some(underlying.asText) else None
   override def asBooleanOpt: Option[Boolean] = if (underlying.isBoolean) Some(underlying.asBoolean()) else None
   override def asNumberOpt: Option[Long] = if (underlying.isNumber) Some(underlying.asLong()) else None
@@ -118,7 +122,9 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
     try {
       Option(json.convertValue(underlying, classOf[Ts]))
     } catch {
-      case _: IllegalArgumentException => None
+      case e: IllegalArgumentException =>
+        println(e)
+        None
     }
   }
 

@@ -172,7 +172,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     resp.after shouldNot be (None)
     resp.before shouldBe None
 
-    val query2F = client.query(Paginate(Match(classRef, randomClassIndex), size=Some(1), cursor=Some(After(resp.after.get.asRef))))
+    val query2F = client.query(Paginate(Match(classRef, randomClassIndex), size=Some(1), cursor=resp.after.map(_.asAfter)))
     val resp2 = Await.result(query2F, 5 seconds).asPage
 
     resp2.data.size shouldBe 1

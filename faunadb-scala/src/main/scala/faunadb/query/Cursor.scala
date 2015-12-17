@@ -7,7 +7,7 @@ import scala.annotation.meta.field
 
 /**
  * A FaunaDB cursor, for use when paginating through an ordered set.
- * 
+ *
  * Concrete cursors contain a direction: before, or after.
  */
 sealed trait Cursor

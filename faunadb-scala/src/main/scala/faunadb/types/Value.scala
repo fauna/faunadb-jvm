@@ -4,6 +4,7 @@ import java.time.format.DateTimeFormatter
 import java.time.{LocalDate, ZonedDateTime, Instant}
 
 import com.fasterxml.jackson.annotation.{JsonProperty, JsonCreator, JsonIgnore, JsonValue}
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
 import faunadb.response._
 
@@ -195,6 +196,8 @@ trait Value {
   def get(index: Int): Option[Value] = asArrayOpt.flatMap(_.lift(index))
 
 }
+
+case class RawV(@(JsonValue @getter) value: JsonNode) extends Value
 
 case class StringV(@(JsonValue @getter) value: String) extends Value {
   override def asStringOpt: Option[String] = Some(value)
