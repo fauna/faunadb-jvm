@@ -48,7 +48,6 @@ public class ClientSpec {
     File configFile = new File("config/test.yml");
     if (configFile.isFile()) {
       return readConfig(configFile);
-
     } else {
       String rootKey = System.getenv("FAUNA_ROOT_KEY");
       if (rootKey == null) throw new RuntimeException("FAUNA_ROOT_KEY must be defined to run tests");

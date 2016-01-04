@@ -27,7 +27,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val configFile = new File("config/test.yml")
     if (configFile.isFile) {
       readConfig(configFile)
-
     } else {
       val rootKey = Option(System.getenv("FAUNA_ROOT_KEY")) getOrElse {
         throw new RuntimeException("FAUNA_ROOT_KEY must defined to run tests")
