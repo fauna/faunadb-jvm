@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
 import faunadb.response._
 
-import scala.annotation.meta.{field, getter}
+import scala.annotation.meta.{param, field, getter}
 
 /**
   * An abstract node in a FaunaDB response tree. Something conforming to this trait should be
@@ -244,7 +244,7 @@ object Ts {
   def apply(value: String) = new Ts(value)
 }
 
-case class Ts(@(JsonIgnore @field @getter) value: Instant) extends Value {
+case class Ts(@(JsonIgnore @param @field @getter) value: Instant) extends Value {
   @JsonCreator
   def this(@JsonProperty("@ts") value: String) = this(ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant)
 
@@ -258,7 +258,7 @@ object Date {
   def apply(value: String) = new Date(value)
 }
 
-case class Date(@(JsonIgnore @field @getter) value: LocalDate) extends Value {
+case class Date(@(JsonIgnore @param @field @getter) value: LocalDate) extends Value {
   @JsonCreator
   def this(@JsonProperty("@date") value: String) = this(LocalDate.parse(value))
 

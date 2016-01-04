@@ -122,7 +122,10 @@ class LazyValue private[faunadb] (private val underlying: JsonNode, json: Object
     try {
       Option(json.convertValue(underlying, classOf[Ts]))
     } catch {
-      case _: IllegalArgumentException => None
+      case ex: IllegalArgumentException =>
+        println(underlying)
+        println(ex)
+        None
     }
   }
 

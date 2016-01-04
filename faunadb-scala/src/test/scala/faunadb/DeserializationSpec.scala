@@ -20,6 +20,10 @@ class DeserializationSpec extends FlatSpec with Matchers {
     new LazyValue(json.valueToTree(ref), json)
   }
 
+  def toResponseNode(value: Int) = {
+    new LazyValue(json.valueToTree(value), json)
+  }
+
   def toResponseNode(value: Long) = {
     new LazyValue(json.valueToTree(value), json)
   }
@@ -41,7 +45,7 @@ class DeserializationSpec extends FlatSpec with Matchers {
   it should "deserialize a query response" in {
     val toDeserialize = "{\n        \"class\": {\n            \"@ref\": \"classes/derp\"\n        },\n        \"data\": {\n            \"test\": 1\n        },\n        \"ref\": {\n            \"@ref\": \"classes/derp/101192216816386048\"\n        },\n        \"ts\": 1432763268186882\n    }"
     val parsed = json.readValue(toDeserialize, classOf[LazyValue])
-    parsed.asInstance shouldBe Instance(Ref("classes/derp/101192216816386048"), Ref("classes/derp"), 1432763268186882L, new LazyValueMap(immutable.Map("test" -> toResponseNode(1L))))
+    parsed.asInstance shouldBe Instance(Ref("classes/derp/101192216816386048"), Ref("classes/derp"), 1432763268186882L, new LazyValueMap(immutable.Map("test" -> toResponseNode(1))))
   }
 
   it should "deserialize a query response with a literal object" in {

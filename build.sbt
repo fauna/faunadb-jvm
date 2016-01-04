@@ -1,4 +1,4 @@
-val jacksonVersion = "2.5.1"
+val jacksonVersion = "2.6.4"
 val metricsVersion = "3.1.0"
 
 lazy val commonSettings = Seq(
@@ -52,10 +52,10 @@ lazy val scala = project.in(file("faunadb-scala"))
   .settings(commonSettings : _*)
   .settings(
     name := "faunadb-scala",
-    scalaVersion := "2.11.6",
+    scalaVersion := "2.11.7",
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
-      "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.6.3",
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
       "org.yaml" % "snakeyaml" % "1.14" % "test",
       "org.scalatest" %% "scalatest" % "2.2.1" % "test"
