@@ -26,3 +26,19 @@ private[types] class LazyValueMapDeserializer extends JsonDeserializer[LazyValue
     new LazyValueMap(json.convertValue(innerTree, t))
   }
 }
+
+private[types] class TsDeserializer extends JsonDeserializer[Ts] {
+  override def deserialize(jsonParser: JsonParser, deserializationContext: DeserializationContext): Ts = {
+    val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
+    val tree = json.readTree(jsonParser).asInstanceOf[JsonNode]
+    new Ts(tree.get("@ts").asText)
+  }
+}
+
+private[types] class DateDeserializer extends JsonDeserializer[Date] {
+  override def deserialize(jsonParser: JsonParser, deserializationContext: DeserializationContext): Date = {
+    val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
+    val tree = json.readTree(jsonParser).asInstanceOf[JsonNode]
+    new Date(tree.get("@date").asText)
+  }
+}

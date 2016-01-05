@@ -3,11 +3,13 @@ package faunadb.types
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDate, ZonedDateTime, Instant}
 
-import com.fasterxml.jackson.annotation._
+import com.fasterxml.jackson.annotation.{JsonProperty, JsonCreator, JsonIgnore, JsonValue}
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.node.NullNode
 import faunadb.response._
 
+import scala.annotation.compileTimeOnly
 import scala.annotation.meta.{param, field, getter}
 
 /**
@@ -243,11 +245,11 @@ object Ts {
   def apply(value: String) = new Ts(value)
 }
 
+@JsonDeserialize(using=classOf[TsDeserializer])
 case class Ts(@(JsonIgnore @param @field @getter) value: Instant) extends Value {
-  @JsonCreator
-  def this(@JsonProperty("@ts") value: String) = this(ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant)
+  def this(value: String) = this(ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant)
 
-  @JsonGetter("@ts")
+  @JsonProperty("@ts")
   val strValue = value.toString
 
   override def asTsOpt = Some(this)
@@ -257,11 +259,11 @@ object Date {
   def apply(value: String) = new Date(value)
 }
 
+@JsonDeserialize(using=classOf[DateDeserializer])
 case class Date(@(JsonIgnore @param @field @getter) value: LocalDate) extends Value {
-  @JsonCreator
-  def this(@JsonProperty("@date") value: String) = this(LocalDate.parse(value))
+  def this(value: String) = this(LocalDate.parse(value))
 
-  @JsonGetter("@date")
+  @JsonProperty("@date")
   val strValue = value.toString
 
   override def asDateOpt = Some(this)
