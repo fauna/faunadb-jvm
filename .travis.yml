@@ -11,6 +11,6 @@ scala:
 jdk:
   - oraclejdk8
 before_install:
-  - openssl aes-256-cbc -K $encrypted_0517a6256a40_key -iv $encrypted_0517a6256a40_iv -in core.tgz.enc -out core.tgz -d
+  - openssl aes-256-cbc -K $encrypted_1c20d184f614_key -iv $encrypted_1c20d184f614_iv -in core.tgz.enc -out core.tgz -d
   - tar zxf core.tgz
   - sh install-core.sh
