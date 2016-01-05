@@ -7,7 +7,7 @@ env:
     - FAUNA_SCHEME=http
     - FAUNA_PORT=8443
 scala:
-  - 2.11.8
+  - 2.11.7
 jdk:
   - oraclejdk8
 before_install:
