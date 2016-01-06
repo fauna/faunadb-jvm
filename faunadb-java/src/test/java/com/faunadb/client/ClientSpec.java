@@ -104,7 +104,8 @@ public class ClientSpec {
     ListenableFuture<Value> indexByElementF = client.query(Create(Ref("indexes"), Quote(ObjectV(
       "name", StringV("spells_by_element"),
       "source", Ref("classes/spells"),
-      "path", StringV("data.element")
+      "path", StringV("data.element"),
+      "active", BooleanV(true)
     ))));
 
     indexByElementF.get();
@@ -112,7 +113,8 @@ public class ClientSpec {
     ListenableFuture<Value> indexSpellbookByOwnerF = client.query(Create(Ref("indexes"), Quote(ObjectV(
       "name", StringV("spellbooks_by_owner"),
       "source", Ref("classes/spellbooks"),
-      "path", StringV("data.owner")
+      "path", StringV("data.owner"),
+      "active", BooleanV(true)
     ))));
 
     indexSpellbookByOwnerF.get();
@@ -120,7 +122,8 @@ public class ClientSpec {
     ListenableFuture<Value> indexBySpellbookF = client.query(Create(Ref("indexes"), Quote(ObjectV(
       "name", StringV("spells_by_spellbook"),
       "source", Ref("classes/spells"),
-      "path", StringV("data.spellbook")
+      "path", StringV("data.spellbook"),
+      "active", BooleanV(true)
     ))));
 
     indexBySpellbookF.get();
@@ -206,6 +209,7 @@ public class ClientSpec {
       "name", StringV(randomClassName + "_class_index"),
       "source", classRef,
       "path", StringV("class"),
+      "active", BooleanV(true),
       "unique", BooleanV(false)
     ))));
 
@@ -213,6 +217,7 @@ public class ClientSpec {
       "name", StringV(randomClassName + "_test_index"),
       "source", classRef,
       "path", StringV("data.queryTest1"),
+      "active", BooleanV(true),
       "unique", BooleanV(false)))));
 
     Ref randomClassIndex = randomClassIndexF.get().asIndex().ref();
@@ -276,6 +281,7 @@ public class ClientSpec {
         "name", StringV(randomClassName + "_class_index"),
         "source", classRef,
         "path", StringV("data.uniqueTest1"),
+        "active", BooleanV(true),
         "unique", BooleanV(true)
     ))));
     randomClassIndexF.get();
