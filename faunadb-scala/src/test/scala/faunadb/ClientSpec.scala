@@ -13,7 +13,6 @@ import faunadb.query._
 import faunadb.types._
 import com.faunadb.httpclient.Connection
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
-import org.yaml.snakeyaml.Yaml
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable
@@ -24,19 +23,14 @@ import scala.util.Random
 
 class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   val config = {
-    val configFile = new File("config/test.yml")
-    if (configFile.isFile) {
-      readConfig(configFile)
-    } else {
-      val rootKey = Option(System.getenv("FAUNA_ROOT_KEY")) getOrElse {
-        throw new RuntimeException("FAUNA_ROOT_KEY must defined to run tests")
-      }
-      val domain = Option(System.getenv("FAUNA_DOMAIN")) getOrElse { "rest.faunadb.com" }
-      val scheme = Option(System.getenv("FAUNA_SCHEME")) getOrElse { "https" }
-      val port = Option(System.getenv("FAUNA_PORT")) getOrElse { "443" }
-
-      collection.Map("root_token" -> rootKey, "root_url" -> s"${scheme}://${domain}:${port}")
+    val rootKey = Option(System.getenv("FAUNA_ROOT_KEY")) getOrElse {
+      throw new RuntimeException("FAUNA_ROOT_KEY must defined to run tests")
     }
+    val domain = Option(System.getenv("FAUNA_DOMAIN")) getOrElse { "rest.faunadb.com" }
+    val scheme = Option(System.getenv("FAUNA_SCHEME")) getOrElse { "https" }
+    val port = Option(System.getenv("FAUNA_PORT")) getOrElse { "443" }
+
+    collection.Map("root_token" -> rootKey, "root_url" -> s"${scheme}://${domain}:${port}")
   }
 
   val json = new ObjectMapper()
@@ -45,13 +39,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   val testDbName = "fauna-java-test-" + Random.alphanumeric.take(8).mkString
   var client: FaunaClient = null
-
-  private def readConfig(file: File) = {
-    val reader = new FileInputStream(file)
-    val rv = new Yaml().loadAs(reader, classOf[JMap[String, String]])
-    reader.close()
-    rv.asScala
-  }
 
   override protected def beforeAll(): Unit = {
     val resultFuture = rootClient.query(Create(Ref("databases"), Quote(ObjectV("name" -> testDbName))))
