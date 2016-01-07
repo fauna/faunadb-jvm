@@ -14,11 +14,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.ning.http.client.Response;
-import org.jboss.netty.util.Timeout;
 
 import java.io.IOException;
 import java.net.ConnectException;
-import java.sql.Time;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -105,7 +103,7 @@ public class FaunaClient {
             JsonNode resource = responseBody.get("resource");
             return json.treeToValue(resource, LazyValue.class);
           } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            throw new AssertionError(ex);
           }
         }
       }));
@@ -144,7 +142,7 @@ public class FaunaClient {
 
             return responseNodeBuilder.build();
           } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            throw new AssertionError(ex);
           }
         }
       }));
