@@ -1,5 +1,8 @@
 package faunadb
 
+import java.net.ConnectException
+import java.util.concurrent.TimeoutException
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
@@ -65,7 +68,7 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
       val respBody = parseResponseBody(resp)
       val resource = respBody.get("resource")
       json.treeToValue(resource, classOf[LazyValue])
-    }
+    }.recover(handleNetworkExceptions)
   }
 
   /**
@@ -84,7 +87,7 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
       respBody.get("resource").asInstanceOf[ArrayNode].asScala.map { node =>
         json.treeToValue(node, classOf[LazyValue])
       }.toIndexedSeq
-    }
+    }.recover(handleNetworkExceptions)
   }
 
   /**
@@ -92,6 +95,13 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
    */
   def close(): Unit = {
     connection.close()
+  }
+
+  private def handleNetworkExceptions[A]: PartialFunction[Throwable, A] = {
+    case ex: ConnectException =>
+      throw new UnavailableException(ex.getMessage)
+    case ex: TimeoutException =>
+      throw new TimeoutException(ex.getMessage)
   }
 
   private def handleQueryErrors(response: HttpResponse) = {

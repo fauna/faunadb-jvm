@@ -14,8 +14,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.ning.http.client.Response;
+import org.jboss.netty.util.Timeout;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.sql.Time;
+import java.util.concurrent.TimeoutException;
 
 /**
  * The Java native client for FaunaDB.
@@ -91,7 +95,7 @@ public class FaunaClient {
     ObjectNode body = json.createObjectNode();
     body.set("q", json.valueToTree(expr));
     try {
-      return Futures.transform(connection.post("/", body), new Function<Response, Value>() {
+      return handleNetworkExceptions(Futures.transform(connection.post("/", body), new Function<Response, Value>() {
         @Override
         public Value apply(Response response) {
           try {
@@ -104,7 +108,7 @@ public class FaunaClient {
             throw new RuntimeException(ex);
           }
         }
-      });
+      }));
     } catch (IOException ex) {
       return Futures.immediateFailedFuture(ex);
     }
@@ -125,7 +129,7 @@ public class FaunaClient {
     ObjectNode body = json.createObjectNode();
     body.set("q", json.valueToTree(exprs));
     try {
-      return Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<Value>>() {
+      return handleNetworkExceptions(Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<Value>>() {
         @Override
         public ImmutableList<Value> apply(Response resp) {
           try {
@@ -143,7 +147,7 @@ public class FaunaClient {
             throw new RuntimeException(ex);
           }
         }
-      });
+      }));
     } catch (IOException ex) {
       return Futures.immediateFailedFuture(ex);
     }
@@ -174,6 +178,22 @@ public class FaunaClient {
           throw new UnknownException(errorResponse);
       }
     }
+  }
+
+  private <V> ListenableFuture<V> handleNetworkExceptions(ListenableFuture<V> f) {
+    ListenableFuture<V> f1 = Futures.catching(f, ConnectException.class, new Function<ConnectException, V>() {
+      @Override
+      public V apply(ConnectException input) {
+        throw new UnavailableException(input.getMessage());
+      }
+    });
+
+    return Futures.catching(f1, TimeoutException.class, new Function<TimeoutException, V>() {
+      @Override
+      public V apply(TimeoutException input) {
+        throw new UnavailableException(input.getMessage());
+      }
+    });
   }
 
   private JsonNode parseResponseBody(Response response) throws IOException {

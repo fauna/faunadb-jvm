@@ -120,9 +120,12 @@ public class Connection {
         r = metricRegistry;
 
       AsyncHttpClient c;
-      if (client == null)
-        c = new AsyncHttpClient();
-      else
+      if (client == null) {
+        AsyncHttpClientConfig.Builder b = new AsyncHttpClientConfig.Builder();
+        b.setConnectionTimeoutInMs(10000);
+        b.setRequestTimeoutInMs(10000);
+        c = new AsyncHttpClient(b.build());
+      } else
         c = client;
 
       URL root;

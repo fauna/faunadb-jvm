@@ -40,7 +40,7 @@ lazy val httpclient = project.in(file("faunadb-httpclient"))
       "-linkoffline", "http://static.javadoc.io/com.ning/async-http-client/1.8.15", "./faunadb-httpclient/doc/com.ning/async-http-client/1.8.15"),
     libraryDependencies ++= Seq(
       "com.ning" % "async-http-client" % "1.8.15",
-      "com.google.guava" % "guava" % "18.0",
+      "com.google.guava" % "guava" % "19.0",
       "io.dropwizard.metrics" % "metrics-core" % metricsVersion,
       "org.slf4j" % "slf4j-api" % "1.7.7",
       "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
