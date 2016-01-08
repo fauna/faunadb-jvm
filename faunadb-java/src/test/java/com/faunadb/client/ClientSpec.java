@@ -41,7 +41,7 @@ public class ClientSpec {
   static ImmutableMap<String, String> config = getConfig();
   static FaunaClient rootClient;
   static FaunaClient client;
-  static String testDbName = RandomStringUtils.randomAlphanumeric(8);
+  static String testDbName = "faunadb-java-test-" + RandomStringUtils.randomAlphanumeric(8);
 
   static ImmutableMap<String, String> getConfig() {
     String rootKey = System.getenv("FAUNA_ROOT_KEY");

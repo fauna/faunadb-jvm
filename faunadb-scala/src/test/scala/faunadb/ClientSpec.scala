@@ -37,7 +37,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   val rootClient = FaunaClient(Connection.builder().withFaunaRoot(config("root_url")).withAuthToken(config("root_token")).build())
 
-  val testDbName = "fauna-java-test-" + Random.alphanumeric.take(8).mkString
+  val testDbName = "faunadb-scala-test-" + Random.alphanumeric.take(8).mkString
   var client: FaunaClient = null
 
   override protected def beforeAll(): Unit = {
