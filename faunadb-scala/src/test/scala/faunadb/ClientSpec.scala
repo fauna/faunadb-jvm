@@ -13,7 +13,6 @@ import faunadb.query._
 import faunadb.types._
 import com.faunadb.httpclient.Connection
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
-import org.yaml.snakeyaml.Yaml
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable
@@ -24,34 +23,22 @@ import scala.util.Random
 
 class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   val config = {
-    val configFile = new File("config/test.yml")
-    if (configFile.isFile) {
-      readConfig(configFile)
-    } else {
-      val rootKey = Option(System.getenv("FAUNA_ROOT_KEY")) getOrElse {
-        throw new RuntimeException("FAUNA_ROOT_KEY must defined to run tests")
-      }
-      val domain = Option(System.getenv("FAUNA_DOMAIN")) getOrElse { "rest.faunadb.com" }
-      val scheme = Option(System.getenv("FAUNA_SCHEME")) getOrElse { "https" }
-      val port = Option(System.getenv("FAUNA_PORT")) getOrElse { "443" }
-
-      collection.Map("root_token" -> rootKey, "root_url" -> s"${scheme}://${domain}:${port}")
+    val rootKey = Option(System.getenv("FAUNA_ROOT_KEY")) getOrElse {
+      throw new RuntimeException("FAUNA_ROOT_KEY must defined to run tests")
     }
+    val domain = Option(System.getenv("FAUNA_DOMAIN")) getOrElse { "rest.faunadb.com" }
+    val scheme = Option(System.getenv("FAUNA_SCHEME")) getOrElse { "https" }
+    val port = Option(System.getenv("FAUNA_PORT")) getOrElse { "443" }
+
+    collection.Map("root_token" -> rootKey, "root_url" -> s"${scheme}://${domain}:${port}")
   }
 
   val json = new ObjectMapper()
 
   val rootClient = FaunaClient(Connection.builder().withFaunaRoot(config("root_url")).withAuthToken(config("root_token")).build())
 
-  val testDbName = "fauna-java-test-" + Random.alphanumeric.take(8).mkString
+  val testDbName = "faunadb-scala-test-" + Random.alphanumeric.take(8).mkString
   var client: FaunaClient = null
-
-  private def readConfig(file: File) = {
-    val reader = new FileInputStream(file)
-    val rv = new Yaml().loadAs(reader, classOf[JMap[String, String]])
-    reader.close()
-    rv.asScala
-  }
 
   override protected def beforeAll(): Unit = {
     val resultFuture = rootClient.query(Create(Ref("databases"), Quote(ObjectV("name" -> testDbName))))
@@ -67,7 +54,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val classFuture = client.query(Create(Ref("classes"), Quote(ObjectV("name" -> "spells"))))
     Await.result(classFuture, 1 second)
 
-    val indexByElementF = client.query(Create(Ref("indexes"), Quote(ObjectV("name" -> "spells_by_element", "source" -> Ref("classes/spells"), "path" -> "data.element"))))
+    val indexByElementF = client.query(Create(Ref("indexes"), Quote(ObjectV("name" -> "spells_by_element", "source" -> Ref("classes/spells"), "path" -> "data.element", "active" -> true))))
     Await.result(indexByElementF, 1 second)
   }
 
@@ -135,6 +122,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       "name" -> (randomClassName + "_class_index"),
       "source" -> classRef,
       "path" -> "class",
+      "active" -> true,
       "unique" -> false
     ))))
 
@@ -142,6 +130,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       "name" -> (randomClassName + "_test_index"),
       "source" -> classRef,
       "path" -> "data.queryTest1",
+      "active" -> true,
       "unique" -> false
     ))))
 
@@ -188,7 +177,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val randomClassF = client.query(Create(Ref("classes"), Quote(ObjectV("name" -> randomClassName))))
     val classRef = Await.result(randomClassF, 1 second).asClass.ref
 
-    val uniqueIndexFuture = client.query(Create(Ref("indexes"), Quote(ObjectV("name" -> (randomClassName+"_by_unique_test"), "source" -> classRef, "path" -> "data.uniqueTest1", "unique" -> true))))
+    val uniqueIndexFuture = client.query(Create(Ref("indexes"), Quote(ObjectV("name" -> (randomClassName+"_by_unique_test"), "source" -> classRef, "path" -> "data.uniqueTest1", "unique" -> true, "active" -> true))))
     Await.result(uniqueIndexFuture, 1 second)
 
     val randomText = Random.alphanumeric.take(8).mkString
