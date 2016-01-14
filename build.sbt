@@ -2,7 +2,7 @@ val jacksonVersion = "2.6.4"
 val metricsVersion = "3.1.0"
 
 lazy val commonSettings = Seq(
-  version := "0.2.1-SNAPSHOT",
+  version := "0.2.2-SNAPSHOT",
   publishMavenStyle := true,
   licenses := Seq("Mozilla Public License" -> url("https://www.mozilla.org/en-US/MPL/2.0/")),
   homepage := Some(url("https://github.com/faunadb/faunadb-jvm")),
