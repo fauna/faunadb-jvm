@@ -181,9 +181,9 @@ public class FaunaClient {
       } catch (IOException ex) {
         switch (status) {
           case 503:
-            throw new UnavailableException("Unknown unavailable exception.");
+            throw new UnavailableException("Service Unavailable: Unparseable response.");
           default:
-            throw new UnknownException("Unknown " + status + " response.");
+            throw new UnknownException("Unparseable service " + status + "response.");
         }
       }
     }

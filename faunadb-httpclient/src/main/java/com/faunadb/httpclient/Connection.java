@@ -29,8 +29,8 @@ import java.util.Map;
  */
 
 public class Connection {
-  static final int DEFAULT_CONNECTION_TIMEOUT_MS = 5000;
-  static final int DEFAULT_REQUEST_TIMEOUT_MS = 30000;
+  static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
+  static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
 
   /**
    * Returns a new {@link Connection.Builder}.
@@ -126,8 +126,8 @@ public class Connection {
       AsyncHttpClient c;
       if (client == null) {
         AsyncHttpClientConfig config = new AsyncHttpClientConfig.Builder()
-          .setConnectTimeout(10000)
-          .setRequestTimeout(60000)
+          .setConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_MS)
+          .setRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
           .setMaxRequestRetry(0)
           .build();
         c = new AsyncHttpClient(config);

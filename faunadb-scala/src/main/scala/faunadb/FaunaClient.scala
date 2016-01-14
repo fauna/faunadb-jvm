@@ -125,8 +125,8 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
         } catch {
           case ex: IOException =>
             response.getStatusCode match {
-              case 503 => throw new UnavailableException("Unparsable unavailable response.")
-              case s@_ => throw new UnknownException("Unparsable " + s + "response.")
+              case 503 => throw new UnavailableException("Service Unavailable: Unparseable response.")
+              case s@_ => throw new UnknownException("Unparsable service " + s + "response.")
             }
         }
       case _ =>
