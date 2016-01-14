@@ -17,7 +17,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,41 +41,25 @@ public class ClientSpec {
   static ImmutableMap<String, String> config = getConfig();
   static FaunaClient rootClient;
   static FaunaClient client;
-  static String testDbName = RandomStringUtils.randomAlphanumeric(8);
+  static String testDbName = "faunadb-java-test-" + RandomStringUtils.randomAlphanumeric(8);
 
   static ImmutableMap<String, String> getConfig() {
-    File configFile = new File("config/test.yml");
-    if (configFile.isFile()) {
-      return readConfig(configFile);
-    } else {
-      String rootKey = System.getenv("FAUNA_ROOT_KEY");
-      if (rootKey == null) throw new RuntimeException("FAUNA_ROOT_KEY must be defined to run tests");
+    String rootKey = System.getenv("FAUNA_ROOT_KEY");
+    if (rootKey == null) throw new RuntimeException("FAUNA_ROOT_KEY must be defined to run tests");
 
-      String domain = System.getenv("FAUNA_DOMAIN");
-      if (domain == null) domain = "rest.faunadb.com";
+    String domain = System.getenv("FAUNA_DOMAIN");
+    if (domain == null) domain = "rest.faunadb.com";
 
-      String scheme = System.getenv("FAUNA_SCHEME");
-      if (scheme == null) scheme = "https";
+    String scheme = System.getenv("FAUNA_SCHEME");
+    if (scheme == null) scheme = "https";
 
-      String port = System.getenv("FAUNA_PORT");
-      if (port == null) port = "443";
+    String port = System.getenv("FAUNA_PORT");
+    if (port == null) port = "443";
 
-      return ImmutableMap.<String, String>builder()
-        .put("root_token", rootKey)
-        .put("root_url", scheme + "://" + domain + ":" + port)
-        .build();
-    }
-  }
-
-  static ImmutableMap<String, String> readConfig(File file) {
-    try {
-      FileInputStream reader = new FileInputStream(file);
-      ImmutableMap<String, String> rv = ImmutableMap.<String, String>copyOf(new Yaml().loadAs(reader, Map.class));
-      reader.close();
-      return rv;
-    } catch (IOException ex) {
-      throw new RuntimeException(ex);
-    }
+    return ImmutableMap.<String, String>builder()
+      .put("root_token", rootKey)
+      .put("root_url", scheme + "://" + domain + ":" + port)
+      .build();
   }
 
   @BeforeClass
@@ -104,7 +87,8 @@ public class ClientSpec {
     ListenableFuture<Value> indexByElementF = client.query(Create(Ref("indexes"), Quote(ObjectV(
       "name", StringV("spells_by_element"),
       "source", Ref("classes/spells"),
-      "path", StringV("data.element")
+      "path", StringV("data.element"),
+      "active", BooleanV(true)
     ))));
 
     indexByElementF.get();
@@ -112,7 +96,8 @@ public class ClientSpec {
     ListenableFuture<Value> indexSpellbookByOwnerF = client.query(Create(Ref("indexes"), Quote(ObjectV(
       "name", StringV("spellbooks_by_owner"),
       "source", Ref("classes/spellbooks"),
-      "path", StringV("data.owner")
+      "path", StringV("data.owner"),
+      "active", BooleanV(true)
     ))));
 
     indexSpellbookByOwnerF.get();
@@ -120,7 +105,8 @@ public class ClientSpec {
     ListenableFuture<Value> indexBySpellbookF = client.query(Create(Ref("indexes"), Quote(ObjectV(
       "name", StringV("spells_by_spellbook"),
       "source", Ref("classes/spells"),
-      "path", StringV("data.spellbook")
+      "path", StringV("data.spellbook"),
+      "active", BooleanV(true)
     ))));
 
     indexBySpellbookF.get();
@@ -206,6 +192,7 @@ public class ClientSpec {
       "name", StringV(randomClassName + "_class_index"),
       "source", classRef,
       "path", StringV("class"),
+      "active", BooleanV(true),
       "unique", BooleanV(false)
     ))));
 
@@ -213,6 +200,7 @@ public class ClientSpec {
       "name", StringV(randomClassName + "_test_index"),
       "source", classRef,
       "path", StringV("data.queryTest1"),
+      "active", BooleanV(true),
       "unique", BooleanV(false)))));
 
     Ref randomClassIndex = randomClassIndexF.get().asIndex().ref();
@@ -276,6 +264,7 @@ public class ClientSpec {
         "name", StringV(randomClassName + "_class_index"),
         "source", classRef,
         "path", StringV("data.uniqueTest1"),
+        "active", BooleanV(true),
         "unique", BooleanV(true)
     ))));
     randomClassIndexF.get();
