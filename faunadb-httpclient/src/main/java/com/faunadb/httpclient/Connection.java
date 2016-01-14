@@ -18,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -124,10 +125,12 @@ public class Connection {
 
       AsyncHttpClient c;
       if (client == null) {
-        AsyncHttpClientConfig.Builder b = new AsyncHttpClientConfig.Builder();
-        b.setConnectionTimeoutInMs(DEFAULT_CONNECTION_TIMEOUT_MS);
-        b.setRequestTimeoutInMs(DEFAULT_REQUEST_TIMEOUT_MS);
-        c = new AsyncHttpClient(b.build());
+        AsyncHttpClientConfig config = new AsyncHttpClientConfig.Builder()
+          .setConnectTimeout(10000)
+          .setRequestTimeout(60000)
+          .setMaxRequestRetry(0)
+          .build();
+        c = new AsyncHttpClient(config);
       } else
         c = client;
 
@@ -184,10 +187,10 @@ public class Connection {
    * @return a {@code ListenableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public ListenableFuture<Response> get(String path, Map<String, Collection<String>> params) throws IOException {
+  public ListenableFuture<Response> get(String path, Map<String, List<String>> params) throws IOException {
     Request request = new RequestBuilder("GET")
       .setUrl(mkUrl(path))
-      .setParameters(params)
+      .setQueryParams(params)
       .build();
 
     return performRequest(request);
@@ -291,14 +294,14 @@ public class Connection {
     String faunaBuild = Optional.fromNullable(response.getHeader(XFaunaDBBuild)).or("Unknown");
     String responseBody = Optional.fromNullable(response.getResponseBody()).or("");
 
-    log.debug("Request: " + request.getMethod() + " " + request.getURI() + ": " + requestData + ". " +
+    log.debug("Request: " + request.getMethod() + " " + request.getUrl() + ": " + requestData + ". " +
       "Response: Status=" + response.getStatusCode() + ", Fauna Host: " + faunaHost + ", " +
       "Fauna Build: " + faunaBuild + ": " + responseBody);
   }
 
   private void logFailure(Request request, Throwable ex) {
     String requestData = Optional.fromNullable(request.getStringData()).or("");
-    log.info("Request: " + request.getMethod() + " " + request.getURI() + ": " + requestData + ". " +
+    log.info("Request: " + request.getMethod() + " " + request.getUrl() + ": " + requestData + ". " +
       "Failed: " + ex.getMessage(), ex);
   }
 

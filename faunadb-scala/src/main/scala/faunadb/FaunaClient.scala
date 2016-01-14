@@ -1,5 +1,6 @@
 package faunadb
 
+import java.io.IOException
 import java.net.ConnectException
 import java.util.concurrent.TimeoutException
 
@@ -107,15 +108,26 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
   private def handleQueryErrors(response: HttpResponse) = {
     response.getStatusCode match {
       case x if x >= 300 =>
-        val errors = parseResponseBody(response).get("errors").asInstanceOf[ArrayNode]
-        val parsedErrors = errors.iterator().asScala.map { json.treeToValue(_, classOf[QueryError]) }.toIndexedSeq
-        val error = QueryErrorResponse(x, parsedErrors)
-        x match {
-          case 400 => throw new BadRequestException(error)
-          case 401 => throw new UnauthorizedException(error)
-          case 404 => throw new NotFoundException(error)
-          case 500 => throw new InternalException(error)
-          case _ => throw new UnknownException(error)
+        try {
+          val errors = parseResponseBody(response).get("errors").asInstanceOf[ArrayNode]
+          val parsedErrors = errors.iterator().asScala.map {
+            json.treeToValue(_, classOf[QueryError])
+          }.toIndexedSeq
+          val error = QueryErrorResponse(x, parsedErrors)
+          x match {
+            case 400 => throw new BadRequestException(error)
+            case 401 => throw new UnauthorizedException(error)
+            case 404 => throw new NotFoundException(error)
+            case 500 => throw new InternalException(error)
+            case 503 => throw new UnavailableException(error)
+            case _ => throw new UnknownException(error)
+          }
+        } catch {
+          case ex: IOException =>
+            response.getStatusCode match {
+              case 503 => throw new UnavailableException("Unparsable unavailable response.")
+              case s@_ => throw new UnknownException("Unparsable " + s + "response.")
+            }
         }
       case _ =>
     }

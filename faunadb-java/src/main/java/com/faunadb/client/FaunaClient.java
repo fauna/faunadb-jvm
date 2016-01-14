@@ -154,26 +154,37 @@ public class FaunaClient {
   private void handleQueryErrors(Response response) throws IOException, FaunaException {
     int status = response.getStatusCode();
     if (status >= 300) {
-      ArrayNode errors = (ArrayNode) parseResponseBody(response).get("errors");
-      ImmutableList.Builder<HttpResponses.QueryError> errorBuilder = ImmutableList.builder();
+      try {
+        ArrayNode errors = (ArrayNode) parseResponseBody(response).get("errors");
+        ImmutableList.Builder<HttpResponses.QueryError> errorBuilder = ImmutableList.builder();
 
-      for (JsonNode errorNode : errors) {
-        errorBuilder.add(json.treeToValue(errorNode, HttpResponses.QueryError.class));
-      }
+        for (JsonNode errorNode : errors) {
+          errorBuilder.add(json.treeToValue(errorNode, HttpResponses.QueryError.class));
+        }
 
-      HttpResponses.QueryErrorResponse errorResponse = HttpResponses.QueryErrorResponse.create(status, errorBuilder.build());
+        HttpResponses.QueryErrorResponse errorResponse = HttpResponses.QueryErrorResponse.create(status, errorBuilder.build());
 
-      switch(status) {
-        case 400:
-          throw new BadRequestException(errorResponse);
-        case 401:
-          throw new UnauthorizedException(errorResponse);
-        case 404:
-          throw new NotFoundException(errorResponse);
-        case 500:
-          throw new InternalException(errorResponse);
-        default:
-          throw new UnknownException(errorResponse);
+        switch (status) {
+          case 400:
+            throw new BadRequestException(errorResponse);
+          case 401:
+            throw new UnauthorizedException(errorResponse);
+          case 404:
+            throw new NotFoundException(errorResponse);
+          case 500:
+            throw new InternalException(errorResponse);
+          case 503:
+            throw new UnavailableException(errorResponse);
+          default:
+            throw new UnknownException(errorResponse);
+        }
+      } catch (IOException ex) {
+        switch (status) {
+          case 503:
+            throw new UnavailableException("Unknown unavailable exception.");
+          default:
+            throw new UnknownException("Unknown " + status + " response.");
+        }
       }
     }
   }

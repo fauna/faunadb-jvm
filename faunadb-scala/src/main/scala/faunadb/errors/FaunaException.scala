@@ -16,12 +16,19 @@ class FaunaException(response: Option[QueryErrorResponse], msg: String) extends 
   def status = response.get.status
 }
 
-case class UnavailableException(message: String) extends FaunaException("FaunaDB host unavailable: "+message)
+/**
+  * An exception thrown  if FaunaDB responds with an HTTP 503. Such errors represent that
+  * the FaunaDB service was unavailable.
+  */
+case class UnavailableException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
+  def this(message: String) = this(None, message)
+  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
+}
 
 /**
- * An exception thrown in FaunaDB cannot evaluate a query.
+ * An exception thrown if FaunaDB cannot evaluate a query.
  */
-class BadRequestException(response: Option[QueryErrorResponse], msg: String) extends FaunaException(response, msg) {
+class BadRequestException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
   def this(message: String) = this(None, message)
   def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
 }
