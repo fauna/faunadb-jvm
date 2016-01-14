@@ -16,6 +16,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.ning.http.client.Response;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * The Java native client for FaunaDB.
@@ -91,7 +93,7 @@ public class FaunaClient {
     ObjectNode body = json.createObjectNode();
     body.set("q", json.valueToTree(expr));
     try {
-      return Futures.transform(connection.post("/", body), new Function<Response, Value>() {
+      return handleNetworkExceptions(Futures.transform(connection.post("/", body), new Function<Response, Value>() {
         @Override
         public Value apply(Response response) {
           try {
@@ -101,10 +103,10 @@ public class FaunaClient {
             JsonNode resource = responseBody.get("resource");
             return json.treeToValue(resource, LazyValue.class);
           } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            throw new AssertionError(ex);
           }
         }
-      });
+      }));
     } catch (IOException ex) {
       return Futures.immediateFailedFuture(ex);
     }
@@ -125,7 +127,7 @@ public class FaunaClient {
     ObjectNode body = json.createObjectNode();
     body.set("q", json.valueToTree(exprs));
     try {
-      return Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<Value>>() {
+      return handleNetworkExceptions(Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<Value>>() {
         @Override
         public ImmutableList<Value> apply(Response resp) {
           try {
@@ -140,10 +142,10 @@ public class FaunaClient {
 
             return responseNodeBuilder.build();
           } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            throw new AssertionError(ex);
           }
         }
-      });
+      }));
     } catch (IOException ex) {
       return Futures.immediateFailedFuture(ex);
     }
@@ -152,28 +154,55 @@ public class FaunaClient {
   private void handleQueryErrors(Response response) throws IOException, FaunaException {
     int status = response.getStatusCode();
     if (status >= 300) {
-      ArrayNode errors = (ArrayNode) parseResponseBody(response).get("errors");
-      ImmutableList.Builder<HttpResponses.QueryError> errorBuilder = ImmutableList.builder();
+      try {
+        ArrayNode errors = (ArrayNode) parseResponseBody(response).get("errors");
+        ImmutableList.Builder<HttpResponses.QueryError> errorBuilder = ImmutableList.builder();
 
-      for (JsonNode errorNode : errors) {
-        errorBuilder.add(json.treeToValue(errorNode, HttpResponses.QueryError.class));
-      }
+        for (JsonNode errorNode : errors) {
+          errorBuilder.add(json.treeToValue(errorNode, HttpResponses.QueryError.class));
+        }
 
-      HttpResponses.QueryErrorResponse errorResponse = HttpResponses.QueryErrorResponse.create(status, errorBuilder.build());
+        HttpResponses.QueryErrorResponse errorResponse = HttpResponses.QueryErrorResponse.create(status, errorBuilder.build());
 
-      switch(status) {
-        case 400:
-          throw new BadRequestException(errorResponse);
-        case 401:
-          throw new UnauthorizedException(errorResponse);
-        case 404:
-          throw new NotFoundException(errorResponse);
-        case 500:
-          throw new InternalException(errorResponse);
-        default:
-          throw new UnknownException(errorResponse);
+        switch (status) {
+          case 400:
+            throw new BadRequestException(errorResponse);
+          case 401:
+            throw new UnauthorizedException(errorResponse);
+          case 404:
+            throw new NotFoundException(errorResponse);
+          case 500:
+            throw new InternalException(errorResponse);
+          case 503:
+            throw new UnavailableException(errorResponse);
+          default:
+            throw new UnknownException(errorResponse);
+        }
+      } catch (IOException ex) {
+        switch (status) {
+          case 503:
+            throw new UnavailableException("Service Unavailable: Unparseable response.");
+          default:
+            throw new UnknownException("Unparseable service " + status + "response.");
+        }
       }
     }
+  }
+
+  private <V> ListenableFuture<V> handleNetworkExceptions(ListenableFuture<V> f) {
+    ListenableFuture<V> f1 = Futures.catching(f, ConnectException.class, new Function<ConnectException, V>() {
+      @Override
+      public V apply(ConnectException input) {
+        throw new UnavailableException(input.getMessage());
+      }
+    });
+
+    return Futures.catching(f1, TimeoutException.class, new Function<TimeoutException, V>() {
+      @Override
+      public V apply(TimeoutException input) {
+        throw new UnavailableException(input.getMessage());
+      }
+    });
   }
 
   private JsonNode parseResponseBody(Response response) throws IOException {

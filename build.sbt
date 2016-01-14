@@ -37,10 +37,10 @@ lazy val httpclient = project.in(file("faunadb-httpclient"))
       "-link", "http://docs.guava-libraries.googlecode.com/git-history/v18.0/javadoc/",
       "-link", "http://fasterxml.github.io/jackson-databind/javadoc/2.5/",
       "-link", "https://dropwizard.github.io/metrics/3.1.0/apidocs/",
-      "-linkoffline", "http://static.javadoc.io/com.ning/async-http-client/1.8.15", "./faunadb-httpclient/doc/com.ning/async-http-client/1.8.15"),
+      "-linkoffline", "http://static.javadoc.io/com.ning/async-http-client/1.9.32", "./faunadb-httpclient/doc/com.ning/async-http-client/1.9.32"),
     libraryDependencies ++= Seq(
-      "com.ning" % "async-http-client" % "1.8.15",
-      "com.google.guava" % "guava" % "18.0",
+      "com.ning" % "async-http-client" % "1.9.32",
+      "com.google.guava" % "guava" % "19.0",
       "io.dropwizard.metrics" % "metrics-core" % metricsVersion,
       "org.slf4j" % "slf4j-api" % "1.7.7",
       "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,

@@ -1,5 +1,9 @@
 package faunadb
 
+import java.io.IOException
+import java.net.ConnectException
+import java.util.concurrent.TimeoutException
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
@@ -65,7 +69,7 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
       val respBody = parseResponseBody(resp)
       val resource = respBody.get("resource")
       json.treeToValue(resource, classOf[LazyValue])
-    }
+    }.recover(handleNetworkExceptions)
   }
 
   /**
@@ -84,7 +88,7 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
       respBody.get("resource").asInstanceOf[ArrayNode].asScala.map { node =>
         json.treeToValue(node, classOf[LazyValue])
       }.toIndexedSeq
-    }
+    }.recover(handleNetworkExceptions)
   }
 
   /**
@@ -94,18 +98,36 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
     connection.close()
   }
 
+  private def handleNetworkExceptions[A]: PartialFunction[Throwable, A] = {
+    case ex: ConnectException =>
+      throw new UnavailableException(ex.getMessage)
+    case ex: TimeoutException =>
+      throw new TimeoutException(ex.getMessage)
+  }
+
   private def handleQueryErrors(response: HttpResponse) = {
     response.getStatusCode match {
       case x if x >= 300 =>
-        val errors = parseResponseBody(response).get("errors").asInstanceOf[ArrayNode]
-        val parsedErrors = errors.iterator().asScala.map { json.treeToValue(_, classOf[QueryError]) }.toIndexedSeq
-        val error = QueryErrorResponse(x, parsedErrors)
-        x match {
-          case 400 => throw new BadRequestException(error)
-          case 401 => throw new UnauthorizedException(error)
-          case 404 => throw new NotFoundException(error)
-          case 500 => throw new InternalException(error)
-          case _ => throw new UnknownException(error)
+        try {
+          val errors = parseResponseBody(response).get("errors").asInstanceOf[ArrayNode]
+          val parsedErrors = errors.iterator().asScala.map {
+            json.treeToValue(_, classOf[QueryError])
+          }.toIndexedSeq
+          val error = QueryErrorResponse(x, parsedErrors)
+          x match {
+            case 400 => throw new BadRequestException(error)
+            case 401 => throw new UnauthorizedException(error)
+            case 404 => throw new NotFoundException(error)
+            case 500 => throw new InternalException(error)
+            case 503 => throw new UnavailableException(error)
+            case _ => throw new UnknownException(error)
+          }
+        } catch {
+          case ex: IOException =>
+            response.getStatusCode match {
+              case 503 => throw new UnavailableException("Service Unavailable: Unparseable response.")
+              case s@_ => throw new UnknownException("Unparsable service " + s + "response.")
+            }
         }
       case _ =>
     }
