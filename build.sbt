@@ -14,6 +14,17 @@ lazy val commonSettings = Seq(
   )
 )
 
+lazy val javaTestSettings = Seq(
+  testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v", "-a"),
+  libraryDependencies ++= Seq(
+    "org.apache.commons" % "commons-lang3" % "3.4" % "test",
+    "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
+    "com.novocode" % "junit-interface" % "0.11" % "test",
+    "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
+    "junit" % "junit" % "4.12" % "test"
+  )
+)
+
 lazy val root = (project in file("."))
   .settings(commonSettings: _*)
   .settings(
@@ -25,6 +36,7 @@ lazy val root = (project in file("."))
 
 lazy val httpclient = project.in(file("faunadb-httpclient"))
   .settings(commonSettings: _*)
+  .settings(javaTestSettings: _*)
   .settings(
     name := "faunadb-httpclient",
     crossPaths := false,
@@ -54,6 +66,7 @@ lazy val scala = project.in(file("faunadb-scala"))
     name := "faunadb-scala",
     scalaVersion := "2.11.7",
     libraryDependencies ++= Seq(
+      "com.google.code.findbugs" % "jsr305" % "3.0.1",
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.6.3",
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
@@ -81,13 +94,13 @@ lazy val scala = project.in(file("faunadb-scala"))
 
 lazy val java = project.in(file("faunadb-java"))
   .settings(commonSettings: _*)
+  .settings(javaTestSettings: _*)
   .settings(
     name := "faunadb-java",
     crossPaths := false,
     autoScalaLibrary := false,
     compileOrder := CompileOrder.JavaThenScala,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
-    testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
     apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-java/api/")),
     (javacOptions in doc) := Seq("-source", "1.7",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
@@ -97,13 +110,7 @@ lazy val java = project.in(file("faunadb-java"))
     ),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
     libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,
-      "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
-      "org.apache.commons" % "commons-lang3" % "3.4" % "test",
-      "org.yaml" % "snakeyaml" % "1.14" % "test",
-      "com.novocode" % "junit-interface" % "0.11" % "test",
-      "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
-      "junit" % "junit" % "4.12" % "test"
+      "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion
     )
   )
   .dependsOn(httpclient)

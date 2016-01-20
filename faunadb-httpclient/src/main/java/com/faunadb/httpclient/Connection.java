@@ -5,6 +5,7 @@ import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.ning.http.client.*;
@@ -17,9 +18,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The HTTP Connection adapter for FaunaDB clients.
@@ -143,6 +144,73 @@ public class Connection {
       return new Connection(root, authToken, c, r);
     }
   }
+
+  private static String StatHeaderPrefix = "fauna-request-reported";
+
+  private static class StatHeader {
+    private String header;
+    private String stat;
+
+    static StatHeader of(String header) {
+      return new StatHeader(header);
+    }
+
+    String header() {
+      return header;
+    }
+
+    String stat() {
+      return stat;
+    }
+
+    StatHeader(String header) {
+      this.header = header;
+      this.stat = StatHeaderPrefix + "-" + header.substring(2).toLowerCase(); // strip X-
+    }
+  }
+
+  private static StatHeader XIOReadTime = StatHeader.of("X-IO-Read-Time");
+  private static StatHeader XIOWriteTime = StatHeader.of("X-IO-Write-Time");
+  private static StatHeader XHttpRequestProcessingTime = StatHeader.of("X-HTTP-Request-Processing-Time");
+  private static StatHeader XKeyCachedGet = StatHeader.of("X-Key-Cached-Get");
+  private static StatHeader XTokenCachedGet = StatHeader.of("X-Token-Cached-Get");
+  private static StatHeader XIndexCachedGet = StatHeader.of("X-Index-Cached-Get");
+  private static StatHeader XIndexCachedGetBySource = StatHeader.of("X-Index-Cached-GetBySource");
+  private static StatHeader XIndexCachedGetByName = StatHeader.of("X-Index-Cached-GetByName");
+  private static StatHeader XKeysLoad = StatHeader.of("X-Keys-Load");
+  private static StatHeader XKeysReload = StatHeader.of("X-Keys-Reload");
+  private static StatHeader XSchemaLoad = StatHeader.of("X-Schema-Load");
+  private static StatHeader XSchemaReload = StatHeader.of("X-Schema-Reload");
+
+  private static ImmutableSet<StatHeader> TimingHeaders = ImmutableSet.of(
+    XIOReadTime, XIOWriteTime, XHttpRequestProcessingTime, XKeyCachedGet, XTokenCachedGet,
+    XIndexCachedGet, XIndexCachedGetBySource, XIndexCachedGetByName,
+    XKeysLoad, XKeysReload, XSchemaLoad, XSchemaReload
+  );
+
+  private static StatHeader XIOStackSize = StatHeader.of("X-IO-Stack-Size");
+  private static StatHeader XIOTransactionCount = StatHeader.of("X-IO-Transaction-Count");
+  private static StatHeader XIOReadOps = StatHeader.of("X-IO-Read-Ops");
+  private static StatHeader XIORemoveOps = StatHeader.of("X-IO-Remove-Ops");
+  private static StatHeader XIOInsertOps = StatHeader.of("X-IO-Insert-Ops");
+  private static StatHeader XIOCounterOps = StatHeader.of("X-IO-Counter-Ops");
+  private static StatHeader XIOColumnsRead = StatHeader.of("X-IO-Columns-Read");
+  private static StatHeader XIOColumnsWritten = StatHeader.of("X-IO-Columns-Written");
+  private static StatHeader XIOCounterColumnsWritten = StatHeader.of("X-IO-CounterColumns-Written");
+  private static StatHeader XIOTombstonesRead = StatHeader.of("X-IO-Tombstones-Read");
+  private static StatHeader XLockTableAttempts = StatHeader.of("X-LockTable-Attempts");
+  private static StatHeader XLockTableSuccesses = StatHeader.of("X-LockTable-Successes");
+  private static StatHeader XLockTableUnlocks = StatHeader.of("X-LockTable-Unlocks");
+  private static StatHeader XLockTableFailuresStale = StatHeader.of("X-LockTable-Failures-Stale");
+  private static StatHeader XLockTableRetries = StatHeader.of("X-LockTable-Retries");
+  private static StatHeader XLockTableFailures = StatHeader.of("X-LockTable-Failures");
+  private static StatHeader XLockTableResets = StatHeader.of("X-LockTable-Resets");
+
+  private static ImmutableSet<StatHeader> HistogramHeaders = ImmutableSet.of(
+    XIOStackSize, XIOTransactionCount, XIOReadOps, XIORemoveOps, XIOInsertOps, XIOCounterOps,
+    XIOColumnsRead, XIOColumnsWritten, XIOCounterColumnsWritten, XIOTombstonesRead,
+    XLockTableAttempts, XLockTableSuccesses, XLockTableUnlocks, XLockTableFailuresStale, XLockTableRetries, XLockTableFailures, XLockTableResets
+  );
 
   private static String XFaunaDBHost = "X-FaunaDB-Host";
   private static String XFaunaDBBuild = "X-FaunaDB-Build";
@@ -275,8 +343,9 @@ public class Connection {
         @Override
         public Response onCompleted(Response response) throws Exception {
           ctx.stop();
-          rv.set(response);
+          recordStatsHeaders(request, response);
           logSuccess(request, response);
+          rv.set(response);
           return response;
         }
       });
@@ -286,6 +355,40 @@ public class Connection {
 
   private String mkUrl(String path) throws MalformedURLException {
     return new URL(faunaRoot, path).toString();
+  }
+
+  private void recordStatsHeaders(Request request, Response response) {
+    for (StatHeader header : TimingHeaders) {
+      String stat = response.getHeader(header.header());
+      recordTimingHeader(stat, header.stat());
+    }
+
+    for (StatHeader header : HistogramHeaders) {
+      String stat = response.getHeader(header.header());
+      recordHistogramHeader(stat, header.stat());
+    }
+  }
+
+  private void recordHistogramHeader(String stat, String key) {
+    if (stat != null) {
+      try {
+        long parsed = Long.parseLong(stat);
+        registry.histogram(key).update(parsed);
+      } catch (NumberFormatException ex) {
+        log.debug("Could not parse histogram header value: " + stat + " for stat key: " + key);
+      }
+    }
+  }
+
+  private void recordTimingHeader(String stat, String key) {
+    if (stat != null) {
+      try {
+        long parsed = Long.parseLong(stat);
+        registry.timer(key).update(parsed, TimeUnit.MILLISECONDS);
+      } catch (NumberFormatException ex) {
+        log.debug("Could not parse timing header value: " + stat + " for stat key: " + key);
+      }
+    }
   }
 
   private void logSuccess(Request request, Response response) throws IOException {
