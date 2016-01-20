@@ -3,9 +3,10 @@ package com.faunadb.client;
 import com.faunadb.client.errors.BadRequestException;
 import com.faunadb.client.errors.NotFoundException;
 import com.faunadb.client.errors.UnauthorizedException;
-import com.faunadb.client.query.*;
+import com.faunadb.client.query.Path;
 import com.faunadb.client.response.*;
-import com.faunadb.client.types.*;
+import com.faunadb.client.types.Ref;
+import com.faunadb.client.types.Value;
 import com.faunadb.httpclient.Connection;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -18,21 +19,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import static com.faunadb.client.query.Language.*;
+import static com.faunadb.client.query.Language.Object;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ClientSpec {
   @Rule

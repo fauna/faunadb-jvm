@@ -31,6 +31,7 @@ lazy val httpclient = project.in(file("faunadb-httpclient"))
     autoScalaLibrary := false,
     compileOrder := CompileOrder.JavaThenScala,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
+    testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v", "-a"),
     apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-httpclient/api/")),
     (javacOptions in doc) := Seq("-source", "1.7",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
@@ -44,7 +45,12 @@ lazy val httpclient = project.in(file("faunadb-httpclient"))
       "io.dropwizard.metrics" % "metrics-core" % metricsVersion,
       "org.slf4j" % "slf4j-api" % "1.7.7",
       "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
-      "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion
+      "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
+      "org.apache.commons" % "commons-lang3" % "3.4" % "test",
+      "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
+      "com.novocode" % "junit-interface" % "0.11" % "test",
+      "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
+      "junit" % "junit" % "4.12" % "test"
     )
   )
 
@@ -54,6 +60,7 @@ lazy val scala = project.in(file("faunadb-scala"))
     name := "faunadb-scala",
     scalaVersion := "2.11.7",
     libraryDependencies ++= Seq(
+      "com.google.code.findbugs" % "jsr305" % "3.0.1",
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.6.3",
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
@@ -87,7 +94,7 @@ lazy val java = project.in(file("faunadb-java"))
     autoScalaLibrary := false,
     compileOrder := CompileOrder.JavaThenScala,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
-    testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
+    testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v", "-a"),
     apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-java/api/")),
     (javacOptions in doc) := Seq("-source", "1.7",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
