@@ -184,7 +184,8 @@ public class Connection {
 
   private static ImmutableSet<StatHeader> TimingHeaders = ImmutableSet.of(
     XIOReadTime, XIOWriteTime, XHttpRequestProcessingTime, XKeyCachedGet, XTokenCachedGet,
-    XIndexCachedGet, XIndexCachedGetBySource, XIndexCachedGetByName
+    XIndexCachedGet, XIndexCachedGetBySource, XIndexCachedGetByName,
+    XKeysLoad, XKeysReload, XSchemaLoad, XSchemaReload
   );
 
   private static StatHeader XIOStackSize = StatHeader.of("X-IO-Stack-Size");
