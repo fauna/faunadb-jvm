@@ -12,7 +12,7 @@ import java.time.LocalDate;
 /**
  * Helper methods for the FaunaDB query language. This class is intended to be statically imported into your code:
  *
- * <p>{@code import static com.faunadb.client.java.query.Language.*;}</p>
+ * <p>{@code import static com.faunadb.client.query.Language.*;}</p>
  *
  * <p>Each of these helper methods constructs a {@link Value}, which can then be composed with other helper methods.
  *
