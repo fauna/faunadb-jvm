@@ -28,11 +28,11 @@
         </head>
         <body class="value">
       <div id="definition">
-        <img src="../../lib/package_big.png" />
+        <img alt="Package" src="../../lib/package_big.png" />
         <p id="owner"><a href="../package.html" class="extype" name="faunadb">faunadb</a></p>
         <h1>errors</h1><span class="permalink">
       <a href="../../index.html#faunadb.errors.package" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" />
+        <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       </div>
@@ -79,10 +79,10 @@
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#faunadb.errors.package@BadRequestExceptionextendsFaunaException" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" />
+        <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">An exception thrown in FaunaDB cannot evaluate a query.</p>
+      <p class="shortcomment cmt">An exception thrown if FaunaDB cannot evaluate a query.</p>
     </li><li name="faunadb.errors.FaunaException" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="FaunaExceptionextendsException"></a>
       <a id="FaunaException:FaunaException"></a>
@@ -96,7 +96,7 @@
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#faunadb.errors.package@FaunaExceptionextendsException" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" />
+        <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
@@ -113,7 +113,7 @@
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#faunadb.errors.package@InternalExceptionextendsFaunaException" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" />
+        <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">An exception thrown if FaunaDB responds with an HTTP 500.</p><div class="fullcomment"><div class="comment cmt"><p>An exception thrown if FaunaDB responds with an HTTP 500. Such errors represent an internal
@@ -132,7 +132,7 @@ failure within the database.
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#faunadb.errors.package@NotFoundExceptionextendsFaunaException" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" />
+        <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">An exception thrown if FaunaDB responds with an HTTP 404 for non-query endpoints.</p>
@@ -149,11 +149,11 @@ failure within the database.
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#faunadb.errors.package@UnauthorizedExceptionextendsFaunaException" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" />
+        <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">An exception thrown if FaunaDB responds with an HTTP 401.</p>
-    </li><li name="faunadb.errors.UnavailableException" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="faunadb.errors.UnavailableException" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="UnavailableExceptionextendsFaunaExceptionwithProductwithSerializable"></a>
       <a id="UnavailableException:UnavailableException"></a>
       <h4 class="signature">
@@ -162,14 +162,16 @@ failure within the database.
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="UnavailableException.html"><span class="name">UnavailableException</span></a><span class="params">(<span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="FaunaException.html" class="extype" name="faunadb.errors.FaunaException">FaunaException</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="UnavailableException.html"><span class="name">UnavailableException</span></a><span class="params">(<span name="response">response: <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="../QueryErrorResponse.html" class="extype" name="faunadb.QueryErrorResponse">QueryErrorResponse</a>]</span>, <span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="FaunaException.html" class="extype" name="faunadb.errors.FaunaException">FaunaException</a> with <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#faunadb.errors.package@UnavailableExceptionextendsFaunaExceptionwithProductwithSerializable" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" />
+        <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">An exception thrown  if FaunaDB responds with an HTTP 503.</p><div class="fullcomment"><div class="comment cmt"><p>An exception thrown  if FaunaDB responds with an HTTP 503. Such errors represent that
+the FaunaDB service was unavailable.
+</p></div></div>
     </li><li name="faunadb.errors.UnknownException" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="UnknownExceptionextendsFaunaException"></a>
       <a id="UnknownException:UnknownException"></a>
@@ -183,7 +185,7 @@ failure within the database.
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#faunadb.errors.package@UnknownExceptionextendsFaunaException" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" />
+        <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
@@ -203,11 +205,11 @@ failure within the database.
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="FaunaException$.html"><span class="name">FaunaException</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="FaunaException$.html"><span class="name">FaunaException</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#faunadb.errors.package@FaunaException" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" />
+        <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       

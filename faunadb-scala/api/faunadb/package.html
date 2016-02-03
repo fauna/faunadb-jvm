@@ -28,11 +28,11 @@
         </head>
         <body class="value">
       <div id="definition">
-        <img src="../lib/package_big.png" />
+        <img alt="Package" src="../lib/package_big.png" />
         
         <h1>faunadb</h1><span class="permalink">
       <a href="../index.html#faunadb.package" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       </div>
@@ -75,11 +75,11 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="ErrorResponse.html"><span class="name">ErrorResponse</span></a><span class="params">(<span name="status">status: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="error">error: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="FaunaResponse.html" class="extype" name="faunadb.FaunaResponse">FaunaResponse</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="ErrorResponse.html"><span class="name">ErrorResponse</span></a><span class="params">(<span name="status">status: <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="error">error: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="FaunaResponse.html" class="extype" name="faunadb.FaunaResponse">FaunaResponse</a> with <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@ErrorResponseextendsFaunaResponsewithProductwithSerializable" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
@@ -96,10 +96,10 @@
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@FaunaClientextendsAnyRef" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">The Scala native client for FaunaDB.</p><div class="fullcomment"><div class="comment cmt"><p>The Scala native client for FaunaDB.</p><p>Obtain an instance of the client using the methods on the companion object.</p><p>The client is asynchronous, so all methods will return a <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.concurrent.Future" class="extype" target="_top">scala.concurrent.Future</a>.</p><p>Example:</p><pre><span class="kw">import</span> com.faunadb.client.query.Language._
+      <p class="shortcomment cmt">The Scala native client for FaunaDB.</p><div class="fullcomment"><div class="comment cmt"><p>The Scala native client for FaunaDB.</p><p>Obtain an instance of the client using the methods on the companion object.</p><p>The client is asynchronous, so all methods will return a <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.concurrent.Future" class="extype" target="_top">scala.concurrent.Future</a>.</p><p>Example:</p><pre><span class="kw">import</span> com.faunadb.client.query.Language._
 
 <span class="kw">val</span> client = FaunaClient(Connection.builder().withAuthToken(<span class="lit">"someAuthToken"</span>).build))
 <span class="kw">val</span> response = client.query(Get(Ref(<span class="lit">"some/ref"</span>)))</pre></div></div>
@@ -116,7 +116,7 @@
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@FaunaResponseextendsAnyRef" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
@@ -133,7 +133,7 @@
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@NoContentResponseextendsFaunaResponse" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
@@ -146,11 +146,11 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="QueryError.html"><span class="name">QueryError</span></a><span class="params">(<span name="position">position: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="description">description: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="failures">failures: <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<a href="QueryError$$ValidationFailure.html" class="extype" name="faunadb.QueryError.ValidationFailure">ValidationFailure</a>]</span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="QueryError.html"><span class="name">QueryError</span></a><span class="params">(<span name="position">position: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="description">description: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="failures">failures: <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<a href="QueryError$$ValidationFailure.html" class="extype" name="faunadb.QueryError.ValidationFailure">ValidationFailure</a>]</span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@QueryErrorextendsProductwithSerializable" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
@@ -163,11 +163,11 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="QueryErrorResponse.html"><span class="name">QueryErrorResponse</span></a><span class="params">(<span name="status">status: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="errors">errors: <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<a href="QueryError.html" class="extype" name="faunadb.QueryError">QueryError</a>]</span>)</span><span class="result"> extends <a href="FaunaResponse.html" class="extype" name="faunadb.FaunaResponse">FaunaResponse</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="QueryErrorResponse.html"><span class="name">QueryErrorResponse</span></a><span class="params">(<span name="status">status: <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="errors">errors: <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<a href="QueryError.html" class="extype" name="faunadb.QueryError">QueryError</a>]</span>)</span><span class="result"> extends <a href="FaunaResponse.html" class="extype" name="faunadb.FaunaResponse">FaunaResponse</a> with <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@QueryErrorResponseextendsFaunaResponsewithProductwithSerializable" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
@@ -180,11 +180,11 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="QueryResponse.html"><span class="name">QueryResponse</span></a><span class="params">(<span name="status">status: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="body">body: <a href="http://fasterxml.github.io/jackson-databind/javadoc/2.5/index.html#com.fasterxml.jackson.databind.node.ObjectNode" class="extype" target="_top">ObjectNode</a></span>)</span><span class="result"> extends <a href="FaunaResponse.html" class="extype" name="faunadb.FaunaResponse">FaunaResponse</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="QueryResponse.html"><span class="name">QueryResponse</span></a><span class="params">(<span name="status">status: <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="body">body: <a href="http://fasterxml.github.io/jackson-databind/javadoc/2.5/index.html#com.fasterxml.jackson.databind.node.ObjectNode" class="extype" target="_top">ObjectNode</a></span>)</span><span class="result"> extends <a href="FaunaResponse.html" class="extype" name="faunadb.FaunaResponse">FaunaResponse</a> with <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@QueryResponseextendsFaunaResponsewithProductwithSerializable" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
@@ -197,11 +197,11 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="ResourceResponse.html"><span class="name">ResourceResponse</span></a><span class="params">(<span name="status">status: <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="resource">resource: <a href="http://fasterxml.github.io/jackson-databind/javadoc/2.5/index.html#com.fasterxml.jackson.databind.JsonNode" class="extype" target="_top">JsonNode</a></span>, <span name="references">references: <a href="http://fasterxml.github.io/jackson-databind/javadoc/2.5/index.html#com.fasterxml.jackson.databind.node.ObjectNode" class="extype" target="_top">ObjectNode</a></span>)</span><span class="result"> extends <a href="FaunaResponse.html" class="extype" name="faunadb.FaunaResponse">FaunaResponse</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="ResourceResponse.html"><span class="name">ResourceResponse</span></a><span class="params">(<span name="status">status: <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="resource">resource: <a href="http://fasterxml.github.io/jackson-databind/javadoc/2.5/index.html#com.fasterxml.jackson.databind.JsonNode" class="extype" target="_top">JsonNode</a></span>, <span name="references">references: <a href="http://fasterxml.github.io/jackson-databind/javadoc/2.5/index.html#com.fasterxml.jackson.databind.node.ObjectNode" class="extype" target="_top">ObjectNode</a></span>)</span><span class="result"> extends <a href="FaunaResponse.html" class="extype" name="faunadb.FaunaResponse">FaunaResponse</a> with <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@ResourceResponseextendsFaunaResponsewithProductwithSerializable" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
@@ -225,7 +225,7 @@
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@FaunaClient" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">Methods to construct and obtain an instance of the FaunaDB client.</p>
@@ -238,11 +238,11 @@
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="QueryError$.html"><span class="name">QueryError</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.6/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="QueryError$.html"><span class="name">QueryError</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.7/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@QueryError" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
@@ -259,7 +259,7 @@
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@errors" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
@@ -276,7 +276,7 @@
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@jackson" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
@@ -293,7 +293,7 @@
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@query" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">Classes modeling the FaunaDB Query language.</p><div class="fullcomment"><div class="comment cmt"><p>Classes modeling the FaunaDB Query language.</p><p>Instances of these classes can be composed to model a query expression, which can then be passed to
@@ -311,7 +311,7 @@
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@response" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">Provides representations of the FaunaDB response format.</p><div class="fullcomment"><div class="comment cmt"><p>Provides representations of the FaunaDB response format.</p><p>Most calls to <a href="FaunaClient.html" class="extype" name="faunadb.FaunaClient">FaunaClient</a> will return a <a href="types/Value.html" class="extype" name="faunadb.types.Value">faunadb.types.Value</a>. This represents an abstract
@@ -330,7 +330,7 @@ response forms.</p><h4>Forms</h4><p><a href="response/Class.html" class="extype"
       </span>
       </h4><span class="permalink">
       <a href="../index.html#faunadb.package@types" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" />
+        <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
