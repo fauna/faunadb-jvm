@@ -42,183 +42,202 @@ object Language {
   implicit def intToValue(unwrapped: Int) = NumberV(unwrapped)
   implicit def longToValue(unwrapped: Long) = NumberV(unwrapped)
   implicit def boolToValue(unwrapped: Boolean) = BooleanV(unwrapped)
-  implicit def arrayToValue(unwrapped: Array[Value]) = ArrayV(unwrapped)
-  implicit def mapToValue(unwrapped: collection.Map[String, Value]) = ObjectV(unwrapped)
+  // implicit def arrayToValue(unwrapped: Array[Value]) = ArrayV(unwrapped)
+  // implicit def mapToValue(unwrapped: collection.Map[String, Value]) = ObjectV(unwrapped)
   implicit def doubleToValue(unwrapped: Double) = DoubleV(unwrapped)
-  implicit def pairToValuePair[T](p: (String, T))(implicit convert: T => Value) = {
-    (p._1, convert(p._2))
-  }
+  // implicit def pairToValuePair[T](p: (String, T))(implicit convert: T => Value) = {
+  //   (p._1, convert(p._2))
+  // }
+
+  case class LambdaArg(val params: Value, val expr: Value)
+
+  implicit def arrayLambdaArg(t: (ArrayV, Value)) =
+    t match { case (as, expr) => LambdaArg(as, expr) }
+
+  implicit def arity1LambdaArg(t: (String, Value)) =
+    t match { case (a, expr) => LambdaArg(a, expr) }
+
+  // FIXME: clean these up with a macro to support all tuple arities.
+  implicit def arity2LambdaArg(t: ((String, String), Value)) =
+    t match { case ((a, b), expr) => LambdaArg(ArrayV(a, b), expr) }
+  implicit def arity3LambdaArg(t: ((String, String, String), Value)) =
+    t match { case ((a, b, c), expr) => LambdaArg(ArrayV(a, b, c), expr) }
+  implicit def arity4LambdaArg(t: ((String, String, String, String), Value)) =
+    t match { case ((a, b, c, d), expr) => LambdaArg(ArrayV(a, b, c, d), expr) }
+  implicit def arity5LambdaArg(t: ((String, String, String, String, String), Value)) =
+    t match { case ((a, b, c, d, e), expr) => LambdaArg(ArrayV(a, b, c, d, e), expr) }
+
+  private def varargs(exprs: Seq[Value]) =
+    exprs match {
+      case Seq(e) => e
+      case es     => ArrayV(es: _*)
+    }
+
+  /**
+    * An Array value.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
+    */
+  def MkArray(elems: Value*): Value =
+    ArrayV(elems: _*)
+
+  /**
+    * An Object value.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
+    */
+  def MkObject(pairs: (String, Value)*): Value =
+    ObjectV("object" -> ObjectV(pairs: _*))
 
   /**
     * A Let expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
     */
-  def Let(vars: collection.Map[String, Value], in: Value): Value = {
-    ObjectV("let" -> ObjectV(vars), "in" -> in)
-  }
+  def Let(bindings: (String, Value)*)(in: Value): Value =
+    ObjectV("let" -> ObjectV(bindings: _*), "in" -> in)
 
   /**
    * A Do expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
    */
-  def Do(exprs: Iterable[Value]): Value = {
-    ObjectV("do" -> ArrayV(exprs.toArray))
-  }
+  def Do(exprs: Value*): Value =
+    ObjectV("do" -> varargs(exprs))
 
   /**
    * An If expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
    */
-  def If(condition: Value, `then`: Value, `else`: Value): Value = {
+  def If(condition: Value, `then`: Value, `else`: Value): Value =
     ObjectV("if" -> condition, "then" -> `then`, "else" -> `else`)
-  }
-
-  /**
-   * A Quote expression.
-   *
-   * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
-   */
-  def Quote(quote: Value): Value = {
-    ObjectV("quote" -> quote)
-  }
 
   /**
    * A Select expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
    */
-  def Select(path: Iterable[Path], from: Value): Value = {
-    ObjectV("select" -> ArrayV(path.map(_.value).toArray), "from" -> from)
-  }
+  def Select(path: Seq[Value], from: Value): Value =
+    ObjectV("select" -> varargs(path), "from" -> from)
+
+  def Select(path: Seq[Value], from: Value, default: Value): Value =
+    ObjectV("select" -> varargs(path), "from" -> from, "default" -> default)
 
   /**
    * A Lambda expression.
    *
    * '''Reference''': TBD
    */
-  def Lambda(argument: String, expr: Value): Value = {
-    ObjectV("lambda" -> StringV(argument), "expr" -> expr)
-  }
+  def Lambda(arg: LambdaArg) =
+    ObjectV("lambda" -> arg.params, "expr" -> arg.expr)
 
   /**
    * A Map expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
    */
-  def Map(lambda: Value, collection: Value): Value = {
+  def Map(lambda: Value, collection: Value): Value =
     ObjectV("map" -> lambda, "collection" -> collection)
-  }
 
   /**
    * A Foreach expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
    */
-  def Foreach(lambda: Value, collection: Value): Value = {
+  def Foreach(lambda: Value, collection: Value): Value =
     ObjectV("foreach" -> lambda, "collection" -> collection)
-  }
 
   /**
     * A Filter expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
     */
-  def Filter(lambda: Value, collection: Value): Value = {
+  def Filter(lambda: Value, collection: Value): Value =
     ObjectV("filter" -> lambda, "collection" -> collection)
-  }
 
   /**
     * A Take expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
     */
-  def Take(num: Value, collection: Value): Value = {
+  def Take(num: Value, collection: Value): Value =
     ObjectV("take" -> num, "collection" -> collection)
-  }
 
   /**
     * A Drop expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
     */
-  def Drop(num: Value, collection: Value): Value = {
+  def Drop(num: Value, collection: Value): Value =
     ObjectV("drop" -> num, "collection" -> collection)
-  }
 
   /**
     * A Prepend expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
     */
-  def Prepend(elems: Value, collection: Value): Value = {
+  def Prepend(elems: Value, collection: Value): Value =
     ObjectV("prepend" -> elems, "collection" -> collection)
-  }
 
   /**
     * An Append expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
     */
-  def Append(elems: Value, collection: Value): Value = {
+  def Append(elems: Value, collection: Value): Value =
     ObjectV("append" -> elems, "collection" -> collection)
-  }
 
   /**
    * A Match set.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#sets]]
    */
-  def Match(term: Value, index: Ref): Value = {
-    ObjectV("match" -> term, "index" -> index)
-  }
+  def Match(index: Value, terms: Value*) =
+    ObjectV("match" -> varargs(terms), "index" -> index)
 
   /**
    * A Union set.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#sets]]
    */
-  def Union(sets: Iterable[Value]): Value = {
-    ObjectV("union" -> ArrayV(sets.toArray))
-  }
+  def Union(sets: Value*): Value =
+    ObjectV("union" -> varargs(sets))
 
   /**
    * An Intersection set.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#sets]]
    */
-  def Intersection(sets: Iterable[Value]): Value = {
-    ObjectV("intersection" -> ArrayV(sets.toArray))
-  }
+  def Intersection(sets: Value*): Value =
+    ObjectV("intersection" -> varargs(sets))
 
   /**
    * A Difference set.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#sets]]
    */
-  def Difference(sets: Iterable[Value]): Value = {
-    ObjectV("difference" -> ArrayV(sets.toArray))
-  }
+  def Difference(sets: Value*): Value =
+    ObjectV("difference" -> varargs(sets))
 
   /**
    * A Join set.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#sets]]
    */
-  def Join(source: Value, target: Value): Value = {
-    ObjectV("join" -> source, "with" -> target)
-  }
+  def Join(source: Value, `with`: Value): Value =
+    ObjectV("join" -> source, "with" -> `with`)
 
   /**
    * A Get expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#read_functions]]
    */
-  def Get(resource: Value): Value = {
+  def Get(resource: Value): Value =
     ObjectV("get" -> resource)
-  }
+
+  def Get(resource: Value, ts: Value): Value =
+    ObjectV("get" -> resource, "ts" -> ts)
 
   /**
    * A Paginate expression.
@@ -271,237 +290,206 @@ object Language {
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#read_functions]]
    */
-  def Count(set: Value): Value = {
+  def Count(set: Value): Value =
     ObjectV("count" -> set)
-  }
 
   /**
    * An Exists expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#read_functions]]
    */
-  def Exists(ref: Value): Value = {
+  def Exists(ref: Value): Value =
     ObjectV("exists" -> ref)
-  }
 
   /**
    * A Create expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
    */
-  def Create(ref: Value, params: Value): Value = {
+  def Create(ref: Value, params: Value): Value =
     ObjectV("create" -> ref, "params" -> params)
-  }
 
   /**
    * A Replace expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
    */
-  def Replace(ref: Value, params: Value): Value = {
+  def Replace(ref: Value, params: Value): Value =
     ObjectV("replace" -> ref, "params" -> params)
-  }
 
   /**
    * An Update expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
    */
-  def Update(ref: Value, params: Value): Value = {
+  def Update(ref: Value, params: Value): Value =
     ObjectV("update" -> ref, "params" -> params)
-  }
 
   /**
    * A Delete expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
    */
-  def Delete(ref: Value): Value = {
+  def Delete(ref: Value): Value =
     ObjectV("delete" -> ref)
-  }
 
   /**
     * An Insert expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
     */
-  def Insert(ref: Value, ts: Long, action: Action, params: Value): Value = {
+  def Insert(ref: Value, ts: Long, action: Action, params: Value): Value =
     ObjectV("insert" -> ref, "ts" -> ts, "action" -> action.value, "params" -> params)
-  }
 
   /**
     * A Remove expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#write_functions]]
     */
-  def Remove(ref: Value, ts: Long, action: Action): Value = {
+  def Remove(ref: Value, ts: Long, action: Action): Value =
     ObjectV("remove" -> ref, "ts" -> ts, "action" -> action.value)
-  }
-
-  def Object(value: ObjectV) = {
-    ObjectV("object" -> value)
-  }
 
   /**
    * An Add expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
-  def Add(terms: Iterable[Value]): Value = {
-    ObjectV("add" -> ArrayV(terms.toArray))
-  }
+  def Add(terms: Value*): Value =
+    ObjectV("add" -> varargs(terms))
 
   /**
    * An Equals expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
-  def Equals(terms: Iterable[Value]): Value = {
-    ObjectV("equals" -> ArrayV(terms.toArray))
-  }
+  def Equals(terms: Value*): Value =
+    ObjectV("equals" -> varargs(terms))
 
   /**
    * A Concat expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
-  def Concat(terms: Iterable[Value]): Value = {
-    ObjectV("concat" -> ArrayV(terms.toArray))
-  }
+  def Concat(term: Value): Value =
+    ObjectV("concat" -> term)
 
-  def Concat(terms: Iterable[Value], separator: Value): Value = {
-    ObjectV("concat" -> ArrayV(terms.toArray), "separator" -> separator)
-  }
+  def Concat(term: Value, separator: Value): Value =
+    ObjectV("concat" -> term, "separator" -> separator)
 
   /**
    * A Contains expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
-  def Contains(path: Iterable[Path], in: Value): Value = {
-    ObjectV("contains" -> ArrayV(path.map(_.value).toArray), "in" -> in)
-  }
+  def Contains(path: Seq[Value], in: Value): Value =
+    ObjectV("contains" -> varargs(path), "in" -> in)
 
   /**
    * A Multiply expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
-  def Multiply(terms: Iterable[Value]): Value = {
-    ObjectV("multiply" -> ArrayV(terms.toArray))
-  }
+  def Multiply(terms: Value*): Value =
+    ObjectV("multiply" -> varargs(terms))
 
   /**
    * A Divide expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
-  def Divide(terms: Iterable[Value]): Value = {
-    ObjectV("divide" -> ArrayV(terms.toArray))
-  }
+  def Divide(terms: Value*): Value =
+    ObjectV("divide" -> varargs(terms))
 
   /**
     * A Modulo expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
     */
-  def Modulo(terms: Iterable[Value]): Value = {
-    ObjectV("modulo" -> ArrayV(terms.toArray))
-  }
+  def Modulo(terms: Value*): Value =
+    ObjectV("modulo" -> varargs(terms))
 
   /**
    * A Subtract expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
-  def Subtract(terms: Iterable[Value]): Value = {
-    ObjectV("subtract" -> ArrayV(terms.toArray))
-  }
+  def Subtract(terms: Value*): Value =
+    ObjectV("subtract" -> varargs(terms))
 
   /**
     * An And expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
     */
-  def And(terms: Iterable[Value]): Value = {
-    ObjectV("and" -> ArrayV(terms.toArray))
-  }
+  def And(terms: Value*): Value =
+    ObjectV("and" -> varargs(terms))
 
   /**
     * An Or expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
     */
-  def Or(terms: Iterable[Value]): Value = {
-    ObjectV("or" -> ArrayV(terms.toArray))
-  }
+  def Or(terms: Value*): Value =
+    ObjectV("or" -> varargs(terms))
 
   /**
     * A Not expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
     */
-  def Not(term: Value): Value = {
+  def Not(term: Value): Value =
     ObjectV("not" -> term)
-  }
 
   /**
     * A Login expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#auth_functions]]
     */
-  def Login(ref: Value, params: Value): Value = {
+  def Login(ref: Value, params: Value): Value =
     ObjectV("login" -> ref, "params" -> params)
-  }
 
   /**
     * A Logout expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#auth_functions]]
     */
-  def Logout(invalidateAll: Boolean): Value = {
+  def Logout(invalidateAll: Value): Value =
     ObjectV("logout" -> invalidateAll)
-  }
 
   /**
     * An Identify expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#auth_functions]]
     */
-  def Identify(ref: Value, password: Value): Value = {
+  def Identify(ref: Value, password: Value): Value =
     ObjectV("identify" -> ref, "password" -> password)
-  }
 
   /**
     * A Time expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#time_functions]]
     */
-  def Time(str: Value): Value = {
+  def Time(str: Value): Value =
     ObjectV("time" -> str)
-  }
 
   /**
     * An Epoch expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#time_functions]]
     */
-  def Epoch(num: Value, unit: TimeUnit) = {
+  def Epoch(num: Value, unit: TimeUnit) =
     ObjectV("epoch" -> num, "unit" -> unit.value)
-  }
 
-  def Epoch(num: Value, unit: String) = {
+  def Epoch(num: Value, unit: Value) =
     ObjectV("epoch" -> num, "unit" -> unit)
-  }
 
   /**
     * A Date expression.
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#time_functions]]
     */
-  def Date(str: Value) = {
+  def Date(str: Value) =
     ObjectV("date" -> str)
-  }
 }
 
 sealed trait Path {
@@ -513,4 +501,3 @@ case class ObjectPath(@(JsonValue @getter) field: String) extends Path {
 case class ArrayPath(@(JsonValue @getter) index: Int) extends Path {
   def value = NumberV(index)
 }
-
