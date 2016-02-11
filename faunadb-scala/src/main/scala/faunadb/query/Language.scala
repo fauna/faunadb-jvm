@@ -361,6 +361,14 @@ object Language {
     ObjectV("difference" -> varargs(sets))
 
   /**
+   * A Distinct set.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation/queries#sets]]
+   */
+  def Distinct(set: Value): Value =
+    ObjectV("distinct" -> set)
+
+  /**
    * A Join set.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#sets]]
@@ -490,6 +498,14 @@ object Language {
     ObjectV("multiply" -> varargs(terms))
 
   /**
+   * A Subtract expression.
+   *
+   * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
+   */
+  def Subtract(terms: Value*): Value =
+    ObjectV("subtract" -> varargs(terms))
+
+  /**
    * A Divide expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
@@ -506,12 +522,36 @@ object Language {
     ObjectV("modulo" -> varargs(terms))
 
   /**
-   * A Subtract expression.
-   *
-   * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
-   */
-  def Subtract(terms: Value*): Value =
-    ObjectV("subtract" -> varargs(terms))
+    * A LT expression.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
+    */
+  def LT(terms: Value*): Value =
+    ObjectV("lt" -> varargs(terms))
+
+  /**
+    * A LTE expression.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
+    */
+  def LTE(terms: Value*): Value =
+    ObjectV("lte" -> varargs(terms))
+
+  /**
+    * A GT expression.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
+    */
+  def GT(terms: Value*): Value =
+    ObjectV("gt" -> varargs(terms))
+
+  /**
+    * A GTE expression.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
+    */
+  def GTE(terms: Value*): Value =
+    ObjectV("gte" -> varargs(terms))
 
   /**
     * An And expression.
