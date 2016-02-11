@@ -357,11 +357,11 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val concat2R = Await.result(concat2F, 1 second).asString
     concat2R shouldBe "Magic Missile"
 
-    val containsF = client.query(Contains(Seq("favorites", "foods"), MkObject("favorites" -> MkObject("foods" -> ArrayV("crunchings", "munchings")))))
+    val containsF = client.query(Contains("favorites" / "foods", MkObject("favorites" -> MkObject("foods" -> ArrayV("crunchings", "munchings")))))
     val containsR = Await.result(containsF, 1 second).asBoolean
     containsR shouldBe true
 
-    val selectF = client.query(Select(Seq("favorites", "foods", 1), MkObject("favorites" -> MkObject("foods" -> ArrayV("crunchings", "munchings", "lunchings")))))
+    val selectF = client.query(Select("favorites" / "foods" / 1, MkObject("favorites" -> MkObject("foods" -> ArrayV("crunchings", "munchings", "lunchings")))))
     val selectR = Await.result(selectF, 1 second).asString
     selectR shouldBe "munchings"
 

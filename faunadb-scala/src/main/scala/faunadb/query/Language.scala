@@ -15,11 +15,18 @@ import scala.annotation.meta.{field, getter}
  *
  */
 object Language {
-  sealed abstract class TimeUnit(val value: String)
+
+  implicit def boolToValue(unwrapped: Boolean) = BooleanV(unwrapped)
+  implicit def stringToValue(unwrapped: String) = StringV(unwrapped)
+  implicit def intToValue(unwrapped: Int) = NumberV(unwrapped)
+  implicit def longToValue(unwrapped: Long) = NumberV(unwrapped)
+  implicit def floatToValue(unwrapped: Float) = DoubleV(unwrapped)
+  implicit def doubleToValue(unwrapped: Double) = DoubleV(unwrapped)
 
   /**
     * Enumeration for time units. Used by [[https://faunadb.com/documentation/queries#time_functions]].
     */
+  sealed abstract class TimeUnit(val value: String)
   object TimeUnit {
     case object Second extends TimeUnit("second")
     case object Millisecond extends TimeUnit("millisecond")
@@ -36,22 +43,12 @@ object Language {
     case object Delete extends Action("delete")
   }
 
-  sealed abstract class Path(val value: Value)
-  case class ObjectPath(@(JsonValue @getter) field: String) extends Path(StringV(field))
-  case class ArrayPath(@(JsonValue @getter) index: Int) extends Path(NumberV(index))
-
-  implicit def stringToObjectPath(str: String) = ObjectPath(str)
-  implicit def intToArrayPath(i: Int) = ArrayPath(i)
-  implicit def stringToValue(unwrapped: String) = StringV(unwrapped)
-  implicit def intToValue(unwrapped: Int) = NumberV(unwrapped)
-  implicit def longToValue(unwrapped: Long) = NumberV(unwrapped)
-  implicit def boolToValue(unwrapped: Boolean) = BooleanV(unwrapped)
-  // implicit def arrayToValue(unwrapped: Array[Value]) = ArrayV(unwrapped)
-  // implicit def mapToValue(unwrapped: collection.Map[String, Value]) = ObjectV(unwrapped)
-  implicit def doubleToValue(unwrapped: Double) = DoubleV(unwrapped)
-  // implicit def pairToValuePair[T](p: (String, T))(implicit convert: T => Value) = {
-  //   (p._1, convert(p._2))
-  // }
+  /**
+    * Helper for path syntax
+    */
+  protected class Path(val segments: Value*) { def /(seg: Value) = new Path(segments :+ seg: _*) }
+  implicit def strToPath(str: String) = new Path(StringV(str))
+  implicit def intToPath(int: Int) = new Path(NumberV(int))
 
   case class LambdaArg(val params: Value, val expr: Value)
 
@@ -467,19 +464,28 @@ object Language {
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
-  def Contains(path: Seq[Value], in: Value): Value =
-    ObjectV("contains" -> varargs(path), "in" -> in)
+  def Contains(path: Path, in: Value): Value =
+    Contains(varargs(path.segments), in)
+
+  def Contains(path: Value, in: Value): Value =
+    ObjectV("contains" -> path, "in" -> in)
 
   /**
    * A Select expression.
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#misc_functions]]
    */
-  def Select(path: Seq[Value], from: Value): Value =
-    ObjectV("select" -> varargs(path), "from" -> from)
+  def Select(path: Path, from: Value): Value =
+    Select(varargs(path.segments), from)
 
-  def Select(path: Seq[Value], from: Value, default: Value): Value =
-    ObjectV("select" -> varargs(path), "from" -> from, "default" -> default)
+  def Select(path: Path, from: Value, default: Value): Value =
+    Select(varargs(path.segments), from, default)
+
+  def Select(path: Value, from: Value): Value =
+    ObjectV("select" -> path, "from" -> from)
+
+  def Select(path: Value, from: Value, default: Value): Value =
+    ObjectV("select" -> path, "from" -> from, "default" -> default)
 
   /**
    * An Add expression.

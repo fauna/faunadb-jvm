@@ -47,7 +47,7 @@ class SerializationSpec extends FlatSpec with Matchers {
       Get(Ref("some/ref/1")))
     json.writeValueAsString(doForm) shouldBe "{\"do\":[{\"create\":{\"@ref\":\"some/ref/1\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Hen Wen\"}}}}},{\"get\":{\"@ref\":\"some/ref/1\"}}]}"
 
-    val select = Select(Seq("favorites", "foods", 1), MkObject("favorites" -> MkObject("foods" -> MkArray("crunchings", "munchings", "lunchings"))))
+    val select = Select("favorites" / "foods" / 1, MkObject("favorites" -> MkObject("foods" -> MkArray("crunchings", "munchings", "lunchings"))))
     json.writeValueAsString(select) shouldBe "{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}"
   }
 
