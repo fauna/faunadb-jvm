@@ -30,9 +30,9 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize complex values" in {
-    json.writeValueAsString(MkArray(1, "test")) shouldBe "[1,\"test\"]"
-    json.writeValueAsString(MkArray(ArrayV(MkObject("test" -> "value"), 2323, true), "hi", MkObject("test" -> "yo", "test2" -> NullV))) shouldBe "[[{\"object\":{\"test\":\"value\"}},2323,true],\"hi\",{\"object\":{\"test\":\"yo\",\"test2\":null}}]"
-    json.writeValueAsString(MkObject("test" -> 1, "test2" -> Ref("some/ref"))) shouldBe "{\"object\":{\"test\":1,\"test2\":{\"@ref\":\"some/ref\"}}}"
+    json.writeValueAsString(Arr(1, "test")) shouldBe "[1,\"test\"]"
+    json.writeValueAsString(Arr(Arr(Obj("test" -> "value"), 2323, true), "hi", Obj("test" -> "yo", "test2" -> NullV))) shouldBe "[[{\"object\":{\"test\":\"value\"}},2323,true],\"hi\",{\"object\":{\"test\":\"yo\",\"test2\":null}}]"
+    json.writeValueAsString(Obj("test" -> 1, "test2" -> Ref("some/ref"))) shouldBe "{\"object\":{\"test\":1,\"test2\":{\"@ref\":\"some/ref\"}}}"
   }
 
   it should "serialize basic forms" in {
@@ -43,34 +43,34 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(ifForm) shouldBe "{\"if\":true,\"then\":\"was true\",\"else\":\"was false\"}"
 
     val doForm = Do(
-      Create(Ref("some/ref/1"), MkObject("data" -> MkObject("name" -> "Hen Wen"))),
+      Create(Ref("some/ref/1"), Obj("data" -> Obj("name" -> "Hen Wen"))),
       Get(Ref("some/ref/1")))
     json.writeValueAsString(doForm) shouldBe "{\"do\":[{\"create\":{\"@ref\":\"some/ref/1\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Hen Wen\"}}}}},{\"get\":{\"@ref\":\"some/ref/1\"}}]}"
 
-    val select = Select("favorites" / "foods" / 1, MkObject("favorites" -> MkObject("foods" -> MkArray("crunchings", "munchings", "lunchings"))))
+    val select = Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings", "lunchings"))))
     json.writeValueAsString(select) shouldBe "{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}"
   }
 
   it should "serialize collections" in {
-    val map = Map(Lambda("munchings" -> Var("munchings")), MkArray(1, 2, 3))
+    val map = Map(Lambda("munchings" -> Var("munchings")), Arr(1, 2, 3))
     json.writeValueAsString(map) shouldBe "{\"map\":{\"lambda\":\"munchings\",\"expr\":{\"var\":\"munchings\"}},\"collection\":[1,2,3]}"
 
-    val foreach = Foreach(Lambda("creature" -> Create(Ref("some/ref"), MkObject("data" -> MkObject("some" -> Var("creature"))))), MkArray(Ref("another/ref/1"), Ref("another/ref/2")))
+    val foreach = Foreach(Lambda("creature" -> Create(Ref("some/ref"), Obj("data" -> Obj("some" -> Var("creature"))))), Arr(Ref("another/ref/1"), Ref("another/ref/2")))
     json.writeValueAsString(foreach) shouldBe "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":\"another/ref/1\"},{\"@ref\":\"another/ref/2\"}]}"
 
-    val filter = Filter(Lambda("i" -> Equals(1, Var("i"))), MkArray(1,2,3))
+    val filter = Filter(Lambda("i" -> Equals(1, Var("i"))), Arr(1,2,3))
     json.writeValueAsString(filter) shouldBe "{\"filter\":{\"lambda\":\"i\",\"expr\":{\"equals\":[1,{\"var\":\"i\"}]}},\"collection\":[1,2,3]}"
 
-    val take = Take(2, MkArray(1,2,3))
+    val take = Take(2, Arr(1,2,3))
     json.writeValueAsString(take) shouldBe "{\"take\":2,\"collection\":[1,2,3]}"
 
-    val drop = Drop(2, MkArray(1,2,3))
+    val drop = Drop(2, Arr(1,2,3))
     json.writeValueAsString(drop) shouldBe "{\"drop\":2,\"collection\":[1,2,3]}"
 
-    val prepend = Prepend(MkArray(1,2,3), MkArray(4,5,6))
+    val prepend = Prepend(Arr(1,2,3), Arr(4,5,6))
     json.writeValueAsString(prepend) shouldBe "{\"prepend\":[1,2,3],\"collection\":[4,5,6]}"
 
-    val append = Append(MkArray(4,5,6), MkArray(1,2,3))
+    val append = Append(Arr(4,5,6), Arr(1,2,3))
     json.writeValueAsString(append) shouldBe "{\"append\":[4,5,6],\"collection\":[1,2,3]}"
   }
 
@@ -97,7 +97,7 @@ class SerializationSpec extends FlatSpec with Matchers {
 
   it should "serialize resource modifications" in {
     val create = Create(Ref("classes/spells"),
-      MkObject("data" -> MkObject(
+      Obj("data" -> Obj(
         "name" -> "Mountainous Thunder",
         "element" -> "air",
         "cost" -> 15)))
@@ -105,16 +105,16 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(create) shouldBe "{\"create\":{\"@ref\":\"classes/spells\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountainous Thunder\",\"element\":\"air\",\"cost\":15}}}}}"
 
     val update = Update(Ref("classes/spells/123456"),
-      MkObject("data" -> MkObject(
+      Obj("data" -> Obj(
         "name" -> "Mountain's Thunder",
         "cost" -> NullV)))
 
     json.writeValueAsString(update) shouldBe "{\"update\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"cost\":null}}}}}"
 
     val replace = Replace(Ref("classes/spells/123456"),
-      MkObject("data" -> MkObject(
+      Obj("data" -> Obj(
         "name" -> "Mountain's Thunder",
-        "element" -> MkArray("air", "earth"),
+        "element" -> Arr("air", "earth"),
         "cost" -> 10)))
 
     json.writeValueAsString(replace) shouldBe "{\"replace\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"element\":[\"air\",\"earth\"],\"cost\":10}}}}}"
@@ -122,7 +122,7 @@ class SerializationSpec extends FlatSpec with Matchers {
     val delete = Delete(Ref("classes/spells/123456"))
     json.writeValueAsString(delete) shouldBe "{\"delete\":{\"@ref\":\"classes/spells/123456\"}}"
 
-    val insert = Insert(Ref("classes/spells/123456"), 1L, Action.Create, MkObject("data" -> MkObject("name" -> "Mountain's Thunder", "cost" -> 10, "element" -> MkArray("air", "earth"))))
+    val insert = Insert(Ref("classes/spells/123456"), 1L, Action.Create, Obj("data" -> Obj("name" -> "Mountain's Thunder", "cost" -> 10, "element" -> Arr("air", "earth"))))
     json.writeValueAsString(insert) shouldBe "{\"insert\":{\"@ref\":\"classes/spells/123456\"},\"ts\":1,\"action\":\"create\",\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"cost\":10,\"element\":[\"air\",\"earth\"]}}}}}"
 
     val remove = Remove(Ref("classes/spells/123456"), 1L, Action.Delete)
@@ -155,7 +155,7 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize authentication functions" in {
-    val login = Login(Ref("classes/characters/104979509695139637"), MkObject("password" -> "abracadabra"))
+    val login = Login(Ref("classes/characters/104979509695139637"), Obj("password" -> "abracadabra"))
     json.writeValueAsString(login) shouldBe "{\"login\":{\"@ref\":\"classes/characters/104979509695139637\"},\"params\":{\"object\":{\"password\":\"abracadabra\"}}}"
 
     val logout = Logout(true)
@@ -183,10 +183,10 @@ class SerializationSpec extends FlatSpec with Matchers {
     val equals = Equals("fire", "fire")
     json.writeValueAsString(equals) shouldBe "{\"equals\":[\"fire\",\"fire\"]}"
 
-    val concat = Concat(MkArray("Hen", "Wen"))
+    val concat = Concat(Arr("Hen", "Wen"))
     json.writeValueAsString(concat) shouldBe "{\"concat\":[\"Hen\",\"Wen\"]}"
 
-    val concat2 = Concat(MkArray("Hen", "Wen"), " ")
+    val concat2 = Concat(Arr("Hen", "Wen"), " ")
     json.writeValueAsString(concat2) shouldBe "{\"concat\":[\"Hen\",\"Wen\"],\"separator\":\" \"}"
 
     val add = Add(1, 2)

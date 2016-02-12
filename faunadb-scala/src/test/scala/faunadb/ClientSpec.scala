@@ -41,23 +41,23 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   var client: FaunaClient = null
 
   override protected def beforeAll(): Unit = {
-    val resultFuture = rootClient.query(Create(Ref("databases"), MkObject("name" -> testDbName)))
+    val resultFuture = rootClient.query(Create(Ref("databases"), Obj("name" -> testDbName)))
     val result = Await.result(resultFuture, 1 second)
 
     val dbRef = result.asDatabase.ref
 
-    val keyFuture = rootClient.query(Create(Ref("keys"), MkObject("database" -> dbRef, "role" -> "server")))
+    val keyFuture = rootClient.query(Create(Ref("keys"), Obj("database" -> dbRef, "role" -> "server")))
     val key = Await.result(keyFuture, 1 second).asKey
 
     client = FaunaClient(Connection.builder().withFaunaRoot(config("root_url")).withAuthToken(key.secret).build())
 
-    val classFuture = client.query(Create(Ref("classes"), MkObject("name" -> "spells")))
+    val classFuture = client.query(Create(Ref("classes"), Obj("name" -> "spells")))
     Await.result(classFuture, 1 second)
 
-    val indexByElementF = client.query(Create(Ref("indexes"), MkObject(
+    val indexByElementF = client.query(Create(Ref("indexes"), Obj(
       "name" -> "spells_by_element",
       "source" -> Ref("classes/spells"),
-      "terms" -> MkArray(MkObject("path" -> "data.element")),
+      "terms" -> Arr(Obj("path" -> "data.element")),
       "active" -> true)))
 
     Await.result(indexByElementF, 1 second)
@@ -81,7 +81,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "create a new instance" in {
     val respFuture = client.query(
       Create(Ref("classes/spells"),
-        MkObject("data" -> MkObject("testField" -> "testValue"))))
+        Obj("data" -> Obj("testField" -> "testValue"))))
 
     val resp = Await.result(respFuture, 1 second).asInstance
 
@@ -94,9 +94,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     existsR shouldBe true
 
     val query2F = client.query(Create(Ref("classes/spells"),
-      MkObject("data" -> MkObject(
-        "testField" -> MkObject(
-          "array" -> MkArray(1, "2", 3.4),
+      Obj("data" -> Obj(
+        "testField" -> Obj(
+          "array" -> Arr(1, "2", 3.4),
           "bool" -> true,
           "num" -> 1234,
           "string" -> "sup",
@@ -117,8 +117,8 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
     val classRef = Ref("classes/spells")
-    val expr1 = Create(classRef, MkObject("data" -> MkObject("queryTest1" -> randomText1)))
-    val expr2 = Create(classRef, MkObject("data" -> MkObject("queryTest1" -> randomText2)))
+    val expr1 = Create(classRef, Obj("data" -> Obj("queryTest1" -> randomText1)))
+    val expr2 = Create(classRef, Obj("data" -> Obj("queryTest1" -> randomText2)))
 
     val createFuture = client.query(Seq(expr1, expr2))
     val results = Await.result(createFuture, 1 second)
@@ -130,20 +130,20 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   it should "issue a paginated query" in {
     val randomClassName = Random.alphanumeric.take(8).mkString
-    val randomClassF = client.query(Create(Ref("classes"), MkObject("name" -> randomClassName)))
+    val randomClassF = client.query(Create(Ref("classes"), Obj("name" -> randomClassName)))
     val classRef = Await.result(randomClassF, 1 second).asClass.ref
 
-    val randomClassIndexF = client.query(Create(Ref("indexes"), MkObject(
+    val randomClassIndexF = client.query(Create(Ref("indexes"), Obj(
       "name" -> (randomClassName + "_class_index"),
       "source" -> classRef,
       "active" -> true,
       "unique" -> false
     )))
 
-    val indexCreateF = client.query(Create(Ref("indexes"), MkObject(
+    val indexCreateF = client.query(Create(Ref("indexes"), Obj(
       "name" -> (randomClassName + "_test_index"),
       "source" -> classRef,
-      "terms" -> MkArray(MkObject("path" -> "data.queryTest1")),
+      "terms" -> Arr(Obj("path" -> "data.queryTest1")),
       "active" -> true,
       "unique" -> false
     )))
@@ -155,9 +155,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val randomText2 = Random.alphanumeric.take(8).mkString
     val randomText3 = Random.alphanumeric.take(8).mkString
 
-    val createFuture = client.query(Create(classRef, MkObject("data" -> MkObject("queryTest1" -> randomText1))))
-    val createFuture2 = client.query(Create(classRef, MkObject("data" -> MkObject("queryTest1" -> randomText2))))
-    val createFuture3 = client.query(Create(classRef, MkObject("data" -> MkObject("queryTest1" -> randomText3))))
+    val createFuture = client.query(Create(classRef, Obj("data" -> Obj("queryTest1" -> randomText1))))
+    val createFuture2 = client.query(Create(classRef, Obj("data" -> Obj("queryTest1" -> randomText2))))
+    val createFuture3 = client.query(Create(classRef, Obj("data" -> Obj("queryTest1" -> randomText3))))
 
     val create1 = Await.result(createFuture, 1 second).asInstance
     val create2 = Await.result(createFuture2, 1 second).asInstance
@@ -188,22 +188,22 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   it should "handle a constraint violation" in {
     val randomClassName = Random.alphanumeric.take(8).mkString
-    val randomClassF = client.query(Create(Ref("classes"), MkObject("name" -> randomClassName)))
+    val randomClassF = client.query(Create(Ref("classes"), Obj("name" -> randomClassName)))
     val classRef = Await.result(randomClassF, 1 second).asClass.ref
 
-    val uniqueIndexFuture = client.query(Create(Ref("indexes"), MkObject(
+    val uniqueIndexFuture = client.query(Create(Ref("indexes"), Obj(
       "name" -> (randomClassName+"_by_unique_test"),
       "source" -> classRef,
-      "terms" -> MkArray(MkObject("path" -> "data.uniqueTest1")),
+      "terms" -> Arr(Obj("path" -> "data.uniqueTest1")),
       "unique" -> true, "active" -> true)))
 
     Await.result(uniqueIndexFuture, 1 second)
 
     val randomText = Random.alphanumeric.take(8).mkString
-    val createFuture = client.query(Create(classRef, MkObject("data" -> MkObject("uniqueTest1" -> randomText))))
+    val createFuture = client.query(Create(classRef, Obj("data" -> Obj("uniqueTest1" -> randomText))))
     val create1 = Await.result(createFuture, 1 second).asInstance
 
-    val createFuture2 = client.query(Create(classRef, MkObject("data" -> MkObject("uniqueTest1" -> randomText))))
+    val createFuture2 = client.query(Create(classRef, Obj("data" -> Obj("uniqueTest1" -> randomText))))
 
     val exception = intercept[BadRequestException] {
       Await.result(createFuture2, 1 second).asInstance
@@ -232,13 +232,13 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val randomNum = Math.abs(Math.floorMod(Random.nextLong(), 250000L)) + 250000L
     val randomRef = Ref("classes/spells/" + randomNum)
     val doF = client.query(Do(
-      Create(randomRef, MkObject("data" -> MkObject("name" -> "Magic Missile"))),
+      Create(randomRef, Obj("data" -> Obj("name" -> "Magic Missile"))),
       Get(randomRef)
     ))
     val doR = Await.result(doF, 1 second).asInstance
     doR.ref shouldBe randomRef
 
-    val objectF = client.query(MkObject("name" -> "Hen Wen", "age" -> 123L))
+    val objectF = client.query(Obj("name" -> "Hen Wen", "age" -> 123L))
     val objectR = Await.result(objectF, 1 second).asObject
     objectR("name").asString shouldBe "Hen Wen"
     objectR("age").asNumber shouldBe 123L
@@ -246,38 +246,38 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test collections" in {
-    val mapF = client.query(Map(Lambda("munchings" -> Add(Var("munchings"), 1L)), MkArray(1L, 2L, 3L)))
+    val mapF = client.query(Map(Lambda("munchings" -> Add(Var("munchings"), 1L)), Arr(1L, 2L, 3L)))
     val mapR = Await.result(mapF, 1 second).asArray
     mapR.toSeq.map(_.asNumber) shouldBe Seq(2L, 3L, 4L)
 
-    val foreachF = client.query(Foreach(Lambda("spell" -> Create(Ref("classes/spells"), MkObject("data" -> MkObject("name" -> Var("spell"))))), ArrayV("Fireball Level 1", "Fireball Level 2")))
+    val foreachF = client.query(Foreach(Lambda("spell" -> Create(Ref("classes/spells"), Obj("data" -> Obj("name" -> Var("spell"))))), ArrayV("Fireball Level 1", "Fireball Level 2")))
     val foreachR = Await.result(foreachF, 1 second).asArray
     foreachR.toSeq.map(_.asString) shouldBe Seq("Fireball Level 1", "Fireball Level 2")
   }
 
   it should "test resource modification" in {
-    val createF = client.query(Create(Ref("classes/spells"), MkObject("data" -> MkObject("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L))))
+    val createF = client.query(Create(Ref("classes/spells"), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L))))
     val createR = Await.result(createF, 1 second).asInstance
     createR.ref.value should startWith("classes/spells")
     createR.data("name").asString shouldBe "Magic Missile"
     createR.data("element").asString shouldBe "arcane"
     createR.data("cost").asNumber shouldBe 10L
 
-    val updateF = client.query(Update(createR.ref, MkObject("data" -> MkObject("name" -> "Faerie Fire", "cost" -> NullV))))
+    val updateF = client.query(Update(createR.ref, Obj("data" -> Obj("name" -> "Faerie Fire", "cost" -> NullV))))
     val updateR = Await.result(updateF, 1 second).asInstance
     updateR.ref shouldBe createR.ref
     updateR.data("name").asString shouldBe "Faerie Fire"
     updateR.data("element").asString shouldBe "arcane"
     updateR.data.get("cost") shouldBe None
 
-    val replaceF = client.query(Replace(createR.ref, MkObject("data" -> MkObject("name" -> "Volcano", "element" -> ArrayV("fire", "earth"), "cost" -> 10L))))
+    val replaceF = client.query(Replace(createR.ref, Obj("data" -> Obj("name" -> "Volcano", "element" -> ArrayV("fire", "earth"), "cost" -> 10L))))
     val replaceR = Await.result(replaceF, 1 second).asInstance
     replaceR.ref shouldBe createR.ref
     replaceR.data("name").asString shouldBe "Volcano"
     replaceR.data("element").asArray.toSeq.map(_.asString) shouldBe Seq("fire", "earth")
     replaceR.data("cost").asNumber shouldBe 10L
 
-    val insertF = client.query(Insert(createR.ref, 1L, Action.Create, MkObject("data" -> MkObject("cooldown" -> 5L))))
+    val insertF = client.query(Insert(createR.ref, 1L, Action.Create, Obj("data" -> Obj("cooldown" -> 5L))))
     val insertR = Await.result(insertF, 1 second).asInstance
     insertR.ref shouldBe createR.ref
     insertR.data.size shouldBe 1
@@ -297,13 +297,13 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   it should "test sets" in {
     val create1F = client.query(Create(Ref("classes/spells"),
-      MkObject("data" -> MkObject("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L))))
+      Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L))))
     val create2F = client.query(Create(Ref("classes/spells"),
-      MkObject("data" -> MkObject("name" -> "Fireball", "element" -> "fire", "cost" -> 10L))))
+      Obj("data" -> Obj("name" -> "Fireball", "element" -> "fire", "cost" -> 10L))))
     val create3F = client.query(Create(Ref("classes/spells"),
-      MkObject("data" -> MkObject("name" -> "Faerie Fire", "element" -> MkArray("arcane", "nature"), "cost" -> 10L))))
+      Obj("data" -> Obj("name" -> "Faerie Fire", "element" -> Arr("arcane", "nature"), "cost" -> 10L))))
     val create4F = client.query(Create(Ref("classes/spells"),
-      MkObject("data" -> MkObject("name" -> "Summon Animal Companion", "element" -> "nature", "cost" -> 10L))))
+      Obj("data" -> Obj("name" -> "Summon Animal Companion", "element" -> "nature", "cost" -> 10L))))
 
     val create1R = Await.result(create1F, 1 second).asInstance
     val create2R = Await.result(create2F, 1 second).asInstance
@@ -349,19 +349,19 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val equalsR = Await.result(equalsF, 1 second).asBoolean
     equalsR shouldBe true
 
-    val concatF = client.query(Concat(MkArray("Magic", "Missile")))
+    val concatF = client.query(Concat(Arr("Magic", "Missile")))
     val concatR = Await.result(concatF, 1 second).asString
     concatR shouldBe "MagicMissile"
 
-    val concat2F = client.query(Concat(MkArray("Magic", "Missile"), " "))
+    val concat2F = client.query(Concat(Arr("Magic", "Missile"), " "))
     val concat2R = Await.result(concat2F, 1 second).asString
     concat2R shouldBe "Magic Missile"
 
-    val containsF = client.query(Contains("favorites" / "foods", MkObject("favorites" -> MkObject("foods" -> ArrayV("crunchings", "munchings")))))
+    val containsF = client.query(Contains("favorites" / "foods", Obj("favorites" -> Obj("foods" -> ArrayV("crunchings", "munchings")))))
     val containsR = Await.result(containsF, 1 second).asBoolean
     containsR shouldBe true
 
-    val selectF = client.query(Select("favorites" / "foods" / 1, MkObject("favorites" -> MkObject("foods" -> ArrayV("crunchings", "munchings", "lunchings")))))
+    val selectF = client.query(Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> ArrayV("crunchings", "munchings", "lunchings")))))
     val selectR = Await.result(selectF, 1 second).asString
     selectR shouldBe "munchings"
 
@@ -413,10 +413,10 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test authentication functions" in {
-    val createF = client.query(Create(Ref("classes/spells"), MkObject("credentials" -> MkObject("password" -> "abcdefg"))))
+    val createF = client.query(Create(Ref("classes/spells"), Obj("credentials" -> Obj("password" -> "abcdefg"))))
     val createR = Await.result(createF, 1 second).asInstance
 
-    val loginF = client.query(Login(createR.ref, MkObject("password" -> "abcdefg")))
+    val loginF = client.query(Login(createR.ref, Obj("password" -> "abcdefg")))
     val loginR = Await.result(loginF, 1 second).asToken
 
     val sessionClient = FaunaClient(Connection.builder().withFaunaRoot(config("root_url")).withAuthToken(loginR.secret).build())

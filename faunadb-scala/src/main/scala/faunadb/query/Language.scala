@@ -79,17 +79,17 @@ object Language {
   /**
     * An Array value.
     *
-    * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
+    * '''Reference''': [[https://faunadb.com/documentation/queries#values]]
     */
-  def MkArray(elems: Value*): Value =
+  def Arr(elems: Value*): Value =
     ArrayV(elems: _*)
 
   /**
     * An Object value.
     *
-    * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
+    * '''Reference''': [[https://faunadb.com/documentation/queries#values]]
     */
-  def MkObject(pairs: (String, Value)*): Value =
+  def Obj(pairs: (String, Value)*): Value =
     ObjectV("object" -> ObjectV(pairs: _*))
 
   // Basic Forms
