@@ -52,13 +52,16 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize collections" in {
-    val map = Map(Lambda("munchings" -> Var("munchings")), Arr(1, 2, 3))
+    val map = Map(Lambda(munchings => munchings), Arr(1, 2, 3))
     json.writeValueAsString(map) shouldBe "{\"map\":{\"lambda\":\"munchings\",\"expr\":{\"var\":\"munchings\"}},\"collection\":[1,2,3]}"
 
-    val foreach = Foreach(Lambda("creature" -> Create(Ref("some/ref"), Obj("data" -> Obj("some" -> Var("creature"))))), Arr(Ref("another/ref/1"), Ref("another/ref/2")))
+    val map2 = Map(Lambda("munchings", Var("munchings")), Arr(1, 2, 3))
+    json.writeValueAsString(map2) shouldBe "{\"map\":{\"lambda\":\"munchings\",\"expr\":{\"var\":\"munchings\"}},\"collection\":[1,2,3]}"
+
+    val foreach = Foreach(Lambda(creature => Create(Ref("some/ref"), Obj("data" -> Obj("some" -> creature)))), Arr(Ref("another/ref/1"), Ref("another/ref/2")))
     json.writeValueAsString(foreach) shouldBe "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":\"another/ref/1\"},{\"@ref\":\"another/ref/2\"}]}"
 
-    val filter = Filter(Lambda("i" -> Equals(1, Var("i"))), Arr(1,2,3))
+    val filter = Filter(Lambda(i => Equals(1, i)), Arr(1,2,3))
     json.writeValueAsString(filter) shouldBe "{\"filter\":{\"lambda\":\"i\",\"expr\":{\"equals\":[1,{\"var\":\"i\"}]}},\"collection\":[1,2,3]}"
 
     val take = Take(2, Arr(1,2,3))
@@ -142,7 +145,7 @@ class SerializationSpec extends FlatSpec with Matchers {
     val difference = Difference(Match(Ref("indexes/spells_by_element"), "fire"), Match(Ref("indexes/spells_by_element"), "water"))
     json.writeValueAsString(difference) shouldBe "{\"difference\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"
 
-    val join = Join(Match(Ref("indexes/spells_by_element"), "fire"), Lambda("spell" -> Get(Var("spell"))))
+    val join = Join(Match(Ref("indexes/spells_by_element"), "fire"), Lambda(spell => Get(spell)))
     json.writeValueAsString(join) shouldBe "{\"join\":{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},\"with\":{\"lambda\":\"spell\",\"expr\":{\"get\":{\"var\":\"spell\"}}}}"
   }
 

@@ -2,8 +2,9 @@ package faunadb.query
 
 import com.fasterxml.jackson.annotation._
 import faunadb.types._
-
+import language.experimental.macros
 import scala.annotation.meta.{field, getter}
+import scala.reflect.macros._
 
 /**
  * Implicit conversions to FaunaDB value types, as well as helper functions to construct queries.
@@ -57,24 +58,6 @@ object Language {
   case class Before(value: Value) extends Cursor
   case class After(value: Value) extends Cursor
   case object NoCursor extends Cursor
-
-  case class LambdaArg(val params: Value, val expr: Value)
-
-  implicit def arrayLambdaArg(t: (ArrayV, Value)) =
-    t match { case (as, expr) => LambdaArg(as, expr) }
-
-  implicit def arity1LambdaArg(t: (String, Value)) =
-    t match { case (a, expr) => LambdaArg(a, expr) }
-
-  // FIXME: clean these up with a macro to support all tuple arities.
-  implicit def arity2LambdaArg(t: ((String, String), Value)) =
-    t match { case ((a, b), expr) => LambdaArg(ArrayV(a, b), expr) }
-  implicit def arity3LambdaArg(t: ((String, String, String), Value)) =
-    t match { case ((a, b, c), expr) => LambdaArg(ArrayV(a, b, c), expr) }
-  implicit def arity4LambdaArg(t: ((String, String, String, String), Value)) =
-    t match { case ((a, b, c, d), expr) => LambdaArg(ArrayV(a, b, c, d), expr) }
-  implicit def arity5LambdaArg(t: ((String, String, String, String, String), Value)) =
-    t match { case ((a, b, c, d, e), expr) => LambdaArg(ArrayV(a, b, c, d, e), expr) }
 
   private def varargs(exprs: Seq[Value]) =
     exprs match {
@@ -139,8 +122,43 @@ object Language {
    *
    * '''Reference''': TBD
    */
-  def Lambda(arg: LambdaArg) =
-    ObjectV("lambda" -> arg.params, "expr" -> arg.expr)
+  def Lambda(fn: Value => Value): Value = macro LanguageMacros.lambda
+  def Lambda(fn: (Value, Value) => Value): Value = macro LanguageMacros.lambda
+  def Lambda(fn: (Value, Value, Value) => Value): Value = macro LanguageMacros.lambda
+  def Lambda(fn: (Value, Value, Value, Value) => Value): Value = macro LanguageMacros.lambda
+  def Lambda(fn: (Value, Value, Value, Value, Value) => Value): Value = macro LanguageMacros.lambda
+  def Lambda(fn: (Value, Value, Value, Value, Value, Value) => Value): Value = macro LanguageMacros.lambda
+  def Lambda(fn: (Value, Value, Value, Value, Value, Value, Value) => Value): Value = macro LanguageMacros.lambda
+  def Lambda(fn: (Value, Value, Value, Value, Value, Value, Value, Value) => Value): Value = macro LanguageMacros.lambda
+  def Lambda(fn: (Value, Value, Value, Value, Value, Value, Value, Value, Value) => Value): Value = macro LanguageMacros.lambda
+  def Lambda(fn: (Value, Value, Value, Value, Value, Value, Value, Value, Value, Value) => Value): Value = macro LanguageMacros.lambda
+
+  def Lambda(lambda: Value, expr: Value) =
+    ObjectV("lambda" -> lambda, "expr" -> expr)
+
+  class LanguageMacros(val c: whitebox.Context) {
+    import c.universe._
+
+    val T = q"_root_.faunadb.types"
+    val M = q"_root_.faunadb.query.Language"
+
+    def lambda(fn: c.Tree): c.Tree = {
+      val (vals, expr) = c.untypecheck(fn.duplicate) match {
+        case Function(ps, expr) => (ps, expr)
+        case _ => c.abort(c.enclosingPosition, "type mismatch: Argument must be a function literal.")
+      }
+
+      val varDefs = vals map { v => q"val ${v.name} = $M.Var(${v.name.toString})" }
+      val paramsV = vals map { v => q"$T.StringV(${v.name.toString})" } match {
+        case List(p) => p
+        case ps => q"$T.ArrayV(..$ps)"
+      }
+
+      val tv = q"$M.Lambda($paramsV, { ..$varDefs; $expr })"
+
+      tv
+    }
+  }
 
   // Collection Functions
 

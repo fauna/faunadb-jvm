@@ -246,11 +246,11 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test collections" in {
-    val mapF = client.query(Map(Lambda("munchings" -> Add(Var("munchings"), 1L)), Arr(1L, 2L, 3L)))
+    val mapF = client.query(Map(Lambda(munchings => Add(munchings, 1L)), Arr(1L, 2L, 3L)))
     val mapR = Await.result(mapF, 1 second).asArray
     mapR.toSeq.map(_.asNumber) shouldBe Seq(2L, 3L, 4L)
 
-    val foreachF = client.query(Foreach(Lambda("spell" -> Create(Ref("classes/spells"), Obj("data" -> Obj("name" -> Var("spell"))))), ArrayV("Fireball Level 1", "Fireball Level 2")))
+    val foreachF = client.query(Foreach(Lambda(spell => Create(Ref("classes/spells"), Obj("data" -> Obj("name" -> spell)))), Arr("Fireball Level 1", "Fireball Level 2")))
     val foreachR = Await.result(foreachF, 1 second).asArray
     foreachR.toSeq.map(_.asString) shouldBe Seq("Fireball Level 1", "Fireball Level 2")
   }
