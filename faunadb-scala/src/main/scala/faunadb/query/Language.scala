@@ -90,7 +90,10 @@ object Language {
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
     */
-  def Let(bindings: (String, Value)*)(in: Value): Value =
+
+  def Let(block: => Any): Value = macro LanguageMacros.let
+
+  def Let(bindings: Seq[(String, Value)], in: Value): Value =
     ObjectV("let" -> ObjectV(bindings: _*), "in" -> in)
 
   /**
@@ -141,6 +144,26 @@ object Language {
 
     val T = q"_root_.faunadb.types"
     val M = q"_root_.faunadb.query.Language"
+
+    def let(block: c.Tree): c.Tree = {
+      val (vals, expr) = c.untypecheck(block.duplicate) match {
+        case Block(stmts, expr) =>
+          stmts foreach {
+            case v @ ValDef(_, _, _, _) => ()
+            case _ => c.abort(c.enclosingPosition, "Let call does not have the structure: Let { val a = ???, ..., val n = ???, <in_expr> }")
+          }
+
+          (stmts.asInstanceOf[List[ValDef]], expr)
+        case expr => (Nil, expr)
+      }
+
+      val varDefs = vals map { v => q"val ${v.name} = $M.Var(${v.name.toString})" }
+      val bindings = vals map { v => q"(${v.name.toString}, ${v.rhs}: $T.Value)" }
+
+      val tv = q"$M.Let($bindings, { ..$varDefs; $expr })"
+
+      tv
+    }
 
     def lambda(fn: c.Tree): c.Tree = {
       val (vals, expr) = c.untypecheck(fn.duplicate) match {

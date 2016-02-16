@@ -36,8 +36,17 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize basic forms" in {
-    val let = Let("x" -> 1, "y" -> "2")(Var("x"))
+    val let = Let { val x = 1; val y = "2"; x }
     json.writeValueAsString(let) shouldBe "{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"
+
+    val let2 = Let { val x = 1; val y = "2"; { val z = "foo"; x } }
+    json.writeValueAsString(let2) shouldBe "{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"
+
+    val let3 = { val x0 = Var("x"); Let { val x = 1; val y = "2"; x0 } }
+    json.writeValueAsString(let3) shouldBe "{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"
+
+    val let4 = Let(Seq("x" -> 1, "y" -> "2"), Var("x"))
+    json.writeValueAsString(let4) shouldBe "{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"
 
     val ifForm = If(true, "was true", "was false")
     json.writeValueAsString(ifForm) shouldBe "{\"if\":true,\"then\":\"was true\",\"else\":\"was false\"}"

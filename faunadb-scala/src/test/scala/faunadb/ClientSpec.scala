@@ -221,7 +221,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test basic forms" in {
-    val letF = client.query(Let("x" -> 1L, "y" -> 2L)(Var("x")))
+    val letF = client.query(Let { val x = 1; val y = 2; x })
     val letR = Await.result(letF, 1 second)
     letR.asNumber shouldBe 1L
 
