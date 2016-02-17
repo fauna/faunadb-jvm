@@ -123,7 +123,7 @@ object Language {
   /**
    * A Lambda expression.
    *
-   * '''Reference''': TBD
+   * '''Reference''': [[https://faunadb.com/documentation/queries#basic_forms]]
    */
   def Lambda(fn: Value => Value): Value = macro LanguageMacros.lambda
   def Lambda(fn: (Value, Value) => Value): Value = macro LanguageMacros.lambda
