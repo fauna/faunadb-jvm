@@ -251,6 +251,9 @@ object Language {
   def Exists(ref: Value): Value =
     ObjectV("exists" -> ref)
 
+  def Exists(ref: Value, ts: Value): Value =
+    ObjectV("exists" -> ref, "ts" -> ts)
+
   /**
    * A Count expression.
    *
