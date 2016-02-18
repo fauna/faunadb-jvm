@@ -82,14 +82,14 @@ class SerializationSpec extends FlatSpec with Matchers {
     val paginate1 = Paginate(Union(Match(Ref("indexes/some_index"), "term"), Match(Ref("indexes/some_index"), "term2")))
     json.writeValueAsString(paginate1) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]}}"
 
-    val paginate2 = Paginate(Union(Match(Ref("indexes/some_index"), "term"), Match(Ref("indexes/some_index"), "term2")), sources=true)
+    val paginate2 = Paginate(Union(Match(Ref("indexes/some_index"), "term"), Match(Ref("indexes/some_index"), "term2")), sources = true)
     json.writeValueAsString(paginate2) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"sources\":true}"
 
-    val paginate3 = Paginate(Union(Match(Ref("indexes/some_index"), "term"), Match(Ref("indexes/some_index"), "term2")), events=true)
+    val paginate3 = Paginate(Union(Match(Ref("indexes/some_index"), "term"), Match(Ref("indexes/some_index"), "term2")), events = true)
     json.writeValueAsString(paginate3) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"events\":true}"
 
-    val paginate4 = Paginate(Union(Match(Ref("indexes/some_index"), "term"), Match(Ref("indexes/some_index"), "term2")), cursor=Some(Before(Ref("some/ref/1"))), size=Some(4))
-    json.writeValueAsString(paginate4) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"size\":4,\"before\":{\"@ref\":\"some/ref/1\"}}"
+    val paginate4 = Paginate(Union(Match(Ref("indexes/some_index"), "term"), Match(Ref("indexes/some_index"), "term2")), Before(Ref("some/ref/1")), size = 4)
+    json.writeValueAsString(paginate4) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"before\":{\"@ref\":\"some/ref/1\"},\"size\":4}"
 
     val count = Count(Match(Ref("indexes/spells_by_element"), "fire"))
     json.writeValueAsString(count) shouldBe "{\"count\":{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}}"

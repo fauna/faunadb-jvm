@@ -8,4 +8,3 @@ import faunadb.types.LazyValue
  *
  */
 case class Page(data: Array[LazyValue], before: Option[LazyValue], after: Option[LazyValue])
-
