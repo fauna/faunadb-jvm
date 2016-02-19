@@ -1,18 +1,17 @@
 package faunadb
 
-import java.io.IOException
-import java.net.ConnectException
-import java.util.concurrent.TimeoutException
-
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import faunadb.errors._
-import faunadb.types.{Value, LazyValue}
-import faunadb.util.FutureImplicits._
 import com.faunadb.httpclient.Connection
 import com.ning.http.client.{Response => HttpResponse}
-
+import faunadb.errors._
+import faunadb.query.Language
+import faunadb.types.{Value, LazyValue}
+import faunadb.util.FutureImplicits._
+import java.io.IOException
+import java.net.ConnectException
+import java.util.concurrent.TimeoutException
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -61,7 +60,7 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
    * Responses are modeled as a general response tree. Each node is a [[faunadb.types.Value]],
    * and can be coerced into structured types through various methods on that class.
    */
-  def query(expr: Value)(implicit ec: ExecutionContext): Future[Value] = {
+  def query(expr: Language.Expr)(implicit ec: ExecutionContext): Future[Value] = {
     val body = json.createObjectNode()
     body.set("q", json.valueToTree(expr))
     connection.post("/", body).asScalaFuture.map { resp =>
@@ -79,7 +78,7 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
    * The list of responses is returned in the same order as the issued queries.
    *
    */
-  def query(exprs: Iterable[Value])(implicit ec: ExecutionContext): Future[IndexedSeq[LazyValue]] = {
+  def query(exprs: Iterable[Language.Expr])(implicit ec: ExecutionContext): Future[IndexedSeq[LazyValue]] = {
     val body = json.createObjectNode()
     body.set("q", json.valueToTree(exprs))
     connection.post("/", body).asScalaFuture.map { resp =>
