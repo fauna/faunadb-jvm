@@ -79,10 +79,10 @@ class SerializationSpec extends FlatSpec with Matchers {
     val drop = Drop(2, Arr(1,2,3))
     json.writeValueAsString(drop) shouldBe "{\"drop\":2,\"collection\":[1,2,3]}"
 
-    val prepend = Prepend(Arr(1,2,3), Arr(4,5,6))
+    val prepend = Prepend(Arr(4,5,6), Arr(1,2,3))
     json.writeValueAsString(prepend) shouldBe "{\"prepend\":[1,2,3],\"collection\":[4,5,6]}"
 
-    val append = Append(Arr(4,5,6), Arr(1,2,3))
+    val append = Append(Arr(1,2,3), Arr(4,5,6))
     json.writeValueAsString(append) shouldBe "{\"append\":[4,5,6],\"collection\":[1,2,3]}"
   }
 

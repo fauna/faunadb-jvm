@@ -70,6 +70,11 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     }
   }
 
+  it should "echo values" in {
+    val resp = client.query(ObjectV("foo" -> StringV("bar")))
+    Await.result(resp, 1 second)("foo").asString should equal ("bar")
+  }
+
   it should "fail with unauthorized" in {
     val badClient = FaunaClient(Connection.builder().withFaunaRoot(config("root_url")).withAuthToken("notavalidsecret").build())
     val resp = badClient.query(Get(Ref("classes/spells/12345")))
@@ -270,7 +275,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     updateR.data("element").asString shouldBe "arcane"
     updateR.data.get("cost") shouldBe None
 
-    val replaceF = client.query(Replace(createR.ref, Obj("data" -> Obj("name" -> "Volcano", "element" -> ArrayV("fire", "earth"), "cost" -> 10L))))
+    val replaceF = client.query(Replace(createR.ref, Obj("data" -> Obj("name" -> "Volcano", "element" -> Arr("fire", "earth"), "cost" -> 10L))))
     val replaceR = Await.result(replaceF, 1 second).asInstance
     replaceR.ref shouldBe createR.ref
     replaceR.data("name").asString shouldBe "Volcano"
@@ -357,11 +362,11 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val concat2R = Await.result(concat2F, 1 second).asString
     concat2R shouldBe "Magic Missile"
 
-    val containsF = client.query(Contains("favorites" / "foods", Obj("favorites" -> Obj("foods" -> ArrayV("crunchings", "munchings")))))
+    val containsF = client.query(Contains("favorites" / "foods", Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings")))))
     val containsR = Await.result(containsF, 1 second).asBoolean
     containsR shouldBe true
 
-    val selectF = client.query(Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> ArrayV("crunchings", "munchings", "lunchings")))))
+    val selectF = client.query(Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings", "lunchings")))))
     val selectR = Await.result(selectF, 1 second).asString
     selectR shouldBe "munchings"
 
