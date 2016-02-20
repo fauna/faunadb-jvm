@@ -87,7 +87,7 @@ public class ClientSpec {
     ListenableFuture<Value> indexByElementF = client.query(Create(Ref("indexes"), Quote(ObjectV(
       "name", StringV("spells_by_element"),
       "source", Ref("classes/spells"),
-      "path", StringV("data.element"),
+      "terms", ArrayV(ObjectV("path", StringV("data.element"))),
       "active", BooleanV(true)
     ))));
 
@@ -96,7 +96,7 @@ public class ClientSpec {
     ListenableFuture<Value> indexSpellbookByOwnerF = client.query(Create(Ref("indexes"), Quote(ObjectV(
       "name", StringV("spellbooks_by_owner"),
       "source", Ref("classes/spellbooks"),
-      "path", StringV("data.owner"),
+      "terms", ArrayV(ObjectV("path", StringV("data.owner"))),
       "active", BooleanV(true)
     ))));
 
@@ -105,7 +105,7 @@ public class ClientSpec {
     ListenableFuture<Value> indexBySpellbookF = client.query(Create(Ref("indexes"), Quote(ObjectV(
       "name", StringV("spells_by_spellbook"),
       "source", Ref("classes/spells"),
-      "path", StringV("data.spellbook"),
+      "terms", ArrayV(ObjectV("path", StringV("data.spellbook"))),
       "active", BooleanV(true)
     ))));
 
@@ -191,7 +191,7 @@ public class ClientSpec {
     ListenableFuture<Value> randomClassIndexF = client.query(Create(Ref("indexes"), Quote(ObjectV(
       "name", StringV(randomClassName + "_class_index"),
       "source", classRef,
-      "path", StringV("class"),
+      "terms", ArrayV(ObjectV("path", StringV("class"))),
       "active", BooleanV(true),
       "unique", BooleanV(false)
     ))));
@@ -199,7 +199,7 @@ public class ClientSpec {
     ListenableFuture<Value> indexCreateF = client.query(Create(Ref("indexes"), Quote(ObjectV(
       "name", StringV(randomClassName + "_test_index"),
       "source", classRef,
-      "path", StringV("data.queryTest1"),
+      "terms", ArrayV(ObjectV("path", StringV("data.queryTest1"))),
       "active", BooleanV(true),
       "unique", BooleanV(false)))));
 
@@ -263,7 +263,7 @@ public class ClientSpec {
     ListenableFuture<Value> randomClassIndexF = client.query(Create(Ref("indexes"), Quote(ObjectV(
         "name", StringV(randomClassName + "_class_index"),
         "source", classRef,
-        "path", StringV("data.uniqueTest1"),
+        "terms", ArrayV(ObjectV("path", StringV("data.uniqueTest1"))),
         "active", BooleanV(true),
         "unique", BooleanV(true)
     ))));
