@@ -90,8 +90,7 @@ public class FaunaClient {
    *
    */
   public ListenableFuture<Value> query(Value expr) {
-    ObjectNode body = json.createObjectNode();
-    body.set("q", json.valueToTree(expr));
+    JsonNode body = json.valueToTree(expr);
     try {
       return handleNetworkExceptions(Futures.transform(connection.post("/", body), new Function<Response, Value>() {
         @Override
@@ -124,8 +123,7 @@ public class FaunaClient {
    * @return a {@link ListenableFuture} containing an ordered list of root response nodes.
    */
   public <T extends Value> ListenableFuture<ImmutableList<Value>> query(ImmutableList<T> exprs) {
-    ObjectNode body = json.createObjectNode();
-    body.set("q", json.valueToTree(exprs));
+    JsonNode body = json.valueToTree(exprs);
     try {
       return handleNetworkExceptions(Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<Value>>() {
         @Override
@@ -209,4 +207,3 @@ public class FaunaClient {
     return json.readTree(response.getResponseBody("UTF-8"));
   }
 }
-
