@@ -50,6 +50,14 @@ object Language {
   implicit def strToPath(str: String) = new Path(StringV(str))
   implicit def intToPath(int: Int) = new Path(NumberV(int))
 
+  /**
+    * Helper for pagination cursors
+    */
+  sealed trait Cursor
+  case class Before(value: Value) extends Cursor
+  case class After(value: Value) extends Cursor
+  case object NoCursor extends Cursor
+
   case class LambdaArg(val params: Value, val expr: Value)
 
   implicit def arrayLambdaArg(t: (ArrayV, Value)) =
@@ -208,47 +216,31 @@ object Language {
   /**
    * A Paginate expression.
    *
-   * The paginate expression takes optional parameters. These can either be specified by named parameters on the constructor:
-   *
-   * {{{
-   *   Paginate(resource, ts, sources=true, cursor=Some(cursor))
-   * }}}
-   *
-   * or through the `with` methods:
-   * {{{
-   *   val paginate = Paginate(resource, ts).withCursor(cursor).withSize(size)
-   * }}}
+   * '''Reference''': [[https://faunadb.com/documentation/queries#read_functions]]
    */
-  def Paginate(resource: Value,
-               ts: Option[Long] = None,
-               cursor: Option[Cursor] = None,
-               size: Option[Long] = None,
-               sources: Boolean = false,
-               events: Boolean = false): Value = {
-    val builder = collection.immutable.Map.newBuilder[String, Value]
-    builder += "paginate" -> resource
+  def Paginate(
+    resource: Value,
+    cursor: Cursor = NoCursor,
+    ts: Value = NullV,
+    size: Value = NullV,
+    sources: Value = NullV,
+    events: Value = NullV): Value = {
 
-    ts foreach { builder += "ts" -> _}
-    size foreach { builder += "size" -> _ }
+    val call = List.newBuilder[(String, Value)]
+    call += "paginate" -> resource
 
-    cursor foreach { c =>
-      c match {
-        case b: Before =>
-          builder += "before" -> b.value
-        case a: After =>
-          builder += "after" -> a.value
-      }
+    cursor match {
+      case b: Before => call += "before" -> b.value
+      case a: After => call += "after" -> a.value
+      case _ => ()
     }
 
-    if (events) {
-      builder += "events" -> events
-    }
+    if (ts != NullV) call += "ts" -> ts
+    if (size != NullV) call += "size" -> size
+    if (events != NullV) call += "events" -> events
+    if (sources != NullV) call += "sources" -> sources
 
-    if (sources) {
-      builder += "sources" -> sources
-    }
-
-    ObjectV(builder.result())
+    ObjectV(call.result: _*)
   }
 
   /**
@@ -258,6 +250,9 @@ object Language {
    */
   def Exists(ref: Value): Value =
     ObjectV("exists" -> ref)
+
+  def Exists(ref: Value, ts: Value): Value =
+    ObjectV("exists" -> ref, "ts" -> ts)
 
   /**
    * A Count expression.

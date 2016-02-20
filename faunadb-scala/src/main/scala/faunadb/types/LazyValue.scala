@@ -1,11 +1,12 @@
 package faunadb.types
 
+import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.databind.`type`.TypeFactory
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
-import faunadb.response._
 import faunadb.query._
-
+import faunadb.response._
+import scala.annotation.meta.getter
 import scala.collection.AbstractMap
 
 /**
@@ -14,8 +15,9 @@ import scala.collection.AbstractMap
   */
 @JsonDeserialize(using=classOf[LazyValueDeserializer])
 class LazyValue private[faunadb] (private val underlying: JsonNode, json: ObjectMapper) extends Value {
-  def asBefore = Before(RawV(underlying))
-  def asAfter = After(RawV(underlying))
+
+  @(JsonValue @getter)
+  def raw = RawV(underlying)
 
   override def asStringOpt: Option[String] = if (underlying.isTextual) Some(underlying.asText) else None
   override def asBooleanOpt: Option[Boolean] = if (underlying.isBoolean) Some(underlying.asBoolean()) else None
