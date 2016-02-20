@@ -61,9 +61,7 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
    * and can be coerced into structured types through various methods on that class.
    */
   def query(expr: Language.Expr)(implicit ec: ExecutionContext): Future[Value] = {
-    val body = json.createObjectNode()
-    body.set("q", json.valueToTree(expr))
-    connection.post("/", body).asScalaFuture.map { resp =>
+    connection.post("/", json.valueToTree(expr)).asScalaFuture.map { resp =>
       handleQueryErrors(resp)
       val respBody = parseResponseBody(resp)
       val resource = respBody.get("resource")
@@ -79,9 +77,7 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
    *
    */
   def query(exprs: Iterable[Language.Expr])(implicit ec: ExecutionContext): Future[IndexedSeq[LazyValue]] = {
-    val body = json.createObjectNode()
-    body.set("q", json.valueToTree(exprs))
-    connection.post("/", body).asScalaFuture.map { resp =>
+    connection.post("/", json.valueToTree(exprs)).asScalaFuture.map { resp =>
       handleQueryErrors(resp)
       val respBody = parseResponseBody(resp)
       respBody.get("resource").asInstanceOf[ArrayNode].asScala.map { node =>

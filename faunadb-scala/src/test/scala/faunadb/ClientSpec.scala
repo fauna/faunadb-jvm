@@ -71,8 +71,8 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "echo values" in {
-    val resp = client.query(ObjectV("foo" -> StringV("bar")))
-    Await.result(resp, 1 second)("foo").asString should equal ("bar")
+    Await.result(client.query(ObjectV("foo" -> StringV("bar"))), 1 second)("foo").asString should equal ("bar")
+    Await.result(client.query("qux"), 1 second).asString should equal ("qux")
   }
 
   it should "fail with unauthorized" in {
