@@ -1,10 +1,10 @@
-package faunadb.types
+package faunadb.values
 
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.node.ObjectNode
 
-private[types] class LazyValueDeserializer extends JsonDeserializer[LazyValue] {
+private[values] class LazyValueDeserializer extends JsonDeserializer[LazyValue] {
   override def deserialize(jsonParser: JsonParser, ctxt: DeserializationContext): LazyValue = {
     val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
     val tree = json.readTree(jsonParser).asInstanceOf[JsonNode]
@@ -12,7 +12,7 @@ private[types] class LazyValueDeserializer extends JsonDeserializer[LazyValue] {
   }
 }
 
-private[types] class LazyValueMapDeserializer extends JsonDeserializer[LazyValueMap] {
+private[values] class LazyValueMapDeserializer extends JsonDeserializer[LazyValueMap] {
   override def deserialize(jsonParser: JsonParser, ctxt: DeserializationContext): LazyValueMap = {
     val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
     val tree = json.readTree(jsonParser).asInstanceOf[JsonNode]
@@ -27,7 +27,7 @@ private[types] class LazyValueMapDeserializer extends JsonDeserializer[LazyValue
   }
 }
 
-private[types] class TsDeserializer extends JsonDeserializer[Ts] {
+private[values] class TsDeserializer extends JsonDeserializer[Ts] {
   override def deserialize(jsonParser: JsonParser, deserializationContext: DeserializationContext): Ts = {
     val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
     val tree = json.readTree(jsonParser).asInstanceOf[JsonNode]
@@ -35,7 +35,7 @@ private[types] class TsDeserializer extends JsonDeserializer[Ts] {
   }
 }
 
-private[types] class DateDeserializer extends JsonDeserializer[Date] {
+private[values] class DateDeserializer extends JsonDeserializer[Date] {
   override def deserialize(jsonParser: JsonParser, deserializationContext: DeserializationContext): Date = {
     val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
     val tree = json.readTree(jsonParser).asInstanceOf[JsonNode]

@@ -7,7 +7,7 @@ import com.faunadb.httpclient.Connection
 import com.ning.http.client.{Response => HttpResponse}
 import faunadb.errors._
 import faunadb.query.Expr
-import faunadb.types.{Value, LazyValue}
+import faunadb.values.{Value, LazyValue}
 import faunadb.util.FutureImplicits._
 import java.io.IOException
 import java.net.ConnectException

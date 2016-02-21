@@ -1,7 +1,7 @@
 package faunadb.response
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import faunadb.types.{LazyValueMap, LazyValue, Ref}
+import faunadb.values.{LazyValueMap, LazyValue, Ref}
 
 import scala.annotation.meta.{field, param}
 

@@ -3,7 +3,7 @@ package faunadb
 import com.faunadb.httpclient.Connection
 import faunadb.errors.{UnauthorizedException, NotFoundException, BadRequestException}
 import faunadb.query._
-import faunadb.types._
+import faunadb.values._
 import java.time.temporal.ChronoUnit
 import java.time.{LocalDate, Instant}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}

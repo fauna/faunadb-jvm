@@ -1,4 +1,4 @@
-package faunadb.types
+package faunadb.values
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

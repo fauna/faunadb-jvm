@@ -1,7 +1,7 @@
 package faunadb.response
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import faunadb.types.Ref
+import faunadb.values.Ref
 
 import scala.annotation.meta.field
 
