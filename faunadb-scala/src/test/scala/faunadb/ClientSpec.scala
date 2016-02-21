@@ -1,21 +1,12 @@
 package faunadb
 
-import _root_.java.io.File
-import _root_.java.io.FileInputStream
-import _root_.java.util.{Map => JMap}
-import java.time.{LocalDate, Instant}
-import java.time.temporal.ChronoUnit
-
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.faunadb.httpclient.Connection
 import faunadb.errors.{UnauthorizedException, NotFoundException, BadRequestException}
-import faunadb.query.Language._
 import faunadb.query._
 import faunadb.types._
-import com.faunadb.httpclient.Connection
+import java.time.temporal.ChronoUnit
+import java.time.{LocalDate, Instant}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
-
-import scala.collection.JavaConverters._
-import scala.collection.immutable
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -32,8 +23,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     collection.Map("root_token" -> rootKey, "root_url" -> s"${scheme}://${domain}:${port}")
   }
-
-  val json = new ObjectMapper()
 
   val rootClient = FaunaClient(Connection.builder().withFaunaRoot(config("root_url")).withAuthToken(config("root_token")).build())
 
@@ -412,7 +401,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val epochR = Await.result(epochF, 1 second)
     epochR.asTs.value shouldBe Instant.EPOCH.plus(30, ChronoUnit.SECONDS)
 
-    val dateF = client.query(Language.Date("1970-01-02"))
+    val dateF = client.query(query.Date("1970-01-02"))
     val dateR = Await.result(dateF, 1 second)
     dateR.asDate.value shouldBe LocalDate.ofEpochDay(1)
   }

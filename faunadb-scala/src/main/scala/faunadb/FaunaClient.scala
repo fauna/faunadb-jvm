@@ -6,7 +6,7 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.httpclient.Connection
 import com.ning.http.client.{Response => HttpResponse}
 import faunadb.errors._
-import faunadb.query.Language
+import faunadb.query.Expr
 import faunadb.types.{Value, LazyValue}
 import faunadb.util.FutureImplicits._
 import java.io.IOException
@@ -42,7 +42,7 @@ object FaunaClient {
  *
  * Example:
  * {{{
- *  import com.faunadb.client.query.Language._
+ *  import faunadb.query._
  *
  *  val client = FaunaClient(Connection.builder().withAuthToken("someAuthToken").build))
  *  val response = client.query(Get(Ref("some/ref")))
@@ -60,7 +60,7 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
    * Responses are modeled as a general response tree. Each node is a [[faunadb.types.Value]],
    * and can be coerced into structured types through various methods on that class.
    */
-  def query(expr: Language.Expr)(implicit ec: ExecutionContext): Future[Value] = {
+  def query(expr: Expr)(implicit ec: ExecutionContext): Future[Value] = {
     connection.post("/", json.valueToTree(expr)).asScalaFuture.map { resp =>
       handleQueryErrors(resp)
       val respBody = parseResponseBody(resp)
@@ -76,7 +76,7 @@ class FaunaClient private (connection: Connection, json: ObjectMapper) {
    * The list of responses is returned in the same order as the issued queries.
    *
    */
-  def query(exprs: Iterable[Language.Expr])(implicit ec: ExecutionContext): Future[IndexedSeq[LazyValue]] = {
+  def query(exprs: Iterable[Expr])(implicit ec: ExecutionContext): Future[IndexedSeq[LazyValue]] = {
     connection.post("/", json.valueToTree(exprs)).asScalaFuture.map { resp =>
       handleQueryErrors(resp)
       val respBody = parseResponseBody(resp)
