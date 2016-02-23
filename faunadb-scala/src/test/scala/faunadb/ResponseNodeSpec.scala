@@ -2,7 +2,7 @@ package faunadb
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import faunadb.types.LazyValue
+import faunadb.values.LazyValue
 import org.scalatest.{Matchers, FlatSpec}
 
 class ResponseNodeSpec extends FlatSpec with Matchers {

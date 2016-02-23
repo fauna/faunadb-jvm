@@ -1,4 +1,4 @@
-package faunadb.types
+package faunadb.values
 
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDate, ZonedDateTime, Instant}

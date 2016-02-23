@@ -1,6 +1,6 @@
 package faunadb.response
 
-import faunadb.types.LazyValue
+import faunadb.values.LazyValue
 
 /**
  * Represents a FaunaDB Page response. This, like other response types, is obtained by coercing a

@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import faunadb.response.Instance
-import faunadb.types.{LazyValue, LazyValueMap, Ref}
+import faunadb.values.{LazyValue, LazyValueMap, Ref}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.collection.immutable

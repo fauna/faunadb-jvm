@@ -6,8 +6,7 @@ import java.time.temporal.ChronoUnit
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import faunadb.query._
-import faunadb.query.Language._
-import faunadb.types._
+import faunadb.values._
 import org.scalatest.{FlatSpec, Matchers}
 
 class SerializationSpec extends FlatSpec with Matchers {
@@ -162,7 +161,7 @@ class SerializationSpec extends FlatSpec with Matchers {
     val ts = Ts(Instant.EPOCH.plus(5, ChronoUnit.MINUTES))
     json.writeValueAsString(ts) shouldBe "{\"@ts\":\"1970-01-01T00:05:00Z\"}"
 
-    val date = types.Date(LocalDate.ofEpochDay(2))
+    val date = values.Date(LocalDate.ofEpochDay(2))
     json.writeValueAsString(date) shouldBe "{\"@date\":\"1970-01-03\"}"
   }
 
@@ -187,7 +186,7 @@ class SerializationSpec extends FlatSpec with Matchers {
     val epoch2 = Epoch(10, "millisecond")
     json.writeValueAsString(epoch2) shouldBe "{\"epoch\":10,\"unit\":\"millisecond\"}"
 
-    val date = Language.Date("1970-01-02")
+    val date = query.Date("1970-01-02")
     json.writeValueAsString(date) shouldBe "{\"date\":\"1970-01-02\"}"
   }
 
