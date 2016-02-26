@@ -70,12 +70,12 @@ package object query {
   // implicit conversions
 
   implicit def strToPath(str: String) = Path(Expr(StringV(str)))
-  implicit def intToPath(int: Int) = Path(Expr(NumberV(int)))
+  implicit def intToPath(int: Int) = Path(Expr(LongV(int)))
 
   implicit def boolToExpr(unwrapped: Boolean) = Expr(BooleanV(unwrapped))
   implicit def stringToExpr(unwrapped: String) = Expr(StringV(unwrapped))
-  implicit def intToExpr(unwrapped: Int) = Expr(NumberV(unwrapped))
-  implicit def longToExpr(unwrapped: Long) = Expr(NumberV(unwrapped))
+  implicit def intToExpr(unwrapped: Int) = Expr(LongV(unwrapped))
+  implicit def longToExpr(unwrapped: Long) = Expr(LongV(unwrapped))
   implicit def floatToExpr(unwrapped: Float) = Expr(DoubleV(unwrapped))
   implicit def doubleToExpr(unwrapped: Double) = Expr(DoubleV(unwrapped))
   implicit def refToExpr(unwrapped: Ref) = Expr(unwrapped)

@@ -9,10 +9,9 @@ import com.ning.http.client.{ AsyncHttpClient, Response => HttpResponse }
 import faunadb.errors._
 import faunadb.query.Expr
 import faunadb.util.FutureImplicits._
-import faunadb.values.{Value, LazyValue}
+import faunadb.values.{ ArrayV, NullV, Value }
 import java.io.IOException
 import java.net.ConnectException
-import java.net.URL
 import java.util.concurrent.TimeoutException
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
@@ -74,9 +73,8 @@ class FaunaClient(connection: Connection, json: ObjectMapper = new ObjectMapper)
   def query(expr: Expr)(implicit ec: ExecutionContext): Future[Value] = {
     connection.post("/", json.valueToTree(expr)).asScalaFuture.map { resp =>
       handleQueryErrors(resp)
-      val respBody = parseResponseBody(resp)
-      val resource = respBody.get("resource")
-      json.treeToValue(resource, classOf[LazyValue])
+      val rv = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
+      if (rv eq null) NullV else rv
     }.recover(handleNetworkExceptions)
   }
 
@@ -87,13 +85,11 @@ class FaunaClient(connection: Connection, json: ObjectMapper = new ObjectMapper)
    * The list of responses is returned in the same order as the issued queries.
    *
    */
-  def query(exprs: Iterable[Expr])(implicit ec: ExecutionContext): Future[IndexedSeq[LazyValue]] = {
+  def query(exprs: Iterable[Expr])(implicit ec: ExecutionContext): Future[IndexedSeq[Value]] = {
     connection.post("/", json.valueToTree(exprs)).asScalaFuture.map { resp =>
       handleQueryErrors(resp)
-      val respBody = parseResponseBody(resp)
-      respBody.get("resource").asInstanceOf[ArrayNode].asScala.map { node =>
-        json.treeToValue(node, classOf[LazyValue])
-      }.toIndexedSeq
+      val arr = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
+      arr.asInstanceOf[ArrayV].elems
     }.recover(handleNetworkExceptions)
   }
 

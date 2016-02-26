@@ -22,8 +22,8 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(BooleanV(true)) shouldBe "true"
     json.writeValueAsString(BooleanV(false)) shouldBe "false"
     json.writeValueAsString(StringV("test")) shouldBe "\"test\""
-    json.writeValueAsString(NumberV(1234)) shouldBe "1234"
-    json.writeValueAsString(NumberV(Long.MaxValue)) shouldBe Long.MaxValue.toString
+    json.writeValueAsString(LongV(1234)) shouldBe "1234"
+    json.writeValueAsString(LongV(Long.MaxValue)) shouldBe Long.MaxValue.toString
     json.writeValueAsString(DoubleV(1.234)) shouldBe "1.234"
     json.writeValueAsString(NullV) shouldBe "null"
   }
@@ -173,7 +173,7 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize date and ts" in {
-    val ts = Ts(Instant.EPOCH.plus(5, ChronoUnit.MINUTES))
+    val ts = Timestamp(Instant.EPOCH.plus(5, ChronoUnit.MINUTES))
     json.writeValueAsString(ts) shouldBe "{\"@ts\":\"1970-01-01T00:05:00Z\"}"
 
     val date = values.Date(LocalDate.ofEpochDay(2))
