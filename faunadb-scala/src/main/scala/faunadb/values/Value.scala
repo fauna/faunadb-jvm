@@ -23,13 +23,33 @@ import scala.annotation.meta.{ param, field, getter }
   *
   * The data in this tree can be accessed using:
   * {{{
-  *   value.asObject("ref").asRef // Ref("some/ref")
-  *   value.asObject("data").asObject("someKey").asString // "string1"
+  *   value("ref").as[Ref].get // Ref("some/ref")
+  *   value("data", "someKey").as[String].get // "string1"
   * }}}
   * @define none [[scala.None]]
   */
 @JsonDeserialize(using=classOf[ValueDeserializer])
 sealed trait Value {
+
+  /**
+    * Extract a value with the provided field.
+    */
+  final def apply[T](field: Field[T]): Result[T] = field.get(this)
+
+  /**
+    * Extract the sub-value at the specified path.
+    */
+  final def apply(p: FieldPath, ps: FieldPath*): Result[Value] = apply(Field(p, ps: _*))
+
+  /**
+    * Cast the value to T, using a Decoder.
+    */
+  final def as[T: Decoder]: Result[T] = apply(Field.as[T])
+
+  /**
+    * Extract the elements of an ArrayV using the provided field.
+    */
+  final def collect[T](field: Field[T]): Result[Seq[T]] = apply(Field.collect(field))
 }
 
 // Concrete Value types
