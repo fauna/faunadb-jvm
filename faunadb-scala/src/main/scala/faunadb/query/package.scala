@@ -295,6 +295,9 @@ package object query {
   def Count(set: Expr): Expr =
     Expr(ObjectV("count" -> set.value))
 
+  def Count(set: Expr, events: Expr): Expr =
+    Expr(ObjectV("count" -> set.value))
+
   // Write Functions
 
   /**
