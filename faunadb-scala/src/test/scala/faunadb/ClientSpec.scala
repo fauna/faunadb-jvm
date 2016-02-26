@@ -24,7 +24,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     collection.Map("root_token" -> rootKey, "root_url" -> s"${scheme}://${domain}:${port}")
   }
 
-  val rootClient = FaunaClient(Connection.builder().withFaunaRoot(config("root_url")).withAuthToken(config("root_token")).build())
+  val rootClient = FaunaClient(config("root_url"), secret = config("root_token"))
 
   val testDbName = "faunadb-scala-test-" + Random.alphanumeric.take(8).mkString
   var client: FaunaClient = null
@@ -38,7 +38,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val keyFuture = rootClient.query(Create(Ref("keys"), Obj("database" -> dbRef, "role" -> "server")))
     val key = Await.result(keyFuture, 1 second).asKey
 
-    client = FaunaClient(Connection.builder().withFaunaRoot(config("root_url")).withAuthToken(key.secret).build())
+    client = FaunaClient(config("root_url"), secret = key.secret)
 
     val classFuture = client.query(Create(Ref("classes"), Obj("name" -> "spells")))
     Await.result(classFuture, 1 second)
@@ -65,7 +65,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "fail with unauthorized" in {
-    val badClient = FaunaClient(Connection.builder().withFaunaRoot(config("root_url")).withAuthToken("notavalidsecret").build())
+    val badClient = FaunaClient(config("root_url"), secret = "notavalidsecret")
     val resp = badClient.query(Get(Ref("classes/spells/12345")))
     intercept[UnauthorizedException] {
       Await.result(resp, 1 second)
@@ -413,7 +413,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val loginF = client.query(Login(createR.ref, Obj("password" -> "abcdefg")))
     val loginR = Await.result(loginF, 1 second).asToken
 
-    val sessionClient = FaunaClient(Connection.builder().withFaunaRoot(config("root_url")).withAuthToken(loginR.secret).build())
+    val sessionClient = FaunaClient(config("root_url"), secret = loginR.secret)
     val logoutF = sessionClient.query(Logout(false))
     val logoutR = Await.result(logoutF, 1 second)
     logoutR.asBoolean shouldBe true

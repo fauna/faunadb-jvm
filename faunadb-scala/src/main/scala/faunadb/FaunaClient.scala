@@ -1,36 +1,47 @@
 package faunadb
 
+import com.codahale.metrics.MetricRegistry
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.httpclient.Connection
-import com.ning.http.client.{Response => HttpResponse}
+import com.ning.http.client.{ AsyncHttpClient, Response => HttpResponse }
 import faunadb.errors._
 import faunadb.query.Expr
-import faunadb.values.{Value, LazyValue}
 import faunadb.util.FutureImplicits._
+import faunadb.values.{Value, LazyValue}
 import java.io.IOException
 import java.net.ConnectException
+import java.net.URL
 import java.util.concurrent.TimeoutException
 import scala.collection.JavaConverters._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * Methods to construct and obtain an instance of the FaunaDB client.
  */
 object FaunaClient {
   /**
-   * Constructs a new FaunaDB client with the provided HTTP Connection.
+   * Constructs a new FaunaDB client with the provided HTTP Connection parameters.
    *
    * See [[com.faunadb.httpclient.Connection.Builder]] for information on creating a Connection.
    */
-  def apply(connection: Connection) = new FaunaClient(connection, new ObjectMapper())
+  def apply(
+    endpoint: String = null,
+    secret: String = null,
+    metrics: MetricRegistry = null,
+    httpClient: AsyncHttpClient = null): FaunaClient = {
 
-  /**
-   * Constructs a new FaunaDB client with the provided HTTP Connection and JSON ObjectMapper. This
-   * can be used when custom JSON serialization and deserialization parameters are required.
-   */
-  def apply(connection: Connection, json: ObjectMapper) = new FaunaClient(connection, json.copy())
+    val b = Connection.builder
+    if (endpoint ne null) b.withFaunaRoot(endpoint)
+    if (secret ne null) b.withAuthToken(secret)
+    if (metrics ne null) b.withMetrics(metrics)
+    if (httpClient ne null) b.withHttpClient(httpClient)
+
+    FaunaClient(b.build)
+  }
+
+  def apply(conn: Connection) = new FaunaClient(conn)
 }
 
 /**
@@ -48,7 +59,7 @@ object FaunaClient {
  *  val response = client.query(Get(Ref("some/ref")))
  * }}}
  */
-class FaunaClient private (connection: Connection, json: ObjectMapper) {
+class FaunaClient(connection: Connection, json: ObjectMapper = new ObjectMapper) {
   json.registerModule(new DefaultScalaModule)
 
   /**
