@@ -29,6 +29,22 @@ package query {
     */
   case class Expr private[query] (@(JsonValue @getter) value: Value) extends AnyVal
 
+  object Expr {
+    implicit def boolToExpr(unwrapped: Boolean) = Expr(BooleanV(unwrapped))
+    implicit def stringToExpr(unwrapped: String) = Expr(StringV(unwrapped))
+    implicit def intToExpr(unwrapped: Int) = Expr(LongV(unwrapped))
+    implicit def longToExpr(unwrapped: Long) = Expr(LongV(unwrapped))
+    implicit def floatToExpr(unwrapped: Float) = Expr(DoubleV(unwrapped))
+    implicit def doubleToExpr(unwrapped: Double) = Expr(DoubleV(unwrapped))
+    implicit def refToExpr(unwrapped: Ref) = Expr(unwrapped)
+    implicit def nullVToExpr(unwrapped: NullV.type) = Expr(unwrapped)
+
+    // FIXME: not sure if this is the best way to do this... would
+    // rather transform the value to a series of object constructions.
+    implicit def quotedValue(unwrapped: Value) = Expr(ObjectV("quote" -> unwrapped))
+    implicit def quotedResult(unwrapped: Result[Value]) = Expr(ObjectV("quote" -> unwrapped.get))
+  }
+
   /**
     * Enumeration for time units. Used by [[https://faunadb.com/documentation/queries#time_functions]].
     */
@@ -71,19 +87,6 @@ package object query {
 
   implicit def strToPath(str: String) = Path(Expr(StringV(str)))
   implicit def intToPath(int: Int) = Path(Expr(LongV(int)))
-
-  implicit def boolToExpr(unwrapped: Boolean) = Expr(BooleanV(unwrapped))
-  implicit def stringToExpr(unwrapped: String) = Expr(StringV(unwrapped))
-  implicit def intToExpr(unwrapped: Int) = Expr(LongV(unwrapped))
-  implicit def longToExpr(unwrapped: Long) = Expr(LongV(unwrapped))
-  implicit def floatToExpr(unwrapped: Float) = Expr(DoubleV(unwrapped))
-  implicit def doubleToExpr(unwrapped: Double) = Expr(DoubleV(unwrapped))
-  implicit def refToExpr(unwrapped: Ref) = Expr(unwrapped)
-  implicit def nullVToExpr(unwrapped: NullV.type) = Expr(unwrapped)
-
-  // FIXME: not sure if this is the best way to do this... would
-  // rather transform the value to a series of object constructions.
-  implicit def quotedValue(unwrapped: Value) = Expr(ObjectV("quote" -> unwrapped))
 
   // Helpers
 
