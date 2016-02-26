@@ -47,6 +47,9 @@ class SerializationSpec extends FlatSpec with Matchers {
     val let4 = Let(Seq("x" -> 1, "y" -> "2"), Var("x"))
     json.writeValueAsString(let4) shouldBe "{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"
 
+    val let5 = Let { val x = 1; val _ = "2"; x }
+    json.writeValueAsString(let5) shouldBe "{\"let\":{\"x\":1,\"_\":\"2\"},\"in\":{\"var\":\"x\"}}"
+
     val ifForm = If(true, "was true", "was false")
     json.writeValueAsString(ifForm) shouldBe "{\"if\":true,\"then\":\"was true\",\"else\":\"was false\"}"
 
@@ -57,6 +60,18 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val select = Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings", "lunchings"))))
     json.writeValueAsString(select) shouldBe "{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}"
+
+    val lambda1 = Lambda(a => a)
+    json.writeValueAsString(lambda1) should equal ("""{"lambda":"a","expr":{"var":"a"}}""")
+
+    val lambda2 = Lambda((a, b) => Arr(b, a))
+    json.writeValueAsString(lambda2) should equal ("""{"lambda":["a","b"],"expr":[{"var":"b"},{"var":"a"}]}""")
+
+    val lambda3 = Lambda((a, _, _) => a)
+    json.writeValueAsString(lambda3) should equal ("""{"lambda":["a","x$1","x$2"],"expr":{"var":"a"}}""")
+
+    val lambda4 = Lambda(Not(_))
+    json.writeValueAsString(lambda4) should equal ("""{"lambda":"x$3","expr":{"not":{"var":"x$3"}}}""")
   }
 
   it should "serialize collections" in {

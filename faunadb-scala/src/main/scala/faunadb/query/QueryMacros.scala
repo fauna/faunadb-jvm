@@ -35,9 +35,9 @@ class QueryMacros(val c: whitebox.Context) {
     }
 
     val varDefs = vals map { v => q"val ${v.name} = $M.Var(${v.name.toString})" }
-    val paramsV = vals map { v => q"${v.name.toString}" } match {
-      case List(p) => p
-      case ps => q"$M.Arr(..$ps)"
+    val paramsV = vals map { v => v.name.toString } match {
+      case List(p) => q"$p"
+      case ps      => q"$M.Arr(..$ps)"
     }
 
     val tv = q"$M.Lambda($paramsV, { ..$varDefs; $expr })"
