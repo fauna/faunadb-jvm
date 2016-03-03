@@ -1,44 +1,145 @@
 package faunadb.values
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind._
-import com.fasterxml.jackson.databind.node.ObjectNode
+import java.time.{ LocalDate, Instant }
 
-private[values] class LazyValueDeserializer extends JsonDeserializer[LazyValue] {
-  override def deserialize(jsonParser: JsonParser, ctxt: DeserializationContext): LazyValue = {
-    val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
-    val tree = json.readTree(jsonParser).asInstanceOf[JsonNode]
-    new LazyValue(tree, json)
-  }
+trait Decoder[T] {
+  def decode(v: Value, path: FieldPath): Result[T]
 }
 
-private[values] class LazyValueMapDeserializer extends JsonDeserializer[LazyValueMap] {
-  override def deserialize(jsonParser: JsonParser, ctxt: DeserializationContext): LazyValueMap = {
-    val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
-    val tree = json.readTree(jsonParser).asInstanceOf[JsonNode]
-
-    val innerTree = if(tree.has("@obj"))
-      tree.get("@obj").asInstanceOf[ObjectNode]
-    else
-      tree
-
-    val t = ctxt.getTypeFactory.constructMapLikeType(classOf[Map[_,_]], classOf[String], classOf[LazyValue])
-    new LazyValueMap(json.convertValue(innerTree, t))
+object Decoder {
+  implicit object ValueDecoder extends Decoder[Value] {
+    def decode(v: Value, path: FieldPath) = Result.successful(v, path)
   }
+
+  implicit object ScalarDecoder extends Decoder[ScalarValue] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case s: ScalarValue => Result.successful(s, path)
+        case v => Result.Unexpected(v, "Scalar", path)
+      }
+  }
+
+  implicit object StringDecoder extends Decoder[String] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case StringV(s) => Result.successful(s, path)
+        case v => Result.Unexpected(v, "String", path)
+      }
+  }
+
+  implicit object BooleanDecoder extends Decoder[Boolean] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case BooleanV(b) => Result.successful(b, path)
+        case v => Result.Unexpected(v, "Boolean", path)
+      }
+  }
+
+  implicit object IntDecoder extends Decoder[Int] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case LongV(l) => Result.successful(l.toInt, path)
+        case v => Result.Unexpected(v, "Long", path)
+      }
+  }
+
+  implicit object LongDecoder extends Decoder[Long] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case LongV(l) => Result.successful(l, path)
+        case v => Result.Unexpected(v, "Long", path)
+      }
+  }
+
+  implicit object DoubleDecoder extends Decoder[Double] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case DoubleV(d) => Result.successful(d, path)
+        case v => Result.Unexpected(v, "Double", path)
+      }
+  }
+
+  implicit object RefDecoder extends Decoder[Ref] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case r: Ref => Result.successful(r, path)
+        case v => Result.Unexpected(v, "Ref", path)
+      }
+  }
+
+  implicit object SetRefDecoder extends Decoder[SetRef] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case r: SetRef => Result.successful(r, path)
+        case v => Result.Unexpected(v, "Set Ref", path)
+      }
+  }
+
+  implicit object TimestampDecoder extends Decoder[Timestamp] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case ts: Timestamp => Result.successful(ts, path)
+        case v => Result.Unexpected(v, "Timestamp", path)
+      }
+  }
+
+  implicit object InstantDecoder extends Decoder[Instant] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case ts: Timestamp => Result.successful(ts.instant, path)
+        case v => Result.Unexpected(v, "Timestamp", path)
+      }
+  }
+
+  implicit object DateDecoder extends Decoder[Date] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case ts: Date => Result.successful(ts, path)
+        case v => Result.Unexpected(v, "Date", path)
+      }
+  }
+
+  implicit object LocalDateDecoder extends Decoder[LocalDate] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case ts: Date => Result.successful(ts.localDate, path)
+        case v => Result.Unexpected(v, "Date", path)
+      }
+  }
+
+  implicit object NullVDecoder extends Decoder[NullV] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case NullV => Result.successful(NullV, path)
+        case v => Result.Unexpected(v, "Null", path)
+      }
+  }
+
+  implicit object ArrayVDecoder extends Decoder[ArrayV] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case a: ArrayV => Result.successful(a, path)
+        case v => Result.Unexpected(v, "Array", path)
+      }
+  }
+
+  implicit object ObjectVDecoder extends Decoder[ObjectV] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case a: ObjectV => Result.successful(a, path)
+        case v => Result.Unexpected(v, "Object", path)
+      }
+  }
+
+  class SeqDecoder[T: Decoder] extends Decoder[Seq[T]] {
+    def decode(v: Value, path: FieldPath) =
+      Field.collect(Field.as[T]).get(v)
+  }
+  implicit def SeqDecoder[T: Decoder]: Decoder[Seq[T]] = new SeqDecoder[T]
 }
 
-private[values] class TsDeserializer extends JsonDeserializer[Ts] {
-  override def deserialize(jsonParser: JsonParser, deserializationContext: DeserializationContext): Ts = {
-    val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
-    val tree = json.readTree(jsonParser).asInstanceOf[JsonNode]
-    new Ts(tree.get("@ts").asText)
-  }
+trait Encoder[T] {
+  def encode(t: T): Value
 }
 
-private[values] class DateDeserializer extends JsonDeserializer[Date] {
-  override def deserialize(jsonParser: JsonParser, deserializationContext: DeserializationContext): Date = {
-    val json = jsonParser.getCodec.asInstanceOf[ObjectMapper]
-    val tree = json.readTree(jsonParser).asInstanceOf[JsonNode]
-    new Date(tree.get("@date").asText)
-  }
-}
+trait Codec[T] extends Decoder[T] with Encoder[T]

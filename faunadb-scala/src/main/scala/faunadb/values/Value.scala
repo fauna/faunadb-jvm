@@ -1,16 +1,13 @@
 package faunadb.values
 
-import java.time.format.DateTimeFormatter
-import java.time.{LocalDate, ZonedDateTime, Instant}
-
-import com.fasterxml.jackson.annotation.{JsonProperty, JsonCreator, JsonIgnore, JsonValue}
+import com.fasterxml.jackson.annotation.{ JsonProperty, JsonCreator, JsonIgnore, JsonValue }
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.node.NullNode
-import faunadb.response._
-
-import scala.annotation.compileTimeOnly
-import scala.annotation.meta.{param, field, getter}
+import faunadb.jackson._
+import java.time.format.DateTimeFormatter
+import java.time.{ LocalDate, ZonedDateTime, Instant }
+import scala.annotation.meta.{ param, field, getter }
 
 /**
   * An abstract node in a FaunaDB response tree. Something conforming to this trait should be
@@ -26,245 +23,161 @@ import scala.annotation.meta.{param, field, getter}
   *
   * The data in this tree can be accessed using:
   * {{{
-  *   value.asObject("ref").asRef // Ref("some/ref")
-  *   value.asObject("data").asObject("someKey").asString // "string1"
+  *   value("ref").as[Ref].get // Ref("some/ref")
+  *   value("data", "someKey").as[String].get // "string1"
   * }}}
   * @define none [[scala.None]]
   */
-trait Value {
+@JsonDeserialize(using=classOf[ValueDeserializer])
+sealed trait Value {
+
   /**
-    * Coerces the node into a string.
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
+    * Extract a value with the provided field.
     */
-  def asStringOpt: Option[String] = None
-  def asString = asStringOpt.get
+  final def apply[T](field: Field[T]): Result[T] = field.get(this)
 
   /**
-    * Coerces the node into a boolean
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
+    * Extract the sub-value at the specified path.
     */
-  def asBooleanOpt: Option[Boolean] = None
-  def asBoolean = asBooleanOpt.get
+  final def apply(p: FieldPath, ps: FieldPath*): Result[Value] = apply(Field(p, ps: _*))
 
   /**
-    * Coerces the node into a long.
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
+    * Cast the value to T, using a Decoder.
     */
-  def asNumberOpt: Option[Long] = None
-  def asNumber = asNumberOpt.get
+  final def as[T: Decoder]: Result[T] = apply(Field.as[T])
 
   /**
-    * Coerces the node into a double.
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
+    * Extract the elements of an ArrayV using the provided field.
     */
-  def asDoubleOpt: Option[Double] = None
-  def asDouble = asDoubleOpt.get
-
-  /**
-    * Coerces the node into an array.
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
-    */
-  def asArrayOpt: Option[Array[Value]] = None
-  def asArray = asArrayOpt.get
-
-  /**
-    * Coerces the node into a map.
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
-    */
-  def asObjectOpt: Option[collection.Map[String, Value]] = None
-  def asObject = asObjectOpt.get
-
-  /**
-    * Coerces the node into a [[Ref]].
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
-    */
-  def asRefOpt: Option[Ref] = None
-  def asRef = asRefOpt.get
-
-  /**
-    * Coerces the node into a [[faunadb.response.Page]].
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
-    */
-  def asPageOpt: Option[Page] = None
-  def asPage = asPageOpt.get
-
-  /**
-    * Coerces the node into an [[faunadb.response.Instance]].
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
-    */
-  def asInstanceOpt: Option[Instance] = None
-  def asInstance = asInstanceOpt.get
-
-  /**
-    * Coerces the node into a [[faunadb.response.Key]].
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
-    */
-  def asKeyOpt: Option[Key] = None
-  def asKey = asKeyOpt.get
-
-  /**
-    * Coerces the node into a [[faunadb.response.Token]]
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
-    */
-  def asTokenOpt: Option[Token] = None
-  def asToken = asTokenOpt.get
-
-  /**
-    * Coerces the node into a [[faunadb.response.Database]]
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
-    */
-  def asDatabaseOpt: Option[Database] = None
-  def asDatabase = asDatabaseOpt.get
-
-  /**
-    * Coerces the node into a [[faunadb.response.Class]]
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
-    */
-  def asClassOpt: Option[faunadb.response.Class] = None
-  def asClass = asClassOpt.get
-
-  /**
-    * Coerces the node into an [[faunadb.response.Index]]
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
-    */
-  def asIndexOpt: Option[Index] = None
-  def asIndex = asIndexOpt.get
-
-  /**
-    * Coerces the node into an [[faunadb.response.Event]].
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
-    */
-  def asEventOpt: Option[Event] = None
-  def asEvent = asEventOpt.get
-
-  /**
-    * Coerces the node into a [[faunadb.response.Set]].
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
-    */
-  def asSetOpt: Option[faunadb.response.Set] = None
-  def asSet = asSetOpt.get
-
-  /**
-    * Coerces the node into a [[faunadb.types.Ts]].
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
-    */
-  def asTsOpt: Option[Ts] = None
-  def asTs = asTsOpt.get
-
-  /**
-    * Coerces the node into a [[faunadb.types.Date]].
-    *
-    * @return [[scala.Some$]] if the coercion is possible, $none if not.
-    */
-  def asDateOpt: Option[Date] = None
-  def asDate = asDateOpt.get
-
-  /**
-   * Accesses the value of the specified field if this is an object node.
-   */
-  def apply(key: String): Value = asObject(key)
-
-  /**
-   * Accesses the value of the specified element if this is an array node.
-   */
-  def apply(index: Int): Value = asArray(index)
-
-  /**
-   * Accesses the value of the specified field if this is an object node.
-   */
-  def get(key: String): Option[Value] = asObjectOpt.flatMap(_.get(key))
-
-  /**
-   * Accesses the value of the specified element if this is an array node.
-   */
-  def get(index: Int): Option[Value] = asArrayOpt.flatMap(_.lift(index))
-
+  final def collect[T](field: Field[T]): Result[Seq[T]] = apply(Field.collect(field))
 }
 
-case class RawV(@(JsonValue @getter) value: JsonNode) extends Value
+// Concrete Value types
 
-case class StringV(@(JsonValue @getter) value: String) extends Value {
-  override def asStringOpt: Option[String] = Some(value)
+/**
+  * Base trait for all scalar values.
+  */
+sealed trait ScalarValue extends Value
+
+/**
+  *  A String value.
+  *
+  * '''Reference''': [[https://faunadb.com/documentation/queries#values FaunaDB Values]]
+  */
+case class StringV(@(JsonValue @getter) value: String) extends ScalarValue
+
+/**
+  *  A Long value.
+  *
+  * '''Reference''': [[https://faunadb.com/documentation/queries#values FaunaDB Values]]
+  */
+case class LongV(@(JsonValue @getter) value: Long) extends ScalarValue
+
+/**
+  *  A Double value.
+  *
+  * '''Reference''': [[https://faunadb.com/documentation/queries#values FaunaDB Values]]
+  */
+case class DoubleV(@(JsonValue @getter) value: Double) extends ScalarValue
+
+/**
+  *  A Boolean value.
+  *
+  * '''Reference''': [[https://faunadb.com/documentation/queries#values FaunaDB Values]]
+  */
+object BooleanV {
+  def apply(b: Boolean) = if (b) TrueV else FalseV
+  def unapply(b: BooleanV) = b
+}
+sealed abstract class BooleanV(@(JsonValue @getter) val value: Boolean) extends ScalarValue {
+  // satisfy name-based extractor interface
+  val isEmpty = false
+  val get = value
+}
+case object TrueV extends BooleanV(true)
+case object FalseV extends BooleanV(false)
+
+// Fauna special types
+
+/**
+  * A Ref.
+  *
+  * '''Reference''': [[https://faunadb.com/documentation/queries#values-special_types FaunaDB Special Types]]
+  */
+object Ref {
+  def apply(clss: Ref, id: String): Ref = Ref(s"${clss.value}/$id")
 }
 
-case class NumberV(@(JsonValue @getter) value: Long) extends Value {
-  override def asNumberOpt: Option[Long] = Some(value)
+case class Ref(@(JsonProperty @field @param)("@ref") value: String) extends ScalarValue
+
+/**
+  * A Set Ref.
+  *
+  * '''Reference''': [[https://faunadb.com/documentation/queries#values-special_types FaunaDB Special Types]]
+  */
+case class SetRef(@JsonProperty("@set") parameters: Value) extends ScalarValue
+
+/**
+  * A Timestamp.
+  *
+  * '''Reference''': [[https://faunadb.com/documentation/queries#values-special_types FaunaDB Special Types]]
+  */
+object Timestamp {
+  def apply(value: String): Timestamp =
+    Timestamp(ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant)
 }
 
-case class DoubleV(@(JsonValue @getter) value: Double) extends Value {
-  override def asDoubleOpt: Option[Double] = Some(value)
-}
-
-case class BooleanV(@(JsonValue @getter) value: Boolean) extends Value {
-  override def asBooleanOpt: Option[Boolean] = Some(value)
-}
-
-object ObjectV {
-  val empty = new ObjectV(scala.collection.Map.empty[String, Value])
-  def apply(pairs: (String, Value)*) = new ObjectV(pairs.toMap)
-}
-
-case class ObjectV(@(JsonValue @getter) values: collection.Map[String, Value]) extends Value {
-  override def asObjectOpt: Option[collection.Map[String, Value]] = Some(values)
-}
-
-object ArrayV {
-  val empty = new ArrayV(Array[Value]())
-
-  def apply(items: Value*) = {
-    new ArrayV(Array(items: _*))
-  }
-}
-
-case class ArrayV(@(JsonValue @getter) values: scala.Array[Value]) extends Value {
-  override def asArrayOpt: Option[Array[Value]] = Some(values)
-}
-
-case object NullV extends Value {
-  @(JsonValue @getter) val value = NullNode.instance
-}
-
-object Ts {
-  def apply(value: String) = new Ts(value)
-}
-
-@JsonDeserialize(using=classOf[TsDeserializer])
-case class Ts(@(JsonIgnore @param @field @getter) value: Instant) extends Value {
-  def this(value: String) = this(ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant)
-
+case class Timestamp(@(JsonIgnore @param @field @getter) instant: Instant) extends ScalarValue {
   @JsonProperty("@ts")
-  val strValue = value.toString
-
-  override def asTsOpt = Some(this)
+  val strValue = instant.toString
 }
 
+/**
+  * A Date.
+  *
+  * '''Reference''': [[https://faunadb.com/documentation/queries#values-special_types FaunaDB Special Types]]
+  */
 object Date {
-  def apply(value: String) = new Date(value)
+  def apply(value: String): Date = Date(LocalDate.parse(value))
 }
 
-@JsonDeserialize(using=classOf[DateDeserializer])
-case class Date(@(JsonIgnore @param @field @getter) value: LocalDate) extends Value {
-  def this(value: String) = this(LocalDate.parse(value))
-
+case class Date(@(JsonIgnore @param @field @getter) localDate: LocalDate) extends ScalarValue {
   @JsonProperty("@date")
-  val strValue = value.toString
+  val strValue = localDate.toString
+}
 
-  override def asDateOpt = Some(this)
+// Container types and Null
+
+/**
+  * An Object.
+  *
+  * '''Reference''': [[https://faunadb.com/documentation/queries#values FaunaDB Values]]
+  */
+object ObjectV {
+  val empty = ObjectV()
+  def apply(fields: (String, Value)*) = new ObjectV(fields.toMap)
+}
+
+case class ObjectV(@(JsonValue @getter) fields: Map[String, Value]) extends Value
+
+/**
+  * An Array.
+  *
+  * '''Reference''': [[https://faunadb.com/documentation/queries#values FaunaDB Values]]
+  */
+object ArrayV {
+  val empty = ArrayV()
+  def apply(elems: Value*) = new ArrayV(Vector(elems: _*))
+}
+
+case class ArrayV(@(JsonValue @getter) elems: Vector[Value]) extends Value
+
+/**
+  * Null.
+  *
+  * '''Reference''': [[https://faunadb.com/documentation/queries#values FaunaDB Values]]
+  */
+sealed trait NullV extends Value
+case object NullV extends NullV {
+  @(JsonValue @getter) val value = NullNode.instance
 }
