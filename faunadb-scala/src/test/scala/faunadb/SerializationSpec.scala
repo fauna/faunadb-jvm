@@ -68,7 +68,7 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(lambda2) should equal ("""{"lambda":["a","b"],"expr":[{"var":"b"},{"var":"a"}]}""")
 
     val lambda3 = Lambda((a, _, _) => a)
-    json.writeValueAsString(lambda3) should equal ("""{"lambda":["a","x$1","x$2"],"expr":{"var":"a"}}""")
+    json.writeValueAsString(lambda3) should equal ("""{"lambda":["a","_","_"],"expr":{"var":"a"}}""")
 
     val lambda4 = Lambda(Not(_))
     json.writeValueAsString(lambda4) should equal ("""{"lambda":"x$3","expr":{"not":{"var":"x$3"}}}""")
