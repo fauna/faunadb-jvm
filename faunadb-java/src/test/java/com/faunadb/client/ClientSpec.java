@@ -3,573 +3,844 @@ package com.faunadb.client;
 import com.faunadb.client.errors.BadRequestException;
 import com.faunadb.client.errors.NotFoundException;
 import com.faunadb.client.errors.UnauthorizedException;
-import com.faunadb.client.query.*;
-import com.faunadb.client.response.*;
-import com.faunadb.client.types.*;
-import com.faunadb.common.Connection;
+import com.faunadb.client.query.Expr;
+import com.faunadb.client.test.FaunaDBTest;
+import com.faunadb.client.types.Ref;
+import com.faunadb.client.types.Value;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.util.concurrent.ListenableFuture;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
+import static com.faunadb.client.query.Language.Action.CREATE;
+import static com.faunadb.client.query.Language.Action.DELETE;
 import static com.faunadb.client.query.Language.*;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertNull;
+import static com.faunadb.client.query.Language.TimeUnit.SECOND;
+import static java.lang.String.format;
+import static java.time.temporal.ChronoUnit.HOURS;
+import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomUtils.nextLong;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
-public class ClientSpec {
+public class ClientSpec extends FaunaDBTest {
+
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  static ImmutableMap<String, String> config = getConfig();
-  static FaunaClient rootClient;
-  static FaunaClient client;
-  static String testDbName = "faunadb-java-test-" + RandomStringUtils.randomAlphanumeric(8);
-
-  static ImmutableMap<String, String> getConfig() {
-    String rootKey = System.getenv("FAUNA_ROOT_KEY");
-    if (rootKey == null) throw new RuntimeException("FAUNA_ROOT_KEY must be defined to run tests");
-
-    String domain = System.getenv("FAUNA_DOMAIN");
-    if (domain == null) domain = "rest.faunadb.com";
-
-    String scheme = System.getenv("FAUNA_SCHEME");
-    if (scheme == null) scheme = "https";
-
-    String port = System.getenv("FAUNA_PORT");
-    if (port == null) port = "443";
-
-    return ImmutableMap.<String, String>builder()
-      .put("root_token", rootKey)
-      .put("root_url", scheme + "://" + domain + ":" + port)
-      .build();
-  }
+  private static Ref magicMissile;
+  private static Ref fireball;
+  private static Ref faerieFire;
+  private static Ref summon;
+  private static Ref thor;
+  private static Ref thorSpell1;
+  private static Ref thorSpell2;
 
   @BeforeClass
-  public static void beforeAll() throws IOException, ExecutionException, InterruptedException {
-    rootClient = FaunaClient.create(Connection.builder().withFaunaRoot(config.get("root_url")).withAuthToken(config.get("root_token")).build());
-    ListenableFuture<Value> dbCreateF = rootClient.query(Create(Ref("databases"), Quote(ObjectV("name", StringV(testDbName)))));
-    Value dbCreateR = dbCreateF.get();
-    Ref dbRef = dbCreateR.asDatabase().ref();
+  public static void setUpSchema() throws Exception {
+    client.query(ImmutableList.of(
+      Create(Ref("classes"), Obj("name", Value("spells"))),
+      Create(Ref("classes"), Obj("name", Value("characters"))),
+      Create(Ref("classes"), Obj("name", Value("spellbooks")))
+    )).get();
 
-    ListenableFuture<Value> keyCreateF = rootClient.query(Create(Ref("keys"), Quote(ObjectV("database", dbRef, "role", StringV("server")))));
-    Value keyCreateR = keyCreateF.get();
-    Key key = keyCreateR.asKey();
+    client.query(ImmutableList.of(
+      Create(Ref("indexes"), Obj(
+        "name", Value("all_spells"),
+        "source", Ref("classes/spells")
+      )),
 
-    client = FaunaClient.create(Connection.builder().withFaunaRoot(config.get("root_url")).withAuthToken(key.secret()).build());
+      Create(Ref("indexes"), Obj(
+        "name", Value("spells_by_element"),
+        "source", Ref("classes/spells"),
+        "terms", Arr(Obj("field", Arr(Value("data"), Value("element"))))
+      )),
 
-    ListenableFuture<Value> classCreateF = client.query(Create(Ref("classes"), Quote(ObjectV("name", StringV("spells")))));
-    classCreateF.get();
+      Create(Ref("indexes"), Obj(
+        "name", Value("elements_of_spells"),
+        "source", Ref("classes/spells"),
+        "values", Arr(Obj("field", Arr(Value("data"), Value("element"))))
+      )),
 
-    ListenableFuture<Value> createClass2F = client.query(Create(Ref("classes"), Quote(ObjectV("name", StringV("characters")))));
-    createClass2F.get();
+      Create(Ref("indexes"), Obj(
+        "name", Value("spellbooks_by_owner"),
+        "source", Ref("classes/spellbooks"),
+        "terms", Arr(Obj("field", Arr(Value("data"), Value("owner"))))
+      )),
 
-    ListenableFuture<Value> createClass3F = client.query(Create(Ref("classes"), Quote(ObjectV("name", StringV("spellbooks")))));
-    createClass3F.get();
+      Create(Ref("indexes"), Obj(
+        "name", Value("spells_by_spellbook"),
+        "source", Ref("classes/spells"),
+        "terms", Arr(Obj("field", Arr(Value("data"), Value("spellbook"))))
+      ))
+    )).get();
 
-    ListenableFuture<Value> indexByElementF = client.query(Create(Ref("indexes"), Quote(ObjectV(
-      "name", StringV("spells_by_element"),
-      "source", Ref("classes/spells"),
-      "terms", ArrayV(ObjectV("path", StringV("data.element"))),
-      "active", BooleanV(true)
-    ))));
+    magicMissile = client.query(
+      Create(Ref("classes/spells"),
+        Obj("data",
+          Obj(
+            "name", Value("Magic Missile"),
+            "element", Value("arcane"),
+            "cost", Value(10))))
+    ).get().get("ref").asRef();
 
-    indexByElementF.get();
+    fireball = client.query(
+      Create(Ref("classes/spells"),
+        Obj("data",
+          Obj(
+            "name", Value("Fireball"),
+            "element", Value("fire"),
+            "cost", Value(10))))
+    ).get().get("ref").asRef();
 
-    ListenableFuture<Value> indexSpellbookByOwnerF = client.query(Create(Ref("indexes"), Quote(ObjectV(
-      "name", StringV("spellbooks_by_owner"),
-      "source", Ref("classes/spellbooks"),
-      "terms", ArrayV(ObjectV("path", StringV("data.owner"))),
-      "active", BooleanV(true)
-    ))));
+    faerieFire = client.query(
+      Create(Ref("classes/spells"),
+        Obj("data",
+          Obj(
+            "name", Value("Faerie Fire"),
+            "cost", Value(10),
+            "element", Arr(
+              Value("arcane"),
+              Value("nature")
+            ))))
+    ).get().get("ref").asRef();
 
-    indexSpellbookByOwnerF.get();
+    summon = client.query(
+      Create(Ref("classes/spells"),
+        Obj("data",
+          Obj(
+            "name", Value("Summon Animal Companion"),
+            "element", Value("nature"),
+            "cost", Value(10))))
+    ).get().get("ref").asRef();
 
-    ListenableFuture<Value> indexBySpellbookF = client.query(Create(Ref("indexes"), Quote(ObjectV(
-      "name", StringV("spells_by_spellbook"),
-      "source", Ref("classes/spells"),
-      "terms", ArrayV(ObjectV("path", StringV("data.spellbook"))),
-      "active", BooleanV(true)
-    ))));
+    thor = client.query(
+      Create(Ref("classes/characters"),
+        Obj("data", Obj("name", Value("Thor"))))
+    ).get().get("ref").asRef();
 
-    indexBySpellbookF.get();
+    Ref thorsSpellbook = client.query(
+      Create(Ref("classes/spellbooks"),
+        Obj("data",
+          Obj("owner", thor)))
+    ).get().get("ref").asRef();
+
+    thorSpell1 = client.query(
+      Create(Ref("classes/spells"),
+        Obj("data",
+          Obj("spellbook", thorsSpellbook)))
+    ).get().get("ref").asRef();
+
+    thorSpell2 = client.query(
+      Create(Ref("classes/spells"),
+        Obj("data",
+          Obj("spellbook", thorsSpellbook)))
+    ).get().get("ref").asRef();
   }
 
   @Test
-  public void testLookupMissingInstance() throws Throwable {
-    thrown.expectCause(isA(NotFoundException.class));
-    ListenableFuture<Value> resp = client.query(Get(Ref("classes/spells/1234")));
-    resp.get();
-  }
-
-  @Test
-  public void testUnauthorizedExcpetion() throws Throwable {
+  public void shouldThrowUnauthorizedOnInvalidSecret() throws Exception {
     thrown.expectCause(isA(UnauthorizedException.class));
-    FaunaClient badClient = FaunaClient.create(Connection.builder().withFaunaRoot(config.get("root_url")).withAuthToken("notavalidsecret").build());
-    ListenableFuture<Value> resp = badClient.query(Get(Ref("classes/spells/1234")));
-    resp.get();
+
+    createFaunaClient("invalid-secret")
+      .query(Get(Ref("classes/spells/1234")))
+      .get();
   }
 
   @Test
-  public void testCreateNewInstance() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<Value> respF = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("testField", StringV("testValue"))))));
-    Instance resp = respF.get().asInstance();
-
-    assertThat(resp.ref().value(), startsWith("classes/spells/"));
-    assertThat(resp.classRef().value(), is("classes/spells"));
-    assertThat(resp.data().get("testField").asString(), is("testValue"));
-
-    ListenableFuture<Value> existsF = client.query(Exists(resp.ref()));
-    assertThat(existsF.get().asBoolean(), is(true));
-
-    ListenableFuture<Value> resp2F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("testField", ObjectV("array", ArrayV(LongV(1), StringV("2"), DoubleV(3.4)), "bool", BooleanV(true), "num", LongV(1234), "string", StringV("sup"), "float", DoubleV(1.234)))))));
-    Instance resp2 = resp2F.get().asInstance();
-
-    assertTrue(resp.data().containsKey("testField"));
-    ImmutableMap<String, Value> testFieldObj = resp2.data().get("testField").asObject();
-    ImmutableList<Value> array = testFieldObj.get("array").asArray();
-    assertThat(array.get(0).asLong(), is(1L));
-    assertThat(array.get(1).asString(), is("2"));
-    assertThat(array.get(2).asDouble(), is(3.4));
-    assertThat(testFieldObj.get("string").asString(), is("sup"));
-    assertThat(testFieldObj.get("num").asLong(), is(1234L));
-    assertThat(testFieldObj.get("bool").asBoolean(), is(true));
+  public void shouldThrowNotFoundWhenInstanceDoesntExists() throws Exception {
+    thrown.expectCause(isA(NotFoundException.class));
+    client.query(Get(Ref("classes/spells/1234"))).get();
   }
 
   @Test
-  public void testIssueBatchedQuery() throws IOException, ExecutionException, InterruptedException {
-    String randomText1 = RandomStringUtils.randomAlphanumeric(8);
-    String randomText2 = RandomStringUtils.randomAlphanumeric(8);
+  public void shouldCreateAComplexInstance() throws Exception {
+    Value instance = client.query(
+      Create(onARandomClass(),
+        Obj("data",
+          Obj("testField",
+            Obj(
+              "array", Arr(
+                Value(1),
+                Value("2"),
+                Value(3.4),
+                Obj("name", Value("JR"))),
+              "bool", Value(true),
+              "num", Value(1234),
+              "string", Value("sup"),
+              "float", Value(1.234))
+          )))
+    ).get();
 
-    Ref classRef = Ref("classes/spells");
+    Value testField = instance.get("data", "testField");
+    assertThat(testField.get("string").asString(), equalTo("sup"));
+    assertThat(testField.get("num").asLong(), equalTo(1234L));
+    assertThat(testField.get("bool").asBoolean(), is(true));
+    assertThat(testField.get("bool").asStringOption(), is(Optional.<String>absent()));
+    assertThat(testField.getOption("credentials"), is(Optional.<Value>absent()));
 
-    Value expr1 = Create(classRef, Quote(ObjectV("data", ObjectV("queryTest1", StringV(randomText1)))));
-    Value expr2 = Create(classRef, Quote(ObjectV("data", ObjectV("queryTest1", StringV(randomText2)))));
-
-    ListenableFuture<ImmutableList<Value>> createFuture = client.query(ImmutableList.of(expr1, expr2));
-    ImmutableList<Value> results = createFuture.get();
-
-    assertThat(results.size(), is(2));
-    assertThat(results.get(0).asInstance().data().get("queryTest1").asString(), is(randomText1));
-    assertThat(results.get(1).asInstance().data().get("queryTest1").asString(), is(randomText2));
+    Value array = testField.get("array");
+    assertThat(array.asArray(), hasSize(4));
+    assertThat(array.get(0).asLong(), equalTo(1L));
+    assertThat(array.get(1).asString(), equalTo("2"));
+    assertThat(array.get(2).asDouble(), equalTo(3.4));
+    assertThat(array.get(3).get("name").asString(), equalTo("JR"));
+    assertThat(array.getOption(4), is(Optional.<Value>absent()));
   }
 
   @Test
-  public void testGet() throws IOException, ExecutionException, InterruptedException {
-    String randomText1 = RandomStringUtils.randomAlphanumeric(8);
-    ListenableFuture<Value> createFuture1 = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("queryTest1", StringV(randomText1))))));
-    Instance create1 = createFuture1.get().asInstance();
-
-    ListenableFuture<Value> queryF = client.query(Get(create1.ref()));
-    Instance result = queryF.get().asInstance();
-    assertThat(result.data().get("queryTest1").asString(), is(randomText1));
+  public void shouldBeAbleToGetAnInstance() throws Exception {
+    Value instance = client.query(Get(magicMissile)).get();
+    assertThat(instance.get("data", "name").asString(), equalTo("Magic Missile"));
   }
 
   @Test
-  public void testPaginate() throws IOException, ExecutionException, InterruptedException {
-    String randomClassName = RandomStringUtils.randomAlphanumeric(8);
-    ListenableFuture<Value> randomClassF = client.query(Create(Ref("classes"), Quote(ObjectV("name", StringV(randomClassName)))));
-    Ref classRef = randomClassF.get().asClass().ref();
+  public void shouldBeAbleToIssueABatchedQuery() throws Exception {
+    ImmutableList<Value> results = client.query(ImmutableList.of(
+      Get(magicMissile),
+      Get(thor)
+    )).get();
 
-    ListenableFuture<Value> randomClassIndexF = client.query(Create(Ref("indexes"), Quote(ObjectV(
-      "name", StringV(randomClassName + "_class_index"),
-      "source", classRef,
-      "terms", ArrayV(ObjectV("path", StringV("class"))),
-      "active", BooleanV(true),
-      "unique", BooleanV(false)
-    ))));
-
-    ListenableFuture<Value> indexCreateF = client.query(Create(Ref("indexes"), Quote(ObjectV(
-      "name", StringV(randomClassName + "_test_index"),
-      "source", classRef,
-      "terms", ArrayV(ObjectV("path", StringV("data.queryTest1"))),
-      "active", BooleanV(true),
-      "unique", BooleanV(false)))));
-
-    Ref randomClassIndex = randomClassIndexF.get().asIndex().ref();
-    Ref testIndex = indexCreateF.get().asIndex().ref();
-
-    String randomText1 = RandomStringUtils.randomAlphanumeric(8);
-    String randomText2 = RandomStringUtils.randomAlphanumeric(8);
-    String randomText3 = RandomStringUtils.randomAlphanumeric(8);
-
-    ListenableFuture<Value> createFuture1 = client.query(Create(classRef, Quote(ObjectV("data", ObjectV("queryTest1", StringV(randomText1))))));
-    ListenableFuture<Value> createFuture2 = client.query(Create(classRef, Quote(ObjectV("data", ObjectV("queryTest1", StringV(randomText2))))));
-    ListenableFuture<Value> createFuture3 = client.query(Create(classRef, Quote(ObjectV("data", ObjectV("queryTest1", StringV(randomText3))))));
-
-    Instance create1 = createFuture1.get().asInstance();
-    Instance create2 = createFuture2.get().asInstance();
-    Instance create3 = createFuture3.get().asInstance();
-
-    ListenableFuture<Value> queryF1 = client.query(Paginate(Match(StringV(randomText1), testIndex)).build());
-    Page page1 = queryF1.get().asPage();
-    assertThat(page1.data().size(), is(1));
-    assertThat(page1.data().get(0).asRef(), is(create1.ref()));
-
-    ListenableFuture<Value> queryF2 = client.query(Paginate(Match(classRef, randomClassIndex)).build());
-    Page page = queryF2.get().asPage();
-
-    ImmutableList.Builder<Ref> refsBuilder = ImmutableList.builder();
-    for (Value node : page.data()) {
-      refsBuilder.add(node.asRef());
-    }
-
-    ImmutableList<Ref> refs = refsBuilder.build();
-    assertThat(refs, hasItems(create1.ref(), create2.ref()));
-
-    ListenableFuture<Value> countF1 = client.query(Count(Match(classRef, randomClassIndex)));
-    Value countNode = countF1.get();
-    assertThat(countNode.asLong(), is(3L));
-
-    ListenableFuture<Value> queryF3 = client.query(Paginate(Match(classRef, randomClassIndex)).withSize(1).build());
-    Page resp1 = queryF3.get().asPage();
-
-    assertThat(resp1.data().size(), is(1));
-    assertThat(resp1.after(), not(Optional.<Value>absent()));
-    assertThat(resp1.before(), is(Optional.<Value>absent()));
-
-    ListenableFuture<Value> queryF4 = client.query(Paginate(Match(classRef, randomClassIndex)).withSize(1).withCursor(After(resp1.after().get())).build());
-    Page resp2 = queryF4.get().asPage();
-
-    assertThat(resp2.data().size(), is(1));
-    assertThat(resp2.data(), not(resp1.data()));
-    assertThat(resp2.before(), not(Optional.<Value>absent()));
-    assertThat(resp2.after(), not(Optional.<Value>absent()));
+    assertThat(results, hasSize(2));
+    assertThat(results.get(0).get("data", "name").asString(), equalTo("Magic Missile"));
+    assertThat(results.get(1).get("data", "name").asString(), equalTo("Thor"));
   }
 
   @Test
-  public void testHandleConstraintViolation() throws Throwable {
-    String randomClassName = RandomStringUtils.randomAlphanumeric(8);
-    ListenableFuture<Value> randomClassF = client.query(Create(Ref("classes"), Quote(ObjectV("name", StringV(randomClassName)))));
-    Ref classRef = randomClassF.get().asClass().ref();
+  public void shouldBeAbleToUpdateAnInstancesData() throws Exception {
+    Value createdInstance = client.query(
+      Create(onARandomClass(),
+        Obj("data",
+          Obj(
+            "name", Value("Magic Missile"),
+            "element", Value("arcane"),
+            "cost", Value(10))))
+    ).get();
 
-    ListenableFuture<Value> randomClassIndexF = client.query(Create(Ref("indexes"), Quote(ObjectV(
-        "name", StringV(randomClassName + "_class_index"),
-        "source", classRef,
-        "terms", ArrayV(ObjectV("path", StringV("data.uniqueTest1"))),
-        "active", BooleanV(true),
-        "unique", BooleanV(true)
-    ))));
-    randomClassIndexF.get();
+    Value updatedInstance = client.query(
+      Update(createdInstance.get("ref"),
+        Obj("data",
+          Obj(
+            "name", Value("Faerie Fire"),
+            "cost", Null())))
+    ).get();
 
-    String randomText = RandomStringUtils.randomAlphanumeric(8);
-    ListenableFuture<Value> createF = client.query(Create(classRef, Quote(ObjectV("data", ObjectV("uniqueTest1", StringV(randomText))))));
-    createF.get();
-
-    ListenableFuture<Value> createF2 = client.query(Create(classRef, Quote(ObjectV("data", ObjectV("uniqueTest1", StringV(randomText))))));
-    thrown.expectCause(isA(BadRequestException.class));
-    createF2.get();
+    assertThat(updatedInstance.get("ref"), equalTo(createdInstance.get("ref")));
+    assertThat(updatedInstance.get("data", "name").asString(), equalTo("Faerie Fire"));
+    assertThat(updatedInstance.get("data", "element").asString(), equalTo("arcane"));
+    assertThat(updatedInstance.get("data", "cost"), nullValue());
   }
 
   @Test
-  public void testTypes() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<Value> setF = client.query(Match(StringV("arcane"), Ref("indexes/spells_by_element")));
-    Value setNode = setF.get();
-    com.faunadb.client.types.Set set = setNode.asSet();
-    assertThat(set.parameters().get("terms").asString(), is("arcane"));
-    assertThat(set.parameters().get("match").asRef(), is(Ref("indexes/spells_by_element")));
+  public void shouldBeAbleToReplaceAnInstancesData() throws Exception {
+    Value createdInstance = client.query(
+      Create(onARandomClass(),
+        Obj("data",
+          Obj(
+            "name", Value("Magic Missile"),
+            "element", Value("arcane"),
+            "cost", Value(10))))
+    ).get();
+
+    Value replacedInstance = client.query(
+      Replace(createdInstance.get("ref"),
+        Obj("data",
+          Obj("name", Value("Volcano"),
+            "element", Arr(Value("fire"), Value("earth")),
+            "cost", Value(10))))
+    ).get();
+
+    assertThat(replacedInstance.get("ref"), equalTo(createdInstance.get("ref")));
+    assertThat(replacedInstance.get("data", "name").asString(), equalTo("Volcano"));
+    assertThat(replacedInstance.get("data", "element").get(0).asString(), equalTo("fire"));
+    assertThat(replacedInstance.get("data", "element").get(1).asString(), equalTo("earth"));
+    assertThat(replacedInstance.get("data", "cost").asLong(), equalTo(10L));
   }
 
   @Test
-  public void testBasicForms() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<Value> letF = client.query(Let(ImmutableMap.<String, Value>of("x", LongV(1), "y", LongV(2)), Var("x")));
-    Value let = letF.get();
-    assertThat(let.asLong(), is(1L));
+  public void shouldBeAbleToDeleteAnInstance() throws Exception {
+    Value createdInstance = client.query(
+      Create(onARandomClass(),
+        Obj("data", Obj("name", Value("Magic Missile"))))
+    ).get();
 
-    ListenableFuture<Value> ifF = client.query(If(BooleanV(true), StringV("was true"), StringV("was false")));
-    Value ifNode = ifF.get();
-    assertThat(ifNode.asString(), is("was true"));
+    Value ref = createdInstance.get("ref");
+    client.query(Delete(ref)).get();
 
-    Long randomRefNum = RandomUtils.nextLong(0, 250000);
-    Ref randomRef = Ref("classes/spells/" + randomRefNum);
-
-    ListenableFuture<Value> doF = client.query(Do(
-      Create(randomRef, Quote(ObjectV("data", ObjectV("name", StringV("Magic Missile"))))),
-      Get(randomRef)
-    ));
-    Value doNode = doF.get();
-    Instance doInstance = doNode.asInstance();
-    assertThat(doInstance.ref(), is(randomRef));
-
-    ListenableFuture<Value> objectF = client.query(Quote(ObjectV("name", StringV("Hen Wen"), "age", LongV(123))));
-    Value objectNode = objectF.get();
-    ImmutableMap<String, Value> objectMap = objectNode.asObject();
-    assertThat(objectMap.get("name").asString(), is("Hen Wen"));
-    assertThat(objectMap.get("age").asLong(), is(123L));
-  }
-
-  @Test
-  public void testCollections() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<Value> mapF = client.query(Map(Lambda("munchings", Add(Var("munchings"), LongV(1))), ArrayV(LongV(1), LongV(2), LongV(3))));
-    Value mapNode = mapF.get();
-    ImmutableList<Value> mapArray = mapNode.asArray();
-    assertThat(mapArray.size(), is(3));
-    assertThat(mapArray.get(0).asLong(), is(2L));
-    assertThat(mapArray.get(1).asLong(), is(3L));
-    assertThat(mapArray.get(2).asLong(), is(4L));
-
-    ListenableFuture<Value> foreachF = client.query(Foreach(Lambda("spell", Create(Ref("classes/spells"), Object(ObjectV("data", Object(ObjectV("name", Var("spell"))))))), ArrayV(StringV("Fireball Level 1"), StringV("Fireball Level 2"))));
-    Value foreachNode = foreachF.get();
-    ImmutableList<Value> foreachArray = foreachNode.asArray();
-    assertThat(foreachArray.size(), is(2));
-    assertThat(foreachArray.get(0).asString(), is("Fireball Level 1"));
-    assertThat(foreachArray.get(1).asString(), is("Fireball Level 2"));
-  }
-
-  @Test
-  public void testResourceModification() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<Value> createF = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Magic Missile"), "element", StringV("arcane"), "cost", LongV(10))))));
-    Value createNode = createF.get();
-    Instance createInstance = createNode.asInstance();
-    assertThat(createInstance.ref().value(), startsWith("classes/spells"));
-    assertThat(createInstance.data().get("name").asString(), is("Magic Missile"));
-
-    ListenableFuture<Value> updateF = client.query(Update(createInstance.ref(), Quote(ObjectV("data", ObjectV("name", StringV("Faerie Fire"), "cost", NullV())))));
-    Value updateNode = updateF.get();
-    Instance updateInstance = updateNode.asInstance();
-    assertThat(updateInstance.ref(), is(createInstance.ref()));
-    assertThat(updateInstance.data().get("name").asString(), is("Faerie Fire"));
-    assertThat(updateInstance.data().get("element").asString(), is("arcane"));
-    assertThat(updateInstance.data().get("cost"), nullValue());
-
-    ListenableFuture<Value> replaceF = client.query(Replace(createInstance.ref(), Quote(ObjectV("data", ObjectV("name", StringV("Volcano"), "element", ArrayV(StringV("fire"), StringV("earth")), "cost", LongV(10))))));
-    Value replaceNode = replaceF.get();
-    Instance replaceInstance = replaceNode.asInstance();
-    assertThat(replaceInstance.ref(), is(createInstance.ref()));
-    assertThat(replaceInstance.data().get("name").asString(), is("Volcano"));
-    assertThat(replaceInstance.data().get("element").get(0).asString(), is("fire"));
-    assertThat(replaceInstance.data().get("element").get(1).asString(), is("earth"));
-    assertThat(replaceInstance.data().get("cost").asLong(), is(10L));
-
-    ListenableFuture<Value> insertF = client.query(Insert(createInstance.ref(), 1L, Action.CREATE, Quote(ObjectV("data", ObjectV("cooldown", LongV(5L))))));
-    Instance insertR = insertF.get().asInstance();
-    assertThat(insertR.ref(), is(createInstance.ref()));
-    assertThat(insertR.data().size(), is(1));
-    assertThat(insertR.data().get("cooldown").asLong(), is(5L));
-
-    ListenableFuture<Value> removeF = client.query(Remove(createInstance.ref(), 2L, Action.DELETE));
-    Value removeR = removeF.get();
-    assertNull(removeR);
-
-    ListenableFuture<Value> deleteF = client.query(Delete(createInstance.ref()));
-    deleteF.get();
+    Value exists = client.query(Exists(ref)).get();
+    assertThat(exists.asBoolean(), is(false));
 
     thrown.expectCause(isA(NotFoundException.class));
-    ListenableFuture<Value> getF = client.query(Get(createInstance.ref()));
-    getF.get();
+    client.query(Get(ref)).get();
   }
 
   @Test
-  public void testSets() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<Value> create1F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Magic Missile"), "element", StringV("arcane"), "cost", LongV(10))))));
-    ListenableFuture<Value> create2F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Fireball"), "element", StringV("fire"), "cost", LongV(10))))));
-    ListenableFuture<Value> create3F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Faerie Fire"), "element", ArrayV(StringV("arcane"), StringV("nature")), "cost", LongV(10))))));
-    ListenableFuture<Value> create4F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("name", StringV("Summon Animal Companion"), "element", StringV("nature"), "cost", LongV(10))))));
-    Value createNode1 = create1F.get();
-    Value createNode2 = create2F.get();
-    Value createNode3 = create3F.get();
-    Value createNode4 = create4F.get();
-    Instance createInstance1 = createNode1.asInstance();
-    Instance createInstance2 = createNode2.asInstance();
-    Instance createInstance3 = createNode3.asInstance();
-    Instance createInstance4 = createNode4.asInstance();
+  public void shouldBeAbleToInsertAndRemoveEvents() throws Exception {
+    Value createdInstance = client.query(
+      Create(onARandomClass(),
+        Obj("data", Obj("name", Value("Magic Missile"))))
+    ).get();
 
-    ListenableFuture<Value> createCharF = client.query(Create(Ref("classes/characters"), Quote(ObjectV("data", ObjectV()))));
-    Instance createCharR = createCharF.get().asInstance();
+    Value insertedEvent = client.query(
+      Insert(createdInstance.get("ref"), Value(1L), CREATE,
+        Obj("data",
+          Obj("cooldown", Value(5L))))
+    ).get();
 
-    ListenableFuture<Value> createSpellbookF = client.query(Create(Ref("classes/spellbooks"), Quote(ObjectV("data", ObjectV("owner", createCharR.ref())))));
-    Instance createSpellbookR = createSpellbookF.get().asInstance();
+    assertThat(insertedEvent.get("ref"), equalTo(createdInstance.get("ref")));
+    assertThat(insertedEvent.get("data").asObject().size(), equalTo(1));
+    assertThat(insertedEvent.get("data", "cooldown").asLong(), is(5L));
 
-    ListenableFuture<Value> createSpellbookSpell1F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("spellbook", createSpellbookR.ref())))));
-    ListenableFuture<Value> createSpellbookSpell2F = client.query(Create(Ref("classes/spells"), Quote(ObjectV("data", ObjectV("spellbook", createSpellbookR.ref())))));
-    Instance createSpellbookSpell1R = createSpellbookSpell1F.get().asInstance();
-    Instance createSpellbookSpell2R = createSpellbookSpell2F.get().asInstance();
+    Value removedEvent = client.query(
+      Remove(createdInstance.get("ref"), Value(2L), DELETE)
+    ).get();
 
-    ListenableFuture<Value> matchF = client.query(Paginate(Match(StringV("arcane"), Ref("indexes/spells_by_element"))).build());
-    Value matchResponse = matchF.get();
-    Page matchList = matchResponse.asPage();
-    assertThat(matchList.data().size(), greaterThanOrEqualTo(1));
-    ImmutableList.Builder<Ref> matchRefsBuilder = ImmutableList.builder();
-    for (Value matchNode : matchList.data()) {
-      matchRefsBuilder.add(matchNode.asRef());
-    }
-    assertThat(matchRefsBuilder.build(), hasItem(createInstance1.ref()));
-
-    ListenableFuture<Value> matchEventsF = client.query(Paginate(Match(StringV("arcane"), Ref("indexes/spells_by_element"))).withEvents(true).build());
-    Value matchEventsResponse = matchEventsF.get();
-    Page matchEventsPage = matchEventsResponse.asPage();
-    assertThat(matchEventsPage.data().size(), greaterThanOrEqualTo(1));
-    ImmutableList.Builder<Ref> matchRefEventsBuilder = ImmutableList.builder();
-    for (Value matchEventNode : matchEventsPage.data()) {
-      Event event = matchEventNode.asEvent();
-      if (event.action().contentEquals("create")) {
-        matchRefEventsBuilder.add(event.resource());
-      }
-    }
-    assertThat(matchRefEventsBuilder.build(), hasItem(createInstance1.ref()));
-
-    ListenableFuture<Value> unionF = client.query(Paginate(Union(Match(StringV("arcane"), Ref("indexes/spells_by_element")), Match(StringV("fire"), Ref("indexes/spells_by_element")))).build());
-    Value unionResponse = unionF.get();
-    Page unionPage = unionResponse.asPage();
-    assertThat(unionPage.data().size(), greaterThanOrEqualTo(2));
-    ImmutableList.Builder<Ref> unionRefsBuilder = ImmutableList.builder();
-    for (Value unionNode : unionPage.data()) {
-      unionRefsBuilder.add(unionNode.asRef());
-    }
-    assertThat(unionRefsBuilder.build(), hasItems(createInstance1.ref(), createInstance2.ref()));
-
-    ListenableFuture<Value> unionEventsF = client.query(Paginate(Union(Match(StringV("arcane"), Ref("indexes/spells_by_element")), Match(StringV("fire"), Ref("indexes/spells_by_element")))).withEvents(true).build());
-    Value unionEventsResponse = unionEventsF.get();
-    Page unionEventsPage = unionEventsResponse.asPage();
-    assertThat(unionEventsPage.data().size(), greaterThanOrEqualTo(2));
-    ImmutableList.Builder<Ref> unionEventsRefsBuilder = ImmutableList.builder();
-    for (Value unionEventsNode : unionEventsPage.data()) {
-      Event event = unionEventsNode.asEvent();
-      if (event.action().contentEquals("create")) {
-        unionEventsRefsBuilder.add(event.resource());
-      }
-    }
-    assertThat(unionEventsRefsBuilder.build(), hasItems(createInstance1.ref(), createInstance2.ref()));
-
-    ListenableFuture<Value> intersectionF = client.query(Paginate(Intersection(Match(StringV("arcane"), Ref("indexes/spells_by_element")), Match(StringV("nature"), Ref("indexes/spells_by_element")))).build());
-    Value intersectionResponse = intersectionF.get();
-    Page intersectionPage = intersectionResponse.asPage();
-    assertThat(intersectionPage.data().size(), greaterThanOrEqualTo(1));
-    ImmutableList.Builder<Ref> intersectionRefsBuilder = ImmutableList.builder();
-    for (Value intersectionNode : intersectionPage.data()) {
-      intersectionRefsBuilder.add(intersectionNode.asRef());
-    }
-    assertThat(intersectionRefsBuilder.build(), hasItem(createInstance3.ref()));
-
-    ListenableFuture<Value> differenceF = client.query(Paginate(Difference(Match(StringV("nature"), Ref("indexes/spells_by_element")), Match(StringV("arcane"), Ref("indexes/spells_by_element")))).build());
-    Value differenceResponse = differenceF.get();
-    Page differencePage = differenceResponse.asPage();
-    assertThat(differencePage.data().size(), greaterThanOrEqualTo(1));
-    ImmutableList.Builder<Ref> differenceRefsBuilder = ImmutableList.builder();
-    for (Value differenceNode : differencePage.data()) {
-      differenceRefsBuilder.add(differenceNode.asRef());
-    }
-    assertThat(differenceRefsBuilder.build(), hasItem(createInstance4.ref()));
-    assertThat(differenceRefsBuilder.build(), not(hasItem(createInstance3.ref())));
-
-    ListenableFuture<Value> joinF = client.query(Paginate(Join(Match(createCharR.ref(), Ref("indexes/spellbooks_by_owner")), Lambda("spellbook", Match(Var("spellbook"), Ref("indexes/spells_by_spellbook"))))).build());
-    Page joinR = joinF.get().asPage();
-
-    assertThat(joinR.data().size(), is(2));
-    ImmutableList.Builder<Ref> joinRefsBuilder = ImmutableList.builder();
-    for (Value joinNode : joinR.data()) {
-      joinRefsBuilder.add(joinNode.asRef());
-    }
-    assertThat(joinRefsBuilder.build(), hasItems(createSpellbookSpell1R.ref(), createSpellbookSpell2R.ref()));
+    assertThat(removedEvent, nullValue());
   }
 
   @Test
-  public void testMiscFunctions() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<Value> equalsF = client.query(Equals(StringV("fire"), StringV("fire")));
-    Value equalsR = equalsF.get();
-    assertThat(equalsR.asBoolean(), is(true));
+  public void shouldHandleConstraintViolations() throws Exception {
+    Ref classRef = onARandomClass();
 
-    ListenableFuture<Value> concatF = client.query(Concat(StringV("Magic"), StringV("Missile")));
-    Value concatR = concatF.get();
-    assertThat(concatR.asString(), is("MagicMissile"));
+    client.query(
+      Create(Ref("indexes"),
+        Obj(
+          "name", Value(format("%s_class_index", randomAlphanumeric(8))),
+          "source", classRef,
+          "terms", Arr(Obj("field", Arr(Value("data"), Value("uniqueField")))),
+          "unique", Value(true)
+        ))
+    ).get();
 
-    ListenableFuture<Value> concat2F = client.query(Concat(ImmutableList.<Value>of(StringV("Magic"), StringV("Missile")), " "));
-    Value concat2R = concat2F.get();
-    assertThat(concat2R.asString(), is("Magic Missile"));
+    client.query(
+      Create(classRef,
+        Obj("data", Obj("uniqueField", Value("same value"))))
+    ).get();
 
-    ListenableFuture<Value> containsF = client.query(Contains(Path(Path.Object("favorites"), Path.Object("foods")), Quote(ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings")))))));
-    Value containsR = containsF.get();
-    assertThat(containsR.asBoolean(), is(true));
+    thrown.expectCause(isA(BadRequestException.class));
+    client.query(
+      Create(classRef,
+        Obj("data", Obj("uniqueField", Value("same value"))))
+    ).get();
+  }
 
-    ListenableFuture<Value> selectF = client.query(Select(Path(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
-      Quote(ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings"), StringV("lunchings")))))));
-    Value selectNode = selectF.get();
-    assertThat(selectNode.asString(), is("munchings"));
+  @Test
+  public void shouldFindASingleInstanceFromIndex() throws Exception {
+    Value singleMatch = client.query(
+      Paginate(Match(Ref("indexes/spells_by_element"), Value("fire")))
+    ).get();
 
-    ListenableFuture<Value> addF = client.query(Add(LongV(100), LongV(10)));
-    Value addR = addF.get();
-    assertThat(addR.asLong(), is(110L));
+    assertThat(singleMatch.get("data").asArray(), hasSize(1));
+    assertThat(singleMatch.get("data").get(0).asRef(), equalTo(fireball));
+  }
 
-    ListenableFuture<Value> multiplyF = client.query(Multiply(LongV(100), LongV(10)));
-    Value multiplyR = multiplyF.get();
-    assertThat(multiplyR.asLong(), is(1000L));
+  @Test
+  public void shouldCountElementsOnAIndex() throws Exception {
+    Value count = client.query(Count(Match(Ref("indexes/all_spells")))).get();
+    assertThat(count.asLong(), equalTo(6L));
+  }
 
-    ListenableFuture<Value> subtractF = client.query(Subtract(LongV(100), LongV(10)));
-    Value subtractR = subtractF.get();
-    assertThat(subtractR.asLong(), is(90L));
+  @Test
+  public void shouldListAllItensOnAClassIndex() throws Exception {
+    Value allInstances = client.query(
+      Paginate(Match(Ref("indexes/all_spells")))
+    ).get();
 
-    ListenableFuture<Value> divideF = client.query(Divide(LongV(100), LongV(10)));
-    Value divideR = divideF.get();
-    assertThat(divideR.asLong(), is(10L));
+    assertThat(allInstances.get("data").asArray(), hasSize(6));
+    assertThat(allInstances.get("data").get(0).asRef(), equalTo(magicMissile));
+    assertThat(allInstances.get("data").get(1).asRef(), equalTo(fireball));
+    assertThat(allInstances.get("data").get(2).asRef(), equalTo(faerieFire));
+    assertThat(allInstances.get("data").get(3).asRef(), equalTo(summon));
+    assertThat(allInstances.get("data").get(4).asRef(), equalTo(thorSpell1));
+    assertThat(allInstances.get("data").get(5).asRef(), equalTo(thorSpell2));
+  }
 
-    ListenableFuture<Value> moduloF = client.query(Modulo(LongV(101), LongV(10)));
-    Value moduloR = moduloF.get();
-    assertThat(moduloR.asLong(), is(1L));
+  @Test
+  public void shouldPaginateOverAnIndex() throws Exception {
+    Value page1 = client.query(
+      Paginate(Match(Ref("indexes/all_spells")))
+        .withSize(3)
+    ).get();
 
-    ListenableFuture<Value> andF = client.query(And(ImmutableList.<Value>of(BooleanV(true), BooleanV(false))));
-    Value andR = andF.get();
-    assertThat(andR.asBoolean(), is(false));
+    assertThat(page1.get("data").asArray(), hasSize(3));
+    assertThat(page1.get("after"), notNullValue());
+    assertThat(page1.get("before"), nullValue());
 
-    ListenableFuture<Value> orF = client.query(Or(ImmutableList.<Value>of(BooleanV(true), BooleanV(false))));
-    Value orR = orF.get();
-    assertThat(orR.asBoolean(), is(true));
+    Value page2 = client.query(
+      Paginate(Match(Ref("indexes/all_spells")))
+        .withCursor(After(page1.get("after")))
+        .withSize(3)
+    ).get();
 
-    ListenableFuture<Value> notF = client.query(Not(BooleanV(false)));
-    Value notR = notF.get();
+    assertThat(page2.get("data").asArray(), hasSize(3));
+    assertThat(page2.get("data"), not(page1.get("data")));
+    assertThat(page2.get("before"), notNullValue());
+    assertThat(page2.get("after"), nullValue());
+  }
+
+  @Test
+  public void shouldDealWithSetRef() throws Exception {
+    Value res = client.query(
+      Match(
+        Ref("indexes/spells_by_element"),
+        Value("arcane"))
+    ).get();
+
+    assertThat(res.asSetRef().get("terms").asString(), equalTo("arcane"));
+    assertThat(res.asSetRef().get("match").asRef(),
+      equalTo(Ref("indexes/spells_by_element").asRef()));
+  }
+
+  @Test
+  public void shouldEvalLetExpression() throws Exception {
+    Value res = client.query(
+      Let(
+        "x", Value(1),
+        "y", Value(2)
+      ).in(
+        Arr(Var("y"), Var("x"))
+      )
+    ).get();
+
+    assertThat(res.get(0).asLong(), equalTo(2L));
+    assertThat(res.get(1).asLong(), equalTo(1L));
+  }
+
+  @Test
+  public void shouldEvalIfExpression() throws Exception {
+    Value res = client.query(
+      If(Value(true),
+        Value("was true"),
+        Value("was false"))
+    ).get();
+
+    assertThat(res.asString(), equalTo("was true"));
+  }
+
+  @Test
+  public void shouldEvalDoExpression() throws Exception {
+    Expr ref = Ref(format("%s/%s", onARandomClass().value(), String.valueOf(nextLong(0, 250000))));
+
+    Value res = client.query(
+      Do(
+        Create(ref, Obj("data", Obj("name", Value("Magic Missile")))),
+        Get(ref)
+      )
+    ).get();
+
+    assertThat(res.get("ref").asRef(),
+      equalTo(ref.asRef()));
+  }
+
+  @Test
+  public void shouldEchoAnObjectBack() throws Exception {
+    Value res = client.query(
+      Obj("name", Value("Hen Wen"), "age", Value(123))
+    ).get();
+
+    assertThat(res.get("name").asString(), equalTo("Hen Wen"));
+    assertThat(res.get("age").asLong(), equalTo(123L));
+  }
+
+  @Test
+  public void shouldMapOverCollections() throws Exception {
+    Value res = client.query(
+      Map(
+        Lambda(Value("i"),
+          Add(Var("i"), Value(1))),
+        Arr(
+          Value(1), Value(2), Value(3))
+      )
+    ).get();
+
+    assertThat(res.asArray(), hasSize(3));
+    assertThat(res.get(0).asLong(), equalTo(2L));
+    assertThat(res.get(1).asLong(), equalTo(3L));
+    assertThat(res.get(2).asLong(), equalTo(4L));
+  }
+
+  @Test
+  public void shouldExecuteForeachExpression() throws Exception {
+    Value res = client.query(
+      Foreach(
+        Lambda(Value("spell"),
+          Create(onARandomClass(),
+            Obj("data", Obj("name", Var("spell"))))),
+        Arr(
+          Value("Fireball Level 1"),
+          Value("Fireball Level 2")))
+    ).get();
+
+    assertThat(res.asArray(), hasSize(2));
+    assertThat(res.get(0).asString(), equalTo("Fireball Level 1"));
+    assertThat(res.get(1).asString(), equalTo("Fireball Level 2"));
+  }
+
+  @Test
+  public void shouldFilterACollection() throws Exception {
+    Value filtered = client.query(
+      Filter(
+        Lambda(Value("i"),
+          Equals(
+            Value(0),
+            Modulo(Var("i"), Value(2)))
+        ),
+        Arr(Value(1), Value(2), Value(3))
+      )).get();
+
+    assertThat(filtered.asArray(), hasSize(1));
+    assertThat(filtered.get(0).asLong(), equalTo(2L));
+  }
+
+  @Test
+  public void shouldTakeElementsFromCollection() throws Exception {
+    Value taken = client.query(Take(Value(2), Arr(Value(1), Value(2), Value(3)))).get();
+
+    assertThat(taken.asArray(), hasSize(2));
+    assertThat(taken.get(0).asLong(), equalTo(1L));
+    assertThat(taken.get(1).asLong(), equalTo(2L));
+  }
+
+  @Test
+  public void shouldDropElementsFromCollection() throws Exception {
+    Value dropped = client.query(Drop(Value(2), Arr(Value(1), Value(2), Value(3)))).get();
+
+    assertThat(dropped.asArray(), hasSize(1));
+    assertThat(dropped.get(0).asLong(), equalTo(3L));
+  }
+
+  @Test
+  public void shouldPrependElementsInACollection() throws Exception {
+    Value prepended = client.query(
+      Prepend(
+        Arr(Value(1), Value(2)),
+        Arr(Value(3), Value(4))
+      )
+    ).get();
+
+    assertThat(prepended.asArray(), hasSize(4));
+    assertThat(prepended.get(0).asLong(), equalTo(1L));
+    assertThat(prepended.get(1).asLong(), equalTo(2L));
+    assertThat(prepended.get(2).asLong(), equalTo(3L));
+    assertThat(prepended.get(3).asLong(), equalTo(4L));
+  }
+
+  @Test
+  public void shouldAppendElementsInACollection() throws Exception {
+    Value appended = client.query(
+      Append(
+        Arr(Value(3), Value(4)),
+        Arr(Value(1), Value(2))
+      )
+    ).get();
+
+    assertThat(appended.asArray(), hasSize(4));
+    assertThat(appended.get(0).asLong(), equalTo(1L));
+    assertThat(appended.get(1).asLong(), equalTo(2L));
+    assertThat(appended.get(2).asLong(), equalTo(3L));
+    assertThat(appended.get(3).asLong(), equalTo(4L));
+  }
+
+  @Test
+  public void shouldReadEventsFromIndex() throws Exception {
+    Value events = client.query(
+      Paginate(Match(Ref("indexes/spells_by_element"), Value("arcane")))
+        .withEvents(true)
+    ).get();
+
+    assertThat(events.get("data").asArray(), hasSize(2));
+    assertThat(collectResourcesFrom(events.get("data")), hasItems(magicMissile, faerieFire));
+  }
+
+  @Test
+  public void shouldPaginateUnion() throws Exception {
+    Value union = client.query(
+      Paginate(
+        Union(
+          Match(Ref("indexes/spells_by_element"), Value("arcane")),
+          Match(Ref("indexes/spells_by_element"), Value("fire")))
+      )
+    ).get();
+
+    assertThat(union.get("data").asArray(), hasSize(3));
+    assertThat(collectRefsFom(union.get("data")), hasItems(magicMissile, faerieFire, fireball));
+
+  }
+
+  @Test
+  public void shouldPaginateIntersection() throws Exception {
+    Value intersection = client.query(
+      Paginate(
+        Intersection(
+          Match(Ref("indexes/spells_by_element"), Value("arcane")),
+          Match(Ref("indexes/spells_by_element"), Value("nature"))
+        ))
+    ).get();
+
+    assertThat(intersection.get("data").asArray(), hasSize(1));
+    assertThat(collectRefsFom(intersection.get("data")), hasItem(faerieFire));
+  }
+
+  @Test
+  public void shouldPaginateDifference() throws Exception {
+    Value difference = client.query(
+      Paginate(
+        Difference(
+          Match(Ref("indexes/spells_by_element"), Value("nature")),
+          Match(Ref("indexes/spells_by_element"), Value("arcane"))
+        ))
+    ).get();
+
+    assertThat(difference.get("data").asArray(), hasSize(1));
+    assertThat(collectRefsFom(difference.get("data")), hasItem(summon));
+  }
+
+  @Test
+  public void shouldPaginateDistinctSets() throws Exception {
+    Value distinct = client.query(
+      Paginate(
+        Distinct(
+          Match(Ref("indexes/elements_of_spells")))
+      )
+    ).get();
+
+    assertThat(distinct.get("data").asArray(), hasSize(3));
+    assertThat(distinct.get("data").get(0).asString(), equalTo("arcane"));
+    assertThat(distinct.get("data").get(1).asString(), equalTo("fire"));
+    assertThat(distinct.get("data").get(2).asString(), equalTo("nature"));
+  }
+
+  @Test
+  public void shouldPaginateJoin() throws Exception {
+    Value join = client.query(
+      Paginate(
+        Join(
+          Match(Ref("indexes/spellbooks_by_owner"), thor),
+          Lambda(Value("spellbook"),
+            Match(Ref("indexes/spells_by_spellbook"), Var("spellbook")))
+        ))
+    ).get();
+
+    assertThat(join.get("data").asArray(), hasSize(2));
+    assertThat(collectRefsFom(join.get("data")), hasItems(thorSpell1, thorSpell2));
+  }
+
+  @Test
+  public void shouldEvalEqualsExpression() throws Exception {
+    Value equals = client.query(Equals(Value("fire"), Value("fire"))).get();
+    assertThat(equals.asBoolean(), is(true));
+  }
+
+  @Test
+  public void shouldEvalConcatExpression() throws Exception {
+    Value simpleConcat = client.query(Concat(Arr(Value("Magic"), Value("Missile")))).get();
+    assertThat(simpleConcat.asString(), equalTo("MagicMissile"));
+
+    Value concatWithSeparator = client.query(
+      Concat(
+        Arr(
+          Value("Magic"),
+          Value("Missile")
+        ),
+        Value(" ")
+      )).get();
+
+    assertThat(concatWithSeparator.asString(), equalTo("Magic Missile"));
+  }
+
+  @Test
+  public void shouldEvalCasefoldExpression() throws Exception {
+    Value res = client.query(Casefold(Value("Hen Wen"))).get();
+    assertThat(res.asString(), equalTo("hen wen"));
+  }
+
+  @Test
+  public void shouldEvalContainsExpression() throws Exception {
+    Value contains = client.query(
+      Contains(
+        Path("favorites", "foods"),
+        Obj("favorites",
+          Obj("foods",
+            Arr(Value("crunchings"), Value("munchings")))))
+    ).get();
+
+    assertThat(contains.asBoolean(), is(true));
+  }
+
+  @Test
+  public void shouldEvalSelectExpression() throws Exception {
+    Value selected = client.query(
+      Select(
+        Path("favorites", "foods").at(1),
+        Obj("favorites",
+          Obj("foods",
+            Arr(
+              Value("crunchings"),
+              Value("munchings"),
+              Value("lunchings")))))
+    ).get();
+
+    assertThat(selected.asString(), equalTo("munchings"));
+  }
+
+  @Test
+  public void shouldEvalLTExpression() throws Exception {
+    Value res = client.query(LT(Arr(Value(1), Value(2), Value(3)))).get();
+    assertThat(res.asBoolean(), is(true));
+  }
+
+  @Test
+  public void shouldEvalLTEExpression() throws Exception {
+    Value res = client.query(LTE(Arr(Value(1), Value(2), Value(2)))).get();
+    assertThat(res.asBoolean(), is(true));
+  }
+
+  @Test
+  public void shouldEvalGTxpression() throws Exception {
+    Value res = client.query(GT(Arr(Value(3), Value(2), Value(1)))).get();
+    assertThat(res.asBoolean(), is(true));
+  }
+
+  @Test
+  public void shouldEvalGTExpression() throws Exception {
+    Value res = client.query(GTE(Arr(Value(3), Value(2), Value(2)))).get();
+    assertThat(res.asBoolean(), is(true));
+  }
+
+  @Test
+  public void shouldEvalAddExpression() throws Exception {
+    Value res = client.query(Add(Value(100), Value(10))).get();
+    assertThat(res.asLong(), equalTo(110L));
+  }
+
+  @Test
+  public void shouldEvalMultiplyExpression() throws Exception {
+    Value res = client.query(Multiply(Value(100), Value(10))).get();
+    assertThat(res.asLong(), equalTo(1000L));
+  }
+
+  @Test
+  public void shouldEvalSubtractExpression() throws Exception {
+    Value res = client.query(Subtract(Value(100), Value(10))).get();
+    assertThat(res.asLong(), equalTo(90L));
+  }
+
+  @Test
+  public void shouldEvalDivideExpression() throws Exception {
+    Value res = client.query(Divide(Value(100), Value(10))).get();
+    assertThat(res.asLong(), equalTo(10L));
+  }
+
+  @Test
+  public void shouldEvalModuloExpression() throws Exception {
+    Value res = client.query(Modulo(Value(101), Value(10))).get();
+    assertThat(res.asLong(), equalTo(1L));
+  }
+
+  @Test
+  public void shouldEvalAndExpression() throws Exception {
+    Value res = client.query(And(Value(true), Value(false))).get();
+    assertThat(res.asBoolean(), is(false));
+  }
+
+  @Test
+  public void shouldEvalOrExpression() throws Exception {
+    Value res = client.query(Or(Value(true), Value(false))).get();
+    assertThat(res.asBoolean(), is(true));
+  }
+
+  @Test
+  public void shouldEvalNotExpression() throws Exception {
+    Value notR = client.query(Not(Value(false))).get();
     assertThat(notR.asBoolean(), is(true));
   }
 
   @Test
-  public void testDateTimeFunctions() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<Value> timeF = client.query(Time(StringV("1970-01-01T00:00:00-04:00")));
-    Value timeR = timeF.get();
-    assertThat(timeR.asTs(), is(Instant.EPOCH.plus(4, ChronoUnit.HOURS)));
-
-    ListenableFuture<Value> epochF = client.query(Epoch(LongV(30), TimeUnit.SECOND));
-    Value epochR = epochF.get();
-    assertThat(epochR.asTs(), is(Instant.EPOCH.plus(30, ChronoUnit.SECONDS)));
-
-    ListenableFuture<Value> dateF = client.query(Date(StringV("1970-01-02")));
-    Value dateR = dateF.get();
-    assertThat(dateR.asDate(), is(LocalDate.ofEpochDay(1)));
+  public void shouldEvalTimeExpression() throws Exception {
+    Value res = client.query(Time(Value("1970-01-01T00:00:00-04:00"))).get();
+    assertThat(res.asTs(), equalTo(Instant.EPOCH.plus(4, HOURS)));
   }
 
   @Test
-  public void testAuthenticationFunctions() throws IOException, ExecutionException, InterruptedException {
-    ListenableFuture<Value> createF = client.query(Create(Ref("classes/spells"), Quote(ObjectV("credentials", ObjectV("password", StringV("abcdefg"))))));
-    Instance createR = createF.get().asInstance();
-
-    ListenableFuture<Value> loginF = client.query(Login(createR.ref(), Quote(ObjectV("password", StringV("abcdefg")))));
-    Token loginR = loginF.get().asToken();
-
-    FaunaClient sessionClient = FaunaClient.create(Connection.builder().withFaunaRoot(config.get("root_url")).withAuthToken(loginR.secret()).build());
-    ListenableFuture<Value> logoutF = sessionClient.query(Logout(false));
-    Boolean logoutR = logoutF.get().asBoolean();
-    assertThat(logoutR, is(true));
-
-    ListenableFuture<Value> identifyF = client.query(Identify(createR.ref(), StringV("abcdefgfd")));
-    Boolean identifyR = identifyF.get().asBoolean();
-    assertThat(identifyR, is(false));
-
-    sessionClient.close();
-
-
+  public void shouldEvalEpochExpression() throws Exception {
+    Value res = client.query(Epoch(Value(30), SECOND)).get();
+    assertThat(res.asTs(), equalTo(Instant.EPOCH.plus(30, SECONDS)));
   }
+
+  @Test
+  public void shouldEvalDateExpression() throws Exception {
+    Value res = client.query(Date(Value("1970-01-02"))).get();
+    assertThat(res.asDate(), equalTo(LocalDate.ofEpochDay(1)));
+  }
+
+  @Test
+  public void shouldGetNextId() throws Exception {
+    Value res = client.query(NextId()).get();
+    assertThat(res.asString(), notNullValue());
+  }
+
+  @Test
+  public void shouldAuthenticateSession() throws Exception {
+    Value createdInstance = client.query(
+      Create(onARandomClass(),
+        Obj("credentials",
+          Obj("password", Value("abcdefg"))))
+    ).get();
+
+    Value auth = client.query(
+      Login(
+        createdInstance.get("ref"),
+        Obj("password", Value("abcdefg")))
+    ).get();
+
+    String token = auth.get("secret").asString();
+
+    try (FaunaClient sessionClient = createFaunaClient(token)) {
+      Value loggedOut = sessionClient.query(Logout(Value(true))).get();
+      assertThat(loggedOut.asBoolean(), is(true));
+    }
+
+    Value identified = client.query(
+      Identify(
+        createdInstance.get("ref"),
+        Value("wrong-password")
+      )
+    ).get();
+
+    assertThat(identified.asBoolean(), is(false));
+  }
+
+  private Ref onARandomClass() throws Exception {
+    Value clazz = client.query(
+      Create(Ref("classes"),
+        Obj("name", Value(randomAlphanumeric(8))))
+    ).get();
+
+    return clazz.get("ref").asRef();
+  }
+
+  private List<Ref> collectRefsFom(Value response) {
+    ImmutableList.Builder<Ref> refs = ImmutableList.builder();
+    for (Value value : response.asArray())
+      refs.add(value.asRef());
+
+    return refs.build();
+  }
+
+  private List<Ref> collectResourcesFrom(Value response) {
+    ImmutableList.Builder<Ref> refs = ImmutableList.builder();
+    for (Value value : response.asArray())
+      refs.add(value.get("resource").asRef());
+
+    return refs.build();
+  }
+
 }

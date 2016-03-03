@@ -2,60 +2,42 @@ package com.faunadb.client.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Optional;
 
 /**
- * A FaunaDB ref type. Create an instance using the {@link Ref#create} method.
+ * A FaunaDB ref type.
  *
- * <p><i>Example</i>: <code>{ "@ref": "classes/spells/102462014988746752" }</code>
- *
- * <p><i>Reference</i>: <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
- *
+ * @see <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
  */
-public class Ref extends Value.ConcreteValue {
-  /**
-   * Creates a new {@link Ref} instance.
-   * @param value the value of the Ref.
-   */
-  public static Ref create(String value) {
-    return new Ref(value);
+public class Ref extends Value.ScalarValue<Value> {
+
+  @JsonCreator
+  public Ref(@JsonProperty("@ref") String value) {
+    this(new StringV(value));
   }
 
+  public Ref(Value ref) {
+    super(ref);
+  }
+
+  /**
+   * Extracts its string value.
+   *
+   * @return a string with the ref value
+   */
   @JsonProperty("@ref")
-  private final String value;
+  public String value() {
+    return value.asString();
+  }
 
   @Override
   public Ref asRef() {
     return this;
   }
 
-  @JsonCreator
-  Ref(@JsonProperty("@ref") String value) {
-    this.value = value;
-  }
-
-  /**
-   * Returns the String representation of the ref.
-   */
-  public String value() {
-    return value;
-  }
-
   @Override
-  public boolean equals(Object obj) {
-    return (obj instanceof Ref) && value.contentEquals(((Ref) obj).value());
-  }
-
-  @Override
-  public int hashCode() {
-    return value.hashCode();
-  }
-
-  @Override
-  /**
-   * Returns the String representation of the ref. Equivalent to {@link value()}.
-   */
-  public String toString() {
-    return value;
+  public Optional<Ref> asRefOption() {
+    return Optional.of(this);
   }
 
 }

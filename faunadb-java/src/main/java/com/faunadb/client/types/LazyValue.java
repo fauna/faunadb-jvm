@@ -5,32 +5,32 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.faunadb.client.response.*;
-import com.faunadb.client.response.Class;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.time.Instant;
 import java.time.LocalDate;
 
+import static java.lang.String.format;
+
 /**
  * A {@link Value} that wraps a JSON response tree. This Value does not convert to a concrete type until one of its
  * type coercion methods is called.
  */
-@JsonDeserialize(using=Codec.LazyValueDeserializer.class)
+@JsonDeserialize(using = Codec.LazyValueDeserializer.class)
 public final class LazyValue implements Value {
-  public static LazyValue create(JsonNode underlying, ObjectMapper json) {
-    return new LazyValue(underlying, json);
-  }
 
   private final JsonNode underlying;
   private final ObjectMapper json;
 
-  @JsonValue
-  private JsonNode underlying() {
-    return underlying;
-  }
+  private final Value rawJson = new ConcreteValue() {
+    @Override
+    public String toString() {
+      return underlying.toString();
+    }
+  };
+  private Value lazy = rawJson;
 
   @JsonCreator
   LazyValue(JsonNode underlying, ObjectMapper json) {
@@ -38,171 +38,183 @@ public final class LazyValue implements Value {
     this.json = json;
   }
 
+  @JsonValue
+  private JsonNode underlying() {
+    return underlying;
+  }
+
+  @Override
   public String asString() {
-    if (underlying.isTextual()) {
-      return underlying.asText();
-    } else {
-      return null;
-    }
+    return as(StringV.class).asString();
   }
 
+  @Override
+  public Optional<String> asStringOption() {
+    return as(StringV.class).asStringOption();
+  }
+
+  @Override
   public Boolean asBoolean() {
-    if (underlying.isBoolean()) {
-      return underlying.asBoolean();
-    } else {
-      return null;
-    }
+    return as(BooleanV.class).asBoolean();
   }
 
+  @Override
+  public Optional<Boolean> asBooleanOption() {
+    return as(BooleanV.class).asBooleanOption();
+  }
+
+  @Override
   public Long asLong() {
-    if (underlying.isNumber()) {
-      return underlying.asLong();
-    } else {
-      return null;
-    }
+    return as(LongV.class).asLong();
   }
 
+  @Override
+  public Optional<Long> asLongOption() {
+    return as(LongV.class).asLongOption();
+  }
+
+  @Override
   public Double asDouble() {
-    if (underlying.isDouble()) {
-      return underlying.asDouble();
-    } else {
-      return null;
-    }
+    return as(DoubleV.class).asDouble();
   }
 
+  @Override
+  public Optional<Double> asDoubleOption() {
+    return as(DoubleV.class).asDoubleOption();
+  }
+
+  @Override
   public Instant asTs() {
-    try {
-      return json.convertValue(underlying, TsV.class).asTs();
-    } catch (IllegalArgumentException ex) {
-      return null;
-    }
+    return as(TsV.class).asTs();
   }
 
+  @Override
+  public Optional<Instant> asTsOption() {
+    return as(TsV.class).asTsOption();
+  }
+
+  @Override
   public LocalDate asDate() {
-    try {
-      return json.convertValue(underlying, DateV.class).asDate();
-    } catch (IllegalArgumentException ex) {
-      return null;
-    }
+    return as(DateV.class).asDate();
   }
 
+  @Override
+  public Optional<LocalDate> asDateOption() {
+    return as(DateV.class).asDateOption();
+  }
+
+  @Override
   public ImmutableList<Value> asArray() {
-    try {
-      return json.convertValue(underlying, TypeFactory.defaultInstance().constructCollectionType(ImmutableList.class, LazyValue.class));
-    } catch (IllegalArgumentException ex) {
-      return null;
-    }
+    return as(ArrayV.class).asArray();
   }
 
+  @Override
+  public Optional<ImmutableList<Value>> asArrayOption() {
+    return as(ArrayV.class).asArrayOption();
+  }
+
+  @Override
   public ImmutableMap<String, Value> asObject() {
-    try {
-      return ImmutableMap.copyOf(json.convertValue(underlying, LazyValueMap.class));
-    } catch (ClassCastException ex) {
-      return null;
-    } catch (IllegalArgumentException ex) {
-      return null;
-    }
+    return as(ObjectV.class).asObject();
   }
 
+  @Override
+  public Optional<ImmutableMap<String, Value>> asObjectOption() {
+    return as(ObjectV.class).asObjectOption();
+  }
+
+  @Override
   public Ref asRef() {
-    try {
-      return json.convertValue(underlying, Ref.class);
-    } catch (IllegalArgumentException ex) {
-      return null;
-    }
+    return as(Ref.class).asRef();
   }
 
-  public Page asPage() {
-    try {
-      return json.convertValue(underlying, Page.class);
-    } catch (IllegalArgumentException ex) {
-      return null;
-    }
+  @Override
+  public Optional<Ref> asRefOption() {
+    return as(Ref.class).asRefOption();
   }
 
-  public Instance asInstance() {
-    try {
-      return json.convertValue(underlying, Instance.class);
-    } catch (IllegalArgumentException ex) {
-      return null;
-    }
+  @Override
+  public SetRef asSetRef() {
+    return as(SetRef.class).asSetRef();
   }
 
-  public Key asKey() {
-    try {
-      return json.convertValue(underlying, Key.class);
-    } catch (IllegalArgumentException ex) {
-      return null;
-    }
+  @Override
+  public Optional<SetRef> asSetRefOption() {
+    return as(SetRef.class).asSetRefOption();
   }
 
-  public Token asToken() {
-    try {
-      return json.convertValue(underlying, Token.class);
-    } catch (IllegalArgumentException ex) {
-      return null;
-    }
-  }
-
-  public Database asDatabase() {
-    try {
-      return json.convertValue(underlying, Database.class);
-    } catch (IllegalArgumentException ex) {
-      return null;
-    }
-  }
-
-  public Class asClass() {
-    try {
-      return json.convertValue(underlying, Class.class);
-    } catch (IllegalArgumentException ex) {
-      return null;
-    }
-  }
-
-  public Index asIndex() {
-    try {
-      return json.convertValue(underlying, Index.class);
-    } catch (IllegalArgumentException ex) {
-      return null;
-    }
-  }
-
-  public Event asEvent() {
-    try {
-      return json.convertValue(underlying, Event.class);
-    } catch (IllegalArgumentException ex) {
-      return null;
-    }
-  }
-
-  public Set asSet() {
-    try {
-      return json.convertValue(underlying, Set.class);
-    } catch (IllegalArgumentException ex) {
-      return null;
-    }
-  }
-
-  /**
-   * Accesses the value of the specified field if this is an object node.
-   * @return the value of the field, or null.
-   */
+  @Override
   public Value get(String key) {
     return asObject().get(key);
   }
 
-  /**
-   * Accesses the value of the specified element if this is an array node.
-   * @return the value of the element, or null.
-   */
+  @Override
+  public Value get(String... keys) {
+    Value res = this;
+    for (String key : keys)
+      res = res.get(key);
+
+    return res;
+  }
+
+  @Override
+  public Optional<Value> getOption(String key) {
+    Optional<ImmutableMap<String, Value>> object = asObjectOption();
+    if (object.isPresent())
+      return Optional.fromNullable(object.get().get(key));
+
+    return Optional.absent();
+  }
+
+  @Override
+  public Optional<Value> getOption(String... keys) {
+    Optional<Value> res = Optional.<Value>of(this);
+    for (String key : keys) {
+      res = res.get().getOption(key);
+      if (!res.isPresent()) break;
+    }
+
+    return res;
+  }
+
+  @Override
   public Value get(int index) {
     return asArray().get(index);
   }
 
   @Override
-  public boolean equals(Object obj) {
-    return (obj instanceof LazyValue) && underlying.equals(((LazyValue) obj).underlying);
+  public Optional<Value> getOption(int index) {
+    Optional<ImmutableList<Value>> array = asArrayOption();
+
+    if (array.isPresent()) {
+      try {
+        return Optional.of(array.get().get(index));
+      } catch (ArrayIndexOutOfBoundsException ign) {
+        return Optional.absent();
+      }
+    }
+
+    return Optional.absent();
+  }
+
+  private Value as(Class<? extends Value> clazz) {
+    if (lazy != rawJson)
+      return lazy;
+
+    try {
+      lazy = json.convertValue(underlying, clazz);
+    } catch (IllegalArgumentException ex) {
+      //Failed to convert. Try again with other type.
+    }
+
+    return lazy;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    return other != null &&
+      other instanceof LazyValue
+      && underlying.equals(((LazyValue) other).underlying);
   }
 
   @Override
@@ -212,6 +224,7 @@ public final class LazyValue implements Value {
 
   @Override
   public String toString() {
-    return underlying.toString();
+    return format("LazyValue(%s)", underlying.toString());
   }
+
 }

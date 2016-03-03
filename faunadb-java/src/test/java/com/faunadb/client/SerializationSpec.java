@@ -1,264 +1,753 @@
 package com.faunadb.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.faunadb.client.query.*;
-import com.faunadb.client.types.Value.*;
-import com.faunadb.client.types.*;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-import static com.faunadb.client.query.Language.*;
-
+import com.faunadb.client.query.Expr;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+
+import static com.faunadb.client.query.Language.*;
+import static com.faunadb.client.query.Language.TimeUnit.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class SerializationSpec {
-  ObjectMapper json = new ObjectMapper();
 
-  @Test
-  public void serializeLiteralValues() throws JsonProcessingException {
-    assertThat(json.writeValueAsString(BooleanV.True), is("true"));
-    assertThat(json.writeValueAsString(BooleanV.False), is("false"));
+  private ObjectMapper json;
 
-    assertThat(json.writeValueAsString(StringV("test")), is("\"test\""));
-    assertThat(json.writeValueAsString(LongV(1234)), is("1234"));
-    assertThat(json.writeValueAsString(LongV(Long.MAX_VALUE)), is(Long.valueOf(Long.MAX_VALUE).toString()));
-
-    assertThat(json.writeValueAsString(DoubleV(1.234)), is("1.234"));
-
-    assertThat(json.writeValueAsString(NullV.Null), is("null"));
+  @Before
+  public void setUp() {
+    json = new ObjectMapper();
   }
 
   @Test
-  public void serializeComplexValues() throws JsonProcessingException {
-    ArrayV value1 = ArrayV(LongV(1), StringV("test"));
-    assertThat(json.writeValueAsString(value1), is("[1,\"test\"]"));
-    ArrayV value2 = ArrayV(ArrayV(ObjectV("test", StringV("value")), LongV(2323), BooleanV.True), StringV("hi"), ObjectV("test", StringV("yo"), "test2", NullV.Null));
-    assertThat(json.writeValueAsString(value2), is("[[{\"test\":\"value\"},2323,true],\"hi\",{\"test\":\"yo\",\"test2\":null}]"));
-    ObjectV obj1 = ObjectV("test", LongV(1), "test2", Ref("some/ref"));
-    assertThat(json.writeValueAsString(obj1), is("{\"test\":1,\"test2\":{\"@ref\":\"some/ref\"}}"));
+  public void shouldSerializeLiteralValues() throws Exception {
+    assertJson(Value(Long.MAX_VALUE), String.valueOf(Long.MAX_VALUE));
+    assertJson(Value("a string"), "\"a string\"");
+    assertJson(Value(10), "10");
+    assertJson(Value(1.0), "1.0");
+    assertJson(Value(true), "true");
+    assertJson(Value(false), "false");
+    assertJson(Null(), "null");
   }
 
   @Test
-  public void serializeBasicForms() throws JsonProcessingException {
-    Value letAndVar = Let(ImmutableMap.<String, Value>of("x", LongV(1), "y", StringV("2")), Var("x"));
-    assertThat(json.writeValueAsString(letAndVar), is("{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"));
+  public void shouldSerializeAnArray() throws Exception {
+    assertJson(
+      Arr(
+        Value("a string"),
+        Value(10),
+        Obj("data", Value("str"))
+      ), "[\"a string\",10,{\"object\":{\"data\":\"str\"}}]");
 
-    Value ifForm = If(BooleanV.True, StringV("was true"), StringV("was false"));
-    assertThat(json.writeValueAsString(ifForm), is("{\"if\":true,\"then\":\"was true\",\"else\":\"was false\"}"));
-
-    Value doForm = Do(
-      Create(Ref("some/ref/1"), Quote(ObjectV("data", ObjectV("name", StringV("Hen Wen"))))),
-      Get(Ref("some/ref/1")));
-    assertThat(json.writeValueAsString(doForm), is("{\"do\":[{\"create\":{\"@ref\":\"some/ref/1\"},\"params\":{\"quote\":{\"data\":{\"name\":\"Hen Wen\"}}}},{\"get\":{\"@ref\":\"some/ref/1\"}}]}"));
-
-    Value select = Select(Path(Path.Object("favorites"), Path.Object("foods"), Path.Array(1)),
-      Quote(ObjectV("favorites", ObjectV("foods", ArrayV(StringV("crunchings"), StringV("munchings"), StringV("lunchings"))))));
-
-    assertThat(json.writeValueAsString(select), is("{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"quote\":{\"favorites\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}"));
-
-    Value quote = Quote(ObjectV("name", StringV("Hen Wen"), "Age", Add(LongV(100), LongV(10))));
+    assertJson(
+      Arr(ImmutableList.of(
+        Value("other string"),
+        Value(42)
+      )), "[\"other string\",42]");
   }
 
   @Test
-  public void serializeRefAndSet() throws JsonProcessingException {
-    Ref ref = Ref("some/ref");
-    assertEquals(json.writeValueAsString(ref), "{\"@ref\":\"some/ref\"}");
+  public void shouldSerializeAnObject() throws Exception {
+    assertJson(Obj(), "{\"object\":{}}");
+
+    assertJson(
+      Obj("k1", Value("v1")),
+      "{\"object\":{\"k1\":\"v1\"}}");
+
+    assertJson(Obj("k1", Value("v1"), "k2", Value("v2")),
+      "{\"object\":{\"k1\":\"v1\",\"k2\":\"v2\"}}");
+
+    assertJson(
+      Obj(
+        "k1", Value("v1"),
+        "k2", Value("v2"),
+        "k3", Value("v3")
+      ),
+      "{\"object\":{\"k1\":\"v1\",\"k2\":\"v2\",\"k3\":\"v3\"}}");
+
+    assertJson(
+      Obj(
+        "k1", Value("v1"),
+        "k2", Value("v2"),
+        "k3", Value("v3"),
+        "k4", Value("v4")
+      ),
+      "{\"object\":{\"k1\":\"v1\",\"k2\":\"v2\",\"k3\":\"v3\",\"k4\":\"v4\"}}");
+
+    assertJson(
+      Obj(
+        "k1", Value("v1"),
+        "k2", Value("v2"),
+        "k3", Value("v3"),
+        "k4", Value("v4"),
+        "k5", Value("v5")
+      ),
+      "{\"object\":{\"k1\":\"v1\",\"k2\":\"v2\",\"k3\":\"v3\",\"k4\":\"v4\",\"k5\":\"v5\"}}");
+
+    assertJson(
+      Obj(ImmutableMap.of(
+        "k1", Value("v1"),
+        "k2", Value("v2"))
+      ),
+      "{\"object\":{\"k1\":\"v1\",\"k2\":\"v2\"}}");
   }
 
   @Test
-  public void serializeCollections() throws JsonProcessingException {
-    Value map = Map(Lambda("munchings", Var("munchings")), ArrayV(LongV(1), LongV(2), LongV(3)));
-    assertEquals(json.writeValueAsString(map), "{\"map\":{\"lambda\":\"munchings\",\"expr\":{\"var\":\"munchings\"}},\"collection\":[1,2,3]}");
-
-    Value foreach = Foreach(Lambda("creature", Create(Ref("some/ref"), Object(ObjectV("data", Object(ObjectV("some", Var("creature"))))))), ArrayV(Ref("another/ref/1"), Ref("another/ref/2")));
-    assertEquals(json.writeValueAsString(foreach), "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":\"another/ref/1\"},{\"@ref\":\"another/ref/2\"}]}");
-
-    Value filter = Filter(Lambda("i", Equals(LongV(1L), Var("i"))), ArrayV(LongV(1L), LongV(2L), LongV(3L)));
-    assertThat(json.writeValueAsString(filter), is("{\"filter\":{\"lambda\":\"i\",\"expr\":{\"equals\":[1,{\"var\":\"i\"}]}},\"collection\":[1,2,3]}"));
-
-    Value take = Take(LongV(2L), ArrayV(LongV(1L),LongV(2L),LongV(3L)));
-    assertThat(json.writeValueAsString(take), is("{\"take\":2,\"collection\":[1,2,3]}"));
-
-    Value drop = Drop(LongV(2L), ArrayV(LongV(1L), LongV(2L), LongV(3L)));
-    assertThat(json.writeValueAsString(drop), is("{\"drop\":2,\"collection\":[1,2,3]}"));
-
-    Value prepend = Prepend(ArrayV(LongV(1L), LongV(2L), LongV(3L)), ArrayV(LongV(4L), LongV(5L), LongV(6L)));
-    assertThat(json.writeValueAsString(prepend), is("{\"prepend\":[1,2,3],\"collection\":[4,5,6]}"));
-
-    Value append = Append(ArrayV(LongV(4L), LongV(5L), LongV(6L)), ArrayV(LongV(1L), LongV(2L), LongV(3L)));
-    assertThat(json.writeValueAsString(append), is("{\"append\":[4,5,6],\"collection\":[1,2,3]}"));
+  public void shouldSerializeRef() throws Exception {
+    assertJson(Ref("classes"), "{\"@ref\":\"classes\"}");
+    assertJson(Ref(Value("classes")), "{\"@ref\":\"classes\"}");
+    assertJson(Ref(Ref("classes/people"), "id1"), "{\"ref\":{\"@ref\":\"classes/people\"},\"id\":\"id1\"}");
+    assertJson(Ref(Ref("classes/people"), Value("id1")), "{\"ref\":{\"@ref\":\"classes/people\"},\"id\":\"id1\"}");
   }
 
   @Test
-  public void serializeResourceRetrieval() throws JsonProcessingException {
-    Ref ref = Ref("some/ref/1");
-    Value get = Get(ref);
-
-    assertThat(json.writeValueAsString(get), is("{\"get\":{\"@ref\":\"some/ref/1\"}}"));
-
-    Value paginate1 = Paginate(Union(
-      Match(StringV("term"), Ref("indexes/some_index")),
-      Match(StringV("term2"), Ref("indexes/some_index")))).build();
-
-    assertThat(json.writeValueAsString(paginate1), is("{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]}}"));
-
-    Value paginate2 = Paginate(Union(
-      Match(StringV("term"), Ref("indexes/some_index")),
-      Match(StringV("term2"), Ref("indexes/some_index")))).withSources(true).build();
-
-    assertThat(json.writeValueAsString(paginate2), is("{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"sources\":true}"));
-
-    Value paginate3 = Paginate(Union(
-      Match(StringV("term"), Ref("indexes/some_index")),
-      Match(StringV("term2"), Ref("indexes/some_index")))).withEvents(true).build();
-
-    assertThat(json.writeValueAsString(paginate3), is("{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"events\":true}"));
-
-    Value paginate4 = Paginate(Union(
-      Match(StringV("term"), Ref("indexes/some_index")),
-      Match(StringV("term2"), Ref("indexes/some_index"))))
-      .withCursor(Before(Ref("some/ref/1")))
-      .withSize(4).build();
-
-    assertThat(json.writeValueAsString(paginate4), is("{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"before\":{\"@ref\":\"some/ref/1\"},\"size\":4}"));
-
-    Value count = Count(Match(StringV("fire"), Ref("indexes/spells_by_element")));
-    assertThat(json.writeValueAsString(count), is("{\"count\":{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}}"));
+  public void shouldSerializeInstantValue() throws Exception {
+    assertJson(Value(Instant.EPOCH), "{\"@ts\":\"1970-01-01T00:00:00Z\"}");
   }
 
   @Test
-  public void serializeResourceModification() throws JsonProcessingException {
-    Ref ref = Ref("classes/spells");
-    ObjectV params = ObjectV("name", StringV("Mountainous Thunder"), "element", StringV("air"), "cost", LongV(15));
-    Value create = Create(ref, Quote(ObjectV("data", params)));
-    assertThat(json.writeValueAsString(create), is("{\"create\":{\"@ref\":\"classes/spells\"},\"params\":{\"quote\":{\"data\":{\"name\":\"Mountainous Thunder\",\"element\":\"air\",\"cost\":15}}}}"));
-
-    Value update = Update(Ref("classes/spells/123456"), Quote(ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "cost", NullV.Null))));
-    assertThat(json.writeValueAsString(update), is("{\"update\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"quote\":{\"data\":{\"name\":\"Mountain's Thunder\",\"cost\":null}}}}"));
-
-    Value replace = Replace(Ref("classes/spells/123456"), Quote(ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "element", ArrayV(StringV("air"), StringV("earth")), "cost", LongV(10)))));
-    assertThat(json.writeValueAsString(replace), is("{\"replace\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"quote\":{\"data\":{\"name\":\"Mountain's Thunder\",\"element\":[\"air\",\"earth\"],\"cost\":10}}}}"));
-
-    Value delete = Delete(Ref("classes/spells/123456"));
-    assertThat(json.writeValueAsString(delete), is("{\"delete\":{\"@ref\":\"classes/spells/123456\"}}"));
-
-    Value insert = Insert(Ref("classes/spells/123456"), 1L, Action.CREATE, Quote(ObjectV("data", ObjectV("name", StringV("Mountain's Thunder"), "cost", LongV(10), "element", ArrayV(StringV("air"), StringV("earth"))))));
-    assertThat(json.writeValueAsString(insert), is("{\"insert\":{\"@ref\":\"classes/spells/123456\"},\"ts\":1,\"action\":\"create\",\"params\":{\"quote\":{\"data\":{\"name\":\"Mountain's Thunder\",\"cost\":10,\"element\":[\"air\",\"earth\"]}}}}"));
-
-    Value remove = Remove(Ref("classes/spells/123456"), 1L, Action.DELETE);
-    assertThat(json.writeValueAsString(remove), is("{\"remove\":{\"@ref\":\"classes/spells/123456\"},\"ts\":1,\"action\":\"delete\"}"));
+  public void shouldSerializeDateValue() throws Exception {
+    assertJson(Value(LocalDate.of(2015, 1, 15)), "{\"@date\":\"2015-01-15\"}");
   }
 
   @Test
-  public void serializeSets() throws JsonProcessingException {
-    Value match = Match(StringV("fire"), Ref("indexes/spells_by_elements"));
-    assertThat(json.writeValueAsString(match), is("{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_elements\"}}"));
+  public void shouldSerializeLet() throws Exception {
+    assertJson(
+      Let(
+        "v1", Value("x1")
+      ).in(
+        Value("x")
+      ), "{\"let\":{\"v1\":\"x1\"},\"in\":\"x\"}");
 
-    Value union = Union(
-      Match(StringV("fire"), Ref("indexes/spells_by_element")),
-      Match(StringV("water"), Ref("indexes/spells_by_element"))
+    assertJson(
+      Let(
+        "v1", Value("x1"),
+        "v2", Value("x2")
+      ).in(
+        Value("x")
+      ), "{\"let\":{\"v1\":\"x1\",\"v2\":\"x2\"},\"in\":\"x\"}");
+
+    assertJson(
+      Let(
+        "v1", Value("x1"),
+        "v2", Value("x2"),
+        "v3", Value("x3")
+      ).in(
+        Value("x")
+      ), "{\"let\":{\"v1\":\"x1\",\"v2\":\"x2\",\"v3\":\"x3\"},\"in\":\"x\"}");
+
+    assertJson(
+      Let(
+        "v1", Value("x1"),
+        "v2", Value("x2"),
+        "v3", Value("x3"),
+        "v4", Value("x4")
+      ).in(
+        Value("x")
+      ), "{\"let\":{\"v1\":\"x1\",\"v2\":\"x2\",\"v3\":\"x3\",\"v4\":\"x4\"},\"in\":\"x\"}");
+
+    assertJson(
+      Let(
+        "v1", Value("x1"),
+        "v2", Value("x2"),
+        "v3", Value("x3"),
+        "v4", Value("x4"),
+        "v5", Value("x5")
+      ).in(
+        Value("x")
+      ), "{\"let\":{\"v1\":\"x1\",\"v2\":\"x2\",\"v3\":\"x3\",\"v4\":\"x4\",\"v5\":\"x5\"},\"in\":\"x\"}");
+
+    assertJson(
+      Let(ImmutableMap.of(
+        "v1", Value("x1"),
+        "v2", Value("x2")
+        )
+      ).in(
+        Value("x")
+      ), "{\"let\":{\"v1\":\"x1\",\"v2\":\"x2\"},\"in\":\"x\"}");
+  }
+
+  @Test
+  public void shouldSerializeVar() throws Exception {
+    assertJson(Var("x"), "{\"var\":\"x\"}");
+  }
+
+  @Test
+  public void shouldSerializeIf() throws Exception {
+    assertJson(
+      If(Value(true), Value(true), Value(false)),
+      "{\"if\":true,\"then\":true,\"else\":false}");
+  }
+
+  @Test
+  public void shouldSerializeDo() throws Exception {
+    assertJson(
+      Do(
+        If(Value(true), Value("x"), Value("y")),
+        Value(42)
+      ), "{\"do\":[{\"if\":true,\"then\":\"x\",\"else\":\"y\"},42]}");
+
+    assertJson(
+      Do(ImmutableList.of(
+        If(Value(true), Value("xx"), Value("yy")),
+        Value(45)
+      )), "{\"do\":[{\"if\":true,\"then\":\"xx\",\"else\":\"yy\"},45]}");
+  }
+
+  @Test
+  public void shouldSerializeLambda() throws Exception {
+    assertJson(
+      Lambda(Value("x"),
+        If(Var("x"), Value(42), Value(45))
+      ), "{\"lambda\":\"x\",\"expr\":{\"if\":{\"var\":\"x\"},\"then\":42,\"else\":45}}");
+
+    assertJson(
+      Lambda(Arr(Value("x"), Value("_")),
+        If(Var("x"), Value(42), Value(45))
+      ), "{\"lambda\":[\"x\",\"_\"],\"expr\":{\"if\":{\"var\":\"x\"},\"then\":42,\"else\":45}}");
+  }
+
+  @Test
+  public void shouldSerializeMap() throws Exception {
+    assertJson(
+      Map(
+        Lambda(Value("x"), Var("x")),
+        Arr(Value(1), Value(2), Value(3))
+      ), "{\"map\":{\"lambda\":\"x\",\"expr\":{\"var\":\"x\"}},\"collection\":[1,2,3]}");
+  }
+
+  @Test
+  public void shouldSerializeForeach() throws Exception {
+    assertJson(
+      Foreach(
+        Lambda(Value("x"), Var("x")),
+        Arr(Value(1), Value(2), Value(3))
+      ), "{\"foreach\":{\"lambda\":\"x\",\"expr\":{\"var\":\"x\"}},\"collection\":[1,2,3]}");
+  }
+
+  @Test
+  public void shouldSerializeFilter() throws Exception {
+    assertJson(
+      Filter(
+        Lambda(Value("x"), Var("x")),
+        Arr(Value(true), Value(false))
+      ), "{\"filter\":{\"lambda\":\"x\",\"expr\":{\"var\":\"x\"}},\"collection\":[true,false]}");
+  }
+
+  @Test
+  public void shouldSerializeTake() throws Exception {
+    assertJson(
+      Take(
+        Value(2),
+        Arr(Value(1), Value(2), Value(3))
+      ), "{\"take\":2,\"collection\":[1,2,3]}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeDrop() throws Exception {
+    assertJson(
+      Drop(
+        Value(2),
+        Arr(Value(1), Value(2), Value(3))
+      ), "{\"drop\":2,\"collection\":[1,2,3]}"
+    );
+  }
+
+  @Test
+  public void shouldSerializePrepend() throws Exception {
+    assertJson(
+      Prepend(
+        Arr(Value(1), Value(2), Value(3)),
+        Arr(Value(4), Value(5), Value(6))
+      ), "{\"prepend\":[1,2,3],\"collection\":[4,5,6]}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeAppend() throws Exception {
+    assertJson(
+      Append(
+        Arr(Value(4), Value(5), Value(6)),
+        Arr(Value(1), Value(2), Value(3))
+      ), "{\"append\":[4,5,6],\"collection\":[1,2,3]}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeGet() throws Exception {
+    assertJson(
+      Get(Ref("classes/spells/104979509692858368")),
+      "{\"get\":{\"@ref\":\"classes/spells/104979509692858368\"}}"
+    );
+  }
+
+  @Test
+  public void shouldSerializePaginate() throws Exception {
+    assertJson(
+      Paginate(Ref("databases")),
+      "{\"paginate\":{\"@ref\":\"databases\"}}"
     );
 
-    assertThat(json.writeValueAsString(union), is("{\"union\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"));
-
-    Value intersection = Intersection(
-      Match(StringV("fire"), Ref("indexes/spells_by_element")),
-      Match(StringV("water"), Ref("indexes/spells_by_element"))
+    assertJson(
+      Paginate(Ref("databases"))
+        .withCursor(After(Ref("databases/test")))
+        .withEvents(true)
+        .withSources(true)
+        .withTs(10L)
+        .withSize(2),
+      "{\"paginate\":{\"@ref\":\"databases\"},\"after\":{\"@ref\":\"databases/test\"}," +
+        "\"events\":true,\"sources\":true,\"ts\":10,\"size\":2}"
     );
 
-    assertThat(json.writeValueAsString(intersection), is("{\"intersection\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"));
-
-    Value difference = Difference(
-      Match(StringV("fire"), Ref("indexes/spells_by_element")),
-      Match(StringV("water"), Ref("indexes/spells_by_element"))
+    assertJson(
+      Paginate(Ref("databases"))
+        .withCursor(After(Ref("databases/test")))
+        .withEvents(Value(true))
+        .withSources(Value(true))
+        .withTs(Value(10L))
+        .withSize(Value(2)),
+      "{\"paginate\":{\"@ref\":\"databases\"},\"after\":{\"@ref\":\"databases/test\"}," +
+        "\"events\":true,\"sources\":true,\"ts\":10,\"size\":2}"
     );
 
-    assertThat(json.writeValueAsString(difference), is("{\"difference\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"));
-
-    Value join = Join(Match(StringV("fire"), Ref("indexes/spells_by_element")),
-      Lambda("spell", Get(Var("spell"))));
-
-    assertThat(json.writeValueAsString(join), is("{\"join\":{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},\"with\":{\"lambda\":\"spell\",\"expr\":{\"get\":{\"var\":\"spell\"}}}}"));
+    assertJson(
+      Paginate(Ref("databases"))
+        .withCursor(Before(Ref("databases/test")))
+        .withEvents(false)
+        .withSources(false)
+        .withTs(10L)
+        .withSize(2),
+      "{\"paginate\":{\"@ref\":\"databases\"},\"before\":{\"@ref\":\"databases/test\"},\"ts\":10,\"size\":2}"
+    );
   }
 
   @Test
-  public void serializeAuthentication() throws JsonProcessingException {
-    Value login = Login(Ref("classes/characters/104979509695139637"), Quote(ObjectV("password", StringV("abracadabra"))));
-    assertThat(json.writeValueAsString(login), is("{\"login\":{\"@ref\":\"classes/characters/104979509695139637\"},\"params\":{\"quote\":{\"password\":\"abracadabra\"}}}"));
+  public void shouldSerializeExists() throws Exception {
+    assertJson(
+      Exists(Ref("classes/spells/104979509692858368")),
+      "{\"exists\":{\"@ref\":\"classes/spells/104979509692858368\"}}"
+    );
 
-    Value logout = Logout(true);
-    assertThat(json.writeValueAsString(logout), is("{\"logout\":true}"));
-
-    Value identify = Identify(Ref("classes/characters/104979509695139637"), StringV("abracadabra"));
-    assertThat(json.writeValueAsString(identify), is("{\"identify\":{\"@ref\":\"classes/characters/104979509695139637\"},\"password\":\"abracadabra\"}"));
+    assertJson(
+      Exists(Ref("classes/spells/104979509692858368"), Value(Instant.EPOCH)),
+      "{\"exists\":{\"@ref\":\"classes/spells/104979509692858368\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}}"
+    );
   }
 
   @Test
-  public void serializeTsAndDateValues() throws JsonProcessingException {
-    Value ts = TsV(Instant.EPOCH.plus(5, ChronoUnit.MINUTES));
-    assertThat(json.writeValueAsString(ts), is("{\"@ts\":\"1970-01-01T00:05:00Z\"}"));
+  public void shouldSerializeCount() throws Exception {
+    assertJson(
+      Count(Ref("databases")),
+      "{\"count\":{\"@ref\":\"databases\"}}"
+    );
 
-    Value date = DateV(LocalDate.ofEpochDay(2));
-    assertThat(json.writeValueAsString(date), is("{\"@date\":\"1970-01-03\"}"));
+    assertJson(
+      Count(Ref("databases"), Value(true)),
+      "{\"count\":{\"@ref\":\"databases\"},\"events\":true}"
+    );
   }
 
   @Test
-  public void serializeDateAndTime() throws JsonProcessingException {
-    Value time = Time(StringV("1970-01-01T00:00:00+00:00"));
-    assertThat(json.writeValueAsString(time), is("{\"time\":\"1970-01-01T00:00:00+00:00\"}"));
+  public void shouldSerializeCreate() throws Exception {
+    assertJson(
+      Create(
+        Ref("databases"),
+        Obj("name", Value("annuvin"))
+      ), "{\"create\":{\"@ref\":\"databases\"},\"params\":{\"object\":{\"name\":\"annuvin\"}}}");
 
-    Value epoch = Epoch(LongV(10L), TimeUnit.SECOND);
-    assertThat(json.writeValueAsString(epoch), is("{\"epoch\":10,\"unit\":\"second\"}"));
-
-    Value epoch2 = Epoch(LongV(10L), "millisecond");
-    assertThat(json.writeValueAsString(epoch2), is("{\"epoch\":10,\"unit\":\"millisecond\"}"));
-
-    Value date = Date(StringV("1970-01-02"));
-    assertThat(json.writeValueAsString(date), is("{\"date\":\"1970-01-02\"}"));
   }
 
   @Test
-  public void serializeMiscAndMath() throws JsonProcessingException {
-    Value equals = Equals(StringV("fire"), StringV("fire"));
-    assertThat(json.writeValueAsString(equals), is("{\"equals\":[\"fire\",\"fire\"]}"));
+  public void shouldSerializeUpdate() throws Exception {
+    assertJson(
+      Update(
+        Ref("databases/annuvin"),
+        Obj("name", Value("llyr"))
+      ), "{\"update\":{\"@ref\":\"databases/annuvin\"},\"params\":{\"object\":{\"name\":\"llyr\"}}}");
 
-    Value concat = Concat(StringV("Hen"), StringV("Wen"));
-    assertThat(json.writeValueAsString(concat), is("{\"concat\":[\"Hen\",\"Wen\"]}"));
+  }
 
-    Value concat2 = Concat(ImmutableList.<Value>of(StringV("Hen"), StringV("Wen")), " ");
-    assertThat(json.writeValueAsString(concat2), is("{\"concat\":[\"Hen\",\"Wen\"],\"separator\":\" \"}"));
+  @Test
+  public void shouldSerializeReplace() throws Exception {
+    assertJson(
+      Replace(
+        Ref("classes/spells/104979509696660483"),
+        Obj("data",
+          Obj("name", Value("Mountain's Thunder")))
+      ), "{\"replace\":{\"@ref\":\"classes/spells/104979509696660483\"}," +
+        "\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\"}}}}}");
 
-    Value add = Add(LongV(1L), LongV(2L));
-    assertThat(json.writeValueAsString(add), is("{\"add\":[1,2]}"));
+  }
 
-    Value multiply = Multiply(LongV(1L), LongV(2L));
-    assertThat(json.writeValueAsString(multiply), is("{\"multiply\":[1,2]}"));
+  @Test
+  public void shouldSerializeDelete() throws Exception {
+    assertJson(
+      Delete(Ref("classes/spells/104979509696660483")),
+      "{\"delete\":{\"@ref\":\"classes/spells/104979509696660483\"}}"
+    );
+  }
 
-    Value subtract = Subtract(LongV(1L), LongV(2L));
-    assertThat(json.writeValueAsString(subtract), is("{\"subtract\":[1,2]}"));
+  @Test
+  public void shouldSerializeInsert() throws Exception {
+    assertJson(
+      Insert(
+        Ref("classes/spells/104979509696660483"),
+        Value(Instant.EPOCH),
+        Action.CREATE,
+        Obj("data", Obj("name", Value("test")))
+      ),
+      "{\"insert\":{\"@ref\":\"classes/spells/104979509696660483\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}," +
+        "\"action\":\"create\",\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"test\"}}}}}"
+    );
 
-    Value divide = Divide(LongV(1L), LongV(2L));
-    assertThat(json.writeValueAsString(divide), is("{\"divide\":[1,2]}"));
+    assertJson(
+      Insert(
+        Ref("classes/spells/104979509696660483"),
+        Value(Instant.EPOCH),
+        Value("create"),
+        Obj("data", Obj("name", Value("test")))
+      ),
+      "{\"insert\":{\"@ref\":\"classes/spells/104979509696660483\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}," +
+        "\"action\":\"create\",\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"test\"}}}}}"
+    );
+  }
 
-    Value modulo = Modulo(LongV(1L), LongV(2L));
-    assertThat(json.writeValueAsString(modulo), is("{\"modulo\":[1,2]}"));
+  @Test
+  public void shouldSerializeRemove() throws Exception {
+    assertJson(
+      Remove(
+        Ref("classes/spells/104979509696660483"),
+        Value(Instant.EPOCH),
+        Action.DELETE
+      ),
+      "{\"remove\":{\"@ref\":\"classes/spells/104979509696660483\"}," +
+        "\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"},\"action\":\"delete\"}"
+    );
 
-    Value and = And(BooleanV(true), BooleanV(false));
-    assertThat(json.writeValueAsString(and), is("{\"and\":[true,false]}"));
+    assertJson(
+      Remove(
+        Ref("classes/spells/104979509696660483"),
+        Value(Instant.EPOCH),
+        Value("delete")
+      ),
+      "{\"remove\":{\"@ref\":\"classes/spells/104979509696660483\"}," +
+        "\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"},\"action\":\"delete\"}"
+    );
+  }
 
-    Value or = Or(BooleanV(true), BooleanV(false));
-    assertThat(json.writeValueAsString(or), is("{\"or\":[true,false]}"));
+  @Test
+  public void shouldSerializeMatchFunction() throws Exception {
+    assertJson(
+      Match(Ref("indexes/all_users")),
+      "{\"match\":{\"@ref\":\"indexes/all_users\"}}"
+    );
 
-    Value not = Not(BooleanV(false));
-    assertThat(json.writeValueAsString(not), is("{\"not\":false}"));
+    assertJson(
+      Match(Ref("indexes/spells_by_element"), Value("fire")),
+      "{\"match\":{\"@ref\":\"indexes/spells_by_element\"},\"terms\":\"fire\"}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeUnion() throws Exception {
+    assertJson(
+      Union(Ref("databases"), Ref("keys")),
+      "{\"union\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+    );
+
+    assertJson(
+      Union(ImmutableList.of(Ref("databases"), Ref("keys"))),
+      "{\"union\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeIntersection() throws Exception {
+    assertJson(
+      Intersection(Ref("databases"), Ref("keys")),
+      "{\"intersection\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+    );
+
+    assertJson(
+      Intersection(ImmutableList.of(Ref("databases"), Ref("keys"))),
+      "{\"intersection\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeDifference() throws Exception {
+    assertJson(
+      Difference(Ref("databases"), Ref("keys")),
+      "{\"difference\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+    );
+
+    assertJson(
+      Difference(ImmutableList.of(Ref("databases"), Ref("keys"))),
+      "{\"difference\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeDistinct() throws Exception {
+    assertJson(
+      Distinct(Match(Ref("indexes/some_set"))),
+      "{\"distinct\":{\"match\":{\"@ref\":\"indexes/some_set\"}}}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeJoin() throws Exception {
+    assertJson(
+      Join(
+        Match(Ref("indexes/spellbooks_by_owner"), Ref("classes/characters/104979509695139637")),
+        Ref("indexes/spells_by_spellbook")
+      ),
+      "{\"join\":{\"match\":{\"@ref\":\"indexes/spellbooks_by_owner\"}," +
+        "\"terms\":{\"@ref\":\"classes/characters/104979509695139637\"}}," +
+        "\"with\":{\"@ref\":\"indexes/spells_by_spellbook\"}}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeLogin() throws Exception {
+    assertJson(
+      Login(
+        Ref("classes/characters/104979509695139637"),
+        Obj("password", Value("abracadabra"))
+      ),
+      "{\"login\":{\"@ref\":\"classes/characters/104979509695139637\"}," +
+        "\"params\":{\"object\":{\"password\":\"abracadabra\"}}}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeLogout() throws Exception {
+    assertJson(Logout(Value(true)), "{\"logout\":true}");
+  }
+
+  @Test
+  public void shouldSerializeIdentify() throws Exception {
+    assertJson(
+      Identify(Ref("classes/characters/104979509695139637"), Value("abracadabra")),
+      "{\"identify\":{\"@ref\":\"classes/characters/104979509695139637\"},\"password\":\"abracadabra\"}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeConcat() throws Exception {
+    assertJson(
+      Concat(
+        Arr(
+          Value("Hen"),
+          Value("Wen")
+        )
+      ), "{\"concat\":[\"Hen\",\"Wen\"]}"
+    );
+
+    assertJson(
+      Concat(
+        Arr(
+          Value("Hen"),
+          Value("Wen")
+        ),
+        Value(" ")
+      ), "{\"concat\":[\"Hen\",\"Wen\"],\"separator\":\" \"}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeCasefold() throws Exception {
+    assertJson(Casefold(Value("Hen Wen")), "{\"casefold\":\"Hen Wen\"}");
+  }
+
+  @Test
+  public void shouldSerializeTime() throws Exception {
+    assertJson(
+      Time(Value("1970-01-01T00:00:00+00:00")),
+      "{\"time\":\"1970-01-01T00:00:00+00:00\"}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeEpoch() throws Exception {
+    assertJson(Epoch(Value(0), SECOND), "{\"epoch\":0,\"unit\":\"second\"}");
+    assertJson(Epoch(Value(0), MILLISECOND), "{\"epoch\":0,\"unit\":\"millisecond\"}");
+    assertJson(Epoch(Value(0), MICROSECOND), "{\"epoch\":0,\"unit\":\"microsecond\"}");
+    assertJson(Epoch(Value(0), NANOSECOND), "{\"epoch\":0,\"unit\":\"nanosecond\"}");
+
+    assertJson(Epoch(Value(0), Value("second")), "{\"epoch\":0,\"unit\":\"second\"}");
+    assertJson(Epoch(Value(0), Value("millisecond")), "{\"epoch\":0,\"unit\":\"millisecond\"}");
+    assertJson(Epoch(Value(0), Value("microsecond")), "{\"epoch\":0,\"unit\":\"microsecond\"}");
+    assertJson(Epoch(Value(0), Value("nanosecond")), "{\"epoch\":0,\"unit\":\"nanosecond\"}");
+  }
+
+  @Test
+  public void shouldSerializeDate() throws Exception {
+    assertJson(Date(Value("1970-01-01")), "{\"date\":\"1970-01-01\"}");
+  }
+
+  @Test
+  public void shouldSerializeNextId() throws Exception {
+    assertJson(NextId(), "{\"next_id\":null}");
+  }
+
+  @Test
+  public void shouldSerializeEquals() throws Exception {
+    assertJson(Equals(Value("fire"), Value("fire")), "{\"equals\":[\"fire\",\"fire\"]}");
+    assertJson(Equals(ImmutableList.of(Value("fire"), Value("fire"))), "{\"equals\":[\"fire\",\"fire\"]}");
+  }
+
+  @Test
+  public void shouldSerializeContains() throws Exception {
+    assertJson(
+      Contains(
+        Path("favorites", "foods"),
+        Obj("favorites",
+          Obj("foods", Arr(
+            Value("crunchings"),
+            Value("munchings"),
+            Value("lunchings")
+          ))
+        )
+      ),
+      "{\"contains\":[\"favorites\",\"foods\"],\"in\":" +
+        "{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}");
+
+    assertJson(
+      Contains(
+        Arr(Value("favorites"), Value("foods")),
+        Obj("favorites",
+          Obj("foods", Arr(
+            Value("crunchings"),
+            Value("munchings"),
+            Value("lunchings")
+          ))
+        )
+      ),
+      "{\"contains\":[\"favorites\",\"foods\"],\"in\":" +
+        "{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}");
+  }
+
+  @Test
+  public void shouldSerializeSelect() throws Exception {
+    assertJson(
+      Select(
+        Path("favorites", "foods").at(1),
+        Obj("favorites",
+          Obj("foods", Arr(
+            Value("crunchings"),
+            Value("munchings"),
+            Value("lunchings")
+          ))
+        )
+      ),
+      "{\"select\":[\"favorites\",\"foods\",1],\"from\":" +
+        "{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}");
+
+    assertJson(
+      Select(
+        Path(0).at("name"),
+        Arr(Obj("name", Value("someone")))
+      ),
+      "{\"select\":[0,\"name\"],\"from\":" +
+        "[{\"object\":{\"name\":\"someone\"}}]}");
+
+    assertJson(
+      Select(
+        Arr(Value("favorites"), Value("foods"), Value(1)),
+        Obj("favorites",
+          Obj("foods", Arr(
+            Value("crunchings"),
+            Value("munchings"),
+            Value("lunchings")
+          ))
+        )
+      ),
+      "{\"select\":[\"favorites\",\"foods\",1],\"from\":" +
+        "{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}");
+  }
+
+  @Test
+  public void shouldSerializeAdd() throws Exception {
+    assertJson(Add(Value(100), Value(10)), "{\"add\":[100,10]}");
+    assertJson(Add(ImmutableList.of(Value(100), Value(10))), "{\"add\":[100,10]}");
+  }
+
+  @Test
+  public void shouldSerializeMultiply() throws Exception {
+    assertJson(Multiply(Value(100), Value(10)), "{\"multiply\":[100,10]}");
+    assertJson(Multiply(ImmutableList.of(Value(100), Value(10))), "{\"multiply\":[100,10]}");
+  }
+
+  @Test
+  public void shouldSerializeSubtract() throws Exception {
+    assertJson(Subtract(Value(100), Value(10)), "{\"subtract\":[100,10]}");
+    assertJson(Subtract(ImmutableList.of(Value(100), Value(10))), "{\"subtract\":[100,10]}");
+  }
+
+  @Test
+  public void shouldSerializeDivide() throws Exception {
+    assertJson(Divide(Value(100), Value(10)), "{\"divide\":[100,10]}");
+    assertJson(Divide(ImmutableList.of(Value(100), Value(10))), "{\"divide\":[100,10]}");
+  }
+
+  @Test
+  public void shouldSerializeModulo() throws Exception {
+    assertJson(Modulo(Value(100), Value(10)), "{\"modulo\":[100,10]}");
+    assertJson(Modulo(ImmutableList.of(Value(100), Value(10))), "{\"modulo\":[100,10]}");
+  }
+
+  @Test
+  public void shouldSerializeLT() throws Exception {
+    assertJson(LT(Value(1), Value(2), Value(3)), "{\"lt\":[1,2,3]}");
+    assertJson(LT(ImmutableList.of(Value(1), Value(2), Value(3))), "{\"lt\":[1,2,3]}");
+  }
+
+  @Test
+  public void shouldSerializeLTE() throws Exception {
+    assertJson(LTE(Value(1), Value(2), Value(2)), "{\"lte\":[1,2,2]}");
+    assertJson(LTE(ImmutableList.of(Value(1), Value(2), Value(2))), "{\"lte\":[1,2,2]}");
+  }
+
+  @Test
+  public void shouldSerializeGT() throws Exception {
+    assertJson(GT(Value(3), Value(2), Value(1)), "{\"gt\":[3,2,1]}");
+    assertJson(GT(ImmutableList.of(Value(3), Value(2), Value(1))), "{\"gt\":[3,2,1]}");
+  }
+
+  @Test
+  public void shouldSerializeGTE() throws Exception {
+    assertJson(GTE(Value(3), Value(2), Value(2)), "{\"gte\":[3,2,2]}");
+    assertJson(GTE(ImmutableList.of(Value(3), Value(2), Value(2))), "{\"gte\":[3,2,2]}");
+  }
+
+  @Test
+  public void shouldSerializeAnd() throws Exception {
+    assertJson(And(Value(true), Value(true), Value(false)), "{\"and\":[true,true,false]}");
+    assertJson(And(ImmutableList.of(Value(true), Value(true), Value(false))), "{\"and\":[true,true,false]}");
+  }
+
+  @Test
+  public void shouldSerializeOr() throws Exception {
+    assertJson(Or(Value(true), Value(true), Value(false)), "{\"or\":[true,true,false]}");
+    assertJson(Or(ImmutableList.of(Value(true), Value(true), Value(false))), "{\"or\":[true,true,false]}");
+  }
+
+  @Test
+  public void shouldSerializeNot() throws Exception {
+    assertJson(Not(Value(true)), "{\"not\":true}");
+  }
+
+  private void assertJson(Expr expr, String jsonString) throws JsonProcessingException {
+    assertThat(json.writeValueAsString(expr),
+      equalTo(jsonString));
   }
 
 }

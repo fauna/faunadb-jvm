@@ -1,89 +1,99 @@
 package com.faunadb.client.types;
 
+import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.type.MapLikeType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.faunadb.client.types.Value.ArrayV;
+import com.faunadb.client.types.Value.NullV;
+import com.faunadb.client.types.Value.ObjectV;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
-import java.io.StringWriter;
+import java.util.Iterator;
 
 class Codec {
-  public static class LazyValueDeserializer extends JsonDeserializer<LazyValue> {
-    @Override
-    public LazyValue deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-      ObjectMapper json = (ObjectMapper) jsonParser.getCodec();
-      JsonNode tree = json.readTree(jsonParser);
-      return LazyValue.create(tree, json);
-    }
-  }
 
-  public static class LazyValueMapDeserializer extends JsonDeserializer<LazyValueMap> {
+  private static abstract class TreeDeserializer<T> extends JsonDeserializer<T> {
     @Override
-    public LazyValueMap deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    public T deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
+      JsonLocation location = jsonParser.getTokenLocation();
       ObjectMapper json = (ObjectMapper) jsonParser.getCodec();
       JsonNode tree = json.readTree(jsonParser);
 
-      ObjectNode innerTree;
-      if (tree.has("@obj")) {
-        innerTree = (ObjectNode) tree.get("@obj");
-      } else {
-        innerTree = (ObjectNode) tree;
-      }
-
-      Value.ObjectV intermediate = json.convertValue(innerTree, Value.ObjectV.class);
-      return new LazyValueMap(intermediate.asObject());
+      return deserializeTree(tree, json, context.getTypeFactory(), location);
     }
+
+    abstract T deserializeTree(
+      JsonNode tree, ObjectMapper json, TypeFactory type, JsonLocation loc) throws JsonParseException;
   }
 
-  public static class SetDeserializer extends JsonDeserializer<Set> {
-
+  static class LazyValueDeserializer extends TreeDeserializer<LazyValue> {
     @Override
-    public Set deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-      ObjectMapper json = (ObjectMapper) jsonParser.getCodec();
-      TypeFactory tf = deserializationContext.getTypeFactory();
-      JsonNode tree = json.readTree(jsonParser);
-
-      if (tree.has("@set")) {
-        ImmutableMap<String, Value> values = json.convertValue(tree.get("@set"), tf.constructMapLikeType(ImmutableMap.class, String.class, LazyValue.class));
-        return new Set(values);
-      } else {
-        throw new JsonParseException("Cannot deserialize as a @set", jsonParser.getTokenLocation());
-      }
+    LazyValue deserializeTree(JsonNode tree, ObjectMapper json, TypeFactory type, JsonLocation loc) {
+      return new LazyValue(tree, json);
     }
   }
 
-  public static class ObjectDeserializer extends JsonDeserializer<Value.ObjectV> {
+  static class SetRefDeserializer extends TreeDeserializer<SetRef> {
     @Override
-    public Value.ObjectV deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-      ImmutableMap.Builder<String, Value> mapBuilder = ImmutableMap.builder();
-      JsonToken t = jsonParser.getCurrentToken();
-      if (t == JsonToken.START_OBJECT) {
-        t = jsonParser.nextToken();
-      }
+    SetRef deserializeTree(JsonNode tree, ObjectMapper json, TypeFactory type, JsonLocation loc)
+      throws JsonParseException {
+      if (!tree.has("@set"))
+        throw new JsonParseException("Cannot deserialize as a @set", loc);
 
-      while (jsonParser.getCurrentToken() == JsonToken.FIELD_NAME) {
-        String key = jsonParser.getCurrentName();
-        Value value;
-        t = jsonParser.nextToken();
-        if (t == JsonToken.VALUE_NULL) {
-          value = Value.NullV.Null;
-        } else {
-          value = deserializationContext.readValue(jsonParser, LazyValue.class);
-        }
-        mapBuilder.put(key, value);
-        t = jsonParser.nextToken();
-      }
+      ImmutableMap<String, Value> values = json.convertValue(tree.get("@set"),
+        type.constructMapLikeType(ImmutableMap.class, String.class, LazyValue.class)
+      );
 
-      return Value.ObjectV.create(mapBuilder.build());
+      return new SetRef(values);
     }
   }
+
+  static class ArrayDeserializer extends TreeDeserializer<ArrayV> {
+    @Override
+    ArrayV deserializeTree(JsonNode tree, final ObjectMapper json, TypeFactory type, JsonLocation loc)
+      throws JsonParseException {
+      if (!tree.isArray())
+        throw new JsonParseException("Cannot deserialize as an array", loc);
+
+      ImmutableList.Builder<Value> values = ImmutableList.builder();
+      for (Iterator<JsonNode> elements = tree.elements(); elements.hasNext(); )
+        values.add(toLazyValue(elements.next(), json));
+
+      return new ArrayV(values.build());
+    }
+  }
+
+  static class ObjectDeserializer extends TreeDeserializer<ObjectV> {
+    @Override
+    ObjectV deserializeTree(final JsonNode tree, final ObjectMapper json, TypeFactory type, JsonLocation loc)
+      throws JsonParseException {
+      if (!tree.isObject())
+        throw new JsonParseException("Cannot deserialize as an object", loc);
+
+      ImmutableMap.Builder<String, Value> result = ImmutableMap.builder();
+      for (Iterator<String> fields = tree.fieldNames(); fields.hasNext(); ) {
+        String key = fields.next();
+        result.put(key, toLazyValue(tree.get(key), json));
+      }
+
+      ImmutableMap<String, Value> values = result.build();
+      if (values.containsKey("@obj"))
+        return new ObjectV(values.get("@obj").asObject());
+
+      return new ObjectV(values);
+    }
+  }
+
+  private static Value toLazyValue(JsonNode node, ObjectMapper json) {
+    if (node.isNull()) return NullV.NULL;
+    return json.convertValue(node, LazyValue.class);
+  }
+
 }

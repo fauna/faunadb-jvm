@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.errors.*;
+import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.LazyValue;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
@@ -17,16 +18,17 @@ import org.asynchttpclient.Response;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 /**
  * The Java native client for FaunaDB.
- *
- * <p>This client is asynchronous, so all methods that perform latent operations return a {@link ListenableFuture}.</p>
- *
- * <p>Queries are constructed by using the static helpers in the {@link com.faunadb.client.query.Language} package.</p>
- *
- * <p><b>Example</b>:</p>
+ * <p>
+ * This client is asynchronous, so all methods that perform latent operations return a {@link ListenableFuture}.
+ * <p>
+ * Queries are constructed by using the static helpers in the {@link com.faunadb.client.query.Language} package.
+ * <p>
+ * <b>Example</b>:
  * <pre>{@code
  * import static com.faunadb.client.query.Language.*;
  * FaunaClient client = FaunaClient.create(Connection.builder().withAuthToken("someAuthToken").build());
@@ -36,7 +38,7 @@ import java.util.concurrent.TimeoutException;
  *
  * @see com.faunadb.client.query.Language
  */
-public class FaunaClient {
+public class FaunaClient implements AutoCloseable {
 
   private static final Charset UTF8 = Charset.forName("UTF-8");
 
@@ -55,7 +57,7 @@ public class FaunaClient {
    * Returns a new {@link FaunaClient} instance.
    *
    * @param connection the underlying {@link Connection} adapter for the client to use.
-   * @param json a custom {@link ObjectMapper} to customize JSON serialization and deserialization behavior.
+   * @param json       a custom {@link ObjectMapper} to customize JSON serialization and deserialization behavior.
    */
   public static FaunaClient create(Connection connection, ObjectMapper json) {
     return new FaunaClient(connection, json.copy().registerModule(new GuavaModule()));
@@ -64,7 +66,7 @@ public class FaunaClient {
   private final Connection connection;
   private final ObjectMapper json;
 
-  FaunaClient(Connection connection, ObjectMapper json) {
+  private FaunaClient(Connection connection, ObjectMapper json) {
     this.connection = connection;
     this.json = json;
   }
@@ -72,27 +74,27 @@ public class FaunaClient {
   /**
    * Frees any resources held by the client. Also closes the underlying {@link Connection}.
    */
-  public void close() {
+  @Override
+  public void close() throws IOException {
     connection.close();
   }
 
   /**
    * Issues a Query to FaunaDB.
-   *
-   * <p>Queries are modeled through the FaunaDB query language, represented by the helper functions in the
+   * <p>
+   * Queries are modeled through the FaunaDB query language, represented by the helper functions in the
    * {@link com.faunadb.client.query} package. See {@link com.faunadb.client.query.Language} for helpers
    * and examples.
-   *
-   * <p>Responses are modeled as a general response tree. Each node is a {@link Value}, and
+   * <p>
+   * Responses are modeled as a general response tree. Each node is a {@link Value}, and
    * can be coerced to structured types through various methods on that class.
    *
    * @param expr The query expression to be sent to FaunaDB.
    * @return A {@link ListenableFuture} containing the root node of the Response tree.
    * @see Value
    * @see com.faunadb.client.query.Language
-   *
    */
-  public ListenableFuture<Value> query(Value expr) {
+  public ListenableFuture<Value> query(Expr expr) {
     JsonNode body = json.valueToTree(expr);
     try {
       return handleNetworkExceptions(Futures.transform(connection.post("/", body), new Function<Response, Value>() {
@@ -116,16 +118,16 @@ public class FaunaClient {
 
   /**
    * Issues multiple queries to FaunaDB.
-   *
-   * <p>These queries are sent to FaunaDB in a single request, and are evaluated. The list of response nodes is returned
+   * <p>
+   * These queries are sent to FaunaDB in a single request, and are evaluated. The list of response nodes is returned
    * in the same order as the issued queries.
-   *
-   * See {@link FaunaClient#query(Value)} for more information on the individual queries.
+   * <p>
+   * See {@link FaunaClient#query(Expr)} for more information on the individual queries.
    *
    * @param exprs the list of query expressions to be sent to FaunaDB.
    * @return a {@link ListenableFuture} containing an ordered list of root response nodes.
    */
-  public <T extends Value> ListenableFuture<ImmutableList<Value>> query(ImmutableList<T> exprs) {
+  public ListenableFuture<ImmutableList<Value>> query(List<Expr> exprs) {
     JsonNode body = json.valueToTree(exprs);
     try {
       return handleNetworkExceptions(Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<Value>>() {
@@ -152,7 +154,7 @@ public class FaunaClient {
     }
   }
 
-  private void handleQueryErrors(Response response) throws IOException, FaunaException {
+  private void handleQueryErrors(Response response) throws FaunaException {
     int status = response.getStatusCode();
     if (status >= 300) {
       try {
