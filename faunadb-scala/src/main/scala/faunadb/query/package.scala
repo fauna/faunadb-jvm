@@ -13,6 +13,7 @@ import scala.language.implicitConversions
   * [[FaunaClient!.query(expr:faunadb\.query\.Expr)*]] in order to execute the query.
   *
   * ===Examples===
+  *
   * {{{
   * val query = Create(Ref("classes/spells"), Obj("data" -> Obj("name" -> "Magic Missile")))
   * }}}
@@ -20,7 +21,6 @@ import scala.language.implicitConversions
   * {{{
   * val query = Map(Lambda(r => Get(r)), Paginate(Match(Ref("indexes/spells_by_name"), "Magic Missile")))
   * }}}
-  *
   */
 package query {
 

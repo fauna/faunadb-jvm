@@ -65,9 +65,9 @@ object FaunaClient {
   *
   * val userCast =
   *   for {
-  *     ref <- result("ref").as[Ref]
-  *     name <- result("data", "name").as[String]
-  *     age <- result("data", "age").as[Int]
+  *     ref <- instance("ref").as[Ref]
+  *     name <- instance("data", "name").as[String]
+  *     age <- instance("data", "age").as[Int]
   *   } yield {
   *     User(ref, name, age)
   *   }
