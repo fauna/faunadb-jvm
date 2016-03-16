@@ -8,7 +8,7 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.errors.*;
 import com.faunadb.client.types.LazyValue;
 import com.faunadb.client.types.Value;
-import com.faunadb.httpclient.Connection;
+import com.faunadb.common.Connection;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;

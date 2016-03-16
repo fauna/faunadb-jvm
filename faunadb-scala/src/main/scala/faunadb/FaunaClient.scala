@@ -4,7 +4,7 @@ import com.codahale.metrics.MetricRegistry
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.faunadb.httpclient.Connection
+import com.faunadb.common.Connection
 import com.ning.http.client.{ AsyncHttpClient, Response => HttpResponse }
 import faunadb.errors._
 import faunadb.query.Expr
@@ -75,7 +75,7 @@ object FaunaClient {
   * userCast.get
   * }}}
   *
-  * @constructor create a new client with a configured [[com.faunadb.httpclient.Connection]].
+  * @constructor create a new client with a configured [[com.faunadb.common.Connection]].
   */
 class FaunaClient(connection: Connection) {
 

@@ -28,23 +28,23 @@ lazy val root = (project in file("."))
     name := "faunadb-jvm-parent",
     crossPaths := false,
     autoScalaLibrary := false)
-  .aggregate(httpclient, scala, java)
+  .aggregate(common, scala, java)
 
-lazy val httpclient = project.in(file("faunadb-httpclient"))
+lazy val common = project.in(file("faunadb-common"))
   .settings(publishSettings: _*)
   .settings(
-    name := "faunadb-httpclient",
+    name := "faunadb-common",
     crossPaths := false,
     autoScalaLibrary := false,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
-    apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-httpclient/api/")),
+    apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-common/api/")),
 
     (javacOptions in doc) := Seq("-source", "1.7",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
       "-link", "http://docs.guava-libraries.googlecode.com/git-history/v18.0/javadoc/",
       "-link", "http://fasterxml.github.io/jackson-databind/javadoc/2.5/",
       "-link", "https://dropwizard.github.io/metrics/3.1.0/apidocs/",
-      "-linkoffline", "http://static.javadoc.io/com.ning/async-http-client/1.9.32", "./faunadb-httpclient/doc/com.ning/async-http-client/1.9.32"),
+      "-linkoffline", "http://static.javadoc.io/com.ning/async-http-client/1.9.32", "./faunadb-common/doc/com.ning/async-http-client/1.9.32"),
 
     libraryDependencies ++= Seq(
       "com.ning" % "async-http-client" % "1.9.32",
@@ -55,7 +55,7 @@ lazy val httpclient = project.in(file("faunadb-httpclient"))
       "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion))
 
 lazy val scala = project.in(file("faunadb-scala"))
-  .dependsOn(httpclient)
+  .dependsOn(common)
   .settings(publishSettings : _*)
   .settings(
     name := "faunadb-scala",
@@ -89,7 +89,7 @@ lazy val scala = project.in(file("faunadb-scala"))
     })
 
 lazy val java = project.in(file("faunadb-java"))
-  .dependsOn(httpclient)
+  .dependsOn(common)
   .settings(publishSettings: _*)
   .settings(
     name := "faunadb-java",
@@ -103,7 +103,7 @@ lazy val java = project.in(file("faunadb-java"))
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
       "-link", "http://docs.guava-libraries.googlecode.com/git-history/v18.0/javadoc/",
       "-link", "http://fasterxml.github.io/jackson-databind/javadoc/2.5/",
-      "-link", ((target in httpclient).value / "api").toString),
+      "-link", ((target in common).value / "api").toString),
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
 

@@ -1,4 +1,4 @@
-package com.faunadb.httpclient;
+package com.faunadb.common;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
