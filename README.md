@@ -64,7 +64,13 @@ The faunadb-jvm project is built using sbt:
 
 * **sbt**: [Scala Simple Build Tool](http://www.scala-sbt.org/)
 
-To build and run tests, run `sbt test` from the project root.
+To build and run tests against cloud, set the env variable
+`FAUNA_ROOT_KEY` to your admin key secret and run `sbt test` from the
+project directory.
+
+To run tests against an enterprise cluster or developer instance, you
+will also need to set `FAUNA_SCHEME` (http or https), `FAUNA_DOMAIN`
+and `FAUNA_PORT`.
 
 ### License
 
