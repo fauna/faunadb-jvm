@@ -8,9 +8,32 @@ This repository contains the FaunaDB clients for the JVM languages. Currently, J
 * All per-language clients share the same underlying library [faunadb-common](./faunadb-common).
 * Supports [Dropwizard Metrics](https://dropwizard.github.io/metrics/3.1.0/) hooks for stats reporting.
 
-## Maven/Ivy
+## Installation
 
-Coming soon.
+Download from the Maven central repository:
+
+### faunadb-java/pom.xml:
+
+*coming soon*
+
+```xml
+  <dependencies>
+  ...
+  <dependency>
+    <groupId>com.faunadb</groupId>
+    <artifactId>faunadb-java</artifactId>
+    <version>0.3.0-M1</version>
+    <scope>compile</scope>
+  </dependency>
+  ...
+</dependencies>
+```
+
+### faunadb-scala/sbt
+
+```scala
+libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "0.3.0-M1")
+```
 
 ## Documentation
 
@@ -37,13 +60,11 @@ Javadocs and Scaladocs are hosted on GitHub:
 
 ## Building
 
-### Build Dependencies
+The faunadb-jvm project is built using sbt:
 
 * **sbt**: [Scala Simple Build Tool](http://www.scala-sbt.org/)
 
-### Building and Using
-
-TBD
+To build and run tests, run `sbt test` from the project root.
 
 ### License
 

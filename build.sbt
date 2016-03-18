@@ -22,11 +22,20 @@ lazy val publishSettings = Seq(
     <scm>
       <url>git@github.com:faunadb/faunadb-jvm.git</url>
       <connection>scm:git:git@github.com:faunadb/faunadb-jvm.git</connection>
-    </scm>))
+    </scm>
+    <developers>
+      <developer>
+        <id>freels</id>
+        <name>Matt Freels</name>
+        <url>http://faunadb.com</url>
+      </developer>
+    </developers>
+  ))
 
 lazy val root = (project in file("."))
   .settings(
     name := "faunadb-jvm-parent",
+    organization := "com.faunadb",
     crossPaths := false,
     autoScalaLibrary := false)
   .aggregate(common, scala, java)
