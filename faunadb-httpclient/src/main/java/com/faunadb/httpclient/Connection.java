@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +30,7 @@ import java.util.Map;
 public class Connection {
   static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
   static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
+  static final int DEFAULT_IDLE_TIMEOUT_MS = 4750;
 
   /**
    * Returns a new {@link Connection.Builder}.
@@ -128,6 +128,7 @@ public class Connection {
         AsyncHttpClientConfig config = new AsyncHttpClientConfig.Builder()
           .setConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_MS)
           .setRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
+          .setPooledConnectionIdleTimeout(DEFAULT_IDLE_TIMEOUT_MS)
           .setMaxRequestRetry(0)
           .build();
         c = new AsyncHttpClient(config);
