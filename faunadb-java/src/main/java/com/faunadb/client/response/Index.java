@@ -2,11 +2,25 @@ package com.faunadb.client.response;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.faunadb.client.types.LazyValue;
 import com.faunadb.client.types.Ref;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.lang.String.format;
+import static java.lang.String.join;
 
 /**
  * A FaunaDB Index response. This, like other response types, is created by coercing a {@link com.faunadb.client.types.Value}
@@ -17,6 +31,7 @@ import com.google.common.collect.ImmutableMap;
  * @see LazyValue#asIndex()
  */
 public final class Index extends Instance {
+
   @JsonProperty("unique")
   private final Boolean unique;
   @JsonProperty("active")
@@ -39,7 +54,8 @@ public final class Index extends Instance {
         @JsonProperty("name") String name,
         @JsonProperty("source") Ref source,
         @JsonProperty("path") String path,
-        @JsonProperty("terms") ImmutableList<ImmutableMap<String, String>> terms,
+        @JsonProperty("terms") @JsonDeserialize(using = TermsDeserializer.class)
+        ImmutableList<ImmutableMap<String, String>> terms,
         @JsonProperty("data") ImmutableMap<String, LazyValue> data) {
     super(ref, classRef, ts, data);
     this.unique = unique;
@@ -110,4 +126,37 @@ public final class Index extends Instance {
       "terms: " + terms()
     ) + ")";
   }
+
+  private static class TermsDeserializer extends JsonDeserializer<ImmutableList<ImmutableMap<String, String>>> {
+
+    private static final TypeReference<List<HashMap<String, Object>>> LIST_OF_TERMS =
+        new TypeReference<List<HashMap<String, Object>>>() {};
+
+    @Override
+    public ImmutableList<ImmutableMap<String, String>> deserialize(JsonParser p, DeserializationContext ctxt)
+        throws IOException {
+
+      List<HashMap<String, Object>> elements = p.readValueAs(LIST_OF_TERMS);
+      if (elements == null) return null;
+
+      Builder<ImmutableMap<String, String>> terms = ImmutableList.builder();
+
+      for (HashMap<String, Object> element : elements) {
+        for (Map.Entry<String, Object> entry : element.entrySet()) {
+          terms.add(parseTerm(entry.getKey(), entry.getValue()));
+        }
+      }
+
+      return terms.build();
+    }
+
+    @SuppressWarnings("unchecked")
+    private ImmutableMap<String, String> parseTerm(String key, Object value) {
+      if ("path".equals(key)) return ImmutableMap.of("path", (String) value);
+      if ("field".equals(key)) return ImmutableMap.of("path", join(".", (List<String>) value));
+
+      throw new IllegalArgumentException(format("Can not deserialize index term \"%s\" with value \"%s\"", key, value));
+    }
+  }
+
 }
