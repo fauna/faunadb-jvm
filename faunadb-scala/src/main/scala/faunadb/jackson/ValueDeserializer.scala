@@ -63,6 +63,7 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
           case _ =>
             readObject(in, ctx)
         }
+      case END_OBJECT => ObjectV.empty
       case t => throw new JsonMappingException(s"Unexpected token $t")
     }
   }

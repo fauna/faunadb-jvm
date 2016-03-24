@@ -58,6 +58,13 @@ class DeserializationSpec extends FlatSpec with Matchers {
       "data" -> ObjectV("test" -> ObjectV("field1" -> ObjectV("@name" -> StringV("Test"))))))
   }
 
+  it should "deserialize empty object" in {
+    val toDeserialize = """{}"""
+    val parsed = json.readValue(toDeserialize, classOf[Value])
+
+    parsed should equal (ObjectV.empty)
+  }
+
   it should "deserialize ts" in {
     val toDeserialize = """{"@ts":"1970-01-01T00:05:00Z"}"""
     val parsed = json.readValue(toDeserialize, classOf[Value])
