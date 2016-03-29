@@ -4,7 +4,7 @@ import com.codahale.metrics.MetricRegistry
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.faunadb.httpclient.Connection
+import com.faunadb.common.Connection
 import com.ning.http.client.{ AsyncHttpClient, Response => HttpResponse }
 import faunadb.errors._
 import faunadb.query.Expr
@@ -16,18 +16,23 @@ import java.util.concurrent.TimeoutException
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 
-/**
- * Methods to construct and obtain an instance of the FaunaDB client.
- */
+/** Companion object to the FaunaClient class. */
 object FaunaClient {
+
   /**
-   * Constructs a new FaunaDB client with the provided HTTP Connection parameters.
-   *
-   * See [[com.faunadb.httpclient.Connection.Builder]] for information on creating a Connection.
-   */
+    * Creates a new FaunaDB client.
+    *
+    *
+    *
+    * @param secret The secret material of the auth key used. See [[https://faunadb.com/documentation#authentication-key_access]]
+    * @param endpoint URL of the FaunaDB service to connect to. Defaults to https://rest.faunadb.com
+    * @param metrics An optional [[com.codehale.metrics.MetricsRegistry]] to record stats.
+    * @param httpClient An optional custom [[com.ning.http.client.AsyncHttpClient]].
+    * @return A configured FaunaClient instance.
+    */
   def apply(
-    endpoint: String = null,
     secret: String = null,
+    endpoint: String = null,
     metrics: MetricRegistry = null,
     httpClient: AsyncHttpClient = null): FaunaClient = {
 
@@ -37,68 +42,82 @@ object FaunaClient {
     if (metrics ne null) b.withMetrics(metrics)
     if (httpClient ne null) b.withHttpClient(httpClient)
 
-    FaunaClient(b.build)
+    new FaunaClient(b.build)
   }
-
-  def apply(conn: Connection) = new FaunaClient(conn)
 }
 
 /**
- * The Scala native client for FaunaDB.
- *
- * Obtain an instance of the client using the methods on the companion object.
- *
- * The client is asynchronous, so all methods will return a [[scala.concurrent.Future]].
- *
- * Example:
- * {{{
- *  import faunadb.query._
- *
- *  val client = FaunaClient(Connection.builder().withAuthToken("someAuthToken").build))
- *  val response = client.query(Get(Ref("some/ref")))
- * }}}
- */
-class FaunaClient(connection: Connection, json: ObjectMapper = new ObjectMapper) {
+  * The Scala native client for FaunaDB.
+  *
+  * Create a new client using [[FaunaClient.apply]].
+  *
+  * Query requests are made asynchronously: All methods will return a
+  * [[scala.concurrent.Future]].
+  *
+  * Example:
+  * {{{
+  * case class User(ref: Ref, name: String, age: Int)
+  *
+  * val client = FaunaClient(secret = "myKeySecret")
+  *
+  * val fut = client.query(Get(Ref("classes/users/123")))
+  * val instance = Await.result(fut, 5.seconds)
+  *
+  * val userCast =
+  *   for {
+  *     ref <- instance("ref").as[Ref]
+  *     name <- instance("data", "name").as[String]
+  *     age <- instance("data", "age").as[Int]
+  *   } yield {
+  *     User(ref, name, age)
+  *   }
+  *
+  * userCast.get
+  * }}}
+  *
+  * @constructor create a new client with a configured [[com.faunadb.common.Connection]].
+  */
+class FaunaClient(connection: Connection) {
+
+  private[this] val json = new ObjectMapper
   json.registerModule(new DefaultScalaModule)
 
   /**
-   * Issues a query to FaunaDB.
-   *
-   * Queries are modeled through the FaunaDB query language, represented by the case
-   * classes in the [[faunadb.query]] package.
-   *
-   * Responses are modeled as a general response tree. Each node is a [[faunadb.types.Value]],
-   * and can be coerced into structured types through various methods on that class.
-   */
-  def query(expr: Expr)(implicit ec: ExecutionContext): Future[Value] = {
+    * Issues a query.
+    *
+    * @param expr the query to run, created using the query dsl helpers in [[faunadb.query]].
+    * @return A [[scala.concurrent.Future]] containing the query result.
+    *         The result is an instance of [[faunadb.values.Result]],
+    *         which can be cast to a typed value using the
+    *         [[faunadb.values.Field]] API. If the query fails, failed
+    *         future is returned.
+    */
+  def query(expr: Expr)(implicit ec: ExecutionContext): Future[Value] =
     connection.post("/", json.valueToTree(expr)).asScalaFuture.map { resp =>
       handleQueryErrors(resp)
       val rv = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
       if (rv eq null) NullV else rv
     }.recover(handleNetworkExceptions)
-  }
 
   /**
-   * Issues multiple queries to FaunaDB.
-   *
-   * These queries are sent to FaunaDB in a single request, where they are evaluated.
-   * The list of responses is returned in the same order as the issued queries.
-   *
-   */
-  def query(exprs: Iterable[Expr])(implicit ec: ExecutionContext): Future[IndexedSeq[Value]] = {
+    * Issues multiple queries as a single transaction.
+    *
+    * @param exprs the queries to run.
+    * @return A [[scala.concurrent.Future]] containing an IndexedSeq of
+    *         the results of each query. Each result is an instance of
+    *         [faunadb.values.Result]], which can be cast to a typed
+    *         value using the [[faunadb.values.Field]] API. If *any*
+    *         query fails, a failed future is returned.
+    */
+  def query(exprs: Iterable[Expr])(implicit ec: ExecutionContext): Future[IndexedSeq[Value]] =
     connection.post("/", json.valueToTree(exprs)).asScalaFuture.map { resp =>
       handleQueryErrors(resp)
       val arr = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
       arr.asInstanceOf[ArrayV].elems
     }.recover(handleNetworkExceptions)
-  }
 
-  /**
-   * Frees any resources held by the client. Also closes the underlying Connection.
-   */
-  def close(): Unit = {
-    connection.close()
-  }
+  /** Frees any resources held by the client and close the underlying connection. */
+  def close(): Unit = connection.close()
 
   private def handleNetworkExceptions[A]: PartialFunction[Throwable, A] = {
     case ex: ConnectException =>
@@ -107,7 +126,7 @@ class FaunaClient(connection: Connection, json: ObjectMapper = new ObjectMapper)
       throw new TimeoutException(ex.getMessage)
   }
 
-  private def handleQueryErrors(response: HttpResponse) = {
+  private def handleQueryErrors(response: HttpResponse) =
     response.getStatusCode match {
       case x if x >= 300 =>
         try {
@@ -133,7 +152,6 @@ class FaunaClient(connection: Connection, json: ObjectMapper = new ObjectMapper)
         }
       case _ =>
     }
-  }
 
   private def parseResponseBody(response: HttpResponse) = {
     val body = response.getResponseBody("UTF-8")

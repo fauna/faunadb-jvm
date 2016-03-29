@@ -5,12 +5,35 @@ This repository contains the FaunaDB clients for the JVM languages. Currently, J
 ### Features
 
 * All clients fully support the current version of the [FaunaDB API](https://faunadb.com/documentation).
-* All per-language clients share the same underlying transport library [faunadb-httpclient](./faunadb-httpclient).
+* All per-language clients share the same underlying library [faunadb-common](./faunadb-common).
 * Supports [Dropwizard Metrics](https://dropwizard.github.io/metrics/3.1.0/) hooks for stats reporting.
 
-## Maven/Ivy
+## Installation
 
-Coming soon.
+Download from the Maven central repository:
+
+### faunadb-java/pom.xml:
+
+*coming soon*
+
+```xml
+  <dependencies>
+  ...
+  <dependency>
+    <groupId>com.faunadb</groupId>
+    <artifactId>faunadb-java</artifactId>
+    <version>0.3.0-M1</version>
+    <scope>compile</scope>
+  </dependency>
+  ...
+</dependencies>
+```
+
+### faunadb-scala/sbt
+
+```scala
+libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "0.3.0-M1")
+```
 
 ## Documentation
 
@@ -37,17 +60,17 @@ Javadocs and Scaladocs are hosted on GitHub:
 
 ## Building
 
-### Build Dependencies
+The faunadb-jvm project is built using sbt:
 
 * **sbt**: [Scala Simple Build Tool](http://www.scala-sbt.org/)
 
-### Building and Using
+To build and run tests against cloud, set the env variable
+`FAUNA_ROOT_KEY` to your admin key secret and run `sbt test` from the
+project directory.
 
-1. Clone this repository.
-2. Run `sbt package` to build all JAR files needed.
-3. Copy the `faunadb-httpclient/target/faunadb-httpclient-0.1-SNAPSHOT.jar` to your project's unmanaged library directory.
-4. Copy the client JAR of your choice to your project's unmanaged library directory. `faunadb-java/target/faunadb-java-0.1-SNAPSHOT.jar`
-for the Java client, and `faunadb-scala/target/scala-2.11/faunadb-scala_2.11-0.1-SNAPSHOT.jar` for the Scala client.
+To run tests against an enterprise cluster or developer instance, you
+will also need to set `FAUNA_SCHEME` (http or https), `FAUNA_DOMAIN`
+and `FAUNA_PORT`.
 
 ### License
 

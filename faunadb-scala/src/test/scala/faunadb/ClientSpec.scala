@@ -1,6 +1,6 @@
 package faunadb
 
-import com.faunadb.httpclient.Connection
+import com.faunadb.common.Connection
 import faunadb.errors.{UnauthorizedException, NotFoundException, BadRequestException}
 import faunadb.query._
 import faunadb.values._
@@ -24,7 +24,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     collection.Map("root_token" -> rootKey, "root_url" -> s"${scheme}://${domain}:${port}")
   }
 
-  val rootClient = FaunaClient(config("root_url"), secret = config("root_token"))
+  val rootClient = FaunaClient(endpoint = config("root_url"), secret = config("root_token"))
 
   val testDbName = "faunadb-scala-test-" + Random.alphanumeric.take(8).mkString
   var client: FaunaClient = null
@@ -56,7 +56,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val dbRef = db(RefField).get
     val key = await(rootClient.query(Create(Ref("keys"), Obj("database" -> dbRef, "role" -> "server"))))
 
-    client = FaunaClient(config("root_url"), secret = key(SecretField).get)
+    client = FaunaClient(endpoint = config("root_url"), secret = key(SecretField).get)
 
     await(client.query(Create(Ref("classes"), Obj("name" -> "spells"))))
 
@@ -81,7 +81,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "fail with unauthorized" in {
-    val badClient = FaunaClient(config("root_url"), secret = "notavalidsecret")
+    val badClient = FaunaClient(endpoint = config("root_url"), secret = "notavalidsecret")
     an[UnauthorizedException] should be thrownBy (await(badClient.query(Get(Ref("classes/spells/12345")))))
   }
 
@@ -427,7 +427,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val loginF = client.query(Login(createR("ref").as[Ref], Obj("password" -> "abcdefg")))
     val secret = Await.result(loginF, 1 second)("secret").as[String].get
 
-    val sessionClient = FaunaClient(config("root_url"), secret = secret)
+    val sessionClient = FaunaClient(endpoint = config("root_url"), secret = secret)
 
     val logoutF = sessionClient.query(Logout(false))
     val logoutR = Await.result(logoutF, 1 second)

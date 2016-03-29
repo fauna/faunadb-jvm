@@ -6,7 +6,7 @@ import com.faunadb.client.errors.UnauthorizedException;
 import com.faunadb.client.query.*;
 import com.faunadb.client.response.*;
 import com.faunadb.client.types.*;
-import com.faunadb.httpclient.Connection;
+import com.faunadb.common.Connection;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
