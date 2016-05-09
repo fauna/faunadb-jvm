@@ -5,7 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.common.Connection
-import com.ning.http.client.{ AsyncHttpClient, Response => HttpResponse }
+import java.nio.charset.Charset
+import org.asynchttpclient.{ AsyncHttpClient, Response => HttpResponse }
 import faunadb.errors._
 import faunadb.query.Expr
 import faunadb.util.FutureImplicits._
@@ -78,6 +79,8 @@ object FaunaClient {
   * @constructor create a new client with a configured [[com.faunadb.common.Connection]].
   */
 class FaunaClient(connection: Connection) {
+
+  private[this] val UTF8 = Charset.forName("UTF-8")
 
   private[this] val json = new ObjectMapper
   json.registerModule(new DefaultScalaModule)
@@ -154,7 +157,7 @@ class FaunaClient(connection: Connection) {
     }
 
   private def parseResponseBody(response: HttpResponse) = {
-    val body = response.getResponseBody("UTF-8")
+    val body = response.getResponseBody(UTF8)
     json.readTree(body)
   }
 }
