@@ -54,7 +54,7 @@ lazy val common = project.in(file("faunadb-common"))
       "-link", "http://docs.guava-libraries.googlecode.com/git-history/v18.0/javadoc/",
       "-link", "http://fasterxml.github.io/jackson-databind/javadoc/2.5/",
       "-link", "https://dropwizard.github.io/metrics/3.1.0/apidocs/",
-      "-linkoffline", "http://static.javadoc.io/com.ning/async-http-client/1.9.32", "./faunadb-common/doc/com.ning/async-http-client/1.9.32"),
+      "-linkoffline", "http://static.javadoc.io/org.asynchttpclient/async-http-client/2.0.2", "./faunadb-common/doc/org.asynchttpclient/async-http-client/2.0.2"),
 
     libraryDependencies ++= Seq(
       "org.asynchttpclient" % "async-http-client" % "2.0.2",

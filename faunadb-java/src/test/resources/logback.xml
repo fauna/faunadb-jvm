@@ -7,9 +7,6 @@
         </encoder>
     </appender>
 
-    <logger name="com.ning.http.client.providers.netty.NettyAsyncHttpProvider" level="off"/>
-    <logger name="com.ning.http.client.providers.netty.NettyConnectionsPool" level="off"/>
-
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>
