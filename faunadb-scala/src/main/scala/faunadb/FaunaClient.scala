@@ -5,15 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.common.Connection
-import java.nio.charset.Charset
-import org.asynchttpclient.{ AsyncHttpClient, Response => HttpResponse }
 import faunadb.errors._
 import faunadb.query.Expr
 import faunadb.util.FutureImplicits._
 import faunadb.values.{ ArrayV, NullV, Value }
 import java.io.IOException
 import java.net.ConnectException
+import java.nio.charset.Charset
 import java.util.concurrent.TimeoutException
+import org.asynchttpclient.{ AsyncHttpClient, Response => HttpResponse }
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 
