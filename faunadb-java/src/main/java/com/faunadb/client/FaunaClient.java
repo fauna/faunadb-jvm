@@ -3,7 +3,6 @@ package com.faunadb.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.errors.*;
 import com.faunadb.client.types.LazyValue;
@@ -13,10 +12,11 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.ning.http.client.Response;
+import org.asynchttpclient.Response;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.nio.charset.Charset;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -37,7 +37,10 @@ import java.util.concurrent.TimeoutException;
  * @see com.faunadb.client.query.Language
  */
 public class FaunaClient {
- /**
+
+  private static final Charset UTF8 = Charset.forName("UTF-8");
+
+  /**
    * Returns a new {@link FaunaClient} instance.
    *
    * @param connection the underlying {@link Connection} adapter for the client to use.
@@ -204,6 +207,6 @@ public class FaunaClient {
   }
 
   private JsonNode parseResponseBody(Response response) throws IOException {
-    return json.readTree(response.getResponseBody("UTF-8"));
+    return json.readTree(response.getResponseBody(UTF8));
   }
 }

@@ -5,14 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.common.Connection
-import com.ning.http.client.{ AsyncHttpClient, Response => HttpResponse }
 import faunadb.errors._
 import faunadb.query.Expr
 import faunadb.util.FutureImplicits._
 import faunadb.values.{ ArrayV, NullV, Value }
 import java.io.IOException
 import java.net.ConnectException
+import java.nio.charset.Charset
 import java.util.concurrent.TimeoutException
+import org.asynchttpclient.{ AsyncHttpClient, Response => HttpResponse }
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -27,7 +28,7 @@ object FaunaClient {
     * @param secret The secret material of the auth key used. See [[https://faunadb.com/documentation#authentication-key_access]]
     * @param endpoint URL of the FaunaDB service to connect to. Defaults to https://rest.faunadb.com
     * @param metrics An optional [[com.codehale.metrics.MetricsRegistry]] to record stats.
-    * @param httpClient An optional custom [[com.ning.http.client.AsyncHttpClient]].
+    * @param httpClient An optional custom [[org.asynchttpclient.AsyncHttpClient]].
     * @return A configured FaunaClient instance.
     */
   def apply(
@@ -78,6 +79,8 @@ object FaunaClient {
   * @constructor create a new client with a configured [[com.faunadb.common.Connection]].
   */
 class FaunaClient(connection: Connection) {
+
+  private[this] val UTF8 = Charset.forName("UTF-8")
 
   private[this] val json = new ObjectMapper
   json.registerModule(new DefaultScalaModule)
@@ -154,7 +157,7 @@ class FaunaClient(connection: Connection) {
     }
 
   private def parseResponseBody(response: HttpResponse) = {
-    val body = response.getResponseBody("UTF-8")
+    val body = response.getResponseBody(UTF8)
     json.readTree(body)
   }
 }

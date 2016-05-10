@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import com.ning.http.client.*;
-import com.ning.http.util.Base64;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaders;
+import org.asynchttpclient.*;
+import org.asynchttpclient.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,13 +125,13 @@ public class Connection {
 
       AsyncHttpClient c;
       if (client == null) {
-        AsyncHttpClientConfig config = new AsyncHttpClientConfig.Builder()
+        AsyncHttpClientConfig config = new DefaultAsyncHttpClientConfig.Builder()
           .setConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_MS)
           .setRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
           .setPooledConnectionIdleTimeout(DEFAULT_IDLE_TIMEOUT_MS)
           .setMaxRequestRetry(0)
           .build();
-        c = new AsyncHttpClient(config);
+        c = new DefaultAsyncHttpClient(config);
       } else
         c = client;
 
@@ -256,7 +256,11 @@ public class Connection {
    * {@link AsyncHttpClient}.
    */
   public void close() {
-    client.close();
+    try {
+      client.close();
+    } catch (IOException e) {
+      // Ignore. Probably already closed.
+    }
   }
 
   private ListenableFuture<Response> performRequest(final Request request) throws IOException {

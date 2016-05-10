@@ -3,7 +3,7 @@ val metricsVersion = "3.1.0"
 val baseScalaVersion = "2.11.8"
 
 lazy val publishSettings = Seq(
-  version := "0.3.0-M2",
+  version := "0.3.0-M3",
   organization := "com.faunadb",
   licenses := Seq("Mozilla Public License" -> url("https://www.mozilla.org/en-US/MPL/2.0/")),
   homepage := Some(url("https://github.com/faunadb/faunadb-jvm")),
@@ -54,10 +54,10 @@ lazy val common = project.in(file("faunadb-common"))
       "-link", "http://docs.guava-libraries.googlecode.com/git-history/v18.0/javadoc/",
       "-link", "http://fasterxml.github.io/jackson-databind/javadoc/2.5/",
       "-link", "https://dropwizard.github.io/metrics/3.1.0/apidocs/",
-      "-linkoffline", "http://static.javadoc.io/com.ning/async-http-client/1.9.32", "./faunadb-common/doc/com.ning/async-http-client/1.9.32"),
+      "-linkoffline", "http://static.javadoc.io/org.asynchttpclient/async-http-client/2.0.2", "./faunadb-common/doc/org.asynchttpclient/async-http-client/2.0.2"),
 
     libraryDependencies ++= Seq(
-      "com.ning" % "async-http-client" % "1.9.32",
+      "org.asynchttpclient" % "async-http-client" % "2.0.2",
       "com.google.guava" % "guava" % "19.0",
       "io.dropwizard.metrics" % "metrics-core" % metricsVersion,
       "org.slf4j" % "slf4j-api" % "1.7.7",
