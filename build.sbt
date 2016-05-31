@@ -3,7 +3,7 @@ val metricsVersion = "3.1.0"
 val baseScalaVersion = "2.11.8"
 
 lazy val publishSettings = Seq(
-  version := "0.3.0-M3",
+  version := "0.3.0-M4",
   organization := "com.faunadb",
   licenses := Seq("Mozilla Public License" -> url("https://www.mozilla.org/en-US/MPL/2.0/")),
   homepage := Some(url("https://github.com/faunadb/faunadb-jvm")),
