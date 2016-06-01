@@ -803,9 +803,13 @@ public class ClientSpec extends FaunaDBTest {
 
     String token = auth.get("secret").asString();
 
-    try (FaunaClient sessionClient = createFaunaClient(token)) {
+    FaunaClient sessionClient = createFaunaClient(token);
+
+    try {
       Value loggedOut = sessionClient.query(Logout(Value(true))).get();
       assertThat(loggedOut.asBoolean(), is(true));
+    } finally {
+      sessionClient.close();
     }
 
     Value identified = client.query(

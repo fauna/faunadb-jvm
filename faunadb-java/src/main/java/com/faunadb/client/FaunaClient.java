@@ -38,7 +38,7 @@ import java.util.concurrent.TimeoutException;
  *
  * @see com.faunadb.client.query.Language
  */
-public class FaunaClient implements AutoCloseable {
+public class FaunaClient {
 
   private static final Charset UTF8 = Charset.forName("UTF-8");
 
@@ -74,8 +74,7 @@ public class FaunaClient implements AutoCloseable {
   /**
    * Frees any resources held by the client. Also closes the underlying {@link Connection}.
    */
-  @Override
-  public void close() throws IOException {
+  public void close() {
     connection.close();
   }
 

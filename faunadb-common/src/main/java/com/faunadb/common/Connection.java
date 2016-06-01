@@ -255,8 +255,12 @@ public class Connection {
    * Releases any resources being held by the HTTP client. Also closes the underlying
    * {@link AsyncHttpClient}.
    */
-  public void close() throws IOException {
-    client.close();
+  public void close() {
+    try {
+      client.close();
+    } catch (IOException e) {
+      // Ignore. Probably already closed.
+    }
   }
 
   private ListenableFuture<Response> performRequest(final Request request) throws IOException {
