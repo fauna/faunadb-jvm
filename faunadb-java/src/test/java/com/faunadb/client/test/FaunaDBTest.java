@@ -9,11 +9,12 @@ import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.junit.BeforeClass;
 
+import java.util.Random;
+
 import static com.faunadb.client.query.Language.*;
 import static com.google.common.util.concurrent.Futures.transform;
 import static com.google.common.util.concurrent.Futures.transformAsync;
 import static java.lang.String.format;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
 public class FaunaDBTest {
 
@@ -36,7 +37,7 @@ public class FaunaDBTest {
 
   @BeforeClass
   public static void setUpClient() throws Exception {
-    dbName = format("faunadb-java-test-%s", randomAlphanumeric(8));
+    dbName = format("faunadb-java-test-%s", new Random().nextLong());
     rootClient = createFaunaClient(ROOT_TOKEN);
 
     client = transform(

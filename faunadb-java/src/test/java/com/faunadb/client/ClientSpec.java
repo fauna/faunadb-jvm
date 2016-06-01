@@ -17,16 +17,14 @@ import org.junit.rules.ExpectedException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
 
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.TimeUnit.SECOND;
-import static java.lang.String.format;
 import static java.time.temporal.ChronoUnit.HOURS;
 import static java.time.temporal.ChronoUnit.SECONDS;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomUtils.nextLong;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
@@ -313,7 +311,7 @@ public class ClientSpec extends FaunaDBTest {
     client.query(
       Create(Ref("indexes"),
         Obj(
-          "name", Value(format("%s_class_index", randomAlphanumeric(8))),
+          "name", Value(randomStartingWith("class_index_")),
           "source", classRef,
           "terms", Arr(Obj("field", Arr(Value("data"), Value("uniqueField")))),
           "unique", Value(true)
@@ -427,7 +425,7 @@ public class ClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldEvalDoExpression() throws Exception {
-    Expr ref = Ref(format("%s/%s", onARandomClass().value(), String.valueOf(nextLong(0, 250000))));
+    Expr ref = Ref(randomStartingWith(onARandomClass().value(), "/"));
 
     Value res = client.query(
       Do(
@@ -825,7 +823,7 @@ public class ClientSpec extends FaunaDBTest {
   private Ref onARandomClass() throws Exception {
     Value clazz = client.query(
       Create(Ref("classes"),
-        Obj("name", Value(randomAlphanumeric(8))))
+        Obj("name", Value(randomStartingWith("some_class_"))))
     ).get();
 
     return clazz.get("ref").asRef();
@@ -845,6 +843,15 @@ public class ClientSpec extends FaunaDBTest {
       refs.add(value.get("resource").asRef());
 
     return refs.build();
+  }
+
+  private String randomStartingWith(String... parts) {
+    StringBuilder builder = new StringBuilder();
+    for (String part : parts)
+      builder.append(part);
+
+    builder.append(Math.abs(new Random().nextLong()));
+    return builder.toString();
   }
 
 }
