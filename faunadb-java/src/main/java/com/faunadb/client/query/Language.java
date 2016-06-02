@@ -808,7 +808,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr NextId() {
-    return Fn.apply("next_id", Null());
+    return Fn.apply("next_id", NullV.NULL);
   }
 
   /**
