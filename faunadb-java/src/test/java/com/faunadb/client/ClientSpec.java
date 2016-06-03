@@ -405,8 +405,9 @@ public class ClientSpec extends FaunaDBTest {
         Value("arcane"))
     ).get();
 
-    assertThat(res.asSetRef().get("terms").asString(), equalTo("arcane"));
-    assertThat(res.asSetRef().get("match").asRef(),
+    ImmutableMap<String, Value> set = res.asSetRef().parameters();
+    assertThat(set.get("terms").asString(), equalTo("arcane"));
+    assertThat(set.get("match").asRef(),
       equalTo(new Ref("indexes/spells_by_element")));
   }
 

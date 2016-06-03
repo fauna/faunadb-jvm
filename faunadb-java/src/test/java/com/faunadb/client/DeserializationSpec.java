@@ -6,6 +6,7 @@ import com.faunadb.client.types.LazyValue;
 import com.faunadb.client.types.Ref;
 import com.faunadb.client.types.Value;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -134,8 +135,9 @@ public class DeserializationSpec {
         "}"
     );
 
-    assertThat(parsed.asSetRef().get("terms").asString(), equalTo("fire"));
-    assertThat(parsed.asSetRef().get("match").asRef(),
+    ImmutableMap<String, Value> set = parsed.asSetRef().parameters();
+    assertThat(set.get("terms").asString(), equalTo("fire"));
+    assertThat(set.get("match").asRef(),
       equalTo(new Ref("indexes/spells_by_element")));
   }
 

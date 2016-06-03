@@ -18,19 +18,8 @@ public class SetRef extends Value.ScalarValue<ImmutableMap<String, Value>> {
   }
 
   @JsonValue
-  @Override
-  public ImmutableMap<String, Value> asObject() {
+  public ImmutableMap<String, Value> parameters() {
     return value;
-  }
-
-  @Override
-  public Value get(String key) {
-    return value.get(key);
-  }
-
-  @Override
-  public Optional<Value> getOption(String key) {
-    return Optional.fromNullable(get(key));
   }
 
   @Override
