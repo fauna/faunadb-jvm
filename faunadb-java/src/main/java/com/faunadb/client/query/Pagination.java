@@ -1,8 +1,10 @@
 package com.faunadb.client.query;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.LongV;
 import com.faunadb.client.types.Value.ObjectV;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import static java.util.Objects.requireNonNull;
@@ -23,7 +25,7 @@ import static java.util.Objects.requireNonNull;
  * @see Language#Paginate(Expr)
  * @see <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
  */
-public final class Pagination extends Expr.ConcreteExpr {
+public final class Pagination extends Expr {
 
   /**
    * Helper to construct the pagination cursor that can constructed either
@@ -48,22 +50,36 @@ public final class Pagination extends Expr.ConcreteExpr {
   }
 
   static class After extends Cursor {
-    After(Expr ref) {
+    After(Expr
+            ref) {
       super("after", ref);
     }
   }
 
-  static Pagination paginate(Expr resource) {
-    return new Pagination(new ObjectV(
-      ImmutableMap.of("paginate", resource.value())
-    ));
+  private final Expr resource;
+  private Optional<Cursor> cursor = Optional.absent();
+  private Optional<Expr> ts = Optional.absent();
+  private Optional<Expr> size = Optional.absent();
+  private Optional<Expr> sources = Optional.absent();
+  private Optional<Expr> events = Optional.absent();
+
+  Pagination(Expr resource) {
+    this.resource = requireNonNull(resource);
   }
 
-  private final ObjectV call;
+  @Override
+  @JsonValue
+  protected Value value() {
+    ImmutableMap.Builder<String, Value> res = ImmutableMap.builder();
+    res.put("paginate", resource.value());
 
-  private Pagination(ObjectV call) {
-    super(call);
-    this.call = call;
+    if (cursor.isPresent()) res.put(cursor.get().name, cursor.get().ref.value());
+    if (events.isPresent()) res.put("events", events.get().value());
+    if (sources.isPresent()) res.put("sources", sources.get().value());
+    if (ts.isPresent()) res.put("ts", ts.get().value());
+    if (size.isPresent()) res.put("size", size.get().value());
+
+    return new ObjectV(res.build());
   }
 
   /**
@@ -74,7 +90,8 @@ public final class Pagination extends Expr.ConcreteExpr {
    * @see Cursor
    */
   public Pagination withCursor(Cursor cursor) {
-    return new Pagination(with(cursor.name, cursor.ref));
+    this.cursor = Optional.of(cursor);
+    return this;
   }
 
   /**
@@ -84,7 +101,8 @@ public final class Pagination extends Expr.ConcreteExpr {
    * @return a new pagination with the timestamp set
    */
   public Pagination withTs(Expr ts) {
-    return new Pagination(with("ts", ts));
+    this.ts = Optional.of(ts);
+    return this;
   }
 
   /**
@@ -104,7 +122,8 @@ public final class Pagination extends Expr.ConcreteExpr {
    * @return a new pagination with the size set
    */
   public Pagination withSize(Expr size) {
-    return new Pagination(with("size", size));
+    this.size = Optional.of(size);
+    return this;
   }
 
   /**
@@ -123,7 +142,8 @@ public final class Pagination extends Expr.ConcreteExpr {
    * @return a new pagination with sources option set
    */
   public Pagination withSources(Expr sources) {
-    return new Pagination(with("sources", sources));
+    this.sources = Optional.of(sources);
+    return this;
   }
 
   /**
@@ -142,7 +162,8 @@ public final class Pagination extends Expr.ConcreteExpr {
    * @return a new pagination with events option set
    */
   public Pagination withEvents(Expr events) {
-    return new Pagination(with("events", events));
+    this.events = Optional.of(events);
+    return this;
   }
 
   /**
@@ -153,14 +174,6 @@ public final class Pagination extends Expr.ConcreteExpr {
   public Pagination withEvents(boolean events) {
     if (!events) return this;
     return withEvents(Value.BooleanV.TRUE);
-  }
-
-  private ObjectV with(String key, Expr value) {
-    ImmutableMap.Builder<String, Value> page = ImmutableMap.builder();
-    page.putAll(call.asObject());
-    page.put(key, value.value());
-
-    return new ObjectV(page.build());
   }
 
 }

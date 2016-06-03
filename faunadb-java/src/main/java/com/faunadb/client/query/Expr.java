@@ -41,7 +41,7 @@ public abstract class Expr {
     if (value == null || value instanceof NullV) return NULL;
     if (value instanceof Value) return escape((Value) value);
 
-    throw new IllegalArgumentException("Can not create Expr from " + value);
+    return new ConcreteExpr(value.value());
   }
 
   private static Expr escape(Value value) {

@@ -484,7 +484,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
    */
   public static Pagination Paginate(Expr resource) {
-    return Pagination.paginate(resource);
+    return new Pagination(resource);
   }
 
   /**
