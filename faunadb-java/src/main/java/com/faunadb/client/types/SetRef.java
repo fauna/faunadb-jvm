@@ -1,7 +1,7 @@
 package com.faunadb.client.types;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -10,10 +10,9 @@ import com.google.common.collect.ImmutableMap;
  *
  * @see <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
  */
-@JsonDeserialize(using = Codec.SetRefDeserializer.class)
 public class SetRef extends Value.ScalarValue<ImmutableMap<String, Value>> {
 
-  public SetRef(ImmutableMap<String, Value> parameters) {
+  public SetRef(@JsonProperty("@set") ImmutableMap<String, Value> parameters) {
     super(parameters);
   }
 

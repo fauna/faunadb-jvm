@@ -2,7 +2,6 @@ package com.faunadb.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.faunadb.client.types.LazyValue;
 import com.faunadb.client.types.Ref;
 import com.faunadb.client.types.Value;
 import com.google.common.base.Optional;
@@ -142,7 +141,7 @@ public class DeserializationSpec {
   }
 
   private Value parsed(String str) throws java.io.IOException {
-    return json.readValue(str, LazyValue.class);
+    return json.readValue(str, Value.class);
   }
 
 }

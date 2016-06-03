@@ -195,7 +195,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Value(boolean value) {
-    return Expr.wrap(value ? BooleanV.TRUE : BooleanV.FALSE);
+    return Expr.wrap(BooleanV.valueOf(value));
   }
 
   /**

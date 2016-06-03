@@ -16,6 +16,9 @@ import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
+
+import static com.faunadb.client.types.Value.BooleanV.*;
 
 class Codec {
 
@@ -33,25 +36,47 @@ class Codec {
       JsonNode tree, ObjectMapper json, TypeFactory type, JsonLocation loc) throws JsonParseException;
   }
 
-  static class LazyValueDeserializer extends TreeDeserializer<LazyValue> {
+  static class ValueDeserializer extends TreeDeserializer<Value> {
     @Override
-    LazyValue deserializeTree(JsonNode tree, ObjectMapper json, TypeFactory type, JsonLocation loc) {
-      return new LazyValue(tree, json);
-    }
-  }
-
-  static class SetRefDeserializer extends TreeDeserializer<SetRef> {
-    @Override
-    SetRef deserializeTree(JsonNode tree, ObjectMapper json, TypeFactory type, JsonLocation loc)
+    Value deserializeTree(JsonNode tree, ObjectMapper json, TypeFactory type, JsonLocation loc)
       throws JsonParseException {
-      if (!tree.has("@set"))
-        throw new JsonParseException("Cannot deserialize as a @set", loc);
 
-      ImmutableMap<String, Value> values = json.convertValue(tree.get("@set"),
-        type.constructMapLikeType(ImmutableMap.class, String.class, LazyValue.class)
-      );
+      switch (tree.getNodeType()) {
+        case OBJECT:
+          return deserializeSpecial(tree, json);
+        case ARRAY:
+          return json.convertValue(tree, ArrayV.class);
+        case STRING:
+          return json.convertValue(tree, StringV.class);
+        case BOOLEAN:
+          return json.convertValue(tree, BooleanV.class);
+        case NUMBER:
+          return tree.isDouble() ?
+            json.convertValue(tree, DoubleV.class) :
+            json.convertValue(tree, LongV.class);
+        case NULL:
+          return NullV.NULL;
+        default:
+          throw new JsonParseException("Cannot deserialize as a Value", loc);
+      }
+    }
 
-      return new SetRef(values);
+    private Value deserializeSpecial(JsonNode tree, ObjectMapper json) throws JsonParseException {
+      String firstField = tree.fieldNames().next();
+      switch (firstField) {
+        case "@ref":
+          return json.convertValue(tree, Ref.class);
+        case "@set":
+          return json.convertValue(tree, SetRef.class);
+        case "@ts":
+          return json.convertValue(tree, TsV.class);
+        case "@date":
+          return json.convertValue(tree, DateV.class);
+        case "@obj":
+          return json.convertValue(tree.get("@obj"), ObjectV.class);
+        default:
+          return json.convertValue(tree, ObjectV.class);
+      }
     }
   }
 
@@ -59,42 +84,36 @@ class Codec {
     @Override
     ArrayV deserializeTree(JsonNode tree, final ObjectMapper json, TypeFactory type, JsonLocation loc)
       throws JsonParseException {
-      if (!tree.isArray())
-        throw new JsonParseException("Cannot deserialize as an array", loc);
 
       ImmutableList.Builder<Value> values = ImmutableList.builder();
-      for (Iterator<JsonNode> elements = tree.elements(); elements.hasNext(); )
-        values.add(toLazyValue(elements.next(), json));
+
+      for (Iterator<JsonNode> elements = tree.elements(); elements.hasNext(); ) {
+        values.add(toValueOrNull(elements.next(), json));
+      }
 
       return new ArrayV(values.build());
     }
+
   }
 
   static class ObjectDeserializer extends TreeDeserializer<ObjectV> {
     @Override
     ObjectV deserializeTree(final JsonNode tree, final ObjectMapper json, TypeFactory type, JsonLocation loc)
       throws JsonParseException {
-      if (!tree.isObject())
-        throw new JsonParseException("Cannot deserialize as an object", loc);
 
-      ImmutableMap.Builder<String, Value> result = ImmutableMap.builder();
-      for (Iterator<String> fields = tree.fieldNames(); fields.hasNext(); ) {
-        String key = fields.next();
-        result.put(key, toLazyValue(tree.get(key), json));
+      ImmutableMap.Builder<String, Value> values = ImmutableMap.builder();
+
+      for (Iterator<Map.Entry<String, JsonNode>> entries = tree.fields(); entries.hasNext(); ) {
+        Map.Entry<String, JsonNode> entry = entries.next();
+        values.put(entry.getKey(), toValueOrNull(entry.getValue(), json));
       }
 
-      ImmutableMap<String, Value> values = result.build();
-
-      if (values.containsKey("@ref")) throw new JsonParseException("Cannot deserialize Ref as an object", loc);
-      if (values.containsKey("@obj")) return new ObjectV(values.get("@obj").asObject());
-
-      return new ObjectV(values);
+      return new ObjectV(values.build());
     }
   }
 
-  private static Value toLazyValue(JsonNode node, ObjectMapper json) {
-    if (node.isNull()) return NullV.NULL;
-    return json.convertValue(node, LazyValue.class);
+  private static Value toValueOrNull(JsonNode node, ObjectMapper json) {
+    Value value = json.convertValue(node, Value.class);
+    return value != null ? value : NullV.NULL;
   }
-
 }

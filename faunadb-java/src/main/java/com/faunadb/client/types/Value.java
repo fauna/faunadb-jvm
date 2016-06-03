@@ -3,6 +3,7 @@ package com.faunadb.client.types;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.faunadb.client.query.Expr;
@@ -51,6 +52,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Value Types</a>
  */
+@JsonDeserialize(using = Codec.ValueDeserializer.class)
 public abstract class Value extends Expr {
 
   @Override
@@ -367,6 +369,7 @@ public abstract class Value extends Expr {
   /**
    * See {@link Value}
    */
+  @JsonDeserialize(using = JsonDeserializer.None.class)
   public static abstract class ScalarValue<T> extends Value {
 
     final T value;
@@ -513,6 +516,10 @@ public abstract class Value extends Expr {
 
     public final static BooleanV TRUE = new BooleanV(true);
     public final static BooleanV FALSE = new BooleanV(false);
+
+    public static BooleanV valueOf(boolean value) {
+      return value ? TRUE : FALSE;
+    }
 
     private BooleanV(Boolean value) {
       super(value);

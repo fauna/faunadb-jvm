@@ -7,7 +7,6 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
-import com.faunadb.client.types.LazyValue;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
 import com.google.common.base.Function;
@@ -105,7 +104,7 @@ public class FaunaClient {
 
             JsonNode responseBody = parseResponseBody(response);
             JsonNode resource = responseBody.get("resource");
-            return json.treeToValue(resource, LazyValue.class);
+            return json.treeToValue(resource, Value.class);
           } catch (IOException ex) {
             throw new AssertionError(ex);
           }
@@ -141,7 +140,7 @@ public class FaunaClient {
             ImmutableList.Builder<Value> responseNodeBuilder = ImmutableList.builder();
 
             for (JsonNode resource : resources) {
-              responseNodeBuilder.add(json.treeToValue(resource, LazyValue.class));
+              responseNodeBuilder.add(json.treeToValue(resource, Value.class));
             }
 
             return responseNodeBuilder.build();
