@@ -3,6 +3,8 @@ package com.faunadb.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.query.Expr;
+import com.faunadb.client.types.Value.ObjectV;
+import com.faunadb.client.types.Value.StringV;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
@@ -46,6 +48,13 @@ public class SerializationSpec {
       ), "[\"a string\",10,{\"object\":{\"data\":\"str\"}}]");
 
     assertJson(
+      Arr(
+        new ObjectV(ImmutableMap.of(
+          "value", new StringV("test")
+        ))
+      ), "[{\"object\":{\"value\":\"test\"}}]");
+
+    assertJson(
       Arr(ImmutableList.of(
         Value("other string"),
         Value(42)
@@ -59,6 +68,18 @@ public class SerializationSpec {
     assertJson(
       Obj("k1", Value("v1")),
       "{\"object\":{\"k1\":\"v1\"}}");
+
+    assertJson(
+      Obj(
+        "k1", new ObjectV(ImmutableMap.of(
+          "v1", new ObjectV(ImmutableMap.of(
+            "v2", new StringV("test")))
+        ))),
+      "{\"object\":{\"k1\":{\"object\":{\"v1\":{\"object\":{\"v2\":\"test\"}}}}}}");
+
+    assertJson(
+      Obj("k1", Obj("v1", Obj("v2", Value("test")))),
+      "{\"object\":{\"k1\":{\"object\":{\"v1\":{\"object\":{\"v2\":\"test\"}}}}}}");
 
     assertJson(Obj("k1", Value("v1"), "k2", Value("v2")),
       "{\"object\":{\"k1\":\"v1\",\"k2\":\"v2\"}}");
@@ -101,7 +122,6 @@ public class SerializationSpec {
   @Test
   public void shouldSerializeRef() throws Exception {
     assertJson(Ref("classes"), "{\"@ref\":\"classes\"}");
-    assertJson(Ref(Value("classes")), "{\"@ref\":\"classes\"}");
     assertJson(Ref(Ref("classes/people"), "id1"), "{\"ref\":{\"@ref\":\"classes/people\"},\"id\":\"id1\"}");
     assertJson(Ref(Ref("classes/people"), Value("id1")), "{\"ref\":{\"@ref\":\"classes/people\"},\"id\":\"id1\"}");
   }
@@ -118,6 +138,13 @@ public class SerializationSpec {
 
   @Test
   public void shouldSerializeLet() throws Exception {
+    assertJson(
+      Let(
+        "v1", Obj("x1", Value("y1"))
+      ).in(
+        Value("x")
+      ), "{\"let\":{\"v1\":{\"object\":{\"x1\":\"y1\"}}},\"in\":\"x\"}");
+
     assertJson(
       Let(
         "v1", Value("x1")

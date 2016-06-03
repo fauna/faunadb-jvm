@@ -19,12 +19,12 @@ import static java.lang.String.format;
  * type coercion methods is called.
  */
 @JsonDeserialize(using = Codec.LazyValueDeserializer.class)
-public final class LazyValue implements Value {
+public final class LazyValue extends Value {
 
   private final JsonNode underlying;
   private final ObjectMapper json;
 
-  private final Value rawJson = new ConcreteValue() {
+  private final Value rawJson = new Value() {
     @Override
     public String toString() {
       return underlying.toString();
@@ -189,7 +189,7 @@ public final class LazyValue implements Value {
     if (array.isPresent()) {
       try {
         return Optional.of(array.get().get(index));
-      } catch (ArrayIndexOutOfBoundsException ign) {
+      } catch (IndexOutOfBoundsException ign) {
         return Optional.absent();
       }
     }

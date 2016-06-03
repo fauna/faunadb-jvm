@@ -7,8 +7,11 @@ import com.faunadb.client.query.Expr;
 import com.faunadb.client.test.FaunaDBTest;
 import com.faunadb.client.types.Ref;
 import com.faunadb.client.types.Value;
+import com.faunadb.client.types.Value.ObjectV;
+import com.faunadb.client.types.Value.StringV;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -184,6 +187,7 @@ public class ClientSpec extends FaunaDBTest {
     assertThat(testField.get("bool").asBoolean(), is(true));
     assertThat(testField.get("bool").asStringOption(), is(Optional.<String>absent()));
     assertThat(testField.getOption("credentials"), is(Optional.<Value>absent()));
+    assertThat(testField.getOption("credentials", "password"), is(Optional.<Value>absent()));
 
     Value array = testField.get("array");
     assertThat(array.asArray(), hasSize(4));
@@ -210,6 +214,15 @@ public class ClientSpec extends FaunaDBTest {
     assertThat(results, hasSize(2));
     assertThat(results.get(0).get("data", "name").asString(), equalTo("Magic Missile"));
     assertThat(results.get(1).get("data", "name").asString(), equalTo("Thor"));
+
+    ImmutableList<Value> data = client.query(ImmutableList.of(
+      new ObjectV(ImmutableMap.of("k1", new StringV("v1"))),
+      new ObjectV(ImmutableMap.of("k2", new StringV("v2")))
+    )).get();
+
+    assertThat(data, hasSize(2));
+    assertThat(data.get(0).get("k1").asString(), equalTo("v1"));
+    assertThat(data.get(1).get("k2").asString(), equalTo("v2"));
   }
 
   @Test
@@ -394,7 +407,7 @@ public class ClientSpec extends FaunaDBTest {
 
     assertThat(res.asSetRef().get("terms").asString(), equalTo("arcane"));
     assertThat(res.asSetRef().get("match").asRef(),
-      equalTo(Ref("indexes/spells_by_element").asRef()));
+      equalTo(new Ref("indexes/spells_by_element")));
   }
 
   @Test
@@ -425,7 +438,7 @@ public class ClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldEvalDoExpression() throws Exception {
-    Expr ref = Ref(randomStartingWith(onARandomClass().value(), "/"));
+    Expr ref = new Ref(randomStartingWith(onARandomClass().strValue(), "/"));
 
     Value res = client.query(
       Do(
@@ -435,7 +448,7 @@ public class ClientSpec extends FaunaDBTest {
     ).get();
 
     assertThat(res.get("ref").asRef(),
-      equalTo(ref.asRef()));
+      equalTo(ref));
   }
 
   @Test
@@ -444,6 +457,10 @@ public class ClientSpec extends FaunaDBTest {
       Obj("name", Value("Hen Wen"), "age", Value(123))
     ).get();
 
+    assertThat(res.get("name").asString(), equalTo("Hen Wen"));
+    assertThat(res.get("age").asLong(), equalTo(123L));
+
+    res = client.query(res).get();
     assertThat(res.get("name").asString(), equalTo("Hen Wen"));
     assertThat(res.get("age").asLong(), equalTo(123L));
   }

@@ -84,8 +84,9 @@ class Codec {
       }
 
       ImmutableMap<String, Value> values = result.build();
-      if (values.containsKey("@obj"))
-        return new ObjectV(values.get("@obj").asObject());
+
+      if (values.containsKey("@ref")) throw new JsonParseException("Cannot deserialize Ref as an object", loc);
+      if (values.containsKey("@obj")) return new ObjectV(values.get("@obj").asObject());
 
       return new ObjectV(values);
     }

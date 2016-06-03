@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.NullNode;
+import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -50,7 +51,12 @@ import static java.util.Objects.requireNonNull;
  *
  * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Value Types</a>
  */
-public interface Value {
+public abstract class Value extends Expr {
+
+  @Override
+  protected Value value() {
+    return this;
+  }
 
   /**
    * Coerces this node into a {@link String}.
@@ -58,14 +64,18 @@ public interface Value {
    * @return the string value of this node.
    * @throws ClassCastException if can not coerced to {@link String}.
    */
-  String asString();
+  public String asString() {
+    throw failOnConvertTo("String");
+  }
 
   /**
    * Attempts to coerce this node into a {@link String}.
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  Optional<String> asStringOption();
+  public Optional<String> asStringOption() {
+    return Optional.absent();
+  }
 
   /**
    * Coerces this node into a {@link Boolean}.
@@ -73,14 +83,18 @@ public interface Value {
    * @return the boolean value of this node.
    * @throws ClassCastException if can not coerced to {@link Boolean}.
    */
-  Boolean asBoolean();
+  public Boolean asBoolean() {
+    throw failOnConvertTo("Boolean");
+  }
 
   /**
    * Attempts to coerce this node into a {@link Boolean}.
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  Optional<Boolean> asBooleanOption();
+  public Optional<Boolean> asBooleanOption() {
+    return Optional.absent();
+  }
 
   /**
    * Coerces this node into a {@link Long}.
@@ -88,14 +102,18 @@ public interface Value {
    * @return the boolean value of this node.
    * @throws ClassCastException if can not coerced to {@link Long}.
    */
-  Long asLong();
+  public Long asLong() {
+    throw failOnConvertTo("Long");
+  }
 
   /**
    * Attempts to coerce this node into a {@link Long}.
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  Optional<Long> asLongOption();
+  public Optional<Long> asLongOption() {
+    return Optional.absent();
+  }
 
   /**
    * Coerces this node into a {@link Double}.
@@ -103,14 +121,18 @@ public interface Value {
    * @return the boolean value of this node.
    * @throws ClassCastException if can not coerced to {@link Double}.
    */
-  Double asDouble();
+  public Double asDouble() {
+    throw failOnConvertTo("Double");
+  }
 
   /**
    * Attempts to coerce this node into a {@link Double}.
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  Optional<Double> asDoubleOption();
+  public Optional<Double> asDoubleOption() {
+    return Optional.absent();
+  }
 
   /**
    * Coerces this node into a {@link Instant}.
@@ -118,14 +140,18 @@ public interface Value {
    * @return the boolean value of this node.
    * @throws ClassCastException if can not coerced to {@link Instant}.
    */
-  Instant asTs();
+  public Instant asTs() {
+    throw failOnConvertTo("Instant");
+  }
 
   /**
    * Attempts to coerce this node into a {@link Instant}.
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  Optional<Instant> asTsOption();
+  public Optional<Instant> asTsOption() {
+    return Optional.absent();
+  }
 
   /**
    * Coerces this node into a {@link LocalDate}.
@@ -133,14 +159,18 @@ public interface Value {
    * @return the boolean value of this node.
    * @throws ClassCastException if can not coerced to {@link LocalDate}.
    */
-  LocalDate asDate();
+  public LocalDate asDate() {
+    throw failOnConvertTo("LocalDate");
+  }
 
   /**
    * Attempts to coerce this node into a {@link LocalDate}.
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  Optional<LocalDate> asDateOption();
+  public Optional<LocalDate> asDateOption() {
+    return Optional.absent();
+  }
 
   /**
    * Coerces this node into a {@link ImmutableList} of nodes.
@@ -148,14 +178,18 @@ public interface Value {
    * @return a immutable list of nodes.
    * @throws ClassCastException if can not coerced to {@link ImmutableList}.
    */
-  ImmutableList<Value> asArray();
+  public ImmutableList<Value> asArray() {
+    throw failOnConvertTo("ImmutableList<Value>");
+  }
 
   /**
    * Attempts to coerce this node into a {@link ImmutableList} of nodes.
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  Optional<ImmutableList<Value>> asArrayOption();
+  public Optional<ImmutableList<Value>> asArrayOption() {
+    return Optional.absent();
+  }
 
   /**
    * Coerces this node into a {@link ImmutableMap} of nodes.
@@ -163,14 +197,18 @@ public interface Value {
    * @return a immutable map of nodes.
    * @throws ClassCastException if can not coerced to {@link ImmutableMap}.
    */
-  ImmutableMap<String, Value> asObject();
+  public ImmutableMap<String, Value> asObject() {
+    throw failOnConvertTo("ImmutableMap<String, Value>");
+  }
 
   /**
    * Attempts to coerce this node into a {@link ImmutableMap} of nodes.
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  Optional<ImmutableMap<String, Value>> asObjectOption();
+  public Optional<ImmutableMap<String, Value>> asObjectOption() {
+    return Optional.absent();
+  }
 
   /**
    * Coerces this node into a {@link Ref}.
@@ -178,14 +216,18 @@ public interface Value {
    * @return a immutable map of nodes.
    * @throws ClassCastException if can not coerced to {@link Ref}.
    */
-  Ref asRef();
+  public Ref asRef() {
+    throw failOnConvertTo("Ref");
+  }
 
   /**
    * Attempts to coerce this node into a {@link Ref}.
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  Optional<Ref> asRefOption();
+  public Optional<Ref> asRefOption() {
+    return Optional.absent();
+  }
 
   /**
    * Coerces this node into a {@link SetRef}.
@@ -193,14 +235,18 @@ public interface Value {
    * @return a immutable map of nodes.
    * @throws ClassCastException if can not coerced to {@link SetRef}.
    */
-  SetRef asSetRef();
+  public SetRef asSetRef() {
+    throw failOnConvertTo("SetRef");
+  }
 
   /**
    * Attempts to coerce this node into a {@link SetRef}.
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  Optional<SetRef> asSetRefOption();
+  public Optional<SetRef> asSetRefOption() {
+    return Optional.absent();
+  }
 
   /**
    * Extract a specific field from this node.
@@ -214,7 +260,10 @@ public interface Value {
    * @return the value under the key.
    * @throws IllegalArgumentException if the field does not exists.
    */
-  Value get(String key);
+  public Value get(String key) {
+    throw new IllegalArgumentException(
+      format("Can't get key %s on a non-object value", key));
+  }
 
   /**
    * Attempts to extract a specific field from this node.
@@ -228,7 +277,9 @@ public interface Value {
    *
    * @return an {@link Optional} type containing the value of the field.
    */
-  Optional<Value> getOption(String key);
+  public Optional<Value> getOption(String key) {
+    return Optional.absent();
+  }
 
   /**
    * Extract a path from this node.
@@ -242,7 +293,13 @@ public interface Value {
    * @return the value under the path.
    * @throws IllegalArgumentException if path does not exists.
    */
-  Value get(String... keys);
+  public Value get(String... keys) {
+    Value res = this;
+    for (String key : keys)
+      res = res.get(key);
+
+    return res;
+  }
 
   /**
    * Attempts to extract a path from this node.
@@ -256,7 +313,16 @@ public interface Value {
    *
    * @return an {@link Optional} type containing the value under the path.
    */
-  Optional<Value> getOption(String... keys);
+  public Optional<Value> getOption(String... keys) {
+    Optional<Value> res = Optional.of(this);
+
+    for (String key : keys) {
+      res = res.get().getOption(key);
+      if (!res.isPresent()) break;
+    }
+
+    return res;
+  }
 
   /**
    * Accesses the value of the specified element if this is an array node.
@@ -271,7 +337,10 @@ public interface Value {
    * @return the value on the index.
    * @throws ArrayIndexOutOfBoundsException if index is out of boundaries.
    */
-  Value get(int index);
+  public Value get(int index) {
+    throw new IndexOutOfBoundsException(
+      format("Can't get index %s on a non-array value", index));
+  }
 
   /**
    * Attempts to accesses the value of the specified element if this is an array node.
@@ -286,165 +355,19 @@ public interface Value {
    *
    * @return an {@link Optional} type containing the value on the index.
    */
-  Optional<Value> getOption(int index);
+  public Optional<Value> getOption(int index) {
+    return Optional.absent();
+  }
 
-  /**
-   * See {@link Value}
-   */
-  abstract class ConcreteValue implements Value {
-    @Override
-    public String asString() {
-      throw failOnConvertTo("String");
-    }
-
-    @Override
-    public Optional<String> asStringOption() {
-      return Optional.absent();
-    }
-
-    @Override
-    public Boolean asBoolean() {
-      throw failOnConvertTo("Boolean");
-    }
-
-    @Override
-    public Optional<Boolean> asBooleanOption() {
-      return Optional.absent();
-    }
-
-    @Override
-    public Long asLong() {
-      throw failOnConvertTo("Long");
-    }
-
-    @Override
-    public Optional<Long> asLongOption() {
-      return Optional.absent();
-    }
-
-    @Override
-    public Double asDouble() {
-      throw failOnConvertTo("Double");
-    }
-
-    @Override
-    public Optional<Double> asDoubleOption() {
-      return Optional.absent();
-    }
-
-    @Override
-    public Instant asTs() {
-      throw failOnConvertTo("Instant");
-    }
-
-    @Override
-    public Optional<Instant> asTsOption() {
-      return Optional.absent();
-    }
-
-    @Override
-    public LocalDate asDate() {
-      throw failOnConvertTo("LocalDate");
-    }
-
-    @Override
-    public Optional<LocalDate> asDateOption() {
-      return Optional.absent();
-    }
-
-    @Override
-    public ImmutableList<Value> asArray() {
-      throw failOnConvertTo("ImmutableList<Value>");
-    }
-
-    @Override
-    public Optional<ImmutableList<Value>> asArrayOption() {
-      return Optional.absent();
-    }
-
-    @Override
-    public ImmutableMap<String, Value> asObject() {
-      throw failOnConvertTo("ImmutableMap<String, Value>");
-    }
-
-    @Override
-    public Optional<ImmutableMap<String, Value>> asObjectOption() {
-      return Optional.absent();
-    }
-
-    @Override
-    public Ref asRef() {
-      throw failOnConvertTo("Ref");
-    }
-
-    @Override
-    public Optional<Ref> asRefOption() {
-      return Optional.absent();
-    }
-
-    @Override
-    public SetRef asSetRef() {
-      throw failOnConvertTo("SetRef");
-    }
-
-    @Override
-    public Optional<SetRef> asSetRefOption() {
-      return Optional.absent();
-    }
-
-    @Override
-    public Value get(String key) {
-      throw new IllegalArgumentException(
-        format("Can't get key %s on a non-object value", key));
-    }
-
-    @Override
-    public Optional<Value> getOption(String key) {
-      return Optional.absent();
-    }
-
-    @Override
-    public Value get(String... keys) {
-      Value res = this;
-      for (String key : keys)
-        res = res.get(key);
-
-      return res;
-    }
-
-    @Override
-    public Optional<Value> getOption(String... keys) {
-      Optional<Value> res = Optional.<Value>of(this);
-
-      for (String key : keys) {
-        res = res.get().getOption(key);
-        if (!res.isPresent()) break;
-      }
-
-      return res;
-    }
-
-    @Override
-    public Value get(int index) {
-      throw new IndexOutOfBoundsException(
-        format("Can't get index %s on a non-array value", index));
-    }
-
-    @Override
-    public Optional<Value> getOption(int index) {
-      return Optional.absent();
-    }
-
-    private ClassCastException failOnConvertTo(String desiredType) {
-      return new ClassCastException(
-        format("Can't convert value to %s. Contained value is: %s", desiredType, toString()));
-    }
+  private ClassCastException failOnConvertTo(String desiredType) {
+    return new ClassCastException(
+      format("Can't convert value to %s. Contained value is: %s", desiredType, toString()));
   }
 
   /**
    * See {@link Value}
    */
-  abstract class ScalarValue<T> extends ConcreteValue {
+  public static abstract class ScalarValue<T> extends Value {
 
     final T value;
 
@@ -476,7 +399,7 @@ public interface Value {
    * @see Language#Obj
    */
   @JsonDeserialize(using = Codec.ObjectDeserializer.class)
-  final class ObjectV extends ConcreteValue {
+  public static final class ObjectV extends Value {
 
     private final ImmutableMap<String, Value> values;
 
@@ -489,6 +412,11 @@ public interface Value {
     @Override
     public ImmutableMap<String, Value> asObject() {
       return values;
+    }
+
+    @Override
+    public Optional<ImmutableMap<String, Value>> asObjectOption() {
+      return Optional.of(values);
     }
 
     @Override
@@ -524,7 +452,7 @@ public interface Value {
    * @see Language#Arr
    */
   @JsonDeserialize(using = Codec.ArrayDeserializer.class)
-  final class ArrayV extends ConcreteValue {
+  public static final class ArrayV extends Value {
 
     private final ImmutableList<Value> values;
 
@@ -532,6 +460,11 @@ public interface Value {
     @Override
     public ImmutableList<Value> asArray() {
       return values;
+    }
+
+    @Override
+    public Optional<ImmutableList<Value>> asArrayOption() {
+      return Optional.of(values);
     }
 
     public ArrayV(List<? extends Value> values) {
@@ -576,7 +509,7 @@ public interface Value {
    *
    * @see Language#Value(boolean)
    */
-  final class BooleanV extends ScalarValue<Boolean> {
+  public static final class BooleanV extends ScalarValue<Boolean> {
 
     public final static BooleanV TRUE = new BooleanV(true);
     public final static BooleanV FALSE = new BooleanV(false);
@@ -603,7 +536,7 @@ public interface Value {
    *
    * @see Language#Value(double)
    */
-  final class DoubleV extends ScalarValue<Double> {
+  public static final class DoubleV extends ScalarValue<Double> {
 
     public DoubleV(double value) {
       super(value);
@@ -627,7 +560,7 @@ public interface Value {
    *
    * @see Language#Value(long)
    */
-  final class LongV extends ScalarValue<Long> {
+  public static final class LongV extends ScalarValue<Long> {
 
     public LongV(long value) {
       super(value);
@@ -650,7 +583,7 @@ public interface Value {
    *
    * @see Language#Value(String)
    */
-  final class StringV extends ScalarValue<String> {
+  public static final class StringV extends ScalarValue<String> {
 
     public StringV(String value) {
       super(value);
@@ -673,7 +606,7 @@ public interface Value {
    *
    * @see Language#Null()
    */
-  final class NullV extends ConcreteValue {
+  public static final class NullV extends Value {
 
     public static final NullV NULL = new NullV();
 
@@ -681,7 +614,7 @@ public interface Value {
     }
 
     @JsonValue
-    private NullNode value() {
+    private NullNode json() {
       return NullNode.getInstance();
     }
 
@@ -708,7 +641,7 @@ public interface Value {
    *
    * @see Language#Value(Instant)
    */
-  final class TsV extends ScalarValue<Instant> {
+  public static final class TsV extends ScalarValue<Instant> {
 
     public TsV(Instant value) {
       super(value);
@@ -720,7 +653,7 @@ public interface Value {
     }
 
     @JsonProperty("@ts")
-    private String value() {
+    private String json() {
       return value.toString();
     }
 
@@ -741,7 +674,7 @@ public interface Value {
    *
    * @see Language#Value(LocalDate)
    */
-  final class DateV extends ScalarValue<LocalDate> {
+  public static final class DateV extends ScalarValue<LocalDate> {
 
     public DateV(LocalDate value) {
       super(value);

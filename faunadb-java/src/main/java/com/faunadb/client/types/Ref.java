@@ -9,15 +9,11 @@ import com.google.common.base.Optional;
  *
  * @see <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
  */
-public class Ref extends Value.ScalarValue<Value> {
+public class Ref extends Value.ScalarValue<String> {
 
   @JsonCreator
   public Ref(@JsonProperty("@ref") String value) {
-    this(new StringV(value));
-  }
-
-  public Ref(Value ref) {
-    super(ref);
+    super(value);
   }
 
   /**
@@ -26,8 +22,8 @@ public class Ref extends Value.ScalarValue<Value> {
    * @return a string with the ref value
    */
   @JsonProperty("@ref")
-  public String value() {
-    return value.asString();
+  public String strValue() {
+    return value;
   }
 
   @Override

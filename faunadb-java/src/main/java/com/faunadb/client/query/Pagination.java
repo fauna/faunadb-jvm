@@ -1,6 +1,8 @@
 package com.faunadb.client.query;
 
 import com.faunadb.client.types.Value;
+import com.faunadb.client.types.Value.LongV;
+import com.faunadb.client.types.Value.ObjectV;
 import com.google.common.collect.ImmutableMap;
 
 import static java.util.Objects.requireNonNull;
@@ -18,48 +20,48 @@ import static java.util.Objects.requireNonNull;
  * );
  * }</pre>
  *
- * @see Language#Paginate(Value)
+ * @see Language#Paginate(Expr)
  * @see <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
  */
-public final class Pagination extends Fn {
+public final class Pagination extends Expr.ConcreteExpr {
 
   /**
    * Helper to construct the pagination cursor that can constructed either
-   * by {@link Language#Before(Value)} or {@link Language#After(Value)}
+   * by {@link Language#Before(Expr)} or {@link Language#After(Expr)}
    *
    * @see <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
    */
   public abstract static class Cursor {
     private final String name;
-    private final Value ref;
+    private final Expr ref;
 
-    Cursor(String name, Value ref) {
+    Cursor(String name, Expr ref) {
       this.name = requireNonNull(name);
       this.ref = requireNonNull(ref);
     }
   }
 
   static class Before extends Cursor {
-    Before(Value ref) {
+    Before(Expr ref) {
       super("before", ref);
     }
   }
 
   static class After extends Cursor {
-    After(Value ref) {
+    After(Expr ref) {
       super("after", ref);
     }
   }
 
-  static Pagination paginate(Value resource) {
-    return new Pagination(new Fn.Call(
-      ImmutableMap.of("paginate", resource)
+  static Pagination paginate(Expr resource) {
+    return new Pagination(new ObjectV(
+      ImmutableMap.of("paginate", resource.value())
     ));
   }
 
-  private final Fn.Call call;
+  private final ObjectV call;
 
-  private Pagination(Fn.Call call) {
+  private Pagination(ObjectV call) {
     super(call);
     this.call = call;
   }
@@ -81,7 +83,7 @@ public final class Pagination extends Fn {
    * @param ts the desired timestamp
    * @return a new pagination with the timestamp set
    */
-  public Pagination withTs(Value ts) {
+  public Pagination withTs(Expr ts) {
     return new Pagination(with("ts", ts));
   }
 
@@ -101,7 +103,7 @@ public final class Pagination extends Fn {
    * @param size the desired size
    * @return a new pagination with the size set
    */
-  public Pagination withSize(Value size) {
+  public Pagination withSize(Expr size) {
     return new Pagination(with("size", size));
   }
 
@@ -120,7 +122,7 @@ public final class Pagination extends Fn {
    *
    * @return a new pagination with sources option set
    */
-  public Pagination withSources(Value sources) {
+  public Pagination withSources(Expr sources) {
     return new Pagination(with("sources", sources));
   }
 
@@ -131,7 +133,7 @@ public final class Pagination extends Fn {
    */
   public Pagination withSources(boolean sources) {
     if (!sources) return this;
-    return withSources(BooleanV.TRUE);
+    return withSources(Value.BooleanV.TRUE);
   }
 
   /**
@@ -139,7 +141,7 @@ public final class Pagination extends Fn {
    *
    * @return a new pagination with events option set
    */
-  public Pagination withEvents(Value events) {
+  public Pagination withEvents(Expr events) {
     return new Pagination(with("events", events));
   }
 
@@ -150,15 +152,15 @@ public final class Pagination extends Fn {
    */
   public Pagination withEvents(boolean events) {
     if (!events) return this;
-    return withEvents(BooleanV.TRUE);
+    return withEvents(Value.BooleanV.TRUE);
   }
 
-  private Fn.Call with(String key, Value value) {
+  private ObjectV with(String key, Expr value) {
     ImmutableMap.Builder<String, Value> page = ImmutableMap.builder();
-    page.putAll(call.body().asObject());
-    page.put(key, value);
+    page.putAll(call.asObject());
+    page.put(key, value.value());
 
-    return new Fn.Call(page.build());
+    return new ObjectV(page.build());
   }
 
 }
