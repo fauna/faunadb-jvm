@@ -7,10 +7,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.faunadb.client.types.Value.ArrayV;
-import com.faunadb.client.types.Value.NullV;
-import com.faunadb.client.types.Value.ObjectV;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -18,7 +14,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.faunadb.client.types.Value.BooleanV.*;
+import static com.faunadb.client.types.Value.ArrayV.*;
 
 class Deserializer {
 
@@ -29,16 +25,16 @@ class Deserializer {
       ObjectMapper json = (ObjectMapper) jsonParser.getCodec();
       JsonNode tree = json.readTree(jsonParser);
 
-      return deserializeTree(tree, json, context.getTypeFactory(), location);
+      return deserializeTree(tree, json, location);
     }
 
     abstract T deserializeTree(
-      JsonNode tree, ObjectMapper json, TypeFactory type, JsonLocation loc) throws JsonParseException;
+      JsonNode tree, ObjectMapper json, JsonLocation loc) throws JsonParseException;
   }
 
   static class ValueDeserializer extends TreeDeserializer<Value> {
     @Override
-    Value deserializeTree(JsonNode tree, ObjectMapper json, TypeFactory type, JsonLocation loc)
+    Value deserializeTree(JsonNode tree, ObjectMapper json, JsonLocation loc)
       throws JsonParseException {
 
       switch (tree.getNodeType()) {
@@ -61,7 +57,7 @@ class Deserializer {
       }
     }
 
-    private Value deserializeSpecial(JsonNode tree, ObjectMapper json) throws JsonParseException {
+    private Value deserializeSpecial(JsonNode tree, ObjectMapper json) {
       String firstField = tree.fieldNames().next();
       switch (firstField) {
         case "@ref":
@@ -82,7 +78,7 @@ class Deserializer {
 
   static class ArrayDeserializer extends TreeDeserializer<ArrayV> {
     @Override
-    ArrayV deserializeTree(JsonNode tree, final ObjectMapper json, TypeFactory type, JsonLocation loc)
+    ArrayV deserializeTree(JsonNode tree, final ObjectMapper json, JsonLocation loc)
       throws JsonParseException {
 
       ImmutableList.Builder<Value> values = ImmutableList.builder();
@@ -98,7 +94,7 @@ class Deserializer {
 
   static class ObjectDeserializer extends TreeDeserializer<ObjectV> {
     @Override
-    ObjectV deserializeTree(final JsonNode tree, final ObjectMapper json, TypeFactory type, JsonLocation loc)
+    ObjectV deserializeTree(final JsonNode tree, final ObjectMapper json, JsonLocation loc)
       throws JsonParseException {
 
       ImmutableMap.Builder<String, Value> values = ImmutableMap.builder();
