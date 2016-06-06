@@ -15,11 +15,12 @@ import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
+import static com.faunadb.client.types.Codec.*;
 import static java.lang.String.format;
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -52,7 +53,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Value Types</a>
  */
-@JsonDeserialize(using = Codec.ValueDeserializer.class)
+@JsonDeserialize(using = Deserializer.ValueDeserializer.class)
 public abstract class Value extends Expr {
 
   @Override
@@ -66,8 +67,8 @@ public abstract class Value extends Expr {
    * @return the string value of this node.
    * @throws ClassCastException if can not coerced to {@link String}.
    */
-  public String asString() {
-    throw failOnConvertTo("String");
+  public final String asString() {
+    return get(Field.to(STRING));
   }
 
   /**
@@ -75,8 +76,8 @@ public abstract class Value extends Expr {
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  public Optional<String> asStringOption() {
-    return Optional.absent();
+  public final Optional<String> asStringOption() {
+    return getOpt(Field.to(STRING));
   }
 
   /**
@@ -85,8 +86,8 @@ public abstract class Value extends Expr {
    * @return the boolean value of this node.
    * @throws ClassCastException if can not coerced to {@link Boolean}.
    */
-  public Boolean asBoolean() {
-    throw failOnConvertTo("Boolean");
+  public final Boolean asBoolean() {
+    return get(Field.to(BOOLEAN));
   }
 
   /**
@@ -94,8 +95,8 @@ public abstract class Value extends Expr {
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  public Optional<Boolean> asBooleanOption() {
-    return Optional.absent();
+  public final Optional<Boolean> asBooleanOption() {
+    return getOpt(Field.to(BOOLEAN));
   }
 
   /**
@@ -104,8 +105,8 @@ public abstract class Value extends Expr {
    * @return the boolean value of this node.
    * @throws ClassCastException if can not coerced to {@link Long}.
    */
-  public Long asLong() {
-    throw failOnConvertTo("Long");
+  public final Long asLong() {
+    return get(Field.to(LONG));
   }
 
   /**
@@ -113,8 +114,8 @@ public abstract class Value extends Expr {
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  public Optional<Long> asLongOption() {
-    return Optional.absent();
+  public final Optional<Long> asLongOption() {
+    return getOpt(Field.to(LONG));
   }
 
   /**
@@ -123,8 +124,8 @@ public abstract class Value extends Expr {
    * @return the boolean value of this node.
    * @throws ClassCastException if can not coerced to {@link Double}.
    */
-  public Double asDouble() {
-    throw failOnConvertTo("Double");
+  public final Double asDouble() {
+    return get(Field.to(DOUBLE));
   }
 
   /**
@@ -132,8 +133,8 @@ public abstract class Value extends Expr {
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  public Optional<Double> asDoubleOption() {
-    return Optional.absent();
+  public final Optional<Double> asDoubleOption() {
+    return getOpt(Field.to(DOUBLE));
   }
 
   /**
@@ -142,8 +143,8 @@ public abstract class Value extends Expr {
    * @return the boolean value of this node.
    * @throws ClassCastException if can not coerced to {@link Instant}.
    */
-  public Instant asTs() {
-    throw failOnConvertTo("Instant");
+  public final Instant asTs() {
+    return get(Field.to(TS));
   }
 
   /**
@@ -151,8 +152,8 @@ public abstract class Value extends Expr {
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  public Optional<Instant> asTsOption() {
-    return Optional.absent();
+  public final Optional<Instant> asTsOption() {
+    return getOpt(Field.to(TS));
   }
 
   /**
@@ -161,8 +162,8 @@ public abstract class Value extends Expr {
    * @return the boolean value of this node.
    * @throws ClassCastException if can not coerced to {@link LocalDate}.
    */
-  public LocalDate asDate() {
-    throw failOnConvertTo("LocalDate");
+  public final LocalDate asDate() {
+    return get(Field.to(DATE));
   }
 
   /**
@@ -170,8 +171,8 @@ public abstract class Value extends Expr {
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  public Optional<LocalDate> asDateOption() {
-    return Optional.absent();
+  public final Optional<LocalDate> asDateOption() {
+    return getOpt(Field.to(DATE));
   }
 
   /**
@@ -180,8 +181,8 @@ public abstract class Value extends Expr {
    * @return a immutable list of nodes.
    * @throws ClassCastException if can not coerced to {@link ImmutableList}.
    */
-  public ImmutableList<Value> asArray() {
-    throw failOnConvertTo("ImmutableList<Value>");
+  public final ImmutableList<Value> asArray() {
+    return get(Field.to(ARRAY));
   }
 
   /**
@@ -189,8 +190,8 @@ public abstract class Value extends Expr {
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  public Optional<ImmutableList<Value>> asArrayOption() {
-    return Optional.absent();
+  public final Optional<ImmutableList<Value>> asArrayOption() {
+    return getOpt(Field.to(ARRAY));
   }
 
   /**
@@ -199,8 +200,8 @@ public abstract class Value extends Expr {
    * @return a immutable map of nodes.
    * @throws ClassCastException if can not coerced to {@link ImmutableMap}.
    */
-  public ImmutableMap<String, Value> asObject() {
-    throw failOnConvertTo("ImmutableMap<String, Value>");
+  public final ImmutableMap<String, Value> asObject() {
+    return get(Field.to(OBJECT));
   }
 
   /**
@@ -208,8 +209,8 @@ public abstract class Value extends Expr {
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  public Optional<ImmutableMap<String, Value>> asObjectOption() {
-    return Optional.absent();
+  public final Optional<ImmutableMap<String, Value>> asObjectOption() {
+    return getOpt(Field.to(OBJECT));
   }
 
   /**
@@ -218,8 +219,8 @@ public abstract class Value extends Expr {
    * @return a immutable map of nodes.
    * @throws ClassCastException if can not coerced to {@link Ref}.
    */
-  public Ref asRef() {
-    throw failOnConvertTo("Ref");
+  public final Ref asRef() {
+    return get(Field.to(REF));
   }
 
   /**
@@ -227,8 +228,8 @@ public abstract class Value extends Expr {
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  public Optional<Ref> asRefOption() {
-    return Optional.absent();
+  public final Optional<Ref> asRefOption() {
+    return getOpt(Field.to(REF));
   }
 
   /**
@@ -237,8 +238,8 @@ public abstract class Value extends Expr {
    * @return a immutable map of nodes.
    * @throws ClassCastException if can not coerced to {@link SetRef}.
    */
-  public SetRef asSetRef() {
-    throw failOnConvertTo("SetRef");
+  public final SetRef asSetRef() {
+    return get(Field.to(SET_REF));
   }
 
   /**
@@ -246,41 +247,8 @@ public abstract class Value extends Expr {
    *
    * @return an {@link Optional} type with the coerced value.
    */
-  public Optional<SetRef> asSetRefOption() {
-    return Optional.absent();
-  }
-
-  /**
-   * Extract a specific field from this node.
-   * <p>
-   * <b>Example:</b>
-   * <pre>{@code
-   * // node = { "name": "jhon" }
-   * node.get("name").asString() // "jhon"
-   * }</pre>
-   *
-   * @return the value under the key.
-   * @throws IllegalArgumentException if the field does not exists.
-   */
-  public Value get(String key) {
-    throw new IllegalArgumentException(
-      format("Can't get key %s on a non-object value", key));
-  }
-
-  /**
-   * Attempts to extract a specific field from this node.
-   * <p>
-   * <b>Example:</b>
-   * <pre>{@code
-   * // node = { "name": "jhon" }
-   * node.getOption("name") // Optional.of(Value("jhon"))
-   * node.getOption("data") // Optional.absent()
-   * }</pre>
-   *
-   * @return an {@link Optional} type containing the value of the field.
-   */
-  public Optional<Value> getOption(String key) {
-    return Optional.absent();
+  public final Optional<SetRef> asSetRefOption() {
+    return getOpt(Field.to(SET_REF));
   }
 
   /**
@@ -295,12 +263,8 @@ public abstract class Value extends Expr {
    * @return the value under the path.
    * @throws IllegalArgumentException if path does not exists.
    */
-  public Value get(String... keys) {
-    Value res = this;
-    for (String key : keys)
-      res = res.get(key);
-
-    return res;
+  public final Value get(String... keys) {
+    return Field.at(keys).get(this).getOrThrow();
   }
 
   /**
@@ -315,15 +279,8 @@ public abstract class Value extends Expr {
    *
    * @return an {@link Optional} type containing the value under the path.
    */
-  public Optional<Value> getOption(String... keys) {
-    Optional<Value> res = Optional.of(this);
-
-    for (String key : keys) {
-      res = res.get().getOption(key);
-      if (!res.isPresent()) break;
-    }
-
-    return res;
+  public final Optional<Value> getOpt(String... keys) {
+    return Field.at(keys).get(this).asOpt();
   }
 
   /**
@@ -339,9 +296,8 @@ public abstract class Value extends Expr {
    * @return the value on the index.
    * @throws ArrayIndexOutOfBoundsException if index is out of boundaries.
    */
-  public Value get(int index) {
-    throw new IndexOutOfBoundsException(
-      format("Can't get index %s on a non-array value", index));
+  public final Value get(int... index) {
+    return Field.at(index).get(this).getOrThrow();
   }
 
   /**
@@ -357,14 +313,28 @@ public abstract class Value extends Expr {
    *
    * @return an {@link Optional} type containing the value on the index.
    */
-  public Optional<Value> getOption(int index) {
-    return Optional.absent();
+  public final Optional<Value> getOption(int... index) {
+    return Field.at(index).get(this).asOpt();
   }
 
-  private ClassCastException failOnConvertTo(String desiredType) {
-    return new ClassCastException(
-      format("Can't convert value to %s. Contained value is: %s", desiredType, toString()));
+  public final <T> T get(Field<T> field) {
+    return field.get(this).getOrThrow();
   }
+
+  public final <T> Optional<T> getOpt(Field<T> field) {
+    return field.get(this).asOpt();
+  }
+
+  public final <T> List<T> collect(Field<T> field) {
+    ImmutableList.Builder<T> res = ImmutableList.builder();
+    for (Value value : get(Field.to(ARRAY)))
+      res.add(value.get(field));
+
+    return res.build();
+  }
+
+  @SuppressWarnings("unused") // Used by Jackson to serialize the value to JSON
+  abstract Object toJson();
 
   /**
    * See {@link Value}
@@ -401,35 +371,20 @@ public abstract class Value extends Expr {
    *
    * @see Language#Obj
    */
-  @JsonDeserialize(using = Codec.ObjectDeserializer.class)
+  @JsonDeserialize(using = Deserializer.ObjectDeserializer.class)
   public static final class ObjectV extends Value {
 
-    private final ImmutableMap<String, Value> values;
+    final ImmutableMap<String, Value> values;
 
     public ObjectV(Map<String, ? extends Value> values) {
       requireNonNull(values);
       this.values = ImmutableMap.copyOf(values);
     }
 
+    @Override
     @JsonValue
-    @Override
-    public ImmutableMap<String, Value> asObject() {
+    ImmutableMap<String, Value> toJson() {
       return values;
-    }
-
-    @Override
-    public Optional<ImmutableMap<String, Value>> asObjectOption() {
-      return Optional.of(values);
-    }
-
-    @Override
-    public Value get(String key) {
-      return values.get(key);
-    }
-
-    @Override
-    public Optional<Value> getOption(String key) {
-      return Optional.fromNullable(get(key));
     }
 
     @Override
@@ -454,21 +409,10 @@ public abstract class Value extends Expr {
    *
    * @see Language#Arr
    */
-  @JsonDeserialize(using = Codec.ArrayDeserializer.class)
+  @JsonDeserialize(using = Deserializer.ArrayDeserializer.class)
   public static final class ArrayV extends Value {
 
-    private final ImmutableList<Value> values;
-
-    @JsonValue
-    @Override
-    public ImmutableList<Value> asArray() {
-      return values;
-    }
-
-    @Override
-    public Optional<ImmutableList<Value>> asArrayOption() {
-      return Optional.of(values);
-    }
+    final ImmutableList<Value> values;
 
     public ArrayV(List<? extends Value> values) {
       requireNonNull(values);
@@ -476,17 +420,9 @@ public abstract class Value extends Expr {
     }
 
     @Override
-    public Value get(int index) {
-      return values.get(index);
-    }
-
-    @Override
-    public Optional<Value> getOption(int index) {
-      try {
-        return Optional.of(values.get(index));
-      } catch (IndexOutOfBoundsException ign) {
-        return Optional.absent();
-      }
+    @JsonValue
+    ImmutableList<Value> toJson() {
+      return values;
     }
 
     @Override
@@ -525,15 +461,10 @@ public abstract class Value extends Expr {
       super(value);
     }
 
+    @Override
     @JsonValue
-    @Override
-    public Boolean asBoolean() {
+    Boolean toJson() {
       return value;
-    }
-
-    @Override
-    public Optional<Boolean> asBooleanOption() {
-      return Optional.of(value);
     }
 
   }
@@ -544,22 +475,15 @@ public abstract class Value extends Expr {
    * @see Language#Value(double)
    */
   public static final class DoubleV extends ScalarValue<Double> {
-
     public DoubleV(double value) {
       super(value);
     }
 
-    @JsonValue
     @Override
-    public Double asDouble() {
+    @JsonValue
+    Double toJson() {
       return value;
     }
-
-    @Override
-    public Optional<Double> asDoubleOption() {
-      return Optional.of(value);
-    }
-
   }
 
   /**
@@ -568,20 +492,14 @@ public abstract class Value extends Expr {
    * @see Language#Value(long)
    */
   public static final class LongV extends ScalarValue<Long> {
-
     public LongV(long value) {
       super(value);
     }
 
+    @Override
     @JsonValue
-    @Override
-    public Long asLong() {
+    Long toJson() {
       return value;
-    }
-
-    @Override
-    public Optional<Long> asLongOption() {
-      return Optional.of(value);
     }
   }
 
@@ -591,20 +509,14 @@ public abstract class Value extends Expr {
    * @see Language#Value(String)
    */
   public static final class StringV extends ScalarValue<String> {
-
     public StringV(String value) {
       super(value);
     }
 
+    @Override
     @JsonValue
-    @Override
-    public String asString() {
+    String toJson() {
       return value;
-    }
-
-    @Override
-    public Optional<String> asStringOption() {
-      return Optional.of(value);
     }
   }
 
@@ -620,8 +532,9 @@ public abstract class Value extends Expr {
     private NullV() {
     }
 
+    @Override
     @JsonValue
-    private NullNode json() {
+    NullNode toJson() {
       return NullNode.getInstance();
     }
 
@@ -656,22 +569,13 @@ public abstract class Value extends Expr {
 
     @JsonCreator
     private TsV(@JsonProperty("@ts") String value) {
-      super(ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant());
+      super(ZonedDateTime.parse(value, ISO_OFFSET_DATE_TIME).toInstant());
     }
 
+    @Override
     @JsonProperty("@ts")
-    private String json() {
+    String toJson() {
       return value.toString();
-    }
-
-    @Override
-    public Instant asTs() {
-      return value;
-    }
-
-    @Override
-    public Optional<Instant> asTsOption() {
-      return Optional.of(value);
     }
 
   }
@@ -692,21 +596,66 @@ public abstract class Value extends Expr {
       super(LocalDate.parse(value));
     }
 
+    @Override
     @JsonProperty("@date")
-    private String strValue() {
+    String toJson() {
       return value.toString();
     }
+  }
 
-    @Override
-    public LocalDate asDate() {
+  /**
+   * A FaunaDB set literal.
+   *
+   * @see <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   */
+  public static final class SetRef extends ScalarValue<ImmutableMap<String, Value>> {
+
+    public SetRef(@JsonProperty("@set") ImmutableMap<String, Value> parameters) {
+      super(parameters);
+    }
+
+    /**
+     * Extact SetRef structure
+     *
+     * @return SetRef structure
+     */
+    public ImmutableMap<String, Value> parameters() {
       return value;
     }
 
     @Override
-    public Optional<LocalDate> asDateOption() {
-      return Optional.of(value);
+    @JsonProperty("@set")
+    ImmutableMap<String, Value> toJson() {
+      return value;
+    }
+  }
+
+  /**
+   * A FaunaDB ref type.
+   *
+   * @see <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   */
+  public static final class Ref extends Value.ScalarValue<String> {
+
+    @JsonCreator
+    public Ref(@JsonProperty("@ref") String value) {
+      super(value);
     }
 
+    @Override
+    @JsonProperty("@ref")
+    String toJson() {
+      return value;
+    }
+
+    /**
+     * Extracts its string value.
+     *
+     * @return a string with the ref value
+     */
+    public String strValue() {
+      return value;
+    }
   }
 
 }

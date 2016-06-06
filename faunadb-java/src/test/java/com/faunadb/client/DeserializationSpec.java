@@ -2,8 +2,8 @@ package com.faunadb.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.faunadb.client.types.Ref;
 import com.faunadb.client.types.Value;
+import com.faunadb.client.types.Value.Ref;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;

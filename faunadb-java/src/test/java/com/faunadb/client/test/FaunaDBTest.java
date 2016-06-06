@@ -1,8 +1,8 @@
 package com.faunadb.client.test;
 
 import com.faunadb.client.FaunaClient;
-import com.faunadb.client.types.Ref;
 import com.faunadb.client.types.Value;
+import com.faunadb.client.types.Value.Ref;
 import com.faunadb.common.Connection;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.AsyncFunction;

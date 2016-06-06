@@ -1,119 +1,82 @@
 package com.faunadb.client.types;
 
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.faunadb.client.types.Value.ArrayV;
-import com.faunadb.client.types.Value.NullV;
-import com.faunadb.client.types.Value.ObjectV;
+import com.faunadb.client.types.Value.*;
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
+import java.time.Instant;
+import java.time.LocalDate;
 
-import static com.faunadb.client.types.Value.BooleanV.*;
+import static java.lang.String.format;
 
-class Codec {
+public interface Codec<T> extends Function<Value, Result<T>> {
 
-  private static abstract class TreeDeserializer<T> extends JsonDeserializer<T> {
+  Codec<Value> IDENTITY = new Codec<Value>() {
     @Override
-    public T deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
-      JsonLocation location = jsonParser.getTokenLocation();
-      ObjectMapper json = (ObjectMapper) jsonParser.getCodec();
-      JsonNode tree = json.readTree(jsonParser);
-
-      return deserializeTree(tree, json, context.getTypeFactory(), location);
+    public Result<Value> apply(Value input) {
+      return Result.success(input);
     }
+  };
 
-    abstract T deserializeTree(
-      JsonNode tree, ObjectMapper json, TypeFactory type, JsonLocation loc) throws JsonParseException;
+  Codec<Ref> REF = Cast.to(Ref.class, Cast.<Ref>identity());
+  Codec<SetRef> SET_REF = Cast.to(SetRef.class, Cast.<SetRef>identity());
+  Codec<Long> LONG = Cast.to(LongV.class, Cast.<LongV, Long>scalarValue());
+  Codec<Instant> TS = Cast.to(TsV.class, Cast.<TsV, Instant>scalarValue());
+  Codec<String> STRING = Cast.to(StringV.class, Cast.<StringV, String>scalarValue());
+  Codec<Double> DOUBLE = Cast.to(DoubleV.class, Cast.<DoubleV, Double>scalarValue());
+  Codec<Boolean> BOOLEAN = Cast.to(BooleanV.class, Cast.<BooleanV, Boolean>scalarValue());
+  Codec<LocalDate> DATE = Cast.to(DateV.class, Cast.<DateV, LocalDate>scalarValue());
+
+  Codec<ImmutableList<Value>> ARRAY = Cast.to(ArrayV.class, new Function<ArrayV, Result<ImmutableList<Value>>>() {
+    @Override
+    public Result<ImmutableList<Value>> apply(ArrayV input) {
+      return Result.success(input.values);
+    }
+  });
+
+  Codec<ImmutableMap<String, Value>> OBJECT = Cast.to(ObjectV.class, new Function<ObjectV, Result<ImmutableMap<String, Value>>>() {
+    @Override
+    public Result<ImmutableMap<String, Value>> apply(ObjectV input) {
+      return Result.success(input.values);
+    }
+  });
+}
+
+final class Cast {
+
+  static <V extends Value, O> Codec<O> to(final Class<V> clazz, final Function<V, Result<O>> fn) {
+    return new Codec<O>() {
+      @Override
+      public Result<O> apply(Value input) {
+        return cast(clazz, input).map(fn);
+      }
+    };
   }
 
-  static class ValueDeserializer extends TreeDeserializer<Value> {
-    @Override
-    Value deserializeTree(JsonNode tree, ObjectMapper json, TypeFactory type, JsonLocation loc)
-      throws JsonParseException {
+  private static <T> Result<T> cast(Class<T> clazz, Value value) {
+    if (value.getClass() == clazz)
+      return Result.success(clazz.cast(value));
 
-      switch (tree.getNodeType()) {
-        case OBJECT:
-          return deserializeSpecial(tree, json);
-        case ARRAY:
-          return json.convertValue(tree, ArrayV.class);
-        case STRING:
-          return json.convertValue(tree, StringV.class);
-        case BOOLEAN:
-          return json.convertValue(tree, BooleanV.class);
-        case NUMBER:
-          return tree.isDouble() ?
-            json.convertValue(tree, DoubleV.class) :
-            json.convertValue(tree, LongV.class);
-        case NULL:
-          return NullV.NULL;
-        default:
-          throw new JsonParseException("Cannot deserialize as a Value", loc);
-      }
-    }
-
-    private Value deserializeSpecial(JsonNode tree, ObjectMapper json) throws JsonParseException {
-      String firstField = tree.fieldNames().next();
-      switch (firstField) {
-        case "@ref":
-          return json.convertValue(tree, Ref.class);
-        case "@set":
-          return json.convertValue(tree, SetRef.class);
-        case "@ts":
-          return json.convertValue(tree, TsV.class);
-        case "@date":
-          return json.convertValue(tree, DateV.class);
-        case "@obj":
-          return json.convertValue(tree.get("@obj"), ObjectV.class);
-        default:
-          return json.convertValue(tree, ObjectV.class);
-      }
-    }
+    return Result.fail(
+      format("Can not convert %s to %s", value.getClass().getSimpleName(), clazz.getSimpleName()));
   }
 
-  static class ArrayDeserializer extends TreeDeserializer<ArrayV> {
-    @Override
-    ArrayV deserializeTree(JsonNode tree, final ObjectMapper json, TypeFactory type, JsonLocation loc)
-      throws JsonParseException {
-
-      ImmutableList.Builder<Value> values = ImmutableList.builder();
-
-      for (Iterator<JsonNode> elements = tree.elements(); elements.hasNext(); ) {
-        values.add(toValueOrNull(elements.next(), json));
+  static <T extends ScalarValue<R>, R> Function<T, Result<R>> scalarValue() {
+    return new Function<T, Result<R>>() {
+      @Override
+      public Result<R> apply(T input) {
+        return Result.success(input.value);
       }
-
-      return new ArrayV(values.build());
-    }
-
+    };
   }
 
-  static class ObjectDeserializer extends TreeDeserializer<ObjectV> {
-    @Override
-    ObjectV deserializeTree(final JsonNode tree, final ObjectMapper json, TypeFactory type, JsonLocation loc)
-      throws JsonParseException {
-
-      ImmutableMap.Builder<String, Value> values = ImmutableMap.builder();
-
-      for (Iterator<Map.Entry<String, JsonNode>> entries = tree.fields(); entries.hasNext(); ) {
-        Map.Entry<String, JsonNode> entry = entries.next();
-        values.put(entry.getKey(), toValueOrNull(entry.getValue(), json));
+  static <T> Function<T, Result<T>> identity() {
+    return new Function<T, Result<T>>() {
+      @Override
+      public Result<T> apply(T input) {
+        return Result.success(input);
       }
-
-      return new ObjectV(values.build());
-    }
-  }
-
-  private static Value toValueOrNull(JsonNode node, ObjectMapper json) {
-    Value value = json.convertValue(node, Value.class);
-    return value != null ? value : NullV.NULL;
+    };
   }
 }

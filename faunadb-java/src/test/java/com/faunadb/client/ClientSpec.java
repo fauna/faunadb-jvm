@@ -5,9 +5,10 @@ import com.faunadb.client.errors.NotFoundException;
 import com.faunadb.client.errors.UnauthorizedException;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.test.FaunaDBTest;
-import com.faunadb.client.types.Ref;
+import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.ObjectV;
+import com.faunadb.client.types.Value.Ref;
 import com.faunadb.client.types.Value.StringV;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -19,23 +20,31 @@ import org.junit.rules.ExpectedException;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Random;
 
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.TimeUnit.SECOND;
+import static com.faunadb.client.types.Codec.*;
 import static java.time.temporal.ChronoUnit.HOURS;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertThat;
 
 public class ClientSpec extends FaunaDBTest {
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
+
+  private static final Field<Ref> REF_FIELD = Field.at("ref").as(REF);
+  private static final Field<Value> DATA = Field.at("data");
+  private static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).as(STRING);
+  private static final Field<Long> COST_FIELD = DATA.at(Field.at("cost")).as(LONG);
+  private static final Field<String> ELEMENT_FIELD = DATA.at(Field.at("element")).as(STRING);
+  private static final Field<Value> ELEMENTS_FIELD = DATA.at(Field.at("elements"));
 
   private static Ref magicMissile;
   private static Ref fireball;
@@ -91,7 +100,7 @@ public class ClientSpec extends FaunaDBTest {
             "name", Value("Magic Missile"),
             "element", Value("arcane"),
             "cost", Value(10))))
-    ).get().get("ref").asRef();
+    ).get().get(REF_FIELD);
 
     fireball = client.query(
       Create(Ref("classes/spells"),
@@ -100,7 +109,7 @@ public class ClientSpec extends FaunaDBTest {
             "name", Value("Fireball"),
             "element", Value("fire"),
             "cost", Value(10))))
-    ).get().get("ref").asRef();
+    ).get().get(REF_FIELD);
 
     faerieFire = client.query(
       Create(Ref("classes/spells"),
@@ -112,7 +121,7 @@ public class ClientSpec extends FaunaDBTest {
               Value("arcane"),
               Value("nature")
             ))))
-    ).get().get("ref").asRef();
+    ).get().get(REF_FIELD);
 
     summon = client.query(
       Create(Ref("classes/spells"),
@@ -121,30 +130,30 @@ public class ClientSpec extends FaunaDBTest {
             "name", Value("Summon Animal Companion"),
             "element", Value("nature"),
             "cost", Value(10))))
-    ).get().get("ref").asRef();
+    ).get().get(REF_FIELD);
 
     thor = client.query(
       Create(Ref("classes/characters"),
         Obj("data", Obj("name", Value("Thor"))))
-    ).get().get("ref").asRef();
+    ).get().get(REF_FIELD);
 
     Ref thorsSpellbook = client.query(
       Create(Ref("classes/spellbooks"),
         Obj("data",
           Obj("owner", thor)))
-    ).get().get("ref").asRef();
+    ).get().get(REF_FIELD);
 
     thorSpell1 = client.query(
       Create(Ref("classes/spells"),
         Obj("data",
           Obj("spellbook", thorsSpellbook)))
-    ).get().get("ref").asRef();
+    ).get().get(REF_FIELD);
 
     thorSpell2 = client.query(
       Create(Ref("classes/spells"),
         Obj("data",
           Obj("spellbook", thorsSpellbook)))
-    ).get().get("ref").asRef();
+    ).get().get(REF_FIELD);
   }
 
   @Test
@@ -181,13 +190,13 @@ public class ClientSpec extends FaunaDBTest {
           )))
     ).get();
 
-    Value testField = instance.get("data", "testField");
+    Value testField = instance.get(DATA).get("testField");
     assertThat(testField.get("string").asString(), equalTo("sup"));
     assertThat(testField.get("num").asLong(), equalTo(1234L));
     assertThat(testField.get("bool").asBoolean(), is(true));
     assertThat(testField.get("bool").asStringOption(), is(Optional.<String>absent()));
-    assertThat(testField.getOption("credentials"), is(Optional.<Value>absent()));
-    assertThat(testField.getOption("credentials", "password"), is(Optional.<Value>absent()));
+    assertThat(testField.getOpt("credentials"), is(Optional.<Value>absent()));
+    assertThat(testField.getOpt("credentials", "password"), is(Optional.<Value>absent()));
 
     Value array = testField.get("array");
     assertThat(array.asArray(), hasSize(4));
@@ -201,7 +210,7 @@ public class ClientSpec extends FaunaDBTest {
   @Test
   public void shouldBeAbleToGetAnInstance() throws Exception {
     Value instance = client.query(Get(magicMissile)).get();
-    assertThat(instance.get("data", "name").asString(), equalTo("Magic Missile"));
+    assertThat(instance.get(NAME_FIELD), equalTo("Magic Missile"));
   }
 
   @Test
@@ -212,8 +221,8 @@ public class ClientSpec extends FaunaDBTest {
     )).get();
 
     assertThat(results, hasSize(2));
-    assertThat(results.get(0).get("data", "name").asString(), equalTo("Magic Missile"));
-    assertThat(results.get(1).get("data", "name").asString(), equalTo("Thor"));
+    assertThat(results.get(0).get(NAME_FIELD), equalTo("Magic Missile"));
+    assertThat(results.get(1).get(NAME_FIELD), equalTo("Thor"));
 
     ImmutableList<Value> data = client.query(ImmutableList.of(
       new ObjectV(ImmutableMap.of("k1", new StringV("v1"))),
@@ -237,17 +246,17 @@ public class ClientSpec extends FaunaDBTest {
     ).get();
 
     Value updatedInstance = client.query(
-      Update(createdInstance.get("ref"),
+      Update(createdInstance.get(REF_FIELD),
         Obj("data",
           Obj(
             "name", Value("Faerie Fire"),
             "cost", Null())))
     ).get();
 
-    assertThat(updatedInstance.get("ref"), equalTo(createdInstance.get("ref")));
-    assertThat(updatedInstance.get("data", "name").asString(), equalTo("Faerie Fire"));
-    assertThat(updatedInstance.get("data", "element").asString(), equalTo("arcane"));
-    assertThat(updatedInstance.get("data", "cost"), nullValue());
+    assertThat(updatedInstance.get(REF_FIELD), equalTo(createdInstance.get(REF_FIELD)));
+    assertThat(updatedInstance.get(NAME_FIELD), equalTo("Faerie Fire"));
+    assertThat(updatedInstance.get(ELEMENT_FIELD), equalTo("arcane"));
+    assertThat(updatedInstance.getOpt(COST_FIELD), is(Optional.<Long>absent()));
   }
 
   @Test
@@ -262,18 +271,18 @@ public class ClientSpec extends FaunaDBTest {
     ).get();
 
     Value replacedInstance = client.query(
-      Replace(createdInstance.get("ref"),
+      Replace(createdInstance.get(REF_FIELD),
         Obj("data",
           Obj("name", Value("Volcano"),
-            "element", Arr(Value("fire"), Value("earth")),
+            "elements", Arr(Value("fire"), Value("earth")),
             "cost", Value(10))))
     ).get();
 
-    assertThat(replacedInstance.get("ref"), equalTo(createdInstance.get("ref")));
-    assertThat(replacedInstance.get("data", "name").asString(), equalTo("Volcano"));
-    assertThat(replacedInstance.get("data", "element").get(0).asString(), equalTo("fire"));
-    assertThat(replacedInstance.get("data", "element").get(1).asString(), equalTo("earth"));
-    assertThat(replacedInstance.get("data", "cost").asLong(), equalTo(10L));
+    assertThat(replacedInstance.get(REF_FIELD), equalTo(createdInstance.get(REF_FIELD)));
+    assertThat(replacedInstance.get(NAME_FIELD), equalTo("Volcano"));
+    assertThat(replacedInstance.get(COST_FIELD), equalTo(10L));
+    assertThat(replacedInstance.get(ELEMENTS_FIELD).collect(Field.to(STRING)),
+      contains("fire", "earth"));
   }
 
   @Test
@@ -283,7 +292,7 @@ public class ClientSpec extends FaunaDBTest {
         Obj("data", Obj("name", Value("Magic Missile"))))
     ).get();
 
-    Value ref = createdInstance.get("ref");
+    Value ref = createdInstance.get(REF_FIELD);
     client.query(Delete(ref)).get();
 
     Value exists = client.query(Exists(ref)).get();
@@ -301,17 +310,17 @@ public class ClientSpec extends FaunaDBTest {
     ).get();
 
     Value insertedEvent = client.query(
-      Insert(createdInstance.get("ref"), Value(1L), CREATE,
+      Insert(createdInstance.get(REF_FIELD), Value(1L), CREATE,
         Obj("data",
           Obj("cooldown", Value(5L))))
     ).get();
 
-    assertThat(insertedEvent.get("ref"), equalTo(createdInstance.get("ref")));
-    assertThat(insertedEvent.get("data").asObject().size(), equalTo(1));
-    assertThat(insertedEvent.get("data", "cooldown").asLong(), is(5L));
+    assertThat(insertedEvent.get(REF_FIELD), equalTo(createdInstance.get(REF_FIELD)));
+    assertThat(insertedEvent.get(DATA).asObject().size(), equalTo(1));
+    assertThat(insertedEvent.get(DATA).get("cooldown").asLong(), is(5L));
 
     Value removedEvent = client.query(
-      Remove(createdInstance.get("ref"), Value(2L), DELETE)
+      Remove(createdInstance.get(REF_FIELD), Value(2L), DELETE)
     ).get();
 
     assertThat(removedEvent, nullValue());
@@ -349,8 +358,7 @@ public class ClientSpec extends FaunaDBTest {
       Paginate(Match(Ref("indexes/spells_by_element"), Value("fire")))
     ).get();
 
-    assertThat(singleMatch.get("data").asArray(), hasSize(1));
-    assertThat(singleMatch.get("data").get(0).asRef(), equalTo(fireball));
+    assertThat(singleMatch.get(DATA).collect(Field.to(REF)), contains(fireball));
   }
 
   @Test
@@ -365,13 +373,8 @@ public class ClientSpec extends FaunaDBTest {
       Paginate(Match(Ref("indexes/all_spells")))
     ).get();
 
-    assertThat(allInstances.get("data").asArray(), hasSize(6));
-    assertThat(allInstances.get("data").get(0).asRef(), equalTo(magicMissile));
-    assertThat(allInstances.get("data").get(1).asRef(), equalTo(fireball));
-    assertThat(allInstances.get("data").get(2).asRef(), equalTo(faerieFire));
-    assertThat(allInstances.get("data").get(3).asRef(), equalTo(summon));
-    assertThat(allInstances.get("data").get(4).asRef(), equalTo(thorSpell1));
-    assertThat(allInstances.get("data").get(5).asRef(), equalTo(thorSpell2));
+    assertThat(allInstances.get(DATA).collect(Field.to(REF)),
+      contains(magicMissile, fireball, faerieFire, summon, thorSpell1, thorSpell2));
   }
 
   @Test
@@ -381,9 +384,9 @@ public class ClientSpec extends FaunaDBTest {
         .withSize(3)
     ).get();
 
-    assertThat(page1.get("data").asArray(), hasSize(3));
+    assertThat(page1.get(DATA).asArray(), hasSize(3));
     assertThat(page1.get("after"), notNullValue());
-    assertThat(page1.get("before"), nullValue());
+    assertThat(page1.getOpt("before"), is(Optional.<Value>absent()));
 
     Value page2 = client.query(
       Paginate(Match(Ref("indexes/all_spells")))
@@ -391,10 +394,10 @@ public class ClientSpec extends FaunaDBTest {
         .withSize(3)
     ).get();
 
-    assertThat(page2.get("data").asArray(), hasSize(3));
-    assertThat(page2.get("data"), not(page1.get("data")));
+    assertThat(page2.get(DATA).asArray(), hasSize(3));
+    assertThat(page2.get(DATA), not(page1.get("data")));
     assertThat(page2.get("before"), notNullValue());
-    assertThat(page2.get("after"), nullValue());
+    assertThat(page2.getOpt("after"), is(Optional.<Value>absent()));
   }
 
   @Test
@@ -422,8 +425,7 @@ public class ClientSpec extends FaunaDBTest {
       )
     ).get();
 
-    assertThat(res.get(0).asLong(), equalTo(2L));
-    assertThat(res.get(1).asLong(), equalTo(1L));
+    assertThat(res.collect(Field.to(LONG)), contains(2L, 1L));
   }
 
   @Test
@@ -448,8 +450,7 @@ public class ClientSpec extends FaunaDBTest {
       )
     ).get();
 
-    assertThat(res.get("ref").asRef(),
-      equalTo(ref));
+    assertThat(res.get(REF_FIELD), equalTo(ref));
   }
 
   @Test
@@ -477,10 +478,7 @@ public class ClientSpec extends FaunaDBTest {
       )
     ).get();
 
-    assertThat(res.asArray(), hasSize(3));
-    assertThat(res.get(0).asLong(), equalTo(2L));
-    assertThat(res.get(1).asLong(), equalTo(3L));
-    assertThat(res.get(2).asLong(), equalTo(4L));
+    assertThat(res.collect(Field.to(LONG)), contains(2L, 3L, 4L));
   }
 
   @Test
@@ -495,9 +493,8 @@ public class ClientSpec extends FaunaDBTest {
           Value("Fireball Level 2")))
     ).get();
 
-    assertThat(res.asArray(), hasSize(2));
-    assertThat(res.get(0).asString(), equalTo("Fireball Level 1"));
-    assertThat(res.get(1).asString(), equalTo("Fireball Level 2"));
+    assertThat(res.collect(Field.to(STRING)),
+      contains("Fireball Level 1", "Fireball Level 2"));
   }
 
   @Test
@@ -512,25 +509,19 @@ public class ClientSpec extends FaunaDBTest {
         Arr(Value(1), Value(2), Value(3))
       )).get();
 
-    assertThat(filtered.asArray(), hasSize(1));
-    assertThat(filtered.get(0).asLong(), equalTo(2L));
+    assertThat(filtered.collect(Field.to(LONG)), contains(2L));
   }
 
   @Test
   public void shouldTakeElementsFromCollection() throws Exception {
     Value taken = client.query(Take(Value(2), Arr(Value(1), Value(2), Value(3)))).get();
-
-    assertThat(taken.asArray(), hasSize(2));
-    assertThat(taken.get(0).asLong(), equalTo(1L));
-    assertThat(taken.get(1).asLong(), equalTo(2L));
+    assertThat(taken.collect(Field.to(LONG)), contains(1L, 2L));
   }
 
   @Test
   public void shouldDropElementsFromCollection() throws Exception {
     Value dropped = client.query(Drop(Value(2), Arr(Value(1), Value(2), Value(3)))).get();
-
-    assertThat(dropped.asArray(), hasSize(1));
-    assertThat(dropped.get(0).asLong(), equalTo(3L));
+    assertThat(dropped.collect(Field.to(LONG)), contains(3L));
   }
 
   @Test
@@ -542,11 +533,8 @@ public class ClientSpec extends FaunaDBTest {
       )
     ).get();
 
-    assertThat(prepended.asArray(), hasSize(4));
-    assertThat(prepended.get(0).asLong(), equalTo(1L));
-    assertThat(prepended.get(1).asLong(), equalTo(2L));
-    assertThat(prepended.get(2).asLong(), equalTo(3L));
-    assertThat(prepended.get(3).asLong(), equalTo(4L));
+    assertThat(prepended.collect(Field.to(LONG)),
+      contains(1L, 2L, 3L, 4L));
   }
 
   @Test
@@ -558,11 +546,8 @@ public class ClientSpec extends FaunaDBTest {
       )
     ).get();
 
-    assertThat(appended.asArray(), hasSize(4));
-    assertThat(appended.get(0).asLong(), equalTo(1L));
-    assertThat(appended.get(1).asLong(), equalTo(2L));
-    assertThat(appended.get(2).asLong(), equalTo(3L));
-    assertThat(appended.get(3).asLong(), equalTo(4L));
+    assertThat(appended.collect(Field.to(LONG)),
+      contains(1L, 2L, 3L, 4L));
   }
 
   @Test
@@ -572,8 +557,8 @@ public class ClientSpec extends FaunaDBTest {
         .withEvents(true)
     ).get();
 
-    assertThat(events.get("data").asArray(), hasSize(2));
-    assertThat(collectResourcesFrom(events.get("data")), hasItems(magicMissile, faerieFire));
+    assertThat(events.get(DATA).collect(Field.at("resource").as(REF)),
+      contains(magicMissile, faerieFire));
   }
 
   @Test
@@ -586,9 +571,8 @@ public class ClientSpec extends FaunaDBTest {
       )
     ).get();
 
-    assertThat(union.get("data").asArray(), hasSize(3));
-    assertThat(collectRefsFom(union.get("data")), hasItems(magicMissile, faerieFire, fireball));
-
+    assertThat(union.get(DATA).collect(Field.to(REF)),
+      contains(magicMissile, fireball, faerieFire));
   }
 
   @Test
@@ -601,8 +585,8 @@ public class ClientSpec extends FaunaDBTest {
         ))
     ).get();
 
-    assertThat(intersection.get("data").asArray(), hasSize(1));
-    assertThat(collectRefsFom(intersection.get("data")), hasItem(faerieFire));
+    assertThat(intersection.get(DATA).collect(Field.to(REF)),
+      contains(faerieFire));
   }
 
   @Test
@@ -615,8 +599,8 @@ public class ClientSpec extends FaunaDBTest {
         ))
     ).get();
 
-    assertThat(difference.get("data").asArray(), hasSize(1));
-    assertThat(collectRefsFom(difference.get("data")), hasItem(summon));
+    assertThat(difference.get(DATA).collect(Field.to(REF)),
+      contains(summon));
   }
 
   @Test
@@ -628,10 +612,8 @@ public class ClientSpec extends FaunaDBTest {
       )
     ).get();
 
-    assertThat(distinct.get("data").asArray(), hasSize(3));
-    assertThat(distinct.get("data").get(0).asString(), equalTo("arcane"));
-    assertThat(distinct.get("data").get(1).asString(), equalTo("fire"));
-    assertThat(distinct.get("data").get(2).asString(), equalTo("nature"));
+    assertThat(distinct.get(DATA).collect(Field.to(STRING)),
+      contains("arcane", "fire", "nature"));
   }
 
   @Test
@@ -645,8 +627,8 @@ public class ClientSpec extends FaunaDBTest {
         ))
     ).get();
 
-    assertThat(join.get("data").asArray(), hasSize(2));
-    assertThat(collectRefsFom(join.get("data")), hasItems(thorSpell1, thorSpell2));
+    assertThat(join.get(DATA).collect(Field.to(REF)),
+      contains(thorSpell1, thorSpell2));
   }
 
   @Test
@@ -813,13 +795,11 @@ public class ClientSpec extends FaunaDBTest {
 
     Value auth = client.query(
       Login(
-        createdInstance.get("ref"),
+        createdInstance.get(REF_FIELD),
         Obj("password", Value("abcdefg")))
     ).get();
 
-    String token = auth.get("secret").asString();
-
-    FaunaClient sessionClient = createFaunaClient(token);
+    FaunaClient sessionClient = createFaunaClient(auth.get("secret").asString());
 
     try {
       Value loggedOut = sessionClient.query(Logout(Value(true))).get();
@@ -830,7 +810,7 @@ public class ClientSpec extends FaunaDBTest {
 
     Value identified = client.query(
       Identify(
-        createdInstance.get("ref"),
+        createdInstance.get(REF_FIELD),
         Value("wrong-password")
       )
     ).get();
@@ -844,23 +824,7 @@ public class ClientSpec extends FaunaDBTest {
         Obj("name", Value(randomStartingWith("some_class_"))))
     ).get();
 
-    return clazz.get("ref").asRef();
-  }
-
-  private List<Ref> collectRefsFom(Value response) {
-    ImmutableList.Builder<Ref> refs = ImmutableList.builder();
-    for (Value value : response.asArray())
-      refs.add(value.asRef());
-
-    return refs.build();
-  }
-
-  private List<Ref> collectResourcesFrom(Value response) {
-    ImmutableList.Builder<Ref> refs = ImmutableList.builder();
-    for (Value value : response.asArray())
-      refs.add(value.get("resource").asRef());
-
-    return refs.build();
+    return clazz.get(REF_FIELD);
   }
 
   private String randomStartingWith(String... parts) {

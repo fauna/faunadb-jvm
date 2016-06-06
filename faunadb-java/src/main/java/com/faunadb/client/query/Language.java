@@ -1,6 +1,5 @@
 package com.faunadb.client.query;
 
-import com.faunadb.client.types.Ref;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.*;
 import com.google.common.collect.ImmutableList;
