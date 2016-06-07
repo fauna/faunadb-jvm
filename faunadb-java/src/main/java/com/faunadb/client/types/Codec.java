@@ -66,47 +66,47 @@ public interface Codec<T> extends Function<Value, Result<T>> {
   /**
    * Coerce a {@link Value} to an instance of {@link Ref}
    */
-  Codec<Ref> REF = Cast.map(Ref.class, Functions.<Ref>identity());
+  Codec<Ref> REF = Cast.mapTo(Ref.class, Functions.<Ref>identity());
 
   /**
    * Coerce a {@link Value} to an instance of {@link SetRef}
    */
-  Codec<SetRef> SET_REF = Cast.map(SetRef.class, Functions.<SetRef>identity());
+  Codec<SetRef> SET_REF = Cast.mapTo(SetRef.class, Functions.<SetRef>identity());
 
   /**
    * Coerce a {@link Value} to a {@link Long}
    */
-  Codec<Long> LONG = Cast.map(LongV.class, Cast.<LongV, Long>scalarValue());
+  Codec<Long> LONG = Cast.mapTo(LongV.class, Cast.<LongV, Long>scalarValue());
 
   /**
    * Coerce a {@link Value} to an {@link Instant}
    */
-  Codec<Instant> TS = Cast.map(TsV.class, Cast.<TsV, Instant>scalarValue());
+  Codec<Instant> TS = Cast.mapTo(TsV.class, Cast.<TsV, Instant>scalarValue());
 
   /**
    * Coerce a {@link Value} to a {@link String}
    */
-  Codec<String> STRING = Cast.map(StringV.class, Cast.<StringV, String>scalarValue());
+  Codec<String> STRING = Cast.mapTo(StringV.class, Cast.<StringV, String>scalarValue());
 
   /**
    * Coerce a {@link Value} to a {@link Double}
    */
-  Codec<Double> DOUBLE = Cast.map(DoubleV.class, Cast.<DoubleV, Double>scalarValue());
+  Codec<Double> DOUBLE = Cast.mapTo(DoubleV.class, Cast.<DoubleV, Double>scalarValue());
 
   /**
    * Coerce a {@link Value} to a {@link Boolean}
    */
-  Codec<Boolean> BOOLEAN = Cast.map(BooleanV.class, Cast.<BooleanV, Boolean>scalarValue());
+  Codec<Boolean> BOOLEAN = Cast.mapTo(BooleanV.class, Cast.<BooleanV, Boolean>scalarValue());
 
   /**
    * Coerce a {@link Value} to a {@link LocalDate}
    */
-  Codec<LocalDate> DATE = Cast.map(DateV.class, Cast.<DateV, LocalDate>scalarValue());
+  Codec<LocalDate> DATE = Cast.mapTo(DateV.class, Cast.<DateV, LocalDate>scalarValue());
 
   /**
    * Coerce a {@link Value} to an {@link ImmutableList} of {@link Value}
    */
-  Codec<ImmutableList<Value>> ARRAY = Cast.map(ArrayV.class, new Function<ArrayV, ImmutableList<Value>>() {
+  Codec<ImmutableList<Value>> ARRAY = Cast.mapTo(ArrayV.class, new Function<ArrayV, ImmutableList<Value>>() {
     @Override
     public ImmutableList<Value> apply(ArrayV input) {
       return input.values;
@@ -116,7 +116,7 @@ public interface Codec<T> extends Function<Value, Result<T>> {
   /**
    * Coerce a {@link Value} to an {@link ImmutableMap} of {@link Value}
    */
-  Codec<ImmutableMap<String, Value>> OBJECT = Cast.map(ObjectV.class, new Function<ObjectV, ImmutableMap<String, Value>>() {
+  Codec<ImmutableMap<String, Value>> OBJECT = Cast.mapTo(ObjectV.class, new Function<ObjectV, ImmutableMap<String, Value>>() {
     @Override
     public ImmutableMap<String, Value> apply(ObjectV input) {
       return input.values;
@@ -126,7 +126,7 @@ public interface Codec<T> extends Function<Value, Result<T>> {
 
 final class Cast {
 
-  static <V extends Value, O> Codec<O> map(final Class<V> clazz, final Function<V, O> extractValue) {
+  static <V extends Value, O> Codec<O> mapTo(final Class<V> clazz, final Function<V, O> extractValue) {
     return new Codec<O>() {
       @Override
       public Result<O> apply(Value input) {
