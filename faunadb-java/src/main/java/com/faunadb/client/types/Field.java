@@ -9,16 +9,6 @@ package com.faunadb.client.types;
 public final class Field<T> {
 
   /**
-   * Creates a field that coerces its value using the codec passaed
-   *
-   * @param codec codec used to coerce the field's value
-   * @return the field extractor
-   */
-  public static <T> Field<T> to(Codec<T> codec) {
-    return new Field<>(Path.empty(), codec);
-  }
-
-  /**
    * Creates a field that extracts its value from a object path, assuming the value
    * is an intance of {@link com.faunadb.client.types.Value.ObjectV}.
    *
@@ -38,6 +28,16 @@ public final class Field<T> {
    */
   public static Field<Value> at(int... indexes) {
     return new Field<>(Path.from(indexes), Codec.VALUE);
+  }
+
+  /**
+   * Creates a field that coerces its value using the codec passaed
+   *
+   * @param codec codec used to coerce the field's value
+   * @return the field extractor
+   */
+  public static <T> Field<T> to(Codec<T> codec) {
+    return new Field<>(Path.empty(), codec);
   }
 
   private final Path path;

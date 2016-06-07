@@ -67,11 +67,6 @@ import static java.util.Objects.requireNonNull;
 @JsonDeserialize(using = Deserializer.ValueDeserializer.class)
 public abstract class Value extends Expr {
 
-  @Override
-  protected final Value value() {
-    return this; // To satisfy Expr contract
-  }
-
   /**
    * Attempts to coerce this value using the {@link Codec} passed
    *
@@ -158,9 +153,6 @@ public abstract class Value extends Expr {
     return Field.at(indexes).get(this).getOrElse(NullV.NULL);
   }
 
-  @SuppressWarnings("unused") // Used by Jackson to serialize the value to JSON
-  abstract Object toJson();
-
   /**
    * Represents a scalar value at the FaunaDB query language.
    * See {@link Value}
@@ -209,8 +201,8 @@ public abstract class Value extends Expr {
 
     @Override
     @JsonValue
-    ImmutableMap<String, Value> toJson() {
-      return values;
+    protected ImmutableMap<String, ImmutableMap<String, Value>> toJson() {
+      return ImmutableMap.of("object", values);
     }
 
     @Override
@@ -247,7 +239,7 @@ public abstract class Value extends Expr {
 
     @Override
     @JsonValue
-    ImmutableList<Value> toJson() {
+    protected ImmutableList<Value> toJson() {
       return values;
     }
 
@@ -289,7 +281,7 @@ public abstract class Value extends Expr {
 
     @Override
     @JsonValue
-    Boolean toJson() {
+    protected Boolean toJson() {
       return value;
     }
 
@@ -307,7 +299,7 @@ public abstract class Value extends Expr {
 
     @Override
     @JsonValue
-    Double toJson() {
+    protected Double toJson() {
       return value;
     }
   }
@@ -324,7 +316,7 @@ public abstract class Value extends Expr {
 
     @Override
     @JsonValue
-    Long toJson() {
+    protected Long toJson() {
       return value;
     }
   }
@@ -341,7 +333,7 @@ public abstract class Value extends Expr {
 
     @Override
     @JsonValue
-    String toJson() {
+    protected String toJson() {
       return value;
     }
   }
@@ -360,7 +352,7 @@ public abstract class Value extends Expr {
 
     @Override
     @JsonValue
-    NullNode toJson() {
+    protected NullNode toJson() {
       return NullNode.getInstance();
     }
 
@@ -400,7 +392,7 @@ public abstract class Value extends Expr {
 
     @Override
     @JsonProperty("@ts")
-    String toJson() {
+    protected String toJson() {
       return value.toString();
     }
 
@@ -424,7 +416,7 @@ public abstract class Value extends Expr {
 
     @Override
     @JsonProperty("@date")
-    String toJson() {
+    protected String toJson() {
       return value.toString();
     }
   }
@@ -451,7 +443,7 @@ public abstract class Value extends Expr {
 
     @Override
     @JsonProperty("@set")
-    ImmutableMap<String, Value> toJson() {
+    protected ImmutableMap<String, Value> toJson() {
       return value;
     }
   }
@@ -470,7 +462,7 @@ public abstract class Value extends Expr {
 
     @Override
     @JsonProperty("@ref")
-    String toJson() {
+    protected String toJson() {
       return value;
     }
 

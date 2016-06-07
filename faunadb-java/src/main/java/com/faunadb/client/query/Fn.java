@@ -1,13 +1,30 @@
 package com.faunadb.client.query;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.faunadb.client.types.Value;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 
 final class Fn {
 
-  private static Expr apply(Map<String, Expr> args) {
-    return new Expr.ConcreteExpr(Expr.wrapValues(args));
+  static class Call extends Value {
+
+    final Map<String, Expr> body;
+
+    Call(Map<String, Expr> body) {
+      this.body = body;
+    }
+
+    @Override
+    @JsonValue
+    protected Object toJson() {
+      return body;
+    }
+  }
+
+  static Expr apply(Map<String, Expr> args) {
+    return new Call(args);
   }
 
   static Expr apply(String k1, Expr p1) {

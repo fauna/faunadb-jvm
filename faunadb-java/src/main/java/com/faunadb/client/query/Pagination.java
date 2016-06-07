@@ -2,8 +2,6 @@ package com.faunadb.client.query;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.faunadb.client.types.Value;
-import com.faunadb.client.types.Value.LongV;
-import com.faunadb.client.types.Value.ObjectV;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -25,7 +23,7 @@ import static java.util.Objects.requireNonNull;
  * @see Language#Paginate(Expr)
  * @see <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
  */
-public final class Pagination extends Expr {
+public final class Pagination extends Fn.Call {
 
   /**
    * Helper to construct the pagination cursor that can constructed either
@@ -55,7 +53,6 @@ public final class Pagination extends Expr {
     }
   }
 
-  private final Expr resource;
   private Optional<Cursor> cursor = Optional.absent();
   private Optional<Expr> ts = Optional.absent();
   private Optional<Expr> size = Optional.absent();
@@ -63,22 +60,22 @@ public final class Pagination extends Expr {
   private Optional<Expr> events = Optional.absent();
 
   Pagination(Expr resource) {
-    this.resource = requireNonNull(resource);
+    super(ImmutableMap.of("paginate", requireNonNull(resource)));
   }
 
   @Override
   @JsonValue
-  protected Value value() {
-    ImmutableMap.Builder<String, Value> res = ImmutableMap.builder();
-    res.put("paginate", resource.value());
+  protected ImmutableMap<String, Expr> toJson() {
+    ImmutableMap.Builder<String, Expr> res = ImmutableMap.builder();
+    res.putAll(body);
 
-    if (cursor.isPresent()) res.put(cursor.get().name, cursor.get().ref.value());
-    if (events.isPresent()) res.put("events", events.get().value());
-    if (sources.isPresent()) res.put("sources", sources.get().value());
-    if (ts.isPresent()) res.put("ts", ts.get().value());
-    if (size.isPresent()) res.put("size", size.get().value());
+    if (cursor.isPresent()) res.put(cursor.get().name, cursor.get().ref);
+    if (events.isPresent()) res.put("events", events.get());
+    if (sources.isPresent()) res.put("sources", sources.get());
+    if (ts.isPresent()) res.put("ts", ts.get());
+    if (size.isPresent()) res.put("size", size.get());
 
-    return new ObjectV(res.build());
+    return res.build();
   }
 
   /**

@@ -77,14 +77,14 @@ public final class Language {
    */
   public static final class LetBinding {
 
-    private final ObjectV bindings;
+    private final Expr bindings;
 
     private LetBinding(ImmutableMap<String, Expr> bindings) {
-      this.bindings = Expr.wrapValues(bindings);
+      this.bindings = Fn.apply(bindings);
     }
 
     public Expr in(Expr in) {
-      return Fn.apply("let", new Expr.ConcreteExpr(bindings), "in", Expr.wrap(in));
+      return Fn.apply("let", bindings, "in", in);
     }
 
   }
@@ -140,7 +140,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Ref(String ref) {
-    return Expr.wrap(new Ref(ref));
+    return new Ref(ref);
   }
 
   /**
@@ -167,7 +167,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Value(String value) {
-    return Expr.wrap(new StringV(value));
+    return new StringV(value);
   }
 
   /**
@@ -176,7 +176,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Value(long value) {
-    return Expr.wrap(new LongV(value));
+    return new LongV(value);
   }
 
   /**
@@ -185,7 +185,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Value(double value) {
-    return Expr.wrap(new DoubleV(value));
+    return new DoubleV(value);
   }
 
   /**
@@ -194,7 +194,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Value(boolean value) {
-    return Expr.wrap(BooleanV.valueOf(value));
+    return BooleanV.valueOf(value);
   }
 
   /**
@@ -203,7 +203,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Value(Instant value) {
-    return Expr.wrap(new TsV(value));
+    return new TsV(value);
   }
 
   /**
@@ -212,7 +212,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Value(LocalDate value) {
-    return Expr.wrap(new DateV(value));
+    return new DateV(value);
   }
 
   /**
@@ -221,7 +221,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Null() {
-    return Expr.wrap(NullV.NULL);
+    return NullV.NULL;
   }
 
   /**
@@ -230,7 +230,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Obj(Map<String, ? extends Expr> values) {
-    return Expr.escapedObject(values);
+    return new ObjectV(Expr.unwrapValues(values));
   }
 
   /**
@@ -293,7 +293,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Arr(List<? extends Expr> values) {
-    return Expr.escapedArray(values);
+    return new ArrayV(Expr.unwrapValues(values));
   }
 
   /**

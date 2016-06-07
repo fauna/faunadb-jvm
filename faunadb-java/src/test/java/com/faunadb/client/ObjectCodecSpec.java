@@ -64,7 +64,7 @@ public class ObjectCodecSpec {
     assertThat(obj.at("test").as(STRING).get(), equalTo("value"));
 
     JsonNode node = this.json.valueToTree(obj);
-    assertThat(node.get("test").asText(), equalTo("value"));
+    assertThat(node.get("object").get("test").asText(), equalTo("value"));
   }
 
   @Test
@@ -78,9 +78,9 @@ public class ObjectCodecSpec {
     assertThat(obj.at("another"), CoreMatchers.<Value>is(NullV.NULL));
 
     JsonNode node = json.valueToTree(obj);
-    assertThat(node.get("something").asText(), equalTo("huh"));
-    assertThat(node.has("another"), is(true));
-    assertThat(node.get("another").isNull(), is(true));
+    assertThat(node.get("object").get("something").asText(), equalTo("huh"));
+    assertThat(node.get("object").has("another"), is(true));
+    assertThat(node.get("object").get("another").isNull(), is(true));
   }
 
   @Test
@@ -97,11 +97,11 @@ public class ObjectCodecSpec {
     assertThat(obj.at("nested").as(OBJECT).get().get("another"), CoreMatchers.<Value>is(NullV.NULL));
 
     JsonNode node = json.valueToTree(obj);
-    assertThat(node.get("aMap").isObject(), is(true));
-    assertThat(node.get("aMap").get("some").asText(), equalTo("value"));
-    assertThat(node.get("nested").get("something").asText(), equalTo("huh"));
-    assertThat(node.get("nested").has("another"), is(true));
-    assertThat(node.get("nested").get("another").isNull(), is(true));
+    assertThat(node.get("object").get("aMap").isObject(), is(true));
+    assertThat(node.get("object").get("aMap").get("object").get("some").asText(), equalTo("value"));
+    assertThat(node.get("object").get("nested").get("object").get("something").asText(), equalTo("huh"));
+    assertThat(node.get("object").get("nested").get("object").has("another"), is(true));
+    assertThat(node.get("object").get("nested").get("object").get("another").isNull(), is(true));
   }
 
   @Test

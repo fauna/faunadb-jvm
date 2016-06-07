@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
-import com.faunadb.client.query.Language;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
 import com.google.common.base.Function;
@@ -94,7 +93,7 @@ public class FaunaClient {
    * @see com.faunadb.client.query.Language
    */
   public ListenableFuture<Value> query(Expr expr) {
-    JsonNode body = json.valueToTree(Expr.wrap(expr));
+    JsonNode body = json.valueToTree(expr);
     try {
       return handleNetworkExceptions(Futures.transform(connection.post("/", body), new Function<Response, Value>() {
         @Override
@@ -127,7 +126,7 @@ public class FaunaClient {
    * @return a {@link ListenableFuture} containing an ordered list of root response nodes.
    */
   public ListenableFuture<ImmutableList<Value>> query(List<? extends Expr> exprs) {
-    JsonNode body = json.valueToTree(Language.Arr(exprs));
+    JsonNode body = json.valueToTree(exprs);
 
     try {
       return handleNetworkExceptions(Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<Value>>() {
