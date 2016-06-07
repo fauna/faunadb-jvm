@@ -76,7 +76,6 @@ public abstract class Value extends Expr {
    * Attempts to coerce this value using the {@link Codec} passed
    *
    * @param codec codec function to attempt coercion
-   * @param <T>   desired result type
    * @return the {@link Result} of the coercion
    * @see Codec
    */
@@ -88,7 +87,6 @@ public abstract class Value extends Expr {
    * Extract a {@link Field} from this node
    *
    * @param field field to extract
-   * @param <T>   desired result type
    * @return the resulting value of extracting the {@link Field} from this node
    * @throws IllegalStateException if {@link Field} does not exists on this node
    * @see Field
@@ -101,7 +99,6 @@ public abstract class Value extends Expr {
    * Attempts to extact a {@link Field} from this node
    *
    * @param field field to extract
-   * @param <T>   desired result type
    * @return An {@link Optional} with the resulting value if the field's extraction was successful
    * @see Field
    */
@@ -130,7 +127,6 @@ public abstract class Value extends Expr {
    * }</pre>
    *
    * @param field field to extract from each array value
-   * @param <T>   desired type
    * @return a {@link ImmutableList} with the collected {@link Field}s
    * @see Field
    */
