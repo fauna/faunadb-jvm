@@ -34,10 +34,8 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * This interface itself does not have any directly accessible data. It must first be coerced into a type before
  * its data can be accessed.
- * Coercion functions will throw a {@link ClassCastException} if this node can not be coerced into the requested type.
- * Every coersion function has a safe version, suffixed with "Option", that returns an {@link Optional} type.
  * <p>
- * <b>Example</b>: Consider the {@code Value node} modeling the root of the tree:
+ * <b>Example</b>: Consider the {@link Value} node modeling the root of the tree:
  * <pre>{@code
  * {
  *   "ref": { "@ref": "some/ref" },
@@ -46,42 +44,97 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * The result tree can be accessed using:
  * <pre>{@code
- *   node.get("ref").asRef(); // {@link Ref}("some/ref")
- *   node.get("data", "someKey").asString() // "string1"
- *   node.getOption("non-existing-key") // Optional.absent()
+ *   Field<Ref> ref = Field.at("ref").as(Codec.REF);
+ *   Field<String> someKey = Field.at("data", "someKey").as(Codec.STRING);
+ *   Field<String> nonExistingKey = Field.at("non-existing-key").as(Codec.LONG);
+ *
+ *   node.get(ref); // Ref("some/ref")
+ *   node.get(someKey); // "string1"
+ *   node.getOptional(nonExistingKey) // Optional.absent()
+ * }</pre>
+ * <p>
+ * The interface also has helpers to transverse values without {@link Field} references:
+ * <pre>{@code
+ *   node.at("ref").as(Codec.REF).get(); // Ref("some/ref")
+ *   node.at("data", "someKey").as(Codec.STRING).get() // "string1"
+ *   node.at("non-existing-key").as(Codec.LONG).getOptional() // Optional.absent()
  * }</pre>
  *
  * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Value Types</a>
+ * @see Field
+ * @see Codec
  */
 @JsonDeserialize(using = Deserializer.ValueDeserializer.class)
 public abstract class Value extends Expr {
 
   @Override
   protected final Value value() {
-    return this;
+    return this; // To satisfy Expr contract
   }
 
-  public final Value at(String... keys) {
-    return Field.at(keys).get(this).getOrElse(NullV.NULL);
-  }
-
-  public final Value at(int... index) {
-    return Field.at(index).get(this).getOrElse(NullV.NULL);
-  }
-
-  public final <T> T get(Field<T> field) {
-    return field.get(this).get();
-  }
-
-  public final <T> Optional<T> getOptional(Field<T> field) {
-    return field.get(this).getOptional();
-  }
-
+  /**
+   * Attempts to coerce this value using the {@link Codec} passed
+   *
+   * @param codec codec function to attempt coercion
+   * @param <T>   desired result type
+   * @return the {@link Result} of the coercion
+   * @see Codec
+   */
   public final <T> Result<T> as(Codec<T> codec) {
     return codec.apply(this);
   }
 
-  public final <T> List<T> collect(Field<T> field) {
+  /**
+   * Extract a {@link Field} from this node
+   *
+   * @param field field to extract
+   * @param <T>   desired result type
+   * @return the resulting value of extracting the {@link Field} from this node
+   * @throws IllegalStateException if {@link Field} does not exists on this node
+   * @see Field
+   */
+  public final <T> T get(Field<T> field) {
+    return field.get(this).get();
+  }
+
+  /**
+   * Attempts to extact a {@link Field} from this node
+   *
+   * @param field field to extract
+   * @param <T>   desired result type
+   * @return An {@link Optional} with the resulting value if the field's extraction was successful
+   * @see Field
+   */
+  public final <T> Optional<T> getOptional(Field<T> field) {
+    return field.get(this).getOptional();
+  }
+
+  /**
+   * Loop through this node collecting the {@link Field} passed, assuming the node is an instance of {@link ArrayV}
+   * <p>
+   * <b>Example</b>: Consider the {@link Value} node modeling the root of the tree:
+   * <pre>{@code
+   * {
+   *   "data": {
+   *     "arrayOfStrings": ["Jhon", "Bill"],
+   *     "arrayOfObjects": [ {"name": "Jhon"}, {"name": "Bill"} ]
+   *    }
+   * }}</pre>
+   * <p>
+   * The result tree can be accessed using:
+   * <pre>{@code
+   *   node.get("arrayOfStrings").collect(Field.to(Codec.STRING)); // ["Jhon", "Bill"]
+   *
+   *   Field<String> name = Field.at("name").as(Codec.STRING);
+   *   node.get("arrayOfObjects").collect(name); // ["Jhon", "Bill"]
+   * }</pre>
+   *
+   * @param field field to extract from each array value
+   * @param <T>   desired type
+   * @return a {@link ImmutableList} with the collected {@link Field}s
+   * @see Field
+   */
+  public final <T> ImmutableList<T> collect(Field<T> field) {
     ImmutableList.Builder<T> res = ImmutableList.builder();
     for (Value value : get(Field.to(ARRAY)))
       res.add(value.get(field));
@@ -89,10 +142,31 @@ public abstract class Value extends Expr {
     return res.build();
   }
 
+  /**
+   * Navigate through object's keys, assuming value is an instance of {@link ObjectV}.
+   *
+   * @param keys path to navigate to
+   * @return {@link Value} under the path or {@link NullV}
+   */
+  public final Value at(String... keys) {
+    return Field.at(keys).get(this).getOrElse(NullV.NULL);
+  }
+
+  /**
+   * Navigate through array's indexes, assuming value is an instance of {@link ArrayV}
+   *
+   * @param indexes path to navigate to
+   * @return {@link Value} under the path or {@link NullV}
+   */
+  public final Value at(int... indexes) {
+    return Field.at(indexes).get(this).getOrElse(NullV.NULL);
+  }
+
   @SuppressWarnings("unused") // Used by Jackson to serialize the value to JSON
   abstract Object toJson();
 
   /**
+   * Represents a scalar value at the FaunaDB query language.
    * See {@link Value}
    */
   @JsonDeserialize(using = JsonDeserializer.None.class)

@@ -50,8 +50,7 @@ public final class Pagination extends Expr {
   }
 
   static class After extends Cursor {
-    After(Expr
-            ref) {
+    After(Expr ref) {
       super("after", ref);
     }
   }
