@@ -46,16 +46,12 @@ final class Path {
     @Override
     @SuppressWarnings("ConstantConditions") // Codec.OBJECT will never return null
     public Result<Value> get(Value root) {
-      return Codec.OBJECT.apply(root).map(extractSegmentFromObject());
-    }
-
-    private Function<ImmutableMap<String, Value>, Result<Value>> extractSegmentFromObject() {
-      return new Function<ImmutableMap<String, Value>, Result<Value>>() {
+      return Codec.OBJECT.apply(root).flatMap(new Function<ImmutableMap<String, Value>, Result<Value>>() {
         @Override
         public Result<Value> apply(ImmutableMap<String, Value> obj) {
           return extractFrom(obj);
         }
-      };
+      });
     }
 
     private Result<Value> extractFrom(ImmutableMap<String, Value> obj) {
@@ -74,16 +70,12 @@ final class Path {
     @Override
     @SuppressWarnings("ConstantConditions") // Codec.ARRAY will never return null
     public Result<Value> get(Value root) {
-      return Codec.ARRAY.apply(root).map(extractFromArray());
-    }
-
-    private Function<ImmutableList<Value>, Result<Value>> extractFromArray() {
-      return new Function<ImmutableList<Value>, Result<Value>>() {
+      return Codec.ARRAY.apply(root).flatMap(new Function<ImmutableList<Value>, Result<Value>>() {
         @Override
         public Result<Value> apply(ImmutableList<Value> array) {
           return extractFrom(array);
         }
-      };
+      });
     }
 
     private Result<Value> extractFrom(ImmutableList<Value> array) {
@@ -132,16 +124,16 @@ final class Path {
   }
 
   Result<Value> get(Value root) {
-    Result<Value> current = Result.success(root);
+    Result<Value> result = Result.success(root);
 
     for (Segment<?> segment : segments) {
-      current = segment.get(current.getOrThrow());
-      if (!current.isSuccess())
+      result = segment.get(result.get());
+      if (result.isFailure())
         return Result.fail(
-          format("Can not find path \"%s\". Failed at segment \"%s\". %s", this, segment, current));
+          format("Can not find path \"%s\". Failed at segment \"%s\". %s", this, segment, result));
     }
 
-    return current;
+    return result;
   }
 
   @Override

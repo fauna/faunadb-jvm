@@ -12,6 +12,8 @@ import org.junit.BeforeClass;
 import java.util.Random;
 
 import static com.faunadb.client.query.Language.*;
+import static com.faunadb.client.types.Codec.REF;
+import static com.faunadb.client.types.Codec.STRING;
 import static com.google.common.util.concurrent.Futures.transform;
 import static com.google.common.util.concurrent.Futures.transformAsync;
 import static java.lang.String.format;
@@ -72,7 +74,7 @@ public class FaunaDBTest {
     return new AsyncFunction<Value, Value>() {
       @Override
       public ListenableFuture<Value> apply(Value dbCreateR) throws Exception {
-        Ref dbRef = dbCreateR.get("ref").asRef();
+        Ref dbRef = dbCreateR.at("ref").as(REF).get();
 
         return rootClient.query(
           Create(
@@ -89,7 +91,7 @@ public class FaunaDBTest {
     return new Function<Value, FaunaClient>() {
       @Override
       public FaunaClient apply(Value serverKeyF) {
-        String secret = serverKeyF.get("secret").asString();
+        String secret = serverKeyF.at("secret").as(STRING).get();
         return createFaunaClient(secret);
       }
     };

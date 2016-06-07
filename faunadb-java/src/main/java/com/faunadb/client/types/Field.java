@@ -7,11 +7,11 @@ public final class Field<T> {
   }
 
   public static Field<Value> at(String... keys) {
-    return new Field<>(Path.from(keys), Codec.IDENTITY);
+    return new Field<>(Path.from(keys), Codec.VALUE);
   }
 
   public static Field<Value> at(int... indexes) {
-    return new Field<>(Path.from(indexes), Codec.IDENTITY);
+    return new Field<>(Path.from(indexes), Codec.VALUE);
   }
 
   private final Path path;
@@ -31,7 +31,7 @@ public final class Field<T> {
   }
 
   Result<T> get(Value root) {
-    return path.get(root).map(codec);
+    return path.get(root).flatMap(codec);
   }
 
 }

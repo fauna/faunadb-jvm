@@ -26,11 +26,11 @@ public final class Result<T> {
     return value.isPresent();
   }
 
-  public Optional<T> asOpt() {
-    return value;
+  public boolean isFailure() {
+    return !value.isPresent();
   }
 
-  public T getOrThrow() {
+  public T get() {
     return value.or(new Supplier<T>() {
       @Override
       public T get() {
@@ -39,12 +39,28 @@ public final class Result<T> {
     });
   }
 
-  @SuppressWarnings("unchecked") // Only cast if result is a failure. Get will throw exception.
-  public <U> Result<U> map(Function<T, Result<U>> fn) {
-    if (value.isPresent())
-      return fn.apply(value.get());
+  public Optional<T> getOptional() {
+    return value;
+  }
 
-    return (Result<U>) this;
+  public T getOrElse(T defaultValue) {
+    return value.or(defaultValue);
+  }
+
+  public <U> Result<U> map(Function<T, U> fn) {
+    Optional<U> res = value.transform(fn);
+    if (res.isPresent())
+      return success(res.get());
+
+    return fail(error.get());
+  }
+
+  public <U> Result<U> flatMap(Function<T, Result<U>> fn) {
+    Optional<Result<U>> opt = value.transform(fn);
+    if (opt.isPresent())
+      return opt.get();
+
+    return fail(error.get());
   }
 
   @Override

@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
+import static com.faunadb.client.types.Codec.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -29,53 +30,53 @@ public class DeserializationSpec {
 
   @Test
   public void shouldDeserializeString() throws Exception {
-    assertThat(parsed("\"a string\"").asString(),
+    assertThat(parsed("\"a string\"").as(STRING).get(),
       equalTo("a string"));
   }
 
   @Test
   public void shouldDeserializeBoolean() throws Exception {
-    assertThat(parsed("true").asBoolean(), is(true));
-    assertThat(parsed("false").asBoolean(), is(false));
+    assertThat(parsed("true").as(BOOLEAN).get(), is(true));
+    assertThat(parsed("false").as(BOOLEAN).get(), is(false));
   }
 
   @Test
   public void shouldDeserializeLong() throws Exception {
-    assertThat(parsed(String.valueOf(Long.MAX_VALUE)).asLong(),
+    assertThat(parsed(String.valueOf(Long.MAX_VALUE)).as(LONG).get(),
       equalTo(Long.MAX_VALUE));
   }
 
   @Test
   public void shouldDeserializeDouble() throws Exception {
-    assertThat(parsed(String.valueOf(Double.MAX_VALUE)).asDouble(),
+    assertThat(parsed(String.valueOf(Double.MAX_VALUE)).as(DOUBLE).get(),
       equalTo(Double.MAX_VALUE));
   }
 
   @Test
   public void shouldDeserializeRef() throws Exception {
-    assertThat(parsed("{ \"@ref\": \"classes/people/1\" }").asRef(),
+    assertThat(parsed("{ \"@ref\": \"classes/people/1\" }").as(REF).get(),
       equalTo(new Ref("classes/people/1")));
   }
 
   @Test
   public void shouldDeserializeArray() throws Exception {
     Value parsed = parsed("[1, \"string\", [true, false], {\"@ref\": \"databases\"}]");
-    assertThat(parsed.get(0).asLong(), equalTo(1L));
-    assertThat(parsed.get(1).asString(), equalTo("string"));
-    assertThat(parsed.get(2).get(0).asBoolean(), is(true));
-    assertThat(parsed.get(2).get(1).asBoolean(), is(false));
-    assertThat(parsed.get(3).asRef(), equalTo(new Ref("databases")));
+    assertThat(parsed.at(0).as(LONG).get(), equalTo(1L));
+    assertThat(parsed.at(1).as(STRING).get(), equalTo("string"));
+    assertThat(parsed.at(2).at(0).as(BOOLEAN).get(), is(true));
+    assertThat(parsed.at(2).at(1).as(BOOLEAN).get(), is(false));
+    assertThat(parsed.at(3).as(REF).get(), equalTo(new Ref("databases")));
   }
 
   @Test
   public void shouldDeserializeDate() throws IOException {
-    assertThat(parsed("{ \"@date\": \"1970-01-03\" }").asDate(),
+    assertThat(parsed("{ \"@date\": \"1970-01-03\" }").as(DATE).get(),
       equalTo(LocalDate.ofEpochDay(2)));
   }
 
   @Test
   public void shouldDeserializeTS() throws IOException {
-    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:05:00Z\" }").asTs(),
+    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:05:00Z\" }").as(TS).get(),
       equalTo(Instant.EPOCH.plus(5, ChronoUnit.MINUTES)));
   }
 
@@ -99,28 +100,28 @@ public class DeserializationSpec {
       " }"
     );
 
-    assertThat(parsed.get("ref").asRef(), equalTo(new Ref("classes/spells/93044099947429888")));
-    assertThat(parsed.get("class").asRef(), equalTo(new Ref("classes/spells")));
-    assertThat(parsed.get("ts").asLong(), equalTo(1424992618413105L));
-    assertThat(parsed.get("data", "name").asString(), equalTo("fireball"));
-    assertThat(parsed.get("data", "refField").asRef(), equalTo(new Ref("classes/spells/93044099909681152")));
-    assertThat(parsed.get("data", "elements").get(0).asString(), equalTo("fire"));
-    assertThat(parsed.get("data", "elements").get(1).asString(), equalTo("air"));
+    assertThat(parsed.at("ref").as(REF).get(), equalTo(new Ref("classes/spells/93044099947429888")));
+    assertThat(parsed.at("class").as(REF).get(), equalTo(new Ref("classes/spells")));
+    assertThat(parsed.at("ts").as(LONG).get(), equalTo(1424992618413105L));
+    assertThat(parsed.at("data", "name").as(STRING).get(), equalTo("fireball"));
+    assertThat(parsed.at("data", "refField").as(REF).get(), equalTo(new Ref("classes/spells/93044099909681152")));
+    assertThat(parsed.at("data", "elements").at(0).as(STRING).get(), equalTo("fire"));
+    assertThat(parsed.at("data", "elements").at(1).as(STRING).get(), equalTo("air"));
   }
 
   @Test
   public void shouldDeserializeNull() throws Exception {
-    assertThat(parsed("{ \"resources\": null }").get("resources").asStringOption(),
+    assertThat(parsed("{ \"resources\": null }").at("resources").as(STRING).getOptional(),
       is(Optional.<String>absent()));
 
-    assertThat(parsed("[1, null]").get(1).asStringOption(),
+    assertThat(parsed("[1, null]").at(1).as(STRING).getOptional(),
       is(Optional.<String>absent()));
   }
 
   @Test
   public void shouldDeserializeObjectLiteral() throws Exception {
     Value parsed = parsed("{ \"@obj\": {\"@name\": \"Test\"}}");
-    assertThat(parsed.get("@name").asString(), equalTo("Test"));
+    assertThat(parsed.at("@name").as(STRING).get(), equalTo("Test"));
   }
 
   @Test
@@ -134,9 +135,9 @@ public class DeserializationSpec {
         "}"
     );
 
-    ImmutableMap<String, Value> set = parsed.asSetRef().parameters();
-    assertThat(set.get("terms").asString(), equalTo("fire"));
-    assertThat(set.get("match").asRef(),
+    ImmutableMap<String, Value> set = parsed.as(SET_REF).get().parameters();
+    assertThat(set.get("terms").as(STRING).get(), equalTo("fire"));
+    assertThat(set.get("match").as(REF).get(),
       equalTo(new Ref("indexes/spells_by_element")));
   }
 

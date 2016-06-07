@@ -18,7 +18,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static com.faunadb.client.types.Codec.*;
+import static com.faunadb.client.types.Codec.ARRAY;
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static java.util.Objects.requireNonNull;
@@ -57,272 +57,28 @@ import static java.util.Objects.requireNonNull;
 public abstract class Value extends Expr {
 
   @Override
-  protected Value value() {
+  protected final Value value() {
     return this;
   }
 
-  /**
-   * Coerces this node into a {@link String}.
-   *
-   * @return the string value of this node.
-   * @throws ClassCastException if can not coerced to {@link String}.
-   */
-  public final String asString() {
-    return get(Field.to(STRING));
+  public final Value at(String... keys) {
+    return Field.at(keys).get(this).getOrElse(NullV.NULL);
   }
 
-  /**
-   * Attempts to coerce this node into a {@link String}.
-   *
-   * @return an {@link Optional} type with the coerced value.
-   */
-  public final Optional<String> asStringOption() {
-    return getOpt(Field.to(STRING));
-  }
-
-  /**
-   * Coerces this node into a {@link Boolean}.
-   *
-   * @return the boolean value of this node.
-   * @throws ClassCastException if can not coerced to {@link Boolean}.
-   */
-  public final Boolean asBoolean() {
-    return get(Field.to(BOOLEAN));
-  }
-
-  /**
-   * Attempts to coerce this node into a {@link Boolean}.
-   *
-   * @return an {@link Optional} type with the coerced value.
-   */
-  public final Optional<Boolean> asBooleanOption() {
-    return getOpt(Field.to(BOOLEAN));
-  }
-
-  /**
-   * Coerces this node into a {@link Long}.
-   *
-   * @return the boolean value of this node.
-   * @throws ClassCastException if can not coerced to {@link Long}.
-   */
-  public final Long asLong() {
-    return get(Field.to(LONG));
-  }
-
-  /**
-   * Attempts to coerce this node into a {@link Long}.
-   *
-   * @return an {@link Optional} type with the coerced value.
-   */
-  public final Optional<Long> asLongOption() {
-    return getOpt(Field.to(LONG));
-  }
-
-  /**
-   * Coerces this node into a {@link Double}.
-   *
-   * @return the boolean value of this node.
-   * @throws ClassCastException if can not coerced to {@link Double}.
-   */
-  public final Double asDouble() {
-    return get(Field.to(DOUBLE));
-  }
-
-  /**
-   * Attempts to coerce this node into a {@link Double}.
-   *
-   * @return an {@link Optional} type with the coerced value.
-   */
-  public final Optional<Double> asDoubleOption() {
-    return getOpt(Field.to(DOUBLE));
-  }
-
-  /**
-   * Coerces this node into a {@link Instant}.
-   *
-   * @return the boolean value of this node.
-   * @throws ClassCastException if can not coerced to {@link Instant}.
-   */
-  public final Instant asTs() {
-    return get(Field.to(TS));
-  }
-
-  /**
-   * Attempts to coerce this node into a {@link Instant}.
-   *
-   * @return an {@link Optional} type with the coerced value.
-   */
-  public final Optional<Instant> asTsOption() {
-    return getOpt(Field.to(TS));
-  }
-
-  /**
-   * Coerces this node into a {@link LocalDate}.
-   *
-   * @return the boolean value of this node.
-   * @throws ClassCastException if can not coerced to {@link LocalDate}.
-   */
-  public final LocalDate asDate() {
-    return get(Field.to(DATE));
-  }
-
-  /**
-   * Attempts to coerce this node into a {@link LocalDate}.
-   *
-   * @return an {@link Optional} type with the coerced value.
-   */
-  public final Optional<LocalDate> asDateOption() {
-    return getOpt(Field.to(DATE));
-  }
-
-  /**
-   * Coerces this node into a {@link ImmutableList} of nodes.
-   *
-   * @return a immutable list of nodes.
-   * @throws ClassCastException if can not coerced to {@link ImmutableList}.
-   */
-  public final ImmutableList<Value> asArray() {
-    return get(Field.to(ARRAY));
-  }
-
-  /**
-   * Attempts to coerce this node into a {@link ImmutableList} of nodes.
-   *
-   * @return an {@link Optional} type with the coerced value.
-   */
-  public final Optional<ImmutableList<Value>> asArrayOption() {
-    return getOpt(Field.to(ARRAY));
-  }
-
-  /**
-   * Coerces this node into a {@link ImmutableMap} of nodes.
-   *
-   * @return a immutable map of nodes.
-   * @throws ClassCastException if can not coerced to {@link ImmutableMap}.
-   */
-  public final ImmutableMap<String, Value> asObject() {
-    return get(Field.to(OBJECT));
-  }
-
-  /**
-   * Attempts to coerce this node into a {@link ImmutableMap} of nodes.
-   *
-   * @return an {@link Optional} type with the coerced value.
-   */
-  public final Optional<ImmutableMap<String, Value>> asObjectOption() {
-    return getOpt(Field.to(OBJECT));
-  }
-
-  /**
-   * Coerces this node into a {@link Ref}.
-   *
-   * @return a immutable map of nodes.
-   * @throws ClassCastException if can not coerced to {@link Ref}.
-   */
-  public final Ref asRef() {
-    return get(Field.to(REF));
-  }
-
-  /**
-   * Attempts to coerce this node into a {@link Ref}.
-   *
-   * @return an {@link Optional} type with the coerced value.
-   */
-  public final Optional<Ref> asRefOption() {
-    return getOpt(Field.to(REF));
-  }
-
-  /**
-   * Coerces this node into a {@link SetRef}.
-   *
-   * @return a immutable map of nodes.
-   * @throws ClassCastException if can not coerced to {@link SetRef}.
-   */
-  public final SetRef asSetRef() {
-    return get(Field.to(SET_REF));
-  }
-
-  /**
-   * Attempts to coerce this node into a {@link SetRef}.
-   *
-   * @return an {@link Optional} type with the coerced value.
-   */
-  public final Optional<SetRef> asSetRefOption() {
-    return getOpt(Field.to(SET_REF));
-  }
-
-  /**
-   * Extract a path from this node.
-   * <p>
-   * <b>Example:</b>
-   * <pre>{@code
-   * // node = { "data": { "name": "jhon" } }
-   * node.get("data", "name").asString() // "jhon"
-   * }</pre>
-   *
-   * @return the value under the path.
-   * @throws IllegalArgumentException if path does not exists.
-   */
-  public final Value get(String... keys) {
-    return Field.at(keys).get(this).getOrThrow();
-  }
-
-  /**
-   * Attempts to extract a path from this node.
-   * <p>
-   * <b>Example:</b>
-   * <pre>{@code
-   * // node = { "data": { "name": "jhon" } }
-   * node.getOption("data", "name") // Optional.of(Value("jhon"))
-   * node.getOption("data", "age") // Optional.absent()
-   * }</pre>
-   *
-   * @return an {@link Optional} type containing the value under the path.
-   */
-  public final Optional<Value> getOpt(String... keys) {
-    return Field.at(keys).get(this).asOpt();
-  }
-
-  /**
-   * Accesses the value of the specified element if this is an array node.
-   * <p>
-   * <b>Example:</b>
-   * <pre>{@code
-   * // node = ["jhon", "ale"]
-   * node.get(0).asString() // "jhon"
-   * node.get(1).asString() // "ale"
-   * }</pre>
-   *
-   * @return the value on the index.
-   * @throws ArrayIndexOutOfBoundsException if index is out of boundaries.
-   */
-  public final Value get(int... index) {
-    return Field.at(index).get(this).getOrThrow();
-  }
-
-  /**
-   * Attempts to accesses the value of the specified element if this is an array node.
-   * <p>
-   * <b>Example:</b>
-   * <pre>{@code
-   * // node = ["jhon", "ale"]
-   * node.getOption(0) // Optional.of(Value("jhon"))
-   * node.getOption(1) // Optional.of(Value("ale"))
-   * node.getOption(2) // Optional.absent()
-   * }</pre>
-   *
-   * @return an {@link Optional} type containing the value on the index.
-   */
-  public final Optional<Value> getOption(int... index) {
-    return Field.at(index).get(this).asOpt();
+  public final Value at(int... index) {
+    return Field.at(index).get(this).getOrElse(NullV.NULL);
   }
 
   public final <T> T get(Field<T> field) {
-    return field.get(this).getOrThrow();
+    return field.get(this).get();
   }
 
-  public final <T> Optional<T> getOpt(Field<T> field) {
-    return field.get(this).asOpt();
+  public final <T> Optional<T> getOptional(Field<T> field) {
+    return field.get(this).getOptional();
+  }
+
+  public final <T> Result<T> as(Codec<T> codec) {
+    return codec.apply(this);
   }
 
   public final <T> List<T> collect(Field<T> field) {

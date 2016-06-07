@@ -1,6 +1,7 @@
 package com.faunadb.client.query;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.faunadb.client.types.Result;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.ArrayV;
 import com.faunadb.client.types.Value.NullV;
@@ -12,6 +13,8 @@ import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.faunadb.client.types.Codec.ARRAY;
+import static com.faunadb.client.types.Codec.OBJECT;
 import static java.lang.String.format;
 
 /**
@@ -45,8 +48,13 @@ public abstract class Expr {
   }
 
   private static Expr escape(Value value) {
-    if (value.asObjectOption().isPresent()) return escapedObject(value.asObject());
-    if (value.asArrayOption().isPresent()) return escapedArray(value.asArray());
+    Result<ImmutableMap<String, Value>> object = value.as(OBJECT);
+    if (object.isSuccess())
+      return escapedObject(object.get());
+
+    Result<ImmutableList<Value>> array = value.as(ARRAY);
+    if (array.isSuccess())
+      return escapedArray(array.get());
 
     return new ConcreteExpr(value);
   }
