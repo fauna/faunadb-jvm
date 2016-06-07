@@ -11,8 +11,48 @@ import java.time.LocalDate;
 
 import static java.lang.String.format;
 
+/**
+ * Codec is a function that represents an attempt to coerce a {@link Value} to a concrete type.
+ * There are pre-defined codecs for each FaunaDB primitive types: {@link Codec#VALUE}, {@link Codec#STRING},
+ * {@link Codec#LONG}, {@link Codec#DOUBLE}, {@link Codec#DATE}, {@link Codec#TS}, {@link Codec#REF},
+ * {@link Codec#SET_REF}, {@link Codec#ARRAY}, and {@link Codec#OBJECT}.
+ * <p>
+ * Codecs return a {@link Result} of the coercion attempt. If it fails to coerce, {@link Result}
+ * will contain an error message.
+ * <p>
+ * It is also possible to create customized codecs to handle complex objects:
+ * <pre>{@code
+ * class Person {
+ *   static final Codec<Person> PERSON = new Codec<Person>() {
+ *     @Override public Result<Person> apply(Value value) {
+ *       return Result.success(new Person(
+ *         value.at("data", "firstName").as(Codec.STRING),
+ *         value.at("data", "lastName").as(Codec.STRING)
+ *       ));
+ *     }
+ *   }
+ *
+ *   static Person fromValue(Value value) {
+ *     return value.as(PERSON);
+ *   }
+ *
+ *   final String firstName, lastName;
+ *
+ *   Person(String firstName, String lastName) {
+ *     this.firstName = firstName;
+ *     this.lastName = lastName;
+ *   }
+ * }
+ * }</pre>
+ *
+ * @param <T> desired resulting type
+ * @see Result
+ */
 public interface Codec<T> extends Function<Value, Result<T>> {
 
+  /**
+   * Coerce a {@link Value} to itself or fail value is an instance of {@link NullV}.
+   */
   Codec<Value> VALUE = new Codec<Value>() {
     @Override
     public Result<Value> apply(Value value) {
@@ -23,23 +63,60 @@ public interface Codec<T> extends Function<Value, Result<T>> {
     }
   };
 
-  Codec<Ref> REF = Cast.to(Ref.class, Functions.<Ref>identity());
-  Codec<SetRef> SET_REF = Cast.to(SetRef.class, Functions.<SetRef>identity());
-  Codec<Long> LONG = Cast.to(LongV.class, Cast.<LongV, Long>scalarValue());
-  Codec<Instant> TS = Cast.to(TsV.class, Cast.<TsV, Instant>scalarValue());
-  Codec<String> STRING = Cast.to(StringV.class, Cast.<StringV, String>scalarValue());
-  Codec<Double> DOUBLE = Cast.to(DoubleV.class, Cast.<DoubleV, Double>scalarValue());
-  Codec<Boolean> BOOLEAN = Cast.to(BooleanV.class, Cast.<BooleanV, Boolean>scalarValue());
-  Codec<LocalDate> DATE = Cast.to(DateV.class, Cast.<DateV, LocalDate>scalarValue());
+  /**
+   * Coerce a {@link Value} to an instance of {@link Ref}
+   */
+  Codec<Ref> REF = Cast.map(Ref.class, Functions.<Ref>identity());
 
-  Codec<ImmutableList<Value>> ARRAY = Cast.to(ArrayV.class, new Function<ArrayV, ImmutableList<Value>>() {
+  /**
+   * Coerce a {@link Value} to an instance of {@link SetRef}
+   */
+  Codec<SetRef> SET_REF = Cast.map(SetRef.class, Functions.<SetRef>identity());
+
+  /**
+   * Coerce a {@link Value} to a {@link Long}
+   */
+  Codec<Long> LONG = Cast.map(LongV.class, Cast.<LongV, Long>scalarValue());
+
+  /**
+   * Coerce a {@link Value} to an {@link Instant}
+   */
+  Codec<Instant> TS = Cast.map(TsV.class, Cast.<TsV, Instant>scalarValue());
+
+  /**
+   * Coerce a {@link Value} to a {@link String}
+   */
+  Codec<String> STRING = Cast.map(StringV.class, Cast.<StringV, String>scalarValue());
+
+  /**
+   * Coerce a {@link Value} to a {@link Double}
+   */
+  Codec<Double> DOUBLE = Cast.map(DoubleV.class, Cast.<DoubleV, Double>scalarValue());
+
+  /**
+   * Coerce a {@link Value} to a {@link Boolean}
+   */
+  Codec<Boolean> BOOLEAN = Cast.map(BooleanV.class, Cast.<BooleanV, Boolean>scalarValue());
+
+  /**
+   * Coerce a {@link Value} to a {@link LocalDate}
+   */
+  Codec<LocalDate> DATE = Cast.map(DateV.class, Cast.<DateV, LocalDate>scalarValue());
+
+  /**
+   * Coerce a {@link Value} to an {@link ImmutableList} of {@link Value}
+   */
+  Codec<ImmutableList<Value>> ARRAY = Cast.map(ArrayV.class, new Function<ArrayV, ImmutableList<Value>>() {
     @Override
     public ImmutableList<Value> apply(ArrayV input) {
       return input.values;
     }
   });
 
-  Codec<ImmutableMap<String, Value>> OBJECT = Cast.to(ObjectV.class, new Function<ObjectV, ImmutableMap<String, Value>>() {
+  /**
+   * Coerce a {@link Value} to an {@link ImmutableMap} of {@link Value}
+   */
+  Codec<ImmutableMap<String, Value>> OBJECT = Cast.map(ObjectV.class, new Function<ObjectV, ImmutableMap<String, Value>>() {
     @Override
     public ImmutableMap<String, Value> apply(ObjectV input) {
       return input.values;
@@ -49,11 +126,11 @@ public interface Codec<T> extends Function<Value, Result<T>> {
 
 final class Cast {
 
-  static <V extends Value, O> Codec<O> to(final Class<V> clazz, final Function<V, O> fn) {
+  static <V extends Value, O> Codec<O> map(final Class<V> clazz, final Function<V, O> extractValue) {
     return new Codec<O>() {
       @Override
       public Result<O> apply(Value input) {
-        return cast(clazz, input).map(fn);
+        return cast(clazz, input).map(extractValue);
       }
     };
   }
