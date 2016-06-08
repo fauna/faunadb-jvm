@@ -59,7 +59,7 @@ final class Path {
       if (obj.containsKey(segment))
         return Result.success(obj.get(segment));
 
-      return Result.fail(format("Missing object key: \"%s\"", segment));
+      return Result.fail(format("Object key \"%s\" not found", segment));
     }
   }
 
@@ -82,7 +82,7 @@ final class Path {
       try {
         return Result.success(array.get(segment));
       } catch (IndexOutOfBoundsException ign) {
-        return Result.fail(format("Missing array index: \"%s\"", segment));
+        return Result.fail(format("Array index \"%s\" not found", segment));
       }
     }
   }
@@ -130,7 +130,7 @@ final class Path {
       result = segment.get(result.get());
       if (result.isFailure())
         return Result.fail(
-          format("Can not find path \"%s\". Failed at segment \"%s\". %s", this, segment, result));
+          format("Can not find path \"%s\". %s", this, result));
     }
 
     return result;
