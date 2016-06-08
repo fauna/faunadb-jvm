@@ -50,17 +50,15 @@ final class Path {
       return root.as(OBJECT).flatMap(new Function<ImmutableMap<String, Value>, Result<Value>>() {
         @Override
         public Result<Value> apply(ImmutableMap<String, Value> obj) {
-          return extractFrom(obj);
+          Value value = obj.get(segment);
+          if (value != null)
+            return Result.success(value);
+
+          return Result.fail(format("Object key \"%s\" not found", segment));
         }
       });
     }
 
-    private Result<Value> extractFrom(ImmutableMap<String, Value> obj) {
-      if (obj.containsKey(segment))
-        return Result.success(obj.get(segment));
-
-      return Result.fail(format("Object key \"%s\" not found", segment));
-    }
   }
 
   private static final class ArrayIndex extends Segment<Integer> {
@@ -73,18 +71,15 @@ final class Path {
       return root.as(ARRAY).flatMap(new Function<ImmutableList<Value>, Result<Value>>() {
         @Override
         public Result<Value> apply(ImmutableList<Value> array) {
-          return extractFrom(array);
+          try {
+            return Result.success(array.get(segment));
+          } catch (IndexOutOfBoundsException ign) {
+            return Result.fail(format("Array index \"%s\" not found", segment));
+          }
         }
       });
     }
 
-    private Result<Value> extractFrom(ImmutableList<Value> array) {
-      try {
-        return Result.success(array.get(segment));
-      } catch (IndexOutOfBoundsException ign) {
-        return Result.fail(format("Array index \"%s\" not found", segment));
-      }
-    }
   }
 
   static Path empty() {
