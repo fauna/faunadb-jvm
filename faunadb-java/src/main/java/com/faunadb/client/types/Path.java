@@ -7,6 +7,8 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
 
+import static com.faunadb.client.types.Codec.ARRAY;
+import static com.faunadb.client.types.Codec.OBJECT;
 import static java.lang.String.format;
 
 final class Path {
@@ -44,9 +46,8 @@ final class Path {
     }
 
     @Override
-    @SuppressWarnings("ConstantConditions") // Codec.OBJECT will never return null
     public Result<Value> get(Value root) {
-      return Codec.OBJECT.apply(root).flatMap(new Function<ImmutableMap<String, Value>, Result<Value>>() {
+      return root.as(OBJECT).flatMap(new Function<ImmutableMap<String, Value>, Result<Value>>() {
         @Override
         public Result<Value> apply(ImmutableMap<String, Value> obj) {
           return extractFrom(obj);
@@ -68,9 +69,8 @@ final class Path {
     }
 
     @Override
-    @SuppressWarnings("ConstantConditions") // Codec.ARRAY will never return null
     public Result<Value> get(Value root) {
-      return Codec.ARRAY.apply(root).flatMap(new Function<ImmutableList<Value>, Result<Value>>() {
+      return root.as(ARRAY).flatMap(new Function<ImmutableList<Value>, Result<Value>>() {
         @Override
         public Result<Value> apply(ImmutableList<Value> array) {
           return extractFrom(array);

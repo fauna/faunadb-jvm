@@ -39,12 +39,14 @@ public class ClientSpec extends FaunaDBTest {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  private static final Field<Ref> REF_FIELD = Field.at("ref").as(REF);
   private static final Field<Value> DATA = Field.at("data");
+  private static final Field<Ref> REF_FIELD = Field.at("ref").as(REF);
+  private static final Field<ImmutableList<Ref>> REF_LIST = DATA.collect(Field.to(REF));
+
   private static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).as(STRING);
-  private static final Field<Long> COST_FIELD = DATA.at(Field.at("cost")).as(LONG);
   private static final Field<String> ELEMENT_FIELD = DATA.at(Field.at("element")).as(STRING);
-  private static final Field<Value> ELEMENTS_FIELD = DATA.at(Field.at("elements"));
+  private static final Field<Value> ELEMENTS_LIST = DATA.at(Field.at("elements"));
+  private static final Field<Long> COST_FIELD = DATA.at(Field.at("cost")).as(LONG);
 
   private static Ref magicMissile;
   private static Ref fireball;
@@ -281,7 +283,7 @@ public class ClientSpec extends FaunaDBTest {
     assertThat(replacedInstance.get(REF_FIELD), equalTo(createdInstance.get(REF_FIELD)));
     assertThat(replacedInstance.get(NAME_FIELD), equalTo("Volcano"));
     assertThat(replacedInstance.get(COST_FIELD), equalTo(10L));
-    assertThat(replacedInstance.get(ELEMENTS_FIELD).collect(Field.to(STRING)),
+    assertThat(replacedInstance.get(ELEMENTS_LIST).collect(Field.to(STRING)),
       contains("fire", "earth"));
   }
 
@@ -358,7 +360,7 @@ public class ClientSpec extends FaunaDBTest {
       Paginate(Match(Ref("indexes/spells_by_element"), Value("fire")))
     ).get();
 
-    assertThat(singleMatch.get(DATA).collect(Field.to(REF)), contains(fireball));
+    assertThat(singleMatch.get(REF_LIST), contains(fireball));
   }
 
   @Test
@@ -373,7 +375,7 @@ public class ClientSpec extends FaunaDBTest {
       Paginate(Match(Ref("indexes/all_spells")))
     ).get();
 
-    assertThat(allInstances.get(DATA).collect(Field.to(REF)),
+    assertThat(allInstances.get(REF_LIST),
       contains(magicMissile, fireball, faerieFire, summon, thorSpell1, thorSpell2));
   }
 
@@ -571,7 +573,7 @@ public class ClientSpec extends FaunaDBTest {
       )
     ).get();
 
-    assertThat(union.get(DATA).collect(Field.to(REF)),
+    assertThat(union.get(REF_LIST),
       contains(magicMissile, fireball, faerieFire));
   }
 
@@ -585,7 +587,7 @@ public class ClientSpec extends FaunaDBTest {
         ))
     ).get();
 
-    assertThat(intersection.get(DATA).collect(Field.to(REF)),
+    assertThat(intersection.get(REF_LIST),
       contains(faerieFire));
   }
 
@@ -599,7 +601,7 @@ public class ClientSpec extends FaunaDBTest {
         ))
     ).get();
 
-    assertThat(difference.get(DATA).collect(Field.to(REF)),
+    assertThat(difference.get(REF_LIST),
       contains(summon));
   }
 
@@ -627,7 +629,7 @@ public class ClientSpec extends FaunaDBTest {
         ))
     ).get();
 
-    assertThat(join.get(DATA).collect(Field.to(REF)),
+    assertThat(join.get(REF_LIST),
       contains(thorSpell1, thorSpell2));
   }
 

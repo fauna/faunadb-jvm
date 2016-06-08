@@ -18,7 +18,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static com.faunadb.client.types.Codec.ARRAY;
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static java.util.Objects.requireNonNull;
@@ -126,11 +125,7 @@ public abstract class Value extends Expr {
    * @see Field
    */
   public final <T> ImmutableList<T> collect(Field<T> field) {
-    ImmutableList.Builder<T> res = ImmutableList.builder();
-    for (Value value : get(Field.to(ARRAY)))
-      res.add(value.get(field));
-
-    return res.build();
+    return Field.root().collect(field).get(this).get();
   }
 
   /**
