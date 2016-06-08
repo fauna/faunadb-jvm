@@ -10,10 +10,10 @@ final class Fn {
 
   static class Call extends Value {
 
-    final Map<String, Expr> body;
+    final ImmutableMap<String, Expr> body;
 
     Call(Map<String, Expr> body) {
-      this.body = body;
+      this.body = ImmutableMap.copyOf(body);
     }
 
     @Override
