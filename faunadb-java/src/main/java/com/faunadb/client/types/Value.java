@@ -152,8 +152,8 @@ public abstract class Value extends Expr {
    * Represents a scalar value at the FaunaDB query language.
    * See {@link Value}
    */
-  @JsonDeserialize(using = JsonDeserializer.None.class)
-  public static abstract class ScalarValue<T> extends Value {
+  @JsonDeserialize(using = JsonDeserializer.None.class) // Disables generic value deserializer for scalar values
+  private static abstract class ScalarValue<T> extends Value {
 
     final T value;
 
