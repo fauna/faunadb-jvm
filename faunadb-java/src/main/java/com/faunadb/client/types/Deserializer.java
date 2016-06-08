@@ -84,7 +84,7 @@ class Deserializer {
       ImmutableList.Builder<Value> values = ImmutableList.builder();
 
       for (Iterator<JsonNode> elements = tree.elements(); elements.hasNext(); ) {
-        values.add(toValueOrNull(elements.next(), json));
+        values.add(toValueOrNullV(elements.next(), json));
       }
 
       return new ArrayV(values.build());
@@ -101,14 +101,14 @@ class Deserializer {
 
       for (Iterator<Map.Entry<String, JsonNode>> entries = tree.fields(); entries.hasNext(); ) {
         Map.Entry<String, JsonNode> entry = entries.next();
-        values.put(entry.getKey(), toValueOrNull(entry.getValue(), json));
+        values.put(entry.getKey(), toValueOrNullV(entry.getValue(), json));
       }
 
       return new ObjectV(values.build());
     }
   }
 
-  private static Value toValueOrNull(JsonNode node, ObjectMapper json) {
+  private static Value toValueOrNullV(JsonNode node, ObjectMapper json) {
     Value value = json.convertValue(node, Value.class);
     return value != null ? value : NullV.NULL;
   }
