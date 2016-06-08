@@ -153,7 +153,7 @@ public abstract class Value extends Expr {
    * See {@link Value}
    */
   @JsonDeserialize(using = JsonDeserializer.None.class) // Disables generic value deserializer for scalar values
-  private static abstract class ScalarValue<T> extends Value {
+  static abstract class ScalarValue<T> extends Value {
 
     final T value;
 
