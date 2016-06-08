@@ -134,4 +134,20 @@ public final class Field<T> {
     return path.get(root).flatMap(codec);
   }
 
+  @Override
+  public boolean equals(Object other) {
+    return other != null &&
+      other instanceof Field &&
+      this.path.equals(((Field) other).path);
+  }
+
+  @Override
+  public int hashCode() {
+    return path.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    return path.toString();
+  }
 }
