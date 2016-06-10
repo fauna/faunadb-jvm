@@ -382,7 +382,7 @@ public final class Language {
    *
    * @see <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
-  public static Expr Do(ImmutableList<? extends Expr> exprs) {
+  public static Expr Do(List<? extends Expr> exprs) {
     return Fn.apply("do", Arr(exprs));
   }
 
