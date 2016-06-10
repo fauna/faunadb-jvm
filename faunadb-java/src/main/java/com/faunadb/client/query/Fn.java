@@ -18,7 +18,7 @@ final class Fn {
 
     @Override
     @JsonValue
-    protected Object toJson() {
+    protected ImmutableMap<String, Expr> toJson() {
       return body;
     }
   }
