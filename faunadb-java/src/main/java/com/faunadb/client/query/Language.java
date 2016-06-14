@@ -230,7 +230,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Obj(Map<String, ? extends Expr> values) {
-    return new ObjectV(Expr.unwrapValues(values));
+    return Fn.apply("object", Fn.apply(values));
   }
 
   /**
@@ -293,7 +293,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Arr(List<? extends Expr> values) {
-    return new ArrayV(Expr.unwrapValues(values));
+    return Fn.apply(values);
   }
 
   /**

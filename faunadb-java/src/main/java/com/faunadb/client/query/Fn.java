@@ -1,30 +1,46 @@
 package com.faunadb.client.query;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.faunadb.client.types.Value;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import java.util.List;
 import java.util.Map;
 
 final class Fn {
 
-  static class Call extends Value {
+  private static abstract class Unescaped<T> extends Expr {
+    final T body;
 
-    final ImmutableMap<String, Expr> body;
-
-    Call(Map<String, Expr> body) {
-      this.body = ImmutableMap.copyOf(body);
+    private Unescaped(T body) {
+      this.body = body;
     }
 
     @Override
     @JsonValue
-    protected ImmutableMap<String, Expr> toJson() {
+    protected T toJson() {
       return body;
     }
   }
 
-  static Expr apply(Map<String, Expr> args) {
-    return new Call(args);
+  private static final class UnescapedObject extends Unescaped<Map<String, Expr>> {
+    private UnescapedObject(Map<String, ? extends Expr> body) {
+      super(ImmutableMap.copyOf(body));
+    }
+  }
+
+  private static final class UnescapedArray extends Unescaped<List<Expr>> {
+    private UnescapedArray(List<? extends Expr> body) {
+      super(ImmutableList.copyOf(body));
+    }
+  }
+
+  static Expr apply(List<? extends Expr> args) {
+    return new UnescapedArray(args);
+  }
+
+  static Expr apply(Map<String, ? extends Expr> args) {
+    return new UnescapedObject(args);
   }
 
   static Expr apply(String k1, Expr p1) {

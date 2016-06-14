@@ -2,6 +2,7 @@ package com.faunadb.client.query;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.faunadb.client.types.Value;
+import com.faunadb.client.types.Value.LongV;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -23,7 +24,7 @@ import static java.util.Objects.requireNonNull;
  * @see Language#Paginate(Expr)
  * @see <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
  */
-public final class Pagination extends Fn.Call {
+public final class Pagination extends Expr {
 
   /**
    * Helper to construct the pagination cursor that can constructed either
@@ -53,6 +54,7 @@ public final class Pagination extends Fn.Call {
     }
   }
 
+  private final Expr resource;
   private Optional<Cursor> cursor = Optional.absent();
   private Optional<Expr> ts = Optional.absent();
   private Optional<Expr> size = Optional.absent();
@@ -60,14 +62,14 @@ public final class Pagination extends Fn.Call {
   private Optional<Expr> events = Optional.absent();
 
   Pagination(Expr resource) {
-    super(ImmutableMap.of("paginate", requireNonNull(resource)));
+    this.resource = resource;
   }
 
   @Override
   @JsonValue
   protected ImmutableMap<String, Expr> toJson() {
     ImmutableMap.Builder<String, Expr> res = ImmutableMap.builder();
-    res.putAll(body);
+    res.put("paginate", resource);
 
     if (cursor.isPresent()) res.put(cursor.get().name, cursor.get().ref);
     if (events.isPresent()) res.put("events", events.get());
