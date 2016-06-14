@@ -24,8 +24,8 @@ import static org.junit.Assert.assertThat;
 public class ObjectCodecSpec {
 
   private final Codec<CustomObject> CUSTOM_OBJECT = new Codec<CustomObject>() {
-    final Field<String> name = Field.at("data", "name").as(STRING);
-    final Field<Long> age = Field.at("data", "age").as(LONG);
+    final Field<String> name = Field.at("data", "name").to(STRING);
+    final Field<Long> age = Field.at("data", "age").to(LONG);
 
     @Override
     public Result<CustomObject> apply(Value value) {
@@ -61,7 +61,7 @@ public class ObjectCodecSpec {
   @Test
   public void shouldConvertASingleMap() {
     ObjectV obj = json.convertValue(ImmutableMap.of("test", "value"), ObjectV.class);
-    assertThat(obj.at("test").as(STRING).get(), equalTo("value"));
+    assertThat(obj.at("test").to(STRING).get(), equalTo("value"));
 
     JsonNode node = this.json.valueToTree(obj);
     assertThat(node.get("object").get("test").asText(), equalTo("value"));
@@ -74,7 +74,7 @@ public class ObjectCodecSpec {
     value.another = null;
 
     ObjectV obj = json.convertValue(value, ObjectV.class);
-    assertThat(obj.at("something").as(STRING).get(), equalTo("huh"));
+    assertThat(obj.at("something").to(STRING).get(), equalTo("huh"));
     assertThat(obj.at("another"), CoreMatchers.<Value>is(NullV.NULL));
 
     JsonNode node = json.valueToTree(obj);
@@ -92,9 +92,9 @@ public class ObjectCodecSpec {
     nested.nested.another = null;
 
     ObjectV obj = json.convertValue(nested, ObjectV.class);
-    assertThat(obj.at("aMap").as(OBJECT).get().get("some").as(STRING).get(), equalTo("value"));
-    assertThat(obj.at("nested").as(OBJECT).get().get("something").as(STRING).get(), equalTo("huh"));
-    assertThat(obj.at("nested").as(OBJECT).get().get("another"), CoreMatchers.<Value>is(NullV.NULL));
+    assertThat(obj.at("aMap").to(OBJECT).get().get("some").to(STRING).get(), equalTo("value"));
+    assertThat(obj.at("nested").to(OBJECT).get().get("something").to(STRING).get(), equalTo("huh"));
+    assertThat(obj.at("nested").to(OBJECT).get().get("another"), CoreMatchers.<Value>is(NullV.NULL));
 
     JsonNode node = json.valueToTree(obj);
     assertThat(node.get("object").get("aMap").isObject(), is(true));
@@ -113,7 +113,7 @@ public class ObjectCodecSpec {
       ))
     ));
 
-    CustomObject custom = obj.as(CUSTOM_OBJECT).get();
+    CustomObject custom = obj.to(CUSTOM_OBJECT).get();
     assertThat(custom.name, equalTo("Jhon"));
     assertThat(custom.age, equalTo(42));
   }

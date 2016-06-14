@@ -47,7 +47,7 @@ final class Path {
 
     @Override
     public Result<Value> get(Value root) {
-      return root.as(OBJECT).flatMap(new Function<ImmutableMap<String, Value>, Result<Value>>() {
+      return root.to(OBJECT).flatMap(new Function<ImmutableMap<String, Value>, Result<Value>>() {
         @Override
         public Result<Value> apply(ImmutableMap<String, Value> obj) {
           Value value = obj.get(segment);
@@ -68,7 +68,7 @@ final class Path {
 
     @Override
     public Result<Value> get(Value root) {
-      return root.as(ARRAY).flatMap(new Function<ImmutableList<Value>, Result<Value>>() {
+      return root.to(ARRAY).flatMap(new Function<ImmutableList<Value>, Result<Value>>() {
         @Override
         public Result<Value> apply(ImmutableList<Value> array) {
           try {

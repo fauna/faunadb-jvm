@@ -43,9 +43,9 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * The result tree can be accessed using:
  * <pre>{@code
- *   Field<Ref> ref = Field.at("ref").as(Codec.REF);
- *   Field<String> someKey = Field.at("data", "someKey").as(Codec.STRING);
- *   Field<String> nonExistingKey = Field.at("non-existing-key").as(Codec.LONG);
+ *   Field<Ref> ref = Field.at("ref").to(Codec.REF);
+ *   Field<String> someKey = Field.at("data", "someKey").to(Codec.STRING);
+ *   Field<String> nonExistingKey = Field.at("non-existing-key").to(Codec.LONG);
  *
  *   node.get(ref); // Ref("some/ref")
  *   node.get(someKey); // "string1"
@@ -54,9 +54,9 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * The interface also has helpers to transverse values without {@link Field} references:
  * <pre>{@code
- *   node.at("ref").as(Codec.REF).get(); // Ref("some/ref")
- *   node.at("data", "someKey").as(Codec.STRING).get() // "string1"
- *   node.at("non-existing-key").as(Codec.LONG).getOptional() // Optional.absent()
+ *   node.at("ref").to(Codec.REF).get(); // Ref("some/ref")
+ *   node.at("data", "someKey").to(Codec.STRING).get() // "string1"
+ *   node.at("non-existing-key").to(Codec.LONG).getOptional() // Optional.absent()
  * }</pre>
  *
  * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Value Types</a>
@@ -73,7 +73,7 @@ public abstract class Value extends Expr {
    * @return the {@link Result} of the coercion
    * @see Codec
    */
-  public final <T> Result<T> as(Codec<T> codec) {
+  public final <T> Result<T> to(Codec<T> codec) {
     return codec.apply(this);
   }
 
@@ -116,7 +116,7 @@ public abstract class Value extends Expr {
    * <pre>{@code
    *   node.get("arrayOfStrings").collect(Field.to(Codec.STRING)); // ["Jhon", "Bill"]
    *
-   *   Field<String> name = Field.at("name").as(Codec.STRING);
+   *   Field<String> name = Field.at("name").to(Codec.STRING);
    *   node.get("arrayOfObjects").collect(name); // ["Jhon", "Bill"]
    * }</pre>
    *

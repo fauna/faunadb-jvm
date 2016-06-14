@@ -25,7 +25,7 @@ public final class Field<T> {
 
     @Override
     public Result<ImmutableList<A>> apply(Value input) {
-      return input.as(ARRAY).flatMap(toList);
+      return input.to(ARRAY).flatMap(toList);
     }
 
     private final Function<ImmutableList<Value>, Result<ImmutableList<A>>> toList =
@@ -83,7 +83,7 @@ public final class Field<T> {
    * @param codec codec used to coerce the field's value
    * @return the field extractor
    */
-  public static <T> Field<T> to(Codec<T> codec) {
+  public static <T> Field<T> as(Codec<T> codec) {
     return new Field<>(Path.empty(), codec);
   }
 
@@ -115,7 +115,7 @@ public final class Field<T> {
    * @param codec codec to be used to coerce the field's value
    * @return a new field that coerces its value using the codec passed
    */
-  public <A> Field<A> as(Codec<A> codec) {
+  public <A> Field<A> to(Codec<A> codec) {
     return new Field<>(path, codec);
   }
 

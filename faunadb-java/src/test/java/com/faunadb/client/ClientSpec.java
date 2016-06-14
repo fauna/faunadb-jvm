@@ -40,13 +40,13 @@ public class ClientSpec extends FaunaDBTest {
   public ExpectedException thrown = ExpectedException.none();
 
   private static final Field<Value> DATA = Field.at("data");
-  private static final Field<Ref> REF_FIELD = Field.at("ref").as(REF);
-  private static final Field<ImmutableList<Ref>> REF_LIST = DATA.collect(Field.to(REF));
+  private static final Field<Ref> REF_FIELD = Field.at("ref").to(REF);
+  private static final Field<ImmutableList<Ref>> REF_LIST = DATA.collect(Field.as(REF));
 
-  private static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).as(STRING);
-  private static final Field<String> ELEMENT_FIELD = DATA.at(Field.at("element")).as(STRING);
+  private static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).to(STRING);
+  private static final Field<String> ELEMENT_FIELD = DATA.at(Field.at("element")).to(STRING);
   private static final Field<Value> ELEMENTS_LIST = DATA.at(Field.at("elements"));
-  private static final Field<Long> COST_FIELD = DATA.at(Field.at("cost")).as(LONG);
+  private static final Field<Long> COST_FIELD = DATA.at(Field.at("cost")).to(LONG);
 
   private static Ref magicMissile;
   private static Ref fireball;
@@ -193,20 +193,20 @@ public class ClientSpec extends FaunaDBTest {
     ).get();
 
     Value testField = instance.get(DATA).at("testField");
-    assertThat(testField.at("string").as(STRING).get(), equalTo("sup"));
-    assertThat(testField.at("num").as(LONG).get(), equalTo(1234L));
-    assertThat(testField.at("bool").as(BOOLEAN).get(), is(true));
-    assertThat(testField.at("bool").as(STRING).getOptional(), is(Optional.<String>absent()));
-    assertThat(testField.at("credentials").as(VALUE).getOptional(), is(Optional.<Value>absent()));
-    assertThat(testField.at("credentials", "password").as(STRING).getOptional(), is(Optional.<String>absent()));
+    assertThat(testField.at("string").to(STRING).get(), equalTo("sup"));
+    assertThat(testField.at("num").to(LONG).get(), equalTo(1234L));
+    assertThat(testField.at("bool").to(BOOLEAN).get(), is(true));
+    assertThat(testField.at("bool").to(STRING).getOptional(), is(Optional.<String>absent()));
+    assertThat(testField.at("credentials").to(VALUE).getOptional(), is(Optional.<Value>absent()));
+    assertThat(testField.at("credentials", "password").to(STRING).getOptional(), is(Optional.<String>absent()));
 
     Value array = testField.at("array");
-    assertThat(array.as(ARRAY).get(), hasSize(4));
-    assertThat(array.at(0).as(LONG).get(), equalTo(1L));
-    assertThat(array.at(1).as(STRING).get(), equalTo("2"));
-    assertThat(array.at(2).as(DOUBLE).get(), equalTo(3.4));
-    assertThat(array.at(3).at("name").as(STRING).get(), equalTo("JR"));
-    assertThat(array.at(4).as(VALUE).getOptional(), is(Optional.<Value>absent()));
+    assertThat(array.to(ARRAY).get(), hasSize(4));
+    assertThat(array.at(0).to(LONG).get(), equalTo(1L));
+    assertThat(array.at(1).to(STRING).get(), equalTo("2"));
+    assertThat(array.at(2).to(DOUBLE).get(), equalTo(3.4));
+    assertThat(array.at(3).at("name").to(STRING).get(), equalTo("JR"));
+    assertThat(array.at(4).to(VALUE).getOptional(), is(Optional.<Value>absent()));
   }
 
   @Test
@@ -232,8 +232,8 @@ public class ClientSpec extends FaunaDBTest {
     )).get();
 
     assertThat(data, hasSize(2));
-    assertThat(data.get(0).at("k1").as(STRING).get(), equalTo("v1"));
-    assertThat(data.get(1).at("k2").as(STRING).get(), equalTo("v2"));
+    assertThat(data.get(0).at("k1").to(STRING).get(), equalTo("v1"));
+    assertThat(data.get(1).at("k2").to(STRING).get(), equalTo("v2"));
   }
 
   @Test
@@ -283,7 +283,7 @@ public class ClientSpec extends FaunaDBTest {
     assertThat(replacedInstance.get(REF_FIELD), equalTo(createdInstance.get(REF_FIELD)));
     assertThat(replacedInstance.get(NAME_FIELD), equalTo("Volcano"));
     assertThat(replacedInstance.get(COST_FIELD), equalTo(10L));
-    assertThat(replacedInstance.get(ELEMENTS_LIST).collect(Field.to(STRING)),
+    assertThat(replacedInstance.get(ELEMENTS_LIST).collect(Field.as(STRING)),
       contains("fire", "earth"));
   }
 
@@ -298,7 +298,7 @@ public class ClientSpec extends FaunaDBTest {
     client.query(Delete(ref)).get();
 
     Value exists = client.query(Exists(ref)).get();
-    assertThat(exists.as(BOOLEAN).get(), is(false));
+    assertThat(exists.to(BOOLEAN).get(), is(false));
 
     thrown.expectCause(isA(NotFoundException.class));
     client.query(Get(ref)).get();
@@ -318,8 +318,8 @@ public class ClientSpec extends FaunaDBTest {
     ).get();
 
     assertThat(insertedEvent.get(REF_FIELD), equalTo(createdInstance.get(REF_FIELD)));
-    assertThat(insertedEvent.get(DATA).as(OBJECT).get().size(), equalTo(1));
-    assertThat(insertedEvent.get(DATA).at("cooldown").as(LONG).get(), is(5L));
+    assertThat(insertedEvent.get(DATA).to(OBJECT).get().size(), equalTo(1));
+    assertThat(insertedEvent.get(DATA).at("cooldown").to(LONG).get(), is(5L));
 
     Value removedEvent = client.query(
       Remove(createdInstance.get(REF_FIELD), Value(2L), DELETE)
@@ -366,7 +366,7 @@ public class ClientSpec extends FaunaDBTest {
   @Test
   public void shouldCountElementsOnAIndex() throws Exception {
     Value count = client.query(Count(Match(Ref("indexes/all_spells")))).get();
-    assertThat(count.as(LONG).get(), equalTo(6L));
+    assertThat(count.to(LONG).get(), equalTo(6L));
   }
 
   @Test
@@ -386,9 +386,9 @@ public class ClientSpec extends FaunaDBTest {
         .withSize(3)
     ).get();
 
-    assertThat(page1.get(DATA).as(ARRAY).get(), hasSize(3));
+    assertThat(page1.get(DATA).to(ARRAY).get(), hasSize(3));
     assertThat(page1.at("after"), notNullValue());
-    assertThat(page1.at("before").as(VALUE).getOptional(), is(Optional.<Value>absent()));
+    assertThat(page1.at("before").to(VALUE).getOptional(), is(Optional.<Value>absent()));
 
     Value page2 = client.query(
       Paginate(Match(Ref("indexes/all_spells")))
@@ -396,10 +396,10 @@ public class ClientSpec extends FaunaDBTest {
         .withSize(3)
     ).get();
 
-    assertThat(page2.get(DATA).as(ARRAY).get(), hasSize(3));
+    assertThat(page2.get(DATA).to(ARRAY).get(), hasSize(3));
     assertThat(page2.get(DATA), not(page1.at("data")));
     assertThat(page2.at("before"), notNullValue());
-    assertThat(page2.at("after").as(VALUE).getOptional(), is(Optional.<Value>absent()));
+    assertThat(page2.at("after").to(VALUE).getOptional(), is(Optional.<Value>absent()));
   }
 
   @Test
@@ -410,9 +410,9 @@ public class ClientSpec extends FaunaDBTest {
         Value("arcane"))
     ).get();
 
-    ImmutableMap<String, Value> set = res.as(SET_REF).get().parameters();
-    assertThat(set.get("terms").as(STRING).get(), equalTo("arcane"));
-    assertThat(set.get("match").as(REF).get(),
+    ImmutableMap<String, Value> set = res.to(SET_REF).get().parameters();
+    assertThat(set.get("terms").to(STRING).get(), equalTo("arcane"));
+    assertThat(set.get("match").to(REF).get(),
       equalTo(new Ref("indexes/spells_by_element")));
   }
 
@@ -427,7 +427,7 @@ public class ClientSpec extends FaunaDBTest {
       )
     ).get();
 
-    assertThat(res.collect(Field.to(LONG)), contains(2L, 1L));
+    assertThat(res.collect(Field.as(LONG)), contains(2L, 1L));
   }
 
   @Test
@@ -438,7 +438,7 @@ public class ClientSpec extends FaunaDBTest {
         Value("was false"))
     ).get();
 
-    assertThat(res.as(STRING).get(), equalTo("was true"));
+    assertThat(res.to(STRING).get(), equalTo("was true"));
   }
 
   @Test
@@ -461,12 +461,12 @@ public class ClientSpec extends FaunaDBTest {
       Obj("name", Value("Hen Wen"), "age", Value(123))
     ).get();
 
-    assertThat(res.at("name").as(STRING).get(), equalTo("Hen Wen"));
-    assertThat(res.at("age").as(LONG).get(), equalTo(123L));
+    assertThat(res.at("name").to(STRING).get(), equalTo("Hen Wen"));
+    assertThat(res.at("age").to(LONG).get(), equalTo(123L));
 
     res = client.query(res).get();
-    assertThat(res.at("name").as(STRING).get(), equalTo("Hen Wen"));
-    assertThat(res.at("age").as(LONG).get(), equalTo(123L));
+    assertThat(res.at("name").to(STRING).get(), equalTo("Hen Wen"));
+    assertThat(res.at("age").to(LONG).get(), equalTo(123L));
   }
 
   @Test
@@ -480,7 +480,7 @@ public class ClientSpec extends FaunaDBTest {
       )
     ).get();
 
-    assertThat(res.collect(Field.to(LONG)), contains(2L, 3L, 4L));
+    assertThat(res.collect(Field.as(LONG)), contains(2L, 3L, 4L));
   }
 
   @Test
@@ -495,7 +495,7 @@ public class ClientSpec extends FaunaDBTest {
           Value("Fireball Level 2")))
     ).get();
 
-    assertThat(res.collect(Field.to(STRING)),
+    assertThat(res.collect(Field.as(STRING)),
       contains("Fireball Level 1", "Fireball Level 2"));
   }
 
@@ -511,19 +511,19 @@ public class ClientSpec extends FaunaDBTest {
         Arr(Value(1), Value(2), Value(3))
       )).get();
 
-    assertThat(filtered.collect(Field.to(LONG)), contains(2L));
+    assertThat(filtered.collect(Field.as(LONG)), contains(2L));
   }
 
   @Test
   public void shouldTakeElementsFromCollection() throws Exception {
     Value taken = client.query(Take(Value(2), Arr(Value(1), Value(2), Value(3)))).get();
-    assertThat(taken.collect(Field.to(LONG)), contains(1L, 2L));
+    assertThat(taken.collect(Field.as(LONG)), contains(1L, 2L));
   }
 
   @Test
   public void shouldDropElementsFromCollection() throws Exception {
     Value dropped = client.query(Drop(Value(2), Arr(Value(1), Value(2), Value(3)))).get();
-    assertThat(dropped.collect(Field.to(LONG)), contains(3L));
+    assertThat(dropped.collect(Field.as(LONG)), contains(3L));
   }
 
   @Test
@@ -535,7 +535,7 @@ public class ClientSpec extends FaunaDBTest {
       )
     ).get();
 
-    assertThat(prepended.collect(Field.to(LONG)),
+    assertThat(prepended.collect(Field.as(LONG)),
       contains(1L, 2L, 3L, 4L));
   }
 
@@ -548,7 +548,7 @@ public class ClientSpec extends FaunaDBTest {
       )
     ).get();
 
-    assertThat(appended.collect(Field.to(LONG)),
+    assertThat(appended.collect(Field.as(LONG)),
       contains(1L, 2L, 3L, 4L));
   }
 
@@ -559,7 +559,7 @@ public class ClientSpec extends FaunaDBTest {
         .withEvents(true)
     ).get();
 
-    assertThat(events.get(DATA).collect(Field.at("resource").as(REF)),
+    assertThat(events.get(DATA).collect(Field.at("resource").to(REF)),
       contains(magicMissile, faerieFire));
   }
 
@@ -614,7 +614,7 @@ public class ClientSpec extends FaunaDBTest {
       )
     ).get();
 
-    assertThat(distinct.get(DATA).collect(Field.to(STRING)),
+    assertThat(distinct.get(DATA).collect(Field.as(STRING)),
       contains("arcane", "fire", "nature"));
   }
 
@@ -636,13 +636,13 @@ public class ClientSpec extends FaunaDBTest {
   @Test
   public void shouldEvalEqualsExpression() throws Exception {
     Value equals = client.query(Equals(Value("fire"), Value("fire"))).get();
-    assertThat(equals.as(BOOLEAN).get(), is(true));
+    assertThat(equals.to(BOOLEAN).get(), is(true));
   }
 
   @Test
   public void shouldEvalConcatExpression() throws Exception {
     Value simpleConcat = client.query(Concat(Arr(Value("Magic"), Value("Missile")))).get();
-    assertThat(simpleConcat.as(STRING).get(), equalTo("MagicMissile"));
+    assertThat(simpleConcat.to(STRING).get(), equalTo("MagicMissile"));
 
     Value concatWithSeparator = client.query(
       Concat(
@@ -653,13 +653,13 @@ public class ClientSpec extends FaunaDBTest {
         Value(" ")
       )).get();
 
-    assertThat(concatWithSeparator.as(STRING).get(), equalTo("Magic Missile"));
+    assertThat(concatWithSeparator.to(STRING).get(), equalTo("Magic Missile"));
   }
 
   @Test
   public void shouldEvalCasefoldExpression() throws Exception {
     Value res = client.query(Casefold(Value("Hen Wen"))).get();
-    assertThat(res.as(STRING).get(), equalTo("hen wen"));
+    assertThat(res.to(STRING).get(), equalTo("hen wen"));
   }
 
   @Test
@@ -672,7 +672,7 @@ public class ClientSpec extends FaunaDBTest {
             Arr(Value("crunchings"), Value("munchings")))))
     ).get();
 
-    assertThat(contains.as(BOOLEAN).get(), is(true));
+    assertThat(contains.to(BOOLEAN).get(), is(true));
   }
 
   @Test
@@ -688,103 +688,103 @@ public class ClientSpec extends FaunaDBTest {
               Value("lunchings")))))
     ).get();
 
-    assertThat(selected.as(STRING).get(), equalTo("munchings"));
+    assertThat(selected.to(STRING).get(), equalTo("munchings"));
   }
 
   @Test
   public void shouldEvalLTExpression() throws Exception {
     Value res = client.query(LT(Arr(Value(1), Value(2), Value(3)))).get();
-    assertThat(res.as(BOOLEAN).get(), is(true));
+    assertThat(res.to(BOOLEAN).get(), is(true));
   }
 
   @Test
   public void shouldEvalLTEExpression() throws Exception {
     Value res = client.query(LTE(Arr(Value(1), Value(2), Value(2)))).get();
-    assertThat(res.as(BOOLEAN).get(), is(true));
+    assertThat(res.to(BOOLEAN).get(), is(true));
   }
 
   @Test
   public void shouldEvalGTxpression() throws Exception {
     Value res = client.query(GT(Arr(Value(3), Value(2), Value(1)))).get();
-    assertThat(res.as(BOOLEAN).get(), is(true));
+    assertThat(res.to(BOOLEAN).get(), is(true));
   }
 
   @Test
   public void shouldEvalGTExpression() throws Exception {
     Value res = client.query(GTE(Arr(Value(3), Value(2), Value(2)))).get();
-    assertThat(res.as(BOOLEAN).get(), is(true));
+    assertThat(res.to(BOOLEAN).get(), is(true));
   }
 
   @Test
   public void shouldEvalAddExpression() throws Exception {
     Value res = client.query(Add(Value(100), Value(10))).get();
-    assertThat(res.as(LONG).get(), equalTo(110L));
+    assertThat(res.to(LONG).get(), equalTo(110L));
   }
 
   @Test
   public void shouldEvalMultiplyExpression() throws Exception {
     Value res = client.query(Multiply(Value(100), Value(10))).get();
-    assertThat(res.as(LONG).get(), equalTo(1000L));
+    assertThat(res.to(LONG).get(), equalTo(1000L));
   }
 
   @Test
   public void shouldEvalSubtractExpression() throws Exception {
     Value res = client.query(Subtract(Value(100), Value(10))).get();
-    assertThat(res.as(LONG).get(), equalTo(90L));
+    assertThat(res.to(LONG).get(), equalTo(90L));
   }
 
   @Test
   public void shouldEvalDivideExpression() throws Exception {
     Value res = client.query(Divide(Value(100), Value(10))).get();
-    assertThat(res.as(LONG).get(), equalTo(10L));
+    assertThat(res.to(LONG).get(), equalTo(10L));
   }
 
   @Test
   public void shouldEvalModuloExpression() throws Exception {
     Value res = client.query(Modulo(Value(101), Value(10))).get();
-    assertThat(res.as(LONG).get(), equalTo(1L));
+    assertThat(res.to(LONG).get(), equalTo(1L));
   }
 
   @Test
   public void shouldEvalAndExpression() throws Exception {
     Value res = client.query(And(Value(true), Value(false))).get();
-    assertThat(res.as(BOOLEAN).get(), is(false));
+    assertThat(res.to(BOOLEAN).get(), is(false));
   }
 
   @Test
   public void shouldEvalOrExpression() throws Exception {
     Value res = client.query(Or(Value(true), Value(false))).get();
-    assertThat(res.as(BOOLEAN).get(), is(true));
+    assertThat(res.to(BOOLEAN).get(), is(true));
   }
 
   @Test
   public void shouldEvalNotExpression() throws Exception {
     Value notR = client.query(Not(Value(false))).get();
-    assertThat(notR.as(BOOLEAN).get(), is(true));
+    assertThat(notR.to(BOOLEAN).get(), is(true));
   }
 
   @Test
   public void shouldEvalTimeExpression() throws Exception {
     Value res = client.query(Time(Value("1970-01-01T00:00:00-04:00"))).get();
-    assertThat(res.as(TS).get(), equalTo(Instant.EPOCH.plus(4, HOURS)));
+    assertThat(res.to(TS).get(), equalTo(Instant.EPOCH.plus(4, HOURS)));
   }
 
   @Test
   public void shouldEvalEpochExpression() throws Exception {
     Value res = client.query(Epoch(Value(30), SECOND)).get();
-    assertThat(res.as(TS).get(), equalTo(Instant.EPOCH.plus(30, SECONDS)));
+    assertThat(res.to(TS).get(), equalTo(Instant.EPOCH.plus(30, SECONDS)));
   }
 
   @Test
   public void shouldEvalDateExpression() throws Exception {
     Value res = client.query(Date(Value("1970-01-02"))).get();
-    assertThat(res.as(DATE).get(), equalTo(LocalDate.ofEpochDay(1)));
+    assertThat(res.to(DATE).get(), equalTo(LocalDate.ofEpochDay(1)));
   }
 
   @Test
   public void shouldGetNextId() throws Exception {
     Value res = client.query(NextId()).get();
-    assertThat(res.as(STRING).get(), notNullValue());
+    assertThat(res.to(STRING).get(), notNullValue());
   }
 
   @Test
@@ -801,11 +801,11 @@ public class ClientSpec extends FaunaDBTest {
         Obj("password", Value("abcdefg")))
     ).get();
 
-    FaunaClient sessionClient = createFaunaClient(auth.at("secret").as(STRING).get());
+    FaunaClient sessionClient = createFaunaClient(auth.at("secret").to(STRING).get());
 
     try {
       Value loggedOut = sessionClient.query(Logout(Value(true))).get();
-      assertThat(loggedOut.as(BOOLEAN).get(), is(true));
+      assertThat(loggedOut.to(BOOLEAN).get(), is(true));
     } finally {
       sessionClient.close();
     }
@@ -817,7 +817,7 @@ public class ClientSpec extends FaunaDBTest {
       )
     ).get();
 
-    assertThat(identified.as(BOOLEAN).get(), is(false));
+    assertThat(identified.to(BOOLEAN).get(), is(false));
   }
 
   private Ref onARandomClass() throws Exception {

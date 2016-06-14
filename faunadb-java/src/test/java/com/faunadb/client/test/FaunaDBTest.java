@@ -74,7 +74,7 @@ public class FaunaDBTest {
     return new AsyncFunction<Value, Value>() {
       @Override
       public ListenableFuture<Value> apply(Value dbCreateR) throws Exception {
-        Ref dbRef = dbCreateR.at("ref").as(REF).get();
+        Ref dbRef = dbCreateR.at("ref").to(REF).get();
 
         return rootClient.query(
           Create(
@@ -91,7 +91,7 @@ public class FaunaDBTest {
     return new Function<Value, FaunaClient>() {
       @Override
       public FaunaClient apply(Value serverKeyF) {
-        String secret = serverKeyF.at("secret").as(STRING).get();
+        String secret = serverKeyF.at("secret").to(STRING).get();
         return createFaunaClient(secret);
       }
     };

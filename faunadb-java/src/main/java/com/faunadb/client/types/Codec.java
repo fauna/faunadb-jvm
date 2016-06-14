@@ -26,14 +26,14 @@ import static java.lang.String.format;
  *   static final Codec<Person> PERSON = new Codec<Person>() {
  *     @Override public Result<Person> apply(Value value) {
  *       return Result.success(new Person(
- *         value.at("data", "firstName").as(Codec.STRING),
- *         value.at("data", "lastName").as(Codec.STRING)
+ *         value.at("data", "firstName").to(Codec.STRING),
+ *         value.at("data", "lastName").to(Codec.STRING)
  *       ));
  *     }
  *   }
  *
  *   static Person fromValue(Value value) {
- *     return value.as(PERSON);
+ *     return value.to(PERSON);
  *   }
  *
  *   final String firstName, lastName;
