@@ -487,26 +487,6 @@ public final class Language {
   }
 
   /**
-   * Creates a new Before cursor.
-   *
-   * @see Pagination.Cursor
-   * @see <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
-   */
-  public static Pagination.Cursor Before(Expr ref) {
-    return new Pagination.Before(ref);
-  }
-
-  /**
-   * Creates a new After cursor.
-   *
-   * @see Pagination.Cursor
-   * @see <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
-   */
-  public static Pagination.After After(Expr ref) {
-    return new Pagination.After(ref);
-  }
-
-  /**
    * Creates a new Exists expression.
    *
    * @see <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a>

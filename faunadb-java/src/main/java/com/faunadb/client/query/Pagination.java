@@ -26,30 +26,24 @@ import static java.util.Objects.requireNonNull;
  */
 public final class Pagination extends Expr {
 
-  /**
-   * Helper to construct the pagination cursor that can constructed either
-   * by {@link Language#Before(Expr)} or {@link Language#After(Expr)}
-   *
-   * @see <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
-   */
-  public abstract static class Cursor {
+  private static abstract class Cursor {
     private final String name;
     private final Expr ref;
 
-    Cursor(String name, Expr ref) {
+    private Cursor(String name, Expr ref) {
       this.name = requireNonNull(name);
       this.ref = requireNonNull(ref);
     }
   }
 
-  static class Before extends Cursor {
-    Before(Expr ref) {
+  private static final class Before extends Cursor {
+    private Before(Expr ref) {
       super("before", ref);
     }
   }
 
-  static class After extends Cursor {
-    After(Expr ref) {
+  private static final class After extends Cursor {
+    private After(Expr ref) {
       super("after", ref);
     }
   }
@@ -81,14 +75,24 @@ public final class Pagination extends Expr {
   }
 
   /**
-   * Sets the cursor for the pagination.
+   * Sets the cursor of the pagination to move backwards.
    *
    * @param cursor the cursor
    * @return a new pagination with the cursor set
-   * @see Cursor
    */
-  public Pagination withCursor(Cursor cursor) {
-    this.cursor = Optional.of(cursor);
+  public Pagination before(Expr cursor) {
+    this.cursor = Optional.<Cursor>of(new Before(cursor));
+    return this;
+  }
+
+  /**
+   * Sets the cursor of the pagination to move forward.
+   *
+   * @param cursor the cursor
+   * @return a new pagination with the cursor set
+   */
+  public Pagination after(Expr cursor) {
+    this.cursor = Optional.<Cursor>of(new After(cursor));
     return this;
   }
 
@@ -98,7 +102,7 @@ public final class Pagination extends Expr {
    * @param ts the desired timestamp
    * @return a new pagination with the timestamp set
    */
-  public Pagination withTs(Expr ts) {
+  public Pagination ts(Expr ts) {
     this.ts = Optional.of(ts);
     return this;
   }
@@ -109,8 +113,8 @@ public final class Pagination extends Expr {
    * @param ts the desired timestamp
    * @return a new pagination with the timestamp set
    */
-  public Pagination withTs(Long ts) {
-    return withTs(new LongV(ts));
+  public Pagination ts(Long ts) {
+    return ts(new LongV(ts));
   }
 
   /**
@@ -119,7 +123,7 @@ public final class Pagination extends Expr {
    * @param size the desired size
    * @return a new pagination with the size set
    */
-  public Pagination withSize(Expr size) {
+  public Pagination size(Expr size) {
     this.size = Optional.of(size);
     return this;
   }
@@ -130,8 +134,8 @@ public final class Pagination extends Expr {
    * @param size the desired size
    * @return a new pagination with the size set
    */
-  public Pagination withSize(Integer size) {
-    return withSize(new LongV(size));
+  public Pagination size(Integer size) {
+    return size(new LongV(size));
   }
 
   /**
@@ -139,7 +143,7 @@ public final class Pagination extends Expr {
    *
    * @return a new pagination with sources option set
    */
-  public Pagination withSources(Expr sources) {
+  public Pagination sources(Expr sources) {
     this.sources = Optional.of(sources);
     return this;
   }
@@ -149,9 +153,9 @@ public final class Pagination extends Expr {
    *
    * @return a new pagination with sources option set
    */
-  public Pagination withSources(boolean sources) {
+  public Pagination sources(boolean sources) {
     if (!sources) return this;
-    return withSources(Value.BooleanV.TRUE);
+    return sources(Value.BooleanV.TRUE);
   }
 
   /**
@@ -159,7 +163,7 @@ public final class Pagination extends Expr {
    *
    * @return a new pagination with events option set
    */
-  public Pagination withEvents(Expr events) {
+  public Pagination events(Expr events) {
     this.events = Optional.of(events);
     return this;
   }
@@ -169,9 +173,9 @@ public final class Pagination extends Expr {
    *
    * @return a new pagination with events option set
    */
-  public Pagination withEvents(boolean events) {
+  public Pagination events(boolean events) {
     if (!events) return this;
-    return withEvents(Value.BooleanV.TRUE);
+    return events(Value.BooleanV.TRUE);
   }
 
 }

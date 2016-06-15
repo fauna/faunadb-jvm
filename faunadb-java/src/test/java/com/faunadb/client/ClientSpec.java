@@ -383,7 +383,7 @@ public class ClientSpec extends FaunaDBTest {
   public void shouldPaginateOverAnIndex() throws Exception {
     Value page1 = client.query(
       Paginate(Match(Ref("indexes/all_spells")))
-        .withSize(3)
+        .size(3)
     ).get();
 
     assertThat(page1.get(DATA).to(ARRAY).get(), hasSize(3));
@@ -392,8 +392,8 @@ public class ClientSpec extends FaunaDBTest {
 
     Value page2 = client.query(
       Paginate(Match(Ref("indexes/all_spells")))
-        .withCursor(After(page1.at("after")))
-        .withSize(3)
+        .after(page1.at("after"))
+        .size(3)
     ).get();
 
     assertThat(page2.get(DATA).to(ARRAY).get(), hasSize(3));
@@ -556,7 +556,7 @@ public class ClientSpec extends FaunaDBTest {
   public void shouldReadEventsFromIndex() throws Exception {
     Value events = client.query(
       Paginate(Match(Ref("indexes/spells_by_element"), Value("arcane")))
-        .withEvents(true)
+        .events(true)
     ).get();
 
     assertThat(events.get(DATA).collect(Field.at("resource").to(REF)),

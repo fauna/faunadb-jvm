@@ -324,33 +324,33 @@ public class SerializationSpec {
 
     assertJson(
       Paginate(Ref("databases"))
-        .withCursor(After(Ref("databases/test")))
-        .withEvents(true)
-        .withSources(true)
-        .withTs(10L)
-        .withSize(2),
+        .after(Ref("databases/test"))
+        .events(true)
+        .sources(true)
+        .ts(10L)
+        .size(2),
       "{\"paginate\":{\"@ref\":\"databases\"},\"after\":{\"@ref\":\"databases/test\"}," +
         "\"events\":true,\"sources\":true,\"ts\":10,\"size\":2}"
     );
 
     assertJson(
       Paginate(Ref("databases"))
-        .withCursor(After(Ref("databases/test")))
-        .withEvents(Value(true))
-        .withSources(Value(true))
-        .withTs(Value(10L))
-        .withSize(Value(2)),
+        .after(Ref("databases/test"))
+        .events(Value(true))
+        .sources(Value(true))
+        .ts(Value(10L))
+        .size(Value(2)),
       "{\"paginate\":{\"@ref\":\"databases\"},\"after\":{\"@ref\":\"databases/test\"}," +
         "\"events\":true,\"sources\":true,\"ts\":10,\"size\":2}"
     );
 
     assertJson(
       Paginate(Ref("databases"))
-        .withCursor(Before(Ref("databases/test")))
-        .withEvents(false)
-        .withSources(false)
-        .withTs(10L)
-        .withSize(2),
+        .before(Ref("databases/test"))
+        .events(false)
+        .sources(false)
+        .ts(10L)
+        .size(2),
       "{\"paginate\":{\"@ref\":\"databases\"},\"before\":{\"@ref\":\"databases/test\"},\"ts\":10,\"size\":2}"
     );
   }
