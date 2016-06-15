@@ -22,7 +22,7 @@ import java.util.Map;
 
 /**
  * The HTTP Connection adapter for FaunaDB clients.
- *
+ * <p>
  * <p>Relies on <a href="https://github.com/AsyncHttpClient/async-http-client">async-http-client</a>
  * for the underlying implementation.
  */
@@ -101,9 +101,9 @@ public class Connection {
 
     /**
      * Sets a {@link MetricRegistry} that the {@link Connection} will use to register and track Connection-level statistics.
+     *
      * @param registry the MetricRegistry instance.
      * @return this {@link Builder} object
-     *
      */
     public Builder withMetrics(MetricRegistry registry) {
       this.metricRegistry = registry;
@@ -114,7 +114,7 @@ public class Connection {
      * Returns a newly constructed {@link Connection} with configuration based on the settings of this {@link Builder}.
      *
      * @throws UnsupportedEncodingException if the system does not support ASCII encoding for the Connection.
-     * @throws MalformedURLException if the default FaunaDB URL cannot be parsed.
+     * @throws MalformedURLException        if the default FaunaDB URL cannot be parsed.
      */
     public Connection build() throws UnsupportedEncodingException, MalformedURLException {
       MetricRegistry r;
@@ -183,7 +183,7 @@ public class Connection {
   /**
    * Issues a {@code GET} request with the provided request parameters.
    *
-   * @param path the relative path of the resource.
+   * @param path   the relative path of the resource.
    * @param params a map containing the request parameters.
    * @return a {@code ListenableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.

@@ -2,7 +2,6 @@ package com.faunadb.client;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -49,7 +48,7 @@ public class HttpResponses {
 
     static class QueryErrorDeserializer extends JsonDeserializer<QueryError> {
       @Override
-      public QueryError deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+      public QueryError deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         ObjectMapper json = (ObjectMapper) jsonParser.getCodec();
         JsonNode tree = json.readTree(jsonParser);
 

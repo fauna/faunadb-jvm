@@ -120,7 +120,6 @@ lazy val java = project.in(file("faunadb-java"))
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
-      "org.apache.commons" % "commons-lang3" % "3.4" % "test",
       "org.yaml" % "snakeyaml" % "1.14" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test",
       "org.hamcrest" % "hamcrest-library" % "1.3" % "test",

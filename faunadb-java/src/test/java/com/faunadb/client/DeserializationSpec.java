@@ -2,14 +2,11 @@ package com.faunadb.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.faunadb.client.response.Class;
-import com.faunadb.client.response.*;
-import com.faunadb.client.types.LazyValue;
-import com.faunadb.client.types.Ref;
 import com.faunadb.client.types.Value;
+import com.faunadb.client.types.Value.Ref;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -17,298 +14,135 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
+import static com.faunadb.client.types.Codec.*;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class DeserializationSpec {
-  ObjectMapper json = new ObjectMapper().registerModule(new GuavaModule());
 
-  @Test
-  public void deserializeInstanceResponseWithRefs() throws IOException {
-    String toDeserialize = "{\n\t\t\"ref\": {\n\t\t\t\"@ref\": \"classes/spells/93044099947429888\"\n\t\t},\n\t\t\"class\": {\n\t\t\t\"@ref\": \"classes/spells\"\n\t\t},\n\t\t\"ts\": 1424992618413105,\n\t\t\"data\": {\n\t\t\t\"refField\": {\n\t\t\t\t\"@ref\": \"classes/spells/93044099909681152\"\n\t\t\t}\n\t\t}\n\t}";
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    Instance instance = parsed.asInstance();
-    assertEquals(instance.ref(), Ref.create("classes/spells/93044099947429888"));
-    assertEquals(instance.classRef(), Ref.create("classes/spells"));
-    assertEquals(instance.ts().longValue(), 1424992618413105L);
-    assertEquals(instance.data().get("refField").asRef(), Ref.create("classes/spells/93044099909681152"));
+  private ObjectMapper json;
+
+  @Before
+  public void setUp() throws Exception {
+    json = new ObjectMapper().registerModule(new GuavaModule());
   }
 
   @Test
-  public void deserializeInstanceResponse() throws IOException {
-    String toDeserialize = "{\n\"class\": {\n\"@ref\": \"classes/derp\"\n},\n\"data\": {\n\"test\": 1\n},\n\"ref\": {\n\"@ref\": \"classes/derp/101192216816386048\"\n},\n\"ts\": 1432763268186882\n}";
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    Instance instance = parsed.asInstance();
-    assertEquals(instance.ref(), Ref.create("classes/derp/101192216816386048"));
-    assertEquals(instance.classRef(), Ref.create("classes/derp"));
-    assertEquals(instance.ts().longValue(), 1432763268186882L);
-    assertEquals(instance.data().get("test").asLong().intValue(), 1);
+  public void shouldDeserializeString() throws Exception {
+    assertThat(parsed("\"a string\"").to(STRING).get(),
+      equalTo("a string"));
   }
 
   @Test
-  public void deserializeErrorResponse() throws IOException {
-    String toDeserialize = "{\n" +
-        "            \"code\": \"invalid expression\", \n" +
-        "            \"description\": \"No query provided.\", \n" +
-        "            \"position\": []\n" +
-        "}\n" +
-        "\n";
-    HttpResponses.QueryError err = json.readValue(toDeserialize, HttpResponses.QueryError.class);
-    assertThat(err.code() , is("invalid expression"));
-    assertThat(err.description(), is("No query provided."));
-    assertThat(err.position().isEmpty(), is(true));
+  public void shouldDeserializeBoolean() throws Exception {
+    assertThat(parsed("true").to(BOOLEAN).get(), is(true));
+    assertThat(parsed("false").to(BOOLEAN).get(), is(false));
   }
 
   @Test
-  public void deserializeInstanceResponseWithObjectLiteral() throws IOException {
-    String toDeserialize = "{\n\"class\": {\n\"@ref\": \"classes/derp\"\n},\n\"data\": {\n\"test\": {\n\"field1\": {\n\"@obj\": {\n\"@name\": \"Test\"\n}\n}\n}\n},\n\"ref\": {\n\"@ref\": \"classes/derp/101727203651223552\"\n},\n\"ts\": 1433273471399755\n}";
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    Instance instance = parsed.asInstance();
-    ImmutableMap<String, Value> unwrappedField = instance.data().get("test").get("field1").asObject();
-    assertEquals("Test", unwrappedField.get("@name").asString());
+  public void shouldDeserializeLong() throws Exception {
+    assertThat(parsed(String.valueOf(Long.MAX_VALUE)).to(LONG).get(),
+      equalTo(Long.MAX_VALUE));
   }
 
   @Test
-  public void deserializeDatabaseResponse() throws IOException {
-    String toDeserialize = "{\n" +
-        "        \"class\": {\n" +
-        "            \"@ref\": \"databases\"\n" +
-        "        },\n" +
-        "        \"name\": \"spells\",\n" +
-        "        \"ref\": {\n" +
-        "            \"@ref\": \"databases/spells\"\n" +
-        "        },\n" +
-        "        \"ts\": 1434343547025544\n" +
-        "    }\n";
-
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    Database database = parsed.asDatabase();
-    assertThat(database.name(), is("spells"));
-    assertThat(database.classRef(), is(Ref.create("databases")));
-    assertThat(database.ts(), is(1434343547025544L));
-    assertThat(database.ref(), is(Ref.create("databases/spells")));
+  public void shouldDeserializeDouble() throws Exception {
+    assertThat(parsed(String.valueOf(Double.MAX_VALUE)).to(DOUBLE).get(),
+      equalTo(Double.MAX_VALUE));
   }
 
   @Test
-  public void deserializeKeyResponse() throws IOException {
-    String toDeserialize = " {\n" +
-        "        \"class\": {\n" +
-        "            \"@ref\": \"keys\"\n" +
-        "        },\n" +
-        "        \"data\": {\n" +
-        "            \"data\": \"yeah\",\n" +
-        "            \"some\": 123\n" +
-        "        },\n" +
-        "        \"database\": {\n" +
-        "            \"@ref\": \"databases/spells\"\n" +
-        "        },\n" +
-        "        \"hashed_secret\": \"$2a$05$LKJiF.hpkt40W9oMC/5atu2g03m2.cPGU9Srys5vmAdOgBaGYjfl2\",\n" +
-        "        \"ref\": {\n" +
-        "            \"@ref\": \"keys/102850208874889216\"\n" +
-        "        },\n" +
-        "        \"role\": \"server\",\n" +
-        "        \"secret\": \"kqoBbWW4VRAAAAACtCcfczgIhDni0TUjuk5RxoNwpgzx\",\n" +
-        "        \"ts\": 1434344452631179\n" +
-        "    }\n";
-
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    Key key = parsed.asKey();
-    assertThat(key.classRef(), is(Ref.create("keys")));
-    assertThat(key.database(), is(Ref.create("databases/spells")));
-    assertThat(key.data().get("some").asLong(), is(123L));
-    assertThat(key.data().get("data").asString(), is("yeah"));
-    assertThat(key.hashedSecret(), is("$2a$05$LKJiF.hpkt40W9oMC/5atu2g03m2.cPGU9Srys5vmAdOgBaGYjfl2"));
-    assertThat(key.ref(), is(Ref.create("keys/102850208874889216")));
-    assertThat(key.role(), is("server"));
-    assertThat(key.secret(), is("kqoBbWW4VRAAAAACtCcfczgIhDni0TUjuk5RxoNwpgzx"));
-    assertThat(key.ts(), is(1434344452631179L));
+  public void shouldDeserializeRef() throws Exception {
+    assertThat(parsed("{ \"@ref\": \"classes/people/1\" }").to(REF).get(),
+      equalTo(new Ref("classes/people/1")));
   }
 
   @Test
-  public void deserializeClassResponse() throws IOException {
-    String toDeserialize = " {\n" +
-        "        \"class\": {\n" +
-        "            \"@ref\": \"classes\"\n" +
-        "        },\n" +
-        "        \"history_days\": 30,\n" +
-        "        \"name\": \"spells\",\n" +
-        "        \"ref\": {\n" +
-        "            \"@ref\": \"classes/spells\"\n" +
-        "        },\n" +
-        "        \"ts\": 1434344944425065\n" +
-        "    }";
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    Class cls = parsed.asClass();
-    assertThat(cls.classRef(), is(Ref.create("classes")));
-    assertThat(cls.historyDays(), is(30L));
-    assertThat(cls.name(), is("spells"));
-    assertThat(cls.ref(), is(Ref.create("classes/spells")));
-    assertThat(cls.ts(), is(1434344944425065L));
+  public void shouldDeserializeArray() throws Exception {
+    Value parsed = parsed("[1, \"string\", [true, false], {\"@ref\": \"databases\"}]");
+    assertThat(parsed.at(0).to(LONG).get(), equalTo(1L));
+    assertThat(parsed.at(1).to(STRING).get(), equalTo("string"));
+    assertThat(parsed.at(2).at(0).to(BOOLEAN).get(), is(true));
+    assertThat(parsed.at(2).at(1).to(BOOLEAN).get(), is(false));
+    assertThat(parsed.at(3).to(REF).get(), equalTo(new Ref("databases")));
   }
 
   @Test
-  public void deserializeIndexResponse() throws IOException {
-    String toDeserialize = "{\n" +
-        "        \"active\": false,\n" +
-        "        \"class\": {\n" +
-        "            \"@ref\": \"indexes\"\n" +
-        "        },\n" +
-        "        \"name\": \"spells_by_name\",\n" +
-        "        \"ref\": {\n" +
-        "            \"@ref\": \"indexes/spells_by_name\"\n" +
-        "        },\n" +
-        "        \"source\": {\n" +
-        "            \"@ref\": \"classes/spells\"\n" +
-        "        },\n" +
-        "        \"terms\": [\n" +
-        "            {\n" +
-        "                \"path\": \"data.name\"\n" +
-        "            }\n" +
-        "        ],\n" +
-        "        \"ts\": 1434345216167501,\n" +
-        "        \"unique\": true\n" +
-        "    }";
-
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    Index idx = parsed.asIndex();
-    assertThat(idx.active(), is(false));
-    assertThat(idx.classRef(), is(Ref.create("indexes")));
-    assertThat(idx.name(), is("spells_by_name"));
-    assertThat(idx.ref(), is(Ref.create("indexes/spells_by_name")));
-    assertThat(idx.source(), is(Ref.create("classes/spells")));
-    assertThat(idx.terms(), is(ImmutableList.of(ImmutableMap.of("path", "data.name"))));
-    assertThat(idx.ts(), is(1434345216167501L));
-    assertThat(idx.unique(), is(true));
+  public void shouldDeserializeDate() throws IOException {
+    assertThat(parsed("{ \"@date\": \"1970-01-03\" }").to(DATE).get(),
+      equalTo(LocalDate.ofEpochDay(2)));
   }
 
   @Test
-  public void deserializeEventResponse() throws IOException {
-    String toDeserialize = "{\n" +
-        "\t\t\t\"ts\": 1434477366352519,\n" +
-        "\t\t\t\"action\": \"create\",\n" +
-        "\t\t\t\"resource\": {\n" +
-        "\t\t\t\t\"@ref\": \"classes/spells/102989579003363328\"\n" +
-        "\t\t\t}\n" +
-        "\t\t}";
-
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    Event event = parsed.asEvent();
-
-    assertThat(event.resource(), is(Ref.create("classes/spells/102989579003363328")));
-    assertThat(event.action(), is("create"));
-    assertThat(event.ts(), is(1434477366352519L));
+  public void shouldDeserializeTS() throws IOException {
+    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:05:00Z\" }").to(TS).get(),
+      equalTo(Instant.EPOCH.plus(5, ChronoUnit.MINUTES)));
   }
 
   @Test
-  public void deserializePageResponseWithNoBeforeOrAfter() throws IOException {
-    String toDeserialize = "{\n" +
-        "        \"data\": [\n" +
-        "            {\n" +
-        "                \"@ref\": \"classes/spells/102851646450565120\"\n" +
-        "            }\n" +
-        "        ]\n" +
-        "    }\n";
+  public void shouldDeserializeObject() throws Exception {
+    Value parsed = parsed("{" +
+      "  \"ref\": {" +
+      "   \"@ref\": \"classes/spells/93044099947429888\"" +
+      "  }," +
+      "  \"class\": {" +
+      "   \"@ref\": \"classes/spells\"" +
+      "  }," +
+      "  \"ts\": 1424992618413105," +
+      "  \"data\": {" +
+      "   \"name\": \"fireball\"," +
+      "   \"refField\": {" +
+      "    \"@ref\": \"classes/spells/93044099909681152\"" +
+      "   }," +
+      "   \"elements\": [\"fire\", \"air\"]" +
+      "  }" +
+      " }"
+    );
 
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    Page page = parsed.asPage();
-    assertThat(page.data().size(), is(1));
-    assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851646450565120")));
-    assertThat(page.after(), is(Optional.<Value>absent()));
-    assertThat(page.before(), is(Optional.<Value>absent()));
+    assertThat(parsed.at("ref").to(REF).get(), equalTo(new Ref("classes/spells/93044099947429888")));
+    assertThat(parsed.at("class").to(REF).get(), equalTo(new Ref("classes/spells")));
+    assertThat(parsed.at("ts").to(LONG).get(), equalTo(1424992618413105L));
+    assertThat(parsed.at("data", "name").to(STRING).get(), equalTo("fireball"));
+    assertThat(parsed.at("data", "refField").to(REF).get(), equalTo(new Ref("classes/spells/93044099909681152")));
+    assertThat(parsed.at("data", "elements").at(0).to(STRING).get(), equalTo("fire"));
+    assertThat(parsed.at("data", "elements").at(1).to(STRING).get(), equalTo("air"));
   }
 
   @Test
-  public void deserializePageResponseWithBefore() throws IOException {
-    String toDeserialize = "{\n" +
-        "        \"before\": {\n" +
-        "            \"@ref\": \"classes/spells/102851646450565120\"\n" +
-        "        },\n" +
-        "        \"data\": [\n" +
-        "            {\n" +
-        "                \"@ref\": \"classes/spells/102851646450565120\"\n" +
-        "            }\n" +
-        "        ]\n" +
-        "    }";
+  public void shouldDeserializeNull() throws Exception {
+    assertThat(parsed("{ \"resources\": null }").at("resources").to(STRING).getOptional(),
+      is(Optional.<String>absent()));
 
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    Page page = parsed.asPage();
-    assertThat(page.data().size(), is(1));
-    assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851646450565120")));
-    assertThat(page.before().get().asRef(), is(Ref.create("classes/spells/102851646450565120")));
-    assertThat(page.after(), is(Optional.<Value>absent()));
+    assertThat(parsed("[1, null]").at(1).to(STRING).getOptional(),
+      is(Optional.<String>absent()));
   }
 
   @Test
-  public void deserializePageResponseWithBeforeAndAfter() throws IOException {
-    String toDeserialize = "{\n" +
-        "        \"after\": {\n" +
-        "            \"@ref\": \"classes/spells/102852248441192448\"\n" +
-        "        },\n" +
-        "        \"before\": {\n" +
-        "            \"@ref\": \"classes/spells/102851646450565120\"\n" +
-        "        },\n" +
-        "        \"data\": [\n" +
-        "            {\n" +
-        "                \"@ref\": \"classes/spells/102851646450565120\"\n" +
-        "            }\n" +
-        "        ]\n" +
-        "    }";
-
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    Page page = parsed.asPage();
-    assertThat(page.data().size(), is(1));
-    assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851646450565120")));
-    assertThat(page.after().get().asRef(), is(Ref.create("classes/spells/102852248441192448")));
-    assertThat(page.before().get().asRef(), is(Ref.create("classes/spells/102851646450565120")));
+  public void shouldDeserializeObjectLiteral() throws Exception {
+    Value parsed = parsed("{ \"@obj\": {\"@name\": \"Test\"}}");
+    assertThat(parsed.at("@name").to(STRING).get(), equalTo("Test"));
   }
 
   @Test
-  public void deserializePageResponseWithAfter() throws IOException {
-    String toDeserialize = "{\n" +
-        "        \"after\": {\n" +
-        "            \"@ref\": \"classes/spells/102851646450565120\"\n" +
-        "        },\n" +
-        "        \"data\": [\n" +
-        "            {\n" +
-        "                \"@ref\": \"classes/spells/102851640310104064\"\n" +
-        "            }\n" +
-        "        ]\n" +
-        "    }";
+  public void shouldDeserializeSetRef() throws Exception {
+    Value parsed = parsed(
+      "{" +
+        "  \"@set\": {" +
+        "    \"match\": { \"@ref\": \"indexes/spells_by_element\" }," +
+        "    \"terms\": \"fire\"" +
+        "  }" +
+        "}"
+    );
 
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    Page page = parsed.asPage();
-    assertThat(page.data().size(), is(1));
-    assertThat(page.data().get(0).asRef(), is(Ref.create("classes/spells/102851640310104064")));
-    assertThat(page.before(), is(Optional.<Value>absent()));
-    assertThat(page.after().get().asRef(), is(Ref.create("classes/spells/102851646450565120")));
+    ImmutableMap<String, Value> set = parsed.to(SET_REF).get().parameters();
+    assertThat(set.get("terms").to(STRING).get(), equalTo("fire"));
+    assertThat(set.get("match").to(REF).get(),
+      equalTo(new Ref("indexes/spells_by_element")));
   }
 
-  @Test
-  public void deserializeTs() throws IOException {
-    String toDeserialize = "{ \"@ts\": \"1970-01-01T00:05:00Z\" }";
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    Instant instant = parsed.asTs();
-    assertThat(instant, is(Instant.EPOCH.plus(5, ChronoUnit.MINUTES)));
+  private Value parsed(String str) throws java.io.IOException {
+    return json.readValue(str, Value.class);
   }
 
-  @Test
-  public void deserializeDate() throws IOException {
-    String toDeserialize = "{ \"@date\": \"1970-01-03\" }";
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    LocalDate date = parsed.asDate();
-    assertThat(date, is(LocalDate.ofEpochDay(2)));
-  }
-
-  @Test
-  public void deserializeTokenResponse() throws IOException {
-    String toDeserialize = "{\"ref\":{\"@ref\":\"tokens/116957992316829696\"},\"class\":{\"@ref\":\"tokens\"},\"ts\":1447798683342861,\"instance\":{\"@ref\":\"classes/spells/119498417185488896\"},\"secret\":\"k6oBn4SsobAAAAADoQS0L5P7oOt-_GnVDxRNPGFjVEWTMK4\"}";
-    LazyValue parsed = json.readValue(toDeserialize, LazyValue.class);
-    Token token = parsed.asToken();
-    assertThat(token.ref(), is(Ref.create("tokens/116957992316829696")));
-    assertThat(token.classRef(), is(Ref.create("tokens")));
-    assertThat(token.ts(), is(1447798683342861L));
-    assertThat(token.instance(), is(Ref.create("classes/spells/119498417185488896")));
-    assertThat(token.secret(), is("k6oBn4SsobAAAAADoQS0L5P7oOt-_GnVDxRNPGFjVEWTMK4"));
-  }
 }

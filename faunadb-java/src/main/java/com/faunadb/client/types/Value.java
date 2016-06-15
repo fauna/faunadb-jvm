@@ -3,344 +3,207 @@ package com.faunadb.client.types;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.NullNode;
+import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
-import com.faunadb.client.response.*;
-import com.faunadb.client.response.Class;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
+
+import static java.lang.String.format;
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Represents any scalar or non-scalar value in the FaunaDB query language. FaunaDB value types consist of
- * all of the JSON value types, as well as the FaunaDB-specific types, {@link Ref} and {@link Set}.
- *
- * <p>Scalar values are {@link LongV}, {@link StringV}, {@link DoubleV}, {@link BooleanV}, {@link NullV},
- * {@link Ref}, and {@link Set}.
- *
- * <p>Non-scalar values are {@link ObjectV} and {@link ArrayV}.</p>
- *
- * <p>This interface itself does not have any directly accessible data. It must first be coerced into a type before
+ * all of the JSON value types, as well as the FaunaDB-specific types, {@link Ref} and {@link SetRef}.
+ * <p>
+ * Scalar values are {@link LongV}, {@link StringV}, {@link DoubleV}, {@link BooleanV}, {@link NullV},
+ * {@link Ref}, and {@link SetRef}.
+ * <p>
+ * Non-scalar values are {@link ObjectV} and {@link ArrayV}.
+ * <p>
+ * This interface itself does not have any directly accessible data. It must first be coerced into a type before
  * its data can be accessed.
- *
- * <p>Coercion functions will return null if this node cannot be transformed into the requested type.
- *
- * <p><b>Example</b>: Consider the {@code Value node} modeling the root of the tree:</p>
- * <pre>
+ * <p>
+ * <b>Example</b>: Consider the {@link Value} node modeling the root of the tree:
+ * <pre>{@code
  * {
  *   "ref": { "@ref": "some/ref" },
  *   "data": { "someKey": "string1", "someKey2": 123 }
+ * }}</pre>
+ * <p>
+ * The result tree can be accessed using:
+ * <pre>{@code
+ *   Field<Ref> ref = Field.at("ref").to(Codec.REF);
+ *   Field<String> someKey = Field.at("data", "someKey").to(Codec.STRING);
+ *   Field<String> nonExistingKey = Field.at("non-existing-key").to(Codec.LONG);
+ *
+ *   node.get(ref); // Ref("some/ref")
+ *   node.get(someKey); // "string1"
+ *   node.getOptional(nonExistingKey) // Optional.absent()
+ * }</pre>
+ * <p>
+ * The interface also has helpers to transverse values without {@link Field} references:
+ * <pre>{@code
+ *   node.at("ref").to(Codec.REF).get(); // Ref("some/ref")
+ *   node.at("data", "someKey").to(Codec.STRING).get() // "string1"
+ *   node.at("non-existing-key").to(Codec.LONG).getOptional() // Optional.absent()
  * }</pre>
  *
- * <p>The result tree can be accessed using:</p>
- *
- * <pre>
- *   node.get("ref").asRef(); // {@link Ref}("some/ref")
- *   node.get("data").get("someKey").asString() // "string1"
- * </pre>
- *
- * <p><i>Reference</i>: <a href="https://faunadb.com/documentation/queries#values">FaunaDB Value Types</a></p>
+ * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Value Types</a>
+ * @see Field
+ * @see Codec
  */
-public interface Value {
-  /**
-   * Coerces this node into a {@link String}.
-   * @return the string value of this node, or null.
-   */
-  String asString();
+@JsonDeserialize(using = Deserializer.ValueDeserializer.class)
+public abstract class Value extends Expr {
 
   /**
-   * Coerces this node into a {@link Boolean}.
-   * @return the boolean value of this node, or null.
+   * Attempts to coerce this value using the {@link Codec} passed
+   *
+   * @param codec codec function to attempt coercion
+   * @return the {@link Result} of the coercion
+   * @see Codec
    */
-  Boolean asBoolean();
+  public final <T> Result<T> to(Codec<T> codec) {
+    return codec.apply(this);
+  }
 
   /**
-   * Coerces this node into a {@link Long}.
-   * @return the long value of this node, or null.
+   * Extract a {@link Field} from this node
+   *
+   * @param field field to extract
+   * @return the resulting value of extracting the {@link Field} from this node
+   * @throws IllegalStateException if {@link Field} does not exists on this node
+   * @see Field
    */
-  Long asLong();
+  public final <T> T get(Field<T> field) {
+    return field.get(this).get();
+  }
 
   /**
-   * Coerces this node into a {@link Double}.
-   * @return the double value of this node, or null.
+   * Attempts to extact a {@link Field} from this node
+   *
+   * @param field field to extract
+   * @return An {@link Optional} with the resulting value if the field's extraction was successful
+   * @see Field
    */
-  Double asDouble();
+  public final <T> Optional<T> getOptional(Field<T> field) {
+    return field.get(this).getOptional();
+  }
 
   /**
-   * Coerces this node into a {@link Instant}, if it is a {@link TsV}.
-   * @return the instant value of this node, or null.
+   * Loop through this node collecting the {@link Field} passed, assuming the node is an instance of {@link ArrayV}
+   * <p>
+   * <b>Example</b>: Consider the {@link Value} node modeling the root of the tree:
+   * <pre>{@code
+   * {
+   *   "data": {
+   *     "arrayOfStrings": ["Jhon", "Bill"],
+   *     "arrayOfObjects": [ {"name": "Jhon"}, {"name": "Bill"} ]
+   *    }
+   * }}</pre>
+   * <p>
+   * The result tree can be accessed using:
+   * <pre>{@code
+   *   node.get("arrayOfStrings").collect(Field.to(Codec.STRING)); // ["Jhon", "Bill"]
+   *
+   *   Field<String> name = Field.at("name").to(Codec.STRING);
+   *   node.get("arrayOfObjects").collect(name); // ["Jhon", "Bill"]
+   * }</pre>
+   *
+   * @param field field to extract from each array value
+   * @return a {@link ImmutableList} with the collected {@link Field}s
+   * @see Field
    */
-  Instant asTs();
+  public final <T> ImmutableList<T> collect(Field<T> field) {
+    return Field.root().collect(field).get(this).get();
+  }
 
   /**
-   * Coerces this node into a {@link LocalDate}, if it is a {@link DateV}.
-   * @return the date value of this node, or null.
+   * Navigate through object's keys, assuming value is an instance of {@link ObjectV}.
+   *
+   * @param keys path to navigate to
+   * @return {@link Value} under the path or {@link NullV}
    */
-  LocalDate asDate();
+  public final Value at(String... keys) {
+    return Field.at(keys).get(this).getOrElse(NullV.NULL);
+  }
 
   /**
-   * Coerces this node into an ordered list of nodes.
-   * @return an ordered list of response nodes, or null.
+   * Navigate through array's indexes, assuming value is an instance of {@link ArrayV}
+   *
+   * @param indexes path to navigate to
+   * @return {@link Value} under the path or {@link NullV}
    */
-  ImmutableList<Value> asArray();
+  public final Value at(int... indexes) {
+    return Field.at(indexes).get(this).getOrElse(NullV.NULL);
+  }
 
   /**
-   * Coerces this node into a dictionary of nodes.
-   * @return a dictionary of nodes, or null.
+   * Represents a scalar value at the FaunaDB query language.
+   * See {@link Value}
    */
-  ImmutableMap<String, Value> asObject();
+  @JsonDeserialize(using = JsonDeserializer.None.class) // Disables generic value deserializer for scalar values
+  static abstract class ScalarValue<T> extends Value {
 
-  /**
-   * Coerces this node into a {@link Ref}.
-   * @return a Ref, or null.
-   */
-  Ref asRef();
+    final T value;
 
-  /**
-   * Coerces this node into a {@link Set}.
-   * @return a Set, or null.
-   */
-  Set asSet();
-
-  /**
-   * Coerces this node into a {@link Page}.
-   * @return a Page, or null.
-   */
-  Page asPage();
-
-  /**
-   * Coerces this node into an {@link Instance}.
-   * @return an Instance, or null.
-   */
-  Instance asInstance();
-
-  /**
-   * Coerces this node into a {@link Key}.
-   * @return a Key, or null.
-   */
-  Key asKey();
-
-  /**
-   * Coerces this node into a {@link Token}.
-   * @return a Token, or null.
-   */
-  Token asToken();
-
-  /**
-   * Coerces this node into a {@link Database}.
-   * @return a Database, or null.
-   */
-  Database asDatabase();
-
-  /**
-   * Coerces this node into a {@link Class}.
-   * @return a Class, or null.
-   */
-  com.faunadb.client.response.Class asClass();
-
-  /**
-   * Coerces this node into an {@link Index}.
-   * @return an Index, or null.
-   */
-  Index asIndex();
-
-  /**
-   * Coerces this node into an {@link Event}.
-   * @return an Event, or null.
-   */
-  Event asEvent();
-  Value get(String key);
-  Value get(int index);
-
-  abstract class ConcreteValue implements Value {
-    @Override
-    public String asString() {
-      return null;
+    ScalarValue(T value) {
+      this.value = requireNonNull(value);
     }
 
     @Override
-    public Boolean asBoolean() {
-      return null;
+    public boolean equals(Object other) {
+      return other != null && other instanceof ScalarValue &&
+        this.value.equals(((ScalarValue) other).value);
     }
 
     @Override
-    public Long asLong() {
-      return null;
+    public int hashCode() {
+      return value.hashCode();
     }
 
     @Override
-    public Double asDouble() {
-      return null;
+    public String toString() {
+      return format("%s(%s)", getClass().getSimpleName(), value);
     }
 
-    @Override
-    public Instant asTs() {
-      return null;
-    }
-
-    @Override
-    public LocalDate asDate() {
-      return null;
-    }
-
-    @Override
-    public ImmutableList<Value> asArray() {
-      return null;
-    }
-
-    @Override
-    public ImmutableMap<String, Value> asObject() {
-      return null;
-    }
-
-    @Override
-    public Ref asRef() {
-      return null;
-    }
-
-    @Override
-    public Value get(int index) {
-      return null;
-    }
-
-    @Override
-    public Value get(String key) {
-      return null;
-    }
-
-    @Override
-    public Page asPage() {
-      return null;
-    }
-
-    @Override
-    public Instance asInstance() {
-      return null;
-    }
-
-    @Override
-    public Key asKey() {
-      return null;
-    }
-
-    @Override
-    public Token asToken() {
-      return null;
-    }
-
-    @Override
-    public Database asDatabase() {
-      return null;
-    }
-
-    @Override
-    public Class asClass() {
-      return null;
-    }
-
-    @Override
-    public Index asIndex() {
-      return null;
-    }
-
-    @Override
-    public Event asEvent() {
-      return null;
-    }
-
-    @Override
-    public Set asSet() {
-      return null;
-    }
   }
 
   /**
    * Represents an Object value in the FaunaDB query language. Objects are polymorphic dictionaries.
    *
-   * @see Language#ObjectV
+   * @see Language#Obj
    */
-  @JsonDeserialize(using=Codec.ObjectDeserializer.class)
-  final class ObjectV extends ConcreteValue {
-    private final ImmutableMap<String, Value> values;
+  @JsonDeserialize(using = Deserializer.ObjectDeserializer.class)
+  public static final class ObjectV extends Value {
+
+    final ImmutableMap<String, Value> values;
+
+    public ObjectV(Map<String, ? extends Value> values) {
+      requireNonNull(values);
+      this.values = ImmutableMap.copyOf(values);
+    }
 
     @Override
-    public ImmutableMap<String, Value> asObject() {
-      return values;
-    }
-
-    /**
-     * Constructs an empty object value.
-     * @see Language#ObjectV()
-     */
-    public static ObjectV empty() {
-      return new ObjectV(ImmutableMap.<String, Value>of());
-    }
-
-    /**
-     * Constructs an object value containing the specified key/value pair.
-     * @see Language#ObjectV(String, Value)
-     */
-    public static ObjectV create(String k1, Value v1) {
-      return new ObjectV(ImmutableMap.of(k1, v1));
-    }
-
-    /**
-     * Constructs an object value containing the specified key/value pairs.
-     * @see Language#ObjectV(String, Value, String, Value)
-     */
-    public static ObjectV create(String k1, Value v1, String k2, Value v2) {
-      return new ObjectV(ImmutableMap.of(k1, v1, k2, v2));
-    }
-
-    /**
-     * Constructs an object value containing the specified key/value pairs.
-     * @see Language#ObjectV(String, Value, String, Value, String, Value)
-     */
-    public static ObjectV create(String k1, Value v1, String k2, Value v2, String k3, Value v3) {
-      return new ObjectV(ImmutableMap.of(k1, v1, k2, v2, k3, v3));
-    }
-
-    /**
-     * Constructs an object value containing the specified key/value pairs.
-     * @see Language#ObjectV(String, Value, String, Value, String, Value, String, Value)
-     */
-    public static ObjectV create(String k1, Value v1, String k2, Value v2, String k3, Value v3, String k4, Value v4) {
-      return new ObjectV(ImmutableMap.of(k1, v1, k2, v2, k3, v3, k4, v4));
-    }
-
-    /**
-     * Constructs an object value containing the specified key/value pairs.
-     * @see Language#ObjectV(String, Value, String, Value, String, Value, String, Value, String, Value)
-     */
-    public static ObjectV create(String k1, Value v1, String k2, Value v2, String k3, Value v3, String k4, Value v4, String k5, Value v5) {
-      return new ObjectV(ImmutableMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5));
-    }
-
-    /**
-     * Constructs an object value wrapping the given dictionary.
-     * @see Language#ObjectV(ImmutableMap)
-     */
-    public static ObjectV create(ImmutableMap<String, Value> values) {
-      return new ObjectV(values);
-    }
-
-    ObjectV(ImmutableMap<String, Value> values) {
-      this.values = values;
-    }
-
     @JsonValue
-    public ImmutableMap<String, Value> values() {
-      return values;
+    protected ImmutableMap<String, ImmutableMap<String, Value>> toJson() {
+      return ImmutableMap.of("object", values);
     }
 
     @Override
-    public Value get(String key) {
-      return values.get(key);
+    public boolean equals(Object other) {
+      return other != null && other instanceof ObjectV &&
+        this.values.equals(((ObjectV) other).values);
     }
 
     @Override
@@ -350,268 +213,262 @@ public interface Value {
 
     @Override
     public String toString() {
-      return "ObjectV(" + values() + ")";
+      return format("ObjectV(%s)", values);
     }
   }
 
   /**
    * Represents an array value in the FaunaDB query language. Arrays are polymorphic ordered lists of other values.
+   *
+   * @see Language#Arr
    */
-  final class ArrayV extends ConcreteValue {
-    private final ImmutableList<Value> values;
+  @JsonDeserialize(using = Deserializer.ArrayDeserializer.class)
+  public static final class ArrayV extends Value {
 
-    @Override
-    public ImmutableList<Value> asArray() {
-      return values;
-    }
+    final ImmutableList<Value> values;
 
-    /**
-     * Returns an empty array value.
-     *
-     * @see Language#ArrayV()
-     */
-    public static ArrayV empty() {
-      return new ArrayV(ImmutableList.<Value>of());
-    }
-
-    /**
-     * Constructs an array value containing the specified value.
-     *
-     * @see Language#ArrayV(Value...)
-     */
-    public static ArrayV create(Value... values) {
-      return new ArrayV(ImmutableList.copyOf(values));
-    }
-
-    /**
-     * Constructs an array value wrapping the provided list of values.
-     *
-     * @see Language#ArrayV(ImmutableList)
-     */
-    public static ArrayV create(ImmutableList<Value> values) {
-      return new ArrayV(values);
-    }
-
-    ArrayV(ImmutableList<Value> values) {
-      this.values = values;
+    public ArrayV(List<? extends Value> values) {
+      requireNonNull(values);
+      this.values = ImmutableList.copyOf(values);
     }
 
     @Override
-    public Value get(int index) {
-      return values.get(index);
-    }
-
     @JsonValue
-    public ImmutableList<Value> values() {
+    protected ImmutableList<Value> toJson() {
       return values;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      return other != null
+        && other instanceof ArrayV &&
+        this.values.equals(((ArrayV) other).values);
     }
 
     @Override
     public int hashCode() {
       return values.hashCode();
+    }
+
+    @Override
+    public String toString() {
+      return format("Arr(%s)", values);
     }
   }
 
   /**
    * Represents a Boolean value in the FaunaDB query language.
    *
-   * @see Language#BooleanV(boolean)
+   * @see Language#Value(boolean)
    */
-  final class BooleanV extends ConcreteValue {
-    private final Boolean value;
+  public static final class BooleanV extends ScalarValue<Boolean> {
 
-    public final static BooleanV True = BooleanV.create(true);
-    public final static BooleanV False = BooleanV.create(false);
+    public final static BooleanV TRUE = new BooleanV(true);
+    public final static BooleanV FALSE = new BooleanV(false);
 
-    public static BooleanV create(boolean value) {
-      return new BooleanV(value);
+    public static BooleanV valueOf(boolean value) {
+      return value ? TRUE : FALSE;
+    }
+
+    private BooleanV(Boolean value) {
+      super(value);
     }
 
     @Override
-    public boolean equals(Object obj) {
-      return super.equals(obj);
-    }
-
-    @Override
-    public Boolean asBoolean() {
-      return value;
-    }
-
-    BooleanV(boolean value) {
-      this.value = value;
-    }
-
     @JsonValue
-    public boolean value() {
+    protected Boolean toJson() {
       return value;
     }
 
-    @Override
-    public int hashCode() {
-      return value.hashCode();
-    }
   }
 
   /**
    * Represents a Double value in the FaunadB query language.
    *
-   * @see Language#DoubleV(double)
+   * @see Language#Value(double)
    */
-  final class DoubleV extends ConcreteValue {
-    private final Double value;
-
-    public static DoubleV create(double value) {
-      return new DoubleV(value);
+  public static final class DoubleV extends ScalarValue<Double> {
+    public DoubleV(double value) {
+      super(value);
     }
 
     @Override
-    public Double asDouble() {
-      return value;
-    }
-
-    DoubleV(double value) {
-      this.value = value;
-    }
-
     @JsonValue
-    public double value() {
+    protected Double toJson() {
       return value;
+    }
+  }
+
+  /**
+   * Represents a Long value in the FaunadB query language.
+   *
+   * @see Language#Value(long)
+   */
+  public static final class LongV extends ScalarValue<Long> {
+    public LongV(long value) {
+      super(value);
+    }
+
+    @Override
+    @JsonValue
+    protected Long toJson() {
+      return value;
+    }
+  }
+
+  /**
+   * Represents a String value in the FaunadB query language.
+   *
+   * @see Language#Value(String)
+   */
+  public static final class StringV extends ScalarValue<String> {
+    public StringV(String value) {
+      super(value);
+    }
+
+    @Override
+    @JsonValue
+    protected String toJson() {
+      return value;
+    }
+  }
+
+  /**
+   * Represents a null value in the FaunadB query language.
+   *
+   * @see Language#Null()
+   */
+  public static final class NullV extends Value {
+
+    public static final NullV NULL = new NullV();
+
+    private NullV() {
+    }
+
+    @Override
+    @JsonValue
+    protected NullNode toJson() {
+      return NullNode.getInstance();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      return other != null
+        && other instanceof NullV;
     }
 
     @Override
     public int hashCode() {
-      return value.hashCode();
+      return -1;
     }
-  }
-
-  final class LongV extends ConcreteValue {
-    private final Long value;
-
-    public static LongV create(long value) {
-      return new LongV(value);
-    }
-
-    @Override
-    public Long asLong() {
-      return value;
-    }
-
-    LongV(long value) {
-      this.value = value;
-    }
-
-    @JsonValue
-    public long value() {
-      return value;
-    }
-
-    @Override
-    public int hashCode() {
-      return value.hashCode();
-    }
-  }
-
-  final class StringV extends ConcreteValue {
-    private final String value;
-
-    public static StringV create(String value) {
-      return new StringV(value);
-    }
-
-    @Override
-    public String asString() {
-      return value;
-    }
-
-    StringV(String value) {
-      this.value = value;
-    }
-
-    @JsonValue
-    public String value() {
-      return value;
-    }
-
-    @Override
-    public int hashCode() {
-      return value.hashCode();
-    }
-  }
-
-  final class NullV extends ConcreteValue {
-    public static final NullV Null = new NullV();
-
-    NullV() { }
 
     @Override
     public String toString() {
-      return "null";
+      return "NullV";
     }
 
-    @JsonValue
-    public NullNode value() {
-      return NullNode.getInstance();
-    }
   }
 
-  final class TsV extends ConcreteValue {
-    private final Instant value;
+  /**
+   * Represents a Timestamp value in the FaunadB query language.
+   *
+   * @see Language#Value(Instant)
+   */
+  public static final class TsV extends ScalarValue<Instant> {
 
-    public static TsV create(Instant value) {
-      return new TsV(value);
-    }
-
-    @JsonProperty("@ts")
-    private String strValue() {
-      return value.toString();
+    public TsV(Instant value) {
+      super(value);
     }
 
     @JsonCreator
-    TsV(@JsonProperty("@ts") String value) {
-      this.value = ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant();
-    }
-
-    TsV(Instant ts) {
-      this.value = ts;
+    private TsV(@JsonProperty("@ts") String value) {
+      super(ZonedDateTime.parse(value, ISO_OFFSET_DATE_TIME).toInstant());
     }
 
     @Override
-    public int hashCode() { return value.hashCode(); }
-
-    @Override
-    public Instant asTs() {
-      return value;
-    }
-  }
-
-  final class DateV extends ConcreteValue {
-    private final LocalDate value;
-
-    public static DateV create(LocalDate value) {
-      return new DateV(value);
-    }
-
-    DateV(LocalDate value) {
-      this.value = value;
-    }
-
-    DateV(@JsonProperty("@date") String value) {
-      this.value = LocalDate.parse(value);
-    }
-
-    @JsonProperty("@date")
-    private String strValue() {
+    @JsonProperty("@ts")
+    protected String toJson() {
       return value.toString();
     }
 
-    @Override
-    public int hashCode() {
-      return value.hashCode();
+  }
+
+  /**
+   * Represents a Date value in the FaunadB query language.
+   *
+   * @see Language#Value(LocalDate)
+   */
+  public static final class DateV extends ScalarValue<LocalDate> {
+
+    public DateV(LocalDate value) {
+      super(value);
+    }
+
+    @JsonCreator
+    private DateV(@JsonProperty("@date") String value) {
+      super(LocalDate.parse(value));
     }
 
     @Override
-    public LocalDate asDate() {
+    @JsonProperty("@date")
+    protected String toJson() {
+      return value.toString();
+    }
+  }
+
+  /**
+   * A FaunaDB set literal.
+   *
+   * @see <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   */
+  public static final class SetRef extends ScalarValue<ImmutableMap<String, Value>> {
+
+    public SetRef(@JsonProperty("@set") ImmutableMap<String, Value> parameters) {
+      super(parameters);
+    }
+
+    /**
+     * Extact SetRef structure
+     *
+     * @return SetRef structure
+     */
+    public ImmutableMap<String, Value> parameters() {
+      return value;
+    }
+
+    @Override
+    @JsonProperty("@set")
+    protected ImmutableMap<String, Value> toJson() {
       return value;
     }
   }
+
+  /**
+   * A FaunaDB ref type.
+   *
+   * @see <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   */
+  public static final class Ref extends Value.ScalarValue<String> {
+
+    @JsonCreator
+    public Ref(@JsonProperty("@ref") String value) {
+      super(value);
+    }
+
+    @Override
+    @JsonProperty("@ref")
+    protected String toJson() {
+      return value;
+    }
+
+    /**
+     * Extracts its string value.
+     *
+     * @return a string with the ref value
+     */
+    public String strValue() {
+      return value;
+    }
+  }
+
 }
