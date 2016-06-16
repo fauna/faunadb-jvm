@@ -35,7 +35,7 @@ import scala.annotation.meta.{ param, field, getter }
   *
   * {{{
   * val refAndNameAndAge = for {
-  *   ref <- value("ref").as[Ref]
+  *   ref <- value("ref").as[RefV]
   *   name <- value("data", "name").as[String]
   *   age <- value("data", "age").as[Int]
   * } yield (ref, name, age)
@@ -45,7 +45,7 @@ import scala.annotation.meta.{ param, field, getter }
   * // or
   *
   * val RefAndNameAndAgeField = Field.zip(
-  *   Field("ref").as[Ref],
+  *   Field("ref").as[RefV],
   *   Field("data", "name").as[String],
   *   Field("data", "age").as[Int])
   *
@@ -137,9 +137,9 @@ object BooleanV {
 // Fauna special types
 
 /** A Ref. */
-case class Ref(@(JsonProperty @field @param)("@ref") value: String) extends ScalarValue
-object Ref {
-  def apply(clss: Ref, id: String): Ref = Ref(s"${clss.value}/$id")
+case class RefV(@(JsonProperty @field @param)("@ref") value: String) extends ScalarValue
+object RefV {
+  def apply(clss: RefV, id: String): RefV = RefV(s"${clss.value}/$id")
 }
 
 /** A Set Ref. */

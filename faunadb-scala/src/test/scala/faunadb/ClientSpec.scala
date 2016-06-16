@@ -30,21 +30,21 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   // Helper fields
 
-  val RefField = Field("ref").as[Ref]
-  val ClassField = Field("class").as[Ref]
+  val RefField = Field("ref").as[RefV]
+  val ClassField = Field("class").as[RefV]
   val SecretField = Field("secret").as[String]
 
   // Page helpers
-  case class Ev(ref: Ref, ts: Long, action: String)
+  case class Ev(ref: RefV, ts: Long, action: String)
 
   val EventField = Field.zip(
-    Field("resource").as[Ref],
+    Field("resource").as[RefV],
     Field("ts").as[Long],
     Field("action").as[String]
   ) map { case (r, ts, a) => Ev(r, ts, a) }
 
   val PageEvents = Field("data").collect(EventField)
-  val PageRefs = Field("data").as[Seq[Ref]]
+  val PageRefs = Field("data").as[Seq[RefV]]
 
   def await[T](f: Future[T]) = Await.result(f, 5.second)
 
@@ -90,7 +90,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
         Obj("data" -> Obj("testField" -> "testValue")))))
 
     inst(RefField).get.value should startWith ("classes/spells/")
-    inst(ClassField).get should equal (Ref("classes/spells"))
+    inst(ClassField).get should equal (RefV("classes/spells"))
     inst("data", "testField").as[String].get should equal ("testValue")
 
     await(client.query(Exists(inst(RefField)))) should equal (TrueV)
@@ -219,7 +219,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "test types" in {
     val setF = client.query(Match(Ref("indexes/spells_by_element"), "arcane"))
     val set = Await.result(setF, 1 second).as[SetRef].get
-    set.parameters("match").as[Ref].get shouldBe Ref("indexes/spells_by_element")
+    set.parameters("match").as[RefV].get shouldBe RefV("indexes/spells_by_element")
     set.parameters("terms").as[String].get shouldBe "arcane"
   }
 
@@ -233,13 +233,13 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     ifR.as[String].get shouldBe "was true"
 
     val randomNum = Math.abs(Math.floorMod(Random.nextLong(), 250000L)) + 250000L
-    val randomRef = Ref("classes/spells/" + randomNum)
+    val randomRef = "classes/spells/" + randomNum
     val doF = client.query(Do(
-      Create(randomRef, Obj("data" -> Obj("name" -> "Magic Missile"))),
-      Get(randomRef)
+      Create(Ref(randomRef), Obj("data" -> Obj("name" -> "Magic Missile"))),
+      Get(Ref(randomRef))
     ))
     val doR = Await.result(doF, 1 second)
-    doR(RefField).get shouldBe randomRef
+    doR(RefField).get shouldBe RefV(randomRef)
 
     val objectF = client.query(Obj("name" -> "Hen Wen", "age" -> 123))
     val objectR = Await.result(objectF, 1 second)
@@ -314,11 +314,11 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val matchF = client.query(Paginate(Match(Ref("indexes/spells_by_element"), "arcane")))
     val matchR = Await.result(matchF, 1 second)
-    matchR("data").as[Seq[Ref]].get should contain (create1R("ref").get)
+    matchR("data").as[Seq[RefV]].get should contain (create1R("ref").get)
 
     val matchEventsF = client.query(Paginate(Match(Ref("indexes/spells_by_element"), "arcane"), events = true))
     val matchEventsR = Await.result(matchEventsF, 1 second)
-    matchEventsR(PageEvents).get map { _.ref } should contain (create1R("ref").as[Ref].get)
+    matchEventsR(PageEvents).get map { _.ref } should contain (create1R("ref").as[RefV].get)
 
     val unionF = client.query(Paginate(Union(
       Match(Ref("indexes/spells_by_element"), "arcane"),
@@ -423,7 +423,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val createF = client.query(Create(Ref("classes/spells"), Obj("credentials" -> Obj("password" -> "abcdefg"))))
     val createR = Await.result(createF, 1 second)
 
-    val loginF = client.query(Login(createR("ref").as[Ref], Obj("password" -> "abcdefg")))
+    val loginF = client.query(Login(createR("ref").as[RefV], Obj("password" -> "abcdefg")))
     val secret = Await.result(loginF, 1 second)("secret").as[String].get
 
     val sessionClient = FaunaClient(endpoint = config("root_url"), secret = secret)
@@ -432,7 +432,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val logoutR = Await.result(logoutF, 1 second)
     logoutR.as[Boolean].get shouldBe true
 
-    val identifyF = client.query(Identify(createR("ref").as[Ref], "abcdefg"))
+    val identifyF = client.query(Identify(createR("ref").as[RefV], "abcdefg"))
     val identifyR = Await.result(identifyF, 1 second)
     identifyR.as[Boolean].get shouldBe true
 
