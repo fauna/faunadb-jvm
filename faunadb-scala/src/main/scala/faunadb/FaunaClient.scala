@@ -57,7 +57,7 @@ object FaunaClient {
   *
   * Example:
   * {{{
-  * case class User(ref: Ref, name: String, age: Int)
+  * case class User(ref: RefV, name: String, age: Int)
   *
   * val client = FaunaClient(secret = "myKeySecret")
   *
@@ -66,7 +66,7 @@ object FaunaClient {
   *
   * val userCast =
   *   for {
-  *     ref <- instance("ref").as[Ref]
+  *     ref <- instance("ref").as[RefV]
   *     name <- instance("data", "name").as[String]
   *     age <- instance("data", "age").as[Int]
   *   } yield {

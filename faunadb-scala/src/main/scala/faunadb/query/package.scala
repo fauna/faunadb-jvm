@@ -36,7 +36,7 @@ package query {
     implicit def longToExpr(unwrapped: Long) = Expr(LongV(unwrapped))
     implicit def floatToExpr(unwrapped: Float) = Expr(DoubleV(unwrapped))
     implicit def doubleToExpr(unwrapped: Double) = Expr(DoubleV(unwrapped))
-    implicit def refToExpr(unwrapped: Ref) = Expr(unwrapped)
+    implicit def refToExpr(unwrapped: RefV) = Expr(unwrapped)
     implicit def nullVToExpr(unwrapped: NullV.type) = Expr(unwrapped)
 
     // FIXME: not sure if this is the best way to do this... would
@@ -103,6 +103,14 @@ package object query {
     exprs map { t => (t._1, t._2.value) }
 
   // Values
+
+  /**
+    * An RefV value.
+    *
+    * '''Reference''': [[https://faunadb.com/documentation/queries#values]]
+    */
+  def Ref(value: String): Expr =
+    Expr(RefV(value))
 
   /**
     * An Array value.

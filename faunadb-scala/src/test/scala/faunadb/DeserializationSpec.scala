@@ -20,10 +20,10 @@ class DeserializationSpec extends FlatSpec with Matchers {
     val parsed = json.readValue[Value](toDeserialize, classOf[Value])
 
     parsed should equal (ObjectV(
-      "ref" -> Ref("classes/spells/93044099947429888"),
-      "class" -> Ref("classes/spells"),
+      "ref" -> RefV("classes/spells/93044099947429888"),
+      "class" -> RefV("classes/spells"),
       "ts" -> LongV(1424992618413105L),
-      "data" -> ObjectV("refField" -> Ref("classes/spells/93044099909681152"))))
+      "data" -> ObjectV("refField" -> RefV("classes/spells/93044099909681152"))))
   }
 
   it should "deserialize a query response" in {
@@ -36,8 +36,8 @@ class DeserializationSpec extends FlatSpec with Matchers {
     val parsed = json.readValue(toDeserialize, classOf[Value])
 
     parsed should equal (ObjectV(
-      "ref" -> Ref("classes/derp/101192216816386048"),
-      "class" -> Ref("classes/derp"),
+      "ref" -> RefV("classes/derp/101192216816386048"),
+      "class" -> RefV("classes/derp"),
       "ts" -> LongV(1432763268186882L),
       "data" -> ObjectV("test" -> LongV(1))))
   }
@@ -52,8 +52,8 @@ class DeserializationSpec extends FlatSpec with Matchers {
     val parsed = json.readValue(toDeserialize, classOf[Value])
 
     parsed should equal (ObjectV(
-      "ref" -> Ref("classes/derp/101727203651223552"),
-      "class" -> Ref("classes/derp"),
+      "ref" -> RefV("classes/derp/101727203651223552"),
+      "class" -> RefV("classes/derp"),
       "ts" -> LongV(1433273471399755L),
       "data" -> ObjectV("test" -> ObjectV("field1" -> ObjectV("@name" -> StringV("Test"))))))
   }
@@ -69,13 +69,13 @@ class DeserializationSpec extends FlatSpec with Matchers {
     val toDeserialize = """{"@ts":"1970-01-01T00:05:00Z"}"""
     val parsed = json.readValue(toDeserialize, classOf[Value])
 
-    parsed should equal (Timestamp(Instant.EPOCH.plus(5, ChronoUnit.MINUTES)))
+    parsed should equal (TimeV(Instant.EPOCH.plus(5, ChronoUnit.MINUTES)))
   }
 
   it should "deserialize date" in {
     val toDeserialize = """{"@date":"1970-01-03"}"""
     val parsed = json.readValue(toDeserialize, classOf[Value])
 
-    parsed should equal (Date(LocalDate.ofEpochDay(2)))
+    parsed should equal (DateV(LocalDate.ofEpochDay(2)))
   }
 }

@@ -33,22 +33,22 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
         in.getText match {
           case "@ref" =>
             in.nextToken()
-            val rv = Ref(in.getText)
+            val rv = RefV(in.getText)
             in.nextToken()
             rv
           case "@set" =>
             in.nextToken()
-            val rv = SetRef(deserialize(in, ctx))
+            val rv = SetRefV(deserialize(in, ctx))
             in.nextToken()
             rv
           case "@ts" =>
             in.nextToken()
-            val rv = Timestamp(in.getText)
+            val rv = TimeV(in.getText)
             in.nextToken()
             rv
           case "@date" =>
             in.nextToken()
-            val rv = Date(in.getText)
+            val rv = DateV(in.getText)
             in.nextToken()
             rv
           case "@obj" =>

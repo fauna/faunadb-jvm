@@ -173,10 +173,10 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize date and ts" in {
-    val ts = Timestamp(Instant.EPOCH.plus(5, ChronoUnit.MINUTES))
+    val ts = TimeV(Instant.EPOCH.plus(5, ChronoUnit.MINUTES))
     json.writeValueAsString(ts) shouldBe "{\"@ts\":\"1970-01-01T00:05:00Z\"}"
 
-    val date = values.Date(LocalDate.ofEpochDay(2))
+    val date = DateV(LocalDate.ofEpochDay(2))
     json.writeValueAsString(date) shouldBe "{\"@date\":\"1970-01-03\"}"
   }
 

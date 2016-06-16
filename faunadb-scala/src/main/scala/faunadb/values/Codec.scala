@@ -59,26 +59,26 @@ object Decoder {
       }
   }
 
-  implicit object RefDecoder extends Decoder[Ref] {
+  implicit object RefDecoder extends Decoder[RefV] {
     def decode(v: Value, path: FieldPath) =
       v match {
-        case r: Ref => Result.successful(r, path)
+        case r: RefV => Result.successful(r, path)
         case v => Result.Unexpected(v, "Ref", path)
       }
   }
 
-  implicit object SetRefDecoder extends Decoder[SetRef] {
+  implicit object SetRefDecoder extends Decoder[SetRefV] {
     def decode(v: Value, path: FieldPath) =
       v match {
-        case r: SetRef => Result.successful(r, path)
+        case r: SetRefV => Result.successful(r, path)
         case v => Result.Unexpected(v, "Set Ref", path)
       }
   }
 
-  implicit object TimestampDecoder extends Decoder[Timestamp] {
+  implicit object TimestampDecoder extends Decoder[TimeV] {
     def decode(v: Value, path: FieldPath) =
       v match {
-        case ts: Timestamp => Result.successful(ts, path)
+        case ts: TimeV => Result.successful(ts, path)
         case v => Result.Unexpected(v, "Timestamp", path)
       }
   }
@@ -86,15 +86,15 @@ object Decoder {
   implicit object InstantDecoder extends Decoder[Instant] {
     def decode(v: Value, path: FieldPath) =
       v match {
-        case ts: Timestamp => Result.successful(ts.instant, path)
+        case ts: TimeV => Result.successful(ts.instant, path)
         case v => Result.Unexpected(v, "Timestamp", path)
       }
   }
 
-  implicit object DateDecoder extends Decoder[Date] {
+  implicit object DateDecoder extends Decoder[DateV] {
     def decode(v: Value, path: FieldPath) =
       v match {
-        case ts: Date => Result.successful(ts, path)
+        case ts: DateV => Result.successful(ts, path)
         case v => Result.Unexpected(v, "Date", path)
       }
   }
@@ -102,7 +102,7 @@ object Decoder {
   implicit object LocalDateDecoder extends Decoder[LocalDate] {
     def decode(v: Value, path: FieldPath) =
       v match {
-        case ts: Date => Result.successful(ts.localDate, path)
+        case ts: DateV => Result.successful(ts.localDate, path)
         case v => Result.Unexpected(v, "Date", path)
       }
   }

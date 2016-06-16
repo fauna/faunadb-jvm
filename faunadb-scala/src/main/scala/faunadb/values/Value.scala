@@ -35,7 +35,7 @@ import scala.annotation.meta.{ param, field, getter }
   *
   * {{{
   * val refAndNameAndAge = for {
-  *   ref <- value("ref").as[Ref]
+  *   ref <- value("ref").as[RefV]
   *   name <- value("data", "name").as[String]
   *   age <- value("data", "age").as[Int]
   * } yield (ref, name, age)
@@ -45,7 +45,7 @@ import scala.annotation.meta.{ param, field, getter }
   * // or
   *
   * val RefAndNameAndAgeField = Field.zip(
-  *   Field("ref").as[Ref],
+  *   Field("ref").as[RefV],
   *   Field("data", "name").as[String],
   *   Field("data", "age").as[Int])
   *
@@ -96,10 +96,10 @@ object Value {
   def apply(boolean: Boolean): Value = BooleanV(boolean)
 
   /** Create a timestamp value. */
-  def apply(instant: Instant): Value = Timestamp(instant)
+  def apply(instant: Instant): Value = TimeV(instant)
 
   /** Create a date value. */
-  def apply(localdate: LocalDate): Value = Date(localdate)
+  def apply(localdate: LocalDate): Value = DateV(localdate)
 }
 
 // Concrete Value types
@@ -137,31 +137,31 @@ object BooleanV {
 // Fauna special types
 
 /** A Ref. */
-case class Ref(@(JsonProperty @field @param)("@ref") value: String) extends ScalarValue
-object Ref {
-  def apply(clss: Ref, id: String): Ref = Ref(s"${clss.value}/$id")
+case class RefV(@(JsonProperty @field @param)("@ref") value: String) extends ScalarValue
+object RefV {
+  def apply(clss: RefV, id: String): RefV = RefV(s"${clss.value}/$id")
 }
 
 /** A Set Ref. */
-case class SetRef(@JsonProperty("@set") parameters: Value) extends ScalarValue
+case class SetRefV(@JsonProperty("@set") parameters: Value) extends ScalarValue
 
 /** A Timestamp value. */
-case class Timestamp(@(JsonIgnore @param @field @getter) instant: Instant) extends ScalarValue {
+case class TimeV(@(JsonIgnore @param @field @getter) instant: Instant) extends ScalarValue {
   @JsonProperty("@ts")
   val strValue = instant.toString
 }
-object Timestamp {
-  def apply(value: String): Timestamp =
-    Timestamp(ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant)
+object TimeV {
+  def apply(value: String): TimeV =
+    TimeV(ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant)
 }
 
 /** A Date value. */
-case class Date(@(JsonIgnore @param @field @getter) localDate: LocalDate) extends ScalarValue {
+case class DateV(@(JsonIgnore @param @field @getter) localDate: LocalDate) extends ScalarValue {
   @JsonProperty("@date")
   val strValue = localDate.toString
 }
-object Date {
-  def apply(value: String): Date = Date(LocalDate.parse(value))
+object DateV {
+  def apply(value: String): DateV = DateV(LocalDate.parse(value))
 }
 
 // Container types and Null
