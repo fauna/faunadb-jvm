@@ -30,21 +30,21 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   // Helper fields
 
-  val RefField = Field("ref").as[RefV]
-  val ClassField = Field("class").as[RefV]
-  val SecretField = Field("secret").as[String]
+  val RefField = Field("ref").to[RefV]
+  val ClassField = Field("class").to[RefV]
+  val SecretField = Field("secret").to[String]
 
   // Page helpers
   case class Ev(ref: RefV, ts: Long, action: String)
 
   val EventField = Field.zip(
-    Field("resource").as[RefV],
-    Field("ts").as[Long],
-    Field("action").as[String]
+    Field("resource").to[RefV],
+    Field("ts").to[Long],
+    Field("action").to[String]
   ) map { case (r, ts, a) => Ev(r, ts, a) }
 
   val PageEvents = Field("data").collect(EventField)
-  val PageRefs = Field("data").as[Seq[RefV]]
+  val PageRefs = Field("data").to[Seq[RefV]]
 
   def await[T](f: Future[T]) = Await.result(f, 5.second)
 
@@ -91,7 +91,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     inst(RefField).get.value should startWith ("classes/spells/")
     inst(ClassField).get should equal (RefV("classes/spells"))
-    inst("data", "testField").as[String].get should equal ("testValue")
+    inst("data", "testField").to[String].get should equal ("testValue")
 
     await(client.query(Exists(inst(RefField)))) should equal (TrueV)
 
@@ -108,11 +108,11 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val testData = inst2("data", "testData")
 
     testData.isDefined shouldBe true
-    testData("array", 0).as[Long].get shouldBe 1
-    testData("array", 1).as[String].get shouldBe "2"
-    testData("array", 2).as[Double].get shouldBe 3.4
-    testData("string").as[String].get shouldBe "sup"
-    testData( "num").as[Long].get shouldBe 1234
+    testData("array", 0).to[Long].get shouldBe 1
+    testData("array", 1).to[String].get shouldBe "2"
+    testData("array", 2).to[Double].get shouldBe 3.4
+    testData("string").to[String].get shouldBe "sup"
+    testData( "num").to[Long].get shouldBe 1234
   }
 
   it should "issue a batched query" in {
@@ -125,8 +125,8 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val results = await(client.query(Seq(expr1, expr2)))
 
     results.length shouldBe 2
-    results(0)("data", "queryTest1").as[String].get shouldBe randomText1
-    results(1)("data", "queryTest1").as[String].get shouldBe randomText2
+    results(0)("data", "queryTest1").to[String].get shouldBe randomText1
+    results(1)("data", "queryTest1").to[String].get shouldBe randomText2
   }
 
   it should "issue a paginated query" in {
@@ -172,19 +172,19 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val queryF = client.query(Paginate(Match(randomClassIndex), size = 1))
     val resp = Await.result(queryF, 5 seconds)
 
-    resp("data").as[ArrayV].get.elems.size shouldBe 1
+    resp("data").to[ArrayV].get.elems.size shouldBe 1
     resp("after").isDefined should equal (true)
     resp("before").isDefined should equal (false)
 
     val query2F = client.query(Paginate(Match(randomClassIndex), After(resp("after")), size = 1))
     val resp2 = Await.result(query2F, 5 seconds)
 
-    resp2("data").as[Seq[Value]].get.size shouldBe 1
+    resp2("data").to[Seq[Value]].get.size shouldBe 1
     resp2("after").isDefined should equal (true)
     resp2("before").isDefined should equal (true)
 
     val countF = client.query(Count(Match(randomClassIndex)))
-    val countR = Await.result(countF, 1 second).as[Long].get
+    val countR = Await.result(countF, 1 second).to[Long].get
     countR shouldBe 3
   }
 
@@ -218,19 +218,19 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   it should "test types" in {
     val setF = client.query(Match(Ref("indexes/spells_by_element"), "arcane"))
-    val set = Await.result(setF, 1 second).as[SetRefV].get
-    set.parameters("match").as[RefV].get shouldBe RefV("indexes/spells_by_element")
-    set.parameters("terms").as[String].get shouldBe "arcane"
+    val set = Await.result(setF, 1 second).to[SetRefV].get
+    set.parameters("match").to[RefV].get shouldBe RefV("indexes/spells_by_element")
+    set.parameters("terms").to[String].get shouldBe "arcane"
   }
 
   it should "test basic forms" in {
     val letF = client.query(Let { val x = 1; val y = 2; x })
     val letR = Await.result(letF, 1 second)
-    letR.as[Long].get shouldBe 1
+    letR.to[Long].get shouldBe 1
 
     val ifF = client.query(If(true, "was true", "was false"))
     val ifR = Await.result(ifF, 1 second)
-    ifR.as[String].get shouldBe "was true"
+    ifR.to[String].get shouldBe "was true"
 
     val randomNum = Math.abs(Math.floorMod(Random.nextLong(), 250000L)) + 250000L
     val randomRef = "classes/spells/" + randomNum
@@ -243,47 +243,47 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val objectF = client.query(Obj("name" -> "Hen Wen", "age" -> 123))
     val objectR = Await.result(objectF, 1 second)
-    objectR("name").as[String].get shouldBe "Hen Wen"
-    objectR("age").as[Long].get shouldBe 123
+    objectR("name").to[String].get shouldBe "Hen Wen"
+    objectR("age").to[Long].get shouldBe 123
 
   }
 
   it should "test collections" in {
     val mapF = client.query(Map(Lambda(munchings => Add(munchings, 1L)), Arr(1L, 2L, 3L)))
     val mapR = Await.result(mapF, 1 second)
-    mapR.as[Seq[Long]].get shouldBe Seq(2, 3, 4)
+    mapR.to[Seq[Long]].get shouldBe Seq(2, 3, 4)
 
     val foreachF = client.query(Foreach(Lambda(spell => Create(Ref("classes/spells"), Obj("data" -> Obj("name" -> spell)))), Arr("Fireball Level 1", "Fireball Level 2")))
     val foreachR = Await.result(foreachF, 1 second)
-    foreachR.as[Seq[String]].get shouldBe Seq("Fireball Level 1", "Fireball Level 2")
+    foreachR.to[Seq[String]].get shouldBe Seq("Fireball Level 1", "Fireball Level 2")
   }
 
   it should "test resource modification" in {
     val createF = client.query(Create(Ref("classes/spells"), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L))))
     val createR = Await.result(createF, 1 second)
     createR(RefField).get.value should startWith("classes/spells")
-    createR("data", "name").as[String].get shouldBe "Magic Missile"
-    createR("data", "element").as[String].get shouldBe "arcane"
-    createR("data", "cost").as[Long].get shouldBe 10L
+    createR("data", "name").to[String].get shouldBe "Magic Missile"
+    createR("data", "element").to[String].get shouldBe "arcane"
+    createR("data", "cost").to[Long].get shouldBe 10L
 
     val updateF = client.query(Update(createR(RefField), Obj("data" -> Obj("name" -> "Faerie Fire", "cost" -> NullV))))
     val updateR = Await.result(updateF, 1 second)
     updateR(RefField).get shouldBe createR(RefField).get
-    updateR("data", "name").as[String].get shouldBe "Faerie Fire"
-    updateR("data", "element").as[String].get shouldBe "arcane"
+    updateR("data", "name").to[String].get shouldBe "Faerie Fire"
+    updateR("data", "element").to[String].get shouldBe "arcane"
     updateR("data", "cost").isDefined should equal (false)
 
     val replaceF = client.query(Replace(createR("ref"), Obj("data" -> Obj("name" -> "Volcano", "element" -> Arr("fire", "earth"), "cost" -> 10L))))
     val replaceR = Await.result(replaceF, 1 second)
     replaceR("ref").get shouldBe createR("ref").get
-    replaceR("data", "name").as[String].get shouldBe "Volcano"
-    replaceR("data", "element").as[Seq[String]].get shouldBe Seq("fire", "earth")
-    replaceR("data", "cost").as[Long].get shouldBe 10L
+    replaceR("data", "name").to[String].get shouldBe "Volcano"
+    replaceR("data", "element").to[Seq[String]].get shouldBe Seq("fire", "earth")
+    replaceR("data", "cost").to[Long].get shouldBe 10L
 
     val insertF = client.query(Insert(createR("ref"), 1L, Action.Create, Obj("data" -> Obj("cooldown" -> 5L))))
     val insertR = Await.result(insertF, 1 second)
     insertR("ref").get shouldBe createR("ref").get
-    insertR("data").as[ObjectV].get should equal (ObjectV("cooldown" -> LongV(5)))
+    insertR("data").to[ObjectV].get should equal (ObjectV("cooldown" -> LongV(5)))
 
     val removeF = client.query(Remove(createR("ref"), 2L, Action.Delete))
     val removeR = Await.result(removeF, 1 second)
@@ -314,11 +314,11 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val matchF = client.query(Paginate(Match(Ref("indexes/spells_by_element"), "arcane")))
     val matchR = Await.result(matchF, 1 second)
-    matchR("data").as[Seq[RefV]].get should contain (create1R("ref").get)
+    matchR("data").to[Seq[RefV]].get should contain (create1R("ref").get)
 
     val matchEventsF = client.query(Paginate(Match(Ref("indexes/spells_by_element"), "arcane"), events = true))
     val matchEventsR = Await.result(matchEventsF, 1 second)
-    matchEventsR(PageEvents).get map { _.ref } should contain (create1R("ref").as[RefV].get)
+    matchEventsR(PageEvents).get map { _.ref } should contain (create1R("ref").to[RefV].get)
 
     val unionF = client.query(Paginate(Union(
       Match(Ref("indexes/spells_by_element"), "arcane"),
@@ -350,91 +350,91 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   it should "test miscellaneous functions" in {
     val equalsF = client.query(Equals("fire", "fire"))
-    val equalsR = Await.result(equalsF, 1 second).as[Boolean].get
+    val equalsR = Await.result(equalsF, 1 second).to[Boolean].get
     equalsR shouldBe true
 
     val concatF = client.query(Concat(Arr("Magic", "Missile")))
-    val concatR = Await.result(concatF, 1 second).as[String].get
+    val concatR = Await.result(concatF, 1 second).to[String].get
     concatR shouldBe "MagicMissile"
 
     val concat2F = client.query(Concat(Arr("Magic", "Missile"), " "))
-    val concat2R = Await.result(concat2F, 1 second).as[String].get
+    val concat2R = Await.result(concat2F, 1 second).to[String].get
     concat2R shouldBe "Magic Missile"
 
     val containsF = client.query(Contains("favorites" / "foods", Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings")))))
-    val containsR = Await.result(containsF, 1 second).as[Boolean].get
+    val containsR = Await.result(containsF, 1 second).to[Boolean].get
     containsR shouldBe true
 
     val selectF = client.query(Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings", "lunchings")))))
-    val selectR = Await.result(selectF, 1 second).as[String].get
+    val selectR = Await.result(selectF, 1 second).to[String].get
     selectR shouldBe "munchings"
 
     val addF = client.query(Add(100L, 10L))
-    val addR = Await.result(addF, 1 second).as[Long].get
+    val addR = Await.result(addF, 1 second).to[Long].get
     addR shouldBe 110L
 
     val multiplyF = client.query(Multiply(100L, 10L))
-    val multiplyR = Await.result(multiplyF, 1 second).as[Long].get
+    val multiplyR = Await.result(multiplyF, 1 second).to[Long].get
     multiplyR shouldBe 1000L
 
     val subtractF = client.query(Subtract(100L, 10L))
-    val subtractR = Await.result(subtractF, 1 second).as[Long].get
+    val subtractR = Await.result(subtractF, 1 second).to[Long].get
     subtractR shouldBe 90L
 
     val divideF = client.query(Divide(100L, 10L))
-    val divideR = Await.result(divideF, 1 second).as[Long].get
+    val divideR = Await.result(divideF, 1 second).to[Long].get
     divideR shouldBe 10L
 
     val moduloF = client.query(Modulo(101L, 10L))
-    val moduloR = Await.result(moduloF, 1 second).as[Long].get
+    val moduloR = Await.result(moduloF, 1 second).to[Long].get
     moduloR shouldBe 1L
 
     val andF = client.query(And(true, false))
-    val andR = Await.result(andF, 1 second).as[Boolean].get
+    val andR = Await.result(andF, 1 second).to[Boolean].get
     andR shouldBe false
 
     val orF = client.query(Or(true, false))
-    val orR = Await.result(orF, 1 second).as[Boolean].get
+    val orR = Await.result(orF, 1 second).to[Boolean].get
     orR shouldBe true
 
     val notF = client.query(Not(false))
-    val notR = Await.result(notF, 1 second).as[Boolean].get
+    val notR = Await.result(notF, 1 second).to[Boolean].get
     notR shouldBe true
   }
 
   it should "test date and time functions" in {
     val timeF = client.query(Time("1970-01-01T00:00:00-04:00"))
     val timeR = Await.result(timeF, 1 second)
-    timeR.as[TimeV].get.instant shouldBe Instant.EPOCH.plus(4, ChronoUnit.HOURS)
-    timeR.as[Instant].get shouldBe Instant.EPOCH.plus(4, ChronoUnit.HOURS)
+    timeR.to[TimeV].get.instant shouldBe Instant.EPOCH.plus(4, ChronoUnit.HOURS)
+    timeR.to[Instant].get shouldBe Instant.EPOCH.plus(4, ChronoUnit.HOURS)
 
     val epochF = client.query(Epoch(30, "second"))
     val epochR = Await.result(epochF, 1 second)
-    epochR.as[TimeV].get.instant shouldBe Instant.EPOCH.plus(30, ChronoUnit.SECONDS)
-    epochR.as[Instant].get shouldBe Instant.EPOCH.plus(30, ChronoUnit.SECONDS)
+    epochR.to[TimeV].get.instant shouldBe Instant.EPOCH.plus(30, ChronoUnit.SECONDS)
+    epochR.to[Instant].get shouldBe Instant.EPOCH.plus(30, ChronoUnit.SECONDS)
 
     val dateF = client.query(query.Date("1970-01-02"))
     val dateR = Await.result(dateF, 1 second)
-    dateR.as[DateV].get.localDate shouldBe LocalDate.ofEpochDay(1)
-    dateR.as[LocalDate].get shouldBe LocalDate.ofEpochDay(1)
+    dateR.to[DateV].get.localDate shouldBe LocalDate.ofEpochDay(1)
+    dateR.to[LocalDate].get shouldBe LocalDate.ofEpochDay(1)
   }
 
   it should "test authentication functions" in {
     val createF = client.query(Create(Ref("classes/spells"), Obj("credentials" -> Obj("password" -> "abcdefg"))))
     val createR = Await.result(createF, 1 second)
 
-    val loginF = client.query(Login(createR("ref").as[RefV], Obj("password" -> "abcdefg")))
-    val secret = Await.result(loginF, 1 second)("secret").as[String].get
+    val loginF = client.query(Login(createR("ref").to[RefV], Obj("password" -> "abcdefg")))
+    val secret = Await.result(loginF, 1 second)("secret").to[String].get
 
     val sessionClient = FaunaClient(endpoint = config("root_url"), secret = secret)
 
     val logoutF = sessionClient.query(Logout(false))
     val logoutR = Await.result(logoutF, 1 second)
-    logoutR.as[Boolean].get shouldBe true
+    logoutR.to[Boolean].get shouldBe true
 
-    val identifyF = client.query(Identify(createR("ref").as[RefV], "abcdefg"))
+    val identifyF = client.query(Identify(createR("ref").to[RefV], "abcdefg"))
     val identifyR = Await.result(identifyF, 1 second)
-    identifyR.as[Boolean].get shouldBe true
+    identifyR.to[Boolean].get shouldBe true
 
     sessionClient.close()
   }
