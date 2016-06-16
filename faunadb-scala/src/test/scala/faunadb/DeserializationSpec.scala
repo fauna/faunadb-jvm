@@ -69,7 +69,7 @@ class DeserializationSpec extends FlatSpec with Matchers {
     val toDeserialize = """{"@ts":"1970-01-01T00:05:00Z"}"""
     val parsed = json.readValue(toDeserialize, classOf[Value])
 
-    parsed should equal (Timestamp(Instant.EPOCH.plus(5, ChronoUnit.MINUTES)))
+    parsed should equal (TimeV(Instant.EPOCH.plus(5, ChronoUnit.MINUTES)))
   }
 
   it should "deserialize date" in {

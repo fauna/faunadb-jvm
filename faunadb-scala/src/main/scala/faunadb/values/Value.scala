@@ -96,7 +96,7 @@ object Value {
   def apply(boolean: Boolean): Value = BooleanV(boolean)
 
   /** Create a timestamp value. */
-  def apply(instant: Instant): Value = Timestamp(instant)
+  def apply(instant: Instant): Value = TimeV(instant)
 
   /** Create a date value. */
   def apply(localdate: LocalDate): Value = Date(localdate)
@@ -146,13 +146,13 @@ object RefV {
 case class SetRefV(@JsonProperty("@set") parameters: Value) extends ScalarValue
 
 /** A Timestamp value. */
-case class Timestamp(@(JsonIgnore @param @field @getter) instant: Instant) extends ScalarValue {
+case class TimeV(@(JsonIgnore @param @field @getter) instant: Instant) extends ScalarValue {
   @JsonProperty("@ts")
   val strValue = instant.toString
 }
-object Timestamp {
-  def apply(value: String): Timestamp =
-    Timestamp(ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant)
+object TimeV {
+  def apply(value: String): TimeV =
+    TimeV(ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant)
 }
 
 /** A Date value. */

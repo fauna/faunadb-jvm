@@ -405,12 +405,12 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "test date and time functions" in {
     val timeF = client.query(Time("1970-01-01T00:00:00-04:00"))
     val timeR = Await.result(timeF, 1 second)
-    timeR.as[Timestamp].get.instant shouldBe Instant.EPOCH.plus(4, ChronoUnit.HOURS)
+    timeR.as[TimeV].get.instant shouldBe Instant.EPOCH.plus(4, ChronoUnit.HOURS)
     timeR.as[Instant].get shouldBe Instant.EPOCH.plus(4, ChronoUnit.HOURS)
 
     val epochF = client.query(Epoch(30, "second"))
     val epochR = Await.result(epochF, 1 second)
-    epochR.as[Timestamp].get.instant shouldBe Instant.EPOCH.plus(30, ChronoUnit.SECONDS)
+    epochR.as[TimeV].get.instant shouldBe Instant.EPOCH.plus(30, ChronoUnit.SECONDS)
     epochR.as[Instant].get shouldBe Instant.EPOCH.plus(30, ChronoUnit.SECONDS)
 
     val dateF = client.query(query.Date("1970-01-02"))
