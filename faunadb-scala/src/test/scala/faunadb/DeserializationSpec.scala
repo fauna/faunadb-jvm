@@ -76,6 +76,6 @@ class DeserializationSpec extends FlatSpec with Matchers {
     val toDeserialize = """{"@date":"1970-01-03"}"""
     val parsed = json.readValue(toDeserialize, classOf[Value])
 
-    parsed should equal (Date(LocalDate.ofEpochDay(2)))
+    parsed should equal (DateV(LocalDate.ofEpochDay(2)))
   }
 }

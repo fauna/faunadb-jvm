@@ -91,10 +91,10 @@ object Decoder {
       }
   }
 
-  implicit object DateDecoder extends Decoder[Date] {
+  implicit object DateDecoder extends Decoder[DateV] {
     def decode(v: Value, path: FieldPath) =
       v match {
-        case ts: Date => Result.successful(ts, path)
+        case ts: DateV => Result.successful(ts, path)
         case v => Result.Unexpected(v, "Date", path)
       }
   }
@@ -102,7 +102,7 @@ object Decoder {
   implicit object LocalDateDecoder extends Decoder[LocalDate] {
     def decode(v: Value, path: FieldPath) =
       v match {
-        case ts: Date => Result.successful(ts.localDate, path)
+        case ts: DateV => Result.successful(ts.localDate, path)
         case v => Result.Unexpected(v, "Date", path)
       }
   }

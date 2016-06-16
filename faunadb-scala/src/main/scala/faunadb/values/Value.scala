@@ -99,7 +99,7 @@ object Value {
   def apply(instant: Instant): Value = TimeV(instant)
 
   /** Create a date value. */
-  def apply(localdate: LocalDate): Value = Date(localdate)
+  def apply(localdate: LocalDate): Value = DateV(localdate)
 }
 
 // Concrete Value types
@@ -156,12 +156,12 @@ object TimeV {
 }
 
 /** A Date value. */
-case class Date(@(JsonIgnore @param @field @getter) localDate: LocalDate) extends ScalarValue {
+case class DateV(@(JsonIgnore @param @field @getter) localDate: LocalDate) extends ScalarValue {
   @JsonProperty("@date")
   val strValue = localDate.toString
 }
-object Date {
-  def apply(value: String): Date = Date(LocalDate.parse(value))
+object DateV {
+  def apply(value: String): DateV = DateV(LocalDate.parse(value))
 }
 
 // Container types and Null

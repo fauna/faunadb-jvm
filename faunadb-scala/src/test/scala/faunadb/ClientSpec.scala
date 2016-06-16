@@ -415,7 +415,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val dateF = client.query(query.Date("1970-01-02"))
     val dateR = Await.result(dateF, 1 second)
-    dateR.as[Date].get.localDate shouldBe LocalDate.ofEpochDay(1)
+    dateR.as[DateV].get.localDate shouldBe LocalDate.ofEpochDay(1)
     dateR.as[LocalDate].get shouldBe LocalDate.ofEpochDay(1)
   }
 

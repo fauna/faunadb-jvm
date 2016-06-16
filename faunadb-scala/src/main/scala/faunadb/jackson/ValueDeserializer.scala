@@ -48,7 +48,7 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
             rv
           case "@date" =>
             in.nextToken()
-            val rv = Date(in.getText)
+            val rv = DateV(in.getText)
             in.nextToken()
             rv
           case "@obj" =>
