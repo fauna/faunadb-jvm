@@ -24,10 +24,10 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Represents any scalar or non-scalar value in the FaunaDB query language. FaunaDB value types consist of
- * all of the JSON value types, as well as the FaunaDB-specific types, {@link Ref} and {@link SetRef}.
+ * all of the JSON value types, as well as the FaunaDB-specific types, {@link RefV} and {@link SetRefV}.
  * <p>
  * Scalar values are {@link LongV}, {@link StringV}, {@link DoubleV}, {@link BooleanV}, {@link NullV},
- * {@link Ref}, and {@link SetRef}.
+ * {@link RefV}, and {@link SetRefV}.
  * <p>
  * Non-scalar values are {@link ObjectV} and {@link ArrayV}.
  * <p>
@@ -43,18 +43,18 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * The result tree can be accessed using:
  * <pre>{@code
- *   Field<Ref> ref = Field.at("ref").to(Codec.REF);
+ *   Field<RefV> ref = Field.at("ref").to(Codec.REF);
  *   Field<String> someKey = Field.at("data", "someKey").to(Codec.STRING);
  *   Field<String> nonExistingKey = Field.at("non-existing-key").to(Codec.LONG);
  *
- *   node.get(ref); // Ref("some/ref")
+ *   node.get(ref); // new RefV("some/ref")
  *   node.get(someKey); // "string1"
  *   node.getOptional(nonExistingKey) // Optional.absent()
  * }</pre>
  * <p>
  * The interface also has helpers to transverse values without {@link Field} references:
  * <pre>{@code
- *   node.at("ref").to(Codec.REF).get(); // Ref("some/ref")
+ *   node.at("ref").to(Codec.REF).get(); // new RefV("some/ref")
  *   node.at("data", "someKey").to(Codec.STRING).get() // "string1"
  *   node.at("non-existing-key").to(Codec.LONG).getOptional() // Optional.absent()
  * }</pre>
@@ -374,14 +374,14 @@ public abstract class Value extends Expr {
    *
    * @see Language#Value(Instant)
    */
-  public static final class TsV extends ScalarValue<Instant> {
+  public static final class TimeV extends ScalarValue<Instant> {
 
-    public TsV(Instant value) {
+    public TimeV(Instant value) {
       super(value);
     }
 
     @JsonCreator
-    private TsV(@JsonProperty("@ts") String value) {
+    private TimeV(@JsonProperty("@ts") String value) {
       super(ZonedDateTime.parse(value, ISO_OFFSET_DATE_TIME).toInstant());
     }
 
@@ -421,16 +421,16 @@ public abstract class Value extends Expr {
    *
    * @see <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
    */
-  public static final class SetRef extends ScalarValue<ImmutableMap<String, Value>> {
+  public static final class SetRefV extends ScalarValue<ImmutableMap<String, Value>> {
 
-    public SetRef(@JsonProperty("@set") ImmutableMap<String, Value> parameters) {
+    public SetRefV(@JsonProperty("@set") ImmutableMap<String, Value> parameters) {
       super(parameters);
     }
 
     /**
-     * Extact SetRef structure
+     * Extact SetRefV structure
      *
-     * @return SetRef structure
+     * @return SetRefV structure
      */
     public ImmutableMap<String, Value> parameters() {
       return value;
@@ -448,10 +448,10 @@ public abstract class Value extends Expr {
    *
    * @see <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
    */
-  public static final class Ref extends Value.ScalarValue<String> {
+  public static final class RefV extends Value.ScalarValue<String> {
 
     @JsonCreator
-    public Ref(@JsonProperty("@ref") String value) {
+    public RefV(@JsonProperty("@ref") String value) {
       super(value);
     }
 

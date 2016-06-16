@@ -61,11 +61,11 @@ class Deserializer {
       String firstField = tree.fieldNames().next();
       switch (firstField) {
         case "@ref":
-          return json.convertValue(tree, Ref.class);
+          return json.convertValue(tree, RefV.class);
         case "@set":
-          return json.convertValue(tree, SetRef.class);
+          return json.convertValue(tree, SetRefV.class);
         case "@ts":
-          return json.convertValue(tree, TsV.class);
+          return json.convertValue(tree, TimeV.class);
         case "@date":
           return json.convertValue(tree, DateV.class);
         case "@obj":

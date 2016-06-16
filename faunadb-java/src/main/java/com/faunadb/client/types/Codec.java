@@ -14,7 +14,7 @@ import static java.lang.String.format;
 /**
  * Codec is a function that represents an attempt to coerce a {@link Value} to a concrete type.
  * There are pre-defined codecs for each FaunaDB primitive types: {@link Codec#VALUE}, {@link Codec#STRING},
- * {@link Codec#LONG}, {@link Codec#DOUBLE}, {@link Codec#DATE}, {@link Codec#TS}, {@link Codec#REF},
+ * {@link Codec#LONG}, {@link Codec#DOUBLE}, {@link Codec#DATE}, {@link Codec#TIME}, {@link Codec#REF},
  * {@link Codec#SET_REF}, {@link Codec#ARRAY}, and {@link Codec#OBJECT}.
  * <p>
  * Codecs return a {@link Result} of the coercion attempt. If it fails to coerce, {@link Result}
@@ -64,14 +64,14 @@ public interface Codec<T> extends Function<Value, Result<T>> {
   };
 
   /**
-   * Coerce a {@link Value} to an instance of {@link Ref}
+   * Coerce a {@link Value} to an instance of {@link RefV}
    */
-  Codec<Ref> REF = Cast.mapTo(Ref.class, Functions.<Ref>identity());
+  Codec<RefV> REF = Cast.mapTo(RefV.class, Functions.<RefV>identity());
 
   /**
-   * Coerce a {@link Value} to an instance of {@link SetRef}
+   * Coerce a {@link Value} to an instance of {@link SetRefV}
    */
-  Codec<SetRef> SET_REF = Cast.mapTo(SetRef.class, Functions.<SetRef>identity());
+  Codec<SetRefV> SET_REF = Cast.mapTo(SetRefV.class, Functions.<SetRefV>identity());
 
   /**
    * Coerce a {@link Value} to a {@link Long}
@@ -81,7 +81,7 @@ public interface Codec<T> extends Function<Value, Result<T>> {
   /**
    * Coerce a {@link Value} to an {@link Instant}
    */
-  Codec<Instant> TS = Cast.mapTo(TsV.class, Cast.<TsV, Instant>scalarValue());
+  Codec<Instant> TIME = Cast.mapTo(TimeV.class, Cast.<TimeV, Instant>scalarValue());
 
   /**
    * Coerce a {@link Value} to a {@link String}
