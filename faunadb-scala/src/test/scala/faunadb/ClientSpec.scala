@@ -1,6 +1,5 @@
 package faunadb
 
-import com.faunadb.common.Connection
 import faunadb.errors.{UnauthorizedException, NotFoundException, BadRequestException}
 import faunadb.query._
 import faunadb.values._
