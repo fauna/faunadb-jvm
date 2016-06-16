@@ -203,7 +203,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Value(Instant value) {
-    return new TsV(value);
+    return new TimeV(value);
   }
 
   /**

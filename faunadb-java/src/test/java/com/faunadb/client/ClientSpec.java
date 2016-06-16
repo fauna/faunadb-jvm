@@ -766,13 +766,13 @@ public class ClientSpec extends FaunaDBTest {
   @Test
   public void shouldEvalTimeExpression() throws Exception {
     Value res = client.query(Time(Value("1970-01-01T00:00:00-04:00"))).get();
-    assertThat(res.to(TS).get(), equalTo(Instant.EPOCH.plus(4, HOURS)));
+    assertThat(res.to(TIME).get(), equalTo(Instant.EPOCH.plus(4, HOURS)));
   }
 
   @Test
   public void shouldEvalEpochExpression() throws Exception {
     Value res = client.query(Epoch(Value(30), SECOND)).get();
-    assertThat(res.to(TS).get(), equalTo(Instant.EPOCH.plus(30, SECONDS)));
+    assertThat(res.to(TIME).get(), equalTo(Instant.EPOCH.plus(30, SECONDS)));
   }
 
   @Test

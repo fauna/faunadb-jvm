@@ -76,7 +76,7 @@ public class DeserializationSpec {
 
   @Test
   public void shouldDeserializeTS() throws IOException {
-    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:05:00Z\" }").to(TS).get(),
+    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:05:00Z\" }").to(TIME).get(),
       equalTo(Instant.EPOCH.plus(5, ChronoUnit.MINUTES)));
   }
 

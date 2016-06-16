@@ -374,14 +374,14 @@ public abstract class Value extends Expr {
    *
    * @see Language#Value(Instant)
    */
-  public static final class TsV extends ScalarValue<Instant> {
+  public static final class TimeV extends ScalarValue<Instant> {
 
-    public TsV(Instant value) {
+    public TimeV(Instant value) {
       super(value);
     }
 
     @JsonCreator
-    private TsV(@JsonProperty("@ts") String value) {
+    private TimeV(@JsonProperty("@ts") String value) {
       super(ZonedDateTime.parse(value, ISO_OFFSET_DATE_TIME).toInstant());
     }
 
