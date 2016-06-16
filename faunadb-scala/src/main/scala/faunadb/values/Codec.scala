@@ -133,7 +133,7 @@ object Decoder {
 
   class SeqDecoder[T: Decoder] extends Decoder[Seq[T]] {
     def decode(v: Value, path: FieldPath) =
-      Field.collect(Field.as[T]).get(v)
+      Field.collect(Field.to[T]).get(v)
   }
   implicit def SeqDecoder[T: Decoder]: Decoder[Seq[T]] = new SeqDecoder[T]
 }

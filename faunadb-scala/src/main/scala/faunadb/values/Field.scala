@@ -68,7 +68,7 @@ sealed abstract class Field[T] {
 
   def map[U](f: T => U): Field[U] = new MappedField(this, f)
 
-  def as[U](implicit ev: Field[T] =:= Field[Value], dec: Decoder[U]): Field[U] =
+  def to[U](implicit ev: Field[T] =:= Field[Value], dec: Decoder[U]): Field[U] =
     new TypedField(ev(this), dec)
 
   def collect[U](inner: Field[U])(implicit ev: Field[T] =:= Field[Value]): Field[Seq[U]] =

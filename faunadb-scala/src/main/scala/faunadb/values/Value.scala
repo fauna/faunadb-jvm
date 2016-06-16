@@ -24,10 +24,10 @@ import scala.annotation.meta.{ param, field, getter }
   *
   * {{{
   * // Simple, adhoc extraction:
-  * value("data", "name").as[String].get
+  * value("data", "name").to[String].get
   *
   * // Using a reusable Field:
-  * val NameField = Field("data", "name").as[String]
+  * val NameField = Field("data", "name").to[String]
   * value(NameField).get
   * }}}
   *
@@ -35,9 +35,9 @@ import scala.annotation.meta.{ param, field, getter }
   *
   * {{{
   * val refAndNameAndAge = for {
-  *   ref <- value("ref").as[RefV]
-  *   name <- value("data", "name").as[String]
-  *   age <- value("data", "age").as[Int]
+  *   ref <- value("ref").to[RefV]
+  *   name <- value("data", "name").to[String]
+  *   age <- value("data", "age").to[Int]
   * } yield (ref, name, age)
   *
   * refAndNameAndAge.get
@@ -45,9 +45,9 @@ import scala.annotation.meta.{ param, field, getter }
   * // or
   *
   * val RefAndNameAndAgeField = Field.zip(
-  *   Field("ref").as[RefV],
-  *   Field("data", "name").as[String],
-  *   Field("data", "age").as[Int])
+  *   Field("ref").to[RefV],
+  *   Field("data", "name").to[String],
+  *   Field("data", "age").to[Int])
   *
   * value(RefAndNameAndAgeField).get
   * }}}
@@ -56,11 +56,11 @@ import scala.annotation.meta.{ param, field, getter }
   * elements may be cast using [[collect]]:
   *
   * {{{
-  * value("data", "tags").collect(Field.as[String]).get
+  * value("data", "tags").collect(Field.to[String]).get
   *
   * // or
   *
-  * val TagsField = Field("data", "tags").collect(Field.as[String])
+  * val TagsField = Field("data", "tags").collect(Field.to[String])
   * value(TagsField).get
   * }}}
   */
@@ -74,7 +74,7 @@ sealed trait Value {
   final def apply(p: FieldPath, ps: FieldPath*): Result[Value] = apply(Field(p, ps: _*))
 
   /** Cast the value to T, using a Decoder. */
-  final def as[T: Decoder]: Result[T] = apply(Field.as[T])
+  final def to[T: Decoder]: Result[T] = apply(Field.to[T])
 
   /** Extract the elements of an ArrayV using the provided field. */
   final def collect[T](field: Field[T]): Result[Seq[T]] = apply(Field.collect(field))

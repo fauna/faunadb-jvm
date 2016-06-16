@@ -30,7 +30,7 @@ object Result {
 
     def apply(p: FieldPath, ps: FieldPath*): Result[Value] = apply(Field(p, ps: _*))
 
-    def as[T: Decoder]: Result[T] = apply(Field.as[T])
+    def to[T: Decoder]: Result[T] = apply(Field.to[T])
 
     def collect[T](inner: Field[T]): Result[Seq[T]] = apply(Field.collect(inner))
   }
