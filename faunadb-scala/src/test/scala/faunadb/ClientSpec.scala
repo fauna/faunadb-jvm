@@ -1,6 +1,5 @@
 package faunadb
 
-import com.faunadb.common.Connection
 import faunadb.errors.{UnauthorizedException, NotFoundException, BadRequestException}
 import faunadb.query._
 import faunadb.values._
@@ -47,7 +46,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   val PageEvents = Field("data").collect(EventField)
   val PageRefs = Field("data").as[Seq[Ref]]
 
-  def await[T](f: Future[T]) = Await.result(f, 1.second)
+  def await[T](f: Future[T]) = Await.result(f, 5.second)
 
   // tests
 
