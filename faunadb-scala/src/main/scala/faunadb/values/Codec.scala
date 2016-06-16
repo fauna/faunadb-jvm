@@ -67,10 +67,10 @@ object Decoder {
       }
   }
 
-  implicit object SetRefDecoder extends Decoder[SetRef] {
+  implicit object SetRefDecoder extends Decoder[SetRefV] {
     def decode(v: Value, path: FieldPath) =
       v match {
-        case r: SetRef => Result.successful(r, path)
+        case r: SetRefV => Result.successful(r, path)
         case v => Result.Unexpected(v, "Set Ref", path)
       }
   }

@@ -143,7 +143,7 @@ object RefV {
 }
 
 /** A Set Ref. */
-case class SetRef(@JsonProperty("@set") parameters: Value) extends ScalarValue
+case class SetRefV(@JsonProperty("@set") parameters: Value) extends ScalarValue
 
 /** A Timestamp value. */
 case class Timestamp(@(JsonIgnore @param @field @getter) instant: Instant) extends ScalarValue {

@@ -218,7 +218,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   it should "test types" in {
     val setF = client.query(Match(Ref("indexes/spells_by_element"), "arcane"))
-    val set = Await.result(setF, 1 second).as[SetRef].get
+    val set = Await.result(setF, 1 second).as[SetRefV].get
     set.parameters("match").as[RefV].get shouldBe RefV("indexes/spells_by_element")
     set.parameters("terms").as[String].get shouldBe "arcane"
   }
