@@ -24,10 +24,10 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Represents any scalar or non-scalar value in the FaunaDB query language. FaunaDB value types consist of
- * all of the JSON value types, as well as the FaunaDB-specific types, {@link RefV} and {@link SetRef}.
+ * all of the JSON value types, as well as the FaunaDB-specific types, {@link RefV} and {@link SetRefV}.
  * <p>
  * Scalar values are {@link LongV}, {@link StringV}, {@link DoubleV}, {@link BooleanV}, {@link NullV},
- * {@link RefV}, and {@link SetRef}.
+ * {@link RefV}, and {@link SetRefV}.
  * <p>
  * Non-scalar values are {@link ObjectV} and {@link ArrayV}.
  * <p>
@@ -421,16 +421,16 @@ public abstract class Value extends Expr {
    *
    * @see <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
    */
-  public static final class SetRef extends ScalarValue<ImmutableMap<String, Value>> {
+  public static final class SetRefV extends ScalarValue<ImmutableMap<String, Value>> {
 
-    public SetRef(@JsonProperty("@set") ImmutableMap<String, Value> parameters) {
+    public SetRefV(@JsonProperty("@set") ImmutableMap<String, Value> parameters) {
       super(parameters);
     }
 
     /**
-     * Extact SetRef structure
+     * Extact SetRefV structure
      *
-     * @return SetRef structure
+     * @return SetRefV structure
      */
     public ImmutableMap<String, Value> parameters() {
       return value;

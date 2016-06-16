@@ -63,7 +63,7 @@ class Deserializer {
         case "@ref":
           return json.convertValue(tree, RefV.class);
         case "@set":
-          return json.convertValue(tree, SetRef.class);
+          return json.convertValue(tree, SetRefV.class);
         case "@ts":
           return json.convertValue(tree, TimeV.class);
         case "@date":
