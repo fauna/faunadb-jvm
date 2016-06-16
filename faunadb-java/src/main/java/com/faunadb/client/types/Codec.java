@@ -64,9 +64,9 @@ public interface Codec<T> extends Function<Value, Result<T>> {
   };
 
   /**
-   * Coerce a {@link Value} to an instance of {@link Ref}
+   * Coerce a {@link Value} to an instance of {@link RefV}
    */
-  Codec<Ref> REF = Cast.mapTo(Ref.class, Functions.<Ref>identity());
+  Codec<RefV> REF = Cast.mapTo(RefV.class, Functions.<RefV>identity());
 
   /**
    * Coerce a {@link Value} to an instance of {@link SetRef}

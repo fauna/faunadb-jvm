@@ -24,10 +24,10 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Represents any scalar or non-scalar value in the FaunaDB query language. FaunaDB value types consist of
- * all of the JSON value types, as well as the FaunaDB-specific types, {@link Ref} and {@link SetRef}.
+ * all of the JSON value types, as well as the FaunaDB-specific types, {@link RefV} and {@link SetRef}.
  * <p>
  * Scalar values are {@link LongV}, {@link StringV}, {@link DoubleV}, {@link BooleanV}, {@link NullV},
- * {@link Ref}, and {@link SetRef}.
+ * {@link RefV}, and {@link SetRef}.
  * <p>
  * Non-scalar values are {@link ObjectV} and {@link ArrayV}.
  * <p>
@@ -43,18 +43,18 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * The result tree can be accessed using:
  * <pre>{@code
- *   Field<Ref> ref = Field.at("ref").to(Codec.REF);
+ *   Field<RefV> ref = Field.at("ref").to(Codec.REF);
  *   Field<String> someKey = Field.at("data", "someKey").to(Codec.STRING);
  *   Field<String> nonExistingKey = Field.at("non-existing-key").to(Codec.LONG);
  *
- *   node.get(ref); // Ref("some/ref")
+ *   node.get(ref); // new RefV("some/ref")
  *   node.get(someKey); // "string1"
  *   node.getOptional(nonExistingKey) // Optional.absent()
  * }</pre>
  * <p>
  * The interface also has helpers to transverse values without {@link Field} references:
  * <pre>{@code
- *   node.at("ref").to(Codec.REF).get(); // Ref("some/ref")
+ *   node.at("ref").to(Codec.REF).get(); // new RefV("some/ref")
  *   node.at("data", "someKey").to(Codec.STRING).get() // "string1"
  *   node.at("non-existing-key").to(Codec.LONG).getOptional() // Optional.absent()
  * }</pre>
@@ -448,10 +448,10 @@ public abstract class Value extends Expr {
    *
    * @see <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
    */
-  public static final class Ref extends Value.ScalarValue<String> {
+  public static final class RefV extends Value.ScalarValue<String> {
 
     @JsonCreator
-    public Ref(@JsonProperty("@ref") String value) {
+    public RefV(@JsonProperty("@ref") String value) {
       super(value);
     }
 

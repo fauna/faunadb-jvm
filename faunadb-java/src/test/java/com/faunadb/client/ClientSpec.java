@@ -8,7 +8,7 @@ import com.faunadb.client.test.FaunaDBTest;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.ObjectV;
-import com.faunadb.client.types.Value.Ref;
+import com.faunadb.client.types.Value.RefV;
 import com.faunadb.client.types.Value.StringV;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -40,21 +40,21 @@ public class ClientSpec extends FaunaDBTest {
   public ExpectedException thrown = ExpectedException.none();
 
   private static final Field<Value> DATA = Field.at("data");
-  private static final Field<Ref> REF_FIELD = Field.at("ref").to(REF);
-  private static final Field<ImmutableList<Ref>> REF_LIST = DATA.collect(Field.as(REF));
+  private static final Field<RefV> REF_FIELD = Field.at("ref").to(REF);
+  private static final Field<ImmutableList<RefV>> REF_LIST = DATA.collect(Field.as(REF));
 
   private static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).to(STRING);
   private static final Field<String> ELEMENT_FIELD = DATA.at(Field.at("element")).to(STRING);
   private static final Field<Value> ELEMENTS_LIST = DATA.at(Field.at("elements"));
   private static final Field<Long> COST_FIELD = DATA.at(Field.at("cost")).to(LONG);
 
-  private static Ref magicMissile;
-  private static Ref fireball;
-  private static Ref faerieFire;
-  private static Ref summon;
-  private static Ref thor;
-  private static Ref thorSpell1;
-  private static Ref thorSpell2;
+  private static RefV magicMissile;
+  private static RefV fireball;
+  private static RefV faerieFire;
+  private static RefV summon;
+  private static RefV thor;
+  private static RefV thorSpell1;
+  private static RefV thorSpell2;
 
   @BeforeClass
   public static void setUpSchema() throws Exception {
@@ -139,7 +139,7 @@ public class ClientSpec extends FaunaDBTest {
         Obj("data", Obj("name", Value("Thor"))))
     ).get().get(REF_FIELD);
 
-    Ref thorsSpellbook = client.query(
+    RefV thorsSpellbook = client.query(
       Create(Ref("classes/spellbooks"),
         Obj("data",
           Obj("owner", thor)))
@@ -330,7 +330,7 @@ public class ClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldHandleConstraintViolations() throws Exception {
-    Ref classRef = onARandomClass();
+    RefV classRef = onARandomClass();
 
     client.query(
       Create(Ref("indexes"),
@@ -413,7 +413,7 @@ public class ClientSpec extends FaunaDBTest {
     ImmutableMap<String, Value> set = res.to(SET_REF).get().parameters();
     assertThat(set.get("terms").to(STRING).get(), equalTo("arcane"));
     assertThat(set.get("match").to(REF).get(),
-      equalTo(new Ref("indexes/spells_by_element")));
+      equalTo(new RefV("indexes/spells_by_element")));
   }
 
   @Test
@@ -443,7 +443,7 @@ public class ClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldEvalDoExpression() throws Exception {
-    Expr ref = new Ref(randomStartingWith(onARandomClass().strValue(), "/"));
+    Expr ref = new RefV(randomStartingWith(onARandomClass().strValue(), "/"));
 
     Value res = client.query(
       Do(
@@ -820,7 +820,7 @@ public class ClientSpec extends FaunaDBTest {
     assertThat(identified.to(BOOLEAN).get(), is(false));
   }
 
-  private Ref onARandomClass() throws Exception {
+  private RefV onARandomClass() throws Exception {
     Value clazz = client.query(
       Create(Ref("classes"),
         Obj("name", Value(randomStartingWith("some_class_"))))

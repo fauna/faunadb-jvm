@@ -2,7 +2,7 @@ package com.faunadb.client.test;
 
 import com.faunadb.client.FaunaClient;
 import com.faunadb.client.types.Value;
-import com.faunadb.client.types.Value.Ref;
+import com.faunadb.client.types.Value.RefV;
 import com.faunadb.common.Connection;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.AsyncFunction;
@@ -74,7 +74,7 @@ public class FaunaDBTest {
     return new AsyncFunction<Value, Value>() {
       @Override
       public ListenableFuture<Value> apply(Value dbCreateR) throws Exception {
-        Ref dbRef = dbCreateR.at("ref").to(REF).get();
+        RefV dbRef = dbCreateR.at("ref").to(REF).get();
 
         return rootClient.query(
           Create(

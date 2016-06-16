@@ -135,12 +135,12 @@ public final class Language {
   }
 
   /**
-   * Creates a new Ref literal value.
+   * Creates a new RefV literal value.
    *
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Ref(String ref) {
-    return new Ref(ref);
+    return new RefV(ref);
   }
 
   /**
