@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * The HTTP Connection adapter for FaunaDB clients.
  * <p>
- * <p>Relies on <a href="https://github.com/AsyncHttpClient/async-http-client">async-http-client</a>
+ * Relies on <a href="https://github.com/AsyncHttpClient/async-http-client">async-http-client</a>
  * for the underlying implementation.
  */
 
