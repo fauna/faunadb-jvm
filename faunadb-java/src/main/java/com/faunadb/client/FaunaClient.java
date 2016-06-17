@@ -1,5 +1,6 @@
 package com.faunadb.client;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -12,10 +13,13 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Response;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
+import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
@@ -41,33 +45,57 @@ public class FaunaClient implements AutoCloseable {
 
   private static final Charset UTF8 = Charset.forName("UTF-8");
 
-  /**
-   * Returns a new {@link FaunaClient} instance.
-   *
-   * @param connection the underlying {@link Connection} adapter for the client to use.
-   */
-  public static FaunaClient create(Connection connection) {
-    ObjectMapper json = new ObjectMapper();
-    json.registerModule(new GuavaModule());
-    return new FaunaClient(connection, json);
+  public static final class Builder {
+
+    private String secret;
+    private String endpoint;
+    private MetricRegistry metrics;
+    private AsyncHttpClient httpClient;
+
+    private Builder() {
+    }
+
+    public Builder withSecret(String secret) {
+      this.secret = secret;
+      return this;
+    }
+
+    public Builder withEndpoint(String endpoint) {
+      this.endpoint = endpoint;
+      return this;
+    }
+
+    public Builder withMetrics(MetricRegistry metrics) {
+      this.metrics = metrics;
+      return this;
+    }
+
+    public Builder withHttpClient(AsyncHttpClient httpClient) {
+      this.httpClient = httpClient;
+      return this;
+    }
+
+    public FaunaClient build() throws MalformedURLException, UnsupportedEncodingException {
+      Connection.Builder builder = Connection.builder()
+        .withAuthToken(secret)
+        .withFaunaRoot(endpoint);
+
+      if (metrics != null) builder.withMetrics(metrics);
+      if (httpClient != null) builder.withHttpClient(httpClient);
+
+      return new FaunaClient(builder.build());
+    }
   }
 
-  /**
-   * Returns a new {@link FaunaClient} instance.
-   *
-   * @param connection the underlying {@link Connection} adapter for the client to use.
-   * @param json       a custom {@link ObjectMapper} to customize JSON serialization and deserialization behavior.
-   */
-  public static FaunaClient create(Connection connection, ObjectMapper json) {
-    return new FaunaClient(connection, json.copy().registerModule(new GuavaModule()));
+  public static Builder builder() {
+    return new Builder();
   }
 
+  private final ObjectMapper json = new ObjectMapper().registerModule(new GuavaModule());
   private final Connection connection;
-  private final ObjectMapper json;
 
-  private FaunaClient(Connection connection, ObjectMapper json) {
+  public FaunaClient(Connection connection) {
     this.connection = connection;
-    this.json = json;
   }
 
   /**

@@ -3,7 +3,6 @@ package com.faunadb.client.test;
 import com.faunadb.client.FaunaClient;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.RefV;
-import com.faunadb.common.Connection;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -50,12 +49,10 @@ public class FaunaDBTest {
 
   protected static FaunaClient createFaunaClient(String secret) {
     try {
-      return FaunaClient.create(
-        Connection.builder()
-          .withFaunaRoot(ROOT_URL)
-          .withAuthToken(secret)
-          .build()
-      );
+      return FaunaClient.builder()
+        .withEndpoint(ROOT_URL)
+        .withSecret(secret)
+        .build();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
