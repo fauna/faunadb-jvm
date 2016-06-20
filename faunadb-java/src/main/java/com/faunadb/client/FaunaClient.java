@@ -53,7 +53,7 @@ public class FaunaClient implements AutoCloseable {
 
     private String secret;
     private URL endpoint;
-    private MetricRegistry metrics;
+    private MetricRegistry registry;
     private AsyncHttpClient httpClient;
 
     private Builder() {
@@ -84,7 +84,7 @@ public class FaunaClient implements AutoCloseable {
         .withAuthToken(secret)
         .withFaunaRoot(endpoint);
 
-      if (metrics != null) builder.withMetrics(metrics);
+      if (registry != null) builder.withMetrics(registry);
       if (httpClient != null) builder.withHttpClient(httpClient);
 
       return new FaunaClient(builder.build());
@@ -94,7 +94,7 @@ public class FaunaClient implements AutoCloseable {
   private final ObjectMapper json = new ObjectMapper().registerModule(new GuavaModule());
   private final Connection connection;
 
-  public FaunaClient(Connection connection) {
+  private FaunaClient(Connection connection) {
     this.connection = connection;
   }
 

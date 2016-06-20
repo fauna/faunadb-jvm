@@ -30,7 +30,7 @@ import static java.lang.String.format;
  * for the underlying implementation.
  */
 
-public class Connection {
+public final class Connection {
 
   private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
   private static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
