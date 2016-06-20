@@ -98,6 +98,10 @@ public class FaunaClient implements AutoCloseable {
     this.connection = connection;
   }
 
+  public FaunaClient newSessionClient(String secret) {
+    return new FaunaClient(connection.newSessionConnection(secret));
+  }
+
   /**
    * Frees any resources held by the client. Also closes the underlying {@link Connection}.
    */

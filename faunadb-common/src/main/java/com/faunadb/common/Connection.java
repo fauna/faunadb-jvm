@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.String.format;
 
@@ -154,7 +155,7 @@ public class Connection {
       else
         root = faunaRoot;
 
-      return new Connection(root, authToken, httpClient, registry);
+      return new Connection(root, authToken, httpClient, registry, new AtomicInteger(1));
     }
   }
 
@@ -166,15 +167,33 @@ public class Connection {
   private final String authHeader;
   private final AsyncHttpClient client;
   private final MetricRegistry registry;
+  private final AtomicInteger refCount;
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final ObjectMapper json = new ObjectMapper();
 
-  private Connection(URL faunaRoot, String authToken, AsyncHttpClient client, MetricRegistry registry) {
+  private Connection(URL faunaRoot, String authToken, AsyncHttpClient client, MetricRegistry registry, AtomicInteger refCount) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
     this.client = client;
     this.registry = registry;
+    this.refCount = refCount;
+  }
+
+  public Connection newSessionConnection(String authToken) {
+    if (refCount.incrementAndGet() > 1)
+      return new Connection(faunaRoot, authToken, client, registry, refCount);
+    else
+      throw new IllegalStateException("Can not create a session connection from a closed connection");
+  }
+
+  /**
+   * Releases any resources being held by the HTTP client. Also closes the underlying
+   * {@link AsyncHttpClient}.
+   */
+  public void close() throws IOException {
+    if (refCount.decrementAndGet() == 0)
+      client.close();
   }
 
   /**
@@ -261,14 +280,6 @@ public class Connection {
       .build();
 
     return performRequest(request);
-  }
-
-  /**
-   * Releases any resources being held by the HTTP client. Also closes the underlying
-   * {@link AsyncHttpClient}.
-   */
-  public void close() throws IOException {
-    client.close();
   }
 
   private ListenableFuture<Response> performRequest(final Request request) {
