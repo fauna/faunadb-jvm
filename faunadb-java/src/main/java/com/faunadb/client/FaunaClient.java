@@ -17,9 +17,9 @@ import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Response;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
@@ -45,10 +45,14 @@ public class FaunaClient implements AutoCloseable {
 
   private static final Charset UTF8 = Charset.forName("UTF-8");
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public static final class Builder {
 
     private String secret;
-    private String endpoint;
+    private URL endpoint;
     private MetricRegistry metrics;
     private AsyncHttpClient httpClient;
 
@@ -60,8 +64,8 @@ public class FaunaClient implements AutoCloseable {
       return this;
     }
 
-    public Builder withEndpoint(String endpoint) {
-      this.endpoint = endpoint;
+    public Builder withEndpoint(String endpoint) throws MalformedURLException {
+      this.endpoint = new URL(endpoint);
       return this;
     }
 
@@ -75,7 +79,7 @@ public class FaunaClient implements AutoCloseable {
       return this;
     }
 
-    public FaunaClient build() throws MalformedURLException, UnsupportedEncodingException {
+    public FaunaClient build() {
       Connection.Builder builder = Connection.builder()
         .withAuthToken(secret)
         .withFaunaRoot(endpoint);
@@ -85,10 +89,6 @@ public class FaunaClient implements AutoCloseable {
 
       return new FaunaClient(builder.build());
     }
-  }
-
-  public static Builder builder() {
-    return new Builder();
   }
 
   private final ObjectMapper json = new ObjectMapper().registerModule(new GuavaModule());
