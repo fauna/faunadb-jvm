@@ -6,6 +6,7 @@ import com.faunadb.client.types.Value.RefV;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.ListenableFuture;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import java.util.Random;
@@ -45,6 +46,12 @@ public class FaunaDBTest {
       transformAsync(createDatabase(), createServerKey()),
       createClientWithServerKey()
     ).get();
+  }
+
+  @AfterClass
+  public static void closeClients() throws Exception {
+    rootClient.close();
+    client.close();
   }
 
   protected static FaunaClient createFaunaClient(String secret) {
