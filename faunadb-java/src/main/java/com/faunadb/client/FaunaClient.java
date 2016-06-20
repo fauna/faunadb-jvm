@@ -45,10 +45,16 @@ public class FaunaClient implements AutoCloseable {
 
   private static final Charset UTF8 = Charset.forName("UTF-8");
 
+  /**
+   * Creates a new {@link Builder}
+   */
   public static Builder builder() {
     return new Builder();
   }
 
+  /**
+   * A builder for creating an instance of {@link FaunaClient}
+   */
   public static final class Builder {
 
     private String secret;
@@ -59,26 +65,55 @@ public class FaunaClient implements AutoCloseable {
     private Builder() {
     }
 
+    /**
+     * Sets the secret to be passed to FaunaDB as a authentication token
+     *
+     * @param secret the auth token secret
+     * @return this {@link Builder} object
+     */
     public Builder withSecret(String secret) {
       this.secret = secret;
       return this;
     }
 
+    /**
+     * Sets the FaunaDB endpoint url for the built {@link FaunaClient}.
+     *
+     * @param endpoint the root endpoint URL
+     * @return this {@link Builder} object
+     */
     public Builder withEndpoint(String endpoint) throws MalformedURLException {
       this.endpoint = new URL(endpoint);
       return this;
     }
 
-    public Builder withMetrics(MetricRegistry metrics) {
-      this.metrics = metrics;
+    /**
+     * Sets a {@link MetricRegistry} that the {@link FaunaClient} will use to register and track Connection-level
+     * statistics.
+     *
+     * @param registry the MetricRegistry instance.
+     * @return this {@link Builder} object
+     */
+    public Builder withMetrics(MetricRegistry registry) {
+      this.registry = registry;
       return this;
     }
 
+    /**
+     * Sets a custom {@link AsyncHttpClient} implementation that the built {@link FaunaClient} will use.
+     * This custom implementation can be provided to control the behavior of the underlying HTTP transport.
+     *
+     * @param httpClient the custom {@link AsyncHttpClient} instance
+     * @return this {@link Builder} object
+     */
     public Builder withHttpClient(AsyncHttpClient httpClient) {
       this.httpClient = httpClient;
       return this;
     }
 
+    /**
+     * Returns a newly constructed {@link FaunaClient} with configuration based on the settings of this {@link Builder}.
+     */
     public FaunaClient build() {
       Connection.Builder builder = Connection.builder()
         .withAuthToken(secret)
@@ -98,6 +133,13 @@ public class FaunaClient implements AutoCloseable {
     this.connection = connection;
   }
 
+  /**
+   * Creates a session client with the user secret provided. Queries submited to a session client will be
+   * authenticated with the secret provided. A Session client shares its parent's {@link Connection} instance.
+   *
+   * @param secret user secret for the session client
+   * @return a new {@link FaunaClient}
+   */
   public FaunaClient newSessionClient(String secret) {
     return new FaunaClient(connection.newSessionConnection(secret));
   }

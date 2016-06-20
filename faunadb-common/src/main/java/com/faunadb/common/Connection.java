@@ -180,6 +180,13 @@ public final class Connection {
     this.refCount = refCount;
   }
 
+  /**
+   * Creates a new short live connection sharing its underneath {@link AsyncHttpClient}. Queries submited to a
+   * session connection will be authenticated with the token provided.
+   *
+   * @param authToken token that will be used to authenticate requests
+   * @return a new {@link Connection}
+   */
   public Connection newSessionConnection(String authToken) {
     if (refCount.incrementAndGet() > 1)
       return new Connection(faunaRoot, authToken, client, registry, refCount);
