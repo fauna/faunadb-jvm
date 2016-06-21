@@ -148,7 +148,7 @@ public class FaunaClient implements AutoCloseable {
    * Frees any resources held by the client. Also closes the underlying {@link Connection}.
    */
   @Override
-  public void close() throws IOException {
+  public void close() {
     connection.close();
   }
 

@@ -31,7 +31,7 @@ import static java.lang.String.format;
  * for the underlying implementation.
  */
 
-public final class Connection {
+public final class Connection implements AutoCloseable {
 
   private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
   private static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
@@ -200,10 +200,17 @@ public final class Connection {
    * Releases any resources being held by the HTTP client. Also closes the underlying
    * {@link AsyncHttpClient}.
    */
-  public void close() throws IOException {
-    if (closed.compareAndSet(false, true))
-      if (refCount.decrementAndGet() == 0)
-        client.close();
+  @Override
+  public void close() {
+    try {
+      if (closed.compareAndSet(false, true)) {
+        if (refCount.decrementAndGet() == 0)
+          client.close();
+      }
+    } catch (IOException e) {
+      // DefaultAsyncHttpClient do not throw IOException, we don't need to pollute the API with it
+      throw new IllegalStateException("Unexpected error when closing http connection pool", e);
+    }
   }
 
   /**
