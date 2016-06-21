@@ -66,6 +66,9 @@ import static java.util.Objects.requireNonNull;
 @JsonDeserialize(using = Deserializer.ValueDeserializer.class)
 public abstract class Value extends Expr {
 
+  private Value() {
+  }
+
   /**
    * Attempts to coerce this value using the {@link Codec} passed
    *
