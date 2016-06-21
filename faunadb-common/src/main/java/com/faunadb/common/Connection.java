@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.String.format;
@@ -171,6 +172,7 @@ public final class Connection {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final ObjectMapper json = new ObjectMapper();
+  private final AtomicBoolean closed = new AtomicBoolean(false);
 
   private Connection(URL faunaRoot, String authToken, AsyncHttpClient client, MetricRegistry registry, AtomicInteger refCount) {
     this.faunaRoot = faunaRoot;
@@ -199,8 +201,9 @@ public final class Connection {
    * {@link AsyncHttpClient}.
    */
   public void close() throws IOException {
-    if (refCount.decrementAndGet() == 0)
-      client.close();
+    if (closed.compareAndSet(false, true))
+      if (refCount.decrementAndGet() == 0)
+        client.close();
   }
 
   /**
