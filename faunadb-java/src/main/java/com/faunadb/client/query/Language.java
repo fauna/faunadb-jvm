@@ -36,6 +36,14 @@ public final class Language {
   private Language() {
   }
 
+  private static Expr varargs(List<? extends Expr> exprs) {
+    if (exprs.size() == 1) {
+      return exprs.get(0);
+    } else {
+      return Arr(exprs);
+    }
+  }
+
   /**
    * Enumeration for time units.
    *
@@ -383,7 +391,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
    */
   public static Expr Do(List<? extends Expr> exprs) {
-    return Fn.apply("do", Arr(exprs));
+    return Fn.apply("do", varargs(exprs));
   }
 
   /**
@@ -618,7 +626,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#sets">FaunaDB Set Functions</a>
    */
   public static Expr Union(List<? extends Expr> sets) {
-    return Fn.apply("union", Arr(sets));
+    return Fn.apply("union", varargs(sets));
   }
 
   /**
@@ -634,7 +642,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#sets">FaunaDB Set Functions</a>
    */
   public static Expr Intersection(List<? extends Expr> sets) {
-    return Fn.apply("intersection", Arr(sets));
+    return Fn.apply("intersection", varargs(sets));
   }
 
   /**
@@ -652,7 +660,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#sets">FaunaDB Set Functions</a>
    */
   public static Expr Difference(List<? extends Expr> sets) {
-    return Fn.apply("difference", Arr(sets));
+    return Fn.apply("difference", varargs(sets));
   }
 
   /**
@@ -787,7 +795,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Equals(List<? extends Expr> values) {
-    return Fn.apply("equals", Arr(values));
+    return Fn.apply("equals", varargs(values));
   }
 
   /**
@@ -859,7 +867,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Add(List<? extends Expr> values) {
-    return Fn.apply("add", Arr(values));
+    return Fn.apply("add", varargs(values));
   }
 
   /**
@@ -877,7 +885,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Multiply(List<? extends Expr> values) {
-    return Fn.apply("multiply", Arr(values));
+    return Fn.apply("multiply", varargs(values));
   }
 
   /**
@@ -895,7 +903,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Subtract(List<? extends Expr> values) {
-    return Fn.apply("subtract", Arr(values));
+    return Fn.apply("subtract", varargs(values));
   }
 
   /**
@@ -913,7 +921,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Divide(List<? extends Expr> values) {
-    return Fn.apply("divide", Arr(values));
+    return Fn.apply("divide", varargs(values));
   }
 
   /**
@@ -931,7 +939,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Modulo(List<? extends Expr> values) {
-    return Fn.apply("modulo", Arr(values));
+    return Fn.apply("modulo", varargs(values));
   }
 
   /**
@@ -949,7 +957,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr LT(List<? extends Expr> values) {
-    return Fn.apply("lt", Arr(values));
+    return Fn.apply("lt", varargs(values));
   }
 
   /**
@@ -967,7 +975,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr LTE(List<? extends Expr> values) {
-    return Fn.apply("lte", Arr(values));
+    return Fn.apply("lte", varargs(values));
   }
 
   /**
@@ -985,7 +993,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr GT(List<? extends Expr> values) {
-    return Fn.apply("gt", Arr(values));
+    return Fn.apply("gt", varargs(values));
   }
 
   /**
@@ -1003,7 +1011,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr GTE(List<? extends Expr> values) {
-    return Fn.apply("gte", Arr(values));
+    return Fn.apply("gte", varargs(values));
   }
 
   /**
@@ -1021,7 +1029,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr And(List<? extends Expr> values) {
-    return Fn.apply("and", Arr(values));
+    return Fn.apply("and", varargs(values));
   }
 
   /**
@@ -1039,7 +1047,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Or(List<? extends Expr> values) {
-    return Fn.apply("or", Arr(values));
+    return Fn.apply("or", varargs(values));
   }
 
   /**
