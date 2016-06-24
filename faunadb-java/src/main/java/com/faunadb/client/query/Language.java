@@ -849,8 +849,26 @@ public final class Language {
    *
    * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
+  public static Expr Select(Expr path, Expr from, Expr defaultValue) {
+    return Fn.apply("select", path, "from", from, "default", defaultValue);
+  }
+
+  /**
+   * Creates a new Select expression.
+   *
+   * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
   public static Expr Select(Path path, Expr from) {
     return Select(Arr(path.segments), from);
+  }
+
+  /**
+   * Creates a new Select expression.
+   *
+   * @see <a href="https://faunadb.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Select(Path path, Expr from, Expr defaultValue) {
+    return Select(Arr(path.segments), from, defaultValue);
   }
 
   /**

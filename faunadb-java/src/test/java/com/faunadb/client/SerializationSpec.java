@@ -699,6 +699,16 @@ public class SerializationSpec {
       ),
       "{\"select\":[\"favorites\",\"foods\",1],\"from\":" +
         "{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}");
+
+    assertJson(
+      Select(
+        Arr(Value("favorites"), Value("foods"), Value(1)),
+        Obj("favorites", Obj("foods", Arr())),
+        Value("munchings")
+      ),
+      "{\"select\":[\"favorites\",\"foods\",1]," +
+        "\"from\":{\"object\":{\"favorites\":{\"object\":{\"foods\":[]}}}}," +
+        "\"default\":\"munchings\"}");
   }
 
   @Test
