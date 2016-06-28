@@ -23,9 +23,7 @@ public class FaunaDBTest {
   private static final String ROOT_TOKEN;
   private static final String ROOT_URL;
 
-  protected static FaunaClient rootClient;
   protected static FaunaClient client;
-  protected static String dbName;
 
   static {
     ROOT_TOKEN = EnvVariables.require("FAUNA_ROOT_KEY");
@@ -39,18 +37,21 @@ public class FaunaDBTest {
 
   @BeforeClass
   public static void setUpClient() throws Exception {
-    dbName = format("faunadb-java-test-%s", new Random().nextLong());
-    rootClient = createFaunaClient(ROOT_TOKEN);
+    String dbName = format("faunadb-java-test-%s", new Random().nextLong());
 
-    client = transform(
-      transformAsync(createDatabase(), createServerKey()),
-      createClientWithServerKey()
-    ).get();
+    try (FaunaClient rootClient = createFaunaClient(ROOT_TOKEN)) {
+      client = transform(
+        transformAsync(
+          createDatabase(rootClient, dbName),
+          createServerKey(rootClient)
+        ),
+        createClientWithServerKey(rootClient)
+      ).get();
+    }
   }
 
   @AfterClass
   public static void closeClients() throws Exception {
-    rootClient.close();
     client.close();
   }
 
@@ -65,7 +66,7 @@ public class FaunaDBTest {
     }
   }
 
-  private static ListenableFuture<Value> createDatabase() {
+  private static ListenableFuture<Value> createDatabase(FaunaClient rootClient, String dbName) {
     return rootClient.query(
       Create(
         Ref("databases"),
@@ -74,7 +75,7 @@ public class FaunaDBTest {
     );
   }
 
-  private static AsyncFunction<Value, Value> createServerKey() {
+  private static AsyncFunction<Value, Value> createServerKey(final FaunaClient rootClient) {
     return new AsyncFunction<Value, Value>() {
       @Override
       public ListenableFuture<Value> apply(Value dbCreateR) throws Exception {
@@ -91,12 +92,12 @@ public class FaunaDBTest {
     };
   }
 
-  private static Function<Value, FaunaClient> createClientWithServerKey() {
+  private static Function<Value, FaunaClient> createClientWithServerKey(final FaunaClient rootClient) {
     return new Function<Value, FaunaClient>() {
       @Override
       public FaunaClient apply(Value serverKeyF) {
         String secret = serverKeyF.at("secret").to(STRING).get();
-        return createFaunaClient(secret);
+        return rootClient.newSessionClient(secret);
       }
     };
   }
