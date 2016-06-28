@@ -21,7 +21,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.String.format;
 
@@ -157,7 +156,7 @@ public final class Connection implements AutoCloseable {
       else
         root = faunaRoot;
 
-      return new Connection(root, authToken, httpClient, registry, new AtomicInteger(1));
+      return new Connection(root, authToken, new RefAwareHttpClient(httpClient), registry);
     }
   }
 
@@ -167,20 +166,18 @@ public final class Connection implements AutoCloseable {
 
   private final URL faunaRoot;
   private final String authHeader;
-  private final AsyncHttpClient client;
+  private final RefAwareHttpClient client;
   private final MetricRegistry registry;
-  private final AtomicInteger refCount;
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final ObjectMapper json = new ObjectMapper();
   private final AtomicBoolean closed = new AtomicBoolean(false);
 
-  private Connection(URL faunaRoot, String authToken, AsyncHttpClient client, MetricRegistry registry, AtomicInteger refCount) {
+  private Connection(URL faunaRoot, String authToken, RefAwareHttpClient client, MetricRegistry registry) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
     this.client = client;
     this.registry = registry;
-    this.refCount = refCount;
   }
 
   /**
@@ -191,10 +188,10 @@ public final class Connection implements AutoCloseable {
    * @return a new {@link Connection}
    */
   public Connection newSessionConnection(String authToken) {
-    if (refCount.incrementAndGet() > 1)
-      return new Connection(faunaRoot, authToken, client, registry, refCount);
+    if (client.retain())
+      return new Connection(faunaRoot, authToken, client, registry);
     else
-      throw new IllegalStateException("Can not create a session connection from a closed connection");
+      throw new IllegalStateException("Can not create a session connection from a closed http connection");
   }
 
   /**
@@ -203,15 +200,8 @@ public final class Connection implements AutoCloseable {
    */
   @Override
   public void close() {
-    try {
-      if (closed.compareAndSet(false, true)) {
-        if (refCount.decrementAndGet() == 0)
-          client.close();
-      }
-    } catch (IOException e) {
-      // DefaultAsyncHttpClient do not throw IOException, we don't need to pollute the API with it
-      throw new IllegalStateException("Unexpected error when closing http connection pool", e);
-    }
+    if (closed.compareAndSet(false, true))
+      client.close();
   }
 
   /**
