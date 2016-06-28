@@ -13,6 +13,7 @@ import org.asynchttpclient.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOError;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -43,7 +44,7 @@ public final class Connection implements AutoCloseable {
     try {
       FAUNA_ROOT = new URL("https://rest.faunadb.com");
     } catch (MalformedURLException e) {
-      throw new RuntimeException(e); // won't happen
+      throw new IOError(e); // won't happen
     }
   }
 
