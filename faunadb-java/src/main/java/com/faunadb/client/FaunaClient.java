@@ -1,5 +1,6 @@
 package com.faunadb.client;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -12,10 +13,13 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Response;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
@@ -42,39 +46,109 @@ public class FaunaClient implements AutoCloseable {
   private static final Charset UTF8 = Charset.forName("UTF-8");
 
   /**
-   * Returns a new {@link FaunaClient} instance.
-   *
-   * @param connection the underlying {@link Connection} adapter for the client to use.
+   * Creates a new {@link Builder}
    */
-  public static FaunaClient create(Connection connection) {
-    ObjectMapper json = new ObjectMapper();
-    json.registerModule(new GuavaModule());
-    return new FaunaClient(connection, json);
+  public static Builder builder() {
+    return new Builder();
   }
 
   /**
-   * Returns a new {@link FaunaClient} instance.
-   *
-   * @param connection the underlying {@link Connection} adapter for the client to use.
-   * @param json       a custom {@link ObjectMapper} to customize JSON serialization and deserialization behavior.
+   * A builder for creating an instance of {@link FaunaClient}
    */
-  public static FaunaClient create(Connection connection, ObjectMapper json) {
-    return new FaunaClient(connection, json.copy().registerModule(new GuavaModule()));
+  public static final class Builder {
+
+    private String secret;
+    private URL endpoint;
+    private MetricRegistry registry;
+    private AsyncHttpClient httpClient;
+
+    private Builder() {
+    }
+
+    /**
+     * Sets the secret to be passed to FaunaDB as a authentication token
+     *
+     * @param secret the auth token secret
+     * @return this {@link Builder} object
+     */
+    public Builder withSecret(String secret) {
+      this.secret = secret;
+      return this;
+    }
+
+    /**
+     * Sets the FaunaDB endpoint url for the built {@link FaunaClient}.
+     *
+     * @param endpoint the root endpoint URL
+     * @return this {@link Builder} object
+     */
+    public Builder withEndpoint(String endpoint) throws MalformedURLException {
+      this.endpoint = new URL(endpoint);
+      return this;
+    }
+
+    /**
+     * Sets a {@link MetricRegistry} that the {@link FaunaClient} will use to register and track Connection-level
+     * statistics.
+     *
+     * @param registry the MetricRegistry instance.
+     * @return this {@link Builder} object
+     */
+    public Builder withMetrics(MetricRegistry registry) {
+      this.registry = registry;
+      return this;
+    }
+
+    /**
+     * Sets a custom {@link AsyncHttpClient} implementation that the built {@link FaunaClient} will use.
+     * This custom implementation can be provided to control the behavior of the underlying HTTP transport.
+     *
+     * @param httpClient the custom {@link AsyncHttpClient} instance
+     * @return this {@link Builder} object
+     */
+    public Builder withHttpClient(AsyncHttpClient httpClient) {
+      this.httpClient = httpClient;
+      return this;
+    }
+
+    /**
+     * Returns a newly constructed {@link FaunaClient} with configuration based on the settings of this {@link Builder}.
+     */
+    public FaunaClient build() {
+      Connection.Builder builder = Connection.builder()
+        .withAuthToken(secret)
+        .withFaunaRoot(endpoint);
+
+      if (registry != null) builder.withMetrics(registry);
+      if (httpClient != null) builder.withHttpClient(httpClient);
+
+      return new FaunaClient(builder.build());
+    }
   }
 
+  private final ObjectMapper json = new ObjectMapper().registerModule(new GuavaModule());
   private final Connection connection;
-  private final ObjectMapper json;
 
-  private FaunaClient(Connection connection, ObjectMapper json) {
+  private FaunaClient(Connection connection) {
     this.connection = connection;
-    this.json = json;
+  }
+
+  /**
+   * Creates a session client with the user secret provided. Queries submited to a session client will be
+   * authenticated with the secret provided. A Session client shares its parent's {@link Connection} instance.
+   *
+   * @param secret user secret for the session client
+   * @return a new {@link FaunaClient}
+   */
+  public FaunaClient newSessionClient(String secret) {
+    return new FaunaClient(connection.newSessionConnection(secret));
   }
 
   /**
    * Frees any resources held by the client. Also closes the underlying {@link Connection}.
    */
   @Override
-  public void close() throws IOException {
+  public void close() {
     connection.close();
   }
 

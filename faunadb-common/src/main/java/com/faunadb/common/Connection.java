@@ -13,12 +13,16 @@ import org.asynchttpclient.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOError;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.lang.String.format;
 
 /**
  * The HTTP Connection adapter for FaunaDB clients.
@@ -27,10 +31,21 @@ import java.util.Map;
  * for the underlying implementation.
  */
 
-public class Connection {
-  static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
-  static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
-  static final int DEFAULT_IDLE_TIMEOUT_MS = 4750;
+public final class Connection implements AutoCloseable {
+
+  private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
+  private static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
+  private static final int DEFAULT_IDLE_TIMEOUT_MS = 4750;
+  private static final int DEFAULT_MAX_RETRIES = 0;
+  private static final URL FAUNA_ROOT;
+
+  static {
+    try {
+      FAUNA_ROOT = new URL("https://rest.faunadb.com");
+    } catch (MalformedURLException e) {
+      throw new IOError(e); // won't happen
+    }
+  }
 
   /**
    * Returns a new {@link Connection.Builder}.
@@ -44,6 +59,7 @@ public class Connection {
    * an instance of this builder.
    */
   public static class Builder {
+
     private URL faunaRoot;
     private String authToken;
     private AsyncHttpClient client;
@@ -112,57 +128,80 @@ public class Connection {
 
     /**
      * Returns a newly constructed {@link Connection} with configuration based on the settings of this {@link Builder}.
-     *
-     * @throws UnsupportedEncodingException if the system does not support ASCII encoding for the Connection.
-     * @throws MalformedURLException        if the default FaunaDB URL cannot be parsed.
      */
-    public Connection build() throws UnsupportedEncodingException, MalformedURLException {
-      MetricRegistry r;
+    public Connection build() {
+      MetricRegistry registry;
       if (metricRegistry == null)
-        r = new MetricRegistry();
+        registry = new MetricRegistry();
       else
-        r = metricRegistry;
+        registry = metricRegistry;
 
-      AsyncHttpClient c;
+      AsyncHttpClient httpClient;
       if (client == null) {
-        AsyncHttpClientConfig config = new DefaultAsyncHttpClientConfig.Builder()
-          .setConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_MS)
-          .setRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
-          .setPooledConnectionIdleTimeout(DEFAULT_IDLE_TIMEOUT_MS)
-          .setMaxRequestRetry(0)
-          .build();
-        c = new DefaultAsyncHttpClient(config);
-      } else
-        c = client;
+        httpClient = new DefaultAsyncHttpClient(
+          new DefaultAsyncHttpClientConfig.Builder()
+            .setConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_MS)
+            .setRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
+            .setPooledConnectionIdleTimeout(DEFAULT_IDLE_TIMEOUT_MS)
+            .setMaxRequestRetry(DEFAULT_MAX_RETRIES)
+            .build()
+        );
+      } else {
+        httpClient = client;
+      }
 
       URL root;
       if (faunaRoot == null)
-        root = new URL("https://rest.faunadb.com");
+        root = FAUNA_ROOT;
       else
         root = faunaRoot;
 
-      return new Connection(root, authToken, c, r);
+      return new Connection(root, authToken, new RefAwareHttpClient(httpClient), registry);
     }
   }
 
-  private static String XFaunaDBHost = "X-FaunaDB-Host";
-  private static String XFaunaDBBuild = "X-FaunaDB-Build";
+  private static final String ASCII = "ASCII";
+  private static final String X_FAUNADB_HOST = "X-FaunaDB-Host";
+  private static final String X_FAUNADB_BUILD = "X-FaunaDB-Build";
 
   private final URL faunaRoot;
-  private final String authToken;
   private final String authHeader;
-  private final AsyncHttpClient client;
+  private final RefAwareHttpClient client;
   private final MetricRegistry registry;
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final ObjectMapper json = new ObjectMapper();
+  private final AtomicBoolean closed = new AtomicBoolean(false);
 
-  Connection(URL faunaRoot, String authToken, AsyncHttpClient client, MetricRegistry registry) throws UnsupportedEncodingException {
+  private Connection(URL faunaRoot, String authToken, RefAwareHttpClient client, MetricRegistry registry) {
     this.faunaRoot = faunaRoot;
-    this.authToken = authToken;
     this.authHeader = generateAuthHeader(authToken);
     this.client = client;
     this.registry = registry;
+  }
+
+  /**
+   * Creates a new short live connection sharing its underneath {@link AsyncHttpClient}. Queries submited to a
+   * session connection will be authenticated with the token provided.
+   *
+   * @param authToken token that will be used to authenticate requests
+   * @return a new {@link Connection}
+   */
+  public Connection newSessionConnection(String authToken) {
+    if (client.retain())
+      return new Connection(faunaRoot, authToken, client, registry);
+    else
+      throw new IllegalStateException("Can not create a session connection from a closed http connection");
+  }
+
+  /**
+   * Releases any resources being held by the HTTP client. Also closes the underlying
+   * {@link AsyncHttpClient}.
+   */
+  @Override
+  public void close() {
+    if (closed.compareAndSet(false, true))
+      client.close();
   }
 
   /**
@@ -251,15 +290,7 @@ public class Connection {
     return performRequest(request);
   }
 
-  /**
-   * Releases any resources being held by the HTTP client. Also closes the underlying
-   * {@link AsyncHttpClient}.
-   */
-  public void close() throws IOException {
-    client.close();
-  }
-
-  private ListenableFuture<Response> performRequest(final Request request) throws IOException {
+  private ListenableFuture<Response> performRequest(final Request request) {
     final Timer.Context ctx = registry.timer("fauna-request").time();
     final SettableFuture<Response> rv = SettableFuture.create();
 
@@ -289,24 +320,33 @@ public class Connection {
     return new URL(faunaRoot, path).toString();
   }
 
-  private void logSuccess(Request request, Response response) throws IOException {
-    String requestData = Optional.fromNullable(request.getStringData()).or("");
-    String faunaHost = Optional.fromNullable(response.getHeader(XFaunaDBHost)).or("Unknown");
-    String faunaBuild = Optional.fromNullable(response.getHeader(XFaunaDBBuild)).or("Unknown");
-    String responseBody = Optional.fromNullable(response.getResponseBody()).or("");
+  private void logSuccess(Request request, Response response) {
+    if (log.isDebugEnabled()) {
+      String data = Optional.fromNullable(request.getStringData()).or("");
+      String host = Optional.fromNullable(response.getHeader(X_FAUNADB_HOST)).or("Unknown");
+      String build = Optional.fromNullable(response.getHeader(X_FAUNADB_BUILD)).or("Unknown");
+      String body = Optional.fromNullable(response.getResponseBody()).or("");
 
-    log.debug("Request: " + request.getMethod() + " " + request.getUrl() + ": " + requestData + ". " +
-      "Response: Status=" + response.getStatusCode() + ", Fauna Host: " + faunaHost + ", " +
-      "Fauna Build: " + faunaBuild + ": " + responseBody);
+      log.debug(
+        format("Request: %s %s: %s. Response: Status=%d, Fauna Host: %s, Fauna Build: %s: %s",
+          request.getMethod(), request.getUrl(), data, response.getStatusCode(), host, build, body));
+    }
   }
 
   private void logFailure(Request request, Throwable ex) {
-    String requestData = Optional.fromNullable(request.getStringData()).or("");
-    log.info("Request: " + request.getMethod() + " " + request.getUrl() + ": " + requestData + ". " +
-      "Failed: " + ex.getMessage(), ex);
+    String data = Optional.fromNullable(request.getStringData()).or("");
+
+    log.info(
+      format("Request: %s %s: %s. Failed: %s",
+        request.getMethod(), request.getUrl(), data, ex.getMessage()), ex);
   }
 
-  private static String generateAuthHeader(String authToken) throws UnsupportedEncodingException {
-    return "Basic " + Base64.encode((authToken + ":").getBytes("ASCII"));
+  private static String generateAuthHeader(String authToken) {
+    try {
+      String token = authToken + ":";
+      return "Basic " + Base64.encode(token.getBytes(ASCII));
+    } catch (UnsupportedEncodingException e) {
+      throw new IllegalStateException(e); // If ASCII is not supported there is no recovery action to be taken
+    }
   }
 }
