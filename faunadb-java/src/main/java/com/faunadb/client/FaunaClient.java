@@ -82,8 +82,7 @@ public class FaunaClient implements AutoCloseable {
    * Issues a Query to FaunaDB.
    * <p>
    * Queries are modeled through the FaunaDB query language, represented by the helper functions in the
-   * {@link com.faunadb.client.query} package. See {@link com.faunadb.client.query.Language} for helpers
-   * and examples.
+   * {@link com.faunadb.client.query.Language} class.
    * <p>
    * Responses are modeled as a general response tree. Each node is a {@link Value}, and
    * can be coerced to structured types through various methods on that class.

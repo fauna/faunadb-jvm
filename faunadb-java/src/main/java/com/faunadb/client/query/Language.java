@@ -47,7 +47,7 @@ public final class Language {
   /**
    * Enumeration for time units.
    *
-   * @see <a href="https://faunadb.com/documentation/queries#time_functions">FaunaDB Time Functions</a>.
+   * @see <a href="https://faunadb.com/documentation/queries#time_functions">FaunaDB Time Functions</a>
    */
   public enum TimeUnit {
     SECOND("second"),

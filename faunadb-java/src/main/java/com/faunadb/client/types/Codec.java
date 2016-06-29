@@ -24,7 +24,7 @@ import static java.lang.String.format;
  * <pre>{@code
  * class Person {
  *   static final Codec<Person> PERSON = new Codec<Person>() {
- *     @Override public Result<Person> apply(Value value) {
+ *     public Result<Person> apply(Value value) {
  *       return Result.success(new Person(
  *         value.at("data", "firstName").to(Codec.STRING),
  *         value.at("data", "lastName").to(Codec.STRING)

@@ -49,10 +49,10 @@ lazy val common = project.in(file("faunadb-common"))
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-common/api/")),
 
-    (javacOptions in doc) := Seq("-source", "1.7",
+    (javacOptions in doc) := Seq("-source", "1.7", "-Xdoclint:none",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
-      "-link", "http://docs.guava-libraries.googlecode.com/git-history/v18.0/javadoc/",
-      "-link", "http://fasterxml.github.io/jackson-databind/javadoc/2.5/",
+      "-link", "http://google.github.io/guava/releases/19.0/api/docs/",
+      "-link", "http://fasterxml.github.io/jackson-databind/javadoc/2.6/",
       "-link", "https://dropwizard.github.io/metrics/3.1.0/apidocs/",
       "-linkoffline", "http://static.javadoc.io/org.asynchttpclient/async-http-client/2.0.2", "./faunadb-common/doc/org.asynchttpclient/async-http-client/2.0.2"),
 
@@ -93,7 +93,7 @@ lazy val scala = project.in(file("faunadb-scala"))
 
       Map(
         findDep("com.fasterxml.jackson.core", "jackson-databind") ->
-          url("http://fasterxml.github.io/jackson-databind/javadoc/2.5/"),
+          url("http://fasterxml.github.io/jackson-databind/javadoc/2.6/"),
         findDep("io.dropwizard.metrics", "metrics-core") ->
           url(s"https://dropwizard.github.io/metrics/${metricsVersion}/apidocs/"))
     })
@@ -109,10 +109,10 @@ lazy val java = project.in(file("faunadb-java"))
     testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
     apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-java/api/")),
 
-    (javacOptions in doc) := Seq("-source", "1.7",
+    (javacOptions in doc) := Seq("-source", "1.7", "-Xdoclint:none",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
-      "-link", "http://docs.guava-libraries.googlecode.com/git-history/v18.0/javadoc/",
-      "-link", "http://fasterxml.github.io/jackson-databind/javadoc/2.5/",
+      "-link", "http://google.github.io/guava/releases/19.0/api/docs/",
+      "-link", "http://fasterxml.github.io/jackson-databind/javadoc/2.6/",
       "-link", ((target in common).value / "api").toString),
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
