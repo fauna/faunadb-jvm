@@ -119,6 +119,20 @@ class FaunaClient(connection: Connection) {
       arr.asInstanceOf[ArrayV].elems
     }.recover(handleNetworkExceptions)
 
+  /**
+    * Creates a new scope to execute session queries. Queries submited within the session scope will be
+    * authenticated with the secret provided. A session client shares its parent's
+    * [[com.faunadb.common.Connection]] instance and is closed as soon as the session scope ends.
+    *
+    * @param secret user secret for the session scope
+    * @param session a function that receives a session client
+    * @return the value produced by the session function
+    */
+  def sessionWith[A](secret: String)(session: FaunaClient => A): A = {
+    val client = new FaunaClient(connection.newSessionConnection(secret))
+    try session(client) finally client.close()
+  }
+
   /** Frees any resources held by the client and close the underlying connection. */
   def close(): Unit = connection.close()
 

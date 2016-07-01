@@ -426,16 +426,11 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val loginF = client.query(Login(createR("ref").to[RefV], Obj("password" -> "abcdefg")))
     val secret = await(loginF)("secret").to[String].get
 
-    val sessionClient = FaunaClient(endpoint = config("root_url"), secret = secret)
-
-    val logoutF = sessionClient.query(Logout(false))
-    val logoutR = await(logoutF)
-    logoutR.to[Boolean].get shouldBe true
+    val loggedOut = client.sessionWith(secret)(_.query(Logout(false)))
+    await(loggedOut).to[Boolean].get shouldBe true
 
     val identifyF = client.query(Identify(createR("ref").to[RefV], "abcdefg"))
     val identifyR = await(identifyF)
     identifyR.to[Boolean].get shouldBe true
-
-    sessionClient.close()
   }
 }
