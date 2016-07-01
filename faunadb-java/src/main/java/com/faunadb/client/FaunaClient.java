@@ -135,7 +135,7 @@ public class FaunaClient implements AutoCloseable {
 
   /**
    * Creates a session client with the user secret provided. Queries submited to a session client will be
-   * authenticated with the secret provided. A Session client shares its parent's {@link Connection} instance.
+   * authenticated with the secret provided. A session client shares its parent's {@link Connection} instance.
    *
    * @param secret user secret for the session client
    * @return a new {@link FaunaClient}
