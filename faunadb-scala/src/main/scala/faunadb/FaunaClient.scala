@@ -108,7 +108,7 @@ class FaunaClient(connection: Connection) {
     * @param exprs the queries to run.
     * @return A [[scala.concurrent.Future]] containing an IndexedSeq of
     *         the results of each query. Each result is an instance of
-    *         [faunadb.values.Result]], which can be cast to a typed
+    *         [[faunadb.values.Value]], which can be cast to a typed
     *         value using the [[faunadb.values.Field]] API. If *any*
     *         query fails, a failed future is returned.
     */
