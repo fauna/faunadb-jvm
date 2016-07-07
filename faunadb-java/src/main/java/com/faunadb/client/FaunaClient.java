@@ -34,7 +34,7 @@ import java.util.concurrent.TimeoutException;
  * <b>Example</b>:
  * <pre>{@code
  * import static com.faunadb.client.query.Language.*;
- * FaunaClient client = FaunaClient.create(Connection.builder().withAuthToken("someAuthToken").build());
+ * FaunaClient client = FaunaClient.builder().withSecret("someAuthToken").build();
  * client.query(Get(Ref("some/ref")));
  * }
  * </pre>

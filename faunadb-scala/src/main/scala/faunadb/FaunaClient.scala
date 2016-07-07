@@ -27,7 +27,7 @@ object FaunaClient {
     *
     * @param secret The secret material of the auth key used. See [[https://faunadb.com/documentation#authentication-key_access]]
     * @param endpoint URL of the FaunaDB service to connect to. Defaults to https://rest.faunadb.com
-    * @param metrics An optional [[com.codehale.metrics.MetricsRegistry]] to record stats.
+    * @param metrics An optional [[com.codahale.metrics.MetricRegistry]] to record stats.
     * @param httpClient An optional custom [[org.asynchttpclient.AsyncHttpClient]].
     * @return A configured FaunaClient instance.
     */
@@ -108,7 +108,7 @@ class FaunaClient(connection: Connection) {
     * @param exprs the queries to run.
     * @return A [[scala.concurrent.Future]] containing an IndexedSeq of
     *         the results of each query. Each result is an instance of
-    *         [faunadb.values.Result]], which can be cast to a typed
+    *         [[faunadb.values.Value]], which can be cast to a typed
     *         value using the [[faunadb.values.Field]] API. If *any*
     *         query fails, a failed future is returned.
     */
