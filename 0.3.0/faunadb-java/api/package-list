@@ -1,0 +1,4 @@
+com.faunadb.client
+com.faunadb.client.errors
+com.faunadb.client.query
+com.faunadb.client.types
