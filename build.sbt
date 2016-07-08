@@ -1,9 +1,13 @@
+val driverVersion = "0.3.0-SNAPSHOT"
+val asyncHttpClientVersion = "2.0.2"
+val guavaVersion = "19.0"
 val jacksonVersion = "2.6.4"
+val jacksonDocVersion = "2.6"
 val metricsVersion = "3.1.0"
 val baseScalaVersion = "2.11.8"
 
 lazy val publishSettings = Seq(
-  version := "0.3.0-SNAPSHOT",
+  version := driverVersion,
   organization := "com.faunadb",
   licenses := Seq("Mozilla Public License" -> url("https://www.mozilla.org/en-US/MPL/2.0/")),
   homepage := Some(url("https://github.com/faunadb/faunadb-jvm")),
@@ -47,19 +51,20 @@ lazy val common = project.in(file("faunadb-common"))
     name := "faunadb-common",
     crossPaths := false,
     autoScalaLibrary := false,
+    exportJars := true,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
-    apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-common/api/")),
+    apiURL := Some(url(s"http://faunadb.github.io/faunadb-jvm/$driverVersion/faunadb-common/api/")),
 
     (javacOptions in doc) := Seq("-source", "1.7", "-Xdoclint:none",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
-      "-link", "http://google.github.io/guava/releases/19.0/api/docs/",
-      "-link", "http://fasterxml.github.io/jackson-databind/javadoc/2.6/",
-      "-link", "https://dropwizard.github.io/metrics/3.1.0/apidocs/",
-      "-linkoffline", "http://static.javadoc.io/org.asynchttpclient/async-http-client/2.0.2", "./faunadb-common/doc/org.asynchttpclient/async-http-client/2.0.2"),
+      "-link", s"http://google.github.io/guava/releases/$guavaVersion/api/docs/",
+      "-link", s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/",
+      "-link", s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/",
+      "-linkoffline", s"http://static.javadoc.io/org.asynchttpclient/async-http-client/$asyncHttpClientVersion/", s"./faunadb-common/doc/org.asynchttpclient/async-http-client/$asyncHttpClientVersion/"),
 
     libraryDependencies ++= Seq(
-      "org.asynchttpclient" % "async-http-client" % "2.0.2",
-      "com.google.guava" % "guava" % "19.0",
+      "org.asynchttpclient" % "async-http-client" % asyncHttpClientVersion,
+      "com.google.guava" % "guava" % guavaVersion,
       "io.dropwizard.metrics" % "metrics-core" % metricsVersion,
       "org.slf4j" % "slf4j-api" % "1.7.7",
       "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
@@ -79,7 +84,7 @@ lazy val scala = project.in(file("faunadb-scala"))
       "org.scalatest" %% "scalatest" % "2.2.1" % "test"),
 
     autoAPIMappings := true,
-    apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-scala/api/")),
+    apiURL := Some(url(s"http://faunadb.github.io/faunadb-jvm/$driverVersion/faunadb-scala/api/")),
     apiMappings ++= {
       val cp = (fullClasspath in Compile).value
       def findDep(org: String, name: String) = {
@@ -93,10 +98,12 @@ lazy val scala = project.in(file("faunadb-scala"))
       }.head
 
       Map(
+        findDep("org.asynchttpclient", "async-http-client") ->
+          url(s"http://static.javadoc.io/org.asynchttpclient/async-http-client/$asyncHttpClientVersion/"),
         findDep("com.fasterxml.jackson.core", "jackson-databind") ->
-          url("http://fasterxml.github.io/jackson-databind/javadoc/2.6/"),
+          url(s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/"),
         findDep("io.dropwizard.metrics", "metrics-core") ->
-          url(s"https://dropwizard.github.io/metrics/${metricsVersion}/apidocs/"))
+          url(s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/"))
     })
 
 lazy val java = project.in(file("faunadb-java"))
@@ -112,9 +119,11 @@ lazy val java = project.in(file("faunadb-java"))
 
     (javacOptions in doc) := Seq("-source", "1.7", "-Xdoclint:none",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
-      "-link", "http://google.github.io/guava/releases/19.0/api/docs/",
-      "-link", "http://fasterxml.github.io/jackson-databind/javadoc/2.6/",
-      "-link", ((target in common).value / "api").toString),
+      "-link", s"http://google.github.io/guava/releases/$guavaVersion/api/docs/",
+      "-link", s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/",
+      "-link", s"http://faunadb.github.io/faunadb-jvm/$driverVersion/faunadb-common/api/",
+      "-link", s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/",
+      "-linkoffline", s"http://static.javadoc.io/org.asynchttpclient/async-http-client/$asyncHttpClientVersion", s"./faunadb-common/doc/org.asynchttpclient/async-http-client/$asyncHttpClientVersion"),
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
 
