@@ -57,7 +57,7 @@ public final class Field<T> {
 
   /**
    * Creates a field that extracts its value from a object path, assuming the value
-   * is an intance of {@link com.faunadb.client.types.Value.ObjectV}.
+   * is an instance of {@link com.faunadb.client.types.Value.ObjectV}.
    *
    * @param keys path to the field
    * @return the field extractor
@@ -68,7 +68,7 @@ public final class Field<T> {
 
   /**
    * Creates a field that extracts its value from a array index, assuming the value
-   * is an intance of {@link com.faunadb.client.types.Value.ArrayV}.
+   * is an instance of {@link com.faunadb.client.types.Value.ArrayV}.
    *
    * @param indexes path to the field
    * @return the field extractor
@@ -78,7 +78,7 @@ public final class Field<T> {
   }
 
   /**
-   * Creates a field that coerces its value using the codec passaed
+   * Creates a field that coerces its value using the codec passed
    *
    * @param codec codec used to coerce the field's value
    * @return the field extractor
@@ -124,7 +124,7 @@ public final class Field<T> {
    * assuming the root value is an instance of {@link com.faunadb.client.types.Value.ArrayV}
    *
    * @param field field to be extracted from each array's element
-   * @return a new field that collects each innver value using the field passed
+   * @return a new field that collects each inner value using the field passed
    */
   public <A> Field<ImmutableList<A>> collect(Field<A> field) {
     return new Field<>(path, new CollectionCodec<>(path, field));

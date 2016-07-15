@@ -192,7 +192,7 @@ public abstract class Result<T> {
    *
    * @param fn the map function to be applied
    * @return if this is a successful result, return a new successful result with the map function result.
-   * If this is a failure, returns a new faulure with the name error message.
+   * If this is a failure, returns a new failure with the same error message.
    */
   public abstract <U> Result<U> map(Function<T, U> fn);
 
