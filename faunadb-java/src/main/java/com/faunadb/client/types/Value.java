@@ -286,7 +286,7 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Represents a Double value in the FaunadB query language.
+   * Represents a Double value in the FaunaDB query language.
    *
    * @see Language#Value(double)
    */
@@ -303,7 +303,7 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Represents a Long value in the FaunadB query language.
+   * Represents a Long value in the FaunaDB query language.
    *
    * @see Language#Value(long)
    */
@@ -320,7 +320,7 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Represents a String value in the FaunadB query language.
+   * Represents a String value in the FaunaDB query language.
    *
    * @see Language#Value(String)
    */
@@ -337,7 +337,7 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Represents a null value in the FaunadB query language.
+   * Represents a null value in the FaunaDB query language.
    *
    * @see Language#Null()
    */
@@ -373,7 +373,7 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Represents a Timestamp value in the FaunadB query language.
+   * Represents a Timestamp value in the FaunaDB query language.
    *
    * @see Language#Value(Instant)
    */
@@ -397,7 +397,7 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Represents a Date value in the FaunadB query language.
+   * Represents a Date value in the FaunaDB query language.
    *
    * @see Language#Value(LocalDate)
    */
