@@ -105,7 +105,9 @@ lazy val scala = project.in(file("faunadb-scala"))
         findDep("com.fasterxml.jackson.core", "jackson-databind") ->
           url(s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/"),
         findDep("io.dropwizard.metrics", "metrics-core") ->
-          url(s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/"))
+          url(s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/"),
+        findDep("joda-time", "joda-time") ->
+          url("http://www.joda.org/joda-time/apidocs/index.html"))
     })
 
 lazy val java = project.in(file("faunadb-java"))
@@ -125,6 +127,7 @@ lazy val java = project.in(file("faunadb-java"))
       "-link", s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/",
       "-link", s"http://faunadb.github.io/faunadb-jvm/$driverVersion/faunadb-common/api/",
       "-link", s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/",
+      "-link", "http://www.joda.org/joda-time/apidocs/",
       "-linkoffline", s"http://static.javadoc.io/org.asynchttpclient/async-http-client/$asyncHttpClientVersion", s"./faunadb-common/doc/org.asynchttpclient/async-http-client/$asyncHttpClientVersion"),
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
