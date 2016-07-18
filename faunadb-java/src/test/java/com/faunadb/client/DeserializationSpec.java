@@ -6,17 +6,18 @@ import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.RefV;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 import static com.faunadb.client.types.Codec.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.assertThat;
 
 public class DeserializationSpec {
@@ -71,13 +72,13 @@ public class DeserializationSpec {
   @Test
   public void shouldDeserializeDate() throws IOException {
     assertThat(parsed("{ \"@date\": \"1970-01-03\" }").to(DATE).get(),
-      equalTo(LocalDate.ofEpochDay(2)));
+      equalTo(new LocalDate(0, UTC).plusDays(2)));
   }
 
   @Test
   public void shouldDeserializeTS() throws IOException {
     assertThat(parsed("{ \"@ts\": \"1970-01-01T00:05:00Z\" }").to(TIME).get(),
-      equalTo(Instant.EPOCH.plus(5, ChronoUnit.MINUTES)));
+      equalTo(new Instant(0).plus(Duration.standardMinutes(5))));
   }
 
   @Test

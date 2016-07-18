@@ -5,9 +5,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
-import java.time.Instant;
-import java.time.LocalDate;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
 
 import static java.lang.String.format;
 

@@ -4,9 +4,9 @@ import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.*;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
 
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
