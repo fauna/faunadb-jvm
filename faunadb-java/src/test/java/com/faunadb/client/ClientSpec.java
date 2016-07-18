@@ -13,13 +13,14 @@ import com.faunadb.client.types.Value.StringV;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Random;
 
 import static com.faunadb.client.query.Language.Action.CREATE;
@@ -27,11 +28,10 @@ import static com.faunadb.client.query.Language.Action.DELETE;
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.TimeUnit.SECOND;
 import static com.faunadb.client.types.Codec.*;
-import static java.time.temporal.ChronoUnit.HOURS;
-import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.assertThat;
 
 public class ClientSpec extends FaunaDBTest {
@@ -766,19 +766,19 @@ public class ClientSpec extends FaunaDBTest {
   @Test
   public void shouldEvalTimeExpression() throws Exception {
     Value res = client.query(Time(Value("1970-01-01T00:00:00-04:00"))).get();
-    assertThat(res.to(TIME).get(), equalTo(Instant.EPOCH.plus(4, HOURS)));
+    assertThat(res.to(TIME).get(), equalTo(new Instant(0).plus(Duration.standardHours(4))));
   }
 
   @Test
   public void shouldEvalEpochExpression() throws Exception {
     Value res = client.query(Epoch(Value(30), SECOND)).get();
-    assertThat(res.to(TIME).get(), equalTo(Instant.EPOCH.plus(30, SECONDS)));
+    assertThat(res.to(TIME).get(), equalTo(new Instant(0).plus(Duration.standardSeconds(30))));
   }
 
   @Test
   public void shouldEvalDateExpression() throws Exception {
     Value res = client.query(Date(Value("1970-01-02"))).get();
-    assertThat(res.to(DATE).get(), equalTo(LocalDate.ofEpochDay(1)));
+    assertThat(res.to(DATE).get(), equalTo(new LocalDate(0, UTC).plusDays(1)));
   }
 
   @Test

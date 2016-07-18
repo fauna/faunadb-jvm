@@ -1,9 +1,9 @@
 package faunadb
 
-import java.time.{LocalDate, Instant}
-import java.time.temporal.ChronoUnit
 import com.fasterxml.jackson.databind.ObjectMapper
 import faunadb.values._
+import org.joda.time.DateTimeZone.UTC
+import org.joda.time.{ Duration, Instant, LocalDate }
 import org.scalatest.{ FlatSpec, Matchers }
 
 class DeserializationSpec extends FlatSpec with Matchers {
@@ -69,13 +69,13 @@ class DeserializationSpec extends FlatSpec with Matchers {
     val toDeserialize = """{"@ts":"1970-01-01T00:05:00Z"}"""
     val parsed = json.readValue(toDeserialize, classOf[Value])
 
-    parsed should equal (TimeV(Instant.EPOCH.plus(5, ChronoUnit.MINUTES)))
+    parsed should equal (TimeV(new Instant(0).plus(Duration.standardMinutes(5))))
   }
 
   it should "deserialize date" in {
     val toDeserialize = """{"@date":"1970-01-03"}"""
     val parsed = json.readValue(toDeserialize, classOf[Value])
 
-    parsed should equal (DateV(LocalDate.ofEpochDay(2)))
+    parsed should equal (DateV(new LocalDate(0, UTC).plusDays(2)))
   }
 }

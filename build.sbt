@@ -4,6 +4,7 @@ val guavaVersion = "19.0"
 val jacksonVersion = "2.6.4"
 val jacksonDocVersion = "2.6"
 val metricsVersion = "3.1.0"
+val jodaTimeVersion = "2.9.4"
 val baseScalaVersion = "2.11.8"
 
 lazy val publishSettings = Seq(
@@ -80,6 +81,7 @@ lazy val scala = project.in(file("faunadb-scala"))
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
+      "joda-time" % "joda-time" % jodaTimeVersion,
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
       "org.scalatest" %% "scalatest" % "2.2.1" % "test"),
 
@@ -103,7 +105,9 @@ lazy val scala = project.in(file("faunadb-scala"))
         findDep("com.fasterxml.jackson.core", "jackson-databind") ->
           url(s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/"),
         findDep("io.dropwizard.metrics", "metrics-core") ->
-          url(s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/"))
+          url(s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/"),
+        findDep("joda-time", "joda-time") ->
+          url("http://www.joda.org/joda-time/apidocs/index.html"))
     })
 
 lazy val java = project.in(file("faunadb-java"))
@@ -123,12 +127,14 @@ lazy val java = project.in(file("faunadb-java"))
       "-link", s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/",
       "-link", s"http://faunadb.github.io/faunadb-jvm/$driverVersion/faunadb-common/api/",
       "-link", s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/",
+      "-link", "http://www.joda.org/joda-time/apidocs/",
       "-linkoffline", s"http://static.javadoc.io/org.asynchttpclient/async-http-client/$asyncHttpClientVersion", s"./faunadb-common/doc/org.asynchttpclient/async-http-client/$asyncHttpClientVersion"),
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
 
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,
+      "joda-time" % "joda-time" % jodaTimeVersion,
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
       "org.yaml" % "snakeyaml" % "1.14" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test",

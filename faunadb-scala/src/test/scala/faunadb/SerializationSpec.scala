@@ -1,13 +1,12 @@
 package faunadb
 
-import java.time.{LocalDate, Instant}
-import java.time.temporal.ChronoUnit
-
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import faunadb.query._
 import faunadb.values._
-import org.scalatest.{FlatSpec, Matchers}
+import org.joda.time.DateTimeZone.UTC
+import org.joda.time.{ Duration, Instant, LocalDate }
+import org.scalatest.{ FlatSpec, Matchers }
 
 class SerializationSpec extends FlatSpec with Matchers {
   val json = new ObjectMapper()
@@ -173,10 +172,10 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize date and ts" in {
-    val ts = TimeV(Instant.EPOCH.plus(5, ChronoUnit.MINUTES))
+    val ts = TimeV(new Instant(0).plus(Duration.standardMinutes(5)))
     json.writeValueAsString(ts) shouldBe "{\"@ts\":\"1970-01-01T00:05:00Z\"}"
 
-    val date = DateV(LocalDate.ofEpochDay(2))
+    val date = DateV(new LocalDate(0, UTC).plusDays(2))
     json.writeValueAsString(date) shouldBe "{\"@date\":\"1970-01-03\"}"
   }
 

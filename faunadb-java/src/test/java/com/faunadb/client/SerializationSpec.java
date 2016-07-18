@@ -10,8 +10,8 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.time.Instant;
-import java.time.LocalDate;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
 
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.TimeUnit.*;
@@ -128,12 +128,12 @@ public class SerializationSpec {
 
   @Test
   public void shouldSerializeInstantValue() throws Exception {
-    assertJson(Value(Instant.EPOCH), "{\"@ts\":\"1970-01-01T00:00:00Z\"}");
+    assertJson(Value(new Instant(0)), "{\"@ts\":\"1970-01-01T00:00:00Z\"}");
   }
 
   @Test
   public void shouldSerializeDateValue() throws Exception {
-    assertJson(Value(LocalDate.of(2015, 1, 15)), "{\"@date\":\"2015-01-15\"}");
+    assertJson(Value(new LocalDate(2015, 1, 15)), "{\"@date\":\"2015-01-15\"}");
   }
 
   @Test
@@ -369,7 +369,7 @@ public class SerializationSpec {
     );
 
     assertJson(
-      Exists(Ref("classes/spells/104979509692858368"), Value(Instant.EPOCH)),
+      Exists(Ref("classes/spells/104979509692858368"), Value(new Instant(0))),
       "{\"exists\":{\"@ref\":\"classes/spells/104979509692858368\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}}"
     );
   }
@@ -432,7 +432,7 @@ public class SerializationSpec {
     assertJson(
       Insert(
         Ref("classes/spells/104979509696660483"),
-        Value(Instant.EPOCH),
+        Value(new Instant(0)),
         Action.CREATE,
         Obj("data", Obj("name", Value("test")))
       ),
@@ -443,7 +443,7 @@ public class SerializationSpec {
     assertJson(
       Insert(
         Ref("classes/spells/104979509696660483"),
-        Value(Instant.EPOCH),
+        Value(new Instant(0)),
         Value("create"),
         Obj("data", Obj("name", Value("test")))
       ),
@@ -457,7 +457,7 @@ public class SerializationSpec {
     assertJson(
       Remove(
         Ref("classes/spells/104979509696660483"),
-        Value(Instant.EPOCH),
+        Value(new Instant(0)),
         Action.DELETE
       ),
       "{\"remove\":{\"@ref\":\"classes/spells/104979509696660483\"}," +
@@ -467,7 +467,7 @@ public class SerializationSpec {
     assertJson(
       Remove(
         Ref("classes/spells/104979509696660483"),
-        Value(Instant.EPOCH),
+        Value(new Instant(0)),
         Value("delete")
       ),
       "{\"remove\":{\"@ref\":\"classes/spells/104979509696660483\"}," +

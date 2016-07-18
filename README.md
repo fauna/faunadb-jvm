@@ -46,6 +46,7 @@ Javadocs and Scaladocs are hosted on GitHub:
 
 * [Jackson](https://github.com/FasterXML/jackson) for JSON parsing.
 * [Async HTTP client](https://github.com/AsyncHttpClient/async-http-client) and [Netty](http://netty.io/) for the HTTP transport.
+* [Joda Time](http://www.joda.org/joda-time/) for date and time manipulation.
 
 ### Java
 

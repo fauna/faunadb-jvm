@@ -1,6 +1,6 @@
 package faunadb.values
 
-import java.time.{ LocalDate, Instant }
+import org.joda.time.{ LocalDate, Instant }
 
 trait Decoder[T] {
   def decode(v: Value, path: FieldPath): Result[T]

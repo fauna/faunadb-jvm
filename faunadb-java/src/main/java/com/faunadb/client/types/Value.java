@@ -11,15 +11,15 @@ import com.faunadb.client.query.Language;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -379,19 +379,21 @@ public abstract class Value extends Expr {
    */
   public static final class TimeV extends ScalarValue<Instant> {
 
+    private static final DateTimeFormatter TIME_FORMAT = ISODateTimeFormat.dateTimeNoMillis();
+
     public TimeV(Instant value) {
       super(value);
     }
 
     @JsonCreator
     private TimeV(@JsonProperty("@ts") String value) {
-      super(ZonedDateTime.parse(value, ISO_OFFSET_DATE_TIME).toInstant());
+      super(TIME_FORMAT.parseDateTime(value).toInstant());
     }
 
     @Override
     @JsonProperty("@ts")
     protected String toJson() {
-      return value.toString();
+      return value.toString(TIME_FORMAT);
     }
 
   }
