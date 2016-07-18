@@ -1,14 +1,15 @@
 package faunadb
 
-import faunadb.errors.{UnauthorizedException, NotFoundException, BadRequestException}
+import faunadb.errors.{ BadRequestException, NotFoundException, UnauthorizedException }
 import faunadb.query._
 import faunadb.values._
-import java.time.temporal.ChronoUnit
-import java.time.{LocalDate, Instant}
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
-import scala.concurrent.{ Await, Future }
+import org.joda.time
+import org.joda.time.DateTimeZone.UTC
+import org.joda.time.{ Instant, LocalDate }
+import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
+import scala.concurrent.{ Await, Future }
 import scala.util.Random
 
 class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
@@ -68,6 +69,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   override protected def afterAll(): Unit = {
     client.close()
+    rootClient.close()
   }
 
   "Fauna Client" should "should not find an instance" in {
@@ -405,18 +407,18 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "test date and time functions" in {
     val timeF = client.query(Time("1970-01-01T00:00:00-04:00"))
     val timeR = await(timeF)
-    timeR.to[TimeV].get.instant shouldBe Instant.EPOCH.plus(4, ChronoUnit.HOURS)
-    timeR.to[Instant].get shouldBe Instant.EPOCH.plus(4, ChronoUnit.HOURS)
+    timeR.to[TimeV].get.instant shouldBe new Instant(0).plus(time.Duration.standardHours(4))
+    timeR.to[Instant].get shouldBe new Instant(0).plus(time.Duration.standardHours(4))
 
     val epochF = client.query(Epoch(30, "second"))
     val epochR = await(epochF)
-    epochR.to[TimeV].get.instant shouldBe Instant.EPOCH.plus(30, ChronoUnit.SECONDS)
-    epochR.to[Instant].get shouldBe Instant.EPOCH.plus(30, ChronoUnit.SECONDS)
+    epochR.to[TimeV].get.instant shouldBe new Instant(0).plus(time.Duration.standardSeconds(30))
+    epochR.to[Instant].get shouldBe new Instant(0).plus(time.Duration.standardSeconds(30))
 
     val dateF = client.query(query.Date("1970-01-02"))
     val dateR = await(dateF)
-    dateR.to[DateV].get.localDate shouldBe LocalDate.ofEpochDay(1)
-    dateR.to[LocalDate].get shouldBe LocalDate.ofEpochDay(1)
+    dateR.to[DateV].get.localDate shouldBe new LocalDate(0, UTC).plusDays(1)
+    dateR.to[LocalDate].get shouldBe new LocalDate(0, UTC).plusDays(1)
   }
 
   it should "test authentication functions" in {

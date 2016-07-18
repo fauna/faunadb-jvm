@@ -1,13 +1,12 @@
 package faunadb.values
 
-import com.fasterxml.jackson.annotation.{ JsonProperty, JsonCreator, JsonIgnore, JsonValue }
-import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.annotation.{ JsonIgnore, JsonProperty, JsonValue }
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.node.NullNode
 import faunadb.jackson._
-import java.time.format.DateTimeFormatter
-import java.time.{ LocalDate, ZonedDateTime, Instant }
-import scala.annotation.meta.{ param, field, getter }
+import org.joda.time.format.ISODateTimeFormat
+import org.joda.time.{ Instant, LocalDate }
+import scala.annotation.meta.{ field, getter, param }
 
 /**
   * A FaunaDB value.
@@ -148,11 +147,11 @@ case class SetRefV(@JsonProperty("@set") parameters: Value) extends ScalarValue
 /** A Timestamp value. */
 case class TimeV(@(JsonIgnore @param @field @getter) instant: Instant) extends ScalarValue {
   @JsonProperty("@ts")
-  val strValue = instant.toString
+  val strValue = instant.toString(ISODateTimeFormat.dateTimeNoMillis())
 }
 object TimeV {
   def apply(value: String): TimeV =
-    TimeV(ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant)
+    TimeV(ISODateTimeFormat.dateTimeNoMillis().parseDateTime(value).toInstant)
 }
 
 /** A Date value. */
