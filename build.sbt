@@ -4,6 +4,7 @@ val guavaVersion = "19.0"
 val jacksonVersion = "2.6.4"
 val jacksonDocVersion = "2.6"
 val metricsVersion = "3.1.0"
+val jodaTimeVersion = "2.9.4"
 val baseScalaVersion = "2.11.8"
 
 lazy val publishSettings = Seq(
@@ -80,6 +81,7 @@ lazy val scala = project.in(file("faunadb-scala"))
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
+      "joda-time" % "joda-time" % jodaTimeVersion,
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
       "org.scalatest" %% "scalatest" % "2.2.1" % "test"),
 
@@ -129,6 +131,7 @@ lazy val java = project.in(file("faunadb-java"))
 
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,
+      "joda-time" % "joda-time" % jodaTimeVersion,
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
       "org.yaml" % "snakeyaml" % "1.14" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test",
