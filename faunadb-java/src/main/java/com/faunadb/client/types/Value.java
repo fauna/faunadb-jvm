@@ -379,7 +379,7 @@ public abstract class Value extends Expr {
    */
   public static final class TimeV extends ScalarValue<Instant> {
 
-    private static final DateTimeFormatter TIME_FORMAT = ISODateTimeFormat.dateTimeNoMillis();
+    private static final DateTimeFormatter TIME_FORMAT = ISODateTimeFormat.dateTimeParser();
 
     public TimeV(Instant value) {
       super(value);

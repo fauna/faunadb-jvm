@@ -76,9 +76,24 @@ public class DeserializationSpec {
   }
 
   @Test
-  public void shouldDeserializeTS() throws IOException {
+  public void shouldDeserializeTime() throws IOException {
     assertThat(parsed("{ \"@ts\": \"1970-01-01T00:05:00Z\" }").to(TIME).get(),
       equalTo(new Instant(0).plus(Duration.standardMinutes(5))));
+
+    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:00:05Z\" }").to(TIME).get(),
+      equalTo(new Instant(0).plus(Duration.standardSeconds(5))));
+
+    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:00:00.005Z\" }").to(TIME).get(),
+      equalTo(new Instant(5)));
+  }
+
+  @Test
+  public void shouldIgnoreHightPrecisionWhenConvertingToTime() throws IOException {
+    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:00:00.000005Z\" }").to(TIME).get(),
+      equalTo(new Instant(0)));
+
+    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:00:00.00000005Z\" }").to(TIME).get(),
+      equalTo(new Instant(0)));
   }
 
   @Test

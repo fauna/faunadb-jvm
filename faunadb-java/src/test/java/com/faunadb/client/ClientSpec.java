@@ -772,6 +772,7 @@ public class ClientSpec extends FaunaDBTest {
   @Test
   public void shouldEvalEpochExpression() throws Exception {
     Value res = client.query(Epoch(Value(30), SECOND)).get();
+
     assertThat(res.to(TIME).get(), equalTo(new Instant(0).plus(Duration.standardSeconds(30))));
   }
 
