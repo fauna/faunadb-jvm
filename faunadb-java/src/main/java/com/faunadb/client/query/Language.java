@@ -2,6 +2,7 @@ package com.faunadb.client.query;
 
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.*;
+import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.joda.time.Instant;
@@ -211,6 +212,10 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Value(Instant value) {
+    return new TimeV(new HighPrecisionTime(value, 0, 0));
+  }
+
+  public static Expr Value(HighPrecisionTime value) {
     return new TimeV(value);
   }
 

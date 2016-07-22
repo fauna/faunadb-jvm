@@ -378,13 +378,13 @@ public abstract class Value extends Expr {
    */
   public static final class TimeV extends ScalarValue<HighPrecisionTime> {
 
-    public TimeV(Instant value) {
-      super(new HighPrecisionTime(value, 0, 0));
+    public TimeV(HighPrecisionTime value) {
+      super(value);
     }
 
     @JsonCreator
     private TimeV(@JsonProperty("@ts") String value) {
-      super(HighPrecisionTime.parse(value));
+      this(HighPrecisionTime.parse(value));
     }
 
     Instant truncaded() {
