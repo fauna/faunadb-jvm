@@ -8,13 +8,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
+import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.List;
 import java.util.Map;
@@ -377,23 +376,25 @@ public abstract class Value extends Expr {
    *
    * @see Language#Value(Instant)
    */
-  public static final class TimeV extends ScalarValue<Instant> {
-
-    private static final DateTimeFormatter TIME_FORMAT = ISODateTimeFormat.dateTimeParser();
+  public static final class TimeV extends ScalarValue<HighPrecisionTime> {
 
     public TimeV(Instant value) {
-      super(value);
+      super(new HighPrecisionTime(value, 0, 0));
     }
 
     @JsonCreator
     private TimeV(@JsonProperty("@ts") String value) {
-      super(TIME_FORMAT.parseDateTime(value).toInstant());
+      super(HighPrecisionTime.parse(value));
+    }
+
+    Instant truncaded() {
+      return value.truncated();
     }
 
     @Override
     @JsonProperty("@ts")
     protected String toJson() {
-      return value.toString(TIME_FORMAT);
+      return value.toString();
     }
 
   }

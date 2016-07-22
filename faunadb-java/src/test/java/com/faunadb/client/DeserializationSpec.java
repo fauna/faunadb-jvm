@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.RefV;
+import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import org.joda.time.Duration;
@@ -94,6 +95,15 @@ public class DeserializationSpec {
 
     assertThat(parsed("{ \"@ts\": \"1970-01-01T00:00:00.00000005Z\" }").to(TIME).get(),
       equalTo(new Instant(0)));
+  }
+
+  @Test
+  public void shouldDeserializeHighPrecisionTime() throws Exception {
+    HighPrecisionTime micro = parsed("{ \"@ts\": \"1970-01-01T00:00:00.000005Z\" }").to(HP_TIME).get();
+    assertThat(micro, equalTo(HighPrecisionTime.microSeconds(5)));
+
+    HighPrecisionTime nano = parsed("{ \"@ts\": \"1970-01-01T00:00:00.000000005Z\" }").to(HP_TIME).get();
+    assertThat(nano, equalTo(HighPrecisionTime.nanoSeconds(5)));
   }
 
   @Test
