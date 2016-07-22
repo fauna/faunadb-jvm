@@ -88,6 +88,9 @@ public interface Codec<T> extends Function<Value, Result<T>> {
     }
   });
 
+  /**
+   * Coerce a {@link Value} to an {@link HighPrecisionTime}
+   */
   Codec<HighPrecisionTime> HP_TIME = Cast.mapTo(TimeV.class, Cast.<TimeV, HighPrecisionTime>scalarValue());
 
   /**

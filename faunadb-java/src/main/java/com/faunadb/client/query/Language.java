@@ -215,6 +215,12 @@ public final class Language {
     return new TimeV(new HighPrecisionTime(value, 0, 0));
   }
 
+  /**
+   * Creates a new Timestamp value from a high precision time.
+   *
+   * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
+   * @see HighPrecisionTime
+   */
   public static Expr Value(HighPrecisionTime value) {
     return new TimeV(value);
   }
