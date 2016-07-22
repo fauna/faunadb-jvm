@@ -388,7 +388,7 @@ public abstract class Value extends Expr {
     }
 
     Instant truncaded() {
-      return value.truncated();
+      return value.toInstant();
     }
 
     @Override

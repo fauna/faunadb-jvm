@@ -46,8 +46,16 @@ public class HighPrecisionTime {
     this.nanosToAdd = nanosToAdd % 1000;
   }
 
-  public Instant truncated() {
+  public Instant toInstant() {
     return truncated;
+  }
+
+  public long getMicros() {
+    return microsToAdd;
+  }
+
+  public long getNamos() {
+    return nanosToAdd;
   }
 
   @Override

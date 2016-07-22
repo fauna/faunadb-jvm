@@ -786,6 +786,24 @@ public class ClientSpec extends FaunaDBTest {
   }
 
   @Test
+  public void shouldOverflowOnHighPrecisionTime() throws Exception {
+    ImmutableList<Value> res = client.query(ImmutableList.of(
+      Epoch(Value(1001), MICROSECOND),
+      Epoch(Value(1001), NANOSECOND)
+    )).get();
+
+    HighPrecisionTime micros = res.get(0).to(HP_TIME).get();
+    assertThat(micros.toInstant(), equalTo(new Instant(1)));
+    assertThat(micros.getMicros(), equalTo(1L));
+    assertThat(micros.getNamos(), equalTo(0L));
+
+    HighPrecisionTime nanos = res.get(1).to(HP_TIME).get();
+    assertThat(nanos.toInstant(), equalTo(new Instant(0)));
+    assertThat(nanos.getMicros(), equalTo(1L));
+    assertThat(nanos.getNamos(), equalTo(1L));
+  }
+
+  @Test
   public void shouldEvalDateExpression() throws Exception {
     Value res = client.query(Date(Value("1970-01-02"))).get();
     assertThat(res.to(DATE).get(), equalTo(new LocalDate(0, UTC).plusDays(1)));
