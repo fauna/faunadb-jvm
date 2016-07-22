@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
+import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
 import com.google.common.base.Function;
@@ -23,6 +24,9 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
+
+import static com.faunadb.client.types.Codec.VALUE;
+import static com.google.common.util.concurrent.Futures.transform;
 
 /**
  * The Java native client for FaunaDB.
@@ -167,25 +171,7 @@ public class FaunaClient implements AutoCloseable {
    * @see com.faunadb.client.query.Language
    */
   public ListenableFuture<Value> query(Expr expr) {
-    JsonNode body = json.valueToTree(expr);
-    try {
-      return handleNetworkExceptions(Futures.transform(connection.post("/", body), new Function<Response, Value>() {
-        @Override
-        public Value apply(Response response) {
-          try {
-            handleQueryErrors(response);
-
-            JsonNode responseBody = parseResponseBody(response);
-            JsonNode resource = responseBody.get("resource");
-            return json.treeToValue(resource, Value.class);
-          } catch (IOException ex) {
-            throw new AssertionError(ex);
-          }
-        }
-      }));
-    } catch (IOException ex) {
-      return Futures.immediateFailedFuture(ex);
-    }
+    return performRequest(json.valueToTree(expr));
   }
 
   /**
@@ -200,23 +186,25 @@ public class FaunaClient implements AutoCloseable {
    * @return a {@link ListenableFuture} containing an ordered list of root response nodes.
    */
   public ListenableFuture<ImmutableList<Value>> query(List<? extends Expr> exprs) {
-    JsonNode body = json.valueToTree(exprs);
+    return transform(performRequest(json.valueToTree(exprs)), new Function<Value, ImmutableList<Value>>() {
+      @Override
+      public ImmutableList<Value> apply(Value result) {
+        return result.collect(Field.as(VALUE));
+      }
+    });
+  }
 
+  private ListenableFuture<Value> performRequest(JsonNode body) {
     try {
-      return handleNetworkExceptions(Futures.transform(connection.post("/", body), new Function<Response, ImmutableList<Value>>() {
+      return handleNetworkExceptions(transform(connection.post("/", body), new Function<Response, Value>() {
         @Override
-        public ImmutableList<Value> apply(Response resp) {
+        public Value apply(Response response) {
           try {
-            handleQueryErrors(resp);
-            JsonNode responseBody = parseResponseBody(resp);
-            ArrayNode resources = ((ArrayNode) responseBody.get("resource"));
-            ImmutableList.Builder<Value> responseNodeBuilder = ImmutableList.builder();
+            handleQueryErrors(response);
 
-            for (JsonNode resource : resources) {
-              responseNodeBuilder.add(json.treeToValue(resource, Value.class));
-            }
-
-            return responseNodeBuilder.build();
+            JsonNode responseBody = parseResponseBody(response);
+            JsonNode resource = responseBody.get("resource");
+            return json.treeToValue(resource, Value.class);
           } catch (IOException ex) {
             throw new AssertionError(ex);
           }
