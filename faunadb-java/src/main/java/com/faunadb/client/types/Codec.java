@@ -84,7 +84,7 @@ public interface Codec<T> extends Function<Value, Result<T>> {
   Codec<Instant> TIME = Cast.mapTo(TimeV.class, new Function<TimeV, Instant>() {
     @Override
     public Instant apply(TimeV time) {
-      return time.truncaded();
+      return time.truncated();
     }
   });
 

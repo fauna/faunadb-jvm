@@ -387,7 +387,7 @@ public abstract class Value extends Expr {
       this(HighPrecisionTime.parse(value));
     }
 
-    Instant truncaded() {
+    Instant truncated() {
       return value.toInstant();
     }
 
