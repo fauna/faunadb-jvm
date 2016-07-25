@@ -13,7 +13,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Wraps an instance of {@link Instant} and adds micro and nanosecond precision to it.
  */
-public class HighPrecisionTime {
+public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
 
   private static final Pattern PRECISION_GROUPS = Pattern.compile("\\.\\d{3}(?<micros>\\d{3})(?<nanos>\\d{3})?Z");
 
@@ -120,6 +120,16 @@ public class HighPrecisionTime {
   @Override
   public int hashCode() {
     return hash(truncated, nanosToAdd);
+  }
+
+  @Override
+  public int compareTo(HighPrecisionTime other) {
+    int compareTruncated = truncated.compareTo(other.truncated);
+    if (compareTruncated != 0) return compareTruncated;
+
+    if (nanosToAdd < other.nanosToAdd) return -1;
+    if (nanosToAdd > other.nanosToAdd) return 1;
+    return 0;
   }
 
   @Override

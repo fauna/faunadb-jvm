@@ -22,6 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import static com.faunadb.client.query.Language.Action.CREATE;
@@ -30,6 +31,7 @@ import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.TimeUnit.*;
 import static com.faunadb.client.types.Codec.*;
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.collection.IsArrayContainingInOrder.arrayContaining;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.joda.time.DateTimeZone.UTC;
@@ -803,6 +805,26 @@ public class ClientSpec extends FaunaDBTest {
     assertThat(nanos.toMillis(), equalTo(0L));
     assertThat(nanos.remainingMicros(), equalTo(1));
     assertThat(nanos.remainingNanos(), equalTo(1001));
+  }
+
+  @Test
+  public void shouldBeAbleToSortHighPrecisionTime() throws Exception {
+    Value res = client.query(Arr(
+      Epoch(Value(42), NANOSECOND),
+      Epoch(Value(50), MILLISECOND),
+      Epoch(Value(30), MICROSECOND),
+      Epoch(Value(1), SECOND)
+    )).get();
+
+    HighPrecisionTime[] times = res.collect(Field.as(HP_TIME)).toArray(new HighPrecisionTime[0]);
+    Arrays.sort(times);
+
+    assertThat(times, arrayContaining(
+      new HighPrecisionTime(new Instant(0), 0, 42),
+      new HighPrecisionTime(new Instant(0), 30, 0),
+      new HighPrecisionTime(new Instant(50), 0, 0),
+      new HighPrecisionTime(new Instant(1000), 0, 0)
+    ));
   }
 
   @Test
