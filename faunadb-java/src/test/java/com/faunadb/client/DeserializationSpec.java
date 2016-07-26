@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.RefV;
+import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import org.joda.time.Duration;
@@ -76,9 +77,33 @@ public class DeserializationSpec {
   }
 
   @Test
-  public void shouldDeserializeTS() throws IOException {
+  public void shouldDeserializeTime() throws IOException {
     assertThat(parsed("{ \"@ts\": \"1970-01-01T00:05:00Z\" }").to(TIME).get(),
       equalTo(new Instant(0).plus(Duration.standardMinutes(5))));
+
+    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:00:05Z\" }").to(TIME).get(),
+      equalTo(new Instant(0).plus(Duration.standardSeconds(5))));
+
+    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:00:00.005Z\" }").to(TIME).get(),
+      equalTo(new Instant(5)));
+  }
+
+  @Test
+  public void shouldIgnoreHightPrecisionWhenConvertingToTime() throws IOException {
+    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:00:00.000005Z\" }").to(TIME).get(),
+      equalTo(new Instant(0)));
+
+    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:00:00.00000005Z\" }").to(TIME).get(),
+      equalTo(new Instant(0)));
+  }
+
+  @Test
+  public void shouldDeserializeHighPrecisionTime() throws Exception {
+    HighPrecisionTime micro = parsed("{ \"@ts\": \"1970-01-01T00:00:00.000005Z\" }").to(HP_TIME).get();
+    assertThat(micro, equalTo(new HighPrecisionTime(new Instant(0), 5, 0)));
+
+    HighPrecisionTime nano = parsed("{ \"@ts\": \"1970-01-01T00:00:00.000000005Z\" }").to(HP_TIME).get();
+    assertThat(nano, equalTo(new HighPrecisionTime(new Instant(0), 0, 5)));
   }
 
   @Test

@@ -1,6 +1,7 @@
 package com.faunadb.client.types;
 
 import com.faunadb.client.types.Value.*;
+import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
@@ -80,7 +81,17 @@ public interface Codec<T> extends Function<Value, Result<T>> {
   /**
    * Coerce a {@link Value} to an {@link Instant}
    */
-  Codec<Instant> TIME = Cast.mapTo(TimeV.class, Cast.<TimeV, Instant>scalarValue());
+  Codec<Instant> TIME = Cast.mapTo(TimeV.class, new Function<TimeV, Instant>() {
+    @Override
+    public Instant apply(TimeV time) {
+      return time.truncated();
+    }
+  });
+
+  /**
+   * Coerce a {@link Value} to an {@link HighPrecisionTime}
+   */
+  Codec<HighPrecisionTime> HP_TIME = Cast.mapTo(TimeV.class, Cast.<TimeV, HighPrecisionTime>scalarValue());
 
   /**
    * Coerce a {@link Value} to a {@link String}

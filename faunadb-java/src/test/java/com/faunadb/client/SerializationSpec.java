@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Value.ObjectV;
 import com.faunadb.client.types.Value.StringV;
+import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -128,7 +130,26 @@ public class SerializationSpec {
 
   @Test
   public void shouldSerializeInstantValue() throws Exception {
-    assertJson(Value(new Instant(0)), "{\"@ts\":\"1970-01-01T00:00:00Z\"}");
+    assertJson(Value(new Instant(0)), "{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}");
+  }
+
+  @Test
+  public void shouldSerializeHighPrecisionTimeValue() throws Exception {
+    Instant initialTime = new Instant(10)
+      .plus(Duration.standardMinutes(5))
+      .plus(Duration.standardSeconds(2));
+
+    assertJson(Value(new HighPrecisionTime(initialTime, 0, 0)),
+      "{\"@ts\":\"1970-01-01T00:05:02.010000000Z\"}");
+
+    assertJson(Value(new HighPrecisionTime(initialTime, 20, 5)),
+      "{\"@ts\":\"1970-01-01T00:05:02.010020005Z\"}");
+
+    assertJson(Value(new HighPrecisionTime(initialTime, 1001, 5)),
+      "{\"@ts\":\"1970-01-01T00:05:02.011001005Z\"}");
+
+    assertJson(Value(new HighPrecisionTime(initialTime, 20, 1001)),
+      "{\"@ts\":\"1970-01-01T00:05:02.010021001Z\"}");
   }
 
   @Test
@@ -370,7 +391,7 @@ public class SerializationSpec {
 
     assertJson(
       Exists(Ref("classes/spells/104979509692858368"), Value(new Instant(0))),
-      "{\"exists\":{\"@ref\":\"classes/spells/104979509692858368\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}}"
+      "{\"exists\":{\"@ref\":\"classes/spells/104979509692858368\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}}"
     );
   }
 
@@ -436,7 +457,7 @@ public class SerializationSpec {
         Action.CREATE,
         Obj("data", Obj("name", Value("test")))
       ),
-      "{\"insert\":{\"@ref\":\"classes/spells/104979509696660483\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}," +
+      "{\"insert\":{\"@ref\":\"classes/spells/104979509696660483\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}," +
         "\"action\":\"create\",\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"test\"}}}}}"
     );
 
@@ -447,7 +468,7 @@ public class SerializationSpec {
         Value("create"),
         Obj("data", Obj("name", Value("test")))
       ),
-      "{\"insert\":{\"@ref\":\"classes/spells/104979509696660483\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}," +
+      "{\"insert\":{\"@ref\":\"classes/spells/104979509696660483\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}," +
         "\"action\":\"create\",\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"test\"}}}}}"
     );
   }
@@ -461,7 +482,7 @@ public class SerializationSpec {
         Action.DELETE
       ),
       "{\"remove\":{\"@ref\":\"classes/spells/104979509696660483\"}," +
-        "\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"},\"action\":\"delete\"}"
+        "\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"},\"action\":\"delete\"}"
     );
 
     assertJson(
@@ -471,7 +492,7 @@ public class SerializationSpec {
         Value("delete")
       ),
       "{\"remove\":{\"@ref\":\"classes/spells/104979509696660483\"}," +
-        "\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"},\"action\":\"delete\"}"
+        "\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"},\"action\":\"delete\"}"
     );
   }
 

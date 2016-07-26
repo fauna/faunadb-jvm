@@ -10,6 +10,7 @@ import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.ObjectV;
 import com.faunadb.client.types.Value.RefV;
 import com.faunadb.client.types.Value.StringV;
+import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -21,14 +22,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
 import static com.faunadb.client.query.Language.*;
-import static com.faunadb.client.query.Language.TimeUnit.SECOND;
+import static com.faunadb.client.query.Language.TimeUnit.*;
 import static com.faunadb.client.types.Codec.*;
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.collection.IsArrayContainingInOrder.arrayContaining;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.joda.time.DateTimeZone.UTC;
@@ -771,8 +774,57 @@ public class ClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldEvalEpochExpression() throws Exception {
-    Value res = client.query(Epoch(Value(30), SECOND)).get();
-    assertThat(res.to(TIME).get(), equalTo(new Instant(0).plus(Duration.standardSeconds(30))));
+    ImmutableList<Value> res = client.query(ImmutableList.of(
+      Epoch(Value(30), SECOND),
+      Epoch(Value(30), MILLISECOND),
+      Epoch(Value(30), MICROSECOND),
+      Epoch(Value(30), NANOSECOND)
+    )).get();
+
+    assertThat(res.get(0).to(TIME).get(), equalTo(new Instant(0).plus(Duration.standardSeconds(30))));
+    assertThat(res.get(1).to(TIME).get(), equalTo(new Instant(0).plus(Duration.millis(30))));
+    assertThat(res.get(2).to(HP_TIME).get(), equalTo(new HighPrecisionTime(new Instant(0), 30, 0)));
+    assertThat(res.get(3).to(HP_TIME).get(), equalTo(new HighPrecisionTime(new Instant(0), 0, 30)));
+  }
+
+  @Test
+  public void shouldOverflowOnHighPrecisionTime() throws Exception {
+    ImmutableList<Value> res = client.query(ImmutableList.of(
+      Epoch(Value(1001), MICROSECOND),
+      Epoch(Value(1001), NANOSECOND)
+    )).get();
+
+    HighPrecisionTime micros = res.get(0).to(HP_TIME).get();
+    assertThat(micros.toInstant(), equalTo(new Instant(1)));
+    assertThat(micros.toMillis(), equalTo(1L));
+    assertThat(micros.remainingMicros(), equalTo(1));
+    assertThat(micros.remainingNanos(), equalTo(1000));
+
+    HighPrecisionTime nanos = res.get(1).to(HP_TIME).get();
+    assertThat(nanos.toInstant(), equalTo(new Instant(0)));
+    assertThat(nanos.toMillis(), equalTo(0L));
+    assertThat(nanos.remainingMicros(), equalTo(1));
+    assertThat(nanos.remainingNanos(), equalTo(1001));
+  }
+
+  @Test
+  public void shouldBeAbleToSortHighPrecisionTime() throws Exception {
+    Value res = client.query(Arr(
+      Epoch(Value(42), NANOSECOND),
+      Epoch(Value(50), MILLISECOND),
+      Epoch(Value(30), MICROSECOND),
+      Epoch(Value(1), SECOND)
+    )).get();
+
+    HighPrecisionTime[] times = res.collect(Field.as(HP_TIME)).toArray(new HighPrecisionTime[0]);
+    Arrays.sort(times);
+
+    assertThat(times, arrayContaining(
+      new HighPrecisionTime(new Instant(0), 0, 42),
+      new HighPrecisionTime(new Instant(0), 30, 0),
+      new HighPrecisionTime(new Instant(50), 0, 0),
+      new HighPrecisionTime(new Instant(1000), 0, 0)
+    ));
   }
 
   @Test
