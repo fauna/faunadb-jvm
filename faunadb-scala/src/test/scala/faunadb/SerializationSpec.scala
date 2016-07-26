@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import faunadb.query._
 import faunadb.values._
+import faunadb.values.time._
 import org.joda.time.DateTimeZone.UTC
 import org.joda.time.{ Duration, Instant, LocalDate }
 import org.scalatest.{ FlatSpec, Matchers }
@@ -173,7 +174,10 @@ class SerializationSpec extends FlatSpec with Matchers {
 
   it should "serialize date and ts" in {
     val ts = TimeV(new Instant(0).plus(Duration.standardMinutes(5)))
-    json.writeValueAsString(ts) shouldBe "{\"@ts\":\"1970-01-01T00:05:00Z\"}"
+    json.writeValueAsString(ts) shouldBe "{\"@ts\":\"1970-01-01T00:05:00.000000000Z\"}"
+
+    val withNanos = TimeV(HighPrecisionTime(new Instant(0), nanosToAdd=1001))
+    json.writeValueAsString(withNanos) shouldBe "{\"@ts\":\"1970-01-01T00:00:00.000001001Z\"}"
 
     val date = DateV(new LocalDate(0, UTC).plusDays(2))
     json.writeValueAsString(date) shouldBe "{\"@date\":\"1970-01-03\"}"

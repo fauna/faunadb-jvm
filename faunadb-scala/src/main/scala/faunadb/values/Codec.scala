@@ -86,7 +86,7 @@ object Decoder {
   implicit object InstantDecoder extends Decoder[Instant] {
     def decode(v: Value, path: FieldPath) =
       v match {
-        case ts: TimeV => Result.successful(ts.instant, path)
+        case TimeV(time) => Result.successful(time.instant, path)
         case v => Result.Unexpected(v, "Timestamp", path)
       }
   }

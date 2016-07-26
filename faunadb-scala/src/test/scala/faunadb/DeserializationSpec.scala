@@ -2,6 +2,7 @@ package faunadb
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import faunadb.values._
+import faunadb.values.time._
 import org.joda.time.DateTimeZone.UTC
 import org.joda.time.{ Duration, Instant, LocalDate }
 import org.scalatest.{ FlatSpec, Matchers }
@@ -66,10 +67,19 @@ class DeserializationSpec extends FlatSpec with Matchers {
   }
 
   it should "deserialize ts" in {
+    val fiveMinutes = new Instant(0).plus(Duration.standardMinutes(5))
+
     val toDeserialize = """{"@ts":"1970-01-01T00:05:00Z"}"""
     val parsed = json.readValue(toDeserialize, classOf[Value])
+    parsed should equal (TimeV(fiveMinutes))
 
-    parsed should equal (TimeV(new Instant(0).plus(Duration.standardMinutes(5))))
+    val withMicros = """{"@ts":"1970-01-01T00:05:00.001442Z"}"""
+    val withMicrosParsed = json.readValue(withMicros, classOf[Value])
+    withMicrosParsed should equal (TimeV(HighPrecisionTime(fiveMinutes.plus(1), 442)))
+
+    val withNanos = """{"@ts":"1970-01-01T00:05:00.001442042Z"}"""
+    val withNanosParsed = json.readValue(withNanos, classOf[Value])
+    withNanosParsed should equal (TimeV(HighPrecisionTime(fiveMinutes.plus(1), 442, 42)))
   }
 
   it should "deserialize date" in {
