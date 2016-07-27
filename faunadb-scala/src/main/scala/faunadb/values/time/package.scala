@@ -6,10 +6,22 @@ import scala.Ordered._
 
 package time {
 
+  /**
+    * Represents an instance of [[org.joda.time.Instant]] with nanosecond precision.
+    * It calculates the overflow from nano to milliseconds and adds to the initial instant.
+    */
   class HighPrecisionTime private(initialInstant: Instant, nanosToAdd: Int) {
+
+    /** [[org.joda.time.Instant]] representation. Truncates micro and nanoseconds. */
     val instant = initialInstant.plus(nanosToAdd / 1000000)
+
+    /** Nanoseconds added to the initial time */
     val nanos = nanosToAdd % 1000000
+
+    /** Microseconds added to the initial time. Truncates nanoseconds. */
     val micros = nanos / 1000
+
+    /** Milliseconds since Java epoch. Truncates micro and nanoseconds. */
     val millis = instant.getMillis
 
     override def equals(obj: Any): Boolean = obj match {
@@ -29,11 +41,19 @@ package time {
 
   object HighPrecisionTime {
 
+    /**
+      * Creates an instance of [[faunadb.values.time.HighPrecisionTime]] adding
+      * the the micro and nanoseconds informed.
+      */
     def apply(initial: Instant, microsToAdd: Int = 0, nanosToAdd: Int = 0): HighPrecisionTime =
       new HighPrecisionTime(initial, microsToAdd * 1000 + nanosToAdd)
 
     private val Precision = ".*\\.\\d{3}(\\d{3})(\\d{3})?Z".r
 
+    /**
+      * Parses an [[String]] into an instance of [[faunadb.values.time.HighPrecisionTime]].
+      * String must be in "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ" date format.
+      */
     def parse(value: String): HighPrecisionTime = {
       value match {
         case Precision(micros, null)  => HighPrecisionTime(toInstant(value), microsToAdd = micros.toInt)
