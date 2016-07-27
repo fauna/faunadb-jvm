@@ -10,7 +10,7 @@ package time {
     * Represents an instance of [[org.joda.time.Instant]] with nanosecond precision.
     * It calculates the overflow from nano to milliseconds and adds to the initial instant.
     */
-  class HighPrecisionTime private(initialInstant: Instant, nanosToAdd: Int) {
+  class HighPrecisionTime private(initialInstant: Instant, nanosToAdd: Long) {
 
     /** [[org.joda.time.Instant]] representation. Truncates micro and nanoseconds. */
     val instant = initialInstant.plus(nanosToAdd / 1000000)
@@ -45,7 +45,7 @@ package time {
       * Creates an instance of [[faunadb.values.time.HighPrecisionTime]] adding
       * the the micro and nanoseconds informed.
       */
-    def apply(initial: Instant, microsToAdd: Int = 0, nanosToAdd: Int = 0): HighPrecisionTime =
+    def apply(initial: Instant, microsToAdd: Long = 0, nanosToAdd: Long = 0): HighPrecisionTime =
       new HighPrecisionTime(initial, microsToAdd * 1000 + nanosToAdd)
 
     private val Precision = ".*\\.\\d{3}(\\d{3})(\\d{3})?Z".r
