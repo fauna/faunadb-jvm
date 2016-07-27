@@ -30,20 +30,20 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
     if (precision.find()) {
       return new HighPrecisionTime(
         initialTime,
-        toInt(precision.group("micros")),
-        toInt(precision.group("nanos"))
+        toLong(precision.group("micros")),
+        toLong(precision.group("nanos"))
       );
     }
 
     return new HighPrecisionTime(initialTime, 0, 0);
   }
 
-  private static int toInt(String value) {
-    return value != null ? Integer.valueOf(value) : 0;
+  private static long toLong(String value) {
+    return value != null ? Long.valueOf(value) : 0;
   }
 
   private final Instant truncated;
-  private final int nanosToAdd;
+  private final long nanosToAdd;
 
   /**
    * Creates a new instance of {@link HighPrecisionTime}. Nano and microseconds overflows will
@@ -59,9 +59,9 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
    * @param microsToAdd microseconds to add to the initial timestamp
    * @param nanosToAdd  nanoseconds to add to the initial timestamp
    */
-  public HighPrecisionTime(Instant initialTime, int microsToAdd, int nanosToAdd) {
+  public HighPrecisionTime(Instant initialTime, long microsToAdd, long nanosToAdd) {
     requireNonNull(initialTime);
-    int microsOverflow = microsToAdd + nanosToAdd / 1000;
+    long microsOverflow = microsToAdd + nanosToAdd / 1000;
     this.truncated = initialTime.plus(microsOverflow / 1000);
     this.nanosToAdd = (microsOverflow % 1000) * 1000 + nanosToAdd % 1000;
   }
@@ -80,7 +80,7 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
    * Truncates nanoseconds, if any.
    *
    * @return number of milliseconds
-   * @see HighPrecisionTime#HighPrecisionTime(Instant, int, int)
+   * @see HighPrecisionTime#HighPrecisionTime(Instant, long, long)
    */
   public long toMillis() {
     return truncated.getMillis();
@@ -91,9 +91,9 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
    * Truncates nanoseconds, if any.
    *
    * @return number of microseconds
-   * @see HighPrecisionTime#HighPrecisionTime(Instant, int, int)
+   * @see HighPrecisionTime#HighPrecisionTime(Instant, long, long)
    */
-  public int remainingMicros() {
+  public long remainingMicros() {
     return nanosToAdd / 1000;
   }
 
@@ -101,9 +101,9 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
    * Returns the number of nanoseconds remaining to be added to the underlying timestamp.
    *
    * @return number of nanoseconds
-   * @see HighPrecisionTime#HighPrecisionTime(Instant, int, int)
+   * @see HighPrecisionTime#HighPrecisionTime(Instant, long, long)
    */
-  public int remainingNanos() {
+  public long remainingNanos() {
     return nanosToAdd;
   }
 

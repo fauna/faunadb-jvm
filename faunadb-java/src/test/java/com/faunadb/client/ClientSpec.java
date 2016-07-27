@@ -797,14 +797,14 @@ public class ClientSpec extends FaunaDBTest {
     HighPrecisionTime micros = res.get(0).to(HP_TIME).get();
     assertThat(micros.toInstant(), equalTo(new Instant(1)));
     assertThat(micros.toMillis(), equalTo(1L));
-    assertThat(micros.remainingMicros(), equalTo(1));
-    assertThat(micros.remainingNanos(), equalTo(1000));
+    assertThat(micros.remainingMicros(), equalTo(1L));
+    assertThat(micros.remainingNanos(), equalTo(1000L));
 
     HighPrecisionTime nanos = res.get(1).to(HP_TIME).get();
     assertThat(nanos.toInstant(), equalTo(new Instant(0)));
     assertThat(nanos.toMillis(), equalTo(0L));
-    assertThat(nanos.remainingMicros(), equalTo(1));
-    assertThat(nanos.remainingNanos(), equalTo(1001));
+    assertThat(nanos.remainingMicros(), equalTo(1L));
+    assertThat(nanos.remainingNanos(), equalTo(1001L));
   }
 
   @Test
