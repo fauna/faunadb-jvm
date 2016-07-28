@@ -212,7 +212,7 @@ public final class Language {
    * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Value(Instant value) {
-    return new TimeV(HighPrecisionTime.fromInstant(value, 0, 0));
+    return new TimeV(HighPrecisionTime.fromInstant(value));
   }
 
   /**

@@ -33,38 +33,62 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
     Matcher precision = PRECISION_GROUPS.matcher(value);
 
     if (precision.find()) {
-      return fromInstant(
+      return create(
         initialTime,
         toLong(precision.group("micros")),
         toLong(precision.group("nanos"))
       );
     }
 
-    return fromInstant(initialTime, 0, 0);
+    return create(initialTime, 0, 0);
   }
 
   private static long toLong(String value) {
     return value != null ? Long.valueOf(value) : 0;
   }
 
-  private final long secondsSinceEpoch;
-  private final int nanoSecondsOffset;
+  /**
+   * Creates a new instance of {@link HighPrecisionTime} from a {@link Instant}.
+   *
+   * @param initialTime initial timestamp
+   */
+  public static HighPrecisionTime fromInstant(Instant initialTime) {
+    return create(initialTime, 0, 0);
+  }
 
   /**
-   * Creates a new instance of {@link HighPrecisionTime}. Nano and microseconds overflows will
+   * Creates a new instance of {@link HighPrecisionTime}. Nanoseconds overflow will
    * be calculated and added to the initial timestamp.
    * <p>
    * For example:
-   * <ul>
-   * <li>{@code new HighPrecisionTime(new Instant(0), 1001, 0) == new HighPrecisionTime(new Instant(1), 1, 0)}</li>
-   * <li>{@code new HighPrecisionTime(new Instant(0), 0, 1001) == new HighPrecisionTime(new Instant(0), 1, 1)}</li>
-   * </ul>
+   * <pre>
+   * {@code HighPrecisionTime.withNanos(new Instant(1), 0) == HighPrecisionTime.withNanos(new Instant(0), 1000000)}
+   * </pre>
    *
    * @param initialTime initial timestamp
-   * @param microsToAdd microseconds to add to the initial timestamp
    * @param nanosToAdd  nanoseconds to add to the initial timestamp
    */
-  public static HighPrecisionTime fromInstant(Instant initialTime, long microsToAdd, long nanosToAdd) {
+  public static HighPrecisionTime withNanos(Instant initialTime, long nanosToAdd) {
+    return create(initialTime, 0, nanosToAdd);
+  }
+
+  /**
+   * Creates a new instance of {@link HighPrecisionTime}. Microseconds overflows will
+   * be calculated and added to the initial timestamp.
+   * <p>
+   * For example:
+   * <pre>
+   * {@code HighPrecisionTime.fromInstant(new Instant(1), 0) == HighPrecisionTime.fromInstant(new Instant(0), 1000)}
+   * </pre>
+   *
+   * @param initialTime initial timestamp
+   * @param microsToAdd  nanoseconds to add to the initial timestamp
+   */
+  public static HighPrecisionTime withMicros(Instant initialTime, long microsToAdd) {
+    return create(initialTime, microsToAdd, 0);
+  }
+
+  private static HighPrecisionTime create(Instant initialTime, long microsToAdd, long nanosToAdd) {
     requireNonNull(initialTime);
 
     long nanos =
@@ -74,6 +98,9 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
 
     return new HighPrecisionTime(initialTime.getMillis() / MILLIS_IN_A_SECOND, nanos);
   }
+
+  private final long secondsSinceEpoch;
+  private final int nanoSecondsOffset;
 
   /**
    * Creates a new instance of {@link HighPrecisionTime}. Nano to seconds overflow will be calculated.
