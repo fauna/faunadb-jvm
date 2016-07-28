@@ -72,7 +72,7 @@ object HighPrecisionTime {
   }
 
   private def toInstant(value: String): Instant =
-    ISODateTimeFormat.dateTimeParser().parseDateTime(value).toInstant
+    ISODateTimeFormat.dateTimeParser.parseDateTime(value).toInstant
 
   implicit object HighPrecisionTimeDecoder extends Decoder[HighPrecisionTime] {
     def decode(value: Value, path: FieldPath) =
