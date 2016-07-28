@@ -82,11 +82,11 @@ object HighPrecisionTime {
       }
   }
 
-  implicit val jodaTimeOrdering: Ordering[Instant] =
-    Ordering.fromLessThan(_ isBefore _)
-
   implicit object HighPrecisionTimeOrdering extends Ordering[HighPrecisionTime] {
     def compare(x: HighPrecisionTime, y: HighPrecisionTime): Int =
-      (x.secondsSinceEpoch, x.nanoSecondsOffset) compare (y.secondsSinceEpoch, y.nanoSecondsOffset)
+      x.secondsSinceEpoch compare y.secondsSinceEpoch match {
+        case 0   => x.nanoSecondsOffset compare y.nanoSecondsOffset
+        case cmp => cmp
+      }
   }
 }
