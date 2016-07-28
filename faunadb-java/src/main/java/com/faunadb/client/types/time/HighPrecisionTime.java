@@ -136,8 +136,7 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
   @Override
   public int compareTo(HighPrecisionTime other) {
     int compareSeconds = Long.compare(secondsSinceEpoch, other.secondsSinceEpoch);
-    if (compareSeconds != 0)
-      return compareSeconds;
+    if (compareSeconds != 0) return compareSeconds;
 
     return Integer.compare(nanoSecondsOffset, other.nanoSecondsOffset);
   }
