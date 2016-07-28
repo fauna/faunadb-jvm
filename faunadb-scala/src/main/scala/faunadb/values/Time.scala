@@ -18,7 +18,7 @@ case class HighPrecisionTime private(secondsSinceEpoch: Long, nanoSecondsOffset:
 
   /** Milliseconds since Java epoch. Truncates micro and nanoseconds. */
   def millisecondsSinceEpoch: Long =
-    secondsSinceEpoch * 1000 + nanoSecondsOffset / NanosInAMilli
+    secondsSinceEpoch * MillisInASecond + nanoSecondsOffset / NanosInAMilli
 
   override def toString =
     "%s.%09dZ".format(
