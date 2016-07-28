@@ -71,26 +71,22 @@ package time {
 
     private def toInstant(value: String): Instant =
       ISODateTimeFormat.dateTimeParser().parseDateTime(value).toInstant
-  }
 
-}
+    implicit object HighPrecisionTimeDecoder extends Decoder[HighPrecisionTime] {
+      def decode(value: Value, path: FieldPath) =
+        value match {
+          case TimeV(time) => Result.successful(time, path)
+          case v           => Result.Unexpected(v, "HightPrecisionTime", path)
+        }
+    }
 
-package object time {
+    implicit val jodaTimeOrdering: Ordering[Instant] =
+      Ordering.fromLessThan(_ isBefore _)
 
-  implicit object HighPrecisionTimeDecoder extends Decoder[HighPrecisionTime] {
-    def decode(value: Value, path: FieldPath) =
-      value match {
-        case TimeV(time) => Result.successful(time, path)
-        case v           => Result.Unexpected(v, "HightPrecisionTime", path)
-      }
-  }
-
-  implicit val jodaTimeOrdering: Ordering[Instant] =
-    Ordering.fromLessThan(_ isBefore _)
-
-  implicit object HighPrecisionTimeOrdering extends Ordering[HighPrecisionTime] {
-    def compare(x: HighPrecisionTime, y: HighPrecisionTime): Int =
-      (x.secondsSinceEposh, x.nanoSecondsOffset) compare (y.secondsSinceEposh, y.nanoSecondsOffset)
+    implicit object HighPrecisionTimeOrdering extends Ordering[HighPrecisionTime] {
+      def compare(x: HighPrecisionTime, y: HighPrecisionTime): Int =
+        (x.secondsSinceEposh, x.nanoSecondsOffset) compare (y.secondsSinceEposh, y.nanoSecondsOffset)
+    }
   }
 
 }
