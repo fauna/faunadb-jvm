@@ -40,7 +40,6 @@ package time {
 
   object HighPrecisionTime {
 
-    private val MicrosInASecond = 1000000
     private val NanosInAMicro = 10000
     private val NanosInASecond = 1000000000
 
@@ -49,14 +48,11 @@ package time {
       * the the micro and nanoseconds informed.
       */
     def apply(initial: Instant, microsToAdd: Long = 0, nanosToAdd: Long = 0): HighPrecisionTime = {
-      val secondsOverflow = microsToAdd / MicrosInASecond + nanosToAdd / NanosInASecond
-      val microsToNanos = microsToAdd % MicrosInASecond * NanosInAMicro
-      val remainingNanos = nanosToAdd % NanosInASecond
+      val nanos = microsToAdd * NanosInAMicro + nanosToAdd
+      val overflow = nanos / NanosInASecond
+      val remaining = nanos % NanosInASecond
 
-      new HighPrecisionTime(
-        initial.getMillis * 1000 + secondsOverflow,
-        (microsToNanos + remainingNanos).toInt
-      )
+      new HighPrecisionTime(initial.getMillis * 1000 + overflow, remaining.toInt)
     }
 
     private val Precision = ".*\\.\\d{3}(\\d{3})(\\d{3})?Z".r
