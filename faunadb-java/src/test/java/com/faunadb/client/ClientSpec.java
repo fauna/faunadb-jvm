@@ -783,8 +783,8 @@ public class ClientSpec extends FaunaDBTest {
 
     assertThat(res.get(0).to(TIME).get(), equalTo(new Instant(0).plus(Duration.standardSeconds(30))));
     assertThat(res.get(1).to(TIME).get(), equalTo(new Instant(0).plus(Duration.millis(30))));
-    assertThat(res.get(2).to(HP_TIME).get(), equalTo(new HighPrecisionTime(new Instant(0), 30, 0)));
-    assertThat(res.get(3).to(HP_TIME).get(), equalTo(new HighPrecisionTime(new Instant(0), 0, 30)));
+    assertThat(res.get(2).to(HP_TIME).get(), equalTo(HighPrecisionTime.fromInstant(new Instant(0), 30, 0)));
+    assertThat(res.get(3).to(HP_TIME).get(), equalTo(HighPrecisionTime.fromInstant(new Instant(0), 0, 30)));
   }
 
   @Test
@@ -796,15 +796,13 @@ public class ClientSpec extends FaunaDBTest {
 
     HighPrecisionTime micros = res.get(0).to(HP_TIME).get();
     assertThat(micros.toInstant(), equalTo(new Instant(1)));
-    assertThat(micros.toMillis(), equalTo(1L));
-    assertThat(micros.remainingMicros(), equalTo(1L));
-    assertThat(micros.remainingNanos(), equalTo(1000L));
+    assertThat(micros.getMillisecondsFromEpoch(), equalTo(1L));
+    assertThat(micros.getNanosecondsOffset(), equalTo(1001000L));
 
     HighPrecisionTime nanos = res.get(1).to(HP_TIME).get();
     assertThat(nanos.toInstant(), equalTo(new Instant(0)));
-    assertThat(nanos.toMillis(), equalTo(0L));
-    assertThat(nanos.remainingMicros(), equalTo(1L));
-    assertThat(nanos.remainingNanos(), equalTo(1001L));
+    assertThat(nanos.getMillisecondsFromEpoch(), equalTo(0L));
+    assertThat(nanos.getNanosecondsOffset(), equalTo(1001L));
   }
 
   @Test
@@ -820,10 +818,10 @@ public class ClientSpec extends FaunaDBTest {
     Arrays.sort(times);
 
     assertThat(times, arrayContaining(
-      new HighPrecisionTime(new Instant(0), 0, 42),
-      new HighPrecisionTime(new Instant(0), 30, 0),
-      new HighPrecisionTime(new Instant(50), 0, 0),
-      new HighPrecisionTime(new Instant(1000), 0, 0)
+      HighPrecisionTime.fromInstant(new Instant(0), 0, 42),
+      HighPrecisionTime.fromInstant(new Instant(0), 30, 0),
+      HighPrecisionTime.fromInstant(new Instant(50), 0, 0),
+      HighPrecisionTime.fromInstant(new Instant(1000), 0, 0)
     ));
   }
 

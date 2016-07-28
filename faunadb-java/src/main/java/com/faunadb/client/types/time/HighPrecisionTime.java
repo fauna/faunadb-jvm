@@ -11,9 +11,14 @@ import static java.util.Objects.hash;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Wraps an instance of {@link Instant} and adds micro and nanosecond precision to it.
+ * Represents an instant in time with nanosecond precision.
  */
 public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
+
+  private static final int NANOS_IN_A_MIRO = 1000;
+  private static final int NANOS_IN_A_MILLI = 1000000;
+  private static final int NANOS_IN_A_SECOND = 1000000000;
+  private static final int MILLIS_IN_A_SECOND = 1000;
 
   private static final Pattern PRECISION_GROUPS = Pattern.compile("\\.\\d{3}(?<micros>\\d{3})(?<nanos>\\d{3})?Z");
 
@@ -28,22 +33,22 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
     Matcher precision = PRECISION_GROUPS.matcher(value);
 
     if (precision.find()) {
-      return new HighPrecisionTime(
+      return fromInstant(
         initialTime,
         toLong(precision.group("micros")),
         toLong(precision.group("nanos"))
       );
     }
 
-    return new HighPrecisionTime(initialTime, 0, 0);
+    return fromInstant(initialTime, 0, 0);
   }
 
   private static long toLong(String value) {
     return value != null ? Long.valueOf(value) : 0;
   }
 
-  private final Instant truncated;
-  private final long nanosToAdd;
+  private final long secondsSinceEpoch;
+  private final int nanoSecondsOffset;
 
   /**
    * Creates a new instance of {@link HighPrecisionTime}. Nano and microseconds overflows will
@@ -59,52 +64,58 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
    * @param microsToAdd microseconds to add to the initial timestamp
    * @param nanosToAdd  nanoseconds to add to the initial timestamp
    */
-  public HighPrecisionTime(Instant initialTime, long microsToAdd, long nanosToAdd) {
+  public static HighPrecisionTime fromInstant(Instant initialTime, long microsToAdd, long nanosToAdd) {
     requireNonNull(initialTime);
-    long microsOverflow = microsToAdd + nanosToAdd / 1000;
-    this.truncated = initialTime.plus(microsOverflow / 1000);
-    this.nanosToAdd = (microsOverflow % 1000) * 1000 + nanosToAdd % 1000;
+
+    long nanos =
+      initialTime.getMillis() % MILLIS_IN_A_SECOND * NANOS_IN_A_MILLI +
+        microsToAdd * NANOS_IN_A_MIRO +
+        nanosToAdd;
+
+    return new HighPrecisionTime(initialTime.getMillis() / MILLIS_IN_A_SECOND, nanos);
   }
 
   /**
-   * Returns an instance of {@link Instant} truncating micro and nanoseconds.
+   * Creates a new instance of {@link HighPrecisionTime}. Nano to seconds overflow will be calculated.
+   *
+   * @param secondsSinceEpoch seconds passed since Java's epoch
+   * @param nanoSecondsOffset nanoseconds offset
+   */
+  public HighPrecisionTime(long secondsSinceEpoch, long nanoSecondsOffset) {
+    this.secondsSinceEpoch = secondsSinceEpoch + nanoSecondsOffset / NANOS_IN_A_SECOND;
+    this.nanoSecondsOffset = (int) (nanoSecondsOffset % NANOS_IN_A_SECOND);
+  }
+
+  /**
+   * Returns an instance of {@link Instant}.
+   * Truncates nanoseconds.
    *
    * @return trucated timestamp
    */
   public Instant toInstant() {
-    return truncated;
+    return new Instant(getMillisecondsFromEpoch());
   }
 
   /**
-   * Returns the number of milliseconds from Java's Eposh.
-   * Truncates nanoseconds, if any.
+   * Returns the number of milliseconds since Java's Eposh.
+   * Truncates nanoseconds.
    *
    * @return number of milliseconds
-   * @see HighPrecisionTime#HighPrecisionTime(Instant, long, long)
+   * @see HighPrecisionTime#HighPrecisionTime(long, long)
    */
-  public long toMillis() {
-    return truncated.getMillis();
+  public long getMillisecondsFromEpoch() {
+    return secondsSinceEpoch * MILLIS_IN_A_SECOND +
+      nanoSecondsOffset / NANOS_IN_A_MILLI;
   }
 
   /**
-   * Returns the number of microseconds remaining to be added to the underlying timestamp.
-   * Truncates nanoseconds, if any.
-   *
-   * @return number of microseconds
-   * @see HighPrecisionTime#HighPrecisionTime(Instant, long, long)
-   */
-  public long remainingMicros() {
-    return nanosToAdd / 1000;
-  }
-
-  /**
-   * Returns the number of nanoseconds remaining to be added to the underlying timestamp.
+   * Returns the number of nanosecond adjustment to the initial timestamp.
    *
    * @return number of nanoseconds
-   * @see HighPrecisionTime#HighPrecisionTime(Instant, long, long)
+   * @see HighPrecisionTime#HighPrecisionTime(long, long)
    */
-  public long remainingNanos() {
-    return nanosToAdd;
+  public long getNanosecondsOffset() {
+    return nanoSecondsOffset;
   }
 
   @Override
@@ -113,31 +124,30 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
       return false;
 
     HighPrecisionTime other = (HighPrecisionTime) obj;
-    return this.truncated.equals(other.truncated)
-      && this.nanosToAdd == other.nanosToAdd;
+    return this.secondsSinceEpoch == other.secondsSinceEpoch
+      && this.nanoSecondsOffset == other.nanoSecondsOffset;
   }
 
   @Override
   public int hashCode() {
-    return hash(truncated, nanosToAdd);
+    return hash(secondsSinceEpoch, nanoSecondsOffset);
   }
 
   @Override
   public int compareTo(HighPrecisionTime other) {
-    int compareTruncated = truncated.compareTo(other.truncated);
-    if (compareTruncated != 0) return compareTruncated;
+    int compareSeconds = Long.compare(secondsSinceEpoch, other.secondsSinceEpoch);
+    if (compareSeconds != 0)
+      return compareSeconds;
 
-    if (nanosToAdd < other.nanosToAdd) return -1;
-    if (nanosToAdd > other.nanosToAdd) return 1;
-    return 0;
+    return Integer.compare(nanoSecondsOffset, other.nanoSecondsOffset);
   }
 
   @Override
   public String toString() {
     return format(
-      "%s%06dZ",
-      truncated.toString(ISODateTimeFormat.dateHourMinuteSecondMillis()),
-      nanosToAdd
+      "%s.%09dZ",
+      toInstant().toString(ISODateTimeFormat.dateHourMinuteSecond()),
+      nanoSecondsOffset
     );
   }
 }
