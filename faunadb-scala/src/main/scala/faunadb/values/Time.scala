@@ -78,7 +78,7 @@ object HighPrecisionTime {
     def decode(value: Value, path: FieldPath) =
       value match {
         case TimeV(time) => Result.successful(time, path)
-        case v           => Result.Unexpected(v, "HightPrecisionTime", path)
+        case v           => Result.Unexpected(v, "HighPrecisionTime", path)
       }
   }
 
