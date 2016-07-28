@@ -9,7 +9,7 @@ import scala.Ordered._
   * Represents the instant from Java's epoch composed by the number of seconds since eposh
   * and the nanoseconds offset.
   */
-class HighPrecisionTime private(val secondsSinceEpoch: Long, val nanoSecondsOffset: Int) {
+case class HighPrecisionTime private(secondsSinceEpoch: Long, nanoSecondsOffset: Int) {
 
   /** Returns a [[org.joda.time.Instant]]. Truncates micro and nanoseconds. */
   def toInstant: Instant =
@@ -18,17 +18,6 @@ class HighPrecisionTime private(val secondsSinceEpoch: Long, val nanoSecondsOffs
   /** Milliseconds since Java epoch. Truncates micro and nanoseconds. */
   def milliSecondsSinceEpoch: Long =
     secondsSinceEpoch * 1000
-
-  override def equals(obj: Any): Boolean = obj match {
-    case other: HighPrecisionTime =>
-      secondsSinceEpoch == other.secondsSinceEpoch &&
-        nanoSecondsOffset == other.nanoSecondsOffset
-
-    case _ => false
-  }
-
-  override def hashCode(): Int =
-    secondsSinceEpoch.hashCode() + nanoSecondsOffset.hashCode()
 
   override def toString =
     "%s.%09dZ".format(
