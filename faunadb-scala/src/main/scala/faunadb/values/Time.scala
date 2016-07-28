@@ -10,14 +10,15 @@ import scala.Ordered._
   * and the nanoseconds offset.
   */
 case class HighPrecisionTime private(secondsSinceEpoch: Long, nanoSecondsOffset: Int) {
+  import HighPrecisionTime._
 
   /** Returns a [[org.joda.time.Instant]]. Truncates micro and nanoseconds. */
   def toInstant: Instant =
-    new Instant(milliSecondsSinceEpoch)
+    new Instant(millisecondsSinceEpoch)
 
   /** Milliseconds since Java epoch. Truncates micro and nanoseconds. */
-  def milliSecondsSinceEpoch: Long =
-    secondsSinceEpoch * 1000
+  def millisecondsSinceEpoch: Long =
+    secondsSinceEpoch * 1000 + nanoSecondsOffset / NanosInAMilli
 
   override def toString =
     "%s.%09dZ".format(
