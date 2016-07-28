@@ -176,8 +176,23 @@ class SerializationSpec extends FlatSpec with Matchers {
     val ts = TimeV(new Instant(0).plus(Duration.standardMinutes(5)))
     json.writeValueAsString(ts) shouldBe "{\"@ts\":\"1970-01-01T00:05:00.000000000Z\"}"
 
-    val withNanos = TimeV(HighPrecisionTime(new Instant(0), nanosToAdd=1001))
-    json.writeValueAsString(withNanos) shouldBe "{\"@ts\":\"1970-01-01T00:00:00.000001001Z\"}"
+    val withMillis = TimeV(HighPrecisionTime(new Instant(1)))
+    json.writeValueAsString(withMillis) shouldBe "{\"@ts\":\"1970-01-01T00:00:00.001000000Z\"}"
+
+    val withMicros = TimeV(HighPrecisionTime(new Instant(1), microsToAdd=1001))
+    json.writeValueAsString(withMicros) shouldBe "{\"@ts\":\"1970-01-01T00:00:00.002001000Z\"}"
+
+    val withNanos = TimeV(HighPrecisionTime(new Instant(1), nanosToAdd=1001))
+    json.writeValueAsString(withNanos) shouldBe "{\"@ts\":\"1970-01-01T00:00:00.001001001Z\"}"
+
+    val microsOverflow = TimeV(HighPrecisionTime(new Instant(1000), microsToAdd=1777777777))
+    json.writeValueAsString(microsOverflow) shouldBe "{\"@ts\":\"1970-01-01T00:29:38.777777000Z\"}"
+
+    val nanosOverflow = TimeV(HighPrecisionTime(new Instant(1000), nanosToAdd=1999999999))
+    json.writeValueAsString(nanosOverflow) shouldBe "{\"@ts\":\"1970-01-01T00:00:02.999999999Z\"}"
+
+    val microAndNanosOverflow = TimeV(HighPrecisionTime(new Instant(1000), microsToAdd = 1000000, nanosToAdd = 1000000000))
+    json.writeValueAsString(microAndNanosOverflow) shouldBe "{\"@ts\":\"1970-01-01T00:00:03.000000000Z\"}"
 
     val date = DateV(new LocalDate(0, UTC).plusDays(2))
     json.writeValueAsString(date) shouldBe "{\"@date\":\"1970-01-03\"}"

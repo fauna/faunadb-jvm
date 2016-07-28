@@ -9,7 +9,7 @@ import scala.Ordered._
   * Represents the instant from Java's epoch composed by the number of seconds since eposh
   * and the nanoseconds offset.
   */
-class HighPrecisionTime private(val secondsSinceEposh: Long, val nanoSecondsOffset: Int) {
+class HighPrecisionTime private(val secondsSinceEpoch: Long, val nanoSecondsOffset: Int) {
 
   /** Returns a [[org.joda.time.Instant]]. Truncates micro and nanoseconds. */
   def toInstant: Instant =
@@ -17,41 +17,54 @@ class HighPrecisionTime private(val secondsSinceEposh: Long, val nanoSecondsOffs
 
   /** Milliseconds since Java epoch. Truncates micro and nanoseconds. */
   def milliSecondsSinceEpoch: Long =
-    secondsSinceEposh / 1000
+    secondsSinceEpoch * 1000
 
   override def equals(obj: Any): Boolean = obj match {
     case other: HighPrecisionTime =>
-      secondsSinceEposh == other.secondsSinceEposh &&
+      secondsSinceEpoch == other.secondsSinceEpoch &&
         nanoSecondsOffset == other.nanoSecondsOffset
 
     case _ => false
   }
 
   override def hashCode(): Int =
-    secondsSinceEposh.hashCode() + nanoSecondsOffset.hashCode()
+    secondsSinceEpoch.hashCode() + nanoSecondsOffset.hashCode()
 
   override def toString =
-    "%s%06dZ".format(
-      toInstant.toString(ISODateTimeFormat.dateHourMinuteSecondMillis()),
+    "%s.%09dZ".format(
+      toInstant.toString(ISODateTimeFormat.dateHourMinuteSecond()),
       nanoSecondsOffset
     )
 }
 
 object HighPrecisionTime {
 
-  private val NanosInAMicro = 10000
+  private val MillisInASecond = 1000
+  private val NanosInAMicro = 1000
+  private val NanosInAMilli = 1000000
   private val NanosInASecond = 1000000000
+
+  /**
+    * Creates an instance of [[faunadb.values.time.HighPrecisionTime]].
+    * Calculate overflow of nanoseconds to seconds.
+    */
+  def apply(secondsSinceEpoch: Long, nanoSecondsOffset: Long): HighPrecisionTime =
+    new HighPrecisionTime(
+      secondsSinceEpoch + nanoSecondsOffset / NanosInASecond,
+      (nanoSecondsOffset % NanosInASecond).toInt
+    )
 
   /**
     * Creates an instance of [[faunadb.values.time.HighPrecisionTime]] adding
     * the the micro and nanoseconds informed.
     */
   def apply(initial: Instant, microsToAdd: Long = 0, nanosToAdd: Long = 0): HighPrecisionTime = {
-    val nanos = microsToAdd * NanosInAMicro + nanosToAdd
-    val overflow = nanos / NanosInASecond
-    val remaining = nanos % NanosInASecond
+    val nanos =
+      initial.getMillis % MillisInASecond * NanosInAMilli +
+      microsToAdd * NanosInAMicro +
+      nanosToAdd
 
-    new HighPrecisionTime(initial.getMillis * 1000 + overflow, remaining.toInt)
+    HighPrecisionTime(initial.getMillis / MillisInASecond, nanos)
   }
 
   private val Precision = ".*\\.\\d{3}(\\d{3})(\\d{3})?Z".r
@@ -84,6 +97,6 @@ object HighPrecisionTime {
 
   implicit object HighPrecisionTimeOrdering extends Ordering[HighPrecisionTime] {
     def compare(x: HighPrecisionTime, y: HighPrecisionTime): Int =
-      (x.secondsSinceEposh, x.nanoSecondsOffset) compare (y.secondsSinceEposh, y.nanoSecondsOffset)
+      (x.secondsSinceEpoch, x.nanoSecondsOffset) compare (y.secondsSinceEpoch, y.nanoSecondsOffset)
   }
 }
