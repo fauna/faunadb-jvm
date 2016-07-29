@@ -19,7 +19,7 @@ import scala.language.implicitConversions
   * }}}
   *
   * {{{
-  * val query = Map(Lambda(r => Get(r)), Paginate(Match(Ref("indexes/spells_by_name"), "Magic Missile")))
+  * val query = Map(Paginate(Match(Ref("indexes/spells_by_name"), "Magic Missile")), Lambda(r => Get(r)))
   * }}}
   */
 package query {
