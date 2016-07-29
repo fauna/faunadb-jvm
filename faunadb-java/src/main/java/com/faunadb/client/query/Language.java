@@ -437,7 +437,7 @@ public final class Language {
    *
    * @see <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
    */
-  public static Expr Foreach(Expr lambda, Expr collection) {
+  public static Expr Foreach(Expr collection, Expr lambda) {
     return Fn.apply("foreach", lambda, "collection", collection);
   }
 

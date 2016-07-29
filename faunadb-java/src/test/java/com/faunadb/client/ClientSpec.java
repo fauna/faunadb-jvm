@@ -490,12 +490,13 @@ public class ClientSpec extends FaunaDBTest {
   public void shouldExecuteForeachExpression() throws Exception {
     Value res = client.query(
       Foreach(
-        Lambda(Value("spell"),
-          Create(onARandomClass(),
-            Obj("data", Obj("name", Var("spell"))))),
         Arr(
           Value("Fireball Level 1"),
-          Value("Fireball Level 2")))
+          Value("Fireball Level 2")),
+        Lambda(Value("spell"),
+          Create(onARandomClass(),
+            Obj("data", Obj("name", Var("spell")))))
+      )
     ).get();
 
     assertThat(res.collect(Field.as(STRING)),
