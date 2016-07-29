@@ -476,10 +476,10 @@ public class ClientSpec extends FaunaDBTest {
   public void shouldMapOverCollections() throws Exception {
     Value res = client.query(
       Map(
-        Lambda(Value("i"),
-          Add(Var("i"), Value(1))),
         Arr(
-          Value(1), Value(2), Value(3))
+          Value(1), Value(2), Value(3)),
+        Lambda(Value("i"),
+          Add(Var("i"), Value(1)))
       )
     ).get();
 
