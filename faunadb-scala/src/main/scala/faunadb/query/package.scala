@@ -19,7 +19,7 @@ import scala.language.implicitConversions
   * }}}
   *
   * {{{
-  * val query = Map(Lambda(r => Get(r)), Paginate(Match(Ref("indexes/spells_by_name"), "Magic Missile")))
+  * val query = Map(Paginate(Match(Ref("indexes/spells_by_name"), "Magic Missile")), Lambda(r => Get(r)))
   * }}}
   */
 package query {
@@ -191,7 +191,7 @@ package object query {
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
    */
-  def Map(lambda: Expr, collection: Expr): Expr =
+  def Map(collection: Expr, lambda: Expr): Expr =
     Expr(ObjectV("map" -> lambda.value, "collection" -> collection.value))
 
   /**
@@ -199,7 +199,7 @@ package object query {
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
    */
-  def Foreach(lambda: Expr, collection: Expr): Expr =
+  def Foreach(collection: Expr, lambda: Expr): Expr =
     Expr(ObjectV("foreach" -> lambda.value, "collection" -> collection.value))
 
   /**
@@ -207,7 +207,7 @@ package object query {
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
     */
-  def Filter(lambda: Expr, collection: Expr): Expr =
+  def Filter(collection: Expr, lambda: Expr): Expr =
     Expr(ObjectV("filter" -> lambda.value, "collection" -> collection.value))
 
   /**
