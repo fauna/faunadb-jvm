@@ -80,7 +80,7 @@ class SerializationSpec extends FlatSpec with Matchers {
     val map2 = Map(Arr(1, 2, 3), Lambda("munchings", Var("munchings")))
     json.writeValueAsString(map2) shouldBe "{\"map\":{\"lambda\":\"munchings\",\"expr\":{\"var\":\"munchings\"}},\"collection\":[1,2,3]}"
 
-    val foreach = Foreach(Lambda(creature => Create(Ref("some/ref"), Obj("data" -> Obj("some" -> creature)))), Arr(Ref("another/ref/1"), Ref("another/ref/2")))
+    val foreach = Foreach(Arr(Ref("another/ref/1"), Ref("another/ref/2")), Lambda(creature => Create(Ref("some/ref"), Obj("data" -> Obj("some" -> creature)))))
     json.writeValueAsString(foreach) shouldBe "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":\"another/ref/1\"},{\"@ref\":\"another/ref/2\"}]}"
 
     val filter = Filter(Lambda(i => Equals(1, i)), Arr(1,2,3))
