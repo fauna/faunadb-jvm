@@ -207,7 +207,7 @@ package object query {
     *
     * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
     */
-  def Filter(lambda: Expr, collection: Expr): Expr =
+  def Filter(collection: Expr, lambda: Expr): Expr =
     Expr(ObjectV("filter" -> lambda.value, "collection" -> collection.value))
 
   /**
