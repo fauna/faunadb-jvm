@@ -271,8 +271,8 @@ public class SerializationSpec {
   public void shouldSerializeMap() throws Exception {
     assertJson(
       Map(
-        Lambda(Value("x"), Var("x")),
-        Arr(Value(1), Value(2), Value(3))
+        Arr(Value(1), Value(2), Value(3)),
+        Lambda(Value("x"), Var("x"))
       ), "{\"map\":{\"lambda\":\"x\",\"expr\":{\"var\":\"x\"}},\"collection\":[1,2,3]}");
   }
 
@@ -280,8 +280,8 @@ public class SerializationSpec {
   public void shouldSerializeForeach() throws Exception {
     assertJson(
       Foreach(
-        Lambda(Value("x"), Var("x")),
-        Arr(Value(1), Value(2), Value(3))
+        Arr(Value(1), Value(2), Value(3)),
+        Lambda(Value("x"), Var("x"))
       ), "{\"foreach\":{\"lambda\":\"x\",\"expr\":{\"var\":\"x\"}},\"collection\":[1,2,3]}");
   }
 
@@ -289,8 +289,8 @@ public class SerializationSpec {
   public void shouldSerializeFilter() throws Exception {
     assertJson(
       Filter(
-        Lambda(Value("x"), Var("x")),
-        Arr(Value(true), Value(false))
+        Arr(Value(true), Value(false)),
+        Lambda(Value("x"), Var("x"))
       ), "{\"filter\":{\"lambda\":\"x\",\"expr\":{\"var\":\"x\"}},\"collection\":[true,false]}");
   }
 

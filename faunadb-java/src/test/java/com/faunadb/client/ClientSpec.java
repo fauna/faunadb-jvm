@@ -476,10 +476,10 @@ public class ClientSpec extends FaunaDBTest {
   public void shouldMapOverCollections() throws Exception {
     Value res = client.query(
       Map(
-        Lambda(Value("i"),
-          Add(Var("i"), Value(1))),
         Arr(
-          Value(1), Value(2), Value(3))
+          Value(1), Value(2), Value(3)),
+        Lambda(Value("i"),
+          Add(Var("i"), Value(1)))
       )
     ).get();
 
@@ -490,12 +490,13 @@ public class ClientSpec extends FaunaDBTest {
   public void shouldExecuteForeachExpression() throws Exception {
     Value res = client.query(
       Foreach(
-        Lambda(Value("spell"),
-          Create(onARandomClass(),
-            Obj("data", Obj("name", Var("spell"))))),
         Arr(
           Value("Fireball Level 1"),
-          Value("Fireball Level 2")))
+          Value("Fireball Level 2")),
+        Lambda(Value("spell"),
+          Create(onARandomClass(),
+            Obj("data", Obj("name", Var("spell")))))
+      )
     ).get();
 
     assertThat(res.collect(Field.as(STRING)),
@@ -506,12 +507,12 @@ public class ClientSpec extends FaunaDBTest {
   public void shouldFilterACollection() throws Exception {
     Value filtered = client.query(
       Filter(
+        Arr(Value(1), Value(2), Value(3)),
         Lambda(Value("i"),
           Equals(
             Value(0),
             Modulo(Var("i"), Value(2)))
-        ),
-        Arr(Value(1), Value(2), Value(3))
+        )
       )).get();
 
     assertThat(filtered.collect(Field.as(LONG)), contains(2L));
