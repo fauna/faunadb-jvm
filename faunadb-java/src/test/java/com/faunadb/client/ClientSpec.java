@@ -507,12 +507,12 @@ public class ClientSpec extends FaunaDBTest {
   public void shouldFilterACollection() throws Exception {
     Value filtered = client.query(
       Filter(
+        Arr(Value(1), Value(2), Value(3)),
         Lambda(Value("i"),
           Equals(
             Value(0),
             Modulo(Var("i"), Value(2)))
-        ),
-        Arr(Value(1), Value(2), Value(3))
+        )
       )).get();
 
     assertThat(filtered.collect(Field.as(LONG)), contains(2L));

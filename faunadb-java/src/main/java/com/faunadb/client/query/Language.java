@@ -446,7 +446,7 @@ public final class Language {
    *
    * @see <a href="https://faunadb.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
    */
-  public static Expr Filter(Expr lambda, Expr collection) {
+  public static Expr Filter(Expr collection, Expr lambda) {
     return Fn.apply("filter", lambda, "collection", collection);
   }
 

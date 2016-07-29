@@ -289,8 +289,8 @@ public class SerializationSpec {
   public void shouldSerializeFilter() throws Exception {
     assertJson(
       Filter(
-        Lambda(Value("x"), Var("x")),
-        Arr(Value(true), Value(false))
+        Arr(Value(true), Value(false)),
+        Lambda(Value("x"), Var("x"))
       ), "{\"filter\":{\"lambda\":\"x\",\"expr\":{\"var\":\"x\"}},\"collection\":[true,false]}");
   }
 
