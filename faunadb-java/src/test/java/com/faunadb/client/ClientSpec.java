@@ -783,8 +783,8 @@ public class ClientSpec extends FaunaDBTest {
 
     assertThat(res.get(0).to(TIME).get(), equalTo(new Instant(0).plus(Duration.standardSeconds(30))));
     assertThat(res.get(1).to(TIME).get(), equalTo(new Instant(0).plus(Duration.millis(30))));
-    assertThat(res.get(2).to(HP_TIME).get(), equalTo(HighPrecisionTime.withMicros(new Instant(0), 30)));
-    assertThat(res.get(3).to(HP_TIME).get(), equalTo(HighPrecisionTime.withNanos(new Instant(0), 30)));
+    assertThat(res.get(2).to(HP_TIME).get(), equalTo(HighPrecisionTime.fromInstantWithMicros(new Instant(0), 30)));
+    assertThat(res.get(3).to(HP_TIME).get(), equalTo(HighPrecisionTime.fromInstantWithNanos(new Instant(0), 30)));
   }
 
   @Test
@@ -818,8 +818,8 @@ public class ClientSpec extends FaunaDBTest {
     Arrays.sort(times);
 
     assertThat(times, arrayContaining(
-      HighPrecisionTime.withNanos(new Instant(0), 42),
-      HighPrecisionTime.withMicros(new Instant(0), 30),
+      HighPrecisionTime.fromInstantWithNanos(new Instant(0), 42),
+      HighPrecisionTime.fromInstantWithMicros(new Instant(0), 30),
       HighPrecisionTime.fromInstant(new Instant(50)),
       HighPrecisionTime.fromInstant(new Instant(1000))
     ));

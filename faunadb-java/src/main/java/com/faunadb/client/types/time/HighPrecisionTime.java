@@ -68,7 +68,7 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
    * @param initialTime initial timestamp
    * @param nanosToAdd  nanoseconds to add to the initial timestamp
    */
-  public static HighPrecisionTime withNanos(Instant initialTime, long nanosToAdd) {
+  public static HighPrecisionTime fromInstantWithNanos(Instant initialTime, long nanosToAdd) {
     return create(initialTime, 0, nanosToAdd);
   }
 
@@ -84,7 +84,7 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
    * @param initialTime initial timestamp
    * @param microsToAdd  nanoseconds to add to the initial timestamp
    */
-  public static HighPrecisionTime withMicros(Instant initialTime, long microsToAdd) {
+  public static HighPrecisionTime fromInstantWithMicros(Instant initialTime, long microsToAdd) {
     return create(initialTime, microsToAdd, 0);
   }
 
