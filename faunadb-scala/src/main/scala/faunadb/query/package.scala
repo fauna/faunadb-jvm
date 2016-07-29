@@ -191,7 +191,7 @@ package object query {
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
    */
-  def Map(lambda: Expr, collection: Expr): Expr =
+  def Map(collection: Expr, lambda: Expr): Expr =
     Expr(ObjectV("map" -> lambda.value, "collection" -> collection.value))
 
   /**

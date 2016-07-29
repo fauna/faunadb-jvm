@@ -251,7 +251,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test collections" in {
-    val mapF = client.query(Map(Lambda(munchings => Add(munchings, 1L)), Arr(1L, 2L, 3L)))
+    val mapF = client.query(Map(Arr(1L, 2L, 3L), Lambda(munchings => Add(munchings, 1L))))
     val mapR = await(mapF)
     mapR.to[Seq[Long]].get shouldBe Seq(2, 3, 4)
 
