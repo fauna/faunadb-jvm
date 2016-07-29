@@ -199,7 +199,7 @@ package object query {
    *
    * '''Reference''': [[https://faunadb.com/documentation/queries#collection_functions]]
    */
-  def Foreach(lambda: Expr, collection: Expr): Expr =
+  def Foreach(collection: Expr, lambda: Expr): Expr =
     Expr(ObjectV("foreach" -> lambda.value, "collection" -> collection.value))
 
   /**
