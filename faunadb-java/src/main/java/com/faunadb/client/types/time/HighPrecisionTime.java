@@ -15,7 +15,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
 
-  private static final int NANOS_IN_A_MIRO = 1000;
+  private static final int NANOS_IN_A_MICRO = 1000;
   private static final int NANOS_IN_A_MILLI = 1000000;
   private static final int NANOS_IN_A_SECOND = 1000000000;
   private static final int MILLIS_IN_A_SECOND = 1000;
@@ -62,7 +62,7 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
    * <p>
    * For example:
    * <pre>
-   * {@code HighPrecisionTime.withNanos(new Instant(1), 0) == HighPrecisionTime.withNanos(new Instant(0), 1000000)}
+   * {@code HighPrecisionTime.fromInstantWithNanos(new Instant(1), 0) == HighPrecisionTime.fromInstantWithNanos(new Instant(0), 1000000)}
    * </pre>
    *
    * @param initialTime initial timestamp
@@ -78,7 +78,7 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
    * <p>
    * For example:
    * <pre>
-   * {@code HighPrecisionTime.fromInstant(new Instant(1), 0) == HighPrecisionTime.fromInstant(new Instant(0), 1000)}
+   * {@code HighPrecisionTime.fromInstantWithMicros(new Instant(1), 0) == HighPrecisionTime.fromInstantWithMicros(new Instant(0), 1000)}
    * </pre>
    *
    * @param initialTime initial timestamp
@@ -93,7 +93,7 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
 
     long nanos =
       initialTime.getMillis() % MILLIS_IN_A_SECOND * NANOS_IN_A_MILLI +
-        microsToAdd * NANOS_IN_A_MIRO +
+        microsToAdd * NANOS_IN_A_MICRO +
         nanosToAdd;
 
     return new HighPrecisionTime(initialTime.getMillis() / MILLIS_IN_A_SECOND, nanos);
