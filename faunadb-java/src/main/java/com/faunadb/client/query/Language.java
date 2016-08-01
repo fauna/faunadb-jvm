@@ -1,6 +1,5 @@
 package com.faunadb.client.query;
 
-import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.*;
 import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.collect.ImmutableList;
@@ -16,14 +15,14 @@ import java.util.Map;
  *
  * {@code import static com.faunadb.client.query.Language.*;}
  *
- * Each of these methods constructs a {@link Value}, which can then be composed with other methods to form complex
+ * Each of these methods constructs a {@link Expr}, which can then be composed with other methods to form complex
  * expressions.
  *
  * <b>Examples:</b>
  * <pre>{@code
- *   Value existsValue = Exists(Ref("some/ref"));
+ *   Expr existsValue = Exists(Ref("some/ref"));
  *
- *   Value createValue = Create(
+ *   Expr createValue = Create(
  *    Ref("classes/some_class"),
  *    Obj("data",
  *      Obj("some", Value("field")))
