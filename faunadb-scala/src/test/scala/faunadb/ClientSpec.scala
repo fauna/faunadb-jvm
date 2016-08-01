@@ -1,8 +1,10 @@
 package faunadb
 
 import faunadb.errors.{ BadRequestException, NotFoundException, UnauthorizedException }
+import faunadb.query.TimeUnit._
 import faunadb.query._
 import faunadb.values._
+import faunadb.values.time._
 import org.joda.time
 import org.joda.time.DateTimeZone.UTC
 import org.joda.time.{ Instant, LocalDate }
@@ -407,13 +409,25 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "test date and time functions" in {
     val timeF = client.query(Time("1970-01-01T00:00:00-04:00"))
     val timeR = await(timeF)
-    timeR.to[TimeV].get.instant shouldBe new Instant(0).plus(time.Duration.standardHours(4))
+    timeR.to[TimeV].get.time.toInstant shouldBe new Instant(0).plus(time.Duration.standardHours(4))
     timeR.to[Instant].get shouldBe new Instant(0).plus(time.Duration.standardHours(4))
 
-    val epochF = client.query(Epoch(30, "second"))
-    val epochR = await(epochF)
-    epochR.to[TimeV].get.instant shouldBe new Instant(0).plus(time.Duration.standardSeconds(30))
-    epochR.to[Instant].get shouldBe new Instant(0).plus(time.Duration.standardSeconds(30))
+    val epochR = await(client.query(Arr(
+      Epoch(30, Second),
+      Epoch(10, Millisecond),
+      Epoch(42, Nanosecond),
+      Epoch(40, Microsecond)
+    )))
+
+    epochR.collect(Field.to[HighPrecisionTime]).get.sorted shouldBe Seq(
+      HighPrecisionTime(new Instant(0), nanosToAdd = 42),
+      HighPrecisionTime(new Instant(0), microsToAdd = 40),
+      HighPrecisionTime(new Instant(10)),
+      HighPrecisionTime(new Instant(30000))
+    )
+
+    epochR(0).to[TimeV].get.time.toInstant shouldBe new Instant(0).plus(time.Duration.standardSeconds(30))
+    epochR(0).to[Instant].get shouldBe new Instant(0).plus(time.Duration.standardSeconds(30))
 
     val dateF = client.query(query.Date("1970-01-02"))
     val dateR = await(dateF)
