@@ -139,17 +139,17 @@ public class SerializationSpec {
       .plus(Duration.standardMinutes(5))
       .plus(Duration.standardSeconds(2));
 
-    assertJson(Value(new HighPrecisionTime(initialTime, 0, 0)),
+    assertJson(Value(HighPrecisionTime.fromInstant(initialTime)),
       "{\"@ts\":\"1970-01-01T00:05:02.010000000Z\"}");
 
-    assertJson(Value(new HighPrecisionTime(initialTime, 20, 5)),
+    assertJson(Value(HighPrecisionTime.fromInstantWithMicros(initialTime, 1005)),
+      "{\"@ts\":\"1970-01-01T00:05:02.011005000Z\"}");
+
+    assertJson(Value(HighPrecisionTime.fromInstantWithNanos(initialTime, 20005)),
       "{\"@ts\":\"1970-01-01T00:05:02.010020005Z\"}");
 
-    assertJson(Value(new HighPrecisionTime(initialTime, 1001, 5)),
-      "{\"@ts\":\"1970-01-01T00:05:02.011001005Z\"}");
-
-    assertJson(Value(new HighPrecisionTime(initialTime, 20, 1001)),
-      "{\"@ts\":\"1970-01-01T00:05:02.010021001Z\"}");
+    assertJson(Value(HighPrecisionTime.fromInstantWithNanos(initialTime, 3021001)),
+      "{\"@ts\":\"1970-01-01T00:05:02.013021001Z\"}");
   }
 
   @Test

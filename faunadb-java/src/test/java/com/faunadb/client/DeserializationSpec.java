@@ -100,10 +100,10 @@ public class DeserializationSpec {
   @Test
   public void shouldDeserializeHighPrecisionTime() throws Exception {
     HighPrecisionTime micro = parsed("{ \"@ts\": \"1970-01-01T00:00:00.000005Z\" }").to(HP_TIME).get();
-    assertThat(micro, equalTo(new HighPrecisionTime(new Instant(0), 5, 0)));
+    assertThat(micro, equalTo(new HighPrecisionTime(0, 5000)));
 
     HighPrecisionTime nano = parsed("{ \"@ts\": \"1970-01-01T00:00:00.000000005Z\" }").to(HP_TIME).get();
-    assertThat(nano, equalTo(new HighPrecisionTime(new Instant(0), 0, 5)));
+    assertThat(nano, equalTo(new HighPrecisionTime(0, 5)));
   }
 
   @Test
