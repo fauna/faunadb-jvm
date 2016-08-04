@@ -28,7 +28,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   val rootClient = FaunaClient(endpoint = config("root_url"), secret = config("root_token"))
 
-  val testDbName = "faunadb-scala-test-" + Random.alphanumeric.take(8).mkString
+  val testDbName = "faunadb-scala-test"
   var client: FaunaClient = null
 
   // Helper fields
@@ -50,10 +50,16 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   val PageRefs = Field("data").to[Seq[RefV]]
 
   def await[T](f: Future[T]) = Await.result(f, 5.second)
+  def ready[T](f: Future[T]) = Await.ready(f, 5.second)
+
+  def dropDB(): Unit =
+    ready(rootClient.query(Delete(Ref(s"databases/$testDbName"))))
 
   // tests
 
   override protected def beforeAll(): Unit = {
+    dropDB()
+
     val db = await(rootClient.query(Create(Ref("databases"), Obj("name" -> testDbName))))
     val dbRef = db(RefField).get
     val key = await(rootClient.query(Create(Ref("keys"), Obj("database" -> dbRef, "role" -> "server"))))
@@ -70,6 +76,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   override protected def afterAll(): Unit = {
+    dropDB()
     client.close()
     rootClient.close()
   }
