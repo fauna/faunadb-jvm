@@ -259,9 +259,6 @@ lazy val javaAndroidCheck = project.in(file("android-check/faunadb-java-android"
     javaSource in Compile := (javaSource in Compile in javaAndroid).value,
     unmanagedSourceDirectories in Compile := (javaSource in Compile).value :: Nil,
 
-    javaSource in Test := (javaSource in Test in javaAndroid).value,
-    unmanagedSourceDirectories in Test := (javaSource in Test).value :: Nil,
-
     libraryDependencies ++= javaAndroidDependencies
   )
 
@@ -274,9 +271,6 @@ lazy val javaDslAndroidCheck = project.in(file("android-check/faunadb-java-dsl-a
 
     javaSource in Compile := (javaSource in Compile in javaDsl).value,
     unmanagedSourceDirectories in Compile := (javaSource in Compile).value :: Nil,
-
-    javaSource in Test := (javaSource in Test in javaDsl).value,
-    unmanagedSourceDirectories in Test := (javaSource in Test).value :: Nil,
 
     libraryDependencies ++= javaDslDependencies
   )
