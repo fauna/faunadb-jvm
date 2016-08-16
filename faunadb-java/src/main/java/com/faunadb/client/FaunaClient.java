@@ -14,8 +14,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.Response;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Response;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -47,7 +47,7 @@ import static com.google.common.util.concurrent.Futures.transform;
  */
 public class FaunaClient implements AutoCloseable {
 
-  private static final Charset UTF8 = Charset.forName("UTF-8");
+  private static final String UTF8 = "UTF-8";
 
   /**
    * Creates a new {@link Builder}

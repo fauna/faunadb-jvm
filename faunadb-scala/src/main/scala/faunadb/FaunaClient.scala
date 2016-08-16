@@ -11,9 +11,8 @@ import faunadb.util.FutureImplicits._
 import faunadb.values.{ ArrayV, NullV, Value }
 import java.io.IOException
 import java.net.ConnectException
-import java.nio.charset.Charset
 import java.util.concurrent.TimeoutException
-import org.asynchttpclient.{ AsyncHttpClient, Response => HttpResponse }
+import com.ning.http.client.{ AsyncHttpClient, Response => HttpResponse }
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -28,7 +27,7 @@ object FaunaClient {
     * @param secret The secret material of the auth key used. See [[https://fauna.com/documentation#authentication-key_access]]
     * @param endpoint URL of the FaunaDB service to connect to. Defaults to https://cloud.faunadb.com
     * @param metrics An optional [[com.codahale.metrics.MetricRegistry]] to record stats.
-    * @param httpClient An optional custom [[org.asynchttpclient.AsyncHttpClient]].
+    * @param httpClient An optional custom [[com.ning.http.client.AsyncHttpClient]].
     * @return A configured FaunaClient instance.
     */
   def apply(
@@ -80,7 +79,7 @@ object FaunaClient {
   */
 class FaunaClient(connection: Connection) {
 
-  private[this] val UTF8 = Charset.forName("UTF-8")
+  private[this] val UTF8 = "UTF-8"
 
   private[this] val json = new ObjectMapper
   json.registerModule(new DefaultScalaModule)

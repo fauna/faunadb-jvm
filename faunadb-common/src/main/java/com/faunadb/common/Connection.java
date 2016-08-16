@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import io.netty.handler.codec.http.HttpHeaders;
-import org.asynchttpclient.*;
-import org.asynchttpclient.util.Base64;
+import com.ning.http.client.*;
+import com.ning.http.util.Base64;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,8 +138,8 @@ public final class Connection implements AutoCloseable {
 
       AsyncHttpClient httpClient;
       if (client == null) {
-        httpClient = new DefaultAsyncHttpClient(
-          new DefaultAsyncHttpClientConfig.Builder()
+        httpClient = new AsyncHttpClient(
+          new AsyncHttpClientConfig.Builder()
             .setConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_MS)
             .setRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
             .setPooledConnectionIdleTimeout(DEFAULT_IDLE_TIMEOUT_MS)
@@ -320,7 +320,7 @@ public final class Connection implements AutoCloseable {
     return new URL(faunaRoot, path).toString();
   }
 
-  private void logSuccess(Request request, Response response) {
+  private void logSuccess(Request request, Response response) throws IOException {
     if (log.isDebugEnabled()) {
       String data = Optional.fromNullable(request.getStringData()).or("");
       String host = Optional.fromNullable(response.getHeader(X_FAUNADB_HOST)).or("Unknown");
