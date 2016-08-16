@@ -6,7 +6,7 @@ import com.faunadb.client.types.Value.LongV;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import static java.util.Objects.requireNonNull;
+import static com.faunadb.client.util.Objects.requireNonNull;
 
 /**
  * A pagination expression.

@@ -1,14 +1,15 @@
 package com.faunadb.client.types.time;
 
+import com.faunadb.client.util.Objects;
 import org.joda.time.Instant;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.faunadb.client.util.Objects.hash;
+import static com.faunadb.client.util.Objects.requireNonNull;
 import static java.lang.String.format;
-import static java.util.Objects.hash;
-import static java.util.Objects.requireNonNull;
 
 /**
  * Represents an instant in time with nanosecond precision.
@@ -20,7 +21,7 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
   private static final int NANOS_IN_A_SECOND = 1000000000;
   private static final int MILLIS_IN_A_SECOND = 1000;
 
-  private static final Pattern PRECISION_GROUPS = Pattern.compile("\\.\\d{3}(?<micros>\\d{3})(?<nanos>\\d{3})?Z");
+  private static final Pattern PRECISION_GROUPS = Pattern.compile("\\.\\d{3}(\\d{3})(\\d{3})?Z");
 
   /**
    * Parses a string into a {@link HighPrecisionTime} instance.
@@ -35,8 +36,8 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
     if (precision.find()) {
       return create(
         initialTime,
-        toLong(precision.group("micros")),
-        toLong(precision.group("nanos"))
+        toLong(precision.group(1)),
+        toLong(precision.group(2))
       );
     }
 
@@ -162,10 +163,10 @@ public class HighPrecisionTime implements Comparable<HighPrecisionTime> {
 
   @Override
   public int compareTo(HighPrecisionTime other) {
-    int compareSeconds = Long.compare(secondsSinceEpoch, other.secondsSinceEpoch);
+    int compareSeconds = Objects.compare(secondsSinceEpoch, other.secondsSinceEpoch);
     if (compareSeconds != 0) return compareSeconds;
 
-    return Integer.compare(nanoSecondsOffset, other.nanoSecondsOffset);
+    return Objects.compare(nanoSecondsOffset, other.nanoSecondsOffset);
   }
 
   @Override

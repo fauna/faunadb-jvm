@@ -239,7 +239,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val ifR = await(ifF)
     ifR.to[String].get shouldBe "was true"
 
-    val randomNum = Math.abs(Math.floorMod(Random.nextLong(), 250000L)) + 250000L
+    val randomNum = Math.abs(Random.nextLong() % 250000L) + 250000L
     val randomRef = "classes/spells/" + randomNum
     val doF = client.query(Do(
       Create(Ref(randomRef), Obj("data" -> Obj("name" -> "Magic Missile"))),
