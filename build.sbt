@@ -40,22 +40,6 @@ lazy val publishSettings = Seq(
     </developers>
   ))
 
-lazy val disablePublishSettings = Seq(
-  publishLocal := {},
-  publish := {},
-
-  publishArtifact in Test := false,
-  publishArtifact in Compile := false,
-  publishArtifact in (Compile, packageBin) := false,
-  publishArtifact in (Compile, packageDoc) := false,
-  publishArtifact in (Compile, packageSrc) := false
-)
-
-lazy val androidSettings = Seq(
-  platformTarget in Android := "android-16",
-  showSdkProgress in Android := true
-)
-
 lazy val root = (project in file("."))
   .settings(
     name := "faunadb-jvm-parent",
@@ -63,8 +47,7 @@ lazy val root = (project in file("."))
     crossPaths := false,
     autoScalaLibrary := false
   )
-  .settings(disablePublishSettings: _*)
-  .aggregate(common, scala, javaDsl, java, javaAndroid, androidCheck)
+  .aggregate(common, scala, javaDsl, java, javaAndroid)
 
 lazy val common = project.in(file("faunadb-common"))
   .settings(publishSettings: _*)
@@ -76,7 +59,7 @@ lazy val common = project.in(file("faunadb-common"))
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     apiURL := Some(url(s"http://faunadb.github.io/faunadb-jvm/$driverVersion/faunadb-common/api/")),
 
-    (javacOptions in doc) := Seq("-source", "1.7", "-Xdoclint:none",
+    (javacOptions in doc) := Seq("-source", "1.7",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
       "-link", s"http://google.github.io/guava/releases/$guavaVersion/api/docs/",
       "-link", s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/",
@@ -136,16 +119,6 @@ lazy val scala = project.in(file("faunadb-scala"))
 
     jacoco.reportFormats in jacoco.Config := Seq(XMLReport()))
 
-lazy val javaDslDependencies = Seq(
-    "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,
-    "joda-time" % "joda-time" % jodaTimeVersion,
-    "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
-    "org.yaml" % "snakeyaml" % "1.14" % "test",
-    "com.novocode" % "junit-interface" % "0.11" % "test",
-    "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
-    "junit" % "junit" % "4.12" % "test"
-  )
-
 lazy val javaDsl = project.in(file("faunadb-java-dsl"))
   .settings(publishSettings: _*)
   .settings(
@@ -157,7 +130,7 @@ lazy val javaDsl = project.in(file("faunadb-java-dsl"))
     testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
     apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-java-dsl/api/")),
 
-    (javacOptions in doc) := Seq("-source", "1.7", "-Xdoclint:none",
+    (javacOptions in doc) := Seq("-source", "1.7",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
       "-link", s"http://google.github.io/guava/releases/$guavaVersion/api/docs/",
       "-link", s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/",
@@ -167,7 +140,16 @@ lazy val javaDsl = project.in(file("faunadb-java-dsl"))
     ),
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
-    libraryDependencies ++= javaDslDependencies
+    libraryDependencies ++= Seq(
+      "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,
+      "joda-time" % "joda-time" % jodaTimeVersion,
+      "org.joda" % "joda-convert" % "1.8.1",
+      "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
+      "org.yaml" % "snakeyaml" % "1.14" % "test",
+      "com.novocode" % "junit-interface" % "0.11" % "test",
+      "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
+      "junit" % "junit" % "4.12" % "test"
+    )
   )
 
 lazy val java = project.in(file("faunadb-java"))
@@ -182,7 +164,7 @@ lazy val java = project.in(file("faunadb-java"))
     testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
     apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-java/api/")),
 
-    (javacOptions in doc) := Seq("-source", "1.7", "-Xdoclint:none",
+    (javacOptions in doc) := Seq("-source", "1.7",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
       "-link", s"http://google.github.io/guava/releases/$guavaVersion/api/docs/",
       "-link", s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/",
@@ -205,18 +187,10 @@ lazy val java = project.in(file("faunadb-java"))
     jacoco.reportFormats in jacoco.Config := Seq(XMLReport())
   )
 
-
-lazy val javaAndroidDependencies = Seq(
-  "com.squareup.okhttp3" % "okhttp" % "3.4.1",
-  "com.google.guava" % "guava" % "19.0",
-  "com.novocode" % "junit-interface" % "0.11" % "test",
-  "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
-  "junit" % "junit" % "4.12" % "test"
-)
-
 lazy val javaAndroid = project.in(file("faunadb-android"))
   .dependsOn(javaDsl)
   .settings(publishSettings: _*)
+  .settings(androidBuild: _*)
   .settings(
     name := "faunadb-android",
     crossPaths := false,
@@ -225,7 +199,7 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
     testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
     apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-java/api/")),
 
-    (javacOptions in doc) := Seq("-source", "1.7", "-Xdoclint:none",
+    (javacOptions in doc) := Seq("-source", "1.7",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
       "-link", s"http://google.github.io/guava/releases/$guavaVersion/api/docs/",
       "-link", s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/",
@@ -236,42 +210,63 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
 
-    libraryDependencies ++= javaAndroidDependencies
-  )
+    libraryDependencies ++= Seq(
+      "com.squareup.okhttp3" % "okhttp" % "3.4.1",
+      "com.google.guava" % "guava" % "19.0",
+      "com.google.code.findbugs" % "jsr305" % "2.0.1",
+      "com.novocode" % "junit-interface" % "0.11" % "test",
+      "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
+      "junit" % "junit" % "4.12" % "test"
+    ),
 
-///////////////////////////////////////////////////////////////////////////////////////
-/// Android - this project is not meant to be published                             ///
-/// It exists only to build our DSL against android sdk and check for compatibility ///
-///////////////////////////////////////////////////////////////////////////////////////
+    platformTarget in Android := "android-16",
+    buildToolsVersion in Android := Some("24.0.2"),
+    showSdkProgress in Android := true,
+    useProguard := true,
+    useProguardInDebug := true,
 
-lazy val androidCheck = project.in(file("android-check"))
-  .settings(disablePublishSettings: _*)
-  .aggregate(javaAndroidCheck, javaDslAndroidCheck)
+    publishArtifact in Test := false,
+    publishArtifact in Compile := true,
+    publishArtifact in (Compile, packageBin) := true,
+    publishArtifact in (Compile, packageDoc) := true,
+    publishArtifact in (Compile, packageSrc) := true,
 
-lazy val javaAndroidCheck = project.in(file("android-check/faunadb-java-android"))
-  .dependsOn(javaDslAndroidCheck)
-  .settings(android.Plugin.androidBuildJar)
-  .settings(disablePublishSettings: _*)
-  .settings(androidSettings: _*)
-  .settings(
-    testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
+    proguardOptions in Android ++= Seq(
+      //Guava
+      "-dontwarn sun.misc.Unsafe",
+      "-dontwarn java.lang.ClassValue",
+      "-dontwarn java.lang.SafeVarargs",
+      "-dontwarn com.google.j2objc.annotations.Weak",
+      "-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement",
 
-    javaSource in Compile := (javaSource in Compile in javaAndroid).value,
-    unmanagedSourceDirectories in Compile := (javaSource in Compile).value :: Nil,
+      //Joda Convert
+      "-keep class org.joda.convert.** { *; }",
+      "-keep interface org.joda.convert.** { *; }",
 
-    libraryDependencies ++= javaAndroidDependencies
-  )
+      //Jackson
+      "-dontwarn com.fasterxml.jackson.databind.ext.DOMSerializer",
+      "-keep class org.codehaus.** { *; }",
+      "-keep class com.fasterxml.jackson.annotation.** { *; }",
 
-lazy val javaDslAndroidCheck = project.in(file("android-check/faunadb-java-dsl-android"))
-  .settings(android.Plugin.androidBuildJar)
-  .settings(disablePublishSettings: _*)
-  .settings(androidSettings: _*)
-  .settings(
-    testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
+      //Okio rules
+      "-dontwarn okio.**",
 
-    javaSource in Compile := (javaSource in Compile in javaDsl).value,
-    unmanagedSourceDirectories in Compile := (javaSource in Compile).value :: Nil,
+      //OkHttp rules
+      "-keepattributes Signature",
+      "-keepattributes *Annotation*",
+      "-keep class okhttp3.** { *; }",
+      "-keep interface okhttp3.** { *; }",
+      "-dontwarn okhttp3.**",
 
-    libraryDependencies ++= javaDslDependencies
+      "-keep class com.faunadb.**"
+    ),
+
+    packagingOptions in Android := PackagingOptions(excludes = Seq(
+      "META-INF/DEPENDENCIES",
+      "META-INF/LICENSE.txt",
+      "META-INF/LICENSE",
+      "META-INF/NOTICE.txt",
+      "META-INF/NOTICE"
+    ))
   )
 
