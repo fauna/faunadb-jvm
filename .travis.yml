@@ -3,7 +3,7 @@ language: scala
 scala:
   - 2.11.8
 jdk:
-  - oraclejdk7
+  - oraclejdk8
 script:
   - sbt jacoco:cover
 after_success:
@@ -21,3 +21,6 @@ notifications:
 branches:
   only:
   - master
+script:
+  sbt "android:package" test
+
