@@ -34,7 +34,7 @@ public class FaunaDBTest {
     ROOT_URL = format(
       "%s://%s:%s",
       EnvVariables.getOrElse("FAUNA_SCHEME", "https"),
-      EnvVariables.getOrElse("FAUNA_DOMAIN", "rest.faunadb.com"),
+      EnvVariables.getOrElse("FAUNA_DOMAIN", "cloud.faunadb.com"),
       EnvVariables.getOrElse("FAUNA_PORT", "443")
     );
   }
