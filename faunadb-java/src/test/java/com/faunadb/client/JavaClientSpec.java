@@ -37,7 +37,7 @@ import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.assertThat;
 
-public class ClientSpec extends FaunaDBTest {
+public class JavaClientSpec extends FaunaDBTest {
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
