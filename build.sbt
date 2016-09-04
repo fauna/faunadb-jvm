@@ -143,7 +143,6 @@ lazy val javaDsl = project.in(file("faunadb-java-dsl"))
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,
       "joda-time" % "joda-time" % jodaTimeVersion,
-      "org.joda" % "joda-convert" % "1.8.1",
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
       "org.yaml" % "snakeyaml" % "1.14" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test",
@@ -240,8 +239,7 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
       "-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement",
 
       //Joda Convert
-      "-keep class org.joda.convert.** { *; }",
-      "-keep interface org.joda.convert.** { *; }",
+      "-dontwarn org.joda.convert.**",
 
       //Jackson
       "-dontwarn com.fasterxml.jackson.databind.ext.DOMSerializer",
