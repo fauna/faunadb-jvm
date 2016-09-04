@@ -320,16 +320,24 @@ public final class Connection implements AutoCloseable {
     return new URL(faunaRoot, path).toString();
   }
 
-  private void logSuccess(Request request, Response response) throws IOException {
+  private void logSuccess(Request request, Response response) {
     if (log.isDebugEnabled()) {
       String data = Optional.fromNullable(request.getStringData()).or("");
       String host = Optional.fromNullable(response.getHeader(X_FAUNADB_HOST)).or("Unknown");
       String build = Optional.fromNullable(response.getHeader(X_FAUNADB_BUILD)).or("Unknown");
-      String body = Optional.fromNullable(response.getResponseBody()).or("");
+      String body = Optional.fromNullable(getResponseBody(response)).or("");
 
       log.debug(
         format("Request: %s %s: %s. Response: Status=%d, Fauna Host: %s, Fauna Build: %s: %s",
           request.getMethod(), request.getUrl(), data, response.getStatusCode(), host, build, body));
+    }
+  }
+
+  private String getResponseBody(Response response) {
+    try {
+      return response.getResponseBody();
+    } catch (IOException e) {
+      return null;
     }
   }
 
