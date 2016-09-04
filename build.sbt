@@ -128,7 +128,7 @@ lazy val javaDsl = project.in(file("faunadb-java-dsl"))
     exportJars := true,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
-    apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-java-dsl/api/")),
+    apiURL := Some(url(s"http://faunadb.github.io/faunadb-jvm/$driverVersion/faunadb-java-dsl/api/")),
 
     (javacOptions in doc) := Seq("-source", "1.7",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
@@ -162,7 +162,7 @@ lazy val java = project.in(file("faunadb-java"))
     autoScalaLibrary := false,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
-    apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-java/api/")),
+    apiURL := Some(url(s"http://faunadb.github.io/faunadb-jvm/$driverVersion/faunadb-java/api/")),
 
     (javacOptions in doc) := Seq("-source", "1.7",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
@@ -197,7 +197,7 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
     autoScalaLibrary := false,
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
-    apiURL := Some(url("http://faunadb.github.io/faunadb-jvm/faunadb-java/api/")),
+    apiURL := Some(url(s"http://faunadb.github.io/faunadb-jvm/$driverVersion/faunadb-java/api/")),
 
     (javacOptions in doc) := Seq("-source", "1.7",
       "-link", "http://docs.oracle.com/javase/7/docs/api/",
