@@ -24,13 +24,8 @@ final class RefAwareHttpClient implements AutoCloseable {
 
   @Override
   public void close() {
-    try {
-      if (refCount.decrementAndGet() < INITIAL_REF_COUNT && !delegate.isClosed()) {
-        delegate.close();
-      }
-    } catch (Exception e) {
-      // DefaultAsyncHttpClient do not throw IOException, we don't need to pollute the API with it
-      throw new IOError(e);
+    if (refCount.decrementAndGet() < INITIAL_REF_COUNT && !delegate.isClosed()) {
+      delegate.close();
     }
   }
 
