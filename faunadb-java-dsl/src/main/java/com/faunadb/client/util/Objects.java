@@ -2,9 +2,11 @@ package com.faunadb.client.util;
 
 import java.util.Arrays;
 
+/**
+ * Methods from {@link java.util.Objects} that doesn't exist in old versions of Android
+ */
 final public class Objects {
   private Objects() {
-    throw new AssertionError("No com.faunadb.client.util.Objects instances for you!");
   }
 
   public static <T> T requireNonNull(T obj) {
