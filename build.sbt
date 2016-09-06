@@ -1,4 +1,4 @@
-val driverVersion = "0.3.2-SNAPSHOT"
+val driverVersion = "0.3.1-1"
 val asyncHttpClientVersion = "2.0.2"
 val guavaVersion = "19.0"
 val jacksonVersion = "2.6.4"
