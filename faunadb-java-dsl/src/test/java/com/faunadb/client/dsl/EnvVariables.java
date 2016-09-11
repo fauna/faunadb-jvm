@@ -1,7 +1,7 @@
-package com.faunadb.client.test;
+package com.faunadb.client.dsl;
 
+import static com.faunadb.client.util.Objects.requireNonNull;
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
 
 final class EnvVariables {
 

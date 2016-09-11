@@ -1,35 +1,234 @@
-package com.faunadb.client;
+package com.faunadb.client.dsl;
 
-import com.faunadb.client.errors.UnauthorizedException;
-import com.faunadb.client.dsl.FaunaDBTest;
+import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Value;
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.AsyncFunction;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.faunadb.client.errors.BadRequestException;
+import com.faunadb.client.errors.NotFoundException;
+import com.faunadb.client.types.Field;
+import com.faunadb.client.types.Value.ObjectV;
+import com.faunadb.client.types.Value.RefV;
+import com.faunadb.client.types.Value.StringV;
+import com.faunadb.client.types.time.HighPrecisionTime;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
+import static com.faunadb.client.query.Language.Action.CREATE;
+import static com.faunadb.client.query.Language.Action.DELETE;
 import static com.faunadb.client.query.Language.*;
+import static com.faunadb.client.query.Language.TimeUnit.*;
 import static com.faunadb.client.types.Codec.*;
+import static com.faunadb.client.types.Value.NullV.NULL;
+import static com.google.common.base.Functions.constant;
+import static com.google.common.util.concurrent.Futures.catching;
+import static com.google.common.util.concurrent.Futures.transformAsync;
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.collection.IsArrayContainingInOrder.arrayContaining;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.assertThat;
 
-public class JavaClientSpec extends FaunaDBTest {
+import static java.lang.String.format;
 
-  @Test
-  public void shouldThrowUnauthorizedOnInvalidSecret() throws Exception {
-    thrown.expectCause(isA(UnauthorizedException.class));
+public abstract class DslSpec {
 
-    createFaunaClient("invalid-secret")
-      .query(Get(Ref(Class(Value("spells")), Value("1234"))))
-      .get();
+  protected static final String ROOT_TOKEN = EnvVariables.require("FAUNA_ROOT_KEY");
+  protected static final String ROOT_URL = format("%s://%s:%s",
+    EnvVariables.getOrElse("FAUNA_SCHEME", "https"),
+    EnvVariables.getOrElse("FAUNA_DOMAIN", "cloud.faunadb.com"),
+    EnvVariables.getOrElse("FAUNA_PORT", "443")
+  );
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
+  protected static final Field<Value> DATA = Field.at("data");
+  protected static final Field<RefV> REF_FIELD = Field.at("ref").to(REF);
+  protected static final Field<ImmutableList<RefV>> REF_LIST = DATA.collect(Field.as(REF));
+
+  protected static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).to(STRING);
+  protected static final Field<String> ELEMENT_FIELD = DATA.at(Field.at("element")).to(STRING);
+  protected static final Field<Value> ELEMENTS_LIST = DATA.at(Field.at("elements"));
+  protected static final Field<Long> COST_FIELD = DATA.at(Field.at("cost")).to(LONG);
+
+  protected static RefV magicMissile;
+  protected static RefV fireball;
+  protected static RefV faerieFire;
+  protected static RefV summon;
+  protected static RefV thor;
+  protected static RefV thorSpell1;
+  protected static RefV thorSpell2;
+
+  protected abstract ListenableFuture<Value> query(Expr expr);
+  protected abstract ListenableFuture<ImmutableList<Value>> query(List<? extends Expr> exprs);
+
+  protected static void setUpSchema(Function<Expr, ListenableFuture<Value>> query) throws Exception {
+    query.apply(Create(Ref("classes"), Obj("name", Value("spells")))).get();
+    query.apply(Create(Ref("classes"), Obj("name", Value("characters")))).get();
+    query.apply(Create(Ref("classes"), Obj("name", Value("spellbooks")))).get();
+
+    query.apply(
+      Create(Ref("indexes"), Obj(
+        "name", Value("all_spells"),
+        "source", Ref("classes/spells")
+      ))).get();
+
+    query.apply(
+      Create(Ref("indexes"), Obj(
+        "name", Value("spells_by_element"),
+        "source", Ref("classes/spells"),
+        "terms", Arr(Obj("field", Arr(Value("data"), Value("element"))))
+      ))).get();
+
+    query.apply(
+      Create(Ref("indexes"), Obj(
+        "name", Value("elements_of_spells"),
+        "source", Ref("classes/spells"),
+        "values", Arr(Obj("field", Arr(Value("data"), Value("element"))))
+      ))).get();
+
+    query.apply(
+      Create(Ref("indexes"), Obj(
+        "name", Value("spellbooks_by_owner"),
+        "source", Ref("classes/spellbooks"),
+        "terms", Arr(Obj("field", Arr(Value("data"), Value("owner"))))
+      ))).get();
+
+    query.apply(
+      Create(Ref("indexes"), Obj(
+        "name", Value("spells_by_spellbook"),
+        "source", Ref("classes/spells"),
+        "terms", Arr(Obj("field", Arr(Value("data"), Value("spellbook"))))
+      ))).get();
+
+    magicMissile = query.apply(
+      Create(Ref("classes/spells"),
+        Obj("data",
+          Obj(
+            "name", Value("Magic Missile"),
+            "element", Value("arcane"),
+            "cost", Value(10))))
+    ).get().get(REF_FIELD);
+
+    fireball = query.apply(
+      Create(Ref("classes/spells"),
+        Obj("data",
+          Obj(
+            "name", Value("Fireball"),
+            "element", Value("fire"),
+            "cost", Value(10))))
+    ).get().get(REF_FIELD);
+
+    faerieFire = query.apply(
+      Create(Ref("classes/spells"),
+        Obj("data",
+          Obj(
+            "name", Value("Faerie Fire"),
+            "cost", Value(10),
+            "element", Arr(
+              Value("arcane"),
+              Value("nature")
+            ))))
+    ).get().get(REF_FIELD);
+
+    summon = query.apply(
+      Create(Ref("classes/spells"),
+        Obj("data",
+          Obj(
+            "name", Value("Summon Animal Companion"),
+            "element", Value("nature"),
+            "cost", Value(10))))
+    ).get().get(REF_FIELD);
+
+    thor = query.apply(
+      Create(Ref("classes/characters"),
+        Obj("data", Obj("name", Value("Thor"))))
+    ).get().get(REF_FIELD);
+
+    RefV thorsSpellbook = query.apply(
+      Create(Ref("classes/spellbooks"),
+        Obj("data",
+          Obj("owner", thor)))
+    ).get().get(REF_FIELD);
+
+    thorSpell1 = query.apply(
+      Create(Ref("classes/spells"),
+        Obj("data",
+          Obj("spellbook", thorsSpellbook)))
+    ).get().get(REF_FIELD);
+
+    thorSpell2 = query.apply(
+      Create(Ref("classes/spells"),
+        Obj("data",
+          Obj("spellbook", thorsSpellbook)))
+    ).get().get(REF_FIELD);
   }
 
+  protected static ListenableFuture<Value> setupDatabase(Expr dbRef, String dbName, Function<Expr, ListenableFuture<Value>> rootClient) {
+    return transformAsync(
+      dropDatabase(dbRef, rootClient),
+      createDatabase(dbName, rootClient)
+    );
+  }
+
+  protected static ListenableFuture<Value> dropDatabase(Expr dbRef, Function<Expr, ListenableFuture<Value>> rootClient) {
+    ListenableFuture<Value> delete = rootClient.apply(Delete(dbRef));
+    return catching(delete, BadRequestException.class, constant(NULL));
+  }
+
+  private static AsyncFunction<Value, Value> createDatabase(final String dbName, final Function<Expr, ListenableFuture<Value>> rootClient) {
+    return new AsyncFunction<Value, Value>() {
+      @Override
+      public ListenableFuture<Value> apply(Value ign) throws Exception {
+        return rootClient.apply(
+          Create(
+            Ref("databases"),
+            Obj("name", Value(dbName))
+          )
+        );
+      }
+    };
+  }
+
+  protected static AsyncFunction<Value, Value> createServerKey(final Function<Expr, ListenableFuture<Value>> rootClient) {
+    return new AsyncFunction<Value, Value>() {
+      @Override
+      public ListenableFuture<Value> apply(Value dbCreateR) throws Exception {
+        RefV dbRef = dbCreateR.at("ref").to(REF).get();
+
+        return rootClient.apply(
+          Create(
+            Ref("keys"),
+            Obj("database", dbRef,
+              "role", Value("server"))
+          )
+        );
+      }
+    };
+  }
   @Test
   public void shouldThrowNotFoundWhenInstanceDoesntExists() throws Exception {
     thrown.expectCause(isA(NotFoundException.class));
-    client.query(Get(Ref(Class(Value("spells")), Value("1234")))).get();
+    query(Get(Ref("classes/spells/1234"))).get();
   }
 
   @Test
   public void shouldCreateAComplexInstance() throws Exception {
-    Value instance = client.query(
+    Value instance = query(
       Create(onARandomClass(),
         Obj("data",
           Obj("testField",
@@ -65,13 +264,13 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldBeAbleToGetAnInstance() throws Exception {
-    Value instance = client.query(Get(magicMissile)).get();
+    Value instance = query(Get(magicMissile)).get();
     assertThat(instance.get(NAME_FIELD), equalTo("Magic Missile"));
   }
 
   @Test
   public void shouldBeAbleToIssueABatchedQuery() throws Exception {
-    ImmutableList<Value> results = client.query(ImmutableList.of(
+    ImmutableList<Value> results = query(ImmutableList.of(
       Get(magicMissile),
       Get(thor)
     )).get();
@@ -80,7 +279,7 @@ public class JavaClientSpec extends FaunaDBTest {
     assertThat(results.get(0).get(NAME_FIELD), equalTo("Magic Missile"));
     assertThat(results.get(1).get(NAME_FIELD), equalTo("Thor"));
 
-    ImmutableList<Value> data = client.query(ImmutableList.of(
+    ImmutableList<Value> data = query(ImmutableList.of(
       new ObjectV(ImmutableMap.of("k1", new StringV("v1"))),
       new ObjectV(ImmutableMap.of("k2", new StringV("v2")))
     )).get();
@@ -92,7 +291,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldBeAbleToUpdateAnInstancesData() throws Exception {
-    Value createdInstance = client.query(
+    Value createdInstance = query(
       Create(onARandomClass(),
         Obj("data",
           Obj(
@@ -101,7 +300,7 @@ public class JavaClientSpec extends FaunaDBTest {
             "cost", Value(10))))
     ).get();
 
-    Value updatedInstance = client.query(
+    Value updatedInstance = query(
       Update(createdInstance.get(REF_FIELD),
         Obj("data",
           Obj(
@@ -117,7 +316,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldBeAbleToReplaceAnInstancesData() throws Exception {
-    Value createdInstance = client.query(
+    Value createdInstance = query(
       Create(onARandomClass(),
         Obj("data",
           Obj(
@@ -126,7 +325,7 @@ public class JavaClientSpec extends FaunaDBTest {
             "cost", Value(10))))
     ).get();
 
-    Value replacedInstance = client.query(
+    Value replacedInstance = query(
       Replace(createdInstance.get(REF_FIELD),
         Obj("data",
           Obj("name", Value("Volcano"),
@@ -143,37 +342,39 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldBeAbleToDeleteAnInstance() throws Exception {
-    Value createdInstance = client.query(
+    Value createdInstance = query(
       Create(onARandomClass(),
         Obj("data", Obj("name", Value("Magic Missile"))))
     ).get();
 
     Value ref = createdInstance.get(REF_FIELD);
-    client.query(Delete(ref)).get();
+    query(Delete(ref)).get();
 
-    Value exists = client.query(Exists(ref)).get();
+    Value exists = query(Exists(ref)).get();
     assertThat(exists.to(BOOLEAN).get(), is(false));
 
     thrown.expectCause(isA(NotFoundException.class));
-    client.query(Get(ref)).get();
+    query(Get(ref)).get();
   }
 
   @Test
   public void shouldBeAbleToInsertAndRemoveEvents() throws Exception {
-    Value createdInstance = client.query(
+    Value createdInstance = query(
       Create(onARandomClass(),
         Obj("data", Obj("name", Value("Magic Missile"))))
     ).get();
 
-    Value insertedEvent = client.query(
+    Value insertedEvent = query(
       Insert(createdInstance.get(REF_FIELD), Value(1L), CREATE,
         Obj("data",
           Obj("cooldown", Value(5L))))
     ).get();
 
-    assertThat(insertedEvent.get(RESOURCE_FIELD), equalTo(createdInstance.get(REF_FIELD)));
+    assertThat(insertedEvent.get(REF_FIELD), equalTo(createdInstance.get(REF_FIELD)));
+    assertThat(insertedEvent.get(DATA).to(OBJECT).get().size(), equalTo(1));
+    assertThat(insertedEvent.get(DATA).at("cooldown").to(LONG).get(), is(5L));
 
-    Value removedEvent = client.query(
+    Value removedEvent = query(
       Remove(createdInstance.get(REF_FIELD), Value(2L), DELETE)
     ).get();
 
@@ -184,8 +385,8 @@ public class JavaClientSpec extends FaunaDBTest {
   public void shouldHandleConstraintViolations() throws Exception {
     RefV classRef = onARandomClass();
 
-    client.query(
-      CreateIndex(
+    query(
+      Create(Ref("indexes"),
         Obj(
           "name", Value(randomStartingWith("class_index_")),
           "source", classRef,
@@ -194,13 +395,13 @@ public class JavaClientSpec extends FaunaDBTest {
         ))
     ).get();
 
-    client.query(
+    query(
       Create(classRef,
         Obj("data", Obj("uniqueField", Value("same value"))))
     ).get();
 
     thrown.expectCause(isA(BadRequestException.class));
-    client.query(
+    query(
       Create(classRef,
         Obj("data", Obj("uniqueField", Value("same value"))))
     ).get();
@@ -208,18 +409,22 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldFindASingleInstanceFromIndex() throws Exception {
-    Value singleMatch = client.query(
-      Paginate(Match(
-        Index(Value("spells_by_element")),
-        Value("fire"))
-      )).get();
+    Value singleMatch = query(
+      Paginate(Match(Ref("indexes/spells_by_element"), Value("fire")))
+    ).get();
 
     assertThat(singleMatch.get(REF_LIST), contains(fireball));
   }
 
   @Test
+  public void shouldCountElementsOnAIndex() throws Exception {
+    Value count = query(Count(Match(Ref("indexes/all_spells")))).get();
+    assertThat(count.to(LONG).get(), equalTo(6L));
+  }
+
+  @Test
   public void shouldListAllItensOnAClassIndex() throws Exception {
-    Value allInstances = client.query(
+    Value allInstances = query(
       Paginate(Match(Ref("indexes/all_spells")))
     ).get();
 
@@ -229,7 +434,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldPaginateOverAnIndex() throws Exception {
-    Value page1 = client.query(
+    Value page1 = query(
       Paginate(Match(Ref("indexes/all_spells")))
         .size(3)
     ).get();
@@ -238,7 +443,7 @@ public class JavaClientSpec extends FaunaDBTest {
     assertThat(page1.at("after"), notNullValue());
     assertThat(page1.at("before").to(VALUE).getOptional(), is(Optional.<Value>absent()));
 
-    Value page2 = client.query(
+    Value page2 = query(
       Paginate(Match(Ref("indexes/all_spells")))
         .after(page1.at("after"))
         .size(3)
@@ -252,7 +457,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldDealWithSetRef() throws Exception {
-    Value res = client.query(
+    Value res = query(
       Match(
         Ref("indexes/spells_by_element"),
         Value("arcane"))
@@ -266,7 +471,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldEvalLetExpression() throws Exception {
-    Value res = client.query(
+    Value res = query(
       Let(
         "x", Value(1),
         "y", Value(2)
@@ -280,7 +485,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldEvalIfExpression() throws Exception {
-    Value res = client.query(
+    Value res = query(
       If(Value(true),
         Value("was true"),
         Value("was false"))
@@ -293,7 +498,7 @@ public class JavaClientSpec extends FaunaDBTest {
   public void shouldEvalDoExpression() throws Exception {
     Expr ref = new RefV(randomStartingWith(onARandomClass().strValue(), "/"));
 
-    Value res = client.query(
+    Value res = query(
       Do(
         Create(ref, Obj("data", Obj("name", Value("Magic Missile")))),
         Get(ref)
@@ -305,21 +510,21 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldEchoAnObjectBack() throws Exception {
-    Value res = client.query(
+    Value res = query(
       Obj("name", Value("Hen Wen"), "age", Value(123))
     ).get();
 
     assertThat(res.at("name").to(STRING).get(), equalTo("Hen Wen"));
     assertThat(res.at("age").to(LONG).get(), equalTo(123L));
 
-    res = client.query(res).get();
+    res = query(res).get();
     assertThat(res.at("name").to(STRING).get(), equalTo("Hen Wen"));
     assertThat(res.at("age").to(LONG).get(), equalTo(123L));
   }
 
   @Test
   public void shouldMapOverCollections() throws Exception {
-    Value res = client.query(
+    Value res = query(
       Map(
         Arr(
           Value(1), Value(2), Value(3)),
@@ -333,7 +538,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldExecuteForeachExpression() throws Exception {
-    Value res = client.query(
+    Value res = query(
       Foreach(
         Arr(
           Value("Fireball Level 1"),
@@ -350,7 +555,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldFilterACollection() throws Exception {
-    Value filtered = client.query(
+    Value filtered = query(
       Filter(
         Arr(Value(1), Value(2), Value(3)),
         Lambda(Value("i"),
@@ -365,19 +570,19 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldTakeElementsFromCollection() throws Exception {
-    Value taken = client.query(Take(Value(2), Arr(Value(1), Value(2), Value(3)))).get();
+    Value taken = query(Take(Value(2), Arr(Value(1), Value(2), Value(3)))).get();
     assertThat(taken.collect(Field.as(LONG)), contains(1L, 2L));
   }
 
   @Test
   public void shouldDropElementsFromCollection() throws Exception {
-    Value dropped = client.query(Drop(Value(2), Arr(Value(1), Value(2), Value(3)))).get();
+    Value dropped = query(Drop(Value(2), Arr(Value(1), Value(2), Value(3)))).get();
     assertThat(dropped.collect(Field.as(LONG)), contains(3L));
   }
 
   @Test
   public void shouldPrependElementsInACollection() throws Exception {
-    Value prepended = client.query(
+    Value prepended = query(
       Prepend(
         Arr(Value(1), Value(2)),
         Arr(Value(3), Value(4))
@@ -390,7 +595,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldAppendElementsInACollection() throws Exception {
-    Value appended = client.query(
+    Value appended = query(
       Append(
         Arr(Value(3), Value(4)),
         Arr(Value(1), Value(2))
@@ -403,7 +608,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldReadEventsFromIndex() throws Exception {
-    Value events = client.query(
+    Value events = query(
       Paginate(Match(Ref("indexes/spells_by_element"), Value("arcane")))
         .events(true)
     ).get();
@@ -414,7 +619,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldPaginateUnion() throws Exception {
-    Value union = client.query(
+    Value union = query(
       Paginate(
         Union(
           Match(Ref("indexes/spells_by_element"), Value("arcane")),
@@ -428,7 +633,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldPaginateIntersection() throws Exception {
-    Value intersection = client.query(
+    Value intersection = query(
       Paginate(
         Intersection(
           Match(Ref("indexes/spells_by_element"), Value("arcane")),
@@ -442,7 +647,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldPaginateDifference() throws Exception {
-    Value difference = client.query(
+    Value difference = query(
       Paginate(
         Difference(
           Match(Ref("indexes/spells_by_element"), Value("nature")),
@@ -456,7 +661,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldPaginateDistinctSets() throws Exception {
-    Value distinct = client.query(
+    Value distinct = query(
       Paginate(
         Distinct(
           Match(Ref("indexes/elements_of_spells")))
@@ -469,7 +674,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldPaginateJoin() throws Exception {
-    Value join = client.query(
+    Value join = query(
       Paginate(
         Join(
           Match(Ref("indexes/spellbooks_by_owner"), thor),
@@ -484,16 +689,16 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldEvalEqualsExpression() throws Exception {
-    Value equals = client.query(Equals(Value("fire"), Value("fire"))).get();
+    Value equals = query(Equals(Value("fire"), Value("fire"))).get();
     assertThat(equals.to(BOOLEAN).get(), is(true));
   }
 
   @Test
   public void shouldEvalConcatExpression() throws Exception {
-    Value simpleConcat = client.query(Concat(Arr(Value("Magic"), Value("Missile")))).get();
+    Value simpleConcat = query(Concat(Arr(Value("Magic"), Value("Missile")))).get();
     assertThat(simpleConcat.to(STRING).get(), equalTo("MagicMissile"));
 
-    Value concatWithSeparator = client.query(
+    Value concatWithSeparator = query(
       Concat(
         Arr(
           Value("Magic"),
@@ -507,13 +712,13 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldEvalCasefoldExpression() throws Exception {
-    Value res = client.query(Casefold(Value("Hen Wen"))).get();
+    Value res = query(Casefold(Value("Hen Wen"))).get();
     assertThat(res.to(STRING).get(), equalTo("hen wen"));
   }
 
   @Test
   public void shouldEvalContainsExpression() throws Exception {
-    Value contains = client.query(
+    Value contains = query(
       Contains(
         Path("favorites", "foods"),
         Obj("favorites",
@@ -526,7 +731,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldEvalSelectExpression() throws Exception {
-    Value selected = client.query(
+    Value selected = query(
       Select(
         Path("favorites", "foods").at(1),
         Obj("favorites",
@@ -542,85 +747,85 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldEvalLTExpression() throws Exception {
-    Value res = client.query(LT(Arr(Value(1), Value(2), Value(3)))).get();
+    Value res = query(LT(Arr(Value(1), Value(2), Value(3)))).get();
     assertThat(res.to(BOOLEAN).get(), is(true));
   }
 
   @Test
   public void shouldEvalLTEExpression() throws Exception {
-    Value res = client.query(LTE(Arr(Value(1), Value(2), Value(2)))).get();
+    Value res = query(LTE(Arr(Value(1), Value(2), Value(2)))).get();
     assertThat(res.to(BOOLEAN).get(), is(true));
   }
 
   @Test
   public void shouldEvalGTxpression() throws Exception {
-    Value res = client.query(GT(Arr(Value(3), Value(2), Value(1)))).get();
+    Value res = query(GT(Arr(Value(3), Value(2), Value(1)))).get();
     assertThat(res.to(BOOLEAN).get(), is(true));
   }
 
   @Test
   public void shouldEvalGTExpression() throws Exception {
-    Value res = client.query(GTE(Arr(Value(3), Value(2), Value(2)))).get();
+    Value res = query(GTE(Arr(Value(3), Value(2), Value(2)))).get();
     assertThat(res.to(BOOLEAN).get(), is(true));
   }
 
   @Test
   public void shouldEvalAddExpression() throws Exception {
-    Value res = client.query(Add(Value(100), Value(10))).get();
+    Value res = query(Add(Value(100), Value(10))).get();
     assertThat(res.to(LONG).get(), equalTo(110L));
   }
 
   @Test
   public void shouldEvalMultiplyExpression() throws Exception {
-    Value res = client.query(Multiply(Value(100), Value(10))).get();
+    Value res = query(Multiply(Value(100), Value(10))).get();
     assertThat(res.to(LONG).get(), equalTo(1000L));
   }
 
   @Test
   public void shouldEvalSubtractExpression() throws Exception {
-    Value res = client.query(Subtract(Value(100), Value(10))).get();
+    Value res = query(Subtract(Value(100), Value(10))).get();
     assertThat(res.to(LONG).get(), equalTo(90L));
   }
 
   @Test
   public void shouldEvalDivideExpression() throws Exception {
-    Value res = client.query(Divide(Value(100), Value(10))).get();
+    Value res = query(Divide(Value(100), Value(10))).get();
     assertThat(res.to(LONG).get(), equalTo(10L));
   }
 
   @Test
   public void shouldEvalModuloExpression() throws Exception {
-    Value res = client.query(Modulo(Value(101), Value(10))).get();
+    Value res = query(Modulo(Value(101), Value(10))).get();
     assertThat(res.to(LONG).get(), equalTo(1L));
   }
 
   @Test
   public void shouldEvalAndExpression() throws Exception {
-    Value res = client.query(And(Value(true), Value(false))).get();
+    Value res = query(And(Value(true), Value(false))).get();
     assertThat(res.to(BOOLEAN).get(), is(false));
   }
 
   @Test
   public void shouldEvalOrExpression() throws Exception {
-    Value res = client.query(Or(Value(true), Value(false))).get();
+    Value res = query(Or(Value(true), Value(false))).get();
     assertThat(res.to(BOOLEAN).get(), is(true));
   }
 
   @Test
   public void shouldEvalNotExpression() throws Exception {
-    Value notR = client.query(Not(Value(false))).get();
+    Value notR = query(Not(Value(false))).get();
     assertThat(notR.to(BOOLEAN).get(), is(true));
   }
 
   @Test
   public void shouldEvalTimeExpression() throws Exception {
-    Value res = client.query(Time(Value("1970-01-01T00:00:00-04:00"))).get();
+    Value res = query(Time(Value("1970-01-01T00:00:00-04:00"))).get();
     assertThat(res.to(TIME).get(), equalTo(new Instant(0).plus(Duration.standardHours(4))));
   }
 
   @Test
   public void shouldEvalEpochExpression() throws Exception {
-    ImmutableList<Value> res = client.query(ImmutableList.of(
+    ImmutableList<Value> res = query(ImmutableList.of(
       Epoch(Value(30), SECOND),
       Epoch(Value(30), MILLISECOND),
       Epoch(Value(30), MICROSECOND),
@@ -635,7 +840,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldOverflowOnHighPrecisionTime() throws Exception {
-    ImmutableList<Value> res = client.query(ImmutableList.of(
+    ImmutableList<Value> res = query(ImmutableList.of(
       Epoch(Value(1001), MICROSECOND),
       Epoch(Value(1001), NANOSECOND)
     )).get();
@@ -653,7 +858,7 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldBeAbleToSortHighPrecisionTime() throws Exception {
-    Value res = client.query(Arr(
+    Value res = query(Arr(
       Epoch(Value(42), NANOSECOND),
       Epoch(Value(50), MILLISECOND),
       Epoch(Value(30), MICROSECOND),
@@ -673,45 +878,33 @@ public class JavaClientSpec extends FaunaDBTest {
 
   @Test
   public void shouldEvalDateExpression() throws Exception {
-    Value res = client.query(Date(Value("1970-01-02"))).get();
+    Value res = query(Date(Value("1970-01-02"))).get();
     assertThat(res.to(DATE).get(), equalTo(new LocalDate(0, UTC).plusDays(1)));
   }
 
   @Test
   public void shouldGetNextId() throws Exception {
-    Value res = client.query(NextId()).get();
+    Value res = query(NextId()).get();
     assertThat(res.to(STRING).get(), notNullValue());
   }
 
-  @Test
-  public void shouldAuthenticateSession() throws Exception {
-    Value createdInstance = client.query(
-      Create(onARandomClass(),
-        Obj("credentials",
-          Obj("password", Value("abcdefg"))))
+  protected RefV onARandomClass() throws Exception {
+
+    Value clazz = query(
+      Create(Ref("classes"),
+        Obj("name", Value(randomStartingWith("some_class_"))))
     ).get();
 
-    Value auth = client.query(
-      Login(
-        createdInstance.get(REF_FIELD),
-        Obj("password", Value("abcdefg")))
-    ).get();
+    return clazz.get(REF_FIELD);
+  }
 
-    String secret = auth.at("secret").to(STRING).get();
+  protected String randomStartingWith(String... parts) {
+    StringBuilder builder = new StringBuilder();
+    for (String part : parts)
+      builder.append(part);
 
-    try (FaunaClient sessionClient = client.newSessionClient(secret)) {
-      Value loggedOut = sessionClient.query(Logout(Value(true))).get();
-      assertThat(loggedOut.to(BOOLEAN).get(), is(true));
-    }
-
-    Value identified = client.query(
-      Identify(
-        createdInstance.get(REF_FIELD),
-        Value("wrong-password")
-      )
-    ).get();
-
-    assertThat(identified.to(BOOLEAN).get(), is(false));
+    builder.append(Math.abs(new Random().nextLong()));
+    return builder.toString();
   }
 }
 

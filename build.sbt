@@ -152,6 +152,7 @@ lazy val javaDsl = project.in(file("faunadb-java-dsl"))
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,
       "joda-time" % "joda-time" % jodaTimeVersion,
+      "com.google.guava" % "guava" % "19.0",
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
       "org.yaml" % "snakeyaml" % "1.14" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test",
@@ -161,7 +162,7 @@ lazy val javaDsl = project.in(file("faunadb-java-dsl"))
   )
 
 lazy val java = project.in(file("faunadb-java"))
-  .dependsOn(common, javaDsl)
+  .dependsOn(common, javaDsl % "test->test;compile->compile")
   .settings(jacoco.settings)
   .settings(publishSettings: _*)
   .settings(
@@ -198,7 +199,7 @@ lazy val java = project.in(file("faunadb-java"))
   )
 
 lazy val javaAndroid = project.in(file("faunadb-android"))
-  .dependsOn(javaDsl)
+  .dependsOn(javaDsl % "test->test;compile->compile")
   .settings(publishSettings: _*)
   .settings(androidBuild: _*)
   .settings(
