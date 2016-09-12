@@ -73,49 +73,49 @@ public abstract class DslSpec {
   protected static RefV thorSpell1;
   protected static RefV thorSpell2;
 
+  protected abstract ListenableFuture<Value> queryRoot(Expr expr);
   protected abstract ListenableFuture<Value> query(Expr expr);
   protected abstract ListenableFuture<ImmutableList<Value>> query(List<? extends Expr> exprs);
 
-  protected static void setUpSchema(Function<Expr, ListenableFuture<Value>> query) throws Exception {
-    query.apply(Create(Ref("classes"), Obj("name", Value("spells")))).get();
-    query.apply(Create(Ref("classes"), Obj("name", Value("characters")))).get();
-    query.apply(Create(Ref("classes"), Obj("name", Value("spellbooks")))).get();
+  protected void setUpSchema() throws Exception {
+    query(ImmutableList.of(
+      Create(Ref("classes"), Obj("name", Value("spells"))),
+      Create(Ref("classes"), Obj("name", Value("characters"))),
+      Create(Ref("classes"), Obj("name", Value("spellbooks")))
+    )).get();
 
-    query.apply(
+    query(ImmutableList.of(
       Create(Ref("indexes"), Obj(
         "name", Value("all_spells"),
         "source", Ref("classes/spells")
-      ))).get();
+      )),
 
-    query.apply(
       Create(Ref("indexes"), Obj(
         "name", Value("spells_by_element"),
         "source", Ref("classes/spells"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("element"))))
-      ))).get();
+      )),
 
-    query.apply(
       Create(Ref("indexes"), Obj(
         "name", Value("elements_of_spells"),
         "source", Ref("classes/spells"),
         "values", Arr(Obj("field", Arr(Value("data"), Value("element"))))
-      ))).get();
+      )),
 
-    query.apply(
       Create(Ref("indexes"), Obj(
         "name", Value("spellbooks_by_owner"),
         "source", Ref("classes/spellbooks"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("owner"))))
-      ))).get();
+      )),
 
-    query.apply(
       Create(Ref("indexes"), Obj(
         "name", Value("spells_by_spellbook"),
         "source", Ref("classes/spells"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("spellbook"))))
-      ))).get();
+      ))
+    )).get();
 
-    magicMissile = query.apply(
+    magicMissile = query(
       Create(Ref("classes/spells"),
         Obj("data",
           Obj(
@@ -124,7 +124,7 @@ public abstract class DslSpec {
             "cost", Value(10))))
     ).get().get(REF_FIELD);
 
-    fireball = query.apply(
+    fireball = query(
       Create(Ref("classes/spells"),
         Obj("data",
           Obj(
@@ -133,7 +133,7 @@ public abstract class DslSpec {
             "cost", Value(10))))
     ).get().get(REF_FIELD);
 
-    faerieFire = query.apply(
+    faerieFire = query(
       Create(Ref("classes/spells"),
         Obj("data",
           Obj(
@@ -145,7 +145,7 @@ public abstract class DslSpec {
             ))))
     ).get().get(REF_FIELD);
 
-    summon = query.apply(
+    summon = query(
       Create(Ref("classes/spells"),
         Obj("data",
           Obj(
@@ -154,47 +154,47 @@ public abstract class DslSpec {
             "cost", Value(10))))
     ).get().get(REF_FIELD);
 
-    thor = query.apply(
+    thor = query(
       Create(Ref("classes/characters"),
         Obj("data", Obj("name", Value("Thor"))))
     ).get().get(REF_FIELD);
 
-    RefV thorsSpellbook = query.apply(
+    RefV thorsSpellbook = query(
       Create(Ref("classes/spellbooks"),
         Obj("data",
           Obj("owner", thor)))
     ).get().get(REF_FIELD);
 
-    thorSpell1 = query.apply(
+    thorSpell1 = query(
       Create(Ref("classes/spells"),
         Obj("data",
           Obj("spellbook", thorsSpellbook)))
     ).get().get(REF_FIELD);
 
-    thorSpell2 = query.apply(
+    thorSpell2 = query(
       Create(Ref("classes/spells"),
         Obj("data",
           Obj("spellbook", thorsSpellbook)))
     ).get().get(REF_FIELD);
   }
 
-  protected static ListenableFuture<Value> setupDatabase(Expr dbRef, String dbName, Function<Expr, ListenableFuture<Value>> rootClient) {
+  protected ListenableFuture<Value> setupDatabase(Expr dbRef, String dbName) {
     return transformAsync(
-      dropDatabase(dbRef, rootClient),
-      createDatabase(dbName, rootClient)
+      dropDatabase(dbRef),
+      createDatabase(dbName)
     );
   }
 
-  protected static ListenableFuture<Value> dropDatabase(Expr dbRef, Function<Expr, ListenableFuture<Value>> rootClient) {
-    ListenableFuture<Value> delete = rootClient.apply(Delete(dbRef));
+  protected ListenableFuture<Value> dropDatabase(Expr dbRef) {
+    ListenableFuture<Value> delete = queryRoot(Delete(dbRef));
     return catching(delete, BadRequestException.class, constant(NULL));
   }
 
-  private static AsyncFunction<Value, Value> createDatabase(final String dbName, final Function<Expr, ListenableFuture<Value>> rootClient) {
+  private AsyncFunction<Value, Value> createDatabase(final String dbName) {
     return new AsyncFunction<Value, Value>() {
       @Override
       public ListenableFuture<Value> apply(Value ign) throws Exception {
-        return rootClient.apply(
+        return queryRoot(
           Create(
             Ref("databases"),
             Obj("name", Value(dbName))
@@ -204,13 +204,13 @@ public abstract class DslSpec {
     };
   }
 
-  protected static AsyncFunction<Value, Value> createServerKey(final Function<Expr, ListenableFuture<Value>> rootClient) {
+  protected AsyncFunction<Value, Value> createServerKey() {
     return new AsyncFunction<Value, Value>() {
       @Override
       public ListenableFuture<Value> apply(Value dbCreateR) throws Exception {
         RefV dbRef = dbCreateR.at("ref").to(REF).get();
 
-        return rootClient.apply(
+        return queryRoot(
           Create(
             Ref("keys"),
             Obj("database", dbRef,
@@ -220,6 +220,7 @@ public abstract class DslSpec {
       }
     };
   }
+
   @Test
   public void shouldThrowNotFoundWhenInstanceDoesntExists() throws Exception {
     thrown.expectCause(isA(NotFoundException.class));

@@ -1,16 +1,33 @@
 package com.faunadb.client;
 
+import com.faunadb.client.dsl.DslSpec;
 import com.faunadb.client.errors.UnauthorizedException;
-import com.faunadb.client.dsl.FaunaDBTest;
+import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Value;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.ListenableFuture;
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
 
-import static com.faunadb.client.query.Language.*;
-import static com.faunadb.client.types.Codec.*;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
+import java.util.List;
 
-public class JavaClientSpec extends FaunaDBTest {
+import static com.faunadb.client.query.Language.*;
+import static com.faunadb.client.types.Codec.BOOLEAN;
+import static com.faunadb.client.types.Codec.STRING;
+import static com.google.common.util.concurrent.Futures.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.Is.isA;
+
+public class JavaClientSpec extends DslSpec {
+
+  private static final String DB_NAME = "faunadb-java-test";
+  private static final Expr DB_REF = Ref("databases/" + DB_NAME);
+
+  private static FaunaClient rootClient;
+  private static FaunaClient client;
 
   @Test
   public void shouldThrowUnauthorizedOnInvalidSecret() throws Exception {
@@ -713,5 +730,64 @@ public class JavaClientSpec extends FaunaDBTest {
 
     assertThat(identified.to(BOOLEAN).get(), is(false));
   }
-}
 
+
+  @Before
+  public void setUpClient() throws Exception {
+    if (rootClient != null)
+      return;
+
+    rootClient = createFaunaClient(ROOT_TOKEN);
+
+    client = transform(
+      transformAsync(
+        setupDatabase(DB_REF, DB_NAME),
+        createServerKey()
+      ),
+      createClientWithServerKey()
+    ).get();
+
+    setUpSchema();
+  }
+
+  @AfterClass
+  public static void closeClients() throws Exception {
+    rootClient.query(Delete(DB_REF)).get();
+    rootClient.close();
+    client.close();
+  }
+
+  protected ListenableFuture<Value> queryRoot(Expr expr) {
+    return rootClient.query(expr);
+  }
+
+  protected ListenableFuture<Value> query(Expr expr) {
+    return client.query(expr);
+  }
+
+  protected ListenableFuture<ImmutableList<Value>> query(List<? extends Expr> exprs) {
+    return client.query(exprs);
+  }
+
+  protected static FaunaClient createFaunaClient(String secret) {
+    try {
+      return FaunaClient.builder()
+        .withEndpoint(ROOT_URL)
+        .withSecret(secret)
+        .build();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static Function<Value, FaunaClient> createClientWithServerKey() {
+    return new Function<Value, FaunaClient>() {
+      @Override
+      public FaunaClient apply(Value serverKeyF) {
+        String secret = serverKeyF.at("secret").to(STRING).get();
+        return rootClient.newSessionClient(secret);
+      }
+    };
+  }
+
+}
