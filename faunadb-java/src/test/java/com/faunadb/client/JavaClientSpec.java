@@ -1,21 +1,26 @@
 package com.faunadb.client;
 
 import com.faunadb.client.dsl.DslSpec;
+import com.faunadb.client.errors.BadRequestException;
 import com.faunadb.client.errors.UnauthorizedException;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Value;
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.junit.AfterClass;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
 
+import static com.faunadb.client.database.SetupDatabase.createDatabase;
+import static com.faunadb.client.database.SetupDatabase.createServerKey;
+import static com.faunadb.client.database.SetupDatabase.dropDatabase;
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.types.Codec.BOOLEAN;
 import static com.faunadb.client.types.Codec.STRING;
+import static com.faunadb.client.types.Value.NullV.NULL;
+import static com.google.common.base.Functions.constant;
 import static com.google.common.util.concurrent.Futures.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -28,6 +33,24 @@ public class JavaClientSpec extends DslSpec {
 
   private static FaunaClient rootClient;
   private static FaunaClient client;
+
+  @BeforeClass
+  public static void setUpClient() throws Exception {
+    rootClient = createFaunaClient(ROOT_TOKEN);
+
+    catching(rootClient.query(dropDatabase(DB_REF)), BadRequestException.class, constant(NULL)).get();
+    Value db = rootClient.query(createDatabase(DB_NAME)).get();
+    Value key = rootClient.query(createServerKey(db)).get();
+
+    client = createClientWithServerKey(key);
+  }
+
+  @AfterClass
+  public static void closeClients() throws Exception {
+    catching(rootClient.query(dropDatabase(DB_REF)), BadRequestException.class, constant(NULL)).get();
+    rootClient.close();
+    client.close();
+  }
 
   @Test
   public void shouldThrowUnauthorizedOnInvalidSecret() throws Exception {
@@ -731,36 +754,6 @@ public class JavaClientSpec extends DslSpec {
     assertThat(identified.to(BOOLEAN).get(), is(false));
   }
 
-
-  @Before
-  public void setUpClient() throws Exception {
-    if (rootClient != null)
-      return;
-
-    rootClient = createFaunaClient(ROOT_TOKEN);
-
-    client = transform(
-      transformAsync(
-        setupDatabase(DB_REF, DB_NAME),
-        createServerKey()
-      ),
-      createClientWithServerKey()
-    ).get();
-
-    setUpSchema();
-  }
-
-  @AfterClass
-  public static void closeClients() throws Exception {
-    rootClient.query(Delete(DB_REF)).get();
-    rootClient.close();
-    client.close();
-  }
-
-  protected ListenableFuture<Value> queryRoot(Expr expr) {
-    return rootClient.query(expr);
-  }
-
   protected ListenableFuture<Value> query(Expr expr) {
     return client.query(expr);
   }
@@ -769,7 +762,7 @@ public class JavaClientSpec extends DslSpec {
     return client.query(exprs);
   }
 
-  protected static FaunaClient createFaunaClient(String secret) {
+  private static FaunaClient createFaunaClient(String secret) {
     try {
       return FaunaClient.builder()
         .withEndpoint(ROOT_URL)
@@ -780,14 +773,9 @@ public class JavaClientSpec extends DslSpec {
     }
   }
 
-  private static Function<Value, FaunaClient> createClientWithServerKey() {
-    return new Function<Value, FaunaClient>() {
-      @Override
-      public FaunaClient apply(Value serverKeyF) {
-        String secret = serverKeyF.at("secret").to(STRING).get();
-        return rootClient.newSessionClient(secret);
-      }
-    };
+  private static FaunaClient createClientWithServerKey(Value serverKey) {
+    String secret = serverKey.at("secret").to(STRING).get();
+    return rootClient.newSessionClient(secret);
   }
 
 }

@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableMap;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -73,11 +74,18 @@ public abstract class DslSpec {
   protected static RefV thorSpell1;
   protected static RefV thorSpell2;
 
-  protected abstract ListenableFuture<Value> queryRoot(Expr expr);
   protected abstract ListenableFuture<Value> query(Expr expr);
   protected abstract ListenableFuture<ImmutableList<Value>> query(List<? extends Expr> exprs);
 
-  protected void setUpSchema() throws Exception {
+  private static boolean initialized = false;
+
+  @Before
+  public void setUpSchema() throws Exception {
+    if (initialized)
+      return;
+
+    initialized = true;
+
     query(ImmutableList.of(
       Create(Ref("classes"), Obj("name", Value("spells"))),
       Create(Ref("classes"), Obj("name", Value("characters"))),
@@ -176,49 +184,6 @@ public abstract class DslSpec {
         Obj("data",
           Obj("spellbook", thorsSpellbook)))
     ).get().get(REF_FIELD);
-  }
-
-  protected ListenableFuture<Value> setupDatabase(Expr dbRef, String dbName) {
-    return transformAsync(
-      dropDatabase(dbRef),
-      createDatabase(dbName)
-    );
-  }
-
-  protected ListenableFuture<Value> dropDatabase(Expr dbRef) {
-    ListenableFuture<Value> delete = queryRoot(Delete(dbRef));
-    return catching(delete, BadRequestException.class, constant(NULL));
-  }
-
-  private AsyncFunction<Value, Value> createDatabase(final String dbName) {
-    return new AsyncFunction<Value, Value>() {
-      @Override
-      public ListenableFuture<Value> apply(Value ign) throws Exception {
-        return queryRoot(
-          Create(
-            Ref("databases"),
-            Obj("name", Value(dbName))
-          )
-        );
-      }
-    };
-  }
-
-  protected AsyncFunction<Value, Value> createServerKey() {
-    return new AsyncFunction<Value, Value>() {
-      @Override
-      public ListenableFuture<Value> apply(Value dbCreateR) throws Exception {
-        RefV dbRef = dbCreateR.at("ref").to(REF).get();
-
-        return queryRoot(
-          Create(
-            Ref("keys"),
-            Obj("database", dbRef,
-              "role", Value("server"))
-          )
-        );
-      }
-    };
   }
 
   @Test
