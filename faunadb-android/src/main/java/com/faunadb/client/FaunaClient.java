@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -46,8 +45,6 @@ import static com.google.common.util.concurrent.Futures.transform;
  * @see com.faunadb.client.query.Language
  */
 public class FaunaClient {
-
-  private static final Charset UTF8 = Charset.forName("UTF-8");
 
   private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
   private static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
@@ -147,6 +144,14 @@ public class FaunaClient {
    */
   public FaunaClient newSessionClient(String secret) {
     return new FaunaClient(client, endpoint, secret);
+  }
+
+  /**
+   * Frees any resources held by the client. Also closes the underlying {@link OkHttpClient}.
+   */
+  public void close() throws IOException {
+    client.dispatcher().executorService().shutdown();
+    client.connectionPool().evictAll();
   }
 
   /**

@@ -1,6 +1,7 @@
 package com.faunadb.client;
 
 import com.faunadb.client.dsl.DslSpec;
+import com.faunadb.client.dsl.EnvVariables;
 import com.faunadb.client.errors.BadRequestException;
 import com.faunadb.client.errors.UnauthorizedException;
 import com.faunadb.client.query.Expr;
@@ -22,11 +23,18 @@ import static com.faunadb.client.types.Codec.STRING;
 import static com.faunadb.client.types.Value.NullV.NULL;
 import static com.google.common.base.Functions.constant;
 import static com.google.common.util.concurrent.Futures.*;
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
 
 public class AndroidClientSpec extends DslSpec {
+  protected static final String ROOT_TOKEN = EnvVariables.require("FAUNA_ROOT_KEY");
+  protected static final String ROOT_URL = format("%s://%s:%s",
+    EnvVariables.getOrElse("FAUNA_SCHEME", "https"),
+    EnvVariables.getOrElse("FAUNA_DOMAIN", "cloud.faunadb.com"),
+    EnvVariables.getOrElse("FAUNA_PORT", "443")
+  );
 
   private static final String DB_NAME = "faunadb-java-android-test";
   private static final Expr DB_REF = Ref("databases/" + DB_NAME);
@@ -48,6 +56,8 @@ public class AndroidClientSpec extends DslSpec {
   @AfterClass
   public static void closeClients() throws Exception {
     catching(rootClient.query(dropDatabase(DB_REF)), BadRequestException.class, constant(NULL)).get();
+    rootClient.close();
+    client.close();
   }
 
   @Test
@@ -89,10 +99,12 @@ public class AndroidClientSpec extends DslSpec {
     assertThat(identified.to(BOOLEAN).get(), is(false));
   }
 
+  @Override
   protected ListenableFuture<Value> query(Expr expr) {
     return client.query(expr);
   }
 
+  @Override
   protected ListenableFuture<ImmutableList<Value>> query(List<? extends Expr> exprs) {
     return client.query(exprs);
   }

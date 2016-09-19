@@ -32,10 +32,6 @@ import static com.faunadb.client.query.Language.Action.DELETE;
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.TimeUnit.*;
 import static com.faunadb.client.types.Codec.*;
-import static com.faunadb.client.types.Value.NullV.NULL;
-import static com.google.common.base.Functions.constant;
-import static com.google.common.util.concurrent.Futures.catching;
-import static com.google.common.util.concurrent.Futures.transformAsync;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.collection.IsArrayContainingInOrder.arrayContaining;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -43,16 +39,7 @@ import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.assertThat;
 
-import static java.lang.String.format;
-
 public abstract class DslSpec {
-
-  protected static final String ROOT_TOKEN = EnvVariables.require("FAUNA_ROOT_KEY");
-  protected static final String ROOT_URL = format("%s://%s:%s",
-    EnvVariables.getOrElse("FAUNA_SCHEME", "https"),
-    EnvVariables.getOrElse("FAUNA_DOMAIN", "cloud.faunadb.com"),
-    EnvVariables.getOrElse("FAUNA_PORT", "443")
-  );
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
