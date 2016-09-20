@@ -73,6 +73,7 @@ Javadocs and Scaladocs are hosted on GitHub:
 ### Android
 
 * [OkHttp client](http://square.github.io/okhttp/) for the HTTP transport.
+* [Google Guava](https://github.com/google/guava), for collections and ListenableFutures.
 
 ### Java
 
