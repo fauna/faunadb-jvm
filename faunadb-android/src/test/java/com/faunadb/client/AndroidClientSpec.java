@@ -64,9 +64,13 @@ public class AndroidClientSpec extends DslSpec {
   public void shouldThrowUnauthorizedOnInvalidSecret() throws Exception {
     thrown.expectCause(isA(UnauthorizedException.class));
 
-    createFaunaClient("invalid-secret")
-      .query(Get(Ref("classes/spells/1234")))
-      .get();
+    FaunaClient client = createFaunaClient("invalid-secret");
+
+    try {
+      client.query(Get(Ref("classes/spells/1234"))).get();
+    } finally {
+      client.close();
+    }
   }
 
   @Test
@@ -86,17 +90,22 @@ public class AndroidClientSpec extends DslSpec {
     String secret = auth.at("secret").to(STRING).get();
 
     FaunaClient sessionClient = client.newSessionClient(secret);
-    Value loggedOut = sessionClient.query(Logout(Value(true))).get();
-    assertThat(loggedOut.to(BOOLEAN).get(), is(true));
 
-    Value identified = client.query(
-      Identify(
-        createdInstance.get(REF_FIELD),
-        Value("wrong-password")
-      )
-    ).get();
+    try {
+      Value loggedOut = sessionClient.query(Logout(Value(true))).get();
+      assertThat(loggedOut.to(BOOLEAN).get(), is(true));
 
-    assertThat(identified.to(BOOLEAN).get(), is(false));
+      Value identified = client.query(
+        Identify(
+          createdInstance.get(REF_FIELD),
+          Value("wrong-password")
+        )
+      ).get();
+
+      assertThat(identified.to(BOOLEAN).get(), is(false));
+    } finally {
+      sessionClient.close();
+    }
   }
 
   @Override

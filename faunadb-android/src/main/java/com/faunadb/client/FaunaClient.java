@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import okhttp3.*;
 
@@ -46,8 +47,11 @@ import static com.google.common.util.concurrent.Futures.transform;
  */
 public class FaunaClient {
 
+  private static final int INITIAL_REF_COUNT = 0;
   private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
   private static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
+
+  private final AtomicInteger refCount;
 
   /**
    * Creates a new {@link Builder}
@@ -130,9 +134,16 @@ public class FaunaClient {
   private final String authHeader;
 
   private FaunaClient(OkHttpClient client, URL endpoint, String secret) {
+    this(new AtomicInteger(INITIAL_REF_COUNT), client, endpoint, secret);
+  }
+
+  private FaunaClient(AtomicInteger refCount, OkHttpClient client, URL endpoint, String secret) {
+    this.refCount = refCount;
     this.client = client;
     this.endpoint = endpoint;
     this.authHeader = Credentials.basic(secret, "");
+
+    this.refCount.incrementAndGet();
   }
 
   /**
@@ -143,15 +154,17 @@ public class FaunaClient {
    * @return a new {@link FaunaClient}
    */
   public FaunaClient newSessionClient(String secret) {
-    return new FaunaClient(client, endpoint, secret);
+    return new FaunaClient(refCount, client, endpoint, secret);
   }
 
   /**
    * Frees any resources held by the client. Also closes the underlying {@link OkHttpClient}.
    */
   public void close() throws IOException {
-    client.dispatcher().executorService().shutdown();
-    client.connectionPool().evictAll();
+    if (refCount.decrementAndGet() == 0) {
+      client.dispatcher().executorService().shutdown();
+      client.connectionPool().evictAll();
+    }
   }
 
   /**
