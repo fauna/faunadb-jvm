@@ -29,8 +29,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
 
 public class AndroidClientSpec extends DslSpec {
-  protected static final String ROOT_TOKEN = EnvVariables.require("FAUNA_ROOT_KEY");
-  protected static final String ROOT_URL = format("%s://%s:%s",
+  private static final String ROOT_TOKEN = EnvVariables.require("FAUNA_ROOT_KEY");
+  private static final String ROOT_URL = format("%s://%s:%s",
     EnvVariables.getOrElse("FAUNA_SCHEME", "https"),
     EnvVariables.getOrElse("FAUNA_DOMAIN", "cloud.faunadb.com"),
     EnvVariables.getOrElse("FAUNA_PORT", "443")
