@@ -154,7 +154,10 @@ public class FaunaClient {
    * @return a new {@link FaunaClient}
    */
   public FaunaClient newSessionClient(String secret) {
-    return new FaunaClient(refCount, client, endpoint, secret);
+    if (refCount.get() > 0)
+      return new FaunaClient(refCount, client, endpoint, secret);
+    else
+      throw new IllegalStateException("Can not create a session connection from a closed http connection");
   }
 
   /**

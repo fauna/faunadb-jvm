@@ -12,6 +12,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.faunadb.client.database.SetupDatabase.createDatabase;
@@ -71,6 +72,17 @@ public class AndroidClientSpec extends DslSpec {
     } finally {
       client.close();
     }
+  }
+
+  @Test
+  public void shouldThrowIllegalStateWhenCreateNewSessionClientOnClosedClient() throws IOException {
+    thrown.expect(IllegalStateException.class);
+    thrown.expectMessage("Can not create a session connection from a closed http connection");
+
+    FaunaClient client = createFaunaClient("secret");
+    client.close();
+
+    client.newSessionClient("new-secret");
   }
 
   @Test
