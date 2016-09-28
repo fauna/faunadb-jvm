@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static java.lang.String.format;
 
 /**
- * The HTTP Connection adapter for FaunaDB clients.
+ * The HTTP Connection adapter for FaunaDB drivers.
  * <p>
  * Relies on <a href="https://github.com/AsyncHttpClient/async-http-client">async-http-client</a>
  * for the underlying implementation.
