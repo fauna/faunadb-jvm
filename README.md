@@ -4,7 +4,7 @@ This repository contains the FaunaDB drivers for the JVM languages. Currently, J
 
 ### Features
 
-* All drivers fully support the current version of the [FaunaDB API](https://faunadb.com/documentation).
+* All drivers fully support the current version of the [FaunaDB API](https://fauna.com/documentation).
 * All per-language drivers share the same underlying library [faunadb-common](./faunadb-common).
 * Supports [Dropwizard Metrics](https://dropwizard.github.io/metrics/3.1.0/) hooks for stats reporting.
 

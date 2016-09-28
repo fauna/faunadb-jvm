@@ -58,7 +58,7 @@ import static java.util.Objects.requireNonNull;
  *   node.at("non-existing-key").to(Codec.LONG).getOptional() // Optional.absent()
  * }</pre>
  *
- * @see <a href="https://faunadb.com/documentation/queries#values">FaunaDB Value Types</a>
+ * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Value Types</a>
  * @see Field
  * @see Codec
  */
@@ -425,7 +425,7 @@ public abstract class Value extends Expr {
   /**
    * A FaunaDB set literal.
    *
-   * @see <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
    */
   public static final class SetRefV extends ScalarValue<ImmutableMap<String, Value>> {
 
@@ -452,7 +452,7 @@ public abstract class Value extends Expr {
   /**
    * A FaunaDB ref type.
    *
-   * @see <a href="https://faunadb.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
    */
   public static final class RefV extends Value.ScalarValue<String> {
 
