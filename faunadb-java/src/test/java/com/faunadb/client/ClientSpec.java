@@ -44,6 +44,7 @@ public class ClientSpec extends FaunaDBTest {
 
   private static final Field<Value> DATA = Field.at("data");
   private static final Field<RefV> REF_FIELD = Field.at("ref").to(REF);
+  private static final Field<RefV> RESOURCE_FIELD = Field.at("resource").to(REF);
   private static final Field<ImmutableList<RefV>> REF_LIST = DATA.collect(Field.as(REF));
 
   private static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).to(STRING);
@@ -320,9 +321,7 @@ public class ClientSpec extends FaunaDBTest {
           Obj("cooldown", Value(5L))))
     ).get();
 
-    assertThat(insertedEvent.get(REF_FIELD), equalTo(createdInstance.get(REF_FIELD)));
-    assertThat(insertedEvent.get(DATA).to(OBJECT).get().size(), equalTo(1));
-    assertThat(insertedEvent.get(DATA).at("cooldown").to(LONG).get(), is(5L));
+    assertThat(insertedEvent.get(RESOURCE_FIELD), equalTo(createdInstance.get(REF_FIELD)));
 
     Value removedEvent = client.query(
       Remove(createdInstance.get(REF_FIELD), Value(2L), DELETE)
