@@ -1,5 +1,9 @@
 # FaunaDB JVM Drivers
 
+[![Build Status](https://img.shields.io/travis/faunadb/faunadb-jvm/master.svg?maxAge=21600)](https://travis-ci.org/faunadb/faunadb-jvm)
+[![Maven Central](https://img.shields.io/maven-central/v/com.faunadb/faunadb-common.svg?maxAge=21600)]()
+[![License](https://img.shields.io/badge/license-MPL_2.0-blue.svg?maxAge=2592000)](https://raw.githubusercontent.com/faunadb/faunadb-jvm/master/LICENSE)
+
 This repository contains the FaunaDB drivers for the JVM languages. Currently, Java and Scala drivers are implemented.
 
 ### Features
