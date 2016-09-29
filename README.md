@@ -1,11 +1,11 @@
-# FaunaDB JVM Clients
+# FaunaDB JVM Drivers
 
-This repository contains the FaunaDB clients for the JVM languages. Currently, Java and Scala clients are implemented.
+This repository contains the FaunaDB drivers for the JVM languages. Currently, Java and Scala drivers are implemented.
 
 ### Features
 
-* All clients fully support the current version of the [FaunaDB API](https://faunadb.com/documentation).
-* All per-language clients share the same underlying library [faunadb-common](./faunadb-common).
+* All drivers fully support the current version of the [FaunaDB API](https://fauna.com/documentation).
+* All per-language drivers share the same underlying library [faunadb-common](./faunadb-common).
 * Supports [Dropwizard Metrics](https://dropwizard.github.io/metrics/3.1.0/) hooks for stats reporting.
 
 ## Installation

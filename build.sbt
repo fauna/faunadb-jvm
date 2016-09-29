@@ -31,9 +31,9 @@ lazy val publishSettings = Seq(
     <developers>
       <developer>
         <name>Matt Freels</name>
-        <email>matt@faunadb.com</email>
-        <organization>FaunaDB</organization>
-        <organizationUrl>http://faunadb.com</organizationUrl>
+        <email>matt@fauna.com</email>
+        <organization>Fauna</organization>
+        <organizationUrl>http://fauna.com</organizationUrl>
       </developer>
     </developers>
   ))

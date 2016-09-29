@@ -22,7 +22,7 @@ import static java.util.Objects.requireNonNull;
  * }</pre>
  *
  * @see Language#Paginate(Expr)
- * @see <a href="https://faunadb.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
+ * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
  */
 public final class Pagination extends Expr {
 
