@@ -39,6 +39,7 @@ lazy val publishSettings = Seq(
   ))
 
 lazy val root = (project in file("."))
+  .settings(jacoco.settings)
   .settings(
     name := "faunadb-jvm-parent",
     organization := "com.faunadb",
@@ -47,6 +48,7 @@ lazy val root = (project in file("."))
   .aggregate(common, scala, java)
 
 lazy val common = project.in(file("faunadb-common"))
+  .settings(jacoco.settings)
   .settings(publishSettings: _*)
   .settings(
     name := "faunadb-common",
@@ -73,6 +75,7 @@ lazy val common = project.in(file("faunadb-common"))
 
 lazy val scala = project.in(file("faunadb-scala"))
   .dependsOn(common)
+  .settings(jacoco.settings)
   .settings(publishSettings : _*)
   .settings(
     name := "faunadb-scala",
@@ -112,6 +115,7 @@ lazy val scala = project.in(file("faunadb-scala"))
 
 lazy val java = project.in(file("faunadb-java"))
   .dependsOn(common)
+  .settings(jacoco.settings)
   .settings(publishSettings: _*)
   .settings(
     name := "faunadb-java",
