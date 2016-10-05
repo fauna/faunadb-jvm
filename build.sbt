@@ -49,7 +49,6 @@ lazy val root = (project in file("."))
   .aggregate(common, scala, java)
 
 lazy val common = project.in(file("faunadb-common"))
-  .settings(jacoco.settings)
   .settings(publishSettings: _*)
   .settings(
     name := "faunadb-common",
@@ -72,9 +71,7 @@ lazy val common = project.in(file("faunadb-common"))
       "io.dropwizard.metrics" % "metrics-core" % metricsVersion,
       "org.slf4j" % "slf4j-api" % "1.7.7",
       "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
-      "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion),
-
-    jacoco.reportFormats in jacoco.Config := Seq(XMLReport()))
+      "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion))
 
 lazy val scala = project.in(file("faunadb-scala"))
   .dependsOn(common)
