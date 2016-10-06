@@ -1,3 +1,5 @@
+import de.johoop.jacoco4sbt.XMLReport
+
 val driverVersion = "0.3.3-SNAPSHOT"
 val asyncHttpClientVersion = "2.0.2"
 val guavaVersion = "19.0"
@@ -73,6 +75,7 @@ lazy val common = project.in(file("faunadb-common"))
 
 lazy val scala = project.in(file("faunadb-scala"))
   .dependsOn(common)
+  .settings(jacoco.settings)
   .settings(publishSettings : _*)
   .settings(
     name := "faunadb-scala",
@@ -108,10 +111,13 @@ lazy val scala = project.in(file("faunadb-scala"))
           url(s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/"),
         findDep("joda-time", "joda-time") ->
           url("http://www.joda.org/joda-time/apidocs/index.html"))
-    })
+    },
+
+    jacoco.reportFormats in jacoco.Config := Seq(XMLReport()))
 
 lazy val java = project.in(file("faunadb-java"))
   .dependsOn(common)
+  .settings(jacoco.settings)
   .settings(publishSettings: _*)
   .settings(
     name := "faunadb-java",
@@ -139,4 +145,6 @@ lazy val java = project.in(file("faunadb-java"))
       "org.yaml" % "snakeyaml" % "1.14" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test",
       "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
-      "junit" % "junit" % "4.12" % "test"))
+      "junit" % "junit" % "4.12" % "test"),
+
+    jacoco.reportFormats in jacoco.Config := Seq(XMLReport()))
