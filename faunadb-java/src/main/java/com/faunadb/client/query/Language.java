@@ -800,6 +800,15 @@ public final class Language {
   }
 
   /**
+   * Creates a new Index expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Index(Expr name) {
+    return Fn.apply("index", name);
+  }
+
+  /**
    * Creates a new Equals expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>

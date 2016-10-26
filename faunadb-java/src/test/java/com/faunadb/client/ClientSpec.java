@@ -359,8 +359,10 @@ public class ClientSpec extends FaunaDBTest {
   @Test
   public void shouldFindASingleInstanceFromIndex() throws Exception {
     Value singleMatch = client.query(
-      Paginate(Match(Ref("indexes/spells_by_element"), Value("fire")))
-    ).get();
+      Paginate(Match(
+        Index(Value("spells_by_element")),
+        Value("fire"))
+      )).get();
 
     assertThat(singleMatch.get(REF_LIST), contains(fireball));
   }
