@@ -224,7 +224,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test types" in {
-    val setF = client.query(Match(Ref("indexes/spells_by_element"), "arcane"))
+    val setF = client.query(Match(Index("spells_by_element"), "arcane"))
     val set = await(setF).to[SetRefV].get
     set.parameters("match").to[RefV].get shouldBe RefV("indexes/spells_by_element")
     set.parameters("terms").to[String].get shouldBe "arcane"
@@ -318,37 +318,37 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val create3R = await(create3F)
     val create4R = await(create4F)
 
-    val matchF = client.query(Paginate(Match(Ref("indexes/spells_by_element"), "arcane")))
+    val matchF = client.query(Paginate(Match(Index("spells_by_element"), "arcane")))
     val matchR = await(matchF)
     matchR("data").to[Seq[RefV]].get should contain (create1R("ref").get)
 
-    val matchEventsF = client.query(Paginate(Match(Ref("indexes/spells_by_element"), "arcane"), events = true))
+    val matchEventsF = client.query(Paginate(Match(Index("spells_by_element"), "arcane"), events = true))
     val matchEventsR = await(matchEventsF)
     matchEventsR(PageEvents).get map { _.ref } should contain (create1R("ref").to[RefV].get)
 
     val unionF = client.query(Paginate(Union(
-      Match(Ref("indexes/spells_by_element"), "arcane"),
-      Match(Ref("indexes/spells_by_element"), "fire"))))
+      Match(Index("spells_by_element"), "arcane"),
+      Match(Index("spells_by_element"), "fire"))))
     val unionR = await(unionF)
     unionR(PageRefs).get should (contain (create1R(RefField).get) and contain (create2R(RefField).get))
 
     val unionEventsF = client.query(Paginate(Union(
-      Match(Ref("indexes/spells_by_element"), "arcane"),
-      Match(Ref("indexes/spells_by_element"), "fire")), events = true))
+      Match(Index("spells_by_element"), "arcane"),
+      Match(Index("spells_by_element"), "fire")), events = true))
     val unionEventsR = await(unionEventsF)
 
     unionEventsR(PageEvents).get collect { case e if e.action == "create" => e.ref } should (
       contain (create1R(RefField).get) and contain (create2R(RefField).get))
 
     val intersectionF = client.query(Paginate(Intersection(
-      Match(Ref("indexes/spells_by_element"), "arcane"),
-      Match(Ref("indexes/spells_by_element"), "nature"))))
+      Match(Index("spells_by_element"), "arcane"),
+      Match(Index("spells_by_element"), "nature"))))
     val intersectionR = await(intersectionF)
     intersectionR(PageRefs).get should contain (create3R(RefField).get)
 
     val differenceF = client.query(Paginate(Difference(
-      Match(Ref("indexes/spells_by_element"), "nature"),
-      Match(Ref("indexes/spells_by_element"), "arcane"))))
+      Match(Index("spells_by_element"), "nature"),
+      Match(Index("spells_by_element"), "arcane"))))
 
     val differenceR = await(differenceF)
     differenceR(PageRefs).get should contain (create4R(RefField).get)

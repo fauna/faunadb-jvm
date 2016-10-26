@@ -507,6 +507,14 @@ package object query {
     Expr(ObjectV("database" -> name.value))
 
   /**
+    * An Index expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def Index(name: Expr): Expr =
+    Expr(ObjectV("index" -> name.value))
+
+  /**
    * An Equals expression.
    *
    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]

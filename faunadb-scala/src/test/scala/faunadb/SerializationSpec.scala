@@ -230,6 +230,9 @@ class SerializationSpec extends FlatSpec with Matchers {
     val database = Database("db-test")
     json.writeValueAsString(database) shouldBe "{\"database\":\"db-test\"}"
 
+    val index = Index("spells_by_name")
+    json.writeValueAsString(index) shouldBe "{\"index\":\"spells_by_name\"}"
+
     val equals = Equals("fire", "fire")
     json.writeValueAsString(equals) shouldBe "{\"equals\":[\"fire\",\"fire\"]}"
 
