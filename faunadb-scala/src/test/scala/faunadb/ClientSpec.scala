@@ -66,7 +66,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     client = FaunaClient(endpoint = config("root_url"), secret = key(SecretField).get)
 
-    await(client.query(Create(Ref("classes"), Obj("name" -> "spells"))))
+    await(client.query(CreateClass(Obj("name" -> "spells"))))
 
     await(client.query(Create(Ref("indexes"), Obj(
       "name" -> "spells_by_element",
@@ -142,7 +142,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   it should "issue a paginated query" in {
     val randomClassName = Random.alphanumeric.take(8).mkString
-    val randomClassF = client.query(Create(Ref("classes"), Obj("name" -> randomClassName)))
+    val randomClassF = client.query(CreateClass(Obj("name" -> randomClassName)))
     val classRef = await(randomClassF)(RefField).get
 
     val randomClassIndexF = client.query(Create(Ref("indexes"), Obj(
@@ -197,7 +197,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   it should "handle a constraint violation" in {
     val randomClassName = Random.alphanumeric.take(8).mkString
-    val randomClassF = client.query(Create(Ref("classes"), Obj("name" -> randomClassName)))
+    val randomClassF = client.query(CreateClass(Obj("name" -> randomClassName)))
     val classRef = await(randomClassF)(RefField).get
 
     val uniqueIndexFuture = client.query(Create(Ref("indexes"), Obj(

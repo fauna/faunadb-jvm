@@ -150,6 +150,9 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val remove = Remove(Ref("classes/spells/123456"), 1L, Action.Delete)
     json.writeValueAsString(remove) shouldBe "{\"remove\":{\"@ref\":\"classes/spells/123456\"},\"ts\":1,\"action\":\"delete\"}"
+
+    val createClass = CreateClass(Obj("name" -> "spells"))
+    json.writeValueAsString(createClass) shouldBe "{\"create_class\":{\"object\":{\"name\":\"spells\"}}}"
   }
 
   it should "serialize sets" in {

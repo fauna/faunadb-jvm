@@ -354,6 +354,14 @@ package object query {
   def Remove(ref: Expr, ts: Expr, action: Expr): Expr =
     Expr(ObjectV("remove" -> ref.value, "ts" -> ts.value, "action" -> action.value))
 
+  /**
+    * A Create Class expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    */
+  def CreateClass(params: Expr): Expr =
+    Expr(ObjectV("create_class" -> params.value))
+
   // Set Constructors
 
   /**
