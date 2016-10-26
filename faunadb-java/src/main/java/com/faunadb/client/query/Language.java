@@ -791,6 +791,15 @@ public final class Language {
   }
 
   /**
+   * Creates a new Database expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Database(Expr name) {
+    return Fn.apply("database", name);
+  }
+
+  /**
    * Creates a new Equals expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>

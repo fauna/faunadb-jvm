@@ -21,8 +21,8 @@ import static java.lang.String.format;
 
 public class FaunaDBTest {
 
-  private static final String DB_NAME = "faunadb-java-test";
-  private static final Expr DB_REF = Ref("databases/" + DB_NAME);
+  private static final Expr DB_NAME = Value("faunadb-java-test");
+  private static final Expr DB_REF = Database(DB_NAME);
   private static final String ROOT_TOKEN;
   private static final String ROOT_URL;
 
@@ -89,7 +89,7 @@ public class FaunaDBTest {
         return rootClient.query(
           Create(
             Ref("databases"),
-            Obj("name", Value(DB_NAME))
+            Obj("name", DB_NAME)
           )
         );
       }
