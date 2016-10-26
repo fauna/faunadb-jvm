@@ -159,6 +159,9 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val createKey = CreateKey(Obj("database" -> Database("db-test"), "role" -> "server"))
     json.writeValueAsString(createKey) shouldBe "{\"create_key\":{\"object\":{\"database\":{\"database\":\"db-test\"},\"role\":\"server\"}}}"
+
+    val createIndex = CreateIndex(Obj("name" -> "all_spells", "source" -> Clazz("spells")))
+    json.writeValueAsString(createIndex) shouldBe "{\"create_index\":{\"object\":{\"name\":\"all_spells\",\"source\":{\"class\":\"spells\"}}}}"
   }
 
   it should "serialize sets" in {

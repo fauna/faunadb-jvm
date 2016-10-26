@@ -68,7 +68,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     await(client.query(CreateClass(Obj("name" -> "spells"))))
 
-    await(client.query(Create(Ref("indexes"), Obj(
+    await(client.query(CreateIndex(Obj(
       "name" -> "spells_by_element",
       "source" -> Clazz("spells"),
       "terms" -> Arr(Obj("path" -> "data.element")),
@@ -145,14 +145,14 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val randomClassF = client.query(CreateClass(Obj("name" -> randomClassName)))
     val classRef = await(randomClassF)(RefField).get
 
-    val randomClassIndexF = client.query(Create(Ref("indexes"), Obj(
+    val randomClassIndexF = client.query(CreateIndex(Obj(
       "name" -> (randomClassName + "_class_index"),
       "source" -> classRef,
       "active" -> true,
       "unique" -> false
     )))
 
-    val indexCreateF = client.query(Create(Ref("indexes"), Obj(
+    val indexCreateF = client.query(CreateIndex(Obj(
       "name" -> (randomClassName + "_test_index"),
       "source" -> classRef,
       "terms" -> Arr(Obj("path" -> "data.queryTest1")),
@@ -200,7 +200,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val randomClassF = client.query(CreateClass(Obj("name" -> randomClassName)))
     val classRef = await(randomClassF)(RefField).get
 
-    val uniqueIndexFuture = client.query(Create(Ref("indexes"), Obj(
+    val uniqueIndexFuture = client.query(CreateIndex(Obj(
       "name" -> (randomClassName+"_by_unique_test"),
       "source" -> classRef,
       "terms" -> Arr(Obj("path" -> "data.uniqueTest1")),

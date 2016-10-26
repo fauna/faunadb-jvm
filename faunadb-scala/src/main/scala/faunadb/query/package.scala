@@ -378,6 +378,14 @@ package object query {
   def CreateKey(params: Expr): Expr =
     Expr(ObjectV("create_key" -> params.value))
 
+  /**
+    * A Create Index expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    */
+  def CreateIndex(params: Expr): Expr =
+    Expr(ObjectV("create_index" -> params.value))
+
   // Set Constructors
 
   /**
