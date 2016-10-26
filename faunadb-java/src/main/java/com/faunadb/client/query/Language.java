@@ -595,6 +595,15 @@ public final class Language {
   }
 
   /**
+   * Creates a new Create Class expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   */
+  public static Expr CreateClass(Expr params) {
+    return Fn.apply("create_class", params);
+  }
+
+  /**
    * Creates a new Match expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#sets">FaunaDB Set Functions</a>

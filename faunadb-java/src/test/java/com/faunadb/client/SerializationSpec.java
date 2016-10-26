@@ -499,6 +499,16 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeCreateClass() throws Exception {
+    assertJson(
+      CreateClass(Obj(
+        "name", Value("spells")
+      )),
+      "{\"create_class\":{\"object\":{\"name\":\"spells\"}}}"
+    );
+  }
+
+  @Test
   public void shouldSerializeMatchFunction() throws Exception {
     assertJson(
       Match(Ref("indexes/all_users")),

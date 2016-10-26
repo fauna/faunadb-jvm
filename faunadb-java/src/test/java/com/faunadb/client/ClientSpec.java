@@ -63,9 +63,9 @@ public class ClientSpec extends FaunaDBTest {
   @BeforeClass
   public static void setUpSchema() throws Exception {
     client.query(ImmutableList.of(
-      Create(Ref("classes"), Obj("name", Value("spells"))),
-      Create(Ref("classes"), Obj("name", Value("characters"))),
-      Create(Ref("classes"), Obj("name", Value("spellbooks")))
+      CreateClass(Obj("name", Value("spells"))),
+      CreateClass(Obj("name", Value("characters"))),
+      CreateClass(Obj("name", Value("spellbooks")))
     )).get();
 
     client.query(ImmutableList.of(
@@ -866,7 +866,7 @@ public class ClientSpec extends FaunaDBTest {
 
   private RefV onARandomClass() throws Exception {
     Value clazz = client.query(
-      Create(Ref("classes"),
+      CreateClass(
         Obj("name", Value(randomStartingWith("some_class_"))))
     ).get();
 
