@@ -53,7 +53,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   def ready[T](f: Future[T]) = Await.ready(f, 5.second)
 
   def dropDB(): Unit =
-    ready(rootClient.query(Delete(Ref(s"databases/$testDbName"))))
+    ready(rootClient.query(Delete(Database(testDbName))))
 
   // tests
 

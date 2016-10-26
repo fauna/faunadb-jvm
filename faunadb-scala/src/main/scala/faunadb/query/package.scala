@@ -499,6 +499,14 @@ package object query {
     Expr(ObjectV("class" -> name.value))
 
   /**
+    * A Database expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def Database(name: Expr): Expr =
+    Expr(ObjectV("database" -> name.value))
+
+  /**
    * An Equals expression.
    *
    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
