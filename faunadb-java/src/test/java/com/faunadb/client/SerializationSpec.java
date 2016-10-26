@@ -509,6 +509,16 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeCreateDatabase() throws Exception {
+    assertJson(
+      CreateDatabase(Obj(
+        "name", Value("db-test")
+      )),
+      "{\"create_database\":{\"object\":{\"name\":\"db-test\"}}}"
+    );
+  }
+
+  @Test
   public void shouldSerializeMatchFunction() throws Exception {
     assertJson(
       Match(Ref("indexes/all_users")),

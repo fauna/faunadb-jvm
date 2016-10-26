@@ -86,12 +86,7 @@ public class FaunaDBTest {
     return new AsyncFunction<Value, Value>() {
       @Override
       public ListenableFuture<Value> apply(Value ign) throws Exception {
-        return rootClient.query(
-          Create(
-            Ref("databases"),
-            Obj("name", DB_NAME)
-          )
-        );
+        return rootClient.query(CreateDatabase(Obj("name", DB_NAME)));
       }
     };
   }
