@@ -167,14 +167,14 @@ public class ClientSpec extends FaunaDBTest {
     thrown.expectCause(isA(UnauthorizedException.class));
 
     createFaunaClient("invalid-secret")
-      .query(Get(Ref("classes/spells/1234")))
+      .query(Get(Ref(Clazz(Value("spells")), Value("1234"))))
       .get();
   }
 
   @Test
   public void shouldThrowNotFoundWhenInstanceDoesntExists() throws Exception {
     thrown.expectCause(isA(NotFoundException.class));
-    client.query(Get(Ref("classes/spells/1234"))).get();
+    client.query(Get(Ref(Clazz(Value("spells")), Value("1234")))).get();
   }
 
   @Test

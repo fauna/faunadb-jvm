@@ -129,6 +129,11 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeClass() throws Exception {
+    assertJson(Clazz(Value("spells")), "{\"class\":\"spells\"}");
+  }
+
+  @Test
   public void shouldSerializeInstantValue() throws Exception {
     assertJson(Value(new Instant(0)), "{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}");
   }
