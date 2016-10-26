@@ -1,4 +1,14 @@
 0.3.3-SNAPSHOT
+* Removing count function from all drivers
+* Adding next id function to scala driver
+* Adding missing functions to all drivers:
+	- class
+	- database
+	- index
+	- create class
+	- create database
+	- create key
+	- create index
 
 0.3.2
 * Change default cloud url to https://cloud.faunadb.com
