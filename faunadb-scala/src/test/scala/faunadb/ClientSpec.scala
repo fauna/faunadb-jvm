@@ -60,7 +60,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   override protected def beforeAll(): Unit = {
     dropDB()
 
-    val db = await(rootClient.query(Create(Ref("databases"), Obj("name" -> testDbName))))
+    val db = await(rootClient.query(CreateDatabase(Obj("name" -> testDbName))))
     val dbRef = db(RefField).get
     val key = await(rootClient.query(Create(Ref("keys"), Obj("database" -> dbRef, "role" -> "server"))))
 

@@ -362,6 +362,14 @@ package object query {
   def CreateClass(params: Expr): Expr =
     Expr(ObjectV("create_class" -> params.value))
 
+  /**
+    * A Create Database expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    */
+  def CreateDatabase(params: Expr): Expr =
+    Expr(ObjectV("create_database" -> params.value))
+
   // Set Constructors
 
   /**
