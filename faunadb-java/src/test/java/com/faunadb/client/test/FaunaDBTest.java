@@ -98,11 +98,10 @@ public class FaunaDBTest {
         RefV dbRef = dbCreateR.at("ref").to(REF).get();
 
         return rootClient.query(
-          Create(
-            Ref("keys"),
-            Obj("database", dbRef,
-              "role", Value("server"))
-          )
+          CreateKey(Obj(
+            "database", dbRef,
+            "role", Value("server")
+          ))
         );
       }
     };

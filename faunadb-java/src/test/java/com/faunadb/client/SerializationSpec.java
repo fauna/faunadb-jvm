@@ -519,6 +519,17 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeCreateKey() throws Exception {
+    assertJson(
+      CreateKey(Obj(
+        "database", Database(Value("db-test")),
+        "role", Value("server")
+      )),
+      "{\"create_key\":{\"object\":{\"database\":{\"database\":\"db-test\"},\"role\":\"server\"}}}"
+    );
+  }
+
+  @Test
   public void shouldSerializeMatchFunction() throws Exception {
     assertJson(
       Match(Ref("indexes/all_users")),

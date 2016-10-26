@@ -613,6 +613,15 @@ public final class Language {
   }
 
   /**
+   * Creates a new Create Key expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   */
+  public static Expr CreateKey(Expr params) {
+    return Fn.apply("create_key", params);
+  }
+
+  /**
    * Creates a new Match expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#sets">FaunaDB Set Functions</a>
