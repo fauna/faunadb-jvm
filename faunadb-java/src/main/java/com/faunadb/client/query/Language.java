@@ -523,24 +523,6 @@ public final class Language {
   }
 
   /**
-   * Creates a new Count expression.
-   *
-   * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
-   */
-  public static Expr Count(Expr set) {
-    return Fn.apply("count", set);
-  }
-
-  /**
-   * Creates a new Count expression.
-   *
-   * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
-   */
-  public static Expr Count(Expr set, Expr countEvents) {
-    return Fn.apply("count", set, "events", countEvents);
-  }
-
-  /**
    * Creates a new Create expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>

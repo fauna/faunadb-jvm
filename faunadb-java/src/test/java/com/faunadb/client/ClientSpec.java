@@ -366,12 +366,6 @@ public class ClientSpec extends FaunaDBTest {
   }
 
   @Test
-  public void shouldCountElementsOnAIndex() throws Exception {
-    Value count = client.query(Count(Match(Ref("indexes/all_spells")))).get();
-    assertThat(count.to(LONG).get(), equalTo(6L));
-  }
-
-  @Test
   public void shouldListAllItensOnAClassIndex() throws Exception {
     Value allInstances = client.query(
       Paginate(Match(Ref("indexes/all_spells")))

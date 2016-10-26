@@ -396,19 +396,6 @@ public class SerializationSpec {
   }
 
   @Test
-  public void shouldSerializeCount() throws Exception {
-    assertJson(
-      Count(Ref("databases")),
-      "{\"count\":{\"@ref\":\"databases\"}}"
-    );
-
-    assertJson(
-      Count(Ref("databases"), Value(true)),
-      "{\"count\":{\"@ref\":\"databases\"},\"events\":true}"
-    );
-  }
-
-  @Test
   public void shouldSerializeCreate() throws Exception {
     assertJson(
       Create(
