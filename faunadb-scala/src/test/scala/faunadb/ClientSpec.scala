@@ -62,7 +62,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val db = await(rootClient.query(CreateDatabase(Obj("name" -> testDbName))))
     val dbRef = db(RefField).get
-    val key = await(rootClient.query(Create(Ref("keys"), Obj("database" -> dbRef, "role" -> "server"))))
+    val key = await(rootClient.query(CreateKey(Obj("database" -> dbRef, "role" -> "server"))))
 
     client = FaunaClient(endpoint = config("root_url"), secret = key(SecretField).get)
 

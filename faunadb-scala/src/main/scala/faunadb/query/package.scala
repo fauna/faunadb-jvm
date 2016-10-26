@@ -370,6 +370,14 @@ package object query {
   def CreateDatabase(params: Expr): Expr =
     Expr(ObjectV("create_database" -> params.value))
 
+  /**
+    * A Create Key expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    */
+  def CreateKey(params: Expr): Expr =
+    Expr(ObjectV("create_key" -> params.value))
+
   // Set Constructors
 
   /**
