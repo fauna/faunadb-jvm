@@ -298,17 +298,6 @@ package object query {
   def Exists(ref: Expr, ts: Expr): Expr =
     Expr(ObjectV("exists" -> ref.value, "ts" -> ts.value))
 
-  /**
-   * A Count expression.
-   *
-   * '''Reference''': [[https://fauna.com/documentation/queries#read_functions]]
-   */
-  def Count(set: Expr): Expr =
-    Expr(ObjectV("count" -> set.value))
-
-  def Count(set: Expr, events: Expr): Expr =
-    Expr(ObjectV("count" -> set.value, "events" -> events.value))
-
   // Write Functions
 
   /**

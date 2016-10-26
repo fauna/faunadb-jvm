@@ -193,10 +193,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     resp2("data").to[Seq[Value]].get.size shouldBe 1
     resp2("after").isDefined should equal (true)
     resp2("before").isDefined should equal (true)
-
-    val countF = client.query(Count(Match(randomClassIndex)))
-    val countR = await(countF).to[Long].get
-    countR shouldBe 3
   }
 
   it should "handle a constraint violation" in {

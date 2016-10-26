@@ -116,9 +116,6 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val paginate4 = Paginate(Union(Match(Ref("indexes/some_index"), "term"), Match(Ref("indexes/some_index"), "term2")), Before(Ref("some/ref/1")), size = 4)
     json.writeValueAsString(paginate4) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"before\":{\"@ref\":\"some/ref/1\"},\"size\":4}"
-
-    val count = Count(Match(Ref("indexes/spells_by_element"), "fire"))
-    json.writeValueAsString(count) shouldBe "{\"count\":{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}}"
   }
 
   it should "serialize resource modifications" in {
