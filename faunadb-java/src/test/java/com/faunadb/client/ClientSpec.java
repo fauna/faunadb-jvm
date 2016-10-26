@@ -69,30 +69,30 @@ public class ClientSpec extends FaunaDBTest {
     )).get();
 
     client.query(ImmutableList.of(
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("all_spells"),
         "source", Ref("classes/spells")
       )),
 
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("spells_by_element"),
         "source", Ref("classes/spells"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("element"))))
       )),
 
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("elements_of_spells"),
         "source", Ref("classes/spells"),
         "values", Arr(Obj("field", Arr(Value("data"), Value("element"))))
       )),
 
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("spellbooks_by_owner"),
         "source", Ref("classes/spellbooks"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("owner"))))
       )),
 
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("spells_by_spellbook"),
         "source", Ref("classes/spells"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("spellbook"))))
@@ -335,7 +335,7 @@ public class ClientSpec extends FaunaDBTest {
     RefV classRef = onARandomClass();
 
     client.query(
-      Create(Ref("indexes"),
+      CreateIndex(
         Obj(
           "name", Value(randomStartingWith("class_index_")),
           "source", classRef,

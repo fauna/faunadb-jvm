@@ -530,6 +530,17 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeCreateIndex() throws Exception {
+    assertJson(
+      CreateIndex(Obj(
+        "name", Value("all_spells"),
+        "source", Clazz(Value("spells"))
+      )),
+      "{\"create_index\":{\"object\":{\"name\":\"all_spells\",\"source\":{\"class\":\"spells\"}}}}"
+    );
+  }
+
+  @Test
   public void shouldSerializeMatchFunction() throws Exception {
     assertJson(
       Match(Ref("indexes/all_users")),

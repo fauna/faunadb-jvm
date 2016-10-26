@@ -622,6 +622,15 @@ public final class Language {
   }
 
   /**
+   * Creates a new Create Index expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   */
+  public static Expr CreateIndex(Expr params) {
+    return Fn.apply("create_index", params);
+  }
+
+  /**
    * Creates a new Match expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#sets">FaunaDB Set Functions</a>
