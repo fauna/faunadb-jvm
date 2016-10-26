@@ -70,7 +70,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     await(client.query(Create(Ref("indexes"), Obj(
       "name" -> "spells_by_element",
-      "source" -> Ref("classes/spells"),
+      "source" -> Clazz("spells"),
       "terms" -> Arr(Obj("path" -> "data.element")),
       "active" -> true))))
   }
@@ -97,7 +97,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   it should "create a new instance" in {
     val inst = await(client.query(
-      Create(Ref("classes/spells"),
+      Create(Clazz("spells"),
         Obj("data" -> Obj("testField" -> "testValue")))))
 
     inst(RefField).get.value should startWith ("classes/spells/")
@@ -106,7 +106,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     await(client.query(Exists(inst(RefField)))) should equal (TrueV)
 
-    val inst2 = await(client.query(Create(Ref("classes/spells"),
+    val inst2 = await(client.query(Create(Clazz("spells"),
       Obj("data" -> Obj(
         "testData" -> Obj(
           "array" -> Arr(1, "2", 3.4),
@@ -129,7 +129,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "issue a batched query" in {
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
-    val classRef = Ref("classes/spells")
+    val classRef = Clazz("spells")
     val expr1 = Create(classRef, Obj("data" -> Obj("queryTest1" -> randomText1)))
     val expr2 = Create(classRef, Obj("data" -> Obj("queryTest1" -> randomText2)))
 
@@ -260,13 +260,13 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val mapR = await(mapF)
     mapR.to[Seq[Long]].get shouldBe Seq(2, 3, 4)
 
-    val foreachF = client.query(Foreach(Arr("Fireball Level 1", "Fireball Level 2"), Lambda(spell => Create(Ref("classes/spells"), Obj("data" -> Obj("name" -> spell))))))
+    val foreachF = client.query(Foreach(Arr("Fireball Level 1", "Fireball Level 2"), Lambda(spell => Create(Clazz("spells"), Obj("data" -> Obj("name" -> spell))))))
     val foreachR = await(foreachF)
     foreachR.to[Seq[String]].get shouldBe Seq("Fireball Level 1", "Fireball Level 2")
   }
 
   it should "test resource modification" in {
-    val createF = client.query(Create(Ref("classes/spells"), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L))))
+    val createF = client.query(Create(Clazz("spells"), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L))))
     val createR = await(createF)
     createR(RefField).get.value should startWith("classes/spells")
     createR("data", "name").to[String].get shouldBe "Magic Missile"
@@ -304,13 +304,13 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test sets" in {
-    val create1F = client.query(Create(Ref("classes/spells"),
+    val create1F = client.query(Create(Clazz("spells"),
       Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L))))
-    val create2F = client.query(Create(Ref("classes/spells"),
+    val create2F = client.query(Create(Clazz("spells"),
       Obj("data" -> Obj("name" -> "Fireball", "element" -> "fire", "cost" -> 10L))))
-    val create3F = client.query(Create(Ref("classes/spells"),
+    val create3F = client.query(Create(Clazz("spells"),
       Obj("data" -> Obj("name" -> "Faerie Fire", "element" -> Arr("arcane", "nature"), "cost" -> 10L))))
-    val create4F = client.query(Create(Ref("classes/spells"),
+    val create4F = client.query(Create(Clazz("spells"),
       Obj("data" -> Obj("name" -> "Summon Animal Companion", "element" -> "nature", "cost" -> 10L))))
 
     val create1R = await(create1F)
@@ -442,7 +442,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test authentication functions" in {
-    val createF = client.query(Create(Ref("classes/spells"), Obj("credentials" -> Obj("password" -> "abcdefg"))))
+    val createF = client.query(Create(Clazz("spells"), Obj("credentials" -> Obj("password" -> "abcdefg"))))
     val createR = await(createF)
 
     val loginF = client.query(Login(createR("ref").to[RefV], Obj("password" -> "abcdefg")))

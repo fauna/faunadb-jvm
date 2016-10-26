@@ -491,6 +491,14 @@ package object query {
     Expr(ObjectV("next_id" -> NullV))
 
   /**
+    * A Class expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def Clazz(name: Expr): Expr =
+    Expr(ObjectV("class" -> name.value))
+
+  /**
    * An Equals expression.
    *
    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
