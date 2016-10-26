@@ -483,6 +483,14 @@ package object query {
   // Misc Functions
 
   /**
+    * A Next Id expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def NextId(): Expr =
+    Expr(ObjectV("next_id" -> NullV))
+
+  /**
    * An Equals expression.
    *
    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]

@@ -221,6 +221,9 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize misc and mathematical functions" in {
+    val nextId = NextId()
+    json.writeValueAsString(nextId) shouldBe "{\"next_id\":null}"
+
     val equals = Equals("fire", "fire")
     json.writeValueAsString(equals) shouldBe "{\"equals\":[\"fire\",\"fire\"]}"
 

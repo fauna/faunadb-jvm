@@ -355,6 +355,10 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test miscellaneous functions" in {
+    val nextIdF = client.query(NextId())
+    val nextIdR = await(nextIdF).to[String].get
+    nextIdR should not be null
+
     val equalsF = client.query(Equals("fire", "fire"))
     val equalsR = await(equalsF).to[Boolean].get
     equalsR shouldBe true
