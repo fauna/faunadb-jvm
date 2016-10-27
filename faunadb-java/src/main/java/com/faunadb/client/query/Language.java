@@ -822,7 +822,7 @@ public final class Language {
    *
    * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
-  public static Expr Clazz(Expr name) {
+  public static Expr Class(Expr name) {
     return Fn.apply("class", name);
   }
 

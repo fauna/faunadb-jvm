@@ -130,7 +130,7 @@ public class SerializationSpec {
 
   @Test
   public void shouldSerializeClass() throws Exception {
-    assertJson(Clazz(Value("spells")), "{\"class\":\"spells\"}");
+    assertJson(Class(Value("spells")), "{\"class\":\"spells\"}");
   }
 
   @Test
@@ -534,7 +534,7 @@ public class SerializationSpec {
     assertJson(
       CreateIndex(Obj(
         "name", Value("all_spells"),
-        "source", Clazz(Value("spells"))
+        "source", Class(Value("spells"))
       )),
       "{\"create_index\":{\"object\":{\"name\":\"all_spells\",\"source\":{\"class\":\"spells\"}}}}"
     );

@@ -527,7 +527,7 @@ package object query {
     *
     * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
     */
-  def Clazz(name: Expr): Expr =
+  def Class(name: Expr): Expr =
     Expr(ObjectV("class" -> name.value))
 
   /**

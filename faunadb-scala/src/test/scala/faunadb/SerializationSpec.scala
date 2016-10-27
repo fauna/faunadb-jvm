@@ -160,7 +160,7 @@ class SerializationSpec extends FlatSpec with Matchers {
     val createKey = CreateKey(Obj("database" -> Database("db-test"), "role" -> "server"))
     json.writeValueAsString(createKey) shouldBe "{\"create_key\":{\"object\":{\"database\":{\"database\":\"db-test\"},\"role\":\"server\"}}}"
 
-    val createIndex = CreateIndex(Obj("name" -> "all_spells", "source" -> Clazz("spells")))
+    val createIndex = CreateIndex(Obj("name" -> "all_spells", "source" -> Class("spells")))
     json.writeValueAsString(createIndex) shouldBe "{\"create_index\":{\"object\":{\"name\":\"all_spells\",\"source\":{\"class\":\"spells\"}}}}"
   }
 
@@ -236,7 +236,7 @@ class SerializationSpec extends FlatSpec with Matchers {
     val nextId = NextId()
     json.writeValueAsString(nextId) shouldBe "{\"next_id\":null}"
 
-    val clazz = Clazz("spells")
+    val clazz = Class("spells")
     json.writeValueAsString(clazz) shouldBe "{\"class\":\"spells\"}"
 
     val database = Database("db-test")
