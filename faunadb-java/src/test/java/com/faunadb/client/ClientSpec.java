@@ -63,36 +63,36 @@ public class ClientSpec extends FaunaDBTest {
   @BeforeClass
   public static void setUpSchema() throws Exception {
     client.query(ImmutableList.of(
-      Create(Ref("classes"), Obj("name", Value("spells"))),
-      Create(Ref("classes"), Obj("name", Value("characters"))),
-      Create(Ref("classes"), Obj("name", Value("spellbooks")))
+      CreateClass(Obj("name", Value("spells"))),
+      CreateClass(Obj("name", Value("characters"))),
+      CreateClass(Obj("name", Value("spellbooks")))
     )).get();
 
     client.query(ImmutableList.of(
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("all_spells"),
         "source", Ref("classes/spells")
       )),
 
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("spells_by_element"),
         "source", Ref("classes/spells"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("element"))))
       )),
 
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("elements_of_spells"),
         "source", Ref("classes/spells"),
         "values", Arr(Obj("field", Arr(Value("data"), Value("element"))))
       )),
 
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("spellbooks_by_owner"),
         "source", Ref("classes/spellbooks"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("owner"))))
       )),
 
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("spells_by_spellbook"),
         "source", Ref("classes/spells"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("spellbook"))))
@@ -167,14 +167,14 @@ public class ClientSpec extends FaunaDBTest {
     thrown.expectCause(isA(UnauthorizedException.class));
 
     createFaunaClient("invalid-secret")
-      .query(Get(Ref("classes/spells/1234")))
+      .query(Get(Ref(Class(Value("spells")), Value("1234"))))
       .get();
   }
 
   @Test
   public void shouldThrowNotFoundWhenInstanceDoesntExists() throws Exception {
     thrown.expectCause(isA(NotFoundException.class));
-    client.query(Get(Ref("classes/spells/1234"))).get();
+    client.query(Get(Ref(Class(Value("spells")), Value("1234")))).get();
   }
 
   @Test
@@ -335,7 +335,7 @@ public class ClientSpec extends FaunaDBTest {
     RefV classRef = onARandomClass();
 
     client.query(
-      Create(Ref("indexes"),
+      CreateIndex(
         Obj(
           "name", Value(randomStartingWith("class_index_")),
           "source", classRef,
@@ -359,16 +359,12 @@ public class ClientSpec extends FaunaDBTest {
   @Test
   public void shouldFindASingleInstanceFromIndex() throws Exception {
     Value singleMatch = client.query(
-      Paginate(Match(Ref("indexes/spells_by_element"), Value("fire")))
-    ).get();
+      Paginate(Match(
+        Index(Value("spells_by_element")),
+        Value("fire"))
+      )).get();
 
     assertThat(singleMatch.get(REF_LIST), contains(fireball));
-  }
-
-  @Test
-  public void shouldCountElementsOnAIndex() throws Exception {
-    Value count = client.query(Count(Match(Ref("indexes/all_spells")))).get();
-    assertThat(count.to(LONG).get(), equalTo(6L));
   }
 
   @Test
@@ -870,7 +866,7 @@ public class ClientSpec extends FaunaDBTest {
 
   private RefV onARandomClass() throws Exception {
     Value clazz = client.query(
-      Create(Ref("classes"),
+      CreateClass(
         Obj("name", Value(randomStartingWith("some_class_"))))
     ).get();
 

@@ -523,24 +523,6 @@ public final class Language {
   }
 
   /**
-   * Creates a new Count expression.
-   *
-   * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
-   */
-  public static Expr Count(Expr set) {
-    return Fn.apply("count", set);
-  }
-
-  /**
-   * Creates a new Count expression.
-   *
-   * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
-   */
-  public static Expr Count(Expr set, Expr countEvents) {
-    return Fn.apply("count", set, "events", countEvents);
-  }
-
-  /**
    * Creates a new Create expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
@@ -610,6 +592,42 @@ public final class Language {
    */
   public static Expr Remove(Expr ref, Expr timestamp, Action action) {
     return Remove(ref, timestamp, action.value);
+  }
+
+  /**
+   * Creates a new Create Class expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   */
+  public static Expr CreateClass(Expr params) {
+    return Fn.apply("create_class", params);
+  }
+
+  /**
+   * Creates a new Create Database expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   */
+  public static Expr CreateDatabase(Expr params) {
+    return Fn.apply("create_database", params);
+  }
+
+  /**
+   * Creates a new Create Key expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   */
+  public static Expr CreateKey(Expr params) {
+    return Fn.apply("create_key", params);
+  }
+
+  /**
+   * Creates a new Create Index expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   */
+  public static Expr CreateIndex(Expr params) {
+    return Fn.apply("create_index", params);
   }
 
   /**
@@ -797,6 +815,33 @@ public final class Language {
    */
   public static Expr NextId() {
     return Fn.apply("next_id", NullV.NULL);
+  }
+
+  /**
+   * Creates a new Class expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Class(Expr name) {
+    return Fn.apply("class", name);
+  }
+
+  /**
+   * Creates a new Database expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Database(Expr name) {
+    return Fn.apply("database", name);
+  }
+
+  /**
+   * Creates a new Index expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Index(Expr name) {
+    return Fn.apply("index", name);
   }
 
   /**

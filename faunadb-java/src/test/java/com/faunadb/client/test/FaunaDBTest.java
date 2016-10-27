@@ -21,8 +21,8 @@ import static java.lang.String.format;
 
 public class FaunaDBTest {
 
-  private static final String DB_NAME = "faunadb-java-test";
-  private static final Expr DB_REF = Ref("databases/" + DB_NAME);
+  private static final Expr DB_NAME = Value("faunadb-java-test");
+  private static final Expr DB_REF = Database(DB_NAME);
   private static final String ROOT_TOKEN;
   private static final String ROOT_URL;
 
@@ -86,12 +86,7 @@ public class FaunaDBTest {
     return new AsyncFunction<Value, Value>() {
       @Override
       public ListenableFuture<Value> apply(Value ign) throws Exception {
-        return rootClient.query(
-          Create(
-            Ref("databases"),
-            Obj("name", Value(DB_NAME))
-          )
-        );
+        return rootClient.query(CreateDatabase(Obj("name", DB_NAME)));
       }
     };
   }
@@ -103,11 +98,10 @@ public class FaunaDBTest {
         RefV dbRef = dbCreateR.at("ref").to(REF).get();
 
         return rootClient.query(
-          Create(
-            Ref("keys"),
-            Obj("database", dbRef,
-              "role", Value("server"))
-          )
+          CreateKey(Obj(
+            "database", dbRef,
+            "role", Value("server")
+          ))
         );
       }
     };

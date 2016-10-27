@@ -298,17 +298,6 @@ package object query {
   def Exists(ref: Expr, ts: Expr): Expr =
     Expr(ObjectV("exists" -> ref.value, "ts" -> ts.value))
 
-  /**
-   * A Count expression.
-   *
-   * '''Reference''': [[https://fauna.com/documentation/queries#read_functions]]
-   */
-  def Count(set: Expr): Expr =
-    Expr(ObjectV("count" -> set.value))
-
-  def Count(set: Expr, events: Expr): Expr =
-    Expr(ObjectV("count" -> set.value, "events" -> events.value))
-
   // Write Functions
 
   /**
@@ -364,6 +353,38 @@ package object query {
 
   def Remove(ref: Expr, ts: Expr, action: Expr): Expr =
     Expr(ObjectV("remove" -> ref.value, "ts" -> ts.value, "action" -> action.value))
+
+  /**
+    * A Create Class expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    */
+  def CreateClass(params: Expr): Expr =
+    Expr(ObjectV("create_class" -> params.value))
+
+  /**
+    * A Create Database expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    */
+  def CreateDatabase(params: Expr): Expr =
+    Expr(ObjectV("create_database" -> params.value))
+
+  /**
+    * A Create Key expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    */
+  def CreateKey(params: Expr): Expr =
+    Expr(ObjectV("create_key" -> params.value))
+
+  /**
+    * A Create Index expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    */
+  def CreateIndex(params: Expr): Expr =
+    Expr(ObjectV("create_index" -> params.value))
 
   // Set Constructors
 
@@ -492,6 +513,38 @@ package object query {
     Expr(ObjectV("date" -> str.value))
 
   // Misc Functions
+
+  /**
+    * A Next Id expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def NextId(): Expr =
+    Expr(ObjectV("next_id" -> NullV))
+
+  /**
+    * A Class expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def Class(name: Expr): Expr =
+    Expr(ObjectV("class" -> name.value))
+
+  /**
+    * A Database expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def Database(name: Expr): Expr =
+    Expr(ObjectV("database" -> name.value))
+
+  /**
+    * An Index expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def Index(name: Expr): Expr =
+    Expr(ObjectV("index" -> name.value))
 
   /**
    * An Equals expression.

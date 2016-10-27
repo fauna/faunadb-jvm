@@ -116,9 +116,6 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val paginate4 = Paginate(Union(Match(Ref("indexes/some_index"), "term"), Match(Ref("indexes/some_index"), "term2")), Before(Ref("some/ref/1")), size = 4)
     json.writeValueAsString(paginate4) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"before\":{\"@ref\":\"some/ref/1\"},\"size\":4}"
-
-    val count = Count(Match(Ref("indexes/spells_by_element"), "fire"))
-    json.writeValueAsString(count) shouldBe "{\"count\":{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}}"
   }
 
   it should "serialize resource modifications" in {
@@ -153,6 +150,18 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val remove = Remove(Ref("classes/spells/123456"), 1L, Action.Delete)
     json.writeValueAsString(remove) shouldBe "{\"remove\":{\"@ref\":\"classes/spells/123456\"},\"ts\":1,\"action\":\"delete\"}"
+
+    val createClass = CreateClass(Obj("name" -> "spells"))
+    json.writeValueAsString(createClass) shouldBe "{\"create_class\":{\"object\":{\"name\":\"spells\"}}}"
+
+    val createDatabase = CreateDatabase(Obj("name" -> "db-test"))
+    json.writeValueAsString(createDatabase) shouldBe "{\"create_database\":{\"object\":{\"name\":\"db-test\"}}}"
+
+    val createKey = CreateKey(Obj("database" -> Database("db-test"), "role" -> "server"))
+    json.writeValueAsString(createKey) shouldBe "{\"create_key\":{\"object\":{\"database\":{\"database\":\"db-test\"},\"role\":\"server\"}}}"
+
+    val createIndex = CreateIndex(Obj("name" -> "all_spells", "source" -> Class("spells")))
+    json.writeValueAsString(createIndex) shouldBe "{\"create_index\":{\"object\":{\"name\":\"all_spells\",\"source\":{\"class\":\"spells\"}}}}"
   }
 
   it should "serialize sets" in {
@@ -224,6 +233,18 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize misc and mathematical functions" in {
+    val nextId = NextId()
+    json.writeValueAsString(nextId) shouldBe "{\"next_id\":null}"
+
+    val clazz = Class("spells")
+    json.writeValueAsString(clazz) shouldBe "{\"class\":\"spells\"}"
+
+    val database = Database("db-test")
+    json.writeValueAsString(database) shouldBe "{\"database\":\"db-test\"}"
+
+    val index = Index("spells_by_name")
+    json.writeValueAsString(index) shouldBe "{\"index\":\"spells_by_name\"}"
+
     val equals = Equals("fire", "fire")
     json.writeValueAsString(equals) shouldBe "{\"equals\":[\"fire\",\"fire\"]}"
 

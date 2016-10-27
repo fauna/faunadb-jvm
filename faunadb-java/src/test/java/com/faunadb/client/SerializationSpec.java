@@ -129,6 +129,21 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeClass() throws Exception {
+    assertJson(Class(Value("spells")), "{\"class\":\"spells\"}");
+  }
+
+  @Test
+  public void shouldSerializeDatabase() throws Exception {
+    assertJson(Database(Value("test-db")), "{\"database\":\"test-db\"}");
+  }
+
+  @Test
+  public void shouldSerializeIndex() throws Exception {
+    assertJson(Index(Value("spells_by_name")), "{\"index\":\"spells_by_name\"}");
+  }
+
+  @Test
   public void shouldSerializeInstantValue() throws Exception {
     assertJson(Value(new Instant(0)), "{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}");
   }
@@ -396,19 +411,6 @@ public class SerializationSpec {
   }
 
   @Test
-  public void shouldSerializeCount() throws Exception {
-    assertJson(
-      Count(Ref("databases")),
-      "{\"count\":{\"@ref\":\"databases\"}}"
-    );
-
-    assertJson(
-      Count(Ref("databases"), Value(true)),
-      "{\"count\":{\"@ref\":\"databases\"},\"events\":true}"
-    );
-  }
-
-  @Test
   public void shouldSerializeCreate() throws Exception {
     assertJson(
       Create(
@@ -493,6 +495,48 @@ public class SerializationSpec {
       ),
       "{\"remove\":{\"@ref\":\"classes/spells/104979509696660483\"}," +
         "\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"},\"action\":\"delete\"}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeCreateClass() throws Exception {
+    assertJson(
+      CreateClass(Obj(
+        "name", Value("spells")
+      )),
+      "{\"create_class\":{\"object\":{\"name\":\"spells\"}}}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeCreateDatabase() throws Exception {
+    assertJson(
+      CreateDatabase(Obj(
+        "name", Value("db-test")
+      )),
+      "{\"create_database\":{\"object\":{\"name\":\"db-test\"}}}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeCreateKey() throws Exception {
+    assertJson(
+      CreateKey(Obj(
+        "database", Database(Value("db-test")),
+        "role", Value("server")
+      )),
+      "{\"create_key\":{\"object\":{\"database\":{\"database\":\"db-test\"},\"role\":\"server\"}}}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeCreateIndex() throws Exception {
+    assertJson(
+      CreateIndex(Obj(
+        "name", Value("all_spells"),
+        "source", Class(Value("spells"))
+      )),
+      "{\"create_index\":{\"object\":{\"name\":\"all_spells\",\"source\":{\"class\":\"spells\"}}}}"
     );
   }
 
