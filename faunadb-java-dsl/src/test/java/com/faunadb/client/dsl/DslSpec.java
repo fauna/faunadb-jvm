@@ -46,6 +46,7 @@ public abstract class DslSpec {
 
   protected static final Field<Value> DATA = Field.at("data");
   protected static final Field<RefV> REF_FIELD = Field.at("ref").to(REF);
+  protected static final Field<RefV> RESOURCE_FIELD = Field.at("resource").to(REF);
   protected static final Field<ImmutableList<RefV>> REF_LIST = DATA.collect(Field.as(REF));
 
   protected static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).to(STRING);
@@ -74,36 +75,36 @@ public abstract class DslSpec {
     initialized = true;
 
     query(ImmutableList.of(
-      Create(Ref("classes"), Obj("name", Value("spells"))),
-      Create(Ref("classes"), Obj("name", Value("characters"))),
-      Create(Ref("classes"), Obj("name", Value("spellbooks")))
+      CreateClass(Obj("name", Value("spells"))),
+      CreateClass(Obj("name", Value("characters"))),
+      CreateClass(Obj("name", Value("spellbooks")))
     )).get();
 
     query(ImmutableList.of(
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("all_spells"),
         "source", Ref("classes/spells")
       )),
 
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("spells_by_element"),
         "source", Ref("classes/spells"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("element"))))
       )),
 
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("elements_of_spells"),
         "source", Ref("classes/spells"),
         "values", Arr(Obj("field", Arr(Value("data"), Value("element"))))
       )),
 
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("spellbooks_by_owner"),
         "source", Ref("classes/spellbooks"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("owner"))))
       )),
 
-      Create(Ref("indexes"), Obj(
+      CreateIndex(Obj(
         "name", Value("spells_by_spellbook"),
         "source", Ref("classes/spells"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("spellbook"))))
@@ -323,9 +324,7 @@ public abstract class DslSpec {
           Obj("cooldown", Value(5L))))
     ).get();
 
-    assertThat(insertedEvent.get(REF_FIELD), equalTo(createdInstance.get(REF_FIELD)));
-    assertThat(insertedEvent.get(DATA).to(OBJECT).get().size(), equalTo(1));
-    assertThat(insertedEvent.get(DATA).at("cooldown").to(LONG).get(), is(5L));
+    assertThat(insertedEvent.get(RESOURCE_FIELD), equalTo(createdInstance.get(REF_FIELD)));
 
     Value removedEvent = query(
       Remove(createdInstance.get(REF_FIELD), Value(2L), DELETE)
@@ -367,12 +366,6 @@ public abstract class DslSpec {
     ).get();
 
     assertThat(singleMatch.get(REF_LIST), contains(fireball));
-  }
-
-  @Test
-  public void shouldCountElementsOnAIndex() throws Exception {
-    Value count = query(Count(Match(Ref("indexes/all_spells")))).get();
-    assertThat(count.to(LONG).get(), equalTo(6L));
   }
 
   @Test
