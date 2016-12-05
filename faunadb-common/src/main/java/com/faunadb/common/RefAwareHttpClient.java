@@ -1,8 +1,7 @@
 package com.faunadb.common;
 
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.BoundRequestBuilder;
-import org.asynchttpclient.Request;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Request;
 
 import java.io.IOError;
 import java.io.IOException;
@@ -25,17 +24,12 @@ final class RefAwareHttpClient implements AutoCloseable {
 
   @Override
   public void close() {
-    try {
-      if (refCount.decrementAndGet() < INITIAL_REF_COUNT && !delegate.isClosed()) {
-        delegate.close();
-      }
-    } catch (IOException e) {
-      // DefaultAsyncHttpClient do not throw IOException, we don't need to pollute the API with it
-      throw new IOError(e);
+    if (refCount.decrementAndGet() < INITIAL_REF_COUNT && !delegate.isClosed()) {
+      delegate.close();
     }
   }
 
-  BoundRequestBuilder prepareRequest(Request request) {
+  AsyncHttpClient.BoundRequestBuilder prepareRequest(Request request) {
     return delegate.prepareRequest(request);
   }
 

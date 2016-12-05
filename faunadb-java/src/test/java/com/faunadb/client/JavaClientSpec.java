@@ -1,10 +1,10 @@
 package com.faunadb.client;
 
+import com.faunadb.client.dsl.DslSpec;
 import com.faunadb.client.errors.BadRequestException;
 import com.faunadb.client.errors.NotFoundException;
 import com.faunadb.client.errors.UnauthorizedException;
 import com.faunadb.client.query.Expr;
-import com.faunadb.client.test.FaunaDBTest;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.ObjectV;
@@ -14,152 +14,59 @@ import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.ListenableFuture;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
-import java.util.Random;
+import java.util.List;
 
+import static com.faunadb.client.database.SetupDatabase.*;
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
 import static com.faunadb.client.query.Language.*;
+import static com.faunadb.client.query.Language.Class;
 import static com.faunadb.client.query.Language.TimeUnit.*;
 import static com.faunadb.client.types.Codec.*;
+import static com.faunadb.client.types.Value.NullV.NULL;
+import static com.google.common.base.Functions.constant;
+import static com.google.common.util.concurrent.Futures.catching;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.collection.IsArrayContainingInOrder.arrayContaining;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.Is.isA;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.assertThat;
 
-public class ClientSpec extends FaunaDBTest {
+public class JavaClientSpec extends DslSpec {
+  private static final String DB_NAME = "faunadb-java-test";
+  private static final Expr DB_REF = Ref("databases/" + DB_NAME);
 
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
-
-  private static final Field<Value> DATA = Field.at("data");
-  private static final Field<RefV> REF_FIELD = Field.at("ref").to(REF);
-  private static final Field<RefV> RESOURCE_FIELD = Field.at("resource").to(REF);
-  private static final Field<ImmutableList<RefV>> REF_LIST = DATA.collect(Field.as(REF));
-
-  private static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).to(STRING);
-  private static final Field<String> ELEMENT_FIELD = DATA.at(Field.at("element")).to(STRING);
-  private static final Field<Value> ELEMENTS_LIST = DATA.at(Field.at("elements"));
-  private static final Field<Long> COST_FIELD = DATA.at(Field.at("cost")).to(LONG);
-
-  private static RefV magicMissile;
-  private static RefV fireball;
-  private static RefV faerieFire;
-  private static RefV summon;
-  private static RefV thor;
-  private static RefV thorSpell1;
-  private static RefV thorSpell2;
+  private static FaunaClient rootClient;
+  private static FaunaClient client;
 
   @BeforeClass
-  public static void setUpSchema() throws Exception {
-    client.query(ImmutableList.of(
-      CreateClass(Obj("name", Value("spells"))),
-      CreateClass(Obj("name", Value("characters"))),
-      CreateClass(Obj("name", Value("spellbooks")))
-    )).get();
+  public static void setUpClient() throws Exception {
+    rootClient = createFaunaClient(ROOT_TOKEN);
 
-    client.query(ImmutableList.of(
-      CreateIndex(Obj(
-        "name", Value("all_spells"),
-        "source", Ref("classes/spells")
-      )),
+    catching(rootClient.query(dropDatabase(DB_REF)), BadRequestException.class, constant(NULL)).get();
+    Value db = rootClient.query(createDatabase(DB_NAME)).get();
+    Value key = rootClient.query(createServerKey(db)).get();
 
-      CreateIndex(Obj(
-        "name", Value("spells_by_element"),
-        "source", Ref("classes/spells"),
-        "terms", Arr(Obj("field", Arr(Value("data"), Value("element"))))
-      )),
+    client = createClientWithServerKey(key);
+  }
 
-      CreateIndex(Obj(
-        "name", Value("elements_of_spells"),
-        "source", Ref("classes/spells"),
-        "values", Arr(Obj("field", Arr(Value("data"), Value("element"))))
-      )),
-
-      CreateIndex(Obj(
-        "name", Value("spellbooks_by_owner"),
-        "source", Ref("classes/spellbooks"),
-        "terms", Arr(Obj("field", Arr(Value("data"), Value("owner"))))
-      )),
-
-      CreateIndex(Obj(
-        "name", Value("spells_by_spellbook"),
-        "source", Ref("classes/spells"),
-        "terms", Arr(Obj("field", Arr(Value("data"), Value("spellbook"))))
-      ))
-    )).get();
-
-    magicMissile = client.query(
-      Create(Ref("classes/spells"),
-        Obj("data",
-          Obj(
-            "name", Value("Magic Missile"),
-            "element", Value("arcane"),
-            "cost", Value(10))))
-    ).get().get(REF_FIELD);
-
-    fireball = client.query(
-      Create(Ref("classes/spells"),
-        Obj("data",
-          Obj(
-            "name", Value("Fireball"),
-            "element", Value("fire"),
-            "cost", Value(10))))
-    ).get().get(REF_FIELD);
-
-    faerieFire = client.query(
-      Create(Ref("classes/spells"),
-        Obj("data",
-          Obj(
-            "name", Value("Faerie Fire"),
-            "cost", Value(10),
-            "element", Arr(
-              Value("arcane"),
-              Value("nature")
-            ))))
-    ).get().get(REF_FIELD);
-
-    summon = client.query(
-      Create(Ref("classes/spells"),
-        Obj("data",
-          Obj(
-            "name", Value("Summon Animal Companion"),
-            "element", Value("nature"),
-            "cost", Value(10))))
-    ).get().get(REF_FIELD);
-
-    thor = client.query(
-      Create(Ref("classes/characters"),
-        Obj("data", Obj("name", Value("Thor"))))
-    ).get().get(REF_FIELD);
-
-    RefV thorsSpellbook = client.query(
-      Create(Ref("classes/spellbooks"),
-        Obj("data",
-          Obj("owner", thor)))
-    ).get().get(REF_FIELD);
-
-    thorSpell1 = client.query(
-      Create(Ref("classes/spells"),
-        Obj("data",
-          Obj("spellbook", thorsSpellbook)))
-    ).get().get(REF_FIELD);
-
-    thorSpell2 = client.query(
-      Create(Ref("classes/spells"),
-        Obj("data",
-          Obj("spellbook", thorsSpellbook)))
-    ).get().get(REF_FIELD);
+  @AfterClass
+  public static void closeClients() throws Exception {
+    catching(rootClient.query(dropDatabase(DB_REF)), BadRequestException.class, constant(NULL)).get();
+    rootClient.close();
+    client.close();
   }
 
   @Test
@@ -864,22 +771,30 @@ public class ClientSpec extends FaunaDBTest {
     assertThat(identified.to(BOOLEAN).get(), is(false));
   }
 
-  private RefV onARandomClass() throws Exception {
-    Value clazz = client.query(
-      CreateClass(
-        Obj("name", Value(randomStartingWith("some_class_"))))
-    ).get();
-
-    return clazz.get(REF_FIELD);
+  @Override
+  protected ListenableFuture<Value> query(Expr expr) {
+    return client.query(expr);
   }
 
-  private String randomStartingWith(String... parts) {
-    StringBuilder builder = new StringBuilder();
-    for (String part : parts)
-      builder.append(part);
+  @Override
+  protected ListenableFuture<ImmutableList<Value>> query(List<? extends Expr> exprs) {
+    return client.query(exprs);
+  }
 
-    builder.append(Math.abs(new Random().nextLong()));
-    return builder.toString();
+  private static FaunaClient createFaunaClient(String secret) {
+    try {
+      return FaunaClient.builder()
+        .withEndpoint(ROOT_URL)
+        .withSecret(secret)
+        .build();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static FaunaClient createClientWithServerKey(Value serverKey) {
+    String secret = serverKey.at("secret").to(STRING).get();
+    return rootClient.newSessionClient(secret);
   }
 
 }

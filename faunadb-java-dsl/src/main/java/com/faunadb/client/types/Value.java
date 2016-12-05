@@ -1,6 +1,7 @@
 package com.faunadb.client.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -18,8 +19,8 @@ import org.joda.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import static com.faunadb.client.util.Objects.requireNonNull;
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
 
 /**
  * Represents any scalar or non-scalar value in the FaunaDB query language. FaunaDB value types consist of
@@ -157,6 +158,7 @@ public abstract class Value extends Expr {
   @JsonDeserialize(using = JsonDeserializer.None.class) // Disables generic value deserializer for scalar values
   static abstract class ScalarValue<T> extends Value {
 
+    @JsonIgnore
     final T value;
 
     ScalarValue(T value) {

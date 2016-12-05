@@ -21,3 +21,6 @@ notifications:
 branches:
   only:
   - master
+script:
+  sbt "android:package" test
+

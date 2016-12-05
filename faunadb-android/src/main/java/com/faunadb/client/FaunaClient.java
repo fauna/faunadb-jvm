@@ -1,6 +1,5 @@
 package com.faunadb.client;
 
-import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -9,21 +8,22 @@ import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
-import com.faunadb.common.Connection;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Response;
+import com.google.common.util.concurrent.SettableFuture;
 
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import okhttp3.*;
 
 import static com.faunadb.client.types.Codec.VALUE;
 import static com.google.common.util.concurrent.Futures.transform;
@@ -45,12 +45,18 @@ import static com.google.common.util.concurrent.Futures.transform;
  *
  * @see com.faunadb.client.query.Language
  */
-public class FaunaClient implements AutoCloseable {
+public class FaunaClient {
 
-  private static final String UTF8 = "UTF-8";
+  private static final int INITIAL_REF_COUNT = 0;
+  private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
+  private static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
+
+  private final AtomicInteger refCount;
 
   /**
    * Creates a new {@link Builder}
+   *
+   * @return a new {@link Builder}
    */
   public static Builder builder() {
     return new Builder();
@@ -63,8 +69,7 @@ public class FaunaClient implements AutoCloseable {
 
     private String secret;
     private URL endpoint;
-    private MetricRegistry registry;
-    private AsyncHttpClient httpClient;
+    private OkHttpClient httpClient;
 
     private Builder() {
     }
@@ -85,6 +90,7 @@ public class FaunaClient implements AutoCloseable {
      *
      * @param endpoint the root endpoint URL
      * @return this {@link Builder} object
+     * @throws java.net.MalformedURLException when an invalid string is passed
      */
     public Builder withEndpoint(String endpoint) throws MalformedURLException {
       this.endpoint = new URL(endpoint);
@@ -92,68 +98,76 @@ public class FaunaClient implements AutoCloseable {
     }
 
     /**
-     * Sets a {@link MetricRegistry} that the {@link FaunaClient} will use to register and track Connection-level
-     * statistics.
-     *
-     * @param registry the MetricRegistry instance.
-     * @return this {@link Builder} object
-     */
-    public Builder withMetrics(MetricRegistry registry) {
-      this.registry = registry;
-      return this;
-    }
-
-    /**
-     * Sets a custom {@link AsyncHttpClient} implementation that the built {@link FaunaClient} will use.
+     * Sets a custom {@link OkHttpClient} implementation that the built {@link FaunaClient} will use.
      * This custom implementation can be provided to control the behavior of the underlying HTTP transport.
      *
-     * @param httpClient the custom {@link AsyncHttpClient} instance
+     * @param httpClient the custom {@link OkHttpClient} instance
      * @return this {@link Builder} object
      */
-    public Builder withHttpClient(AsyncHttpClient httpClient) {
+    public Builder withHttpClient(OkHttpClient httpClient) {
       this.httpClient = httpClient;
       return this;
     }
 
     /**
      * Returns a newly constructed {@link FaunaClient} with configuration based on the settings of this {@link Builder}.
+     *
+     * @return a new {@link FaunaClient}
      */
     public FaunaClient build() {
-      Connection.Builder builder = Connection.builder()
-        .withAuthToken(secret)
-        .withFaunaRoot(endpoint);
+      if (httpClient == null) {
+        return new FaunaClient(new OkHttpClient.Builder()
+                .connectTimeout(DEFAULT_CONNECTION_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+                .readTimeout(DEFAULT_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+                .writeTimeout(DEFAULT_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+                .retryOnConnectionFailure(true)
+                .build(), endpoint, secret);
+      }
 
-      if (registry != null) builder.withMetrics(registry);
-      if (httpClient != null) builder.withHttpClient(httpClient);
-
-      return new FaunaClient(builder.build());
+      return new FaunaClient(httpClient, endpoint, secret);
     }
   }
 
   private final ObjectMapper json = new ObjectMapper().registerModule(new GuavaModule());
-  private final Connection connection;
+  private final OkHttpClient client;
+  private final URL endpoint;
+  private final String authHeader;
 
-  private FaunaClient(Connection connection) {
-    this.connection = connection;
+  private FaunaClient(OkHttpClient client, URL endpoint, String secret) {
+    this(new AtomicInteger(INITIAL_REF_COUNT), client, endpoint, secret);
+  }
+
+  private FaunaClient(AtomicInteger refCount, OkHttpClient client, URL endpoint, String secret) {
+    this.refCount = refCount;
+    this.client = client;
+    this.endpoint = endpoint;
+    this.authHeader = Credentials.basic(secret, "");
+
+    this.refCount.incrementAndGet();
   }
 
   /**
    * Creates a session client with the user secret provided. Queries submited to a session client will be
-   * authenticated with the secret provided. A session client shares its parent's {@link Connection} instance.
+   * authenticated with the secret provided.
    *
    * @param secret user secret for the session client
    * @return a new {@link FaunaClient}
    */
   public FaunaClient newSessionClient(String secret) {
-    return new FaunaClient(connection.newSessionConnection(secret));
+    if (refCount.get() > 0)
+      return new FaunaClient(refCount, client, endpoint, secret);
+    else
+      throw new IllegalStateException("Can not create a session connection from a closed http connection");
   }
 
   /**
-   * Frees any resources held by the client. Also closes the underlying {@link Connection}.
+   * Frees any resources held by the client. Also closes the underlying {@link OkHttpClient}.
    */
-  @Override
-  public void close() {
-    connection.close();
+  public void close() throws IOException {
+    if (refCount.decrementAndGet() == 0) {
+      client.dispatcher().executorService().shutdown();
+      client.connectionPool().evictAll();
+    }
   }
 
   /**
@@ -196,27 +210,42 @@ public class FaunaClient implements AutoCloseable {
 
   private ListenableFuture<Value> performRequest(JsonNode body) {
     try {
-      return handleNetworkExceptions(transform(connection.post("/", body), new Function<Response, Value>() {
+      Request request = new Request.Builder()
+              .url(endpoint)
+              .post(RequestBody.create(MediaType.parse("application/json"), json.writeValueAsString(body)))
+              .addHeader("Authorization", authHeader)
+              .build();
+
+      final SettableFuture<Value> rv = SettableFuture.create();
+
+      client.newCall(request).enqueue(new Callback() {
         @Override
-        public Value apply(Response response) {
+        public void onFailure(Call call, IOException ex) {
+          rv.setException(ex);
+        }
+
+        @Override
+        public void onResponse(Call call, Response response) throws IOException {
           try {
             handleQueryErrors(response);
 
             JsonNode responseBody = parseResponseBody(response);
             JsonNode resource = responseBody.get("resource");
-            return json.treeToValue(resource, Value.class);
-          } catch (IOException ex) {
-            throw new AssertionError(ex);
+            rv.set(json.treeToValue(resource, Value.class));
+          } catch (Exception ex) {
+            rv.setException(ex);
           }
         }
-      }));
-    } catch (IOException ex) {
-      return Futures.immediateFailedFuture(ex);
+      });
+
+      return handleNetworkExceptions(rv);
+    } catch (Exception ex) {
+      return Futures.immediateCancelledFuture();
     }
   }
 
   private void handleQueryErrors(Response response) throws FaunaException {
-    int status = response.getStatusCode();
+    int status = response.code();
     if (status >= 300) {
       try {
         ArrayNode errors = (ArrayNode) parseResponseBody(response).get("errors");
@@ -270,6 +299,6 @@ public class FaunaClient implements AutoCloseable {
   }
 
   private JsonNode parseResponseBody(Response response) throws IOException {
-    return json.readTree(response.getResponseBody(UTF8));
+    return json.readTree(response.body().string());
   }
 }

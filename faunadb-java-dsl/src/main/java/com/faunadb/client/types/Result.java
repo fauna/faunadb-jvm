@@ -183,6 +183,7 @@ public abstract class Result<T> {
   /**
    * Gets the result value or return the a default value if the operation has failed
    *
+   * @param defaultValue default value to return case this represents a failure
    * @return the result value of the default value
    */
   public abstract T getOrElse(T defaultValue);
