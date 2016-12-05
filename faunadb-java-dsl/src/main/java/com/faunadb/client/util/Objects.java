@@ -3,7 +3,7 @@ package com.faunadb.client.util;
 import java.util.Arrays;
 
 /**
- * Methods from {@link java.util.Objects} that doesn't exist in old versions of Android
+ * Methods from {@link java.util.Objects} that don't exist in old versions of Android
  */
 final public class Objects {
   private Objects() {
