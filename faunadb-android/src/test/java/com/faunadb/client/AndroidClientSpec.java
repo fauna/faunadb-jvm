@@ -2,8 +2,10 @@ package com.faunadb.client;
 
 import com.faunadb.client.dsl.DslSpec;
 import com.faunadb.client.errors.BadRequestException;
+import com.faunadb.client.errors.PermissionDeniedException;
 import com.faunadb.client.errors.UnauthorizedException;
 import com.faunadb.client.query.Expr;
+import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -63,6 +65,17 @@ public class AndroidClientSpec extends DslSpec {
     } finally {
       client.close();
     }
+  }
+
+  @Test
+  public void shouldThrowPermissionDeniedException() throws Exception {
+    thrown.expectCause(isA(PermissionDeniedException.class));
+
+    Value key = rootClient.query(Create(Ref("keys"), Obj("database", DB_REF, "role", Value("client")))).get();
+
+    FaunaClient client = createFaunaClient(key.get(Field.at("secret").to(STRING)));
+
+    client.query(Paginate(Ref("databases"))).get();
   }
 
   @Test

@@ -59,6 +59,14 @@ class UnauthorizedException(response: Option[QueryErrorResponse], message: Strin
   def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
 }
 
+/**
+  * An exception thrown if FaunaDB responds with an HTTP 403.
+  */
+class PermissionDeniedException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
+  def this(message: String) = this(None, message)
+  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
+}
+
 class UnknownException(response: Option[QueryErrorResponse], message: String) extends FaunaException(message) {
   def this(message: String) = this(None, message)
   def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
