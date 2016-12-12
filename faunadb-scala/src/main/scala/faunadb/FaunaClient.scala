@@ -154,6 +154,7 @@ class FaunaClient(connection: Connection) {
           x match {
             case 400 => throw new BadRequestException(error)
             case 401 => throw new UnauthorizedException(error)
+            case 403 => throw new PermissionDeniedException(error)
             case 404 => throw new NotFoundException(error)
             case 500 => throw new InternalException(error)
             case 503 => throw new UnavailableException(error)

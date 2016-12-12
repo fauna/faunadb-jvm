@@ -1,6 +1,6 @@
 package faunadb
 
-import faunadb.errors.{ BadRequestException, NotFoundException, UnauthorizedException }
+import faunadb.errors.{ BadRequestException, NotFoundException, PermissionDeniedException, UnauthorizedException }
 import faunadb.query.TimeUnit._
 import faunadb.query._
 import faunadb.values._
@@ -88,6 +88,13 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "echo values" in {
     await(client.query(ObjectV("foo" -> StringV("bar")))) should equal (ObjectV("foo" -> StringV("bar")))
     await(client.query("qux")) should equal (StringV("qux"))
+  }
+
+  it should "fail with permission denied" in {
+    val key = await(rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "client"))))
+    val client = FaunaClient(endpoint = config("root_url"), secret = key(SecretField).get)
+
+    an[PermissionDeniedException] should be thrownBy (await(client.query(Paginate(Ref("databases")))))
   }
 
   it should "fail with unauthorized" in {

@@ -233,6 +233,8 @@ public class FaunaClient implements AutoCloseable {
             throw new BadRequestException(errorResponse);
           case 401:
             throw new UnauthorizedException(errorResponse);
+          case 403:
+            throw new PermissionDeniedException(errorResponse);
           case 404:
             throw new NotFoundException(errorResponse);
           case 500:
