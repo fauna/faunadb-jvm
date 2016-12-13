@@ -41,7 +41,7 @@ public final class Connection implements AutoCloseable {
 
   static {
     try {
-      FAUNA_ROOT = new URL("https://cloud.faunadb.com");
+      FAUNA_ROOT = new URL("https://db.fauna.com");
     } catch (MalformedURLException e) {
       throw new IOError(e); // won't happen
     }
@@ -71,7 +71,7 @@ public final class Connection implements AutoCloseable {
     /**
      * Sets the FaunaDB root URL for the built {@link Connection}.
      *
-     * @param root the root URL, as a RFC 2396 formatted string. Example: https://cloud.faunadb.com
+     * @param root the root URL, as a RFC 2396 formatted string. Example: https://db.fauna.com
      * @return this {@link Builder} object
      * @throws MalformedURLException if {@code root} is not RFC 2396.
      */

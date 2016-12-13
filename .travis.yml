@@ -11,7 +11,7 @@ after_success:
 env:
   global:
   - secure: RNx7z4itvtYrnMEoK0tyvOswJ99W8EObq1lgiu04SEmfB+Yh/rh6BOWxTRUXFJO2d/CgUVvmW6mcAUHFzXYq0hperXdDqJjbyaagF8GcJ6NRZVz4W1KbdFU9XaMcO9fmJdf0r3bEkpPAmxIqwR5Va0dEEebb6wiRmhlyqYYAB0LarpeLd8PCLaZAUjp/4q8lZ8yewIboJbevWdPafYfm8i8iQJxKFhrnwtq4nB59iDXujWEBJoKr1pSvGv2V9H5tKydK+AYkwpJ1ceVPgQpxNepeLFNkgCzIrZzinfyAin8I+Y2oEGukFQeemATXwHGj4kJ8AilEktOiAqrxnZKU1dn2pB880A8PtRXztS+sQ3knqFOJoJlMoDz0oEKZ2Bat8sOpGJcKZ5NioYYd5cOULDkkEjq0pWeOOb58eJQbUmkX/Z1u6hvlpFtid6+95/Q/wuC1josE5Drqy1jS7hjWhIU4g2xZ5X0VRtyiBGiEAz5A841Y5v++/eqePji9GcuvR0awxKwl6ibZrDHU8Pvcgl3LL+pC76nnP1G16caUBMSTDQ8C/jpqLYU5iJvGVZx3c+3A7q65UUl102xYnBEUfk//9K/WZo17gU0XgxkYaZHA5XDF3I55ekg/cIvKUi7J+5H0PJOI6+/YxbgtoeXYGGl49KX76gGIzk6P1oRYJ7E=
-  - FAUNA_DOMAIN=cloud.faunadb.com
+  - FAUNA_DOMAIN=db.fauna.com
   - FAUNA_SCHEME=https
   - FAUNA_PORT=443
 notifications:
