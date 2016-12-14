@@ -19,7 +19,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val rootKey = Option(System.getenv("FAUNA_ROOT_KEY")) getOrElse {
       throw new RuntimeException("FAUNA_ROOT_KEY must defined to run tests")
     }
-    val domain = Option(System.getenv("FAUNA_DOMAIN")) getOrElse { "cloud.faunadb.com" }
+    val domain = Option(System.getenv("FAUNA_DOMAIN")) getOrElse { "db.fauna.com" }
     val scheme = Option(System.getenv("FAUNA_SCHEME")) getOrElse { "https" }
     val port = Option(System.getenv("FAUNA_PORT")) getOrElse { "443" }
 

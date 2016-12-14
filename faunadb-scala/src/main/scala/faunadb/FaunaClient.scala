@@ -25,7 +25,7 @@ object FaunaClient {
     *
     *
     * @param secret The secret material of the auth key used. See [[https://fauna.com/documentation#authentication-key_access]]
-    * @param endpoint URL of the FaunaDB service to connect to. Defaults to https://cloud.faunadb.com
+    * @param endpoint URL of the FaunaDB service to connect to. Defaults to https://db.fauna.com
     * @param metrics An optional [[com.codahale.metrics.MetricRegistry]] to record stats.
     * @param httpClient An optional custom [[com.ning.http.client.AsyncHttpClient]].
     * @return A configured FaunaClient instance.
