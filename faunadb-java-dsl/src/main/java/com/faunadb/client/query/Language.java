@@ -495,6 +495,15 @@ public final class Language {
   }
 
   /**
+   * Creates a new Get expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
+   */
+  public static Expr Get(Expr ref, Expr timestamp) {
+    return Fn.apply("get", ref, "ts", timestamp);
+  }
+
+  /**
    * Creates a new Paginate expression.
    *
    * @see Pagination

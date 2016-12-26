@@ -1,6 +1,7 @@
 0.3.4-SNAPSHOT
 * Adds support to Android 4.1
 * Change default cloud url to https://db.fauna.com
+* Adds optional timestamp parameter to Get function
 
 0.3.3
 * Removing count function from all drivers
