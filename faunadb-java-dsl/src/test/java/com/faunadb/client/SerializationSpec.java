@@ -355,6 +355,11 @@ public class SerializationSpec {
       Get(Ref("classes/spells/104979509692858368")),
       "{\"get\":{\"@ref\":\"classes/spells/104979509692858368\"}}"
     );
+
+    assertJson(
+      Get(Ref("classes/spells/104979509692858368"), Value(new Instant(0))),
+      "{\"get\":{\"@ref\":\"classes/spells/104979509692858368\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}}"
+    );
   }
 
   @Test
