@@ -480,4 +480,10 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val identifyR = await(identifyF)
     identifyR.to[Boolean].get shouldBe true
   }
+
+  it should "find key by secret" in {
+    val key = await(rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "admin"))))
+
+    await(rootClient.query(KeyFromSecret(key(SecretField).get))) should equal(await(rootClient.query(Get(key(RefField).get))))
+  }
 }

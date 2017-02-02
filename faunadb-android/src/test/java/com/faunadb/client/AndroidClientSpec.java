@@ -25,6 +25,7 @@ import static com.faunadb.client.types.Codec.STRING;
 import static com.faunadb.client.types.Value.NullV.NULL;
 import static com.google.common.base.Functions.constant;
 import static com.google.common.util.concurrent.Futures.*;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
@@ -122,6 +123,18 @@ public class AndroidClientSpec extends DslSpec {
     } finally {
       sessionClient.close();
     }
+  }
+
+  @Test
+  public void shouldGetKeyFromSecret() throws Exception {
+    Value key = rootClient.query(
+      CreateKey(Obj("database", DB_REF, "role", Value("server")))
+    ).get();
+
+    Value secret = key.at("secret");
+
+    assertThat(rootClient.query(Get(key.get(REF_FIELD))).get(),
+      equalTo(rootClient.query(KeyFromSecret(secret)).get()));
   }
 
   @Override

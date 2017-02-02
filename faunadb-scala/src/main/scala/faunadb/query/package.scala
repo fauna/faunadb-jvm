@@ -264,6 +264,14 @@ package object query {
     Expr(ObjectV("get" -> resource.value, "ts" -> ts.value))
 
   /**
+    * A KeyFromSecret expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#read_functions]]
+    */
+  def KeyFromSecret(secret: Expr) =
+    Expr(ObjectV("key_from_secret" -> secret.value))
+
+  /**
    * A Paginate expression.
    *
    * '''Reference''': [[https://fauna.com/documentation/queries#read_functions]]
