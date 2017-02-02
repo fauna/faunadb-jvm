@@ -1,9 +1,9 @@
 # FaunaDB JVM Drivers
 
-[![Build Status](https://img.shields.io/travis/faunadb/faunadb-jvm/master.svg?maxAge=21600)](https://travis-ci.org/faunadb/faunadb-jvm)
-[![Coverage Status](https://img.shields.io/codecov/c/github/faunadb/faunadb-jvm/master.svg?maxAge=21600)](https://codecov.io/gh/faunadb/faunadb-jvm/branch/master)
+[![Build Status](https://img.shields.io/travis/fauna/faunadb-jvm/master.svg?maxAge=21600)](https://travis-ci.org/fauna/faunadb-jvm)
+[![Coverage Status](https://img.shields.io/codecov/c/github/fauna/faunadb-jvm/master.svg?maxAge=21600)](https://codecov.io/gh/fauna/faunadb-jvm/branch/master)
 [![Maven Central](https://img.shields.io/maven-central/v/com.faunadb/faunadb-common.svg?maxAge=21600)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.faunadb%22)
-[![License](https://img.shields.io/badge/license-MPL_2.0-blue.svg?maxAge=2592000)](https://raw.githubusercontent.com/faunadb/faunadb-jvm/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MPL_2.0-blue.svg?maxAge=2592000)](https://raw.githubusercontent.com/fauna/faunadb-jvm/master/LICENSE)
 
 This repository contains the FaunaDB drivers for the JVM languages. Currently, Java, Android and Scala clients are implemented.
 
@@ -58,9 +58,9 @@ libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "0.3.3")
 
 Javadocs and Scaladocs are hosted on GitHub:
 
-* [faunadb-java](http://faunadb.github.io/faunadb-jvm/0.3.3/faunadb-java/api/)
-* [faunadb-android](http://faunadb.github.io/faunadb-jvm/0.3.3/faunadb-android/api/)
-* [faunadb-scala](http://faunadb.github.io/faunadb-jvm/0.3.3/faunadb-scala/api/)
+* [faunadb-java](http://fauna.github.io/faunadb-jvm/0.3.3/faunadb-java/api/)
+* [faunadb-android](http://fauna.github.io/faunadb-jvm/0.3.3/faunadb-android/api/)
+* [faunadb-scala](http://fauna.github.io/faunadb-jvm/0.3.3/faunadb-scala/api/)
 
 ## Dependencies
 

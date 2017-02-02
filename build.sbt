@@ -17,17 +17,17 @@ val metricsDocUrl = s"http://dropwizard.github.io/metrics/$metricsVersion/apidoc
 val jodaDocUrl = "http://www.joda.org/joda-time/apidocs/"
 val okHttpDocUrl = "https://square.github.io/okhttp/3.x/okhttp/"
 
-val commonApiUrl = s"http://faunadb.github.io/faunadb-jvm/$driverVersion/faunadb-common/api/"
-val scalaApiUrl = s"http://faunadb.github.io/faunadb-jvm/$driverVersion/faunadb-scala/api/"
-val javaDslApiUrl = s"http://faunadb.github.io/faunadb-jvm/$driverVersion/faunadb-java-dsl/api/"
-val javaApiUrl = s"http://faunadb.github.io/faunadb-jvm/$driverVersion/faunadb-java/api/"
-val javaAndroidApiUrl = s"http://faunadb.github.io/faunadb-jvm/$driverVersion/faunadb-android/api/"
+val commonApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-common/api/"
+val scalaApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-scala/api/"
+val javaDslApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-java-dsl/api/"
+val javaApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-java/api/"
+val javaAndroidApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-android/api/"
 
 lazy val publishSettings = Seq(
   version := driverVersion,
   organization := "com.faunadb",
   licenses := Seq("Mozilla Public License" -> url("https://www.mozilla.org/en-US/MPL/2.0/")),
-  homepage := Some(url("https://github.com/faunadb/faunadb-jvm")),
+  homepage := Some(url("https://github.com/fauna/faunadb-jvm")),
   publishMavenStyle := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
@@ -41,8 +41,8 @@ lazy val publishSettings = Seq(
   },
   pomExtra := (
     <scm>
-      <url>git@github.com:faunadb/faunadb-jvm.git</url>
-      <connection>scm:git:git@github.com:faunadb/faunadb-jvm.git</connection>
+      <url>git@github.com:fauna/faunadb-jvm.git</url>
+      <connection>scm:git:git@github.com:fauna/faunadb-jvm.git</connection>
     </scm>
     <developers>
       <developer>
