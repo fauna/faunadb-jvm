@@ -324,6 +324,15 @@ public final class Language {
   }
 
   /**
+   * Creates a new At expression
+   *
+   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   */
+  public static Expr At(Expr timestamp, Expr expr) {
+    return Fn.apply("at", timestamp, "expr", expr);
+  }
+
+  /**
    * Creates a new Let expression wrapping the provided map of bindings.
    *
    * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
