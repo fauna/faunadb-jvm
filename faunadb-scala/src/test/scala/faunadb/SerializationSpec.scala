@@ -72,6 +72,8 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val lambda4 = Lambda(Not(_))
     json.writeValueAsString(lambda4) should equal ("""{"lambda":"x$3","expr":{"not":{"var":"x$3"}}}""")
+
+    json.writeValueAsString(At(1L, Get(Ref("classes")))) should equal ("""{"at":1,"expr":{"get":{"@ref":"classes"}}}""")
   }
 
   it should "serialize collections" in {

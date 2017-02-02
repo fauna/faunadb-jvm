@@ -34,6 +34,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   // Helper fields
 
   val RefField = Field("ref").to[RefV]
+  val TsField = Field("ts").to[Long]
   val ClassField = Field("class").to[RefV]
   val SecretField = Field("secret").to[String]
 
@@ -145,6 +146,24 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     results.length shouldBe 2
     results(0)("data", "queryTest1").to[String].get shouldBe randomText1
     results(1)("data", "queryTest1").to[String].get shouldBe randomText2
+  }
+
+  it should "get at timestamp" in {
+    val randomClassName = Random.alphanumeric.take(8).mkString
+    val randomClass = await(client.query(CreateClass(Obj("name" -> randomClassName))))
+
+    val data = await(client.query(Create(randomClass(RefField).get, Obj("data" -> Obj("x" -> 1)))))
+    val dataRef = data(RefField).get
+
+    val ts1 = data(TsField).get
+    val ts2 = await(client.query(Update(dataRef, Obj("data" -> Obj("x" -> 2)))))(TsField).get
+    val ts3 = await(client.query(Update(dataRef, Obj("data" -> Obj("x" -> 3)))))(TsField).get
+
+    val xField = Field("data", "x").to[Long]
+
+    await(client.query(At(ts1, Get(dataRef))))(xField).get should equal(1)
+    await(client.query(At(ts2, Get(dataRef))))(xField).get should equal(2)
+    await(client.query(At(ts3, Get(dataRef))))(xField).get should equal(3)
   }
 
   it should "issue a paginated query" in {

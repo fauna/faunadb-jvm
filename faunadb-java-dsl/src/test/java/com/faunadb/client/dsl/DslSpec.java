@@ -51,6 +51,7 @@ public abstract class DslSpec {
   public ExpectedException thrown = ExpectedException.none();
 
   protected static final Field<Value> DATA = Field.at("data");
+  protected static final Field<Long> TS_FIELD = Field.at("ts").to(LONG);
   protected static final Field<RefV> REF_FIELD = Field.at("ref").to(REF);
   protected static final Field<RefV> RESOURCE_FIELD = Field.at("resource").to(REF);
   protected static final Field<ImmutableList<RefV>> REF_LIST = DATA.collect(Field.as(REF));
@@ -838,6 +839,20 @@ public abstract class DslSpec {
   public void shouldGetNextId() throws Exception {
     Value res = query(NextId()).get();
     assertThat(res.to(STRING).get(), notNullValue());
+  }
+
+  @Test
+  public void shouldPaginateAtTimestamp() throws Exception {
+    Value summonData = query(Get(summon)).get();
+
+    long beforeSummon = summonData.get(TS_FIELD) - 1;
+
+    Value allSpells = query(
+      At(Value(beforeSummon), Paginate(Match(Index(Value("all_spells")))))
+    ).get();
+
+    assertThat(allSpells.get(REF_LIST),
+      contains(magicMissile, fireball, faerieFire));
   }
 
   protected RefV onARandomClass() throws Exception {

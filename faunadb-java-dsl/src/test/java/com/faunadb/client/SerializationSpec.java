@@ -885,6 +885,13 @@ public class SerializationSpec {
     assertJson(Not(Value(true)), "{\"not\":true}");
   }
 
+  @Test
+  public void shouldSerializeAt() throws Exception {
+    assertJson(At(Value(1L), Get(Ref("classes"))), "{\"at\":1,\"expr\":{\"get\":{\"@ref\":\"classes\"}}}");
+    assertJson(At(Time(Value("1970-01-01T00:00:00+00:00")), Get(Ref("classes"))),
+      "{\"at\":{\"time\":\"1970-01-01T00:00:00+00:00\"},\"expr\":{\"get\":{\"@ref\":\"classes\"}}}");
+  }
+
   private void assertJson(Expr expr, String jsonString) throws JsonProcessingException {
     assertThat(json.writeValueAsString(expr),
       equalTo(jsonString));

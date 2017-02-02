@@ -131,6 +131,14 @@ package object query {
   // Basic Forms
 
   /**
+    * A At expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
+    */
+  def At(timestamp: Expr, expr: Expr) =
+    Expr(ObjectV("at" -> timestamp.value, "expr" -> expr.value))
+
+  /**
     * A Let expression.
     *
     * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
