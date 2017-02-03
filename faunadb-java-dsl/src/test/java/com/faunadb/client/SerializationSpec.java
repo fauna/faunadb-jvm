@@ -363,6 +363,11 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeKeyFromSecret() throws Exception {
+    assertJson(KeyFromSecret(Value("s3cr3t")), "{\"key_from_secret\":\"s3cr3t\"}");
+  }
+
+  @Test
   public void shouldSerializePaginate() throws Exception {
     assertJson(
       Paginate(Ref("databases")),

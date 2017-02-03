@@ -513,6 +513,15 @@ public final class Language {
   }
 
   /**
+   * Creates a new KeyFromSecret expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
+   */
+  public static Expr KeyFromSecret(Expr secret) {
+    return Fn.apply("key_from_secret", secret);
+  }
+
+  /**
    * Creates a new Paginate expression.
    *
    * @see Pagination

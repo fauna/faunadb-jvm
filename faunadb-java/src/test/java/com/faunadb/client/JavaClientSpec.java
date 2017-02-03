@@ -783,6 +783,18 @@ public class JavaClientSpec extends DslSpec {
     assertThat(identified.to(BOOLEAN).get(), is(false));
   }
 
+  @Test
+  public void shouldGetKeyFromSecret() throws Exception {
+    Value key = rootClient.query(
+      CreateKey(Obj("database", DB_REF, "role", Value("server")))
+    ).get();
+
+    Value secret = key.at("secret");
+
+    assertThat(rootClient.query(Get(key.get(REF_FIELD))).get(),
+      equalTo(rootClient.query(KeyFromSecret(secret)).get()));
+  }
+
   @Override
   protected ListenableFuture<Value> query(Expr expr) {
     return client.query(expr);
