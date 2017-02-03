@@ -855,6 +855,13 @@ public abstract class DslSpec {
       contains(magicMissile, fireball, faerieFire));
   }
 
+  @Test
+  public void shouldEchoBytes() throws Exception {
+    Value bytes = query(Value(new byte[] {0x1, 0x2, 0x3, 0x4})).get();
+
+    assertThat(bytes, equalTo(Value(new byte[] {0x1, 0x2, 0x3, 0x4})));
+  }
+
   protected RefV onARandomClass() throws Exception {
 
     Value clazz = query(

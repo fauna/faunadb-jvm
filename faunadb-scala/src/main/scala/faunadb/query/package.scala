@@ -38,6 +38,7 @@ package query {
     implicit def doubleToExpr(unwrapped: Double) = Expr(DoubleV(unwrapped))
     implicit def refToExpr(unwrapped: RefV) = Expr(unwrapped)
     implicit def nullVToExpr(unwrapped: NullV.type) = Expr(unwrapped)
+    implicit def byteArrayToExpr(unwrapped: Array[Byte]) = Expr(BytesV(unwrapped))
 
     // FIXME: not sure if this is the best way to do this... would
     // rather transform the value to a series of object constructions.

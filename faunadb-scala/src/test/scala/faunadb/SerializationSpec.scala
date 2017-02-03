@@ -28,6 +28,19 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(NullV) shouldBe "null"
   }
 
+  it should "serialize bytes" in {
+    json.writeValueAsString(BytesV(0x1, 0x2, 0x3, 0x4)) shouldBe "{\"@bytes\":\"AQIDBA==\"}"
+
+    json.writeValueAsString(BytesV(0xf8)) shouldBe "{\"@bytes\":\"-A==\"}"
+    json.writeValueAsString(BytesV(0xf9)) shouldBe "{\"@bytes\":\"-Q==\"}"
+    json.writeValueAsString(BytesV(0xfa)) shouldBe "{\"@bytes\":\"-g==\"}"
+    json.writeValueAsString(BytesV(0xfb)) shouldBe "{\"@bytes\":\"-w==\"}"
+    json.writeValueAsString(BytesV(0xfc)) shouldBe "{\"@bytes\":\"_A==\"}"
+    json.writeValueAsString(BytesV(0xfd)) shouldBe "{\"@bytes\":\"_Q==\"}"
+    json.writeValueAsString(BytesV(0xfe)) shouldBe "{\"@bytes\":\"_g==\"}"
+    json.writeValueAsString(BytesV(0xff)) shouldBe "{\"@bytes\":\"_w==\"}"
+  }
+
   it should "serialize complex values" in {
     json.writeValueAsString(Arr(1, "test")) shouldBe "[1,\"test\"]"
     json.writeValueAsString(Arr(Arr(Obj("test" -> "value"), 2323, true), "hi", Obj("test" -> "yo", "test2" -> NullV))) shouldBe "[[{\"object\":{\"test\":\"value\"}},2323,true],\"hi\",{\"object\":{\"test\":\"yo\",\"test2\":null}}]"

@@ -3,6 +3,7 @@ package com.faunadb.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.types.Value;
+import com.faunadb.client.types.Value.BytesV;
 import com.faunadb.client.types.Value.RefV;
 import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Optional;
@@ -165,6 +166,23 @@ public class DeserializationSpec {
     assertThat(set.get("terms").to(STRING).get(), equalTo("fire"));
     assertThat(set.get("match").to(REF).get(),
       equalTo(new RefV("indexes/spells_by_element")));
+  }
+
+  @Test
+  public void shouldDeserializeBytes() throws Exception {
+    assertThat(parsed("{\"@bytes\":\"AQIDBA==\"}").to(BYTES).get(), equalTo(new byte[]{0x1, 0x2, 0x3, 0x4}));
+  }
+
+  @Test
+  public void shouldDeserializeBytesUrlSafe() throws Exception {
+    assertThat(parsed("{\"@bytes\":\"-A==\"}").to(BYTES).get(), equalTo(new byte[] {(byte)0xf8}));
+    assertThat(parsed("{\"@bytes\":\"-Q==\"}").to(BYTES).get(), equalTo(new byte[] {(byte)0xf9}));
+    assertThat(parsed("{\"@bytes\":\"-g==\"}").to(BYTES).get(), equalTo(new byte[] {(byte)0xfa}));
+    assertThat(parsed("{\"@bytes\":\"-w==\"}").to(BYTES).get(), equalTo(new byte[] {(byte)0xfb}));
+    assertThat(parsed("{\"@bytes\":\"_A==\"}").to(BYTES).get(), equalTo(new byte[] {(byte)0xfc}));
+    assertThat(parsed("{\"@bytes\":\"_Q==\"}").to(BYTES).get(), equalTo(new byte[] {(byte)0xfd}));
+    assertThat(parsed("{\"@bytes\":\"_g==\"}").to(BYTES).get(), equalTo(new byte[] {(byte)0xfe}));
+    assertThat(parsed("{\"@bytes\":\"_w==\"}").to(BYTES).get(), equalTo(new byte[] {(byte)0xff}));
   }
 
   private Value parsed(String str) throws java.io.IOException {

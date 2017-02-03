@@ -68,6 +68,8 @@ class Deserializer {
           return json.convertValue(tree, TimeV.class);
         case "@date":
           return json.convertValue(tree, DateV.class);
+        case "@bytes":
+          return json.convertValue(tree, BytesV.class);
         case "@obj":
           return json.convertValue(tree.get("@obj"), ObjectV.class);
         default:

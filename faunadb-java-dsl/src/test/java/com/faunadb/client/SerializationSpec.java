@@ -173,6 +173,24 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeBytesValue() throws Exception {
+    assertJson(Value(new byte[] {0x1, 0x2, 0x3, 0x4}),
+      "{\"@bytes\":\"AQIDBA==\"}");
+  }
+
+  @Test
+  public void shouldSerializeBytesValueUrlSafe() throws Exception {
+    assertJson(Value(new byte[] {(byte)0xf8}), "{\"@bytes\":\"-A==\"}");
+    assertJson(Value(new byte[] {(byte)0xf9}), "{\"@bytes\":\"-Q==\"}");
+    assertJson(Value(new byte[] {(byte)0xfa}), "{\"@bytes\":\"-g==\"}");
+    assertJson(Value(new byte[] {(byte)0xfb}), "{\"@bytes\":\"-w==\"}");
+    assertJson(Value(new byte[] {(byte)0xfc}), "{\"@bytes\":\"_A==\"}");
+    assertJson(Value(new byte[] {(byte)0xfd}), "{\"@bytes\":\"_Q==\"}");
+    assertJson(Value(new byte[] {(byte)0xfe}), "{\"@bytes\":\"_g==\"}");
+    assertJson(Value(new byte[] {(byte)0xff}), "{\"@bytes\":\"_w==\"}");
+  }
+
+  @Test
   public void shouldSerializeLet() throws Exception {
     assertJson(
       Let(
