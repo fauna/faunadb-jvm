@@ -10,16 +10,21 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
 import com.faunadb.client.types.time.HighPrecisionTime;
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.*;
+import com.google.common.io.BaseEncoding;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static com.faunadb.client.util.Objects.requireNonNull;
+import static com.google.common.base.Joiner.on;
+import static com.google.common.collect.FluentIterable.from;
+import static com.google.common.primitives.Bytes.asList;
 import static java.lang.String.format;
 
 /**
@@ -479,4 +484,49 @@ public abstract class Value extends Expr {
     }
   }
 
+  /**
+   * Represents a blob value in the FaunaDB query language.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   */
+  public static final class BytesV extends ScalarValue<byte[]> {
+
+    public BytesV(byte[] bytes) {
+      super(bytes);
+    }
+
+    @JsonCreator
+    public BytesV(@JsonProperty("@bytes") String urlSafeBase64) {
+      super(BaseEncoding.base64Url().decode(urlSafeBase64));
+    }
+
+    @Override
+    @JsonProperty("@bytes")
+    protected Object toJson() {
+      return BaseEncoding.base64Url().encode(value);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      return other != null && other instanceof BytesV &&
+        Arrays.equals(this.value, ((BytesV) other).value);
+    }
+
+    @Override
+    public int hashCode() {
+      return value.hashCode();
+    }
+
+    @Override
+    public String toString() {
+      String str = from(asList(value)).transform(new Function<Byte, String>() {
+        @Override
+        public String apply(Byte input) {
+          return format("0x%02x", input);
+        }
+      }).join(on(", "));
+
+      return format("BytesV(%s)", str);
+    }
+  }
 }

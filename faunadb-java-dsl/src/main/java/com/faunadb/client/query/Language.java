@@ -234,6 +234,15 @@ public final class Language {
   }
 
   /**
+   * Creates a new Bytes value.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
+   */
+  public static Expr Value(byte[] bytes) {
+    return new BytesV(bytes);
+  }
+
+  /**
    * Creates a null value.
    *
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>

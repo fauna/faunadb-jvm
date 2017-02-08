@@ -93,4 +93,21 @@ class DeserializationSpec extends FlatSpec with Matchers {
 
     parsed should equal (DateV(new LocalDate(0, UTC).plusDays(2)))
   }
+
+  it should "deserialize bytes" in {
+    val bytes = json.readValue("{\"@bytes\":\"AQIDBA==\"}", classOf[Value])
+
+    bytes should equal (BytesV(0x1, 0x2, 0x3, 0x4))
+    bytes.to[BytesV].get should equal (BytesV(0x1, 0x2, 0x3, 0x4))
+    bytes.to[Array[Byte]].get should equal (Array[Byte](0x1, 0x2, 0x3, 0x4))
+
+    json.readValue("{\"@bytes\":\"-A==\"}", classOf[Value]) should equal (BytesV(0xf8))
+    json.readValue("{\"@bytes\":\"-Q==\"}", classOf[Value]) should equal (BytesV(0xf9))
+    json.readValue("{\"@bytes\":\"-g==\"}", classOf[Value]) should equal (BytesV(0xfa))
+    json.readValue("{\"@bytes\":\"-w==\"}", classOf[Value]) should equal (BytesV(0xfb))
+    json.readValue("{\"@bytes\":\"_A==\"}", classOf[Value]) should equal (BytesV(0xfc))
+    json.readValue("{\"@bytes\":\"_Q==\"}", classOf[Value]) should equal (BytesV(0xfd))
+    json.readValue("{\"@bytes\":\"_g==\"}", classOf[Value]) should equal (BytesV(0xfe))
+    json.readValue("{\"@bytes\":\"_w==\"}", classOf[Value]) should equal (BytesV(0xff))
+  }
 }

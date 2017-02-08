@@ -1,8 +1,11 @@
 package faunadb.values
 
+import java.nio.ByteBuffer
+
 import com.fasterxml.jackson.annotation.{ JsonIgnore, JsonProperty, JsonValue }
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.node.NullNode
+import com.google.common.io.BaseEncoding
 import faunadb.jackson._
 import faunadb.values.time._
 import org.joda.time.{ Instant, LocalDate }
@@ -161,6 +164,25 @@ case class DateV(@(JsonIgnore @param @field @getter) localDate: LocalDate) exten
 }
 object DateV {
   def apply(value: String): DateV = DateV(LocalDate.parse(value))
+}
+
+case class BytesV(@(JsonIgnore @param @field @getter) bytes: Array[Byte]) extends ScalarValue {
+  @JsonProperty("@bytes")
+  lazy val strValue = BaseEncoding.base64Url().encode(bytes)
+
+  override def equals(obj: Any): Boolean =
+    obj match {
+      case b: BytesV => ByteBuffer.wrap(bytes) == ByteBuffer.wrap(b.bytes)
+      case _ => false
+    }
+
+  override def hashCode(): Int = bytes.hashCode()
+
+  override def toString: String = bytes map { s => f"0x$s%02x" } mkString ("BytesV(", ", ", ")")
+}
+object BytesV {
+  def apply(bytes: Int*): BytesV = BytesV(bytes map { _.toByte } toArray)
+  def apply(value: String): BytesV = BytesV(BaseEncoding.base64Url().decode(value))
 }
 
 // Container types and Null

@@ -136,6 +136,22 @@ object Decoder {
       Field.collect(Field.to[T]).get(v)
   }
   implicit def SeqDecoder[T: Decoder]: Decoder[Seq[T]] = new SeqDecoder[T]
+
+  implicit object BytesVDecoder extends Decoder[BytesV] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case b: BytesV => Result.successful(b, path)
+        case v => Result.Unexpected(v, "Bytes", path)
+      }
+  }
+
+  implicit object ByteArrayDecoder extends Decoder[Array[Byte]] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case BytesV(b) => Result.successful(b, path)
+        case v => Result.Unexpected(v, "Bytes", path)
+      }
+  }
 }
 
 trait Encoder[T] {

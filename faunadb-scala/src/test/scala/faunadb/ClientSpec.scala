@@ -253,6 +253,8 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val set = await(setF).to[SetRefV].get
     set.parameters("match").to[RefV].get shouldBe RefV("indexes/spells_by_element")
     set.parameters("terms").to[String].get shouldBe "arcane"
+
+    await(client.query(Array[Byte](0x1, 0x2, 0x3, 0x4))) should equal (BytesV(0x1, 0x2, 0x3, 0x4))
   }
 
   it should "test basic forms" in {

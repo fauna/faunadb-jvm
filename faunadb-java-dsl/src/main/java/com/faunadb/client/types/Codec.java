@@ -132,6 +132,11 @@ public interface Codec<T> extends Function<Value, Result<T>> {
       return input.values;
     }
   });
+
+  /**
+   * Coerce a {@link Value} to an array of bytes
+   */
+  Codec<byte[]> BYTES = Cast.mapTo(BytesV.class, Cast.<BytesV, byte[]>scalarValue());
 }
 
 final class Cast {
