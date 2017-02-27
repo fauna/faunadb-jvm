@@ -27,7 +27,7 @@ Download from the Maven central repository:
   <dependency>
     <groupId>com.faunadb</groupId>
     <artifactId>faunadb-java</artifactId>
-    <version>0.3.3</version>
+    <version>0.4.0</version>
     <scope>compile</scope>
   </dependency>
   ...
@@ -42,7 +42,7 @@ Download from the Maven central repository:
   <dependency>
     <groupId>com.faunadb</groupId>
     <artifactId>faunadb-android</artifactId>
-    <version>0.3.3</version>
+    <version>0.4.0</version>
     <scope>compile</scope>
   </dependency>
   ...
@@ -51,16 +51,16 @@ Download from the Maven central repository:
 ### faunadb-scala/sbt
 
 ```scala
-libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "0.3.3")
+libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "0.4.0")
 ```
 
 ## Documentation
 
 Javadocs and Scaladocs are hosted on GitHub:
 
-* [faunadb-java](http://fauna.github.io/faunadb-jvm/0.3.3/faunadb-java/api/)
-* [faunadb-android](http://fauna.github.io/faunadb-jvm/0.3.3/faunadb-android/api/)
-* [faunadb-scala](http://fauna.github.io/faunadb-jvm/0.3.3/faunadb-scala/api/)
+* [faunadb-java](http://fauna.github.io/faunadb-jvm/0.4.0/faunadb-java/api/)
+* [faunadb-android](http://fauna.github.io/faunadb-jvm/0.4.0/faunadb-android/api/)
+* [faunadb-scala](http://fauna.github.io/faunadb-jvm/0.4.0/faunadb-scala/api/)
 
 ## Dependencies
 
