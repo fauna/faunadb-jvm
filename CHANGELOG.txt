@@ -1,8 +1,11 @@
-0.3.4-SNAPSHOT
+0.4.1-SNAPSHOT
+
+0.4.0
 * Adds support to @bytes type
 * Adds support to KeyFromSecret() function
 * Adds support to At() function
 * Adds support to Android 4.1
+* Downgrade async-http-client from verstion 2.0.2 to 1.9.39 to fully support Java 7
 * Change default cloud url to https://db.fauna.com
 * Adds optional timestamp parameter to Get function
 
