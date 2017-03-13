@@ -1,4 +1,5 @@
-0.4.1-SNAPSHOT
+1.0.0
+* Official release
 
 0.4.0
 * Adds support to @bytes type
