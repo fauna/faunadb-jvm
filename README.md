@@ -59,6 +59,7 @@ libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "1.0.0")
 Javadocs and Scaladocs are hosted on GitHub:
 
 * [faunadb-java](http://fauna.github.io/faunadb-jvm/1.0.0/faunadb-java/api/)
+* [faunadb-java-dsl](http://fauna.github.io/faunadb-jvm/1.0.0/faunadb-java-dsl/api/)
 * [faunadb-android](http://fauna.github.io/faunadb-jvm/1.0.0/faunadb-android/api/)
 * [faunadb-scala](http://fauna.github.io/faunadb-jvm/1.0.0/faunadb-scala/api/)
 
