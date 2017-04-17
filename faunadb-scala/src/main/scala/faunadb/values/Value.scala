@@ -185,6 +185,8 @@ object BytesV {
   def apply(value: String): BytesV = BytesV(BaseEncoding.base64Url().decode(value))
 }
 
+case class QueryV(@JsonProperty("@query") lambda: ObjectV) extends Value
+
 // Container types and Null
 
 /** An Object value. */

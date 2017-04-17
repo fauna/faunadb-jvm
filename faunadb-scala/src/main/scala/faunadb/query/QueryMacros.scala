@@ -48,4 +48,7 @@ class QueryMacros(val c: whitebox.Context) {
 
     tv
   }
+
+  def query(fn: c.Tree): c.Tree =
+    q"$M.Query(${lambda(fn)})"
 }

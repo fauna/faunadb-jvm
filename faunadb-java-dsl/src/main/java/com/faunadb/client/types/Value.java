@@ -529,4 +529,35 @@ public abstract class Value extends Expr {
       return format("BytesV(%s)", str);
     }
   }
+
+  /**
+   * Represents a query value in the FaunaDB query language.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   */
+  @JsonDeserialize(using = JsonDeserializer.None.class) // Disables generic value deserializer for query values
+  public static final class QueryV extends Value {
+
+    private Map<String, Object> lambda;
+
+    private QueryV(@JsonProperty("@query") Map<String, Object> lambda) {
+      this.lambda = lambda;
+    }
+
+    @Override
+    @JsonProperty("@query")
+    protected Map<String, Object> toJson() {
+      return lambda;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return obj != null && obj instanceof QueryV && lambda.equals(((QueryV)obj).lambda);
+    }
+
+    @Override
+    public int hashCode() {
+      return lambda.hashCode();
+    }
+  }
 }

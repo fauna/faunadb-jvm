@@ -3,7 +3,6 @@ package com.faunadb.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.types.Value;
-import com.faunadb.client.types.Value.BytesV;
 import com.faunadb.client.types.Value.RefV;
 import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Optional;

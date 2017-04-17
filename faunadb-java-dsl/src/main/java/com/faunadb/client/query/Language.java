@@ -333,6 +333,33 @@ public final class Language {
   }
 
   /**
+   * Creates a new Call expression
+   *
+   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   */
+  public static Expr Call(Expr ref, List<? extends  Expr> args) {
+    return Fn.apply("call", ref, "arguments", varargs(args));
+  }
+
+  /**
+   * Creates a new Call expression
+   *
+   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   */
+  public static Expr Call(Expr ref, Expr... args) {
+    return Call(ref, ImmutableList.copyOf(args));
+  }
+
+  /**
+   * Creates a new Query expression
+   *
+   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   */
+  public static Expr Query(Expr lambda) {
+    return Fn.apply("query", lambda);
+  }
+
+  /**
    * Creates a new At expression
    *
    * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
@@ -664,6 +691,15 @@ public final class Language {
    */
   public static Expr CreateIndex(Expr params) {
     return Fn.apply("create_index", params);
+  }
+
+  /**
+   * Creates a new Create Function expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   */
+  public static Expr CreateFunction(Expr params) {
+    return Fn.apply("create_function", params);
   }
 
   /**
