@@ -15,45 +15,6 @@ This repository contains the FaunaDB drivers for the JVM languages. Currently, J
 * Supports [Dropwizard Metrics](https://dropwizard.github.io/metrics/3.1.0/) hooks for stats reporting (except Android).
 * Support Android 4.1 (API level 16)
 
-## Installation
-
-Download from the Maven central repository:
-
-### faunadb-java/pom.xml:
-
-```xml
-  <dependencies>
-  ...
-  <dependency>
-    <groupId>com.faunadb</groupId>
-    <artifactId>faunadb-java</artifactId>
-    <version>1.0.0</version>
-    <scope>compile</scope>
-  </dependency>
-  ...
-</dependencies>
-```
-
-### faunadb-android/pom.xml:
-
-```xml
-  <dependencies>
-  ...
-  <dependency>
-    <groupId>com.faunadb</groupId>
-    <artifactId>faunadb-android</artifactId>
-    <version>1.0.0</version>
-    <scope>compile</scope>
-  </dependency>
-  ...
-</dependencies>
-```
-### faunadb-scala/sbt
-
-```scala
-libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "1.0.0")
-```
-
 ## Documentation
 
 Javadocs and Scaladocs are hosted on GitHub:
@@ -84,6 +45,103 @@ Javadocs and Scaladocs are hosted on GitHub:
 ### Scala
 
 * Scala 2.11.x
+
+## Using the Driver
+
+### Java
+
+#### Installation
+
+Download from the Maven central repository:
+
+##### faunadb-java/pom.xml:
+
+```xml
+  <dependencies>
+  ...
+  <dependency>
+    <groupId>com.faunadb</groupId>
+    <artifactId>faunadb-java</artifactId>
+    <version>1.0.0</version>
+    <scope>compile</scope>
+  </dependency>
+  ...
+</dependencies>
+```
+
+##### faunadb-android/pom.xml:
+
+```xml
+  <dependencies>
+  ...
+  <dependency>
+    <groupId>com.faunadb</groupId>
+    <artifactId>faunadb-android</artifactId>
+    <version>1.0.0</version>
+    <scope>compile</scope>
+  </dependency>
+  ...
+</dependencies>
+```
+
+##### Basic Usage
+
+```java
+import com.faunadb.client.*;
+import com.faunadb.client.types.*;
+import com.faunadb.client.types.Value.*;
+import com.google.common.collect.*;
+
+import static com.faunadb.client.query.Language.*;
+
+public class Main {
+  public static void main(String[] args) throws Exception {
+    FaunaClient client = FaunaClient.builder()
+      .withSecret("your-secret-here")
+      .build();
+
+    ImmutableList<RefV> indexes = client.query(Paginate(Ref("indexes"))).get()
+      .at("data").collect(Field.as(Codec.REF));
+
+    System.out.println(indexes);
+  }
+}
+
+```
+
+### Scala
+
+#### Installation
+
+##### faunadb-scala/sbt
+
+```scala
+libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "1.0.0")
+```
+
+##### Basic Usage
+
+```scala
+import faunadb.FaunaClient
+import faunadb.query._
+import faunadb.values._
+import scala.concurrent._
+import scala.concurrent.duration._
+
+object Main extends App {
+  import ExecutionContext.Implicits._
+
+  val client = FaunaClient(secret = "your-secret-here")
+
+  val indexes = client
+    .query(Paginate(Ref("indexes")))
+    .map(value => value("data").to[Seq[RefV]].get)
+
+  println(
+    Await.result(indexes, Duration.Inf)
+  )
+}
+```
 
 ## Building
 
