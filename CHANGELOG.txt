@@ -27,6 +27,9 @@
 0.3.2
 * Change default cloud url to https://cloud.faunadb.com
 
+0.3.1-1
+* Change default cloud url to https://cloud.faunadb.com
+
 0.3.1
 * Remove references to java.time.Instant. Using Joda-Time instead. See: http://www.joda.org/joda-time/
 * Fully support for high precision time implemented with com.faunadb.client.types.time.HighPrecisionTime
