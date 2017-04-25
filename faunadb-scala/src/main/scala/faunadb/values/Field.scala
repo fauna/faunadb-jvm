@@ -1,5 +1,8 @@
 package faunadb.values
 
+import scala.collection.generic.CanBuildFrom
+import scala.language.higherKinds
+
 case class ValueReadException(errors: List[FieldError]) extends Exception {
   override def getMessage = errors map { _.message } mkString ", "
 }
@@ -71,8 +74,8 @@ sealed abstract class Field[T] {
   def to[U](implicit ev: Field[T] =:= Field[Value], dec: Decoder[U]): Field[U] =
     new TypedField(ev(this), dec)
 
-  def collect[U](inner: Field[U])(implicit ev: Field[T] =:= Field[Value]): Field[Seq[U]] =
-    new CollectionField(ev(this), inner.get _)
+  def collect[U, Col[_]](inner: Field[U])(implicit ev: Field[T] =:= Field[Value], cbf: CanBuildFrom[_, U, Col[U]]): Field[Col[U]] =
+    new CollectionField(ev(this), cbf, inner.get _)
 }
 
 private[values] class SubField(parent: Field[Value], subpath: FieldPath) extends Field[Value] {
@@ -91,13 +94,13 @@ private[values] class MappedField[T, U](field: Field[T], f: T => U) extends Fiel
   def get(value: Value) = field.get(value) map f
 }
 
-private[values] class CollectionField[T](field: Field[Value], tr: Value => Result[T]) extends Field[Seq[T]] {
+private[values] class CollectionField[T, Col](field: Field[Value], cbf: CanBuildFrom[_, T, Col], tr: Value => Result[T]) extends Field[Col] {
   def path = field.path
   def get(value: Value) =
     field.get(value) flatMap {
       case ArrayV(elems) =>
         val errs = List.newBuilder[FieldError]
-        val rv = List.newBuilder[T]
+        val rv = cbf()
 
         elems.zipWithIndex foreach {
           case (v, i) =>

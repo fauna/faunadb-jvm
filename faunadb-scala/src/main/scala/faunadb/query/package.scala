@@ -30,20 +30,13 @@ package query {
   case class Expr private[query] (@(JsonValue @getter) value: Value) extends AnyVal
 
   object Expr {
-    implicit def boolToExpr(unwrapped: Boolean) = Expr(BooleanV(unwrapped))
-    implicit def stringToExpr(unwrapped: String) = Expr(StringV(unwrapped))
-    implicit def intToExpr(unwrapped: Int) = Expr(LongV(unwrapped))
-    implicit def longToExpr(unwrapped: Long) = Expr(LongV(unwrapped))
-    implicit def floatToExpr(unwrapped: Float) = Expr(DoubleV(unwrapped))
-    implicit def doubleToExpr(unwrapped: Double) = Expr(DoubleV(unwrapped))
-    implicit def refToExpr(unwrapped: RefV) = Expr(unwrapped)
-    implicit def nullVToExpr(unwrapped: NullV.type) = Expr(unwrapped)
-    implicit def byteArrayToExpr(unwrapped: Array[Byte]) = Expr(BytesV(unwrapped))
+    implicit def encode[T: Encoder](obj: T): Expr = Expr(wrapValue(obj))
 
-    // FIXME: not sure if this is the best way to do this... would
-    // rather transform the value to a series of object constructions.
-    implicit def quotedValue(unwrapped: Value) = Expr(ObjectV("quote" -> unwrapped))
-    implicit def quotedResult(unwrapped: Result[Value]) = Expr(ObjectV("quote" -> unwrapped.get))
+    private def wrapValue(value: Value): Value = value match {
+      case ObjectV(fields) => ObjectV("object" -> ObjectV(fields.map { case (k, v) => (k, wrapValue(v)) }))
+      case ArrayV(values) => ArrayV(values.map(wrapValue))
+      case _ => value
+    }
   }
 
   /**

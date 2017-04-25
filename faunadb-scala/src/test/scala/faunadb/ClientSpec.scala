@@ -516,4 +516,20 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     await(client.query(Call(Ref("functions/concat_with_slash"), "a", "b"))).to[String].get shouldBe "a/b"
   }
+
+  case class Spell(name: String, element: Either[String, Seq[String]], cost: Option[Long])
+
+  implicit val spellCodec: Codec[Spell] = Codec.caseClass[Spell]
+
+  it should "encode/decode user classes" in {
+    val masterSummon = Spell("Master Summon", Left("wind"), None)
+    val magicMissile = Spell("Magic Missile", Left("arcane"), Some(10))
+    val faerieFire = Spell("Faerie Fire", Right(Seq("arcane", "nature")), Some(10))
+
+    val masterSummonCreated = await(client.query(Create(Class("spells"), Obj("data" -> masterSummon))))
+    masterSummonCreated("data").to[Spell].get shouldBe masterSummon
+
+    val spells = await(client.query(Map(Paginate(Match(Index("spells_by_element"), "arcane")), Lambda(x => Select("data", Get(x))))))("data").get
+    spells.to[Set[Spell]].get shouldBe Set(magicMissile, faerieFire)
+  }
 }
