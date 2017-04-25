@@ -2,6 +2,7 @@ package com.faunadb.client.dsl;
 
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Value;
+import com.faunadb.client.types.Value.BooleanV;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.faunadb.client.errors.BadRequestException;
 import com.faunadb.client.errors.NotFoundException;
@@ -860,6 +861,35 @@ public abstract class DslSpec {
     Value bytes = query(Value(new byte[] {0x1, 0x2, 0x3, 0x4})).get();
 
     assertThat(bytes, equalTo(Value(new byte[] {0x1, 0x2, 0x3, 0x4})));
+  }
+
+  @Test
+  public void shouldEchoQuery() throws Exception {
+    Value query = query(Query(Lambda(Arr(Value("x"), Value("y")), Concat(Arr(Var("x"), Var("y")), Value("/"))))).get();
+    Value echoed = query(query).get();
+
+    assertThat(query, equalTo(echoed));
+  }
+
+  @Test
+  public void shouldCreateFunction() throws Exception {
+    String functionName = randomStartingWith();
+
+    Expr lambda = Lambda(Arr(Value("x"), Value("y")), Concat(Arr(Var("x"), Var("y")), Value("/")));
+    query(CreateFunction(Obj("name", Value(functionName), "body", Query(lambda)))).get();
+
+    assertThat(query(Exists(Ref(format("functions/%s", functionName)))).get(), equalTo((Value)BooleanV.TRUE));
+  }
+
+  @Test
+  public void shouldCallFunction() throws Exception {
+    Expr lambda = Lambda(Arr(Value("x"), Value("y")), Concat(Arr(Var("x"), Var("y")), Value("/")));
+    query(CreateFunction(Obj("name", Value("concat_with_slash"), "body", Query(lambda)))).get();
+
+    assertThat(
+      query(Call(Ref("functions/concat_with_slash"), Value("a"), Value("b"))).get(),
+      equalTo(Value("a/b"))
+    );
   }
 
   protected RefV onARandomClass() throws Exception {

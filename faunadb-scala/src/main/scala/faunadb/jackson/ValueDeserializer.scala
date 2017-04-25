@@ -56,6 +56,11 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
             val rv = BytesV(in.getText)
             in.nextToken()
             rv
+          case "@query" =>
+            in.nextToken();
+            val rv = QueryV(in.readValueAs(classOf[ObjectV]))
+            in.nextToken();
+            rv
           case "@obj" =>
             in.nextToken() match {
               case START_OBJECT =>

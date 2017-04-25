@@ -488,4 +488,20 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     await(rootClient.query(KeyFromSecret(key(SecretField).get))) should equal(await(rootClient.query(Get(key(RefField).get))))
   }
+
+  it should "create a function" in {
+    val query = Query((a, b) => Concat(Arr(a, b), "/"))
+
+    await(client.query(CreateFunction(Obj("name" -> "a_function", "body" -> query))))
+
+    await(client.query(Exists(Ref("functions/a_function")))).to[Boolean].get shouldBe true
+  }
+
+  it should "call a function" in  {
+    val query = Query((a, b) => Concat(Arr(a, b), "/"))
+
+    await(client.query(CreateFunction(Obj("name" -> "concat_with_slash", "body" -> query))))
+
+    await(client.query(Call(Ref("functions/concat_with_slash"), "a", "b"))).to[String].get shouldBe "a/b"
+  }
 }

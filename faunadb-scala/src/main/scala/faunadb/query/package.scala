@@ -132,6 +132,33 @@ package object query {
   // Basic Forms
 
   /**
+    * A Call expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
+    */
+  def Call(ref: Expr, arguments: Expr*) =
+    Expr(ObjectV("call" -> ref.value, "arguments" -> varargs(arguments)))
+
+  /**
+    * A Query expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
+    */
+  def Query(fn: Expr => Expr): Expr = macro QueryMacros.query
+  def Query(fn: (Expr, Expr) => Expr): Expr = macro QueryMacros.query
+  def Query(fn: (Expr, Expr, Expr) => Expr): Expr = macro QueryMacros.query
+  def Query(fn: (Expr, Expr, Expr, Expr) => Expr): Expr = macro QueryMacros.query
+  def Query(fn: (Expr, Expr, Expr, Expr, Expr) => Expr): Expr = macro QueryMacros.query
+  def Query(fn: (Expr, Expr, Expr, Expr, Expr, Expr) => Expr): Expr = macro QueryMacros.query
+  def Query(fn: (Expr, Expr, Expr, Expr, Expr, Expr, Expr) => Expr): Expr = macro QueryMacros.query
+  def Query(fn: (Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr) => Expr): Expr = macro QueryMacros.query
+  def Query(fn: (Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr) => Expr): Expr = macro QueryMacros.query
+  def Query(fn: (Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr) => Expr): Expr = macro QueryMacros.query
+
+  def Query(lambda: Expr) =
+    Expr(ObjectV("query" -> lambda.value))
+
+  /**
     * A At expression.
     *
     * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
@@ -402,6 +429,14 @@ package object query {
     */
   def CreateIndex(params: Expr): Expr =
     Expr(ObjectV("create_index" -> params.value))
+
+  /**
+    * A Create Function expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    */
+  def CreateFunction(params: Expr): Expr =
+    Expr(ObjectV("create_function" -> params.value))
 
   // Set Constructors
 
