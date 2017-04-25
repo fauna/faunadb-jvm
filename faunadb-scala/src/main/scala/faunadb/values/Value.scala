@@ -85,23 +85,8 @@ sealed trait Value {
 /** Companion object to the Value trait. */
 object Value {
 
-  /** Create a string value. */
-  def apply(str: String): Value = StringV(str)
+  implicit def apply[T](value: T)(implicit encoder: Encoder[T]): Value = encoder.encode(value)
 
-  /** Create a long value. */
-  def apply(long: Long): Value = LongV(long)
-
-  /** Create a double value. */
-  def apply(double: Double): Value = DoubleV(double)
-
-  /** Create a boolean value. */
-  def apply(boolean: Boolean): Value = BooleanV(boolean)
-
-  /** Create a timestamp value. */
-  def apply(instant: Instant): Value = TimeV(instant)
-
-  /** Create a date value. */
-  def apply(localdate: LocalDate): Value = DateV(localdate)
 }
 
 // Concrete Value types

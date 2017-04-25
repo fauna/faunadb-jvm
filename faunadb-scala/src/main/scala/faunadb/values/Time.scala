@@ -82,6 +82,10 @@ object HighPrecisionTime {
       }
   }
 
+  implicit object HighPrecisionEncoder extends Encoder[HighPrecisionTime] {
+    def encode(t: HighPrecisionTime) = if (t != null) TimeV(t) else NullV
+  }
+
   implicit object HighPrecisionTimeOrdering extends Ordering[HighPrecisionTime] {
     def compare(x: HighPrecisionTime, y: HighPrecisionTime): Int =
       x.secondsSinceEpoch compare y.secondsSinceEpoch match {
