@@ -415,6 +415,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(client.query(Select(1, Arr("value0", "value1", "value2")))) shouldBe StringV("value1")
     await(client.query(Select(100, Arr("value0", "value1", "value2"), "a default value"))) shouldBe StringV("a default value")
 
+    await(client.query(Contains("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value"))))))) shouldBe TrueV
+    await(client.query(Select("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value"))))))) shouldBe StringV("value")
+
     val addF = client.query(Add(100L, 10L))
     val addR = await(addF).to[Long].get
     addR shouldBe 110L
