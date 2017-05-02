@@ -1,5 +1,6 @@
 1.0.1-SNAPSHOT
 * Adds support to @query type
+* Add joda-convert to avoid compile time warnings
 
 1.0.0
 * Official release
