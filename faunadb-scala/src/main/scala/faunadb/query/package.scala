@@ -86,8 +86,9 @@ package object query {
 
   // implicit conversions
 
-  implicit def strToPath(str: String) = Path(Expr(StringV(str)))
-  implicit def intToPath(int: Int) = Path(Expr(LongV(int)))
+  implicit def strToPath(str: String): Path = Path(Expr(StringV(str)))
+  implicit def intToPath(int: Int): Path = Path(Expr(LongV(int)))
+  implicit def pathToExpr(path: Path): Expr = Expr(varargs(path.segments))
 
   // Helpers
 
@@ -611,9 +612,6 @@ package object query {
    *
    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
    */
-  def Contains(path: Path, in: Expr): Expr =
-    Expr(ObjectV("contains" -> varargs(path.segments), "in" -> in.value))
-
   def Contains(path: Expr, in: Expr): Expr =
     Expr(ObjectV("contains" -> path.value, "in" -> in.value))
 
@@ -622,12 +620,6 @@ package object query {
    *
    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
    */
-  def Select(path: Path, from: Expr): Expr =
-    Expr(ObjectV("select" -> varargs(path.segments), "from" -> from.value))
-
-  def Select(path: Path, from: Expr, default: Expr): Expr =
-    Expr(ObjectV("select" -> varargs(path.segments), "from" -> from.value, "default" -> default.value))
-
   def Select(path: Expr, from: Expr): Expr =
     Expr(ObjectV("select" -> path.value, "from" -> from.value))
 

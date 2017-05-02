@@ -1,6 +1,7 @@
 1.0.1-SNAPSHOT
 * Adds support to @query type
 * Add joda-convert to avoid compile time warnings
+* Fix ambiguous reference when using Select/Contains functions
 
 1.0.0
 * Official release
