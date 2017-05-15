@@ -45,6 +45,7 @@ Javadocs and Scaladocs are hosted on GitHub:
 ### Scala
 
 * Scala 2.11.x
+* Scala 2.12.x
 
 ## Using the Driver
 
