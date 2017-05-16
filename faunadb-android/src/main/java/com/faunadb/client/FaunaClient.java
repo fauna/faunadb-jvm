@@ -14,6 +14,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 
+import java.io.IOError;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
@@ -50,6 +51,15 @@ public class FaunaClient {
   private static final int INITIAL_REF_COUNT = 0;
   private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
   private static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
+  private static final URL FAUNA_ROOT;
+
+  static {
+    try {
+      FAUNA_ROOT = new URL("https://db.fauna.com");
+    } catch (MalformedURLException e) {
+      throw new IOError(e); // won't happen
+    }
+  }
 
   private final AtomicInteger refCount;
 
@@ -115,16 +125,20 @@ public class FaunaClient {
      * @return a new {@link FaunaClient}
      */
     public FaunaClient build() {
+      URL faunaEndpoint = FAUNA_ROOT;
+      if (endpoint != null)
+        faunaEndpoint = endpoint;
+
       if (httpClient == null) {
         return new FaunaClient(new OkHttpClient.Builder()
                 .connectTimeout(DEFAULT_CONNECTION_TIMEOUT_MS, TimeUnit.MILLISECONDS)
                 .readTimeout(DEFAULT_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
                 .writeTimeout(DEFAULT_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
                 .retryOnConnectionFailure(true)
-                .build(), endpoint, secret);
+                .build(), faunaEndpoint, secret);
       }
 
-      return new FaunaClient(httpClient, endpoint, secret);
+      return new FaunaClient(httpClient, faunaEndpoint, secret);
     }
   }
 
