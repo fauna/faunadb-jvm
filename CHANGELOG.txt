@@ -1,6 +1,7 @@
 1.2.0-SNAPSHOT
 * Add support for scala 2.12.x
 * Upgrade jackson to 2.8.8
+* Default android driver to cloud if not endpoint is provided
 
 1.1.0
 * Adds support to @query type
