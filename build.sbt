@@ -3,12 +3,13 @@ import de.johoop.jacoco4sbt.XMLReport
 val driverVersion = "1.1.1-SNAPSHOT"
 val asyncHttpClientVersion = "1.9.39"
 val guavaVersion = "19.0"
-val jacksonVersion = "2.6.4"
-val jacksonDocVersion = "2.6"
+val jacksonVersion = "2.8.8"
+val jacksonDocVersion = "2.8"
 val metricsVersion = "3.1.0"
 val jodaTimeVersion = "2.9.4"
 val jodaConvert = "1.8.1"
-val baseScalaVersion = "2.11.8"
+val scalaDefaultVersion = "2.12.2"
+val scalaVersions = Seq("2.11.8", scalaDefaultVersion)
 
 val javaDocUrl = "http://docs.oracle.com/javase/7/docs/api/"
 val asyncHttpClientDocUrl = s"http://static.javadoc.io/com.ning/async-http-client/$asyncHttpClientVersion/"
@@ -92,13 +93,15 @@ lazy val common = project.in(file("faunadb-common"))
     )
   )
 
+crossScalaVersions := scalaVersions
+
 lazy val scala = project.in(file("faunadb-scala"))
   .dependsOn(common)
   .settings(jacoco.settings)
   .settings(publishSettings : _*)
   .settings(
     name := "faunadb-scala",
-    scalaVersion := baseScalaVersion,
+    scalaVersion := scalaDefaultVersion,
 
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
@@ -106,7 +109,7 @@ lazy val scala = project.in(file("faunadb-scala"))
       "joda-time" % "joda-time" % jodaTimeVersion,
       "org.joda" % "joda-convert" % jodaConvert,
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
-      "org.scalatest" %% "scalatest" % "2.2.1" % "test"),
+      "org.scalatest" %% "scalatest" % "3.0.3" % "test"),
 
     autoAPIMappings := true,
     apiURL := Some(url(scalaApiUrl)),
@@ -258,9 +261,10 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
       "-dontwarn org.joda.convert.**",
 
       //Jackson
-      "-dontwarn com.fasterxml.jackson.databind.ext.DOMSerializer",
-      "-keep class org.codehaus.** { *; }",
+      // We can ignore the databind package as long as we don't obfuscate the annotations package
+      "-dontwarn com.fasterxml.jackson.databind.**",
       "-keep class com.fasterxml.jackson.annotation.** { *; }",
+      "-keep class org.codehaus.** { *; }",
 
       //Okio rules
       "-dontwarn okio.**",
