@@ -41,6 +41,13 @@ lazy val publishSettings = Seq(
       Some("Releases" at s"$nexus/service/local/staging/deploy/maven2")
     }
   },
+  credentials += Credentials(
+    "Sonatype Nexus Repository Manager",
+    "oss.sonatype.org",
+    sys.env.getOrElse("SONATYPE_USER", ""),
+    sys.env.getOrElse("SONATYPE_PASS", "")
+  ),
+
   pomExtra := (
     <scm>
       <url>git@github.com:fauna/faunadb-jvm.git</url>
@@ -54,7 +61,12 @@ lazy val publishSettings = Seq(
         <organizationUrl>http://fauna.com</organizationUrl>
       </developer>
     </developers>
-  ))
+  ),
+  usePgpKeyHex(sys.env.getOrElse("GPG_SIGNING_KEY", "0")),
+  pgpPassphrase := sys.env.get("GPG_PASSPHRASE") map (_.toArray),
+  pgpSecretRing := file(sys.env.getOrElse("GPG_PRIVATE_KEY", "")),
+  pgpPublicRing := file(sys.env.getOrElse("GPG_PUBLIC_KEY", ""))
+)
 
 lazy val root = (project in file("."))
   .settings(
