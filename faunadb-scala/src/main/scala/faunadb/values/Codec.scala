@@ -281,23 +281,21 @@ object Encoder {
     def encode(col: Col[T]) = if (col != null) ArrayV(col map { Value(_) } toVector) else NullV
   }
 
-  implicit def OptionEncoder[T](implicit encoder: Encoder[T]): Encoder[Option[T]] = new Encoder[Option[T]] {
-    def encode(t: Option[T]) = t match {
-      case Some(v) => encoder.encode(v)
-      case None => NullV
-    }
+  class OptionEncoder[Opt <: Option[T], T: Encoder] extends Encoder[Opt] {
+    def encode(t: Opt): Value = t map (Value(_)) getOrElse NullV
   }
 
-  implicit object NoneEncoder extends Encoder[None.type] {
-    def encode(t: None.type): Value = NullV
+  implicit def OptionEncoder[T: Encoder] = new OptionEncoder[Option[T], T]
+  implicit def SomeEncoder[T: Encoder] = new OptionEncoder[Some[T], T]
+  implicit def NoneEncoder = new OptionEncoder[None.type, Nothing]
+
+  class EitherEncoder[A: Encoder, B: Encoder, Etr <: Either[A, B]] extends Encoder[Etr] {
+    def encode(t: Etr): Value = t.fold(Value(_), Value(_))
   }
 
-  implicit def EitherEncoder[A, B](implicit a: Encoder[A], b: Encoder[B]): Encoder[Either[A, B]] = new Encoder[Either[A, B]] {
-    def encode(t: Either[A, B]) = t match {
-      case Left(left) => a.encode(left)
-      case Right(right) => b.encode(right)
-    }
-  }
+  implicit def EitherEncoder[A: Encoder, B: Encoder] = new EitherEncoder[A, B, Either[A, B]]
+  implicit def LeftEncoder[A: Encoder] = new EitherEncoder[A, Nothing, Left[A, Nothing]]
+  implicit def RightEncoder[B: Encoder] = new EitherEncoder[Nothing, B, Right[Nothing, B]]
 }
 
 trait Codec[T] extends Decoder[T] with Encoder[T]
