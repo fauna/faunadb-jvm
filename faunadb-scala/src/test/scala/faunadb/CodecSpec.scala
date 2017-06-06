@@ -220,10 +220,20 @@ class CodecSpec extends FlatSpec with Matchers {
     (List(GenericClass[Int, String](10, "str", NonGenericClass(10))): Value) shouldBe ArrayV(obj1)
   }
 
+  it should "encode an Option" in {
+    (Some(1): Value) shouldBe LongV(1)
+    (None: Value) shouldBe NullV
+  }
+
   it should "encode class with Option" in {
     (ClassWithOption("a", Some(10L)): Value) shouldBe ObjectV("a" -> StringV("a"), "b" -> LongV(10))
 
     (ClassWithOption("a", None): Value) shouldBe ObjectV("a" -> StringV("a"), "b" -> NullV)
+  }
+
+  it should "encode an Either" in {
+    (Left(1): Value) shouldBe LongV(1)
+    (Right(2): Value) shouldBe LongV(2)
   }
 
   it should "encode class with Either" in {
