@@ -1,5 +1,4 @@
 import de.johoop.jacoco4sbt.XMLReport
-import com.typesafe.sbt.SbtPgp.autoImport._
 
 val driverVersion = "1.2.1-SNAPSHOT"
 val asyncHttpClientVersion = "1.9.39"
@@ -25,20 +24,6 @@ val scalaApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-sc
 val javaDslApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-java-dsl/api/"
 val javaApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-java/api/"
 val javaAndroidApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-android/api/"
-
-// GPG
-PgpKeys.gpgCommand in Global := "gpg2"
-
-useGpg := true
-useGpgAgent := true
-pgpReadOnly := true
-
-// Sonatype
-credentials += Credentials(
-  "Sonatype Nexus Repository Manager",
-  "oss.sonatype.org",
-  sys.env.getOrElse("SONATYPE_USER", ""),
-  sys.env.getOrElse("SONATYPE_PASS", ""))
 
 lazy val publishSettings = Seq(
   version := driverVersion,
@@ -69,7 +54,12 @@ lazy val publishSettings = Seq(
         <organizationUrl>http://fauna.com</organizationUrl>
       </developer>
     </developers>
-  ))
+  ),
+  credentials += Credentials(
+    "Sonatype Nexus Repository Manager",
+    "oss.sonatype.org",
+    sys.env.getOrElse("SONATYPE_USER", ""),
+    sys.env.getOrElse("SONATYPE_PASS", "")))
 
 lazy val root = (project in file("."))
   .settings(
