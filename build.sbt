@@ -25,8 +25,6 @@ val javaDslApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-
 val javaApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-java/api/"
 val javaAndroidApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-android/api/"
 
-useGpg := true
-
 lazy val publishSettings = Seq(
   version := driverVersion,
   organization := "com.faunadb",
@@ -61,7 +59,8 @@ lazy val publishSettings = Seq(
     "Sonatype Nexus Repository Manager",
     "oss.sonatype.org",
     sys.env.getOrElse("SONATYPE_USER", ""),
-    sys.env.getOrElse("SONATYPE_PASS", "")))
+    sys.env.getOrElse("SONATYPE_PASS", "")),
+  useGpg := true)
 
 lazy val root = (project in file("."))
   .settings(
