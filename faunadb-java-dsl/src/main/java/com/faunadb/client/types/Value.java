@@ -12,18 +12,20 @@ import com.faunadb.client.query.Language;
 import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.collect.*;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.BaseEncoding;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import static com.faunadb.client.util.Objects.requireNonNull;
 import static com.google.common.base.Joiner.on;
-import static com.google.common.collect.FluentIterable.from;
 import static com.google.common.primitives.Bytes.asList;
 import static java.lang.String.format;
 
@@ -82,7 +84,54 @@ public abstract class Value extends Expr {
    * @see Codec
    */
   public final <T> Result<T> to(Codec<T> codec) {
-    return codec.apply(this);
+    return codec.decode(this);
+  }
+
+  /**
+   * Attempts to coerce this value using the {@link Decoder} class into the specified type
+   *
+   * @param clazz a class type to convert
+   * @return the {@link Result} of the coercion
+   * @see Decoder
+   */
+  public final <T> Result<T> to(Class<T> clazz) {
+    return Decoder.decode(this, Types.of(clazz));
+  }
+
+  /**
+   * Attempts to convert the specified object into the corresponding {@link Value} type
+   *
+   * @param obj the object instance to convert
+   * @return the {@link Result} of the conversion
+   */
+  public static <T> Result<Value> from(T obj) {
+    return Encoder.encode(obj);
+  }
+
+  /**
+   * Attempts to coerce this value to a {@link Map}.
+   * This method is only util if this object is an instance of {@link ObjectV}.
+   *
+   * @param valueType the type of the values.
+   * @return a {@link Result} with the resulting map containing the keys/values.
+   * @see Decoder
+   * @see Types
+   */
+  public final <K, V> Result<Map<K, V>> asMapOf(Class<V> valueType) {
+    return Decoder.decode(this, Types.hashMapOf(valueType));
+  }
+
+  /**
+   * Attempts to coerce this value to a {@link Collection}.
+   * This method is only util if this object is an instance of {@link ArrayV}.
+   *
+   * @param elementType the type of the elements in the collection.
+   * @return a {@link Result} with the resulting collection.
+   * @see Decoder
+   * @see Types
+   */
+  public final <T> Result<Collection<T>> asCollectionOf(Class<T> elementType) {
+    return Decoder.decode(this, Types.arrayListOf(elementType));
   }
 
   /**
@@ -519,7 +568,7 @@ public abstract class Value extends Expr {
 
     @Override
     public String toString() {
-      String str = from(asList(value)).transform(new Function<Byte, String>() {
+      String str = FluentIterable.from(asList(value)).transform(new Function<Byte, String>() {
         @Override
         public String apply(Byte input) {
           return format("0x%02x", input);

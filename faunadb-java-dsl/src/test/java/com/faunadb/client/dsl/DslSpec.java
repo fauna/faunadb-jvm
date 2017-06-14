@@ -1,12 +1,13 @@
 package com.faunadb.client.dsl;
 
-import com.faunadb.client.query.Expr;
-import com.faunadb.client.types.Value;
-import com.faunadb.client.types.Value.BooleanV;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.faunadb.client.errors.BadRequestException;
 import com.faunadb.client.errors.NotFoundException;
+import com.faunadb.client.query.Expr;
+import com.faunadb.client.types.FaunaConstructor;
+import com.faunadb.client.types.FaunaField;
 import com.faunadb.client.types.Field;
+import com.faunadb.client.types.Value;
+import com.faunadb.client.types.Value.BooleanV;
 import com.faunadb.client.types.Value.ObjectV;
 import com.faunadb.client.types.Value.RefV;
 import com.faunadb.client.types.Value.StringV;
@@ -14,6 +15,7 @@ import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.ListenableFuture;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
@@ -31,6 +33,7 @@ import static com.faunadb.client.query.Language.Action.DELETE;
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.TimeUnit.*;
 import static com.faunadb.client.types.Codec.*;
+import static com.faunadb.client.types.Decoder.decode;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.collection.IsArrayContainingInOrder.arrayContaining;
@@ -52,6 +55,7 @@ public abstract class DslSpec {
   public ExpectedException thrown = ExpectedException.none();
 
   protected static final Field<Value> DATA = Field.at("data");
+  protected static final Field<Spell> SPELL_FIELD = DATA.to(Spell.class);
   protected static final Field<Long> TS_FIELD = Field.at("ts").to(LONG);
   protected static final Field<RefV> REF_FIELD = Field.at("ref").to(REF);
   protected static final Field<RefV> RESOURCE_FIELD = Field.at("resource").to(REF);
@@ -890,6 +894,39 @@ public abstract class DslSpec {
       query(Call(Ref("functions/concat_with_slash"), Value("a"), Value("b"))).get(),
       equalTo(Value("a/b"))
     );
+  }
+
+  static class Spell {
+    @FaunaField
+    private final String name;
+    @FaunaField
+    private final String element;
+    @FaunaField
+    private final Integer cost;
+
+    @FaunaConstructor
+    Spell(@FaunaField("name") String name, @FaunaField("element") String element, @FaunaField("cost") Integer cost) {
+      this.name = name;
+      this.element = element;
+      this.cost = cost;
+    }
+  }
+
+  @Test
+  public void shouldCreateASpellUsingEncoderDecoder() throws Exception {
+    RefV ref = query(
+      Create(Ref("classes/spells"),
+        Obj("data", Value(new Spell("Blah", "blah", 10)))
+      )).get().get(REF_FIELD);
+
+
+    Spell spell = query(Get(ref)).get().get(SPELL_FIELD);
+
+    assertThat(spell.name, equalTo("Blah"));
+    assertThat(spell.element, equalTo("blah"));
+    assertThat(spell.cost, equalTo(10));
+
+    query(Delete(ref)).get();
   }
 
   protected RefV onARandomClass() throws Exception {

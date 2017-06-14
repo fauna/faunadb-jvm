@@ -1,5 +1,6 @@
 1.2.1-SNAPSHOT
 * Fix possible NullPointerException when checking for failing requests
+* Adds support for user class serialization (encode/decode)
 
 1.2.0
 * Add support for scala 2.12.x

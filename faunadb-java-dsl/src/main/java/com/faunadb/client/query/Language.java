@@ -1,5 +1,6 @@
 package com.faunadb.client.query;
 
+import com.faunadb.client.types.Encoder;
 import com.faunadb.client.types.Value.*;
 import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.collect.ImmutableList;
@@ -167,6 +168,13 @@ public final class Language {
    */
   public static Expr Ref(Expr classRef, String id) {
     return Ref(classRef, Value(id));
+  }
+
+  /**
+   * Encode the given object using {@link Encoder}
+   */
+  public static Expr Value(Object value) {
+    return Encoder.encode(value).get();
   }
 
   /**

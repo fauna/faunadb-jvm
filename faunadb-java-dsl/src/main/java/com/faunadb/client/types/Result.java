@@ -74,9 +74,11 @@ public abstract class Result<T> {
   private static final class Failure<A> extends Result<A> {
 
     private final String error;
+    private final Throwable cause;
 
-    private Failure(String error) {
+    private Failure(String error, Throwable cause) {
       this.error = error;
+      this.cause = cause;
     }
 
     @Override
@@ -91,7 +93,7 @@ public abstract class Result<T> {
 
     @Override
     public A get() {
-      throw new IllegalStateException(error);
+      throw new IllegalStateException(error, cause);
     }
 
     @Override
@@ -106,12 +108,12 @@ public abstract class Result<T> {
 
     @Override
     public <U> Result<U> map(Function<A, U> fn) {
-      return new Failure<>(error);
+      return new Failure<>(error, cause);
     }
 
     @Override
     public <U> Result<U> flatMap(Function<A, Result<U>> fn) {
-      return new Failure<>(error);
+      return new Failure<>(error, cause);
     }
 
     @Override
@@ -149,7 +151,18 @@ public abstract class Result<T> {
    * @return a failure result
    */
   public static <T> Result<T> fail(String error) {
-    return new Failure<>(error);
+    return new Failure<>(error, null);
+  }
+
+  /**
+   * Creates failure result with an exception
+   *
+   * @param error the error message
+   * @param cause the exception that caused this failure
+   * @return a failure result
+   */
+  public static <T> Result<T> fail(String error, Throwable cause) {
+    return new Failure<>(error, cause);
   }
 
   private Result() {
