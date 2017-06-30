@@ -21,10 +21,10 @@ import java.util.Map;
  *
  * <b>Examples:</b>
  * <pre>{@code
- *   Expr existsValue = Exists(Ref("some/ref"));
+ *   Expr existsValue = Exists(Ref(Class("some_class"), "ref"));
  *
  *   Expr createValue = Create(
- *    Ref("classes/some_class"),
+ *    Class("some_class"),
  *    Obj("data",
  *      Obj("some", Value("field")))
  *   );
@@ -144,12 +144,16 @@ public final class Language {
   }
 
   /**
-   * Creates a new RefV literal value.
+   * Creates a RefV value. The string "classes/widget/123" will be equivalent to:
+   *
+   * <pre>
+   * {@code new RefV("123", new RefV("widget", Native.CLASSES)) }
+   * </pre>
    *
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Ref(String ref) {
-    return new RefV(ref);
+    return Fn.apply("@ref", Value(ref));
   }
 
   /**
@@ -168,6 +172,104 @@ public final class Language {
    */
   public static Expr Ref(Expr classRef, String id) {
     return Ref(classRef, Value(id));
+  }
+
+  /**
+   * Returns a native reference to all classes.
+   */
+  public static Expr Classes() {
+    return Classes(Null());
+  }
+
+  /**
+   * Returns a native reference to all classes in a nested database.
+   */
+  public static Expr Classes(Expr scope) {
+    return Fn.apply("classes", scope);
+  }
+
+  /**
+   * Returns a native reference to all databases.
+   */
+  public static Expr Databases() {
+    return Databases(Null());
+  }
+
+  /**
+   * Returns a native reference to all databases in a nested database.
+   */
+  public static Expr Databases(Expr scope) {
+    return Fn.apply("databases", scope);
+  }
+
+  /**
+   * Returns a native reference to all indexes.
+   */
+  public static Expr Indexes() {
+    return Indexes(Null());
+  }
+
+  /**
+   * Returns a native reference to all indexes in a nested database.
+   */
+  public static Expr Indexes(Expr scope) {
+    return Fn.apply("indexes", scope);
+  }
+
+  /**
+   * Returns a native reference to all functions.
+   */
+  public static Expr Functions() {
+    return Functions(Null());
+  }
+
+  /**
+   * Returns a native reference to all functions in a nested database.
+   */
+  public static Expr Functions(Expr scope) {
+    return Fn.apply("functions", scope);
+  }
+
+  /**
+   * Returns a native reference to all keys.
+   */
+  public static Expr Keys() {
+    return Keys(Null());
+  }
+
+  /**
+   * Returns a native reference to all keys in a nested database.
+   */
+  public static Expr Keys(Expr scope) {
+    return Fn.apply("keys", scope);
+  }
+
+  /**
+   * Returns a native reference to all tokens.
+   */
+  public static Expr Tokens() {
+    return Tokens(Null());
+  }
+
+  /**
+   * Returns a native reference to all tokens in a nested database.
+   */
+  public static Expr Tokens(Expr scope) {
+    return Fn.apply("tokens", scope);
+  }
+
+  /**
+   * Returns a native reference to all credentials.
+   */
+  public static Expr Credentials() {
+    return Credentials(Null());
+  }
+
+  /**
+   * Returns a native reference to all credentials in a nested database.
+   */
+  public static Expr Credentials(Expr scope) {
+    return Fn.apply("credentials", scope);
   }
 
   /**
@@ -907,6 +1009,33 @@ public final class Language {
   }
 
   /**
+   * Creates a new Class expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Class(String name) {
+    return Class(Value(name));
+  }
+
+  /**
+   * Creates a new Class expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Class(Expr name, Expr database) {
+    return Fn.apply("class", name, "scope", database);
+  }
+
+  /**
+   * Creates a new Class expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Class(String name, Expr database) {
+    return Class(Value(name), database);
+  }
+
+  /**
    * Creates a new Database expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
@@ -916,12 +1045,102 @@ public final class Language {
   }
 
   /**
+   * Creates a new Database expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Database(String name) {
+    return Database(Value(name));
+  }
+
+  /**
+   * Creates a new Database expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Database(Expr name, Expr database) {
+      return Fn.apply("database", name, "scope", database);
+  }
+
+  /**
+   * Creates a new Database expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Database(String name, Expr database) {
+    return Database(Value(name), database);
+  }
+
+  /**
    * Creates a new Index expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Index(Expr name) {
     return Fn.apply("index", name);
+  }
+
+  /**
+   * Creates a new Index expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Index(String name) {
+    return Index(Value(name));
+  }
+
+  /**
+   * Creates a new Index expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Index(Expr name, Expr database) {
+    return Fn.apply("index", name, "scope", database);
+  }
+
+  /**
+   * Creates a new Index expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Index(String name, Expr database) {
+    return Index(Value(name), database);
+  }
+
+  /**
+   * Creates a new Function expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Function(Expr name) {
+    return Fn.apply("function", name);
+  }
+
+  /**
+   * Creates a new Function expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Function(String name) {
+    return Function(Value(name));
+  }
+
+  /**
+   * Creates a new Function expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Function(Expr name, Expr database) {
+    return Fn.apply("function", name, "scope", database);
+  }
+
+  /**
+   * Creates a new Function expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Function(String name, Expr database) {
+    return Function(Value(name), database);
   }
 
   /**

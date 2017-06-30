@@ -1,6 +1,6 @@
 package faunadb
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.{ JsonMappingException, ObjectMapper }
 import faunadb.values._
 import faunadb.values.time._
 import org.joda.time.DateTimeZone.UTC
@@ -12,51 +12,75 @@ class DeserializationSpec extends FlatSpec with Matchers {
 
   "Query AST deserialization" should "deserialize a query response with refs" in {
     val toDeserialize = """{
-      "ref":{"@ref":"classes/spells/93044099947429888"},
-      "class":{"@ref":"classes/spells"},
+      "ref":{"@ref":{"id":"93044099947429888","class":{"@ref":{"id":"spells","class":{"@ref":{"id":"classes"}}}}}},
+      "class":{"@ref":{"id":"spells","class":{"@ref":{"id":"classes"}}}},
       "ts":1424992618413105,
-      "data":{"refField":{"@ref":"classes/spells/93044099909681152"}}
+      "data":{"refField":{"@ref":{"id":"93044099909681152","class":{"@ref":{"id":"spells","class":{"@ref":{"id":"classes"}}}}}}}
     }"""
 
     val parsed = json.readValue[Value](toDeserialize, classOf[Value])
 
     parsed should equal (ObjectV(
-      "ref" -> RefV("classes/spells/93044099947429888"),
-      "class" -> RefV("classes/spells"),
+      "ref" -> RefV("93044099947429888", RefV("spells", Native.Classes)),
+      "class" -> RefV("spells", Native.Classes),
       "ts" -> LongV(1424992618413105L),
-      "data" -> ObjectV("refField" -> RefV("classes/spells/93044099909681152"))))
+      "data" -> ObjectV("refField" -> RefV("93044099909681152", RefV("spells", Native.Classes)))))
   }
 
   it should "deserialize a query response" in {
     val toDeserialize = """{
-      "class":{"@ref":"classes/derp"},
+      "class":{"@ref":{"id":"derp","class":{"@ref":{"id":"classes"}}}},
       "data":{"test":1},
-      "ref":{"@ref":"classes/derp/101192216816386048"},
+      "ref":{"@ref":{"id":"101192216816386048","class":{"@ref":{"id":"derp","class":{"@ref":{"id":"classes"}}}}}},
       "ts":1432763268186882
     }"""
     val parsed = json.readValue(toDeserialize, classOf[Value])
 
     parsed should equal (ObjectV(
-      "ref" -> RefV("classes/derp/101192216816386048"),
-      "class" -> RefV("classes/derp"),
+      "ref" -> RefV("101192216816386048", RefV("derp", Native.Classes)),
+      "class" -> RefV("derp", Native.Classes),
       "ts" -> LongV(1432763268186882L),
       "data" -> ObjectV("test" -> LongV(1))))
   }
 
   it should "deserialize a query response with a literal object" in {
     val toDeserialize = """{
-      "class":{"@ref":"classes/derp"},
+      "class":{"@ref":{"id":"derp","class":{"@ref":{"id":"classes"}}}},
       "data":{"test":{"field1":{"@obj":{"@name":"Test"}}}},
-      "ref":{"@ref":"classes/derp/101727203651223552"},
+      "ref":{"@ref":{"id":"101727203651223552","class":{"@ref":{"id":"derp","class":{"@ref":{"id":"classes"}}}}}},
       "ts":1433273471399755
     }"""
     val parsed = json.readValue(toDeserialize, classOf[Value])
 
     parsed should equal (ObjectV(
-      "ref" -> RefV("classes/derp/101727203651223552"),
-      "class" -> RefV("classes/derp"),
+      "ref" -> RefV("101727203651223552", RefV("derp", Native.Classes)),
+      "class" -> RefV("derp", Native.Classes),
       "ts" -> LongV(1433273471399755L),
       "data" -> ObjectV("test" -> ObjectV("field1" -> ObjectV("@name" -> StringV("Test"))))))
+  }
+
+  it should "deserialize an invalid reference" in {
+    the [JsonMappingException] thrownBy {
+      val toDeserialize = """{
+        "@ref":{
+          "id": "1234567890",
+          "class": "it was expected another ref here"
+        }
+      }"""
+
+      json.readValue(toDeserialize, classOf[Value])
+    } should have message "Unexpected value in class field of @ref: StringV(it was expected another ref here)"
+
+    the [JsonMappingException] thrownBy {
+      val toDeserialize = """{
+        "@ref":{
+          "id": "1234567890",
+          "database": "it was expected another ref here"
+        }
+      }"""
+
+      json.readValue(toDeserialize, classOf[Value])
+    } should have message "Unexpected value in database field of @ref: StringV(it was expected another ref here)"
   }
 
   it should "deserialize empty object" in {

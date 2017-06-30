@@ -40,7 +40,7 @@ import static com.google.common.util.concurrent.Futures.transform;
  * <pre>{@code
  * import static com.faunadb.client.query.Language.*;
  * FaunaClient client = FaunaClient.builder().withSecret("someAuthToken").build();
- * client.query(Get(Ref("some/ref")));
+ * client.query(Get(Ref(Class("some_class"), "ref")));
  * }
  * </pre>
  *
@@ -228,6 +228,7 @@ public class FaunaClient {
               .url(endpoint)
               .post(RequestBody.create(MediaType.parse("application/json"), json.writeValueAsString(body)))
               .addHeader("Authorization", authHeader)
+              .addHeader("X-FaunaDB-API-Version", "2.1")
               .build();
 
       final SettableFuture<Value> rv = SettableFuture.create();

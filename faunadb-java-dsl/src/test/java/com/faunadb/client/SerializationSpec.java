@@ -3,20 +3,20 @@ package com.faunadb.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.query.Expr;
-import com.faunadb.client.types.Value.ObjectV;
-import com.faunadb.client.types.Value.StringV;
+import com.faunadb.client.types.Value.*;
 import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.joda.time.Duration;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-
 import static com.faunadb.client.query.Language.*;
+import static com.faunadb.client.query.Language.Class;
 import static com.faunadb.client.query.Language.TimeUnit.*;
+import static com.faunadb.client.types.Value.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -123,9 +123,8 @@ public class SerializationSpec {
 
   @Test
   public void shouldSerializeRef() throws Exception {
-    assertJson(Ref("classes"), "{\"@ref\":\"classes\"}");
-    assertJson(Ref(Ref("classes/people"), "id1"), "{\"ref\":{\"@ref\":\"classes/people\"},\"id\":\"id1\"}");
-    assertJson(Ref(Ref("classes/people"), Value("id1")), "{\"ref\":{\"@ref\":\"classes/people\"},\"id\":\"id1\"}");
+    assertJson(Native.CLASSES, "{\"@ref\":{\"id\":\"classes\"}}");
+    assertJson(new RefV("id1", new RefV("people", Native.CLASSES)), "{\"@ref\":{\"id\":\"id1\",\"class\":{\"@ref\":{\"id\":\"people\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}");
   }
 
   @Test
@@ -370,13 +369,13 @@ public class SerializationSpec {
   @Test
   public void shouldSerializeGet() throws Exception {
     assertJson(
-      Get(Ref("classes/spells/104979509692858368")),
-      "{\"get\":{\"@ref\":\"classes/spells/104979509692858368\"}}"
+      Get(new RefV("104979509692858368", new RefV("spells", Native.CLASSES))),
+      "{\"get\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}}"
     );
 
     assertJson(
-      Get(Ref("classes/spells/104979509692858368"), Value(new Instant(0))),
-      "{\"get\":{\"@ref\":\"classes/spells/104979509692858368\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}}"
+      Get(new RefV("104979509692858368", new RefV("spells", Native.CLASSES)), Value(new Instant(0))),
+      "{\"get\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}}"
     );
   }
 
@@ -388,53 +387,54 @@ public class SerializationSpec {
   @Test
   public void shouldSerializePaginate() throws Exception {
     assertJson(
-      Paginate(Ref("databases")),
-      "{\"paginate\":{\"@ref\":\"databases\"}}"
+      Paginate(Native.DATABASES),
+      "{\"paginate\":{\"@ref\":{\"id\":\"databases\"}}}"
     );
 
     assertJson(
-      Paginate(Ref("databases"))
-        .after(Ref("databases/test"))
+      Paginate(Native.DATABASES)
+        .after(new RefV("test", Native.DATABASES))
         .events(true)
         .sources(true)
         .ts(10L)
         .size(2),
-      "{\"paginate\":{\"@ref\":\"databases\"},\"after\":{\"@ref\":\"databases/test\"}," +
+      "{\"paginate\":{\"@ref\":{\"id\":\"databases\"}},\"after\":{\"@ref\":{\"id\":\"test\",\"class\":{\"@ref\":{\"id\":\"databases\"}}}}," +
         "\"events\":true,\"sources\":true,\"ts\":10,\"size\":2}"
     );
 
     assertJson(
-      Paginate(Ref("databases"))
-        .after(Ref("databases/test"))
+      Paginate(Native.DATABASES)
+        .after(new RefV("test", Native.DATABASES))
         .events(Value(true))
         .sources(Value(true))
         .ts(Value(10L))
         .size(Value(2)),
-      "{\"paginate\":{\"@ref\":\"databases\"},\"after\":{\"@ref\":\"databases/test\"}," +
+      "{\"paginate\":{\"@ref\":{\"id\":\"databases\"}},\"after\":{\"@ref\":{\"id\":\"test\",\"class\":{\"@ref\":{\"id\":\"databases\"}}}}," +
         "\"events\":true,\"sources\":true,\"ts\":10,\"size\":2}"
     );
 
     assertJson(
-      Paginate(Ref("databases"))
-        .before(Ref("databases/test"))
+      Paginate(Native.DATABASES)
+        .before(new RefV("test", Native.DATABASES))
         .events(false)
         .sources(false)
         .ts(10L)
         .size(2),
-      "{\"paginate\":{\"@ref\":\"databases\"},\"before\":{\"@ref\":\"databases/test\"},\"ts\":10,\"size\":2}"
+      "{\"paginate\":{\"@ref\":{\"id\":\"databases\"}},\"before\":{\"@ref\":{\"id\":\"test\",\"class\":{\"@ref\":{\"id\":\"databases\"}}}}," +
+        "\"ts\":10,\"size\":2}"
     );
   }
 
   @Test
   public void shouldSerializeExists() throws Exception {
     assertJson(
-      Exists(Ref("classes/spells/104979509692858368")),
-      "{\"exists\":{\"@ref\":\"classes/spells/104979509692858368\"}}"
+      Exists(new RefV("104979509692858368", new RefV("spells", Native.CLASSES))),
+      "{\"exists\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}}"
     );
 
     assertJson(
-      Exists(Ref("classes/spells/104979509692858368"), Value(new Instant(0))),
-      "{\"exists\":{\"@ref\":\"classes/spells/104979509692858368\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}}"
+      Exists(new RefV("104979509692858368", new RefV("spells", Native.CLASSES)), Value(new Instant(0))),
+      "{\"exists\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}}"
     );
   }
 
@@ -442,9 +442,9 @@ public class SerializationSpec {
   public void shouldSerializeCreate() throws Exception {
     assertJson(
       Create(
-        Ref("databases"),
+        Native.DATABASES,
         Obj("name", Value("annuvin"))
-      ), "{\"create\":{\"@ref\":\"databases\"},\"params\":{\"object\":{\"name\":\"annuvin\"}}}");
+      ), "{\"create\":{\"@ref\":{\"id\":\"databases\"}},\"params\":{\"object\":{\"name\":\"annuvin\"}}}");
 
   }
 
@@ -452,9 +452,9 @@ public class SerializationSpec {
   public void shouldSerializeUpdate() throws Exception {
     assertJson(
       Update(
-        Ref("databases/annuvin"),
+        new RefV("annuvin", Native.DATABASES),
         Obj("name", Value("llyr"))
-      ), "{\"update\":{\"@ref\":\"databases/annuvin\"},\"params\":{\"object\":{\"name\":\"llyr\"}}}");
+      ), "{\"update\":{\"@ref\":{\"id\":\"annuvin\",\"class\":{\"@ref\":{\"id\":\"databases\"}}}},\"params\":{\"object\":{\"name\":\"llyr\"}}}");
 
   }
 
@@ -462,19 +462,18 @@ public class SerializationSpec {
   public void shouldSerializeReplace() throws Exception {
     assertJson(
       Replace(
-        Ref("classes/spells/104979509696660483"),
+        new RefV("104979509696660483", new RefV("spells", Native.CLASSES)),
         Obj("data",
           Obj("name", Value("Mountain's Thunder")))
-      ), "{\"replace\":{\"@ref\":\"classes/spells/104979509696660483\"}," +
+      ), "{\"replace\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}," +
         "\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\"}}}}}");
-
   }
 
   @Test
   public void shouldSerializeDelete() throws Exception {
     assertJson(
-      Delete(Ref("classes/spells/104979509696660483")),
-      "{\"delete\":{\"@ref\":\"classes/spells/104979509696660483\"}}"
+      Delete(new RefV("104979509696660483", new RefV("spells", Native.CLASSES))),
+      "{\"delete\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}}"
     );
   }
 
@@ -482,23 +481,23 @@ public class SerializationSpec {
   public void shouldSerializeInsert() throws Exception {
     assertJson(
       Insert(
-        Ref("classes/spells/104979509696660483"),
+        new RefV("104979509696660483", new RefV("spells", Native.CLASSES)),
         Value(new Instant(0)),
         Action.CREATE,
         Obj("data", Obj("name", Value("test")))
       ),
-      "{\"insert\":{\"@ref\":\"classes/spells/104979509696660483\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}," +
+      "{\"insert\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}," +
         "\"action\":\"create\",\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"test\"}}}}}"
     );
 
     assertJson(
       Insert(
-        Ref("classes/spells/104979509696660483"),
+        new RefV("104979509696660483", new RefV("spells", Native.CLASSES)),
         Value(new Instant(0)),
         Value("create"),
         Obj("data", Obj("name", Value("test")))
       ),
-      "{\"insert\":{\"@ref\":\"classes/spells/104979509696660483\"},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}," +
+      "{\"insert\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}," +
         "\"action\":\"create\",\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"test\"}}}}}"
     );
   }
@@ -507,21 +506,21 @@ public class SerializationSpec {
   public void shouldSerializeRemove() throws Exception {
     assertJson(
       Remove(
-        Ref("classes/spells/104979509696660483"),
+        new RefV("104979509696660483", new RefV("spells", Native.CLASSES)),
         Value(new Instant(0)),
         Action.DELETE
       ),
-      "{\"remove\":{\"@ref\":\"classes/spells/104979509696660483\"}," +
+      "{\"remove\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}," +
         "\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"},\"action\":\"delete\"}"
     );
 
     assertJson(
       Remove(
-        Ref("classes/spells/104979509696660483"),
+        new RefV("104979509696660483", new RefV("spells", Native.CLASSES)),
         Value(new Instant(0)),
         Value("delete")
       ),
-      "{\"remove\":{\"@ref\":\"classes/spells/104979509696660483\"}," +
+      "{\"remove\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}," +
         "\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"},\"action\":\"delete\"}"
     );
   }
@@ -571,75 +570,75 @@ public class SerializationSpec {
   @Test
   public void shouldSerializeMatchFunction() throws Exception {
     assertJson(
-      Match(Ref("indexes/all_users")),
-      "{\"match\":{\"@ref\":\"indexes/all_users\"}}"
+      Match(new RefV("all_users", Native.INDEXES)),
+      "{\"match\":{\"@ref\":{\"id\":\"all_users\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}"
     );
 
     assertJson(
-      Match(Ref("indexes/spells_by_element"), Value("fire")),
-      "{\"match\":{\"@ref\":\"indexes/spells_by_element\"},\"terms\":\"fire\"}"
+      Match(new RefV("spells_by_element", Native.INDEXES), Value("fire")),
+      "{\"match\":{\"@ref\":{\"id\":\"spells_by_element\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}},\"terms\":\"fire\"}"
     );
   }
 
   @Test
   public void shouldSerializeUnion() throws Exception {
     assertJson(
-      Union(Ref("databases"), Ref("keys")),
-      "{\"union\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+      Union(Native.DATABASES, Native.KEYS),
+      "{\"union\":[{\"@ref\":{\"id\":\"databases\"}},{\"@ref\":{\"id\":\"keys\"}}]}"
     );
 
     assertJson(
-      Union(ImmutableList.of(Ref("databases"), Ref("keys"))),
-      "{\"union\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+      Union(ImmutableList.of(Native.DATABASES, Native.KEYS)),
+      "{\"union\":[{\"@ref\":{\"id\":\"databases\"}},{\"@ref\":{\"id\":\"keys\"}}]}"
     );
 
     assertJson(
-      Union(Arr(Ref("databases"), Ref("keys"))),
-      "{\"union\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+      Union(Arr(Native.DATABASES, Native.KEYS)),
+      "{\"union\":[{\"@ref\":{\"id\":\"databases\"}},{\"@ref\":{\"id\":\"keys\"}}]}"
     );
   }
 
   @Test
   public void shouldSerializeIntersection() throws Exception {
     assertJson(
-      Intersection(Ref("databases"), Ref("keys")),
-      "{\"intersection\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+      Intersection(Native.DATABASES, Native.KEYS),
+      "{\"intersection\":[{\"@ref\":{\"id\":\"databases\"}},{\"@ref\":{\"id\":\"keys\"}}]}"
     );
 
     assertJson(
-      Intersection(ImmutableList.of(Ref("databases"), Ref("keys"))),
-      "{\"intersection\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+      Intersection(ImmutableList.of(Native.DATABASES, Native.KEYS)),
+      "{\"intersection\":[{\"@ref\":{\"id\":\"databases\"}},{\"@ref\":{\"id\":\"keys\"}}]}"
     );
 
     assertJson(
-      Intersection(Arr(Ref("databases"), Ref("keys"))),
-      "{\"intersection\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+      Intersection(Arr(Native.DATABASES, Native.KEYS)),
+      "{\"intersection\":[{\"@ref\":{\"id\":\"databases\"}},{\"@ref\":{\"id\":\"keys\"}}]}"
     );
   }
 
   @Test
   public void shouldSerializeDifference() throws Exception {
     assertJson(
-      Difference(Ref("databases"), Ref("keys")),
-      "{\"difference\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+      Difference(Native.DATABASES, Native.KEYS),
+      "{\"difference\":[{\"@ref\":{\"id\":\"databases\"}},{\"@ref\":{\"id\":\"keys\"}}]}"
     );
 
     assertJson(
-      Difference(ImmutableList.of(Ref("databases"), Ref("keys"))),
-      "{\"difference\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+      Difference(ImmutableList.of(Native.DATABASES, Native.KEYS)),
+      "{\"difference\":[{\"@ref\":{\"id\":\"databases\"}},{\"@ref\":{\"id\":\"keys\"}}]}"
     );
 
     assertJson(
-      Difference(Arr(Ref("databases"), Ref("keys"))),
-      "{\"difference\":[{\"@ref\":\"databases\"},{\"@ref\":\"keys\"}]}"
+      Difference(Arr(Native.DATABASES, Native.KEYS)),
+      "{\"difference\":[{\"@ref\":{\"id\":\"databases\"}},{\"@ref\":{\"id\":\"keys\"}}]}"
     );
   }
 
   @Test
   public void shouldSerializeDistinct() throws Exception {
     assertJson(
-      Distinct(Match(Ref("indexes/some_set"))),
-      "{\"distinct\":{\"match\":{\"@ref\":\"indexes/some_set\"}}}"
+      Distinct(Match(new RefV("some_set", Native.INDEXES))),
+      "{\"distinct\":{\"match\":{\"@ref\":{\"id\":\"some_set\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}}"
     );
   }
 
@@ -647,12 +646,12 @@ public class SerializationSpec {
   public void shouldSerializeJoin() throws Exception {
     assertJson(
       Join(
-        Match(Ref("indexes/spellbooks_by_owner"), Ref("classes/characters/104979509695139637")),
-        Ref("indexes/spells_by_spellbook")
+        Match(new RefV("spellbooks_by_owner", Native.INDEXES), new RefV("104979509695139637", new RefV("characters", Native.CLASSES))),
+        new RefV("spells_by_spellbook", Native.INDEXES)
       ),
-      "{\"join\":{\"match\":{\"@ref\":\"indexes/spellbooks_by_owner\"}," +
-        "\"terms\":{\"@ref\":\"classes/characters/104979509695139637\"}}," +
-        "\"with\":{\"@ref\":\"indexes/spells_by_spellbook\"}}"
+      "{\"join\":{\"match\":{\"@ref\":{\"id\":\"spellbooks_by_owner\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}," +
+        "\"terms\":{\"@ref\":{\"id\":\"104979509695139637\",\"class\":{\"@ref\":{\"id\":\"characters\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}}," +
+        "\"with\":{\"@ref\":{\"id\":\"spells_by_spellbook\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}"
     );
   }
 
@@ -660,10 +659,10 @@ public class SerializationSpec {
   public void shouldSerializeLogin() throws Exception {
     assertJson(
       Login(
-        Ref("classes/characters/104979509695139637"),
+        new RefV("104979509695139637", new RefV("characters", Native.CLASSES)),
         Obj("password", Value("abracadabra"))
       ),
-      "{\"login\":{\"@ref\":\"classes/characters/104979509695139637\"}," +
+      "{\"login\":{\"@ref\":{\"id\":\"104979509695139637\",\"class\":{\"@ref\":{\"id\":\"characters\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}," +
         "\"params\":{\"object\":{\"password\":\"abracadabra\"}}}"
     );
   }
@@ -676,8 +675,8 @@ public class SerializationSpec {
   @Test
   public void shouldSerializeIdentify() throws Exception {
     assertJson(
-      Identify(Ref("classes/characters/104979509695139637"), Value("abracadabra")),
-      "{\"identify\":{\"@ref\":\"classes/characters/104979509695139637\"},\"password\":\"abracadabra\"}"
+      Identify(new RefV("104979509695139637", new RefV("characters", Native.CLASSES)), Value("abracadabra")),
+      "{\"identify\":{\"@ref\":{\"id\":\"104979509695139637\",\"class\":{\"@ref\":{\"id\":\"characters\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"password\":\"abracadabra\"}"
     );
   }
 
@@ -910,9 +909,9 @@ public class SerializationSpec {
 
   @Test
   public void shouldSerializeAt() throws Exception {
-    assertJson(At(Value(1L), Get(Ref("classes"))), "{\"at\":1,\"expr\":{\"get\":{\"@ref\":\"classes\"}}}");
-    assertJson(At(Time(Value("1970-01-01T00:00:00+00:00")), Get(Ref("classes"))),
-      "{\"at\":{\"time\":\"1970-01-01T00:00:00+00:00\"},\"expr\":{\"get\":{\"@ref\":\"classes\"}}}");
+    assertJson(At(Value(1L), Get(Native.CLASSES)), "{\"at\":1,\"expr\":{\"get\":{\"@ref\":{\"id\":\"classes\"}}}}");
+    assertJson(At(Time(Value("1970-01-01T00:00:00+00:00")), Get(Native.CLASSES)),
+      "{\"at\":{\"time\":\"1970-01-01T00:00:00+00:00\"},\"expr\":{\"get\":{\"@ref\":{\"id\":\"classes\"}}}}");
   }
 
   private void assertJson(Expr expr, String jsonString) throws JsonProcessingException {

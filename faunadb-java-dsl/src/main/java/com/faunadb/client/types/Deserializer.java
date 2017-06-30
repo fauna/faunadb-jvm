@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import static com.faunadb.client.types.Value.ArrayV.*;
+import static java.lang.String.format;
 
 class Deserializer {
 
@@ -61,7 +62,7 @@ class Deserializer {
       String firstField = tree.fieldNames().next();
       switch (firstField) {
         case "@ref":
-          return json.convertValue(tree, RefV.class);
+          return deserializeRefs(tree);
         case "@set":
           return json.convertValue(tree, SetRefV.class);
         case "@ts":
@@ -77,6 +78,31 @@ class Deserializer {
         default:
           return json.convertValue(tree, ObjectV.class);
       }
+    }
+
+    private RefV deserializeRefs(JsonNode node) {
+      if (node == null)
+        return null;
+
+      JsonNode ref = node.get("@ref");
+
+      if (ref != null)
+        return makeRef(ref);
+
+      throw new IllegalArgumentException(format("Malformed @ref: %s", node));
+    }
+
+    private RefV makeRef(JsonNode node) {
+      JsonNode id = node.get("id");
+      RefV clazz = deserializeRefs(node.get("class"));
+      RefV database = deserializeRefs(node.get("database"));
+
+      String idE = id.textValue();
+
+      if (clazz == null && database == null)
+        return Native.fromName(idE);
+
+      return new RefV(idE, clazz, database);
     }
   }
 

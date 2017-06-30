@@ -7,10 +7,7 @@ import com.faunadb.client.types.FaunaConstructor;
 import com.faunadb.client.types.FaunaField;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
-import com.faunadb.client.types.Value.BooleanV;
-import com.faunadb.client.types.Value.ObjectV;
-import com.faunadb.client.types.Value.RefV;
-import com.faunadb.client.types.Value.StringV;
+import com.faunadb.client.types.Value.*;
 import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -31,9 +28,9 @@ import java.util.Random;
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
 import static com.faunadb.client.query.Language.*;
+import static com.faunadb.client.query.Language.Class;
 import static com.faunadb.client.query.Language.TimeUnit.*;
 import static com.faunadb.client.types.Codec.*;
-import static com.faunadb.client.types.Decoder.decode;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.collection.IsArrayContainingInOrder.arrayContaining;
@@ -58,13 +55,14 @@ public abstract class DslSpec {
   protected static final Field<Spell> SPELL_FIELD = DATA.to(Spell.class);
   protected static final Field<Long> TS_FIELD = Field.at("ts").to(LONG);
   protected static final Field<RefV> REF_FIELD = Field.at("ref").to(REF);
-  protected static final Field<RefV> RESOURCE_FIELD = Field.at("resource").to(REF);
+  protected static final Field<RefV> INSTANCE_FIELD = Field.at("instance").to(REF);
   protected static final Field<ImmutableList<RefV>> REF_LIST = DATA.collect(Field.as(REF));
 
   protected static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).to(STRING);
   protected static final Field<String> ELEMENT_FIELD = DATA.at(Field.at("element")).to(STRING);
   protected static final Field<Value> ELEMENTS_LIST = DATA.at(Field.at("elements"));
   protected static final Field<Long> COST_FIELD = DATA.at(Field.at("cost")).to(LONG);
+  protected static final Field<String> SECRET_FIELD = Field.at("secret").to(STRING);
 
   protected static RefV magicMissile;
   protected static RefV fireball;
@@ -95,36 +93,36 @@ public abstract class DslSpec {
     query(ImmutableList.of(
       CreateIndex(Obj(
         "name", Value("all_spells"),
-        "source", Ref("classes/spells")
+        "source", Class("spells")
       )),
 
       CreateIndex(Obj(
         "name", Value("spells_by_element"),
-        "source", Ref("classes/spells"),
+        "source", Class("spells"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("element"))))
       )),
 
       CreateIndex(Obj(
         "name", Value("elements_of_spells"),
-        "source", Ref("classes/spells"),
+        "source", Class("spells"),
         "values", Arr(Obj("field", Arr(Value("data"), Value("element"))))
       )),
 
       CreateIndex(Obj(
         "name", Value("spellbooks_by_owner"),
-        "source", Ref("classes/spellbooks"),
+        "source", Class("spellbooks"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("owner"))))
       )),
 
       CreateIndex(Obj(
         "name", Value("spells_by_spellbook"),
-        "source", Ref("classes/spells"),
+        "source", Class("spells"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("spellbook"))))
       ))
     )).get();
 
     magicMissile = query(
-      Create(Ref("classes/spells"),
+      Create(Class("spells"),
         Obj("data",
           Obj(
             "name", Value("Magic Missile"),
@@ -133,7 +131,7 @@ public abstract class DslSpec {
     ).get().get(REF_FIELD);
 
     fireball = query(
-      Create(Ref("classes/spells"),
+      Create(Class("spells"),
         Obj("data",
           Obj(
             "name", Value("Fireball"),
@@ -142,7 +140,7 @@ public abstract class DslSpec {
     ).get().get(REF_FIELD);
 
     faerieFire = query(
-      Create(Ref("classes/spells"),
+      Create(Class("spells"),
         Obj("data",
           Obj(
             "name", Value("Faerie Fire"),
@@ -154,7 +152,7 @@ public abstract class DslSpec {
     ).get().get(REF_FIELD);
 
     summon = query(
-      Create(Ref("classes/spells"),
+      Create(Class("spells"),
         Obj("data",
           Obj(
             "name", Value("Summon Animal Companion"),
@@ -163,24 +161,24 @@ public abstract class DslSpec {
     ).get().get(REF_FIELD);
 
     thor = query(
-      Create(Ref("classes/characters"),
+      Create(Class("characters"),
         Obj("data", Obj("name", Value("Thor"))))
     ).get().get(REF_FIELD);
 
     RefV thorsSpellbook = query(
-      Create(Ref("classes/spellbooks"),
+      Create(Class("spellbooks"),
         Obj("data",
           Obj("owner", thor)))
     ).get().get(REF_FIELD);
 
     thorSpell1 = query(
-      Create(Ref("classes/spells"),
+      Create(Class("spells"),
         Obj("data",
           Obj("spellbook", thorsSpellbook)))
     ).get().get(REF_FIELD);
 
     thorSpell2 = query(
-      Create(Ref("classes/spells"),
+      Create(Class("spells"),
         Obj("data",
           Obj("spellbook", thorsSpellbook)))
     ).get().get(REF_FIELD);
@@ -189,7 +187,7 @@ public abstract class DslSpec {
   @Test
   public void shouldThrowNotFoundWhenInstanceDoesntExists() throws Exception {
     thrown.expectCause(isA(NotFoundException.class));
-    query(Get(Ref("classes/spells/1234"))).get();
+    query(Get(Ref(Class("spells"), "1234"))).get();
   }
 
   @Test
@@ -336,7 +334,7 @@ public abstract class DslSpec {
           Obj("cooldown", Value(5L))))
     ).get();
 
-    assertThat(insertedEvent.get(RESOURCE_FIELD), equalTo(createdInstance.get(REF_FIELD)));
+    assertThat(insertedEvent.get(INSTANCE_FIELD), equalTo(createdInstance.get(REF_FIELD)));
 
     Value removedEvent = query(
       Remove(createdInstance.get(REF_FIELD), Value(2L), DELETE)
@@ -350,7 +348,7 @@ public abstract class DslSpec {
     RefV classRef = onARandomClass();
 
     query(
-      Create(Ref("indexes"),
+      CreateIndex(
         Obj(
           "name", Value(randomStartingWith("class_index_")),
           "source", classRef,
@@ -374,7 +372,7 @@ public abstract class DslSpec {
   @Test
   public void shouldFindASingleInstanceFromIndex() throws Exception {
     Value singleMatch = query(
-      Paginate(Match(Ref("indexes/spells_by_element"), Value("fire")))
+      Paginate(Match(Index("spells_by_element"), Value("fire")))
     ).get();
 
     assertThat(singleMatch.get(REF_LIST), contains(fireball));
@@ -383,7 +381,7 @@ public abstract class DslSpec {
   @Test
   public void shouldListAllItensOnAClassIndex() throws Exception {
     Value allInstances = query(
-      Paginate(Match(Ref("indexes/all_spells")))
+      Paginate(Match(Index("all_spells")))
     ).get();
 
     assertThat(allInstances.get(REF_LIST),
@@ -393,7 +391,7 @@ public abstract class DslSpec {
   @Test
   public void shouldPaginateOverAnIndex() throws Exception {
     Value page1 = query(
-      Paginate(Match(Ref("indexes/all_spells")))
+      Paginate(Match(Index("all_spells")))
         .size(3)
     ).get();
 
@@ -402,7 +400,7 @@ public abstract class DslSpec {
     assertThat(page1.at("before").to(VALUE).getOptional(), is(Optional.<Value>absent()));
 
     Value page2 = query(
-      Paginate(Match(Ref("indexes/all_spells")))
+      Paginate(Match(Index("all_spells")))
         .after(page1.at("after"))
         .size(3)
     ).get();
@@ -417,14 +415,14 @@ public abstract class DslSpec {
   public void shouldDealWithSetRef() throws Exception {
     Value res = query(
       Match(
-        Ref("indexes/spells_by_element"),
+        Index("spells_by_element"),
         Value("arcane"))
     ).get();
 
     ImmutableMap<String, Value> set = res.to(SET_REF).get().parameters();
     assertThat(set.get("terms").to(STRING).get(), equalTo("arcane"));
     assertThat(set.get("match").to(REF).get(),
-      equalTo(new RefV("indexes/spells_by_element")));
+      equalTo(new RefV("spells_by_element", Native.INDEXES)));
   }
 
   @Test
@@ -454,7 +452,7 @@ public abstract class DslSpec {
 
   @Test
   public void shouldEvalDoExpression() throws Exception {
-    Expr ref = new RefV(randomStartingWith(onARandomClass().strValue(), "/"));
+    RefV ref = new RefV(randomStartingWith(), onARandomClass());
 
     Value res = query(
       Do(
@@ -567,11 +565,11 @@ public abstract class DslSpec {
   @Test
   public void shouldReadEventsFromIndex() throws Exception {
     Value events = query(
-      Paginate(Match(Ref("indexes/spells_by_element"), Value("arcane")))
+      Paginate(Match(Index("spells_by_element"), Value("arcane")))
         .events(true)
     ).get();
 
-    assertThat(events.get(DATA).collect(Field.at("resource").to(REF)),
+    assertThat(events.get(DATA).collect(INSTANCE_FIELD),
       contains(magicMissile, faerieFire));
   }
 
@@ -580,8 +578,8 @@ public abstract class DslSpec {
     Value union = query(
       Paginate(
         Union(
-          Match(Ref("indexes/spells_by_element"), Value("arcane")),
-          Match(Ref("indexes/spells_by_element"), Value("fire")))
+          Match(Index("spells_by_element"), Value("arcane")),
+          Match(Index("spells_by_element"), Value("fire")))
       )
     ).get();
 
@@ -594,8 +592,8 @@ public abstract class DslSpec {
     Value intersection = query(
       Paginate(
         Intersection(
-          Match(Ref("indexes/spells_by_element"), Value("arcane")),
-          Match(Ref("indexes/spells_by_element"), Value("nature"))
+          Match(Index("spells_by_element"), Value("arcane")),
+          Match(Index("spells_by_element"), Value("nature"))
         ))
     ).get();
 
@@ -608,8 +606,8 @@ public abstract class DslSpec {
     Value difference = query(
       Paginate(
         Difference(
-          Match(Ref("indexes/spells_by_element"), Value("nature")),
-          Match(Ref("indexes/spells_by_element"), Value("arcane"))
+          Match(Index("spells_by_element"), Value("nature")),
+          Match(Index("spells_by_element"), Value("arcane"))
         ))
     ).get();
 
@@ -622,7 +620,7 @@ public abstract class DslSpec {
     Value distinct = query(
       Paginate(
         Distinct(
-          Match(Ref("indexes/elements_of_spells")))
+          Match(Index("elements_of_spells")))
       )
     ).get();
 
@@ -635,9 +633,9 @@ public abstract class DslSpec {
     Value join = query(
       Paginate(
         Join(
-          Match(Ref("indexes/spellbooks_by_owner"), thor),
+          Match(Index("spellbooks_by_owner"), thor),
           Lambda(Value("spellbook"),
-            Match(Ref("indexes/spells_by_spellbook"), Var("spellbook")))
+            Match(Index("spells_by_spellbook"), Var("spellbook")))
         ))
     ).get();
 
@@ -882,7 +880,7 @@ public abstract class DslSpec {
     Expr lambda = Lambda(Arr(Value("x"), Value("y")), Concat(Arr(Var("x"), Var("y")), Value("/")));
     query(CreateFunction(Obj("name", Value(functionName), "body", Query(lambda)))).get();
 
-    assertThat(query(Exists(Ref(format("functions/%s", functionName)))).get(), equalTo((Value)BooleanV.TRUE));
+    assertThat(query(Exists(Function(functionName))).get(), equalTo((Value)BooleanV.TRUE));
   }
 
   @Test
@@ -891,7 +889,7 @@ public abstract class DslSpec {
     query(CreateFunction(Obj("name", Value("concat_with_slash"), "body", Query(lambda)))).get();
 
     assertThat(
-      query(Call(Ref("functions/concat_with_slash"), Value("a"), Value("b"))).get(),
+      query(Call(Function("concat_with_slash"), Value("a"), Value("b"))).get(),
       equalTo(Value("a/b"))
     );
   }
@@ -915,7 +913,7 @@ public abstract class DslSpec {
   @Test
   public void shouldCreateASpellUsingEncoderDecoder() throws Exception {
     RefV ref = query(
-      Create(Ref("classes/spells"),
+      Create(Class("spells"),
         Obj("data", Value(new Spell("Blah", "blah", 10)))
       )).get().get(REF_FIELD);
 
@@ -929,10 +927,56 @@ public abstract class DslSpec {
     query(Delete(ref)).get();
   }
 
+  @Test
+  public void shouldTestReferences() throws Exception {
+    assertThat(
+      query(Index("all_spells")).get(),
+      equalTo((Value) new RefV("all_spells", Native.INDEXES))
+    );
+
+    assertThat(
+      query(Class("spells")).get(),
+      equalTo((Value) new RefV("spells", Native.CLASSES))
+    );
+
+    assertThat(
+      query(Database("faunadb-database")).get(),
+      equalTo((Value) new RefV("faunadb-database", Native.DATABASES))
+    );
+
+    assertThat(
+      query(new RefV("1234567890", Native.KEYS)).get(),
+      equalTo((Value) new RefV("1234567890", Native.KEYS))
+    );
+
+    assertThat(
+      query(Function("function_name")).get(),
+      equalTo((Value) new RefV("function_name", Native.FUNCTIONS))
+    );
+
+    assertThat(
+      query(Ref(Class("spells"), Value("1234567890"))).get(),
+      equalTo((Value) new RefV("1234567890", new RefV("spells", Native.CLASSES)))
+    );
+
+    assertThat(
+      query(Ref(Class("spells"), "1234567890")).get(),
+      equalTo((Value) new RefV("1234567890", new RefV("spells", Native.CLASSES)))
+    );
+  }
+
+  @Test
+  public void shouldCreateNestedRefFromString() throws Exception {
+    assertThat(
+      query(Ref("classes/widget/123")).get(),
+      equalTo((Value) new RefV("123", new RefV("widget", Native.CLASSES)))
+    );
+  }
+
   protected RefV onARandomClass() throws Exception {
 
     Value clazz = query(
-      Create(Ref("classes"),
+      CreateClass(
         Obj("name", Value(randomStartingWith("some_class_"))))
     ).get();
 
