@@ -1,4 +1,5 @@
 1.2.1-SNAPSHOT
+* Fix possible NullPointerException when checking for failing requests
 
 1.2.0
 * Add support for scala 2.12.x

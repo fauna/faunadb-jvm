@@ -5,16 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.common.Connection
+import com.ning.http.client.{ AsyncHttpClient, Response => HttpResponse }
 import faunadb.errors._
 import faunadb.query.Expr
 import faunadb.util.FutureImplicits._
 import faunadb.values.{ ArrayV, NullV, Value }
-import java.io.IOException
 import java.net.ConnectException
 import java.util.concurrent.TimeoutException
-import com.ning.http.client.{ AsyncHttpClient, Response => HttpResponse }
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.control.NonFatal
 
 /** Companion object to the FaunaClient class. */
 object FaunaClient {
@@ -158,14 +158,14 @@ class FaunaClient(connection: Connection) {
             case 404 => throw new NotFoundException(error)
             case 500 => throw new InternalException(error)
             case 503 => throw new UnavailableException(error)
-            case _ => throw new UnknownException(error)
+            case _   => throw new UnknownException(error)
           }
         } catch {
-          case ex: IOException =>
-            response.getStatusCode match {
-              case 503 => throw new UnavailableException("Service Unavailable: Unparseable response.")
-              case s@_ => throw new UnknownException("Unparsable service " + s + "response.")
-            }
+          case e: FaunaException => throw e
+          case NonFatal(_)       => response.getStatusCode match {
+            case 503   => throw new UnavailableException("Service Unavailable: Unparseable response.")
+            case s @ _ => throw new UnknownException(s"Unparseable service $s response.")
+          }
         }
       case _ =>
     }
