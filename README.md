@@ -105,6 +105,8 @@ public class Main {
       .at("data").collect(Field.as(Codec.REF));
 
     System.out.println(indexes);
+    
+    client.close();
   }
 }
 
@@ -141,6 +143,8 @@ object Main extends App {
   println(
     Await.result(indexes, Duration.Inf)
   )
+  
+  client.close()
 }
 ```
 
