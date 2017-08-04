@@ -96,10 +96,8 @@ import com.google.common.collect.*;
 import static com.faunadb.client.query.Language.*;
 
 class Person {
-  @FaunaField
-  private final String firstName;
-  @FaunaField
-  private final String lastName;
+  @FaunaField private final String firstName;
+  @FaunaField private final String lastName;
 
   @FaunaConstructor
   public Person(@FaunaField("firstName") String firstName, @FaunaField("lastName") String lastName) {
@@ -109,8 +107,7 @@ class Person {
 }
 
 public class Main {
-  private static final Field<Value> DATA_FIELD = Field.at("data");
-  private static final Field<Person> PERSON_FIELD = DATA_FIELD.to(Person.class);
+  private static final Field<Person> PERSON_FIELD = Field.at("data").to(Person.class);
 
   public static void main(String[] args) throws Exception {
     FaunaClient client = FaunaClient.builder()
@@ -151,12 +148,14 @@ import faunadb.values._
 import scala.concurrent._
 import scala.concurrent.duration._
 
+case class Person(firstName: String, lastName: String)
+
+object Person {
+  implicit val personCodec: Codec[Person] = Codec.caseClass[Person]
+}
+
 object Main extends App {
   import ExecutionContext.Implicits._
-
-  case class Person(firstName: String, lastName: String)
-
-  implicit val personCodec: Codec[Person] = Codec.caseClass[Person]
 
   val client = FaunaClient(secret = "your-secret-here")
 
