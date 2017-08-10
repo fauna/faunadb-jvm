@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * <p>Instruct the encoder/decoder to rename the annotated enum field.</p>
  * <p>
- * <p>If not used the method {@link Enum#name()} will be used instead.</p>
+ * <p>If absent, the method {@link Enum#name()} will be used instead.</p>
  * <p>
  * <pre>{@code
  * enum CpuTypes {

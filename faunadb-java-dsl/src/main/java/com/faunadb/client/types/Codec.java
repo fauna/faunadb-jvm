@@ -52,9 +52,9 @@ import static java.lang.String.format;
  * }
  * }</pre>
  *
- * <p>It' possible to annotate a class and let the internal framework encode/decode a class automatically.</p>
- * <p>Refer to the annotations {@link FaunaField}, {@link FaunaConstructor}, {@link FaunaIgnore} and {@link FaunaEnum} to see how it can be used.</p>
- * <p>See {@link Encoder}, {@link Decoder} and {@link com.faunadb.client.query.Language#Value(Object)}</p>
+ * <p>It is possible to annotate a class and let the internal framework encode/decode instances of the class automatically.</p>
+ * <p>Refer to the annotations {@link FaunaField}, {@link FaunaConstructor}, {@link FaunaIgnore} and {@link FaunaEnum} for more details.</p>
+ * <p>Also see {@link Encoder}, {@link Decoder} and {@link com.faunadb.client.query.Language#Value(Object)}</p>
  *
  * @param <T> desired resulting type
  * @see Result
@@ -64,7 +64,7 @@ public interface Codec<T> {
   Result<Value> encode(T value);
 
   /**
-   * Coerce a {@link Value} to itself or fail value is an instance of {@link NullV}.
+   * Coerce a {@link Value} to itself. Returns a Fail value if an instance of {@link NullV}.
    */
   Codec<Value> VALUE = new Codec<Value>() {
     @Override
@@ -85,87 +85,87 @@ public interface Codec<T> {
   };
 
   /**
-   * Coerce a {@link Value} to an instance of {@link RefV}
+   * Coerces a {@link Value} to a {@link RefV}
    */
   Codec<RefV> REF = Transformations.mapTo(RefV.class, Functions.<RefV>identity(), Transformations.<RefV, Value>upCast());
 
   /**
-   * Coerce a {@link Value} to an instance of {@link SetRefV}
+   * Coerces a {@link Value} to a {@link SetRefV}
    */
   Codec<SetRefV> SET_REF = Transformations.mapTo(SetRefV.class, Functions.<SetRefV>identity(), Transformations.<SetRefV, Value>upCast());
 
   /**
-   * Coerce a {@link Value} to a {@link Long}
+   * Coerces a {@link Value} to a {@link Long}
    */
   Codec<Long> LONG = Transformations.mapTo(LongV.class, Transformations.<LongV, Long>scalarValue(), Transformations.LONG_TO_VALUE);
 
   /**
-   * Coerce a {@link Value} to a {@link Integer}
+   * Coerces a {@link Value} to a {@link Integer}
    */
   Codec<Integer> INTEGER = Transformations.mapWith(LONG, Transformations.LONG_TO_INTEGER, Transformations.INTEGER_TO_LONG);
 
   /**
-   * Coerce a {@link Value} to a {@link Short}
+   * Coerces a {@link Value} to a {@link Short}
    */
   Codec<Short> SHORT = Transformations.mapWith(LONG, Transformations.LONG_TO_SHORT, Transformations.SHORT_TO_LONG);
 
   /**
-   * Coerce a {@link Value} to a {@link Byte}
+   * Coerces a {@link Value} to a {@link Byte}
    */
   Codec<Byte> BYTE = Transformations.mapWith(LONG, Transformations.LONG_TO_BYTE, Transformations.BYTE_TO_LONG);
 
   /**
-   * Coerce a {@link Value} to a {@link Character}
+   * Coerces a {@link Value} to a {@link Character}
    */
   Codec<Character> CHAR = Transformations.mapWith(LONG, Transformations.LONG_TO_CHAR, Transformations.CHAR_TO_LONG);
 
   /**
-   * Coerce a {@link Value} to an {@link Instant}
+   * Coerces a {@link Value} to an {@link Instant}
    */
   Codec<Instant> TIME = Transformations.mapTo(TimeV.class, Transformations.VALUE_TO_INSTANT, Transformations.INSTANT_TO_VALUE);
 
   /**
-   * Coerce a {@link Value} to an {@link HighPrecisionTime}
+   * Coerces a {@link Value} to a {@link HighPrecisionTime}
    */
   Codec<HighPrecisionTime> HP_TIME = Transformations.mapTo(TimeV.class, Transformations.<TimeV, HighPrecisionTime>scalarValue(), Transformations.HP_TIME_TO_VALUE);
 
   /**
-   * Coerce a {@link Value} to a {@link String}
+   * Coerces a {@link Value} to a {@link String}
    */
   Codec<String> STRING = Transformations.mapTo(StringV.class, Transformations.<StringV, String>scalarValue(), Transformations.STRING_TO_VALUE);
 
   /**
-   * Coerce a {@link Value} to a {@link Double}
+   * Coerces a {@link Value} to a {@link Double}
    */
   Codec<Double> DOUBLE = Transformations.mapTo(DoubleV.class, Transformations.<DoubleV, Double>scalarValue(), Transformations.DOUBLE_TO_VALUE);
 
   /**
-   * Coerce a {@link Value} to a {@link Float}
+   * Coerces a {@link Value} to a {@link Float}
    */
   Codec<Float> FLOAT = Transformations.mapWith(DOUBLE, Transformations.DOUBLE_TO_FLOAT, Transformations.FLOAT_TO_DOUBLE);
 
   /**
-   * Coerce a {@link Value} to a {@link Boolean}
+   * Coerces a {@link Value} to a {@link Boolean}
    */
   Codec<Boolean> BOOLEAN = Transformations.mapTo(BooleanV.class, Transformations.<BooleanV, Boolean>scalarValue(), Transformations.BOOLEAN_TO_VALUE);
 
   /**
-   * Coerce a {@link Value} to a {@link LocalDate}
+   * Coerces a {@link Value} to a {@link LocalDate}
    */
   Codec<LocalDate> DATE = Transformations.mapTo(DateV.class, Transformations.<DateV, LocalDate>scalarValue(), Transformations.LOCAL_DATE_TO_VALUE);
 
   /**
-   * Coerce a {@link Value} to an {@link ImmutableList} of {@link Value}
+   * Coerces a {@link Value} to an {@link ImmutableList} of {@link Value}
    */
   Codec<ImmutableList<Value>> ARRAY = Transformations.mapTo(ArrayV.class, Transformations.VALUE_TO_LIST, Transformations.LIST_TO_VALUE);
 
   /**
-   * Coerce a {@link Value} to an {@link ImmutableMap} of {@link Value}
+   * Coerces a {@link Value} to an {@link ImmutableMap} of {@link String} to {@link Value}
    */
   Codec<ImmutableMap<String, Value>> OBJECT = Transformations.mapTo(ObjectV.class, Transformations.VALUE_TO_MAP, Transformations.MAP_TO_VALUE);
 
   /**
-   * Coerce a {@link Value} to an array of bytes
+   * Coerces a {@link Value} to an array of bytes
    */
   Codec<byte[]> BYTES = Transformations.mapTo(BytesV.class, Transformations.<BytesV, byte[]>scalarValue(), Transformations.BYTES_TO_VALUE);
 }

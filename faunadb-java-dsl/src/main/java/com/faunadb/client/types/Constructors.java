@@ -36,7 +36,9 @@ final class Constructors {
     if (decoder != null)
       return decoder;
 
-    throw new FaunaException(format("No suitable constructor or factory method found for type %s", clazz.getName()));
+    throw new FaunaException(
+      format("No suitable constructor or factory method found for type %s. Ensure that a factory method or constructor is annotated with @%s",
+        clazz.getName(), FaunaConstructor.class.getSimpleName()));
   }
 
   private static Function<Value, Object> getStaticFactoryMethodDecoder(Class<?> clazz) {

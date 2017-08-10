@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.lang.String.format;
 
 /**
- * Auxiliary class used to create types representation while decoding user defined objects.
+ * Helper class which contains convenience methods for creating types used to decode user-defined classes.
  */
 public final class Types {
   private Types() {

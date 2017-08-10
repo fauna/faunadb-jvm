@@ -28,8 +28,7 @@ public final class Decoder {
   /**
    * Decode a FaunaDB {@link Value} to a specified type.
    * <p>
-   * <p>This method is useful if you need to decode
-   * collections types.</p>
+   * <p>This method is useful if you need to decode collections.</p>
    * <p>
    * <pre>{@code
    *     ArrayV array = new ArrayV(Arrays.asList(new StringV("str1"), new StringV("str2")));
@@ -65,7 +64,7 @@ public final class Decoder {
    *     Result<User> user = Decoder.decode(new ObjectV(...), User.class);
    * }</pre>
    * <p>
-   * <p>It's possible to decode primitive types and array of primitive types:</p>
+   * <p>It's possible to decode primitive types and arrays of primitive types</p>
    * <p>
    * <pre>{@code
    *     Result<String> string = Decoder.decode(new StringV("string"), String.class);

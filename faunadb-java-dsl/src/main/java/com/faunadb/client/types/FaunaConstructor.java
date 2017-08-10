@@ -6,29 +6,29 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p>Instruct the decoder which constructor to use when decoding a object.
- * It can also be used in a public static method instead in a constructor.</p>
+ * <p>Specifies which constructor to use when decoding an object with a {@link Decoder}.
+ * You can also annotate a public static method, which will then be used instead of a constructor.</p>
  *
- * <p>That attribute can only be used once per class.</p>
+ * <p>This annotation can only be used once per class.</p>
  *
  * <pre>{@code
  * class Product {
- *     private string description;
+ *     private String description;
  *     private double price;
  *
  *     @FaunaConstructor
- *     public Product(@FaunaField("description") string description, @FaunaField("price") double price) {
+ *     public Product(@FaunaField("description") String description, @FaunaField("price") double price) {
  *         this.description = description;
  *         this.price = price;
  *     }
  * }
  *
  * class Order {
- *     private string number;
+ *     private String number;
  *     private List<Product> products;
  *
  *     @FaunaConstructor
- *     public static Order createOrder(@FaunaField("number") string number, @FaunaField("products") List<Product> products) {
+ *     public static Order createOrder(@FaunaField("number") String number, @FaunaField("products") List<Product> products) {
  *         Order order = new Order;
  *         order.number = number;
  *         order.products = products;

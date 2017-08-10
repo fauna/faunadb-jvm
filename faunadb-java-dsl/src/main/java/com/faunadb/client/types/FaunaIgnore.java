@@ -4,12 +4,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * <p>Instruct the encoder/decoder to not encode/decode the specified member.</p>
+ * <p>Instructs the encoder/decoder to not encode/decode the annotated member.</p>
  *
  * <pre>{@code
  * class User {
- *     private string userName;
- *     private string password;
+ *     private String userName;
+ *     private String password;
  *
  *     @FaunaField("user_name")
  *     public String getUserName() { return userName; }

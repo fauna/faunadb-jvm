@@ -6,23 +6,23 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p>Maps a field/getter or constructor parameter to FaunaDB object property while encoding/decoding an object.</p>
+ * <p>Maps a field, getter, or constructor parameter to an object field in FaunaDB when encoding or decoding an object.</p>
  * <p>
  * <pre>{@code
  * class Car {
  *     @FaunaField("model")
- *     private string model;
+ *     private String model;
  *
  *     @FaunaField("manufacturer")
- *     private string manufacturer;
+ *     private String manufacturer;
  * }
  *
  * class Product {
- *     private string description;
+ *     private String description;
  *     private double price;
  *
  *     @FaunaConstructor
- *     public Product(@FaunaField("Description") string description, @FaunaField("Price") double price) {
+ *     public Product(@FaunaField("description") String description, @FaunaField("price") double price) {
  *         this.description = description;
  *         this.price = price;
  *     }

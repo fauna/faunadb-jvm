@@ -403,7 +403,7 @@ public class DecoderSpec {
     @Test
     public void shouldFailWhenNotSuitableConstructorAreFound() {
         assertEquals(
-          Result.fail("No suitable constructor or factory method found for type com.faunadb.client.DecoderSpec$ObjectWithNoAnnotatedConstructorAndNotDefaultConstructor"),
+          Result.fail("No suitable constructor or factory method found for type com.faunadb.client.DecoderSpec$ObjectWithNoAnnotatedConstructorAndNotDefaultConstructor. Ensure that a factory method or constructor is annotated with @FaunaConstructor"),
           decode(EMPTY_OBJECT, ObjectWithNoAnnotatedConstructorAndNotDefaultConstructor.class)
         );
     }

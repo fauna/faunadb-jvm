@@ -77,7 +77,7 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Attempts to coerce this value using the {@link Codec} passed
+   * Attempts to coerce this value using the {@link Codec} passed.
    *
    * @param codec codec function to attempt coercion
    * @return the {@link Result} of the coercion
@@ -88,7 +88,7 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Attempts to coerce this value using the {@link Decoder} class into the specified type
+   * Attempts to decode this value using the {@link Decoder} into the specified type.
    *
    * @param clazz a class type to convert
    * @return the {@link Result} of the coercion
@@ -99,7 +99,7 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Attempts to convert the specified object into the corresponding {@link Value} type
+   * Attempts to encode an object using an {@link Encoder} into a {@link Value} type.
    *
    * @param obj the object instance to convert
    * @return the {@link Result} of the conversion
@@ -110,7 +110,7 @@ public abstract class Value extends Expr {
 
   /**
    * Attempts to coerce this value to a {@link Map}.
-   * This method is only util if this object is an instance of {@link ObjectV}.
+   * This object must be an instance of {@link ObjectV}.
    *
    * @param valueType the type of the values.
    * @return a {@link Result} with the resulting map containing the keys/values.
@@ -123,7 +123,7 @@ public abstract class Value extends Expr {
 
   /**
    * Attempts to coerce this value to a {@link Collection}.
-   * This method is only util if this object is an instance of {@link ArrayV}.
+   * This object must be an instance of {@link ArrayV}.
    *
    * @param elementType the type of the elements in the collection.
    * @return a {@link Result} with the resulting collection.

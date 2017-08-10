@@ -134,7 +134,7 @@ public final class Field<T> {
    * Creates a field extractor that coerces its value to the class passed
    *
    * @param type class to be used to coerce the field's value
-   * @return a new field that coerces its value using the class passed
+   * @return a new {@link Field} that coerces its value using the class passed
    */
   public <A> Field<A> to(final Class<A> type) {
     return new Field<>(path, new Codec<A>() {
@@ -151,8 +151,8 @@ public final class Field<T> {
   }
 
   /**
-   * Creates a field extractor that collects each inner value of an array using the nested field passed,
-   * assuming the root value is an instance of {@link com.faunadb.client.types.Value.ArrayV}
+   * Creates a field extractor that collects each inner value of an array using the nested {@link Field} passed,
+   * assuming the target value is an instance of {@link com.faunadb.client.types.Value.ArrayV}
    *
    * @param field field to be extracted from each array's element
    * @return a new field that collects each inner value using the field passed
