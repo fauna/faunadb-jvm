@@ -28,11 +28,16 @@ public class ObjectCodecSpec {
     final Field<Long> age = Field.at("data", "age").to(LONG);
 
     @Override
-    public Result<CustomObject> apply(Value value) {
+    public Result<CustomObject> decode(Value value) {
       CustomObject res = new CustomObject();
       res.name = value.get(name);
       res.age = value.get(age).intValue();
       return Result.success(res);
+    }
+
+    @Override
+    public Result<Value> encode(CustomObject value) {
+      return Result.fail("not implemented");
     }
   };
 

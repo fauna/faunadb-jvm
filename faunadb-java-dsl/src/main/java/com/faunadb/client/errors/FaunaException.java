@@ -21,6 +21,11 @@ public class FaunaException extends RuntimeException {
     this.response = Optional.absent();
   }
 
+  public FaunaException(String message, Throwable cause) {
+    super(message, cause);
+    this.response = Optional.absent();
+  }
+
   /**
    * Gets the list of errors that caused the query to fail.
    */

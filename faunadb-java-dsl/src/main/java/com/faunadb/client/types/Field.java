@@ -24,8 +24,13 @@ public final class Field<T> {
     }
 
     @Override
-    public Result<ImmutableList<A>> apply(Value input) {
+    public Result<ImmutableList<A>> decode(Value input) {
       return input.to(ARRAY).flatMap(toList);
+    }
+
+    @Override
+    public Result<Value> encode(ImmutableList<A> value) {
+      throw new IllegalArgumentException("not implemented");
     }
 
     private final Function<ImmutableList<Value>, Result<ImmutableList<A>>> toList =
@@ -93,6 +98,12 @@ public final class Field<T> {
 
   private final Path path;
   private final Codec<T> codec;
+  private final Function<Value, Result<T>> codecFn = new Function<Value, Result<T>>() {
+    @Override
+    public Result<T> apply(Value input) {
+      return codec.decode(input);
+    }
+  };
 
   private Field(Path path, Codec<T> codec) {
     this.path = path;
@@ -120,8 +131,28 @@ public final class Field<T> {
   }
 
   /**
-   * Creates a field extractor that collects each inner value of an array using the nested field passed,
-   * assuming the root value is an instance of {@link com.faunadb.client.types.Value.ArrayV}
+   * Creates a field extractor that coerces its value to the class passed
+   *
+   * @param type class to be used to coerce the field's value
+   * @return a new {@link Field} that coerces its value using the class passed
+   */
+  public <A> Field<A> to(final Class<A> type) {
+    return new Field<>(path, new Codec<A>() {
+      @Override
+      public Result<A> decode(Value value) {
+        return Decoder.decode(value, type);
+      }
+
+      @Override
+      public Result<Value> encode(A value) {
+        return Encoder.encode(value);
+      }
+    });
+  }
+
+  /**
+   * Creates a field extractor that collects each inner value of an array using the nested {@link Field} passed,
+   * assuming the target value is an instance of {@link com.faunadb.client.types.Value.ArrayV}
    *
    * @param field field to be extracted from each array's element
    * @return a new field that collects each inner value using the field passed
@@ -131,7 +162,7 @@ public final class Field<T> {
   }
 
   Result<T> get(Value root) {
-    return path.get(root).flatMap(codec);
+    return path.get(root).flatMap(codecFn);
   }
 
   @Override
