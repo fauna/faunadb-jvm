@@ -1,9 +1,7 @@
-2.0.1-SNAPSHOT
-* Remove build dependency to GPG for automation purposes
-
 2.0.0
 * Fix possible NullPointerException when checking for failing requests
 * Adds support for user class serialization (encode/decode)
+* Remove build dependency to GPG for automation purposes
 
 1.2.0
 * Add support for scala 2.12.x
