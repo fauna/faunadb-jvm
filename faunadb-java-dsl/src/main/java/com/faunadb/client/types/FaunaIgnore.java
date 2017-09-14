@@ -6,18 +6,18 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * <p>Instructs the encoder/decoder to not encode/decode the annotated member.</p>
  *
- * <pre>{@code
+ * <pre><code>
  * class User {
  *     private String userName;
  *     private String password;
  *
- *     @FaunaField("user_name")
+ *     &#64;FaunaField("user_name")
  *     public String getUserName() { return userName; }
  *
- *     @FaunaIgnore
+ *     &#64;FaunaIgnore
  *     public String getPassword() { return password; }
  * }
- * }</pre>
+ * </code></pre>
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FaunaIgnore {

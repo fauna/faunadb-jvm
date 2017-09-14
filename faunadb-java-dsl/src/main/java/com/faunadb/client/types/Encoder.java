@@ -28,7 +28,7 @@ public final class Encoder {
 
   /**
    * Encode the specified object into a corresponding FaunaDB value.
-   * <p>
+   *
    * <pre>{@code
    * encode(10) => new LongV(10)
    * encode(3.14) => new DoubleV(3.14)

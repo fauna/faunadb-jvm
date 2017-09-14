@@ -11,13 +11,13 @@ import java.lang.annotation.Target;
  *
  * <p>This annotation can only be used once per class.</p>
  *
- * <pre>{@code
+ * <pre><code>
  * class Product {
  *     private String description;
  *     private double price;
  *
- *     @FaunaConstructor
- *     public Product(@FaunaField("description") String description, @FaunaField("price") double price) {
+ *     &#64;FaunaConstructor
+ *     public Product(&#64;FaunaField("description") String description, &#64;FaunaField("price") double price) {
  *         this.description = description;
  *         this.price = price;
  *     }
@@ -25,17 +25,17 @@ import java.lang.annotation.Target;
  *
  * class Order {
  *     private String number;
- *     private List<Product> products;
+ *     private List&lt;Product&gt; products;
  *
- *     @FaunaConstructor
- *     public static Order createOrder(@FaunaField("number") String number, @FaunaField("products") List<Product> products) {
+ *     &#64;FaunaConstructor
+ *     public static Order createOrder(&#64;FaunaField("number") String number, &#64;FaunaField("products") List&lt;Product&gt; products) {
  *         Order order = new Order;
  *         order.number = number;
  *         order.products = products;
  *         return order;
  *     }
  * }
- * }</pre>
+ * </code></pre>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.CONSTRUCTOR, ElementType.METHOD})
