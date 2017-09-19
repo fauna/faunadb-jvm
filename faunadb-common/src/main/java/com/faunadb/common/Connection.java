@@ -296,6 +296,7 @@ public final class Connection implements AutoCloseable {
 
     client.prepareRequest(request)
       .addHeader("Authorization", authHeader)
+      .setHeader("X-FaunaDB-API-Version", "2.1")
       .execute(new AsyncCompletionHandler<Response>() {
         @Override
         public void onThrowable(Throwable t) {

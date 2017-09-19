@@ -1,9 +1,6 @@
 package com.faunadb.client.types;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.NullNode;
@@ -11,6 +8,7 @@ import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
 import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
@@ -505,31 +503,114 @@ public abstract class Value extends Expr {
     }
   }
 
+  @JsonInclude(JsonInclude.Include.NON_ABSENT)
+  public static class RefID {
+    @JsonProperty("id")       private final String id;
+    @JsonProperty("class")    private final RefV clazz;
+    @JsonProperty("database") private final RefV database;
+
+    private RefID(String id, RefV clazz, RefV database) {
+      this.id = id;
+      this.clazz = clazz;
+      this.database = database;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj == null || !(obj instanceof RefID))
+        return false;
+
+      RefID other = (RefID) obj;
+
+      return Objects.equal(id, other.id) &&
+        Objects.equal(clazz, other.clazz) &&
+        Objects.equal(database, other.database);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hashCode(id, clazz, database);
+    }
+  }
+
   /**
    * A FaunaDB ref type.
    *
    * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
    */
-  public static final class RefV extends Value.ScalarValue<String> {
+  public static final class RefV extends Value.ScalarValue<RefID> {
 
-    @JsonCreator
-    public RefV(@JsonProperty("@ref") String value) {
-      super(value);
+    public RefV(String id, RefV clazz, RefV database) {
+      super(new RefID(id, clazz, database));
+    }
+
+    public RefV(String id, RefV clazz) {
+      this(id, clazz, null);
+    }
+
+    @JsonIgnore
+    public String getId() {
+      return value.id;
+    }
+
+    @JsonIgnore
+    public Optional<RefV> getClazz() {
+      return Optional.fromNullable(value.clazz);
+    }
+
+    @JsonIgnore
+    public Optional<RefV> getDatabase() {
+      return Optional.fromNullable(value.database);
     }
 
     @Override
     @JsonProperty("@ref")
-    protected String toJson() {
+    protected Object toJson() {
       return value;
     }
 
-    /**
-     * Extracts its string value.
-     *
-     * @return a string with the ref value
-     */
-    public String strValue() {
-      return value;
+    @Override
+    public boolean equals(Object obj) {
+      if (obj == null || !(obj instanceof RefV))
+        return false;
+
+      RefV other = (RefV) obj;
+
+      return Objects.equal(value, other.value);
+    }
+
+    @Override
+    public int hashCode() {
+      return value.hashCode();
+    }
+
+    @Override
+    public String toString() {
+      String cls = value.clazz != null ? format(", class = %s", value.clazz) : "";
+      String db = value.database != null ? format(", database = %s", value.database) : "";
+      return format("%s(id = \"%s\"%s%s)", getClass().getSimpleName(), value.id, cls, db);
+    }
+  }
+
+  public static final class Native {
+    private Native() {}
+
+    public static final RefV CLASSES = new RefV("classes", null, null);
+    public static final RefV INDEXES = new RefV("indexes", null, null);
+    public static final RefV DATABASES = new RefV("databases", null, null);
+    public static final RefV KEYS = new RefV("keys", null, null);
+    public static final RefV FUNCTIONS = new RefV("functions", null, null);
+
+    public static RefV fromName(String name) {
+      switch (name) {
+        case "classes": return CLASSES;
+        case "indexes": return INDEXES;
+        case "databases": return DATABASES;
+        case "keys": return KEYS;
+        case "functions": return FUNCTIONS;
+      }
+
+      return new RefV(name, null, null);
     }
   }
 

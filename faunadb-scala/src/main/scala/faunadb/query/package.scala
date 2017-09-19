@@ -15,11 +15,11 @@ import scala.language.implicitConversions
   * ===Examples===
   *
   * {{{
-  * val query = Create(Ref("classes/spells"), Obj("data" -> Obj("name" -> "Magic Missile")))
+  * val query = Create(Class("spells"), Obj("data" -> Obj("name" -> "Magic Missile")))
   * }}}
   *
   * {{{
-  * val query = Map(Paginate(Match(Ref("indexes/spells_by_name"), "Magic Missile")), Lambda(r => Get(r)))
+  * val query = Map(Paginate(Match(Index("spells_by_name"), "Magic Missile")), Lambda(r => Get(r)))
   * }}}
   */
 package query {
@@ -100,12 +100,46 @@ package object query {
   // Values
 
   /**
-    * An RefV value.
+    * Creates a RefV value. The string "classes/widget/123" will be equivalent to:
+    * {{{
+    * RefV("123", RefV("widget", Native.Classes))
+    * }}}
     *
     * '''Reference''': [[https://fauna.com/documentation/queries#values]]
     */
   def Ref(value: String): Expr =
-    Expr(RefV(value))
+    Expr(ObjectV("@ref" -> StringV(value)))
+
+  def Ref(classRef: Expr, id: Expr): Expr =
+    Expr(ObjectV("ref" -> classRef.value, "id" -> id.value))
+
+  /** Native reference to all classes */
+  def Classes(scope: Expr = NullV): Expr =
+    Expr(ObjectV("classes" -> scope.value))
+
+  /** Native reference to all databases */
+  def Databases(scope: Expr = NullV): Expr =
+    Expr(ObjectV("databases" -> scope.value))
+
+  /** Native reference to all indexes */
+  def Indexes(scope: Expr = NullV): Expr =
+    Expr(ObjectV("indexes" -> scope.value))
+
+  /** Native reference to all functions */
+  def Functions(scope: Expr = NullV): Expr =
+    Expr(ObjectV("functions" -> scope.value))
+
+  /** Native reference to all keys */
+  def Keys(scope: Expr = NullV): Expr =
+    Expr(ObjectV("keys" -> scope.value))
+
+  /** Native reference to all tokens */
+  def Tokens(scope: Expr = NullV): Expr =
+    Expr(ObjectV("tokens" -> scope.value))
+
+  /** Native reference to all credentials */
+  def Credentials(scope: Expr = NullV): Expr =
+    Expr(ObjectV("credentials" -> scope.value))
 
   /**
     * An Array value.
@@ -577,6 +611,14 @@ package object query {
     Expr(ObjectV("class" -> name.value))
 
   /**
+    * A Class expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def Class(name: Expr, scope: Expr): Expr =
+    Expr(ObjectV("class" -> name.value, "scope" -> scope.value))
+
+  /**
     * A Database expression.
     *
     * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
@@ -585,12 +627,44 @@ package object query {
     Expr(ObjectV("database" -> name.value))
 
   /**
+    * A Database expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def Database(name: Expr, scope: Expr): Expr =
+    Expr(ObjectV("database" -> name.value, "scope" -> scope.value))
+
+  /**
     * An Index expression.
     *
     * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
     */
   def Index(name: Expr): Expr =
     Expr(ObjectV("index" -> name.value))
+
+  /**
+    * An Index expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def Index(name: Expr, scope: Expr): Expr =
+    Expr(ObjectV("index" -> name.value, "scope" -> scope.value))
+
+  /**
+    * A Function expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def Function(name: Expr): Expr =
+    Expr(ObjectV("function" -> name.value))
+
+  /**
+    * A Function expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def Function(name: Expr, scope: Expr): Expr =
+    Expr(ObjectV("function" -> name.value, "scope" -> scope.value))
 
   /**
    * An Equals expression.

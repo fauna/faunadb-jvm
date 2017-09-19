@@ -32,10 +32,7 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
       case FIELD_NAME =>
         in.getText match {
           case "@ref" =>
-            in.nextToken()
-            val rv = RefV(in.getText)
-            in.nextToken()
-            rv
+            readRef(in, ctx)
           case "@set" =>
             in.nextToken()
             val rv = SetRefV(deserialize(in, ctx))
@@ -57,28 +54,79 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
             in.nextToken()
             rv
           case "@query" =>
-            in.nextToken();
+            in.nextToken()
             val rv = QueryV(in.readValueAs(classOf[ObjectV]))
-            in.nextToken();
+            in.nextToken()
             rv
           case "@obj" =>
-            in.nextToken() match {
-              case START_OBJECT =>
-                in.nextToken()
-                val rv = readObject(in, ctx)
-                in.nextToken()
-                rv
-              case t => throw new JsonMappingException(s"Unexpected token $t")
-            }
-          case _ =>
             readObject(in, ctx)
+          case _ =>
+            readObjectBody(in, ctx)
         }
       case END_OBJECT => ObjectV.empty
       case t => throw new JsonMappingException(s"Unexpected token $t")
     }
   }
 
-  private[this] def readObject(in: JsonParser, ctx: DeserializationContext): Value = {
+  private[this] def readRef(in: JsonParser, ctx: DeserializationContext): RefV = {
+    in.nextToken() match {
+      case START_OBJECT =>
+        in.nextToken()
+        val rv = readRefBody(in, ctx)
+        in.nextToken()
+        rv
+      case t => throw new JsonMappingException(s"Unexpected token $t")
+    }
+  }
+
+  private[this] def readRefBody(in: JsonParser, ctx: DeserializationContext): RefV = {
+    var id: Option[String] = None
+    var cls: Option[RefV] = None
+    var db: Option[RefV] = None
+
+    while (in.getCurrentToken != END_OBJECT) {
+      in.getCurrentToken match {
+        case FIELD_NAME =>
+          in.getText match {
+            case "id" =>
+              in.nextToken()
+              id = Some(in.getText)
+              in.nextToken()
+            case "class" =>
+              in.nextToken()
+              cls = deserialize(in, ctx) match {
+                case r: RefV => Some(r)
+                case t => throw new JsonMappingException(s"Unexpected value in class field of @ref: $t")
+              }
+            case "database" =>
+              in.nextToken()
+              db = deserialize(in, ctx) match {
+                case d: RefV => Some(d)
+                case t => throw new JsonMappingException(s"Unexpected value in database field of @ref: $t")
+              }
+            case t => throw new JsonMappingException(s"Unexpected field in @ref: $t")
+          }
+        case t => throw new JsonMappingException(s"Unexpected token $t")
+      }
+    }
+
+    id map (RefV(_, cls, db)) getOrElse {
+      throw new JsonMappingException(s"Malformed reference type")
+    }
+  }
+
+  private[this] def readObject(in: JsonParser, ctx: DeserializationContext): ObjectV = {
+    in.nextToken() match {
+      case START_OBJECT =>
+        in.nextToken()
+        val rv = readObjectBody(in, ctx)
+        in.nextToken()
+        rv
+      case t => throw new JsonMappingException(s"Unexpected token $t")
+    }
+  }
+
+  private[this] def readObjectBody(in: JsonParser, ctx: DeserializationContext): ObjectV = {
     val b = Map.newBuilder[String, Value]
 
     while (in.getCurrentToken != END_OBJECT) {

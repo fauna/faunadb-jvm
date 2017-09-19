@@ -1,8 +1,7 @@
 package faunadb.values
 
 import java.nio.ByteBuffer
-
-import com.fasterxml.jackson.annotation.{ JsonIgnore, JsonProperty, JsonValue }
+import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.node.NullNode
 import com.google.common.io.BaseEncoding
@@ -124,9 +123,31 @@ object BooleanV {
 // Fauna special types
 
 /** A Ref. */
-case class RefV(@(JsonProperty @field @param)("@ref") value: String) extends ScalarValue
+case class RefV(@(JsonIgnore @getter) id: String,
+                @(JsonIgnore @getter) clazz: Option[RefV] = None,
+                @(JsonIgnore @getter) database: Option[RefV] = None) extends ScalarValue {
+
+  @JsonProperty("@ref")
+  lazy val refValue: Any = RefID(id, clazz, database)
+
+  @JsonInclude(JsonInclude.Include.NON_ABSENT)
+  private case class RefID(
+     @(JsonProperty @getter)("id") id: String,
+     @(JsonProperty @getter)("class") clazz: Option[RefV],
+     @(JsonProperty @getter)("database") database: Option[RefV])
+}
+
 object RefV {
-  def apply(clss: RefV, id: String): RefV = RefV(s"${clss.value}/$id")
+  def apply(id: String, clazz: RefV): RefV = RefV(id, Option(clazz))
+  def apply(id: String, clazz: RefV, database: RefV): RefV = RefV(id, Option(clazz), Option(database))
+}
+
+object Native {
+  val Classes: RefV = RefV("classes", None, None)
+  val Indexes: RefV = RefV("indexes", None, None)
+  val Databases: RefV = RefV("databases", None, None)
+  val Functions: RefV = RefV("functions", None, None)
+  val Keys: RefV = RefV("keys", None, None)
 }
 
 /** A Set Ref. */

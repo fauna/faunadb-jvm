@@ -42,7 +42,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   case class Ev(ref: RefV, ts: Long, action: String)
 
   val EventField = Field.zip(
-    Field("resource").to[RefV],
+    Field("instance").to[RefV],
     Field("ts").to[Long],
     Field("action").to[String]
   ) map { case (r, ts, a) => Ev(r, ts, a) }
@@ -83,7 +83,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   "Fauna Client" should "should not find an instance" in {
-    a[NotFoundException] should be thrownBy (await(client.query(Get(Ref("classes/spells/1234")))))
+    a[NotFoundException] should be thrownBy await(client.query(Get(RefV("1234", RefV("spells", Native.Classes)))))
   }
 
   it should "echo values" in {
@@ -95,12 +95,12 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val key = await(rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "client"))))
     val client = FaunaClient(endpoint = config("root_url"), secret = key(SecretField).get)
 
-    an[PermissionDeniedException] should be thrownBy (await(client.query(Paginate(Ref("databases")))))
+    an[PermissionDeniedException] should be thrownBy await(client.query(Paginate(Native.Databases)))
   }
 
   it should "fail with unauthorized" in {
     val badClient = FaunaClient(endpoint = config("root_url"), secret = "notavalidsecret")
-    an[UnauthorizedException] should be thrownBy (await(badClient.query(Get(Ref("classes/spells/12345")))))
+    an[UnauthorizedException] should be thrownBy await(badClient.query(Get(RefV("12345", RefV("spells", Native.Classes)))))
   }
 
   it should "create a new instance" in {
@@ -108,8 +108,8 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       Create(Class("spells"),
         Obj("data" -> Obj("testField" -> "testValue")))))
 
-    inst(RefField).get.value should startWith ("classes/spells/")
-    inst(ClassField).get should equal (RefV("classes/spells"))
+    inst(RefField).get.clazz should equal (Some(RefV("spells", Native.Classes)))
+    inst(RefField).get.database should be (None)
     inst("data", "testField").to[String].get should equal ("testValue")
 
     await(client.query(Exists(inst(RefField)))) should equal (TrueV)
@@ -251,7 +251,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "test types" in {
     val setF = client.query(Match(Index("spells_by_element"), "arcane"))
     val set = await(setF).to[SetRefV].get
-    set.parameters("match").to[RefV].get shouldBe RefV("indexes/spells_by_element")
+    set.parameters("match").to[RefV].get shouldBe RefV("spells_by_element", Native.Indexes)
     set.parameters("terms").to[String].get shouldBe "arcane"
 
     await(client.query(Array[Byte](0x1, 0x2, 0x3, 0x4))) should equal (BytesV(0x1, 0x2, 0x3, 0x4))
@@ -267,13 +267,13 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     ifR.to[String].get shouldBe "was true"
 
     val randomNum = Math.abs(Random.nextLong() % 250000L) + 250000L
-    val randomRef = "classes/spells/" + randomNum
+    val randomRef = RefV(randomNum.toString, RefV("spells", Native.Classes))
     val doF = client.query(Do(
-      Create(Ref(randomRef), Obj("data" -> Obj("name" -> "Magic Missile"))),
-      Get(Ref(randomRef))
+      Create(randomRef, Obj("data" -> Obj("name" -> "Magic Missile"))),
+      Get(randomRef)
     ))
     val doR = await(doF)
-    doR(RefField).get shouldBe RefV(randomRef)
+    doR(RefField).get shouldBe randomRef
 
     val objectF = client.query(Obj("name" -> "Hen Wen", "age" -> 123))
     val objectR = await(objectF)
@@ -295,7 +295,8 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "test resource modification" in {
     val createF = client.query(Create(Class("spells"), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L))))
     val createR = await(createF)
-    createR(RefField).get.value should startWith("classes/spells")
+    createR(RefField).get.clazz shouldBe Some(RefV("spells", Native.Classes))
+    createR(RefField).get.database shouldBe None
     createR("data", "name").to[String].get shouldBe "Magic Missile"
     createR("data", "element").to[String].get shouldBe "arcane"
     createR("data", "cost").to[Long].get shouldBe 10L
@@ -316,7 +317,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val insertF = client.query(Insert(createR("ref"), 1L, Action.Create, Obj("data" -> Obj("cooldown" -> 5L))))
     val insertR = await(insertF)
-    insertR("resource").get shouldBe createR("ref").get
+    insertR("instance").get shouldBe createR("ref").get
 
     val removeF = client.query(Remove(createR("ref"), 2L, Action.Delete))
     val removeR = await(removeF)
@@ -364,7 +365,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       Match(Index("spells_by_element"), "fire")), events = true))
     val unionEventsR = await(unionEventsF)
 
-    unionEventsR(PageEvents).get collect { case e if e.action == "create" => e.ref } should (
+    unionEventsR(PageEvents).get collect { case e if e.action == "add" => e.ref } should (
       contain (create1R(RefField).get) and contain (create2R(RefField).get))
 
     val intersectionF = client.query(Paginate(Intersection(
@@ -506,7 +507,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     await(client.query(CreateFunction(Obj("name" -> "a_function", "body" -> query))))
 
-    await(client.query(Exists(Ref("functions/a_function")))).to[Boolean].get shouldBe true
+    await(client.query(Exists(Function("a_function")))).to[Boolean].get shouldBe true
   }
 
   it should "call a function" in  {
@@ -514,7 +515,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     await(client.query(CreateFunction(Obj("name" -> "concat_with_slash", "body" -> query))))
 
-    await(client.query(Call(Ref("functions/concat_with_slash"), "a", "b"))).to[String].get shouldBe "a/b"
+    await(client.query(Call(Function("concat_with_slash"), "a", "b"))).to[String].get shouldBe "a/b"
   }
 
   case class Spell(name: String, element: Either[String, Seq[String]], cost: Option[Long])
@@ -531,5 +532,52 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val spells = await(client.query(Map(Paginate(Match(Index("spells_by_element"), "arcane")), Lambda(x => Select("data", Get(x))))))("data").get
     spells.to[Set[Spell]].get shouldBe Set(magicMissile, faerieFire)
+  }
+
+  it should "create class in a nested database" in {
+    val adminKey = await(rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "admin"))))
+    val adminClient = FaunaClient(secret = adminKey(SecretField).get, endpoint = config("root_url"))
+
+    val client1 = createNewDatabase(adminClient, "parent-database")
+    createNewDatabase(client1, "child-database")
+
+    val key = await(client1.query(CreateKey(Obj("database" -> Database("child-database"), "role" -> "server"))))
+
+    val client2 = FaunaClient(secret = key(SecretField).get, endpoint = config("root_url"))
+
+    await(client2.query(CreateClass(Obj("name" -> "a_class"))))
+
+    val nestedDatabase = Database("child-database", Database("parent-database"))
+
+    await(client.query(Exists(Class("a_class", nestedDatabase)))).to[Boolean].get shouldBe true
+
+    val allClasses = await(client.query(Paginate(Classes(nestedDatabase))))("data")
+    allClasses.to[List[RefV]].get shouldBe List(RefV("a_class", Native.Classes, RefV("child-database", Native.Databases, RefV("parent-database", Native.Databases))))
+  }
+
+  it should "test for keys in nested database" in {
+    val key = await(rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "admin"))))
+    val adminClient = FaunaClient(secret = key(SecretField).get, endpoint = config("root_url"))
+
+    val client = createNewDatabase(adminClient, "db-for-keys")
+
+    await(client.query(CreateDatabase(Obj("name" -> "db-test"))))
+
+    val serverKey = await(client.query(CreateKey(Obj("database" -> Database("db-test"), "role" -> "server"))))("ref").get
+    val adminKey = await(client.query(CreateKey(Obj("database" -> Database("db-test"), "role" -> "admin"))))("ref").get
+
+    await(client.query(Paginate(Keys())))("data").to[List[Value]].get shouldBe List(serverKey, adminKey)
+
+    await(adminClient.query(Paginate(Keys(Database("db-for-keys")))))("data").to[List[Value]].get shouldBe List(serverKey, adminKey)
+  }
+
+  it should "create recursive refs from string" in {
+    await(client.query(Ref("classes/widget/123"))) shouldBe RefV("123", RefV("widget", Native.Classes))
+  }
+
+  def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
+    await(client.query(CreateDatabase(Obj("name" -> name))))
+    val key = await(client.query(CreateKey(Obj("database" -> Database(name), "role" -> "admin"))))
+    FaunaClient(secret = key(SecretField).get, endpoint = config("root_url"))
   }
 }

@@ -39,7 +39,7 @@ import static com.google.common.util.concurrent.Futures.transform;
  * <pre>{@code
  * import static com.faunadb.client.query.Language.*;
  * FaunaClient client = FaunaClient.builder().withSecret("someAuthToken").build();
- * client.query(Get(Ref("some/ref")));
+ * client.query(Get(Ref(Class("some_class"), "ref")));
  * }
  * </pre>
  *

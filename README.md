@@ -114,12 +114,12 @@ public class Main {
       .withSecret("your-secret-here")
       .build();
 
-    ImmutableList<RefV> indexes = client.query(Paginate(Ref("indexes"))).get()
+    ImmutableList<RefV> indexes = client.query(Paginate(Indexes())).get()
       .at("data").collect(Field.as(Codec.REF));
 
     System.out.println(indexes);
 
-    Person person = client.query(Get(Ref("classes/people/123456789"))).get()
+    Person person = client.query(Get(Ref(Class("people"), "123456789"))).get()
       .get(PERSON_FIELD);
     
     System.out.println(person);
@@ -160,7 +160,7 @@ object Main extends App {
   val client = FaunaClient(secret = "your-secret-here")
 
   val indexes = client
-    .query(Paginate(Ref("indexes")))
+    .query(Paginate(Indexes()))
     .map(value => value("data").to[Seq[RefV]].get)
 
   println(
@@ -168,7 +168,7 @@ object Main extends App {
   )
 
   val person = client
-    .query(Get(Ref("classes/person/123456789")))
+    .query(Get(Ref(Class("person"), "123456789")))
     .map(value => value("data").to[Person].get)
 
   println(

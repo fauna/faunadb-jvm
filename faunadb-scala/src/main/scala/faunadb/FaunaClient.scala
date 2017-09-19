@@ -60,7 +60,7 @@ object FaunaClient {
   *
   * val client = FaunaClient(secret = "myKeySecret")
   *
-  * val fut = client.query(Get(Ref("classes/users/123")))
+  * val fut = client.query(Get(Ref(Class("users"), "123")))
   * val instance = Await.result(fut, 5.seconds)
   *
   * val userCast =

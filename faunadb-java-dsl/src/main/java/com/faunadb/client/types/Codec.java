@@ -217,7 +217,7 @@ final class Transformations {
   }
 
   private static <T> Result<T> cast(Class<T> clazz, Value value) {
-    if (value.getClass() == clazz)
+    if (clazz.isInstance(value))
       return Result.success(clazz.cast(value));
 
     return Result.fail(

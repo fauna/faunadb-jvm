@@ -14,8 +14,8 @@ class SerializationSpec extends FlatSpec with Matchers {
   json.registerModule(new DefaultScalaModule)
 
   "Query AST serialization" should "serialize ref" in {
-    val ref = Ref("some/ref")
-    json.writeValueAsString(ref) shouldBe "{\"@ref\":\"some/ref\"}"
+    val ref = RefV("ref", RefV("some", Native.Classes))
+    json.writeValueAsString(ref) shouldBe "{\"@ref\":{\"id\":\"ref\",\"class\":{\"@ref\":{\"id\":\"some\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}"
   }
 
   it should "serialize literal values" in {
@@ -44,7 +44,7 @@ class SerializationSpec extends FlatSpec with Matchers {
   it should "serialize complex values" in {
     json.writeValueAsString(Arr(1, "test")) shouldBe "[1,\"test\"]"
     json.writeValueAsString(Arr(Arr(Obj("test" -> "value"), 2323, true), "hi", Obj("test" -> "yo", "test2" -> NullV))) shouldBe "[[{\"object\":{\"test\":\"value\"}},2323,true],\"hi\",{\"object\":{\"test\":\"yo\",\"test2\":null}}]"
-    json.writeValueAsString(Obj("test" -> 1, "test2" -> Ref("some/ref"))) shouldBe "{\"object\":{\"test\":1,\"test2\":{\"@ref\":\"some/ref\"}}}"
+    json.writeValueAsString(Obj("test" -> 1, "test2" -> RefV("ref", RefV("some", Native.Classes)))) shouldBe "{\"object\":{\"test\":1,\"test2\":{\"@ref\":{\"id\":\"ref\",\"class\":{\"@ref\":{\"id\":\"some\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}}}"
   }
 
   it should "serialize basic forms" in {
@@ -67,9 +67,9 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(ifForm) shouldBe "{\"if\":true,\"then\":\"was true\",\"else\":\"was false\"}"
 
     val doForm = Do(
-      Create(Ref("some/ref/1"), Obj("data" -> Obj("name" -> "Hen Wen"))),
-      Get(Ref("some/ref/1")))
-    json.writeValueAsString(doForm) shouldBe "{\"do\":[{\"create\":{\"@ref\":\"some/ref/1\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Hen Wen\"}}}}},{\"get\":{\"@ref\":\"some/ref/1\"}}]}"
+      Create(RefV("ref1", RefV("some", Native.Classes)), Obj("data" -> Obj("name" -> "Hen Wen"))),
+      Get(RefV("ref1", RefV("some", Native.Classes))))
+    json.writeValueAsString(doForm) shouldBe "{\"do\":[{\"create\":{\"@ref\":{\"id\":\"ref1\",\"class\":{\"@ref\":{\"id\":\"some\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Hen Wen\"}}}}},{\"get\":{\"@ref\":{\"id\":\"ref1\",\"class\":{\"@ref\":{\"id\":\"some\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}}]}"
 
     val select = Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings", "lunchings"))))
     json.writeValueAsString(select) shouldBe "{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}"
@@ -86,7 +86,7 @@ class SerializationSpec extends FlatSpec with Matchers {
     val lambda4 = Lambda(Not(_))
     json.writeValueAsString(lambda4) should equal ("""{"lambda":"x$3","expr":{"not":{"var":"x$3"}}}""")
 
-    json.writeValueAsString(At(1L, Get(Ref("classes")))) should equal ("""{"at":1,"expr":{"get":{"@ref":"classes"}}}""")
+    json.writeValueAsString(At(1L, Get(Native.Classes))) should equal ("""{"at":1,"expr":{"get":{"@ref":{"id":"classes"}}}}""")
   }
 
   it should "serialize collections" in {
@@ -96,8 +96,8 @@ class SerializationSpec extends FlatSpec with Matchers {
     val map2 = Map(Arr(1, 2, 3), Lambda("munchings", Var("munchings")))
     json.writeValueAsString(map2) shouldBe "{\"map\":{\"lambda\":\"munchings\",\"expr\":{\"var\":\"munchings\"}},\"collection\":[1,2,3]}"
 
-    val foreach = Foreach(Arr(Ref("another/ref/1"), Ref("another/ref/2")), Lambda(creature => Create(Ref("some/ref"), Obj("data" -> Obj("some" -> creature)))))
-    json.writeValueAsString(foreach) shouldBe "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":\"some/ref\"},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":\"another/ref/1\"},{\"@ref\":\"another/ref/2\"}]}"
+    val foreach = Foreach(Arr(RefV("ref1", RefV("another", Native.Classes)), RefV("ref2", RefV("another", Native.Classes))), Lambda(creature => Create(RefV("some", Native.Classes), Obj("data" -> Obj("some" -> creature)))))
+    json.writeValueAsString(foreach) shouldBe "{\"foreach\":{\"lambda\":\"creature\",\"expr\":{\"create\":{\"@ref\":{\"id\":\"some\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}},\"params\":{\"object\":{\"data\":{\"object\":{\"some\":{\"var\":\"creature\"}}}}}}},\"collection\":[{\"@ref\":{\"id\":\"ref1\",\"class\":{\"@ref\":{\"id\":\"another\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},{\"@ref\":{\"id\":\"ref2\",\"class\":{\"@ref\":{\"id\":\"another\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}]}"
 
     val filter = Filter(Arr(1,2,3), Lambda(i => Equals(1, i)))
     json.writeValueAsString(filter) shouldBe "{\"filter\":{\"lambda\":\"i\",\"expr\":{\"equals\":[1,{\"var\":\"i\"}]}},\"collection\":[1,2,3]}"
@@ -116,55 +116,55 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize resource retrievals" in {
-    val ref = Ref("some/ref/1")
+    val ref = RefV("ref1", RefV("some", Native.Classes))
     val get = Get(ref)
-    json.writeValueAsString(get) shouldBe "{\"get\":{\"@ref\":\"some/ref/1\"}}"
+    json.writeValueAsString(get) shouldBe "{\"get\":{\"@ref\":{\"id\":\"ref1\",\"class\":{\"@ref\":{\"id\":\"some\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}}"
 
-    val paginate1 = Paginate(Union(Match(Ref("indexes/some_index"), "term"), Match(Ref("indexes/some_index"), "term2")))
-    json.writeValueAsString(paginate1) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]}}"
+    val paginate1 = Paginate(Union(Match(RefV("some_index", Native.Indexes), "term"), Match(RefV("some_index", Native.Indexes), "term2")))
+    json.writeValueAsString(paginate1) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":{\"id\":\"some_index\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}},{\"match\":\"term2\",\"index\":{\"@ref\":{\"id\":\"some_index\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}]}}"
 
-    val paginate2 = Paginate(Union(Match(Ref("indexes/some_index"), "term"), Match(Ref("indexes/some_index"), "term2")), sources = true)
-    json.writeValueAsString(paginate2) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"sources\":true}"
+    val paginate2 = Paginate(Union(Match(RefV("some_index", Native.Indexes), "term"), Match(RefV("some_index", Native.Indexes), "term2")), sources = true)
+    json.writeValueAsString(paginate2) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":{\"id\":\"some_index\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}},{\"match\":\"term2\",\"index\":{\"@ref\":{\"id\":\"some_index\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}]},\"sources\":true}"
 
-    val paginate3 = Paginate(Union(Match(Ref("indexes/some_index"), "term"), Match(Ref("indexes/some_index"), "term2")), events = true)
-    json.writeValueAsString(paginate3) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"events\":true}"
+    val paginate3 = Paginate(Union(Match(RefV("some_index", Native.Indexes), "term"), Match(RefV("some_index", Native.Indexes), "term2")), events = true)
+    json.writeValueAsString(paginate3) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":{\"id\":\"some_index\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}},{\"match\":\"term2\",\"index\":{\"@ref\":{\"id\":\"some_index\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}]},\"events\":true}"
 
-    val paginate4 = Paginate(Union(Match(Ref("indexes/some_index"), "term"), Match(Ref("indexes/some_index"), "term2")), Before(Ref("some/ref/1")), size = 4)
-    json.writeValueAsString(paginate4) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":\"indexes/some_index\"}},{\"match\":\"term2\",\"index\":{\"@ref\":\"indexes/some_index\"}}]},\"before\":{\"@ref\":\"some/ref/1\"},\"size\":4}"
+    val paginate4 = Paginate(Union(Match(RefV("some_index", Native.Indexes), "term"), Match(RefV("some_index", Native.Indexes), "term2")), Before(RefV("ref1", RefV("some", Native.Classes))), size = 4)
+    json.writeValueAsString(paginate4) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":{\"id\":\"some_index\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}},{\"match\":\"term2\",\"index\":{\"@ref\":{\"id\":\"some_index\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}]},\"before\":{\"@ref\":{\"id\":\"ref1\",\"class\":{\"@ref\":{\"id\":\"some\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"size\":4}"
   }
 
   it should "serialize resource modifications" in {
-    val create = Create(Ref("classes/spells"),
+    val create = Create(RefV("spells", Native.Classes),
       Obj("data" -> Obj(
         "name" -> "Mountainous Thunder",
         "element" -> "air",
         "cost" -> 15)))
 
-    json.writeValueAsString(create) shouldBe "{\"create\":{\"@ref\":\"classes/spells\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountainous Thunder\",\"element\":\"air\",\"cost\":15}}}}}"
+    json.writeValueAsString(create) shouldBe "{\"create\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountainous Thunder\",\"element\":\"air\",\"cost\":15}}}}}"
 
-    val update = Update(Ref("classes/spells/123456"),
+    val update = Update(RefV("123456", RefV("spells", Native.Classes)),
       Obj("data" -> Obj(
         "name" -> "Mountain's Thunder",
         "cost" -> NullV)))
 
-    json.writeValueAsString(update) shouldBe "{\"update\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"cost\":null}}}}}"
+    json.writeValueAsString(update) shouldBe "{\"update\":{\"@ref\":{\"id\":\"123456\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"cost\":null}}}}}"
 
-    val replace = Replace(Ref("classes/spells/123456"),
+    val replace = Replace(RefV("123456", RefV("spells", Native.Classes)),
       Obj("data" -> Obj(
         "name" -> "Mountain's Thunder",
         "element" -> Arr("air", "earth"),
         "cost" -> 10)))
 
-    json.writeValueAsString(replace) shouldBe "{\"replace\":{\"@ref\":\"classes/spells/123456\"},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"element\":[\"air\",\"earth\"],\"cost\":10}}}}}"
+    json.writeValueAsString(replace) shouldBe "{\"replace\":{\"@ref\":{\"id\":\"123456\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"element\":[\"air\",\"earth\"],\"cost\":10}}}}}"
 
-    val delete = Delete(Ref("classes/spells/123456"))
-    json.writeValueAsString(delete) shouldBe "{\"delete\":{\"@ref\":\"classes/spells/123456\"}}"
+    val delete = Delete(RefV("123456", RefV("spells", Native.Classes)))
+    json.writeValueAsString(delete) shouldBe "{\"delete\":{\"@ref\":{\"id\":\"123456\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}}"
 
-    val insert = Insert(Ref("classes/spells/123456"), 1L, Action.Create, Obj("data" -> Obj("name" -> "Mountain's Thunder", "cost" -> 10, "element" -> Arr("air", "earth"))))
-    json.writeValueAsString(insert) shouldBe "{\"insert\":{\"@ref\":\"classes/spells/123456\"},\"ts\":1,\"action\":\"create\",\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"cost\":10,\"element\":[\"air\",\"earth\"]}}}}}"
+    val insert = Insert(RefV("123456", RefV("spells", Native.Classes)), 1L, Action.Create, Obj("data" -> Obj("name" -> "Mountain's Thunder", "cost" -> 10, "element" -> Arr("air", "earth"))))
+    json.writeValueAsString(insert) shouldBe "{\"insert\":{\"@ref\":{\"id\":\"123456\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":1,\"action\":\"create\",\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\",\"cost\":10,\"element\":[\"air\",\"earth\"]}}}}}"
 
-    val remove = Remove(Ref("classes/spells/123456"), 1L, Action.Delete)
-    json.writeValueAsString(remove) shouldBe "{\"remove\":{\"@ref\":\"classes/spells/123456\"},\"ts\":1,\"action\":\"delete\"}"
+    val remove = Remove(RefV("123456", RefV("spells", Native.Classes)), 1L, Action.Delete)
+    json.writeValueAsString(remove) shouldBe "{\"remove\":{\"@ref\":{\"id\":\"123456\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":1,\"action\":\"delete\"}"
 
     val createClass = CreateClass(Obj("name" -> "spells"))
     json.writeValueAsString(createClass) shouldBe "{\"create_class\":{\"object\":{\"name\":\"spells\"}}}"
@@ -180,20 +180,20 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize sets" in {
-    val matchSet = Match(Ref("indexes/spells_by_elements"), "fire")
-    json.writeValueAsString(matchSet) shouldBe "{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_elements\"}}"
+    val matchSet = Match(RefV("spells_by_elements", Native.Indexes), "fire")
+    json.writeValueAsString(matchSet) shouldBe "{\"match\":\"fire\",\"index\":{\"@ref\":{\"id\":\"spells_by_elements\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}"
 
-    val union = Union(Match(Ref("indexes/spells_by_element"), "fire"), Match(Ref("indexes/spells_by_element"), "water"))
-    json.writeValueAsString(union) shouldBe "{\"union\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"
+    val union = Union(Match(RefV("spells_by_element", Native.Indexes), "fire"), Match(RefV("spells_by_element", Native.Indexes), "water"))
+    json.writeValueAsString(union) shouldBe "{\"union\":[{\"match\":\"fire\",\"index\":{\"@ref\":{\"id\":\"spells_by_element\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}},{\"match\":\"water\",\"index\":{\"@ref\":{\"id\":\"spells_by_element\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}]}"
 
-    val intersection = Intersection(Match(Ref("indexes/spells_by_element"), "fire"), Match(Ref("indexes/spells_by_element"), "water"))
-    json.writeValueAsString(intersection) shouldBe "{\"intersection\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"
+    val intersection = Intersection(Match(RefV("spells_by_element", Native.Indexes), "fire"), Match(RefV("spells_by_element", Native.Indexes), "water"))
+    json.writeValueAsString(intersection) shouldBe "{\"intersection\":[{\"match\":\"fire\",\"index\":{\"@ref\":{\"id\":\"spells_by_element\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}},{\"match\":\"water\",\"index\":{\"@ref\":{\"id\":\"spells_by_element\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}]}"
 
-    val difference = Difference(Match(Ref("indexes/spells_by_element"), "fire"), Match(Ref("indexes/spells_by_element"), "water"))
-    json.writeValueAsString(difference) shouldBe "{\"difference\":[{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},{\"match\":\"water\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}}]}"
+    val difference = Difference(Match(RefV("spells_by_element", Native.Indexes), "fire"), Match(RefV("spells_by_element", Native.Indexes), "water"))
+    json.writeValueAsString(difference) shouldBe "{\"difference\":[{\"match\":\"fire\",\"index\":{\"@ref\":{\"id\":\"spells_by_element\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}},{\"match\":\"water\",\"index\":{\"@ref\":{\"id\":\"spells_by_element\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}]}"
 
-    val join = Join(Match(Ref("indexes/spells_by_element"), "fire"), Lambda(spell => Get(spell)))
-    json.writeValueAsString(join) shouldBe "{\"join\":{\"match\":\"fire\",\"index\":{\"@ref\":\"indexes/spells_by_element\"}},\"with\":{\"lambda\":\"spell\",\"expr\":{\"get\":{\"var\":\"spell\"}}}}"
+    val join = Join(Match(RefV("spells_by_element", Native.Indexes), "fire"), Lambda(spell => Get(spell)))
+    json.writeValueAsString(join) shouldBe "{\"join\":{\"match\":\"fire\",\"index\":{\"@ref\":{\"id\":\"spells_by_element\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}},\"with\":{\"lambda\":\"spell\",\"expr\":{\"get\":{\"var\":\"spell\"}}}}"
   }
 
   it should "serialize date and ts" in {
@@ -223,14 +223,14 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize authentication functions" in {
-    val login = Login(Ref("classes/characters/104979509695139637"), Obj("password" -> "abracadabra"))
-    json.writeValueAsString(login) shouldBe "{\"login\":{\"@ref\":\"classes/characters/104979509695139637\"},\"params\":{\"object\":{\"password\":\"abracadabra\"}}}"
+    val login = Login(RefV("104979509695139637", RefV("characters", Native.Classes)), Obj("password" -> "abracadabra"))
+    json.writeValueAsString(login) shouldBe "{\"login\":{\"@ref\":{\"id\":\"104979509695139637\",\"class\":{\"@ref\":{\"id\":\"characters\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"params\":{\"object\":{\"password\":\"abracadabra\"}}}"
 
     val logout = Logout(true)
     json.writeValueAsString(logout) shouldBe "{\"logout\":true}"
 
-    val identify = Identify(Ref("classes/characters/104979509695139637"), "abracadabra")
-    json.writeValueAsString(identify) shouldBe "{\"identify\":{\"@ref\":\"classes/characters/104979509695139637\"},\"password\":\"abracadabra\"}"
+    val identify = Identify(RefV("104979509695139637", RefV("characters", Native.Classes)), "abracadabra")
+    json.writeValueAsString(identify) shouldBe "{\"identify\":{\"@ref\":{\"id\":\"104979509695139637\",\"class\":{\"@ref\":{\"id\":\"characters\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"password\":\"abracadabra\"}"
   }
 
   it should "serialize date and time functions" in {

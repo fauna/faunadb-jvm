@@ -3,7 +3,7 @@ package com.faunadb.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.types.Value;
-import com.faunadb.client.types.Value.RefV;
+import com.faunadb.client.types.Value.Native;
 import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -16,6 +16,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static com.faunadb.client.types.Codec.*;
+import static com.faunadb.client.types.Value.RefV;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.joda.time.DateTimeZone.UTC;
@@ -56,18 +57,18 @@ public class DeserializationSpec {
 
   @Test
   public void shouldDeserializeRef() throws Exception {
-    assertThat(parsed("{ \"@ref\": \"classes/people/1\" }").to(REF).get(),
-      equalTo(new RefV("classes/people/1")));
+    assertThat(parsed("{ \"@ref\": {\"id\": \"1\", \"class\": {\"@ref\": {\"id\": \"people\", \"class\": { \"@ref\": {\"id\": \"classes\"} } } } } }").to(REF).get(),
+      equalTo(new RefV("1", new RefV("people", Native.CLASSES))));
   }
 
   @Test
   public void shouldDeserializeArray() throws Exception {
-    Value parsed = parsed("[1, \"string\", [true, false], {\"@ref\": \"databases\"}]");
+    Value parsed = parsed("[1, \"string\", [true, false], {\"@ref\": {\"id\": \"databases\"}}]");
     assertThat(parsed.at(0).to(LONG).get(), equalTo(1L));
     assertThat(parsed.at(1).to(STRING).get(), equalTo("string"));
     assertThat(parsed.at(2).at(0).to(BOOLEAN).get(), is(true));
     assertThat(parsed.at(2).at(1).to(BOOLEAN).get(), is(false));
-    assertThat(parsed.at(3).to(REF).get(), equalTo(new RefV("databases")));
+    assertThat(parsed.at(3).to(REF).get(), equalTo(Native.DATABASES));
   }
 
   @Test
@@ -110,27 +111,27 @@ public class DeserializationSpec {
   public void shouldDeserializeObject() throws Exception {
     Value parsed = parsed("{" +
       "  \"ref\": {" +
-      "   \"@ref\": \"classes/spells/93044099947429888\"" +
+      "    \"@ref\": { \"id\": \"93044099947429888\", \"class\": { \"@ref\": { \"id\": \"spells\", \"class\": { \"@ref\": { \"id\": \"classes\" } } } } }" +
       "  }," +
       "  \"class\": {" +
-      "   \"@ref\": \"classes/spells\"" +
+      "   \"@ref\": { \"id\": \"spells\", \"class\": { \"@ref\": {\"id\": \"classes\"} } }" +
       "  }," +
       "  \"ts\": 1424992618413105," +
       "  \"data\": {" +
       "   \"name\": \"fireball\"," +
       "   \"refField\": {" +
-      "    \"@ref\": \"classes/spells/93044099909681152\"" +
+      "    \"@ref\": { \"id\": \"93044099909681152\", \"class\": { \"@ref\": { \"id\": \"spells\", \"class\": { \"@ref\": { \"id\": \"classes\" } } } } }" +
       "   }," +
       "   \"elements\": [\"fire\", \"air\"]" +
       "  }" +
       " }"
     );
 
-    assertThat(parsed.at("ref").to(REF).get(), equalTo(new RefV("classes/spells/93044099947429888")));
-    assertThat(parsed.at("class").to(REF).get(), equalTo(new RefV("classes/spells")));
+    assertThat(parsed.at("ref").to(REF).get(), equalTo(new RefV("93044099947429888", new RefV("spells", Native.CLASSES))));
+    assertThat(parsed.at("class").to(REF).get(), equalTo(new RefV("spells", Native.CLASSES)));
     assertThat(parsed.at("ts").to(LONG).get(), equalTo(1424992618413105L));
     assertThat(parsed.at("data", "name").to(STRING).get(), equalTo("fireball"));
-    assertThat(parsed.at("data", "refField").to(REF).get(), equalTo(new RefV("classes/spells/93044099909681152")));
+    assertThat(parsed.at("data", "refField").to(REF).get(), equalTo(new RefV("93044099909681152", new RefV("spells", Native.CLASSES))));
     assertThat(parsed.at("data", "elements").at(0).to(STRING).get(), equalTo("fire"));
     assertThat(parsed.at("data", "elements").at(1).to(STRING).get(), equalTo("air"));
   }
@@ -155,7 +156,7 @@ public class DeserializationSpec {
     Value parsed = parsed(
       "{" +
         "  \"@set\": {" +
-        "    \"match\": { \"@ref\": \"indexes/spells_by_element\" }," +
+        "    \"match\": { \"@ref\": {\"id\": \"spells_by_element\", \"class\": { \"@ref\": {\"id\": \"indexes\"} } } }," +
         "    \"terms\": \"fire\"" +
         "  }" +
         "}"
@@ -164,7 +165,7 @@ public class DeserializationSpec {
     ImmutableMap<String, Value> set = parsed.to(SET_REF).get().parameters();
     assertThat(set.get("terms").to(STRING).get(), equalTo("fire"));
     assertThat(set.get("match").to(REF).get(),
-      equalTo(new RefV("indexes/spells_by_element")));
+      equalTo(new RefV("spells_by_element", Native.INDEXES)));
   }
 
   @Test

@@ -15,7 +15,7 @@ import static com.faunadb.client.util.Objects.requireNonNull;
  * We can paginate all instances of a class, with its evets, in pages with 4 elements only.
  * <pre>{@code
  * client.query(
- *    Paginate(Match(Ref("indexes/all_spells"))
+ *    Paginate(Match(Index("all_spells"))
  *      .withEvents(true)
  *      .withSize(4)
  * );
