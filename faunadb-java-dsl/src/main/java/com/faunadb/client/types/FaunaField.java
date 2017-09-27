@@ -7,13 +7,13 @@ import java.lang.annotation.Target;
 
 /**
  * <p>Maps a field, getter, or constructor parameter to an object field in FaunaDB when encoding or decoding an object.</p>
- * <p>
- * <pre>{@code
+ *
+ * <pre><code>
  * class Car {
- *     @FaunaField("model")
+ *     &#64;FaunaField("model")
  *     private String model;
  *
- *     @FaunaField("manufacturer")
+ *     &#64;FaunaField("manufacturer")
  *     private String manufacturer;
  * }
  *
@@ -21,13 +21,13 @@ import java.lang.annotation.Target;
  *     private String description;
  *     private double price;
  *
- *     @FaunaConstructor
- *     public Product(@FaunaField("description") String description, @FaunaField("price") double price) {
+ *     &#64;FaunaConstructor
+ *     public Product(&#64;FaunaField("description") String description, &#64;FaunaField("price") double price) {
  *         this.description = description;
  *         this.price = price;
  *     }
  * }
- * }</pre>
+ * </code></pre>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})

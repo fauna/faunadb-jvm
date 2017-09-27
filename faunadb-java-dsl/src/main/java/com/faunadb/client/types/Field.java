@@ -85,6 +85,7 @@ public final class Field<T> {
   /**
    * Creates a field that coerces its value using the codec passed
    *
+   * @param <T> the type of the field
    * @param codec codec used to coerce the field's value
    * @return the field extractor
    */
@@ -113,6 +114,7 @@ public final class Field<T> {
   /**
    * Creates a field extractor composed with another nested field
    *
+   * @param <A> the type of the field
    * @param other nested field to compose with
    * @return a new field extractor with the nested field
    */
@@ -123,6 +125,7 @@ public final class Field<T> {
   /**
    * Creates a field extractor that coerces its value using the codec passed
    *
+   * @param <A> the type of the field
    * @param codec codec to be used to coerce the field's value
    * @return a new field that coerces its value using the codec passed
    */
@@ -133,6 +136,7 @@ public final class Field<T> {
   /**
    * Creates a field extractor that coerces its value to the class passed
    *
+   * @param <A> the type of the field
    * @param type class to be used to coerce the field's value
    * @return a new {@link Field} that coerces its value using the class passed
    */
@@ -154,6 +158,7 @@ public final class Field<T> {
    * Creates a field extractor that collects each inner value of an array using the nested {@link Field} passed,
    * assuming the target value is an instance of {@link com.faunadb.client.types.Value.ArrayV}
    *
+   * @param <A> the type of the field
    * @param field field to be extracted from each array's element
    * @return a new field that collects each inner value using the field passed
    */

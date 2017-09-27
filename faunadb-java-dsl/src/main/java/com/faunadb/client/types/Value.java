@@ -77,6 +77,7 @@ public abstract class Value extends Expr {
   /**
    * Attempts to coerce this value using the {@link Codec} passed.
    *
+   * @param <T> the type to coerce to
    * @param codec codec function to attempt coercion
    * @return the {@link Result} of the coercion
    * @see Codec
@@ -88,6 +89,7 @@ public abstract class Value extends Expr {
   /**
    * Attempts to decode this value using the {@link Decoder} into the specified type.
    *
+   * @param <T> the type to coerce to
    * @param clazz a class type to convert
    * @return the {@link Result} of the coercion
    * @see Decoder
@@ -99,6 +101,7 @@ public abstract class Value extends Expr {
   /**
    * Attempts to encode an object using an {@link Encoder} into a {@link Value} type.
    *
+   * @param <T> the type to coerce from
    * @param obj the object instance to convert
    * @return the {@link Result} of the conversion
    */
@@ -110,12 +113,13 @@ public abstract class Value extends Expr {
    * Attempts to coerce this value to a {@link Map}.
    * This object must be an instance of {@link ObjectV}.
    *
+   * @param <T> the type of the values on map
    * @param valueType the type of the values.
    * @return a {@link Result} with the resulting map containing the keys/values.
    * @see Decoder
    * @see Types
    */
-  public final <K, V> Result<Map<K, V>> asMapOf(Class<V> valueType) {
+  public final <T> Result<Map<String, T>> asMapOf(Class<T> valueType) {
     return Decoder.decode(this, Types.hashMapOf(valueType));
   }
 
@@ -123,6 +127,7 @@ public abstract class Value extends Expr {
    * Attempts to coerce this value to a {@link Collection}.
    * This object must be an instance of {@link ArrayV}.
    *
+   * @param <T> the type of the elements on the collection
    * @param elementType the type of the elements in the collection.
    * @return a {@link Result} with the resulting collection.
    * @see Decoder
@@ -135,6 +140,7 @@ public abstract class Value extends Expr {
   /**
    * Extract a {@link Field} from this node
    *
+   * @param <T> the type of returned field
    * @param field field to extract
    * @return the resulting value of extracting the {@link Field} from this node
    * @throws IllegalStateException if {@link Field} does not exists on this node
@@ -145,8 +151,9 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Attempts to extact a {@link Field} from this node
+   * Attempts to extract a {@link Field} from this node
    *
+   * @param <T> the type of returned field
    * @param field field to extract
    * @return An {@link Optional} with the resulting value if the field's extraction was successful
    * @see Field
@@ -175,6 +182,7 @@ public abstract class Value extends Expr {
    *   node.get("arrayOfObjects").collect(name); // ["Jhon", "Bill"]
    * }</pre>
    *
+   * @param <T> the type of the elements
    * @param field field to extract from each array value
    * @return a {@link ImmutableList} with the collected {@link Field}s
    * @see Field

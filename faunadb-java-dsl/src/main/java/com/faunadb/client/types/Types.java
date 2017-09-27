@@ -48,7 +48,7 @@ public final class Types {
 
   /**
    * <p>Creates a generic collection type representation</p>
-   * <p>
+   *
    * <pre>{@code
    * Types.collectionOf(LinkedList.class, User.class)
    * }</pre>
@@ -63,7 +63,7 @@ public final class Types {
 
   /**
    * <p>Creates a collection type specialized for {@link ArrayList}</p>
-   * <p>
+   *
    * <pre>{@code
    * Types.arrayListOf(User.class)
    * Types.arrayListOf(String.class)
@@ -79,7 +79,7 @@ public final class Types {
 
   /**
    * <p>Creates a collection type specialized for {@link HashSet}</p>
-   * <p>
+   *
    * <pre>{@code
    * Types.hashSetOf(User.class)
    * Types.hashSetOf(String.class)
@@ -95,7 +95,7 @@ public final class Types {
 
   /**
    * <p>Creates a generic map type representation where the key is a string</p>
-   * <p>
+   *
    * <pre>{@code
    * Types.mapOf(Hashtable.class, User.class)
    * }</pre>
@@ -110,7 +110,7 @@ public final class Types {
 
   /**
    * <p>Creates a map type specialized for {@link HashMap}</p>
-   * <p>
+   *
    * <pre>{@code
    * Types.hashMapOf(User.class)
    * }</pre>

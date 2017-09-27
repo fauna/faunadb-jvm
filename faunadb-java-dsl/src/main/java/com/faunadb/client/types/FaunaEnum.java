@@ -7,17 +7,17 @@ import java.lang.annotation.Target;
 
 /**
  * <p>Instruct the encoder/decoder to rename the annotated enum field.</p>
- * <p>
+ *
  * <p>If absent, the method {@link Enum#name()} will be used instead.</p>
- * <p>
- * <pre>{@code
+ *
+ * <pre><code>
  * enum CpuTypes {
- *     @FaunaEnum("x86_32") X86,
- *     @FaunaEnum("x86_64") X86_64,
+ *     &#64;FaunaEnum("x86_32") X86,
+ *     &#64;FaunaEnum("x86_64") X86_64,
  *     ARM,
  *     MIPS
  * }
- * }</pre>
+ * </code></pre>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

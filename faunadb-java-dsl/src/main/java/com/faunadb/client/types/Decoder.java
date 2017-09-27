@@ -27,16 +27,16 @@ public final class Decoder {
 
   /**
    * Decode a FaunaDB {@link Value} to a specified type.
-   * <p>
+   *
    * <p>This method is useful if you need to decode collections.</p>
-   * <p>
+   *
    * <pre>{@code
    *     ArrayV array = new ArrayV(Arrays.asList(new StringV("str1"), new StringV("str2")));
    *
    *     Result<List<String>> listStrings = Decoder.decode(array, Types.arrayListOf(String.class));
    *     Result<Set<String>> setStrings = Decoder.decode(array, Types.hashSetOf(String.class));
    * }</pre>
-   * <p>
+   *
    * See {@link Types} for more information.
    *
    * @param <T>     The return type of the method.
@@ -57,15 +57,15 @@ public final class Decoder {
 
   /**
    * Decode a FaunaDB {@link Value} to a specified type.
-   * <p>
+   *
    * <p>Use this method to decode user defined types like:</p>
-   * <p>
+   *
    * <pre>{@code
    *     Result<User> user = Decoder.decode(new ObjectV(...), User.class);
    * }</pre>
-   * <p>
+   *
    * <p>It's possible to decode primitive types and arrays of primitive types</p>
-   * <p>
+   *
    * <pre>{@code
    *     Result<String> string = Decoder.decode(new StringV("string"), String.class);
    *     Result<long> longValue = Decoder.decode(new LongV(10), long.class);

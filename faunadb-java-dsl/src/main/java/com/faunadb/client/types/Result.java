@@ -137,6 +137,7 @@ public abstract class Result<T> {
   /**
    * Creates a successful result
    *
+   * @param <T> the type of the result
    * @param value result's value
    * @return a successful result
    */
@@ -147,6 +148,7 @@ public abstract class Result<T> {
   /**
    * Creates failure result
    *
+   * @param <T> the type of the result
    * @param error the error message
    * @return a failure result
    */
@@ -157,6 +159,7 @@ public abstract class Result<T> {
   /**
    * Creates failure result with an exception
    *
+   * @param <T> the type of the result
    * @param error the error message
    * @param cause the exception that caused this failure
    * @return a failure result
@@ -204,6 +207,7 @@ public abstract class Result<T> {
   /**
    * Apply the function passed on the result value.
    *
+   * @param <U> the type of the result
    * @param fn the map function to be applied
    * @return if this is a successful result, return a new successful result with the map function result.
    * If this is a failure, returns a new failure with the same error message.
@@ -213,6 +217,7 @@ public abstract class Result<T> {
   /**
    * Apply the function passed on the result value.
    *
+   * @param <U> the type of the result
    * @param fn the map function to be applied
    * @return if this is a successful result, returns the map function result.
    * If this is a failure, returns a new failure with the same error message.
