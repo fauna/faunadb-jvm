@@ -6,6 +6,7 @@
 * Adds Null() function to scala
 * Reverses the argument order of Append() and Prepend() functions
 * Adds support to IsEmpty() and IsNonEmpty() functions
+* Adds support to X-Last-Seen-Txn header
 
 2.1.1
 * Fix issue #143: Configured endpoint is overridden by request builder
