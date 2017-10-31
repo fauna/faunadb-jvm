@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static io.netty.util.CharsetUtil.US_ASCII;
 import static java.lang.String.format;
@@ -173,6 +174,7 @@ public final class Connection implements AutoCloseable {
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final ObjectMapper json = new ObjectMapper();
   private final AtomicBoolean closed = new AtomicBoolean(false);
+  private final AtomicLong txnTime = new AtomicLong(0L);
 
   private Connection(URL faunaRoot, String authToken, RefAwareHttpClient client, MetricRegistry registry) {
     this.faunaRoot = faunaRoot;
@@ -295,9 +297,15 @@ public final class Connection implements AutoCloseable {
     final Timer.Context ctx = registry.timer("fauna-request").time();
     final SettableFuture<Response> rv = SettableFuture.create();
 
-    client.prepareRequest(request)
-      .addHeader("Authorization", authHeader)
-      .execute(new AsyncCompletionHandler<Response>() {
+    BoundRequestBuilder req = client.prepareRequest(request)
+      .addHeader("Authorization", authHeader);
+
+    long time = txnTime.get();
+    if (time > 0) {
+      req = req.setHeader("X-Last-Seen-Txn", Long.toString(time));
+    }
+
+    req.execute(new AsyncCompletionHandler<Response>() {
         @Override
         public void onThrowable(Throwable t) {
           ctx.stop();
@@ -309,6 +317,23 @@ public final class Connection implements AutoCloseable {
         public Response onCompleted(Response response) throws Exception {
           ctx.stop();
           rv.set(response);
+
+          String txnTimeHeader = response.getHeader("X-Txn-Time");
+          if (txnTimeHeader != null) {
+            long newTxnTime = Long.valueOf(txnTimeHeader);
+            boolean cas;
+            do {
+              long oldTxnTime = txnTime.get();
+
+              if (oldTxnTime < newTxnTime) {
+                cas = txnTime.compareAndSet(oldTxnTime, newTxnTime);
+              } else {
+                // Another query advanced the txnTime past this one.
+                break;
+              }
+            } while(!cas);
+          }
+
           logSuccess(request, response);
           return response;
         }
