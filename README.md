@@ -121,7 +121,7 @@ public class Main {
 
     Person person = client.query(Get(Ref(Class("people"), "123456789"))).get()
       .get(PERSON_FIELD);
-    
+
     System.out.println(person);
 
     client.close();
@@ -174,7 +174,7 @@ object Main extends App {
   println(
     Await.result(person, Duration.Inf)
   )
-  
+
   client.close()
 }
 ```
@@ -188,6 +188,10 @@ The faunadb-jvm project is built using sbt:
 To build and run tests against cloud, set the env variable
 `FAUNA_ROOT_KEY` to your admin key secret and run `sbt test` from the
 project directory.
+
+Alternatively, tests can be run via a Docker container with
+`FAUNA_ROOT_KEY="your-cloud-secret" make docker-test` (an alternate
+Debian-based JDK image can be provided via `RUNTIME_IMAGE`).
 
 To run tests against an enterprise cluster or developer instance, you
 will also need to set `FAUNA_SCHEME` (http or https), `FAUNA_DOMAIN`
