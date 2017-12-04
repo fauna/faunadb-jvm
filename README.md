@@ -95,20 +95,7 @@ import com.google.common.collect.*;
 
 import static com.faunadb.client.query.Language.*;
 
-class Person {
-  @FaunaField private final String firstName;
-  @FaunaField private final String lastName;
-
-  @FaunaConstructor
-  public Person(@FaunaField("firstName") String firstName, @FaunaField("lastName") String lastName) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-  }
-}
-
 public class Main {
-  private static final Field<Person> PERSON_FIELD = Field.at("data").to(Person.class);
-
   public static void main(String[] args) throws Exception {
     FaunaClient client = FaunaClient.builder()
       .withSecret("your-secret-here")
@@ -118,11 +105,6 @@ public class Main {
       .at("data").collect(Field.as(Codec.REF));
 
     System.out.println(indexes);
-
-    Person person = client.query(Get(Ref(Class("people"), "123456789"))).get()
-      .get(PERSON_FIELD);
-
-    System.out.println(person);
 
     client.close();
   }
@@ -148,12 +130,6 @@ import faunadb.values._
 import scala.concurrent._
 import scala.concurrent.duration._
 
-case class Person(firstName: String, lastName: String)
-
-object Person {
-  implicit val personCodec: Codec[Person] = Codec.caseClass[Person]
-}
-
 object Main extends App {
   import ExecutionContext.Implicits._
 
@@ -165,14 +141,6 @@ object Main extends App {
 
   println(
     Await.result(indexes, Duration.Inf)
-  )
-
-  val person = client
-    .query(Get(Ref(Class("person"), "123456789")))
-    .map(value => value("data").to[Person].get)
-
-  println(
-    Await.result(person, Duration.Inf)
   )
 
   client.close()
