@@ -86,6 +86,10 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     a[NotFoundException] should be thrownBy await(client.query(Get(RefV("1234", RefV("spells", Native.Classes)))))
   }
 
+  it should "abort the execution" in {
+    a[BadRequestException] should be thrownBy await(client.query(Abort("a message")))
+  }
+
   it should "echo values" in {
     await(client.query(ObjectV("foo" -> StringV("bar")))) should equal (ObjectV("foo" -> StringV("bar")))
     await(client.query("qux")) should equal (StringV("qux"))

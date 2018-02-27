@@ -443,6 +443,24 @@ public final class Language {
   }
 
   /**
+   * Creates a new Abort expression
+   *
+   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   */
+  public static Expr Abort(String msg) {
+    return Abort(Value(msg));
+  }
+
+  /**
+   * Creates a new Abort expression
+   *
+   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   */
+  public static Expr Abort(Expr msg) {
+    return Fn.apply("abort", msg);
+  }
+
+  /**
    * Creates a new Call expression
    *
    * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>

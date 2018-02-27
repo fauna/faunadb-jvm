@@ -48,6 +48,8 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize basic forms" in {
+    json.writeValueAsString(Abort("a message")) shouldBe "{\"abort\":\"a message\"}"
+
     val let = Let { val x = 1; val y = "2"; x }
     json.writeValueAsString(let) shouldBe "{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"
 

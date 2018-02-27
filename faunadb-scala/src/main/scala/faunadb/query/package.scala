@@ -160,6 +160,14 @@ package object query {
   // Basic Forms
 
   /**
+    * A Abort expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
+    */
+  def Abort(msg: Expr): Expr =
+    Expr(ObjectV("abort" -> msg.value))
+
+  /**
     * A Call expression.
     *
     * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]

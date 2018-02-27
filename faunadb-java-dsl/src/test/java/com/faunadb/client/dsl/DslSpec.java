@@ -191,6 +191,13 @@ public abstract class DslSpec {
   }
 
   @Test
+  public void shouldAbort() throws Exception {
+    thrown.expectCause(isA(BadRequestException.class));
+    thrown.expectMessage(containsString("transaction aborted: a message"));
+    query(Abort("a message")).get();
+  }
+
+  @Test
   public void shouldCreateAComplexInstance() throws Exception {
     Value instance = query(
       Create(onARandomClass(),

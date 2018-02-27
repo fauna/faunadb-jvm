@@ -190,6 +190,12 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeAbort() throws Exception {
+    assertJson(Abort(Value("a message")), "{\"abort\":\"a message\"}");
+    assertJson(Abort("a message"), "{\"abort\":\"a message\"}");
+  }
+
+  @Test
   public void shouldSerializeLet() throws Exception {
     assertJson(
       Let(
