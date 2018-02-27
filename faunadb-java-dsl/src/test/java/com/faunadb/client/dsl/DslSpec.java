@@ -872,8 +872,8 @@ public abstract class DslSpec {
   }
 
   @Test
-  public void shouldGetNextId() throws Exception {
-    Value res = query(NextId()).get();
+  public void shouldGetNewId() throws Exception {
+    Value res = query(NewId()).get();
     assertThat(res.to(STRING).get(), notNullValue());
   }
 

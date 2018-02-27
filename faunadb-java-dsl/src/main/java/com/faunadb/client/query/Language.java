@@ -1048,10 +1048,22 @@ public final class Language {
   /**
    * Creates a new NextId expression.
    *
+   * @deprecated Use NewId() instead.
+   *
    * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
+  @Deprecated
   public static Expr NextId() {
     return Fn.apply("next_id", NullV.NULL);
+  }
+
+  /**
+   * Creates a new NewId expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr NewId() {
+    return Fn.apply("new_id", NullV.NULL);
   }
 
   /**

@@ -625,8 +625,17 @@ package object query {
     *
     * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
     */
+  @deprecated("use NewId instead")
   def NextId(): Expr =
     Expr(ObjectV("next_id" -> NullV))
+
+  /**
+    * A New Id expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def NewId(): Expr =
+    Expr(ObjectV("new_id" -> NullV))
 
   /**
     * A Class expression.

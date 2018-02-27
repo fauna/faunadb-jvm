@@ -743,8 +743,8 @@ public class SerializationSpec {
   }
 
   @Test
-  public void shouldSerializeNextId() throws Exception {
-    assertJson(NextId(), "{\"next_id\":null}");
+  public void shouldSerializeNewId() throws Exception {
+    assertJson(NewId(), "{\"new_id\":null}");
   }
 
   @Test
