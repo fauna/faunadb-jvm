@@ -1,5 +1,6 @@
 2.0.1-SNAPSHOT
 * Adds support to Abort() function
+* Adds normalizer argument to Casefold() function
 
 2.0.0
 * Fix possible NullPointerException when checking for failing requests

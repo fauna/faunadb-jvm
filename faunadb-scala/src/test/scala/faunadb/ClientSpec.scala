@@ -386,6 +386,17 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     differenceR(PageRefs).get should contain (create4R(RefField).get)
   }
 
+  it should "test string functions" in {
+    await(client.query(Casefold("Hen Wen"))).to[String].get shouldBe "hen wen"
+
+    // https://unicode.org/reports/tr15/
+    await(client.query(Casefold("\u212B", Normalizer.NFD))).to[String].get shouldBe "A\u030A"
+    await(client.query(Casefold("\u212B", Normalizer.NFC))).to[String].get shouldBe "\u00C5"
+    await(client.query(Casefold("\u1E9B\u0323", Normalizer.NFKD))).to[String].get shouldBe "\u0073\u0323\u0307"
+    await(client.query(Casefold("\u1E9B\u0323", Normalizer.NFKC))).to[String].get shouldBe "\u1E69"
+    await(client.query(Casefold("\u212B", Normalizer.NFKCCaseFold))).to[String].get shouldBe "\u00E5"
+  }
+
   it should "test miscellaneous functions" in {
     val nextIdF = client.query(NextId())
     val nextIdR = await(nextIdF).to[String].get

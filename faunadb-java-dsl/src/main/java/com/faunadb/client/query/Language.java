@@ -80,6 +80,25 @@ public final class Language {
   }
 
   /**
+   * Enumeration for casefold operations.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   */
+  public enum Normalizer {
+    NFD("NFD"),
+    NFC("NFC"),
+    NFKD("NFKD"),
+    NFKC("NFKC"),
+    NFKCCaseFold("NFKCCaseFold");
+
+    private final Expr value;
+
+    Normalizer(String value) {
+      this.value = Value(value);
+    }
+  }
+
+  /**
    * Builder for let expressions.
    *
    * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
@@ -970,6 +989,24 @@ public final class Language {
    */
   public static Expr Casefold(Expr str) {
     return Fn.apply("casefold", str);
+  }
+
+  /**
+   * Creates a new Casefold expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   */
+  public static Expr Casefold(Expr str, Expr normalizer) {
+    return Fn.apply("casefold", str, "normalizer", normalizer);
+  }
+
+  /**
+   * Creates a new Casefold expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   */
+  public static Expr Casefold(Expr str, Normalizer normalizer) {
+    return Casefold(str, normalizer.value);
   }
 
   /**

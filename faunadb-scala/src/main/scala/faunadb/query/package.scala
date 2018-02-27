@@ -60,6 +60,18 @@ package query {
   }
 
   /**
+    * Enumeration for casefold operation.
+    */
+  sealed abstract class Normalizer(val expr: Expr)
+  object Normalizer {
+    case object NFD extends Normalizer(Expr(StringV("NFD")))
+    case object NFC extends Normalizer(Expr(StringV("NFC")))
+    case object NFKD extends Normalizer(Expr(StringV("NFKD")))
+    case object NFKC extends Normalizer(Expr(StringV("NFKC")))
+    case object NFKCCaseFold extends Normalizer(Expr(StringV("NFKCCaseFold")))
+  }
+
+  /**
     * Helper for path syntax
     */
   case class Path private (segments: Expr*) extends AnyVal {
@@ -570,6 +582,12 @@ package object query {
    */
   def Casefold(term: Expr): Expr =
     Expr(ObjectV("casefold" -> term.value))
+
+  def Casefold(term: Expr, normalizer: Normalizer): Expr =
+    Casefold(term, normalizer.expr)
+
+  def Casefold(term: Expr, normalizer: Expr): Expr =
+    Expr(ObjectV("casefold" -> term.value, "normalizer" -> normalizer.value))
 
   // Time Functions
 

@@ -677,6 +677,32 @@ public abstract class DslSpec {
   public void shouldEvalCasefoldExpression() throws Exception {
     Value res = query(Casefold(Value("Hen Wen"))).get();
     assertThat(res.to(STRING).get(), equalTo("hen wen"));
+
+    // https://unicode.org/reports/tr15/
+    assertThat(
+      query(Casefold(Value("\u212B"), Normalizer.NFD)).get().to(STRING).get(),
+      equalTo("A\u030A")
+    );
+
+    assertThat(
+      query(Casefold(Value("\u212B"), Normalizer.NFC)).get().to(STRING).get(),
+      equalTo("\u00C5")
+    );
+
+    assertThat(
+      query(Casefold(Value("\u1E9B\u0323"), Normalizer.NFKD)).get().to(STRING).get(),
+      equalTo("\u0073\u0323\u0307")
+    );
+
+    assertThat(
+      query(Casefold(Value("\u1E9B\u0323"), Normalizer.NFKC)).get().to(STRING).get(),
+      equalTo("\u1E69")
+    );
+
+    assertThat(
+      query(Casefold(Value("\u212B"), Normalizer.NFKCCaseFold)).get().to(STRING).get(),
+      equalTo("\u00E5")
+    );
   }
 
   @Test

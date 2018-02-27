@@ -711,6 +711,9 @@ public class SerializationSpec {
   @Test
   public void shouldSerializeCasefold() throws Exception {
     assertJson(Casefold(Value("Hen Wen")), "{\"casefold\":\"Hen Wen\"}");
+
+    assertJson(Casefold(Value("Hen Wen"), Normalizer.NFD), "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFD\"}");
+    assertJson(Casefold(Value("Hen Wen"), Value("NFD")), "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFD\"}");
   }
 
   @Test

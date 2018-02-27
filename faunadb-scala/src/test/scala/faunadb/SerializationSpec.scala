@@ -249,6 +249,18 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(date) shouldBe "{\"date\":\"1970-01-02\"}"
   }
 
+  it should "serialize string functions" in {
+    val concat = Concat(Arr("Hen", "Wen"))
+    json.writeValueAsString(concat) shouldBe "{\"concat\":[\"Hen\",\"Wen\"]}"
+
+    val concat2 = Concat(Arr("Hen", "Wen"), " ")
+    json.writeValueAsString(concat2) shouldBe "{\"concat\":[\"Hen\",\"Wen\"],\"separator\":\" \"}"
+
+    json.writeValueAsString(Casefold("Hen Wen")) shouldBe "{\"casefold\":\"Hen Wen\"}"
+    json.writeValueAsString(Casefold("Hen Wen", "NFC")) shouldBe "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFC\"}"
+    json.writeValueAsString(Casefold("Hen Wen", Normalizer.NFC)) shouldBe "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFC\"}"
+  }
+
   it should "serialize misc and mathematical functions" in {
     val nextId = NextId()
     json.writeValueAsString(nextId) shouldBe "{\"next_id\":null}"
@@ -264,12 +276,6 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val equals = Equals("fire", "fire")
     json.writeValueAsString(equals) shouldBe "{\"equals\":[\"fire\",\"fire\"]}"
-
-    val concat = Concat(Arr("Hen", "Wen"))
-    json.writeValueAsString(concat) shouldBe "{\"concat\":[\"Hen\",\"Wen\"]}"
-
-    val concat2 = Concat(Arr("Hen", "Wen"), " ")
-    json.writeValueAsString(concat2) shouldBe "{\"concat\":[\"Hen\",\"Wen\"],\"separator\":\" \"}"
 
     val add = Add(1, 2)
     json.writeValueAsString(add) shouldBe "{\"add\":[1,2]}"
