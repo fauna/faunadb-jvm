@@ -74,7 +74,7 @@ public class JavaClientSpec extends DslSpec {
 
     Value key = rootClient.query(CreateKey(Obj("database", DB_REF, "role", Value("client")))).get();
 
-    FaunaClient client = createFaunaClient(key.get(Field.at("secret").to(STRING)));
+    FaunaClient client = createFaunaClient(key.get(SECRET_FIELD));
 
     client.query(Paginate(Databases())).get();
   }
@@ -93,7 +93,7 @@ public class JavaClientSpec extends DslSpec {
         Obj("password", Value("abcdefg")))
     ).get();
 
-    String secret = auth.at("secret").to(STRING).get();
+    String secret = auth.get(SECRET_FIELD);
 
     try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
       Value loggedOut = sessionClient.query(Logout(Value(true))).get();
@@ -108,6 +108,54 @@ public class JavaClientSpec extends DslSpec {
     ).get();
 
     assertThat(identified.to(BOOLEAN).get(), is(false));
+  }
+
+  @Test
+  public void shouldTestHasIdentity() throws Exception {
+    Value createdInstance = serverClient.query(
+      Create(onARandomClass(),
+        Obj("credentials",
+          Obj("password", Value("sekret"))))
+    ).get();
+
+    Value auth = serverClient.query(
+      Login(
+        createdInstance.get(REF_FIELD),
+        Obj("password", Value("sekret")))
+    ).get();
+
+    String secret = auth.get(SECRET_FIELD);
+
+    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
+      assertThat(
+        sessionClient.query(HasIdentity()).get().to(BOOLEAN).get(),
+        equalTo(true)
+      );
+    }
+  }
+
+  @Test
+  public void shouldTestIdentity() throws Exception {
+    Value createdInstance = serverClient.query(
+      Create(onARandomClass(),
+        Obj("credentials",
+          Obj("password", Value("sekret"))))
+    ).get();
+
+    Value auth = serverClient.query(
+      Login(
+        createdInstance.get(REF_FIELD),
+        Obj("password", Value("sekret")))
+    ).get();
+
+    String secret = auth.get(SECRET_FIELD);
+
+    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
+      assertThat(
+        sessionClient.query(Identity()).get(),
+        equalTo((Value) createdInstance.get(REF_FIELD))
+      );
+    }
   }
 
   @Test

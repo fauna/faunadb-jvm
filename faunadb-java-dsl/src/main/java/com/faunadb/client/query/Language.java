@@ -965,6 +965,24 @@ public final class Language {
   }
 
   /**
+   * Creates a new Identity expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a>
+   */
+  public static Expr Identity() {
+    return Fn.apply("identity", Null());
+  }
+
+  /**
+   * Creates a new HasIdentity expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a>
+   */
+  public static Expr HasIdentity() {
+    return Fn.apply("has_identity", Null());
+  }
+
+  /**
    * Creates a new Concat expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>

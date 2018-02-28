@@ -562,6 +562,22 @@ package object query {
   def Identify(ref: Expr, password: Expr): Expr =
     Expr(ObjectV("identify" -> ref.value, "password" -> password.value))
 
+  /**
+    * An Identity expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#auth_functions]]
+    */
+  def Identity(): Expr =
+    Expr(ObjectV("identity" -> NullV))
+
+  /**
+    * An HasIdentity expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#auth_functions]]
+    */
+  def HasIdentity(): Expr =
+    Expr(ObjectV("has_identity" -> NullV))
+
   // String Functions
 
   /**

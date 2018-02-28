@@ -79,7 +79,7 @@ public class AndroidClientSpec extends DslSpec {
 
     Value key = rootClient.query(CreateKey(Obj("database", DB_REF, "role", Value("client")))).get();
 
-    FaunaClient client = createFaunaClient(key.get(Field.at("secret").to(STRING)));
+    FaunaClient client = createFaunaClient(key.get(SECRET_FIELD));
 
     client.query(Paginate(Databases())).get();
   }
@@ -109,7 +109,7 @@ public class AndroidClientSpec extends DslSpec {
         Obj("password", Value("abcdefg")))
     ).get();
 
-    String secret = auth.at("secret").to(STRING).get();
+    String secret = auth.get(SECRET_FIELD);
 
     FaunaClient sessionClient = serverClient.newSessionClient(secret);
 
@@ -125,6 +125,62 @@ public class AndroidClientSpec extends DslSpec {
       ).get();
 
       assertThat(identified.to(BOOLEAN).get(), is(false));
+    } finally {
+      sessionClient.close();
+    }
+  }
+
+  @Test
+  public void shouldTestHasIdentity() throws Exception {
+    Value createdInstance = serverClient.query(
+      Create(onARandomClass(),
+        Obj("credentials",
+          Obj("password", Value("sekret"))))
+    ).get();
+
+    Value auth = serverClient.query(
+      Login(
+        createdInstance.get(REF_FIELD),
+        Obj("password", Value("sekret")))
+    ).get();
+
+    String secret = auth.get(SECRET_FIELD);
+
+    FaunaClient sessionClient = serverClient.newSessionClient(secret);
+
+    try {
+      assertThat(
+        sessionClient.query(HasIdentity()).get().to(BOOLEAN).get(),
+        equalTo(true)
+      );
+    } finally {
+      sessionClient.close();
+    }
+  }
+
+  @Test
+  public void shouldTestIdentity() throws Exception {
+    Value createdInstance = serverClient.query(
+      Create(onARandomClass(),
+        Obj("credentials",
+          Obj("password", Value("sekret"))))
+    ).get();
+
+    Value auth = serverClient.query(
+      Login(
+        createdInstance.get(REF_FIELD),
+        Obj("password", Value("sekret")))
+    ).get();
+
+    String secret = auth.get(SECRET_FIELD);
+
+    FaunaClient sessionClient = serverClient.newSessionClient(secret);
+
+    try {
+      assertThat(
+        sessionClient.query(Identity()).get(),
+        equalTo((Value) createdInstance.get(REF_FIELD))
+      );
     } finally {
       sessionClient.close();
     }

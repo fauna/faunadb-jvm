@@ -233,6 +233,12 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val identify = Identify(RefV("104979509695139637", RefV("characters", Native.Classes)), "abracadabra")
     json.writeValueAsString(identify) shouldBe "{\"identify\":{\"@ref\":{\"id\":\"104979509695139637\",\"class\":{\"@ref\":{\"id\":\"characters\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"password\":\"abracadabra\"}"
+
+    val identity = Identity()
+    json.writeValueAsString(identity) shouldBe "{\"identity\":null}"
+
+    val hasIdentity = HasIdentity()
+    json.writeValueAsString(hasIdentity) shouldBe "{\"has_identity\":null}"
   }
 
   it should "serialize date and time functions" in {

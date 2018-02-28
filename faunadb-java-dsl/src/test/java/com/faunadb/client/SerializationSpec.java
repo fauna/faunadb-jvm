@@ -687,6 +687,16 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeIdentity() throws Exception {
+    assertJson(Identity(), "{\"identity\":null}");
+  }
+
+  @Test
+  public void shouldSerializeHasIdentity() throws Exception {
+    assertJson(HasIdentity(), "{\"has_identity\":null}");
+  }
+
+  @Test
   public void shouldSerializeConcat() throws Exception {
     assertJson(
       Concat(

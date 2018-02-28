@@ -500,13 +500,24 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val createF = client.query(Create(Class("spells"), Obj("credentials" -> Obj("password" -> "abcdefg"))))
     val createR = await(createF)
 
-    val loginF = client.query(Login(createR("ref").to[RefV], Obj("password" -> "abcdefg")))
-    val secret = await(loginF)("secret").to[String].get
+    // Login
+    val loginF = client.query(Login(createR(RefField), Obj("password" -> "abcdefg")))
+    val secret = await(loginF)(SecretField).get
 
+    // HasIdentity
+    val hasIdentity = client.sessionWith(secret)(_.query(HasIdentity()))
+    await(hasIdentity).to[Boolean].get shouldBe true
+
+    // Identity
+    val identity = client.sessionWith(secret)(_.query(Identity()))
+    await(identity).to[RefV].get shouldBe createR(RefField).get
+
+    // Logout
     val loggedOut = client.sessionWith(secret)(_.query(Logout(false)))
     await(loggedOut).to[Boolean].get shouldBe true
 
-    val identifyF = client.query(Identify(createR("ref").to[RefV], "abcdefg"))
+    // Identify
+    val identifyF = client.query(Identify(createR(RefField), "abcdefg"))
     val identifyR = await(identifyF)
     identifyR.to[Boolean].get shouldBe true
   }
