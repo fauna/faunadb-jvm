@@ -182,6 +182,12 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize sets" in {
+    val singleton = Singleton(Ref("classes/widget/1"))
+    json.writeValueAsString(singleton) shouldBe "{\"singleton\":{\"@ref\":\"classes/widget/1\"}}"
+
+    val events = Events(Ref("classes/widget/1"))
+    json.writeValueAsString(events) shouldBe "{\"events\":{\"@ref\":\"classes/widget/1\"}}"
+
     val matchSet = Match(RefV("spells_by_elements", Native.Indexes), "fire")
     json.writeValueAsString(matchSet) shouldBe "{\"match\":\"fire\",\"index\":{\"@ref\":{\"id\":\"spells_by_elements\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}"
 

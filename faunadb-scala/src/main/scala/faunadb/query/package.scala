@@ -489,6 +489,22 @@ package object query {
   // Set Constructors
 
   /**
+    * A Singleton set.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#sets]]
+    */
+  def Singleton(ref: Expr): Expr =
+    Expr(ObjectV("singleton" -> ref.value))
+
+  /**
+    * A Events set.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#sets]]
+    */
+  def Events(refSet: Expr): Expr =
+    Expr(ObjectV("events" -> refSet.value))
+
+  /**
    * A Match set.
    *
    * '''Reference''': [[https://fauna.com/documentation/queries#sets]]

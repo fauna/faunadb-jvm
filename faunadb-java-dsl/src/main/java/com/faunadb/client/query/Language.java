@@ -850,6 +850,24 @@ public final class Language {
   }
 
   /**
+   * Create a new Singleton expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#sets">FaunaDB Set Functions</a>
+   */
+  public static Expr Singleton(Expr ref) {
+    return Fn.apply("singleton", ref);
+  }
+
+  /**
+   * Create a new Events expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#sets">FaunaDB Set Functions</a>
+   */
+  public static Expr Events(Expr refSet) {
+    return Fn.apply("events", refSet);
+  }
+
+  /**
    * Creates a new Match expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#sets">FaunaDB Set Functions</a>

@@ -37,6 +37,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   val TsField = Field("ts").to[Long]
   val ClassField = Field("class").to[RefV]
   val SecretField = Field("secret").to[String]
+  val DataField = Field("data")
 
   // Page helpers
   case class Ev(ref: RefV, ts: Long, action: String)
@@ -47,8 +48,8 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     Field("action").to[String]
   ) map { case (r, ts, a) => Ev(r, ts, a) }
 
-  val PageEvents = Field("data").collect(EventField)
-  val PageRefs = Field("data").to[Seq[RefV]]
+  val PageEvents = DataField.collect(EventField)
+  val PageRefs = DataField.to[Seq[RefV]]
 
   def await[T](f: Future[T]) = Await.result(f, 5.second)
   def ready[T](f: Future[T]) = Await.ready(f, 5.second)
@@ -384,6 +385,44 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val differenceR = await(differenceF)
     differenceR(PageRefs).get should contain (create4R(RefField).get)
+  }
+
+  it should "test events api" in {
+    val randomClassName = Random.alphanumeric.take(8).mkString
+    val randomClass = await(client.query(CreateClass(Obj("name" -> randomClassName))))
+
+    val data = await(client.query(Create(randomClass(RefField).get, Obj("data" -> Obj("x" -> 1)))))
+    val dataRef = data(RefField).get
+
+    await(client.query(Update(dataRef, Obj("data" -> Obj("x" -> 2)))))
+    await(client.query(Delete(dataRef)))
+
+    case class Event(action: String, instance: RefV)
+
+    implicit val eventCodec = Codec.caseClass[Event]
+
+    // Events
+    val events = await(client.query(Paginate(Events(dataRef))))(DataField.to[List[Event]]).get
+
+    events.length shouldBe 3
+    events(0).action shouldBe "create"
+    events(0).instance shouldBe dataRef
+
+    events(1).action shouldBe "update"
+    events(1).instance shouldBe dataRef
+
+    events(2).action shouldBe "delete"
+    events(2).instance shouldBe dataRef
+
+    // Singleton
+    val singletons = await(client.query(Paginate(Events(Singleton(dataRef)))))(DataField.to[List[Event]]).get
+
+    singletons.length shouldBe 2
+    singletons(0).action shouldBe "add"
+    singletons(0).instance shouldBe dataRef
+
+    singletons(1).action shouldBe "remove"
+    singletons(1).instance shouldBe dataRef
   }
 
   it should "test string functions" in {

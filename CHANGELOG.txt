@@ -4,6 +4,7 @@
 * Adds support to NewId() function
 * Deprecates NextId() function in favor of NewId()
 * Adds support to Identity() and HasIdentity() functions
+* Adds support to Singleton() and Events() functions
 
 2.0.0
 * Fix possible NullPointerException when checking for failing requests

@@ -574,6 +574,22 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeSingletonFunction() throws Exception {
+    assertJson(
+      Singleton(Ref("classes/widget/1")),
+      "{\"singleton\":{\"@ref\":\"classes/widget/1\"}}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeEventsFunction() throws Exception {
+    assertJson(
+      Events(Ref("classes/widget/1")),
+      "{\"events\":{\"@ref\":\"classes/widget/1\"}}"
+    );
+  }
+
+  @Test
   public void shouldSerializeMatchFunction() throws Exception {
     assertJson(
       Match(new RefV("all_users", Native.INDEXES)),
