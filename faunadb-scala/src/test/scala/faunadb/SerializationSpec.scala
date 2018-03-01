@@ -76,6 +76,9 @@ class SerializationSpec extends FlatSpec with Matchers {
     val select = Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings", "lunchings"))))
     json.writeValueAsString(select) shouldBe "{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}"
 
+    val selectAll = SelectAll("foo" / "bar", Arr(Obj("foo" -> "bar")))
+    json.writeValueAsString(selectAll) shouldBe "{\"select_all\":[\"foo\",\"bar\"],\"from\":[{\"object\":{\"foo\":\"bar\"}}]}"
+
     val lambda1 = Lambda(a => a)
     json.writeValueAsString(lambda1) should equal ("""{"lambda":"a","expr":{"var":"a"}}""")
 

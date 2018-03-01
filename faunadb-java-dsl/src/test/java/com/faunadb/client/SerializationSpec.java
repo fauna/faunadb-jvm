@@ -861,6 +861,35 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeSelectAllFunction() throws Exception {
+    assertJson(
+      SelectAll(
+        Path("foo").at(1),
+        Arr(
+          Obj("foo", Arr(Value(0), Value(1))),
+          Obj("foo", Arr(Value(2), Value(3)))
+        )
+      ),
+      "{\"select_all\":[\"foo\",1],\"from\":[{\"object\":{\"foo\":[0,1]}},{\"object\":{\"foo\":[2,3]}}]}"
+    );
+
+    assertJson(
+      SelectAll(
+        Path(0).at("name"),
+        Arr(Obj("name", Value("someone")))
+      ),
+      "{\"select_all\":[0,\"name\"],\"from\":[{\"object\":{\"name\":\"someone\"}}]}"
+    );
+
+    assertJson(
+      SelectAll(
+        Arr(Value("foo"), Value("bar")),
+        Obj("foo", Obj("bar", Arr(Value(1), Value(2))))
+      ),
+      "{\"select_all\":[\"foo\",\"bar\"],\"from\":{\"object\":{\"foo\":{\"object\":{\"bar\":[1,2]}}}}}");
+  }
+
+  @Test
   public void shouldSerializeAdd() throws Exception {
     assertJson(Add(Value(100), Value(10)), "{\"add\":[100,10]}");
     assertJson(Add(ImmutableList.of(Value(100), Value(10))), "{\"add\":[100,10]}");
