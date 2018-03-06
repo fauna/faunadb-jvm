@@ -80,6 +80,25 @@ public final class Language {
   }
 
   /**
+   * Enumeration for casefold operations.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   */
+  public enum Normalizer {
+    NFD("NFD"),
+    NFC("NFC"),
+    NFKD("NFKD"),
+    NFKC("NFKC"),
+    NFKCCaseFold("NFKCCaseFold");
+
+    private final Expr value;
+
+    Normalizer(String value) {
+      this.value = Value(value);
+    }
+  }
+
+  /**
    * Builder for let expressions.
    *
    * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
@@ -440,6 +459,24 @@ public final class Language {
    */
   public static Expr Arr(Expr... values) {
     return Arr(ImmutableList.copyOf(values));
+  }
+
+  /**
+   * Creates a new Abort expression
+   *
+   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   */
+  public static Expr Abort(String msg) {
+    return Abort(Value(msg));
+  }
+
+  /**
+   * Creates a new Abort expression
+   *
+   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   */
+  public static Expr Abort(Expr msg) {
+    return Fn.apply("abort", msg);
   }
 
   /**
@@ -813,6 +850,24 @@ public final class Language {
   }
 
   /**
+   * Create a new Singleton expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#sets">FaunaDB Set Functions</a>
+   */
+  public static Expr Singleton(Expr ref) {
+    return Fn.apply("singleton", ref);
+  }
+
+  /**
+   * Create a new Events expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#sets">FaunaDB Set Functions</a>
+   */
+  public static Expr Events(Expr refSet) {
+    return Fn.apply("events", refSet);
+  }
+
+  /**
    * Creates a new Match expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#sets">FaunaDB Set Functions</a>
@@ -928,6 +983,24 @@ public final class Language {
   }
 
   /**
+   * Creates a new Identity expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a>
+   */
+  public static Expr Identity() {
+    return Fn.apply("identity", Null());
+  }
+
+  /**
+   * Creates a new HasIdentity expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a>
+   */
+  public static Expr HasIdentity() {
+    return Fn.apply("has_identity", Null());
+  }
+
+  /**
    * Creates a new Concat expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
@@ -952,6 +1025,24 @@ public final class Language {
    */
   public static Expr Casefold(Expr str) {
     return Fn.apply("casefold", str);
+  }
+
+  /**
+   * Creates a new Casefold expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   */
+  public static Expr Casefold(Expr str, Expr normalizer) {
+    return Fn.apply("casefold", str, "normalizer", normalizer);
+  }
+
+  /**
+   * Creates a new Casefold expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   */
+  public static Expr Casefold(Expr str, Normalizer normalizer) {
+    return Casefold(str, normalizer.value);
   }
 
   /**
@@ -993,10 +1084,22 @@ public final class Language {
   /**
    * Creates a new NextId expression.
    *
+   * @deprecated Use NewId() instead.
+   *
    * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
    */
+  @Deprecated
   public static Expr NextId() {
     return Fn.apply("next_id", NullV.NULL);
+  }
+
+  /**
+   * Creates a new NewId expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr NewId() {
+    return Fn.apply("new_id", NullV.NULL);
   }
 
   /**

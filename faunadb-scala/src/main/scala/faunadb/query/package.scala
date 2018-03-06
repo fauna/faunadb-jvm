@@ -44,10 +44,10 @@ package query {
     */
   sealed abstract class TimeUnit(val expr: Expr)
   object TimeUnit {
-    case object Second extends TimeUnit(Expr(StringV("second")))
-    case object Millisecond extends TimeUnit(Expr(StringV("millisecond")))
-    case object Microsecond extends TimeUnit(Expr(StringV("microsecond")))
-    case object Nanosecond extends TimeUnit(Expr(StringV("nanosecond")))
+    case object Second extends TimeUnit("second")
+    case object Millisecond extends TimeUnit("millisecond")
+    case object Microsecond extends TimeUnit("microsecond")
+    case object Nanosecond extends TimeUnit("nanosecond")
   }
 
   /**
@@ -55,8 +55,20 @@ package query {
     */
   sealed abstract class Action(val expr: Expr)
   object Action {
-    case object Create extends Action(Expr(StringV("create")))
-    case object Delete extends Action(Expr(StringV("delete")))
+    case object Create extends Action("create")
+    case object Delete extends Action("delete")
+  }
+
+  /**
+    * Enumeration for casefold operation.
+    */
+  sealed abstract class Normalizer(val expr: Expr)
+  object Normalizer {
+    case object NFD extends Normalizer("NFD")
+    case object NFC extends Normalizer("NFC")
+    case object NFKD extends Normalizer("NFKD")
+    case object NFKC extends Normalizer("NFKC")
+    case object NFKCCaseFold extends Normalizer("NFKCCaseFold")
   }
 
   /**
@@ -158,6 +170,14 @@ package object query {
     Expr(ObjectV("object" -> ObjectV(unwrapPairs(pairs): _*)))
 
   // Basic Forms
+
+  /**
+    * A Abort expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
+    */
+  def Abort(msg: Expr): Expr =
+    Expr(ObjectV("abort" -> msg.value))
 
   /**
     * A Call expression.
@@ -469,6 +489,22 @@ package object query {
   // Set Constructors
 
   /**
+    * A Singleton set.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#sets]]
+    */
+  def Singleton(ref: Expr): Expr =
+    Expr(ObjectV("singleton" -> ref.value))
+
+  /**
+    * A Events set.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#sets]]
+    */
+  def Events(refSet: Expr): Expr =
+    Expr(ObjectV("events" -> refSet.value))
+
+  /**
    * A Match set.
    *
    * '''Reference''': [[https://fauna.com/documentation/queries#sets]]
@@ -542,6 +578,22 @@ package object query {
   def Identify(ref: Expr, password: Expr): Expr =
     Expr(ObjectV("identify" -> ref.value, "password" -> password.value))
 
+  /**
+    * An Identity expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#auth_functions]]
+    */
+  def Identity(): Expr =
+    Expr(ObjectV("identity" -> NullV))
+
+  /**
+    * An HasIdentity expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#auth_functions]]
+    */
+  def HasIdentity(): Expr =
+    Expr(ObjectV("has_identity" -> NullV))
+
   // String Functions
 
   /**
@@ -562,6 +614,12 @@ package object query {
    */
   def Casefold(term: Expr): Expr =
     Expr(ObjectV("casefold" -> term.value))
+
+  def Casefold(term: Expr, normalizer: Normalizer): Expr =
+    Casefold(term, normalizer.expr)
+
+  def Casefold(term: Expr, normalizer: Expr): Expr =
+    Expr(ObjectV("casefold" -> term.value, "normalizer" -> normalizer.value))
 
   // Time Functions
 
@@ -599,8 +657,17 @@ package object query {
     *
     * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
     */
+  @deprecated("use NewId instead")
   def NextId(): Expr =
     Expr(ObjectV("next_id" -> NullV))
+
+  /**
+    * A New Id expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def NewId(): Expr =
+    Expr(ObjectV("new_id" -> NullV))
 
   /**
     * A Class expression.

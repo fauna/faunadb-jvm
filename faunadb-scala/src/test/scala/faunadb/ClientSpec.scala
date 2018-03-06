@@ -37,6 +37,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   val TsField = Field("ts").to[Long]
   val ClassField = Field("class").to[RefV]
   val SecretField = Field("secret").to[String]
+  val DataField = Field("data")
 
   // Page helpers
   case class Ev(ref: RefV, ts: Long, action: String)
@@ -47,8 +48,8 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     Field("action").to[String]
   ) map { case (r, ts, a) => Ev(r, ts, a) }
 
-  val PageEvents = Field("data").collect(EventField)
-  val PageRefs = Field("data").to[Seq[RefV]]
+  val PageEvents = DataField.collect(EventField)
+  val PageRefs = DataField.to[Seq[RefV]]
 
   def await[T](f: Future[T]) = Await.result(f, 5.second)
   def ready[T](f: Future[T]) = Await.ready(f, 5.second)
@@ -84,6 +85,10 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   "Fauna Client" should "should not find an instance" in {
     a[NotFoundException] should be thrownBy await(client.query(Get(RefV("1234", RefV("spells", Native.Classes)))))
+  }
+
+  it should "abort the execution" in {
+    a[BadRequestException] should be thrownBy await(client.query(Abort("a message")))
   }
 
   it should "echo values" in {
@@ -382,10 +387,59 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     differenceR(PageRefs).get should contain (create4R(RefField).get)
   }
 
+  it should "test events api" in {
+    val randomClassName = Random.alphanumeric.take(8).mkString
+    val randomClass = await(client.query(CreateClass(Obj("name" -> randomClassName))))
+
+    val data = await(client.query(Create(randomClass(RefField).get, Obj("data" -> Obj("x" -> 1)))))
+    val dataRef = data(RefField).get
+
+    await(client.query(Update(dataRef, Obj("data" -> Obj("x" -> 2)))))
+    await(client.query(Delete(dataRef)))
+
+    case class Event(action: String, instance: RefV)
+
+    implicit val eventCodec = Codec.caseClass[Event]
+
+    // Events
+    val events = await(client.query(Paginate(Events(dataRef))))(DataField.to[List[Event]]).get
+
+    events.length shouldBe 3
+    events(0).action shouldBe "create"
+    events(0).instance shouldBe dataRef
+
+    events(1).action shouldBe "update"
+    events(1).instance shouldBe dataRef
+
+    events(2).action shouldBe "delete"
+    events(2).instance shouldBe dataRef
+
+    // Singleton
+    val singletons = await(client.query(Paginate(Events(Singleton(dataRef)))))(DataField.to[List[Event]]).get
+
+    singletons.length shouldBe 2
+    singletons(0).action shouldBe "add"
+    singletons(0).instance shouldBe dataRef
+
+    singletons(1).action shouldBe "remove"
+    singletons(1).instance shouldBe dataRef
+  }
+
+  it should "test string functions" in {
+    await(client.query(Casefold("Hen Wen"))).to[String].get shouldBe "hen wen"
+
+    // https://unicode.org/reports/tr15/
+    await(client.query(Casefold("\u212B", Normalizer.NFD))).to[String].get shouldBe "A\u030A"
+    await(client.query(Casefold("\u212B", Normalizer.NFC))).to[String].get shouldBe "\u00C5"
+    await(client.query(Casefold("\u1E9B\u0323", Normalizer.NFKD))).to[String].get shouldBe "\u0073\u0323\u0307"
+    await(client.query(Casefold("\u1E9B\u0323", Normalizer.NFKC))).to[String].get shouldBe "\u1E69"
+    await(client.query(Casefold("\u212B", Normalizer.NFKCCaseFold))).to[String].get shouldBe "\u00E5"
+  }
+
   it should "test miscellaneous functions" in {
-    val nextIdF = client.query(NextId())
-    val nextIdR = await(nextIdF).to[String].get
-    nextIdR should not be null
+    val newIdF = client.query(NewId())
+    val newIdR = await(newIdF).to[String].get
+    newIdR should not be null
 
     val equalsF = client.query(Equals("fire", "fire"))
     val equalsR = await(equalsF).to[Boolean].get
@@ -485,13 +539,24 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val createF = client.query(Create(Class("spells"), Obj("credentials" -> Obj("password" -> "abcdefg"))))
     val createR = await(createF)
 
-    val loginF = client.query(Login(createR("ref").to[RefV], Obj("password" -> "abcdefg")))
-    val secret = await(loginF)("secret").to[String].get
+    // Login
+    val loginF = client.query(Login(createR(RefField), Obj("password" -> "abcdefg")))
+    val secret = await(loginF)(SecretField).get
 
+    // HasIdentity
+    val hasIdentity = client.sessionWith(secret)(_.query(HasIdentity()))
+    await(hasIdentity).to[Boolean].get shouldBe true
+
+    // Identity
+    val identity = client.sessionWith(secret)(_.query(Identity()))
+    await(identity).to[RefV].get shouldBe createR(RefField).get
+
+    // Logout
     val loggedOut = client.sessionWith(secret)(_.query(Logout(false)))
     await(loggedOut).to[Boolean].get shouldBe true
 
-    val identifyF = client.query(Identify(createR("ref").to[RefV], "abcdefg"))
+    // Identify
+    val identifyF = client.query(Identify(createR(RefField), "abcdefg"))
     val identifyR = await(identifyF)
     identifyR.to[Boolean].get shouldBe true
   }

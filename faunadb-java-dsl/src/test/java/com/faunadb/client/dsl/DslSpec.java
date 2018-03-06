@@ -3,10 +3,7 @@ package com.faunadb.client.dsl;
 import com.faunadb.client.errors.BadRequestException;
 import com.faunadb.client.errors.NotFoundException;
 import com.faunadb.client.query.Expr;
-import com.faunadb.client.types.FaunaConstructor;
-import com.faunadb.client.types.FaunaField;
-import com.faunadb.client.types.Field;
-import com.faunadb.client.types.Value;
+import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
 import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Optional;
@@ -21,9 +18,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
@@ -191,6 +186,13 @@ public abstract class DslSpec {
   }
 
   @Test
+  public void shouldAbort() throws Exception {
+    thrown.expectCause(isA(BadRequestException.class));
+    thrown.expectMessage(containsString("transaction aborted: a message"));
+    query(Abort("a message")).get();
+  }
+
+  @Test
   public void shouldCreateAComplexInstance() throws Exception {
     Value instance = query(
       Create(onARandomClass(),
@@ -341,6 +343,74 @@ public abstract class DslSpec {
     ).get();
 
     assertThat(removedEvent, nullValue());
+  }
+
+  static class Event {
+    @FaunaField
+    public String action;
+    @FaunaField
+    public RefV instance;
+  }
+
+  @Test
+  public void shouldTestEvents() throws Exception {
+    RefV ref = query(
+      Create(onARandomClass(), Obj("data", Obj("x", Value(1))))
+    ).get().get(REF_FIELD);
+
+    query(
+      Update(ref, Obj("data", Obj("x", Value(2))))
+    ).get();
+
+    query(
+      Delete(ref)
+    ).get();
+
+    Value data = query(
+      Paginate(Events(ref))
+    ).get().get(DATA);
+
+    List<Event> events = ImmutableList.copyOf(data.asCollectionOf(Event.class).get());
+
+    assertThat(events, hasSize(3));
+
+    assertThat(events.get(0).action, equalTo("create"));
+    assertThat(events.get(0).instance, equalTo(ref));
+
+    assertThat(events.get(1).action, equalTo("update"));
+    assertThat(events.get(1).instance, equalTo(ref));
+
+    assertThat(events.get(2).action, equalTo("delete"));
+    assertThat(events.get(2).instance, equalTo(ref));
+  }
+
+  @Test
+  public void shouldTestSingleton() throws Exception {
+    RefV ref = query(
+      Create(onARandomClass(), Obj("data", Obj("x", Value(1))))
+    ).get().get(REF_FIELD);
+
+    query(
+      Update(ref, Obj("data", Obj("x", Value(2))))
+    ).get();
+
+    query(
+      Delete(ref)
+    ).get();
+
+    Value data = query(
+      Paginate(Events(Singleton(ref)))
+    ).get().get(DATA);
+
+    List<Event> events = ImmutableList.copyOf(data.asCollectionOf(Event.class).get());
+
+    assertThat(events, hasSize(2));
+
+    assertThat(events.get(0).action, equalTo("add"));
+    assertThat(events.get(0).instance, equalTo(ref));
+
+    assertThat(events.get(1).action, equalTo("remove"));
+    assertThat(events.get(1).instance, equalTo(ref));
   }
 
   @Test
@@ -670,6 +740,32 @@ public abstract class DslSpec {
   public void shouldEvalCasefoldExpression() throws Exception {
     Value res = query(Casefold(Value("Hen Wen"))).get();
     assertThat(res.to(STRING).get(), equalTo("hen wen"));
+
+    // https://unicode.org/reports/tr15/
+    assertThat(
+      query(Casefold(Value("\u212B"), Normalizer.NFD)).get().to(STRING).get(),
+      equalTo("A\u030A")
+    );
+
+    assertThat(
+      query(Casefold(Value("\u212B"), Normalizer.NFC)).get().to(STRING).get(),
+      equalTo("\u00C5")
+    );
+
+    assertThat(
+      query(Casefold(Value("\u1E9B\u0323"), Normalizer.NFKD)).get().to(STRING).get(),
+      equalTo("\u0073\u0323\u0307")
+    );
+
+    assertThat(
+      query(Casefold(Value("\u1E9B\u0323"), Normalizer.NFKC)).get().to(STRING).get(),
+      equalTo("\u1E69")
+    );
+
+    assertThat(
+      query(Casefold(Value("\u212B"), Normalizer.NFKCCaseFold)).get().to(STRING).get(),
+      equalTo("\u00E5")
+    );
   }
 
   @Test
@@ -839,8 +935,8 @@ public abstract class DslSpec {
   }
 
   @Test
-  public void shouldGetNextId() throws Exception {
-    Value res = query(NextId()).get();
+  public void shouldGetNewId() throws Exception {
+    Value res = query(NewId()).get();
     assertThat(res.to(STRING).get(), notNullValue());
   }
 

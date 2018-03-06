@@ -48,6 +48,8 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize basic forms" in {
+    json.writeValueAsString(Abort("a message")) shouldBe "{\"abort\":\"a message\"}"
+
     val let = Let { val x = 1; val y = "2"; x }
     json.writeValueAsString(let) shouldBe "{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"
 
@@ -180,6 +182,12 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize sets" in {
+    val singleton = Singleton(Ref("classes/widget/1"))
+    json.writeValueAsString(singleton) shouldBe "{\"singleton\":{\"@ref\":\"classes/widget/1\"}}"
+
+    val events = Events(Ref("classes/widget/1"))
+    json.writeValueAsString(events) shouldBe "{\"events\":{\"@ref\":\"classes/widget/1\"}}"
+
     val matchSet = Match(RefV("spells_by_elements", Native.Indexes), "fire")
     json.writeValueAsString(matchSet) shouldBe "{\"match\":\"fire\",\"index\":{\"@ref\":{\"id\":\"spells_by_elements\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}"
 
@@ -231,6 +239,12 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val identify = Identify(RefV("104979509695139637", RefV("characters", Native.Classes)), "abracadabra")
     json.writeValueAsString(identify) shouldBe "{\"identify\":{\"@ref\":{\"id\":\"104979509695139637\",\"class\":{\"@ref\":{\"id\":\"characters\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"password\":\"abracadabra\"}"
+
+    val identity = Identity()
+    json.writeValueAsString(identity) shouldBe "{\"identity\":null}"
+
+    val hasIdentity = HasIdentity()
+    json.writeValueAsString(hasIdentity) shouldBe "{\"has_identity\":null}"
   }
 
   it should "serialize date and time functions" in {
@@ -247,9 +261,21 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(date) shouldBe "{\"date\":\"1970-01-02\"}"
   }
 
+  it should "serialize string functions" in {
+    val concat = Concat(Arr("Hen", "Wen"))
+    json.writeValueAsString(concat) shouldBe "{\"concat\":[\"Hen\",\"Wen\"]}"
+
+    val concat2 = Concat(Arr("Hen", "Wen"), " ")
+    json.writeValueAsString(concat2) shouldBe "{\"concat\":[\"Hen\",\"Wen\"],\"separator\":\" \"}"
+
+    json.writeValueAsString(Casefold("Hen Wen")) shouldBe "{\"casefold\":\"Hen Wen\"}"
+    json.writeValueAsString(Casefold("Hen Wen", "NFC")) shouldBe "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFC\"}"
+    json.writeValueAsString(Casefold("Hen Wen", Normalizer.NFC)) shouldBe "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFC\"}"
+  }
+
   it should "serialize misc and mathematical functions" in {
-    val nextId = NextId()
-    json.writeValueAsString(nextId) shouldBe "{\"next_id\":null}"
+    val newId = NewId()
+    json.writeValueAsString(newId) shouldBe "{\"new_id\":null}"
 
     val clazz = Class("spells")
     json.writeValueAsString(clazz) shouldBe "{\"class\":\"spells\"}"
@@ -262,12 +288,6 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val equals = Equals("fire", "fire")
     json.writeValueAsString(equals) shouldBe "{\"equals\":[\"fire\",\"fire\"]}"
-
-    val concat = Concat(Arr("Hen", "Wen"))
-    json.writeValueAsString(concat) shouldBe "{\"concat\":[\"Hen\",\"Wen\"]}"
-
-    val concat2 = Concat(Arr("Hen", "Wen"), " ")
-    json.writeValueAsString(concat2) shouldBe "{\"concat\":[\"Hen\",\"Wen\"],\"separator\":\" \"}"
 
     val add = Add(1, 2)
     json.writeValueAsString(add) shouldBe "{\"add\":[1,2]}"

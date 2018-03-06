@@ -190,6 +190,12 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeAbort() throws Exception {
+    assertJson(Abort(Value("a message")), "{\"abort\":\"a message\"}");
+    assertJson(Abort("a message"), "{\"abort\":\"a message\"}");
+  }
+
+  @Test
   public void shouldSerializeLet() throws Exception {
     assertJson(
       Let(
@@ -568,6 +574,22 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeSingletonFunction() throws Exception {
+    assertJson(
+      Singleton(Ref("classes/widget/1")),
+      "{\"singleton\":{\"@ref\":\"classes/widget/1\"}}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeEventsFunction() throws Exception {
+    assertJson(
+      Events(Ref("classes/widget/1")),
+      "{\"events\":{\"@ref\":\"classes/widget/1\"}}"
+    );
+  }
+
+  @Test
   public void shouldSerializeMatchFunction() throws Exception {
     assertJson(
       Match(new RefV("all_users", Native.INDEXES)),
@@ -681,6 +703,16 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeIdentity() throws Exception {
+    assertJson(Identity(), "{\"identity\":null}");
+  }
+
+  @Test
+  public void shouldSerializeHasIdentity() throws Exception {
+    assertJson(HasIdentity(), "{\"has_identity\":null}");
+  }
+
+  @Test
   public void shouldSerializeConcat() throws Exception {
     assertJson(
       Concat(
@@ -705,6 +737,9 @@ public class SerializationSpec {
   @Test
   public void shouldSerializeCasefold() throws Exception {
     assertJson(Casefold(Value("Hen Wen")), "{\"casefold\":\"Hen Wen\"}");
+
+    assertJson(Casefold(Value("Hen Wen"), Normalizer.NFD), "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFD\"}");
+    assertJson(Casefold(Value("Hen Wen"), Value("NFD")), "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFD\"}");
   }
 
   @Test
@@ -734,8 +769,8 @@ public class SerializationSpec {
   }
 
   @Test
-  public void shouldSerializeNextId() throws Exception {
-    assertJson(NextId(), "{\"next_id\":null}");
+  public void shouldSerializeNewId() throws Exception {
+    assertJson(NewId(), "{\"new_id\":null}");
   }
 
   @Test
