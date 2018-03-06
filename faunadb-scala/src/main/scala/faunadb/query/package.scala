@@ -44,10 +44,10 @@ package query {
     */
   sealed abstract class TimeUnit(val expr: Expr)
   object TimeUnit {
-    case object Second extends TimeUnit(Expr(StringV("second")))
-    case object Millisecond extends TimeUnit(Expr(StringV("millisecond")))
-    case object Microsecond extends TimeUnit(Expr(StringV("microsecond")))
-    case object Nanosecond extends TimeUnit(Expr(StringV("nanosecond")))
+    case object Second extends TimeUnit("second")
+    case object Millisecond extends TimeUnit("millisecond")
+    case object Microsecond extends TimeUnit("microsecond")
+    case object Nanosecond extends TimeUnit("nanosecond")
   }
 
   /**
@@ -55,8 +55,8 @@ package query {
     */
   sealed abstract class Action(val expr: Expr)
   object Action {
-    case object Create extends Action(Expr(StringV("create")))
-    case object Delete extends Action(Expr(StringV("delete")))
+    case object Create extends Action("create")
+    case object Delete extends Action("delete")
   }
 
   /**
@@ -64,11 +64,11 @@ package query {
     */
   sealed abstract class Normalizer(val expr: Expr)
   object Normalizer {
-    case object NFD extends Normalizer(Expr(StringV("NFD")))
-    case object NFC extends Normalizer(Expr(StringV("NFC")))
-    case object NFKD extends Normalizer(Expr(StringV("NFKD")))
-    case object NFKC extends Normalizer(Expr(StringV("NFKC")))
-    case object NFKCCaseFold extends Normalizer(Expr(StringV("NFKCCaseFold")))
+    case object NFD extends Normalizer("NFD")
+    case object NFC extends Normalizer("NFC")
+    case object NFKD extends Normalizer("NFKD")
+    case object NFKC extends Normalizer("NFKC")
+    case object NFKCCaseFold extends Normalizer("NFKCCaseFold")
   }
 
   /**
