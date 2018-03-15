@@ -761,6 +761,14 @@ package object query {
     Expr(ObjectV("select" -> path.value, "from" -> from.value, "default" -> default.value))
 
   /**
+    * A SelectAll expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    */
+  def SelectAll(path: Expr, from: Expr): Expr =
+    Expr(ObjectV("select_all" -> path.value, "from" -> from.value))
+
+  /**
    * An Add expression.
    *
    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]

@@ -798,6 +798,45 @@ public abstract class DslSpec {
   }
 
   @Test
+  public void shouldEvalSelectAllExpression() throws Exception {
+    Result<Collection<String>> selected1 = query(
+      SelectAll(
+        Value("foo"),
+        Arr(
+          Obj("foo", Value("bar")),
+          Obj("foo", Value("baz"))
+        )
+      )
+    ).get().asCollectionOf(String.class);
+
+    assertThat(selected1.get(), contains("bar", "baz"));
+
+    Result<Collection<Integer>> selected2 = query(
+      SelectAll(
+        Path("foo", "bar"),
+        Arr(
+          Obj("foo", Obj("bar", Value(1))),
+          Obj("foo", Obj("bar", Value(2)))
+        )
+      )
+    ).get().asCollectionOf(Integer.class);
+
+    assertThat(selected2.get(), contains(1, 2));
+
+    Result<Collection<Integer>> selected3 = query(
+      SelectAll(
+        Path("foo").at(0),
+        Arr(
+          Obj("foo", Arr(Value(0), Value(1))),
+          Obj("foo", Arr(Value(2), Value(3)))
+        )
+      )
+    ).get().asCollectionOf(Integer.class);
+
+    assertThat(selected3.get(), contains(0, 2));
+  }
+
+  @Test
   public void shouldEvalLTExpression() throws Exception {
     Value res = query(LT(Arr(Value(1), Value(2), Value(3)))).get();
     assertThat(res.to(BOOLEAN).get(), is(true));

@@ -1337,6 +1337,24 @@ public final class Language {
   }
 
   /**
+   * Creates a new SelectAll expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr SelectAll(Expr path, Expr from) {
+    return Fn.apply("select_all", path, "from", from);
+  }
+
+  /**
+   * Creates a new SelectAll expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr SelectAll(Path path, Expr from) {
+    return SelectAll(Arr(path.segments), from);
+  }
+
+  /**
    * Creates a new Add expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
