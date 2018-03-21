@@ -25,6 +25,14 @@ val javaDslApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-
 val javaApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-java/api/"
 val javaAndroidApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-android/api/"
 
+// Sonatype credentials must be global for sonatype plugin to work
+credentials += Credentials(
+  "Sonatype Nexus Repository Manager",
+  "oss.sonatype.org",
+  sys.env.getOrElse("SONATYPE_USER", ""),
+  sys.env.getOrElse("SONATYPE_PASS", "")
+)
+
 lazy val publishSettings = Seq(
   version := driverVersion,
   organization := "com.faunadb",
@@ -54,12 +62,6 @@ lazy val publishSettings = Seq(
         <organizationUrl>http://fauna.com</organizationUrl>
       </developer>
     </developers>
-  ),
-  credentials += Credentials(
-    "Sonatype Nexus Repository Manager",
-    "oss.sonatype.org",
-    sys.env.getOrElse("SONATYPE_USER", ""),
-    sys.env.getOrElse("SONATYPE_PASS", "")
   ),
   usePgpKeyHex(sys.env.getOrElse("GPG_SIGNING_KEY", "0")),
   pgpPassphrase := sys.env.get("GPG_PASSPHRASE") map (_.toArray),
