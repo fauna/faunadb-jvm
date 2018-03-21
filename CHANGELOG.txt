@@ -1,4 +1,4 @@
-2.0.1-SNAPSHOT
+2.1.0
 * Adds support to Abort() function
 * Adds normalizer argument to Casefold() function
 * Adds support to NewId() function
