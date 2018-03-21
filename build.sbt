@@ -25,14 +25,6 @@ val javaDslApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-
 val javaApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-java/api/"
 val javaAndroidApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-android/api/"
 
-// Sonatype credentials must be global for sonatype plugin to work
-credentials += Credentials(
-  "Sonatype Nexus Repository Manager",
-  "oss.sonatype.org",
-  sys.env.getOrElse("SONATYPE_USER", ""),
-  sys.env.getOrElse("SONATYPE_PASS", "")
-)
-
 lazy val publishSettings = Seq(
   version := driverVersion,
   organization := "com.faunadb",
@@ -49,6 +41,12 @@ lazy val publishSettings = Seq(
       Some("Releases" at s"$nexus/service/local/staging/deploy/maven2")
     }
   },
+  credentials += Credentials(
+    "Sonatype Nexus Repository Manager",
+    "oss.sonatype.org",
+    sys.env.getOrElse("SONATYPE_USER", ""),
+    sys.env.getOrElse("SONATYPE_PASS", "")
+  ),
   pomExtra := (
     <scm>
       <url>git@github.com:fauna/faunadb-jvm.git</url>
@@ -69,9 +67,9 @@ lazy val publishSettings = Seq(
   pgpPublicRing := file(sys.env.getOrElse("GPG_PUBLIC_KEY", "")))
 
 lazy val root = (project in file("."))
+  .settings(publishSettings: _*)
   .settings(
     name := "faunadb-jvm-parent",
-    organization := "com.faunadb",
     crossPaths := false,
     autoScalaLibrary := false
   )
