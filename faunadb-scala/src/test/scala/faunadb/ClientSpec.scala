@@ -288,13 +288,26 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test collections" in {
-    val mapF = client.query(Map(Arr(1L, 2L, 3L), Lambda(munchings => Add(munchings, 1L))))
-    val mapR = await(mapF)
+    val mapR = await(client.query(Map(Arr(1L, 2L, 3L), Lambda(i => Add(i, 1L)))))
     mapR.to[Seq[Long]].get shouldBe Seq(2, 3, 4)
 
-    val foreachF = client.query(Foreach(Arr("Fireball Level 1", "Fireball Level 2"), Lambda(spell => Create(Class("spells"), Obj("data" -> Obj("name" -> spell))))))
-    val foreachR = await(foreachF)
+    val foreachR = await(client.query(Foreach(Arr("Fireball Level 1", "Fireball Level 2"), Lambda(spell => Create(Class("spells"), Obj("data" -> Obj("name" -> spell)))))))
     foreachR.to[Seq[String]].get shouldBe Seq("Fireball Level 1", "Fireball Level 2")
+
+    val filterR = await(client.query(Filter(Arr(1, 2, 3, 4), Lambda(i => If(Equals(Modulo(i, 2), 0), true, false)))))
+    filterR.to[Seq[Long]].get shouldBe Seq(2, 4)
+
+    val takeR = await(client.query(Take(2, Arr(1, 2, 3, 4))))
+    takeR.to[Seq[Long]].get shouldBe Seq(1, 2)
+
+    val dropR = await(client.query(Drop(2, Arr(1, 2, 3, 4))))
+    dropR.to[Seq[Long]].get shouldBe Seq(3, 4)
+
+    val prependR = await(client.query(Prepend(Arr(1, 2, 3), Arr(4, 5, 6))))
+    prependR.to[Seq[Long]].get shouldBe Seq(1, 2, 3, 4, 5, 6)
+
+    val appendR = await(client.query(Append(Arr(1, 2, 3), Arr(4, 5, 6))))
+    appendR.to[Seq[Long]].get shouldBe Seq(4, 5, 6, 1, 2, 3)
   }
 
   it should "test resource modification" in {

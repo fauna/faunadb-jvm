@@ -307,7 +307,7 @@ package object query {
     *
     * '''Reference''': [[https://fauna.com/documentation/queries#collection_functions]]
     */
-  def Prepend(collection: Expr, elems: Expr): Expr =
+  def Prepend(elems: Expr, collection: Expr): Expr =
     Expr(ObjectV("prepend" -> elems.value, "collection" -> collection.value))
 
   /**
@@ -315,7 +315,7 @@ package object query {
     *
     * '''Reference''': [[https://fauna.com/documentation/queries#collection_functions]]
     */
-  def Append(collection: Expr, elems: Expr): Expr =
+  def Append(elems: Expr, collection: Expr): Expr =
     Expr(ObjectV("append" -> elems.value, "collection" -> collection.value))
 
   /**
