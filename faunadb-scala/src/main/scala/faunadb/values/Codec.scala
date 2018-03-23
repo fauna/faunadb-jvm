@@ -188,6 +188,31 @@ object Decoder {
       Field.collect[T, Col](Field.to[T]).get(v)
   }
 
+  implicit def MapDecoder[T](implicit decoder: Decoder[T]): Decoder[Map[String, T]] = new Decoder[Map[String, T]] {
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case ObjectV(fields) => {
+          val successBuilder = Map.newBuilder[String, T]
+          val failureBuilder = List.newBuilder[FieldError]
+
+          fields.foreach { kv =>
+            decoder.decode(kv._2, path ++ kv._1) match {
+              case VSuccess(v, _) => successBuilder += kv._1 -> v
+              case VFail(errs)    => failureBuilder ++= errs
+            }
+          }
+
+          val failures = failureBuilder.result()
+
+          if (failures.nonEmpty)
+            VFail(failures)
+          else
+            VSuccess(successBuilder.result(), path)
+        }
+        case _ => Result.Unexpected(v, "Map", path)
+      }
+  }
+
   implicit object BytesVDecoder extends Decoder[BytesV] {
     def decode(v: Value, path: FieldPath) =
       v match {
@@ -279,6 +304,10 @@ object Encoder {
 
   implicit def CollectionEncoder[T: Decoder, Col[E] <: Traversable[E]](implicit ev: Encoder[T]): Encoder[Col[T]] = new Encoder[Col[T]] {
     def encode(col: Col[T]) = if (col != null) ArrayV(col map { Value(_) } toVector) else NullV
+  }
+
+  implicit def MapEncoder[T: Encoder](implicit encoder: Encoder[T]) = new Encoder[Map[String, T]] {
+    override def encode(t: Map[String, T]): Value = ObjectV(t mapValues(encoder.encode))
   }
 
   class OptionEncoder[Opt <: Option[T], T: Encoder] extends Encoder[Opt] {
