@@ -88,6 +88,20 @@ class CodecSpec extends FlatSpec with Matchers {
     products.to[Array[Product]].get shouldBe Array(Product("laptop", 999), Product("mouse", 9.99))
   }
 
+  it should "decode to map type" in {
+    val obj = ObjectV("key0" -> StringV("value0"), "key1" -> StringV("value1"))
+
+    obj.to[Map[String, String]].get shouldBe Map("key0" -> "value0", "key1" -> "value1")
+  }
+
+  it should "decode to map of objects" in {
+    val product1 = ObjectV("description" -> StringV("laptop"), "price" -> DoubleV(999))
+    val product2 = ObjectV("description" -> StringV("mouse"), "price" -> DoubleV(9.99))
+    val products = ObjectV("product1" -> product1, "product2" -> product2)
+
+    products.to[Map[String, Product]].get shouldBe Map("product1" -> Product("laptop", 999), "product2" -> Product("mouse", 9.99))
+  }
+
   case class GenericClass[T, U](a: T, b: U, c: NonGenericClass)
 
   case class NonGenericClass(x: Int)
@@ -211,6 +225,20 @@ class CodecSpec extends FlatSpec with Matchers {
     (Array[Product](Product("laptop", 999), Product("mouse", 9.99)): Value) shouldBe products
   }
 
+  it should "encode to map type" in {
+    val obj = ObjectV("key0" -> StringV("value0"), "key1" -> StringV("value1"))
+
+    (Map("key0" -> "value0", "key1" -> "value1"): Value) shouldBe obj
+  }
+
+  it should "encode to map of objects" in {
+    val product1 = ObjectV("description" -> StringV("laptop"), "price" -> DoubleV(999))
+    val product2 = ObjectV("description" -> StringV("mouse"), "price" -> DoubleV(9.99))
+    val products = ObjectV("product1" -> product1, "product2" -> product2)
+
+    (Map("product1" -> Product("laptop", 999), "product2" -> Product("mouse", 9.99)): Value) shouldBe products
+  }
+
   it should "encode using generic types" in {
     val obj1 = ObjectV("a" -> LongV(10), "b" -> StringV("str"), "c" -> ObjectV("x" -> LongV(10)))
     val obj2 = ObjectV("a" -> LongV(10), "b" -> DoubleV(3.14), "c" -> ObjectV("x" -> LongV(10)))
@@ -256,6 +284,15 @@ class CodecSpec extends FlatSpec with Matchers {
     the [ValueReadException] thrownBy {
       ObjectV("either" -> DoubleV(10)).to[ClassWithEither].get
     } should have message "Error at /either: Expected Either String or long value; found faunadb.values.DoubleV."
+
+    the [ValueReadException] thrownBy {
+      ObjectV("x" -> LongV(10), "y" -> LongV(20)).to[Map[String, String]].get
+    } should have message "Error at /x: Expected String value; found faunadb.values.LongV., Error at /y: Expected String value; found faunadb.values.LongV."
+
+    the [ValueReadException] thrownBy {
+      ObjectV("a" -> ObjectV("x" -> LongV(1), "y" -> LongV(2))).to[Map[String, Map[String, String]]].get
+    } should have message "Error at /a/x: Expected String value; found faunadb.values.LongV., Error at /a/y: Expected String value; found faunadb.values.LongV."
   }
+
 }
 
