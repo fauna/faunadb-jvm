@@ -16,7 +16,6 @@ import org.junit.Test;
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.Class;
 import static com.faunadb.client.query.Language.TimeUnit.*;
-import static com.faunadb.client.types.Value.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -740,6 +739,17 @@ public class SerializationSpec {
 
     assertJson(Casefold(Value("Hen Wen"), Normalizer.NFD), "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFD\"}");
     assertJson(Casefold(Value("Hen Wen"), Value("NFD")), "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFD\"}");
+  }
+
+  @Test
+  public void shouldSerializeNGram() throws Exception {
+    assertJson(NGram(Value("str")), "{\"ngram\":\"str\"}");
+    assertJson(NGram(Arr(Value("str0"), Value("str1"))), "{\"ngram\":[\"str0\",\"str1\"]}");
+    assertJson(NGram(ImmutableList.of(Value("str0"), Value("str1"))), "{\"ngram\":[\"str0\",\"str1\"]}");
+
+    assertJson(NGram(Value("str"), Value(2), Value(4)), "{\"ngram\":\"str\",\"min\":2,\"max\":4}");
+    assertJson(NGram(Arr(Value("str0"), Value("str1")), Value(2), Value(4)), "{\"ngram\":[\"str0\",\"str1\"],\"min\":2,\"max\":4}");
+    assertJson(NGram(ImmutableList.of(Value("str0"), Value("str1")), Value(2), Value(4)), "{\"ngram\":[\"str0\",\"str1\"],\"min\":2,\"max\":4}");
   }
 
   @Test

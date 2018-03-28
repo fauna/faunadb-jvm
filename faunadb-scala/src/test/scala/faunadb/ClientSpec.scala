@@ -434,6 +434,12 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(client.query(Casefold("\u1E9B\u0323", Normalizer.NFKD))).to[String].get shouldBe "\u0073\u0323\u0307"
     await(client.query(Casefold("\u1E9B\u0323", Normalizer.NFKC))).to[String].get shouldBe "\u1E69"
     await(client.query(Casefold("\u212B", Normalizer.NFKCCaseFold))).to[String].get shouldBe "\u00E5"
+
+    await(client.query(NGram("what"))).to[Seq[String]].get shouldBe Seq("w", "wh", "h", "ha", "a", "at", "t")
+    await(client.query(NGram("what", 2, 3))).to[Seq[String]].get shouldBe Seq("wh", "wha", "ha", "hat", "at")
+
+    await(client.query(NGram(Arr("john", "doe")))).to[Seq[String]].get shouldBe Seq("j", "jo", "o", "oh", "h", "hn", "n", "d", "do", "o", "oe", "e")
+    await(client.query(NGram(Arr("john", "doe"), 3, 4))).to[Seq[String]].get shouldBe Seq("joh", "john", "ohn", "doe")
   }
 
   it should "test miscellaneous functions" in {
