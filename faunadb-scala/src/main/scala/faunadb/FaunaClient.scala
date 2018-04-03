@@ -95,7 +95,7 @@ class FaunaClient(connection: Connection) {
     *         future is returned.
     */
   def query(expr: Expr)(implicit ec: ExecutionContext): Future[Value] =
-    connection.post("/", json.valueToTree(expr)).asScalaFuture.map { resp =>
+    connection.post("", json.valueToTree(expr)).asScalaFuture.map { resp =>
       handleQueryErrors(resp)
       val rv = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
       if (rv eq null) NullV else rv
@@ -112,7 +112,7 @@ class FaunaClient(connection: Connection) {
     *         query fails, a failed future is returned.
     */
   def query(exprs: Iterable[Expr])(implicit ec: ExecutionContext): Future[IndexedSeq[Value]] =
-    connection.post("/", json.valueToTree(exprs)).asScalaFuture.map { resp =>
+    connection.post("", json.valueToTree(exprs)).asScalaFuture.map { resp =>
       handleQueryErrors(resp)
       val arr = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
       arr.asInstanceOf[ArrayV].elems

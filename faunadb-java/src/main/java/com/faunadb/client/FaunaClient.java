@@ -196,7 +196,7 @@ public class FaunaClient implements AutoCloseable {
 
   private ListenableFuture<Value> performRequest(JsonNode body) {
     try {
-      return handleNetworkExceptions(transform(connection.post("/", body), new Function<Response, Value>() {
+      return handleNetworkExceptions(transform(connection.post("", body), new Function<Response, Value>() {
         @Override
         public Value apply(Response response) {
           try {
