@@ -1,3 +1,5 @@
+2.1.2-SNAPSHOT
+
 2.1.1
 * Fix issue #143: Configured endpoint is overridden by request builder
 
