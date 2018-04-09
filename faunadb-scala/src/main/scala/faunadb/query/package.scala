@@ -169,6 +169,14 @@ package object query {
   def Obj(pairs: (String, Expr)*): Expr =
     Expr(ObjectV("object" -> ObjectV(unwrapPairs(pairs): _*)))
 
+  /**
+    * A Null value.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#values]]
+    */
+  def Null(): Expr =
+    Expr(NullV)
+
   // Basic Forms
 
   /**
