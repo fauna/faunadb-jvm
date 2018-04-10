@@ -1046,6 +1046,42 @@ public final class Language {
   }
 
   /**
+   * Creates a new NGram expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   */
+  public static Expr NGram(Expr terms, Expr min, Expr max) {
+    return Fn.apply("ngram", terms, "min", min, "max", max);
+  }
+
+  /**
+   * Creates a new NGram expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   */
+  public static Expr NGram(List<Expr> terms, Expr min, Expr max) {
+    return NGram(varargs(terms), min, max);
+  }
+
+  /**
+   * Creates a new NGram expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   */
+  public static Expr NGram(List<Expr> terms) {
+    return NGram(varargs(terms));
+  }
+
+  /**
+   * Creates a new NGram expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   */
+  public static Expr NGram(Expr terms) {
+    return Fn.apply("ngram", terms);
+  }
+
+  /**
    * Creates a new Time expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#time_functions">FaunaDB Time and Date Functions</a>

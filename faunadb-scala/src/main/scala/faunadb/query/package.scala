@@ -621,6 +621,20 @@ package object query {
   def Casefold(term: Expr, normalizer: Expr): Expr =
     Expr(ObjectV("casefold" -> term.value, "normalizer" -> normalizer.value))
 
+  /**
+    * A NGram expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#string_functions]]
+    */
+  def NGram(terms: Expr, min: Expr = NullV, max: Expr = NullV): Expr = {
+    val b = Seq.newBuilder[(String, Value)]
+
+    b += "ngram" -> terms.value
+    if (min != NullV) b += "min" -> min.value
+    if (max != NullV) b += "max" -> max.value
+    Expr(ObjectV(b.result(): _*))
+  }
+
   // Time Functions
 
   /**

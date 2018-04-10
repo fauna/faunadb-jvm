@@ -769,6 +769,27 @@ public abstract class DslSpec {
   }
 
   @Test
+  public void shouldEvalNGramExpression() throws Exception {
+    assertThat(
+      query(NGram(Value("what"))).get().asCollectionOf(String.class).get(),
+      contains("w", "wh", "h", "ha", "a", "at", "t")
+    );
+    assertThat(
+      query(NGram(Value("what"), Value(2), Value(3))).get().asCollectionOf(String.class).get(),
+      contains("wh", "wha", "ha", "hat", "at")
+    );
+
+    assertThat(
+      query(NGram(Arr(Value("john"), Value("doe")))).get().asCollectionOf(String.class).get(),
+      contains("j", "jo", "o", "oh", "h", "hn", "n", "d", "do", "o", "oe", "e")
+    );
+    assertThat(
+      query(NGram(Arr(Value("john"), Value("doe")), Value(3), Value(4))).get().asCollectionOf(String.class).get(),
+      contains("joh", "john", "ohn", "doe")
+    );
+  }
+
+  @Test
   public void shouldEvalContainsExpression() throws Exception {
     Value contains = query(
       Contains(
