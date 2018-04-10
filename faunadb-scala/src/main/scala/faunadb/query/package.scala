@@ -630,8 +630,8 @@ package object query {
     val b = Seq.newBuilder[(String, Value)]
 
     b += "ngram" -> terms.value
-    if (min != NullV) b += "min" -> min.value
-    if (max != NullV) b += "max" -> max.value
+    if (min != Expr(NullV)) b += "min" -> min.value
+    if (max != Expr(NullV)) b += "max" -> max.value
     Expr(ObjectV(b.result(): _*))
   }
 
