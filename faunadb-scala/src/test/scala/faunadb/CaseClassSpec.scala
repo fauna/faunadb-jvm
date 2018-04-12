@@ -11,7 +11,7 @@ class CaseClassSpec {
   case class CaseClass(boolean: Boolean, localDate: LocalDate, string: String, char: Char, byte: Byte,
                        short: Short, int: Int, long: Long, float: Float, double: Double,
                        array: Array[Int], seq: Seq[Int], list: List[Int], indexedSeq: IndexedSeq[Int],
-                       option: Option[Int], either: Either[Int, String])
+                       map: Map[String, Long], option: Option[Int], either: Either[Int, String])
 
   implicit val caseClassCodec: Codec[CaseClass] = Codec.caseClass[CaseClass]
 }
