@@ -1,6 +1,7 @@
 2.2.0-SNAPSHOT
 * Adds support to NGram() function
 * Adds codecs to Map type
+* Adds ability to create session clients on Scala
 
 2.1.1
 * Fix issue #143: Configured endpoint is overridden by request builder
