@@ -8,11 +8,11 @@ class CodecMacro(val c: blackbox.Context) {
   def caseClassImpl[T: c.WeakTypeTag]: c.Tree = {
     val tag = weakTypeOf[T]
 
-    q""" new Codec[$tag] {
-      override def decode(value: Value, path: FieldPath): Result[$tag] =
+    q""" new _root_.faunadb.values.Codec[$tag] {
+      override def decode(value: _root_.faunadb.values.Value, path: _root_.faunadb.values.FieldPath): _root_.faunadb.values.Result[$tag] =
         ${getDecodedObject(tag)}
 
-      override def encode(value: $tag): Value =
+      override def encode(value: $tag): _root_.faunadb.values.Value =
         ${getEncodedObject(tag)}
     } """
   }
@@ -22,12 +22,12 @@ class CodecMacro(val c: blackbox.Context) {
       val variable = q"value.${varName(field).toTermName}"
 
       if (isOption(field._2))
-        q""" ${varName(field).toString} -> ($variable.map(v => v: Value).getOrElse(NullV)) """
+        q""" ${varName(field).toString} -> ($variable.map(v => v: _root_.faunadb.values.Value).getOrElse(_root_.faunadb.values.NullV)) """
       else
-        q""" ${varName(field).toString} -> ($variable: Value) """
+        q""" ${varName(field).toString} -> ($variable: _root_.faunadb.values.Value) """
     }
 
-    q"ObjectV.apply(..$fields)"
+    q"_root_.faunadb.values.ObjectV.apply(..$fields)"
   }
 
   def getDecodedObject(tag: c.Type): c.Tree = {
@@ -37,7 +37,7 @@ class CodecMacro(val c: blackbox.Context) {
       val variable = q"value(${varName(field).toString})"
 
       if (isOption(field._2))
-        fq"${varName(field)} <- VSuccess($variable.to[${field._2.typeArgs.head}].toOpt, ${varName(field).toString})"
+        fq"${varName(field)} <- _root_.faunadb.values.VSuccess($variable.to[${field._2.typeArgs.head}].toOpt, ${varName(field).toString})"
       else
         fq"${varName(field)} <- $variable.to[${field._2}]"
     }
