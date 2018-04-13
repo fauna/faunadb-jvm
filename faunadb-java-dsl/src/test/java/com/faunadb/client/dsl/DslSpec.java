@@ -633,6 +633,57 @@ public abstract class DslSpec {
   }
 
   @Test
+  public void shouldTestCollectionPredicatesForArrays() throws Exception {
+    assertThat(
+      query(IsEmpty(Arr())).get().to(BOOLEAN).get(),
+      is(true)
+    );
+
+    assertThat(
+      query(IsEmpty(Arr(Value(1), Value(2)))).get().to(BOOLEAN).get(),
+      is(false)
+    );
+
+    assertThat(
+      query(IsNonEmpty(Arr())).get().to(BOOLEAN).get(),
+      is(false)
+    );
+
+    assertThat(
+      query(IsNonEmpty(Arr(Value(1), Value(2)))).get().to(BOOLEAN).get(),
+      is(true)
+    );
+  }
+
+  @Test
+  public void shouldTestCollectionPredicatesForPages() throws Exception {
+    String randomElement = randomStartingWith("element-");
+    Value created = query(Create(Class("spells"), Obj("data", Obj("name", Value("predicate test"), "element", Value(randomElement))))).get();
+
+    assertThat(
+      query(IsEmpty(Paginate(Match(Index("spells_by_element"), Value("invalid element"))))).get().to(BOOLEAN).get(),
+      is(true)
+    );
+
+    assertThat(
+      query(IsEmpty(Paginate(Match(Index("spells_by_element"), Value(randomElement))))).get().to(BOOLEAN).get(),
+      is(false)
+    );
+
+    assertThat(
+      query(IsNonEmpty(Paginate(Match(Index("spells_by_element"), Value("invalid element"))))).get().to(BOOLEAN).get(),
+      is(false)
+    );
+
+    assertThat(
+      query(IsNonEmpty(Paginate(Match(Index("spells_by_element"), Value(randomElement))))).get().to(BOOLEAN).get(),
+      is(true)
+    );
+
+    query(Delete(Select(Value("ref"), created))).get();
+  }
+
+  @Test
   public void shouldReadEventsFromIndex() throws Exception {
     Value events = query(
       Paginate(Match(Index("spells_by_element"), Value("arcane")))

@@ -5,6 +5,7 @@
 * Does not require `import faunadb.values._` when using `Codec.caseClass`
 * Adds Null() function to scala
 * Reverses the argument order of Append() and Prepend() functions
+* Adds support to IsEmpty() and IsNonEmpty() functions
 
 2.1.1
 * Fix issue #143: Configured endpoint is overridden by request builder

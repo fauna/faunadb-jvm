@@ -308,6 +308,23 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val appendR = await(client.query(Append(Arr(1, 2, 3), Arr(4, 5, 6))))
     appendR.to[Seq[Long]].get shouldBe Seq(4, 5, 6, 1, 2, 3)
+
+    val randomElement = Random.alphanumeric.take(8).mkString
+    await(client.query(Create(Class("spells"), Obj("data" -> Obj("name" -> "predicate test", "element" -> randomElement)))))
+
+    //arrays
+    await(client.query(IsEmpty(Arr(1, 2, 3)))).to[Boolean].get shouldBe false
+    await(client.query(IsEmpty(Arr()))).to[Boolean].get shouldBe true
+
+    await(client.query(IsNonEmpty(Arr(1, 2, 3)))).to[Boolean].get shouldBe true
+    await(client.query(IsNonEmpty(Arr()))).to[Boolean].get shouldBe false
+
+    //pages
+    await(client.query(IsEmpty(Paginate(Match(Index("spells_by_element"), randomElement))))).to[Boolean].get shouldBe false
+    await(client.query(IsEmpty(Paginate(Match(Index("spells_by_element"), "an invalid element"))))).to[Boolean].get shouldBe true
+
+    await(client.query(IsNonEmpty(Paginate(Match(Index("spells_by_element"), randomElement))))).to[Boolean].get shouldBe true
+    await(client.query(IsNonEmpty(Paginate(Match(Index("spells_by_element"), "an invalid element"))))).to[Boolean].get shouldBe false
   }
 
   it should "test resource modification" in {
