@@ -372,6 +372,24 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeIsEmpty() throws Exception {
+    assertJson(
+      IsEmpty(
+        Arr(Value(1), Value(2), Value(3))
+      ), "{\"is_empty\":[1,2,3]}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeIsNonEmpty() throws Exception {
+    assertJson(
+      IsNonEmpty(
+        Arr(Value(1), Value(2), Value(3))
+      ), "{\"is_nonempty\":[1,2,3]}"
+    );
+  }
+
+  @Test
   public void shouldSerializeGet() throws Exception {
     assertJson(
       Get(new RefV("104979509692858368", new RefV("spells", Native.CLASSES))),

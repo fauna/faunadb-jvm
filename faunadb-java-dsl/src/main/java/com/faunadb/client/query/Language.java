@@ -678,6 +678,24 @@ public final class Language {
   }
 
   /**
+   * Creates a new IsEmpty expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   */
+  public static Expr IsEmpty(Expr collection) {
+    return Fn.apply("is_empty", collection);
+  }
+
+  /**
+   * Creates a new IsNonEmpty expression.
+   *
+   * @see <a href="https://fauna.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   */
+  public static Expr IsNonEmpty(Expr collection) {
+    return Fn.apply("is_nonempty", collection);
+  }
+
+  /**
    * Creates a new Get expression.
    *
    * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>

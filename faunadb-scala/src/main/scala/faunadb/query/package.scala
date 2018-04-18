@@ -334,6 +334,22 @@ package object query {
   def Drop(num: Expr, collection: Expr): Expr =
     Expr(ObjectV("drop" -> num.value, "collection" -> collection.value))
 
+  /**
+    * A IsEmpty expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#collection_functions]]
+    */
+  def IsEmpty(collection: Expr): Expr =
+    Expr(ObjectV("is_empty" -> collection.value))
+
+  /**
+    * A IsNonEmpty expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#collection_functions]]
+    */
+  def IsNonEmpty(collection: Expr): Expr =
+    Expr(ObjectV("is_nonempty" -> collection.value))
+
   // Read Functions
 
   /**
