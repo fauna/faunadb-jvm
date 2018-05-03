@@ -565,6 +565,23 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     identifyR.to[Boolean].get shouldBe true
   }
 
+  it should "create session client" in {
+    val otherClient = client.sessionClient(config("root_token"))
+
+    try
+      await(otherClient.query("echo string")).to[String].get shouldBe "echo string"
+    finally
+      otherClient.close()
+  }
+
+  "Fauna Client" should "should not create session clients on a closed client" in {
+    val newClient = FaunaClient(endpoint = config("root_url"), secret = config("root_token"))
+
+    newClient.close()
+
+    a[IllegalStateException] should be thrownBy newClient.sessionClient("sekret")
+  }
+
   it should "find key by secret" in {
     val key = await(rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "admin"))))
 
