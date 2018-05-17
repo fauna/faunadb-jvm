@@ -3,6 +3,8 @@
 * Reverses the argument order of Append() and Prepend() functions
 * Adds support to IsEmpty() and IsNonEmpty() functions
 * Adds support to X-Last-Seen-Txn header
+* Fixes NullPointerException when inspecting status code or error messages
+from a UnknownException on the Scala driver
 
 2.2.0
 * Adds codecs to Map type
