@@ -1,12 +1,14 @@
 3.0.0-SNAPSHOT
 * Adds support to NGram() function
+* Reverses the argument order of Append() and Prepend() functions
+* Adds support to IsEmpty() and IsNonEmpty() functions
+* Adds support to X-Last-Seen-Txn header
+
+2.2.0
 * Adds codecs to Map type
 * Adds ability to create session clients on Scala
 * Does not require `import faunadb.values._` when using `Codec.caseClass`
 * Adds Null() function to scala
-* Reverses the argument order of Append() and Prepend() functions
-* Adds support to IsEmpty() and IsNonEmpty() functions
-* Adds support to X-Last-Seen-Txn header
 
 2.1.1
 * Fix issue #143: Configured endpoint is overridden by request builder
