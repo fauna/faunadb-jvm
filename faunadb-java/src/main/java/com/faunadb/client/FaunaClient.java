@@ -30,16 +30,30 @@ import static com.google.common.util.concurrent.Futures.transform;
 
 /**
  * The Java native client for FaunaDB.
- * <p>
- * This client is asynchronous, so all methods that perform latent operations return a {@link ListenableFuture}.
- * <p>
- * Queries are constructed by using the static helpers in the {@link com.faunadb.client.query.Language} package.
- * <p>
+ *
+ * <p>The client is asynchronous. All methods that performs latent operations
+ * return an instance of {@link ListenableFuture}.</p>
+ *
+ * <p>The {@link FaunaClient#close()} method must be called in order to
+ * release the {@link FaunaClient} I/O resources.</p>
+ *
+ * <p>Queries are constructed by using the static methods in the
+ * {@link com.faunadb.client.query.Language} class.</p>
+ *
  * <b>Example</b>:
+ *
  * <pre>{@code
  * import static com.faunadb.client.query.Language.*;
- * FaunaClient client = FaunaClient.builder().withSecret("someAuthToken").build();
- * client.query(Get(Ref(Class("some_class"), "ref")));
+ *
+ * FaunaClient client = FaunaClient.builder()
+ *   .withSecret("someAuthToken")
+ *   .build();
+ *
+ * client.query(
+ *   Get(
+ *     Ref(Class("some_class"), "123")
+ *   )
+ * );
  * }
  * </pre>
  *
@@ -81,7 +95,7 @@ public class FaunaClient implements AutoCloseable {
     }
 
     /**
-     * Sets the FaunaDB endpoint url for the built {@link FaunaClient}.
+     * Sets the FaunaDB endpoint url for the {@link FaunaClient} instance.
      *
      * @param endpoint the root endpoint URL
      * @return this {@link Builder} object
@@ -95,7 +109,7 @@ public class FaunaClient implements AutoCloseable {
      * Sets a {@link MetricRegistry} that the {@link FaunaClient} will use to register and track Connection-level
      * statistics.
      *
-     * @param registry the MetricRegistry instance.
+     * @param registry the {@link MetricRegistry} instance.
      * @return this {@link Builder} object
      */
     public Builder withMetrics(MetricRegistry registry) {
@@ -104,8 +118,8 @@ public class FaunaClient implements AutoCloseable {
     }
 
     /**
-     * Sets a custom {@link AsyncHttpClient} implementation that the built {@link FaunaClient} will use.
-     * This custom implementation can be provided to control the behavior of the underlying HTTP transport.
+     * Sets a custom {@link AsyncHttpClient} for the {@link FaunaClient} instance.
+     * A custom implementation can be provided to control the behavior of the underlying HTTP transport.
      *
      * @param httpClient the custom {@link AsyncHttpClient} instance
      * @return this {@link Builder} object
@@ -138,8 +152,9 @@ public class FaunaClient implements AutoCloseable {
   }
 
   /**
-   * Creates a session client with the user secret provided. Queries submited to a session client will be
-   * authenticated with the secret provided. A session client shares its parent's {@link Connection} instance.
+   * Creates a session client with the user secret provided. Queries submitted to a session client will be
+   * authenticated with the secret provided. A session client shares its parent's {@link Connection} instance
+   * and must be closed after used.
    *
    * @param secret user secret for the session client
    * @return a new {@link FaunaClient}
@@ -149,7 +164,7 @@ public class FaunaClient implements AutoCloseable {
   }
 
   /**
-   * Frees any resources held by the client. Also closes the underlying {@link Connection}.
+   * Releases any resources being held by the {@link FaunaClient} instance.
    */
   @Override
   public void close() {
@@ -159,14 +174,13 @@ public class FaunaClient implements AutoCloseable {
   /**
    * Issues a Query to FaunaDB.
    * <p>
-   * Queries are modeled through the FaunaDB query language, represented by the helper functions in the
-   * {@link com.faunadb.client.query.Language} class.
+   * Queries are constructed by the helper methods in the {@link com.faunadb.client.query.Language} class.
    * <p>
-   * Responses are modeled as a general response tree. Each node is a {@link Value}, and
-   * can be coerced to structured types through various methods on that class.
+   * Responses are represented as structured tree where each node is a {@link Value} instance.
+   * {@link Value} instances can be converted to native types. See {@link Value} class for details.
    *
-   * @param expr The query expression to be sent to FaunaDB.
-   * @return A {@link ListenableFuture} containing the root node of the Response tree.
+   * @param expr the query to be executed.
+   * @return a {@link ListenableFuture} containing the root node of the response tree.
    * @see Value
    * @see com.faunadb.client.query.Language
    */
@@ -177,13 +191,12 @@ public class FaunaClient implements AutoCloseable {
   /**
    * Issues multiple queries to FaunaDB.
    * <p>
-   * These queries are sent to FaunaDB in a single request, and are evaluated. The list of response nodes is returned
+   * These queries are sent to FaunaDB in a single request. A list containing all responses is returned
    * in the same order as the issued queries.
    * <p>
-   * See {@link FaunaClient#query(Expr)} for more information on the individual queries.
    *
-   * @param exprs the list of query expressions to be sent to FaunaDB.
-   * @return a {@link ListenableFuture} containing an ordered list of root response nodes.
+   * @param exprs the list of queries to be sent to FaunaDB.
+   * @return a {@link ListenableFuture} containing an ordered list of the query's responses.
    */
   public ListenableFuture<ImmutableList<Value>> query(List<? extends Expr> exprs) {
     return transform(performRequest(json.valueToTree(exprs)), new Function<Value, ImmutableList<Value>>() {

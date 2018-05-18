@@ -12,51 +12,58 @@ import org.joda.time.LocalDate;
 import static java.lang.String.format;
 
 /**
- * Codec is a function that represents an attempt to coerce a {@link Value} to a concrete type.
- * There are pre-defined codecs for each FaunaDB primitive types: {@link Codec#VALUE}, {@link Codec#STRING},
- * {@link Codec#LONG}, {@link Codec#DOUBLE}, {@link Codec#DATE}, {@link Codec#TIME}, {@link Codec#REF},
- * {@link Codec#SET_REF}, {@link Codec#ARRAY}, and {@link Codec#OBJECT}.
- * <p>
- * Codecs return a {@link Result} of the coercion attempt. If it fails to coerce, {@link Result}
- * will contain an error message.
- * <p>
- * It is also possible to create customized codecs to handle complex objects:
+ * Codec instances are used to convert a {@link Value} to a concrete type.
+ * There are pre-defined codecs for each FaunaDB primitive types.
+ *
+ * Each Codec implementation returns a {@link Result} instance for the conversion attempt.
+ * If the conversion attempt fails, the {@link Result} instance will contain an error message.
+ *
+ * Custom codecs can be created by implementing the Codec interface.
+ *
+ * <p>Example:</p>
+ *
  * <pre>{@code
- * class Person {
- *   static final Codec<Person> PERSON = new Codec<Person>() {
- *     public Result<Person> decode(Value value) {
- *       return Result.success(new Person(
- *         value.at("firstName").to(String.class).getOrElse("<no name>"),
- *         value.at("lastName").to(String.class).getOrElse("<no name>")
+ * class User {
+ *   static final Codec<User> USER_CODEC = new Codec<User>() {
+ *     public Result<User> decode(Value value) {
+ *       return Result.success(new User(
+ *         value.at("username").to(String.class).getOrElse("<no name>"),
+ *         value.at("password").to(String.class).getOrElse(null)
  *       ));
  *     }
  *
- *     public Result<Value> encode(Person person) {
+ *     public Result<Value> encode(User user) {
  *       return Value.from(ImmutableMap.of(
- *         "firstName", person.firstName,
- *         "lastName", person.lastName
+ *         "username", user.username,
+ *         "password", person.password
  *       ));
  *     }
  *   }
  *
- *   static Person fromValue(Value value) {
- *     return value.to(PERSON);
- *   }
+ *   final String username, password;
  *
- *   final String firstName, lastName;
- *
- *   Person(String firstName, String lastName) {
+ *   Person(String username, String password) {
  *     this.firstName = firstName;
  *     this.lastName = lastName;
  *   }
  * }
+ *
+ * //...
+ * Value result = client.query(getUser).get();
+ * Result<User> user = result.at("data").to(User.USER_CODEC);
  * }</pre>
  *
- * <p>It is possible to annotate a class and let the internal framework encode/decode instances of the class automatically.</p>
+ * <p>It is possible to annotate classes and let the internal framework encode/decode instances of the class automatically.</p>
  * <p>Refer to the annotations {@link FaunaField}, {@link FaunaConstructor}, {@link FaunaIgnore} and {@link FaunaEnum} for more details.</p>
- * <p>Also see {@link Encoder}, {@link Decoder} and {@link com.faunadb.client.query.Language#Value(Object)}</p>
  *
  * @param <T> desired resulting type
+ * @see FaunaField
+ * @see FaunaConstructor
+ * @see FaunaEnum
+ * @see FaunaIgnore
+ * @see Encoder
+ * @see Decoder
+ * @see com.faunadb.client.query.Language#Value(Object)
  * @see Result
  */
 public interface Codec<T> {
@@ -64,7 +71,7 @@ public interface Codec<T> {
   Result<Value> encode(T value);
 
   /**
-   * Coerce a {@link Value} to itself. Returns a Fail value if an instance of {@link NullV}.
+   * Convert a {@link Value} to itself. Returns a {@link com.faunadb.client.types.Result.Failure} if null.
    */
   Codec<Value> VALUE = new Codec<Value>() {
     @Override
@@ -85,87 +92,87 @@ public interface Codec<T> {
   };
 
   /**
-   * Coerces a {@link Value} to a {@link RefV}
+   * Converts a {@link Value} to a {@link RefV}
    */
   Codec<RefV> REF = Transformations.mapTo(RefV.class, Functions.<RefV>identity(), Transformations.<RefV, Value>upCast());
 
   /**
-   * Coerces a {@link Value} to a {@link SetRefV}
+   * Converts a {@link Value} to a {@link SetRefV}
    */
   Codec<SetRefV> SET_REF = Transformations.mapTo(SetRefV.class, Functions.<SetRefV>identity(), Transformations.<SetRefV, Value>upCast());
 
   /**
-   * Coerces a {@link Value} to a {@link Long}
+   * Converts a {@link Value} to a {@link Long}
    */
   Codec<Long> LONG = Transformations.mapTo(LongV.class, Transformations.<LongV, Long>scalarValue(), Transformations.LONG_TO_VALUE);
 
   /**
-   * Coerces a {@link Value} to a {@link Integer}
+   * Converts a {@link Value} to a {@link Integer}
    */
   Codec<Integer> INTEGER = Transformations.mapWith(LONG, Transformations.LONG_TO_INTEGER, Transformations.INTEGER_TO_LONG);
 
   /**
-   * Coerces a {@link Value} to a {@link Short}
+   * Converts a {@link Value} to a {@link Short}
    */
   Codec<Short> SHORT = Transformations.mapWith(LONG, Transformations.LONG_TO_SHORT, Transformations.SHORT_TO_LONG);
 
   /**
-   * Coerces a {@link Value} to a {@link Byte}
+   * Converts a {@link Value} to a {@link Byte}
    */
   Codec<Byte> BYTE = Transformations.mapWith(LONG, Transformations.LONG_TO_BYTE, Transformations.BYTE_TO_LONG);
 
   /**
-   * Coerces a {@link Value} to a {@link Character}
+   * Converts a {@link Value} to a {@link Character}
    */
   Codec<Character> CHAR = Transformations.mapWith(LONG, Transformations.LONG_TO_CHAR, Transformations.CHAR_TO_LONG);
 
   /**
-   * Coerces a {@link Value} to an {@link Instant}
+   * Converts a {@link Value} to an {@link Instant}
    */
   Codec<Instant> TIME = Transformations.mapTo(TimeV.class, Transformations.VALUE_TO_INSTANT, Transformations.INSTANT_TO_VALUE);
 
   /**
-   * Coerces a {@link Value} to a {@link HighPrecisionTime}
+   * Converts a {@link Value} to a {@link HighPrecisionTime}
    */
   Codec<HighPrecisionTime> HP_TIME = Transformations.mapTo(TimeV.class, Transformations.<TimeV, HighPrecisionTime>scalarValue(), Transformations.HP_TIME_TO_VALUE);
 
   /**
-   * Coerces a {@link Value} to a {@link String}
+   * Converts a {@link Value} to a {@link String}
    */
   Codec<String> STRING = Transformations.mapTo(StringV.class, Transformations.<StringV, String>scalarValue(), Transformations.STRING_TO_VALUE);
 
   /**
-   * Coerces a {@link Value} to a {@link Double}
+   * Converts a {@link Value} to a {@link Double}
    */
   Codec<Double> DOUBLE = Transformations.mapTo(DoubleV.class, Transformations.<DoubleV, Double>scalarValue(), Transformations.DOUBLE_TO_VALUE);
 
   /**
-   * Coerces a {@link Value} to a {@link Float}
+   * Converts a {@link Value} to a {@link Float}
    */
   Codec<Float> FLOAT = Transformations.mapWith(DOUBLE, Transformations.DOUBLE_TO_FLOAT, Transformations.FLOAT_TO_DOUBLE);
 
   /**
-   * Coerces a {@link Value} to a {@link Boolean}
+   * Converts a {@link Value} to a {@link Boolean}
    */
   Codec<Boolean> BOOLEAN = Transformations.mapTo(BooleanV.class, Transformations.<BooleanV, Boolean>scalarValue(), Transformations.BOOLEAN_TO_VALUE);
 
   /**
-   * Coerces a {@link Value} to a {@link LocalDate}
+   * Converts a {@link Value} to a {@link LocalDate}
    */
   Codec<LocalDate> DATE = Transformations.mapTo(DateV.class, Transformations.<DateV, LocalDate>scalarValue(), Transformations.LOCAL_DATE_TO_VALUE);
 
   /**
-   * Coerces a {@link Value} to an {@link ImmutableList} of {@link Value}
+   * Converts a {@link Value} to an {@link ImmutableList} of {@link Value}
    */
   Codec<ImmutableList<Value>> ARRAY = Transformations.mapTo(ArrayV.class, Transformations.VALUE_TO_LIST, Transformations.LIST_TO_VALUE);
 
   /**
-   * Coerces a {@link Value} to an {@link ImmutableMap} of {@link String} to {@link Value}
+   * Converts a {@link Value} to an {@link ImmutableMap} of {@link String} to {@link Value}
    */
   Codec<ImmutableMap<String, Value>> OBJECT = Transformations.mapTo(ObjectV.class, Transformations.VALUE_TO_MAP, Transformations.MAP_TO_VALUE);
 
   /**
-   * Coerces a {@link Value} to an array of bytes
+   * Converts a {@link Value} to an array of bytes
    */
   Codec<byte[]> BYTES = Transformations.mapTo(BytesV.class, Transformations.<BytesV, byte[]>scalarValue(), Transformations.BYTES_TO_VALUE);
 }

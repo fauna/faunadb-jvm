@@ -5,24 +5,18 @@ import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.LongV;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import org.joda.time.Instant;
 
 import static com.faunadb.client.util.Objects.requireNonNull;
 
 /**
- * A pagination expression.
+ * A pagination expression. Instances of this class are not thread safe and must not be
+ * modified concurrently from different threads.
  * <p>
- * <b>Example:</b>
- * We can paginate all instances of a class, with its evets, in pages with 4 elements only.
- * <pre>{@code
- * client.query(
- *    Paginate(Match(Index("all_spells"))
- *      .withEvents(true)
- *      .withSize(4)
- * );
- * }</pre>
+ * See {@link Language#Paginate(Expr)} for details.
  *
- * @see Language#Paginate(Expr)
  * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
+ * @see Language#Paginate(Expr)
  */
 public final class Pagination extends Expr {
 
@@ -77,8 +71,8 @@ public final class Pagination extends Expr {
   /**
    * Sets the cursor of the pagination to move backwards.
    *
-   * @param cursor the cursor
-   * @return a new pagination with the cursor set
+   * @param cursor the before cursor
+   * @return this {@link Pagination} instance
    */
   public Pagination before(Expr cursor) {
     this.cursor = Optional.<Cursor>of(new Before(cursor));
@@ -88,8 +82,8 @@ public final class Pagination extends Expr {
   /**
    * Sets the cursor of the pagination to move forward.
    *
-   * @param cursor the cursor
-   * @return a new pagination with the cursor set
+   * @param cursor the after cursor
+   * @return this {@link Pagination} instance
    */
   public Pagination after(Expr cursor) {
     this.cursor = Optional.<Cursor>of(new After(cursor));
@@ -97,10 +91,13 @@ public final class Pagination extends Expr {
   }
 
   /**
-   * Sets the timestamp for the pagination
+   * Sets the timestamp for the pagination.
    *
-   * @param ts the desired timestamp
-   * @return a new pagination with the timestamp set
+   * @param ts the desired timestamp. Type: timestamp
+   * @return this {@link Pagination} instance
+   * @see Language#Time(Expr)
+   * @see Language#Value(Instant)
+   * @see Language#Value(com.faunadb.client.types.time.HighPrecisionTime)
    */
   public Pagination ts(Expr ts) {
     this.ts = Optional.of(ts);
@@ -108,20 +105,20 @@ public final class Pagination extends Expr {
   }
 
   /**
-   * Sets the timestamp for the pagination
+   * Sets the timestamp for the pagination.
    *
-   * @param ts the desired timestamp
-   * @return a new pagination with the timestamp set
+   * @param ts the desired timestamp in UNIX microseconds
+   * @return this {@link Pagination} instance
    */
   public Pagination ts(Long ts) {
     return ts(new LongV(ts));
   }
 
   /**
-   * Sets the size of the pagination
+   * Sets the maximum number of elements per page to return.
    *
-   * @param size the desired size
-   * @return a new pagination with the size set
+   * @param size the desired page size. Type: Number
+   * @return this {@link Pagination} instance
    */
   public Pagination size(Expr size) {
     this.size = Optional.of(size);
@@ -129,19 +126,21 @@ public final class Pagination extends Expr {
   }
 
   /**
-   * Sets the size of the pagination
+   * Sets the maximum number of elements per page to return.
    *
-   * @param size the desired size
-   * @return a new pagination with the size set
+   * @param size the desired page size
+   * @return this {@link Pagination} instance
    */
   public Pagination size(Integer size) {
     return size(new LongV(size));
   }
 
   /**
-   * Define if the pagination should include sources of not
+   * Define if the pagination should return source information or not.
+   * By default source information is not returned.
    *
-   * @return a new pagination with sources option set
+   * @param sources a boolean value
+   * @return this {@link Pagination} instance
    */
   public Pagination sources(Expr sources) {
     this.sources = Optional.of(sources);
@@ -149,9 +148,11 @@ public final class Pagination extends Expr {
   }
 
   /**
-   * Define if the pagination should include sources of not
+   * Define if the pagination should return source information or not.
+   * By default source information is not returned.
    *
-   * @return a new pagination with sources option set
+   * @param sources a boolean value
+   * @return this {@link Pagination} instance
    */
   public Pagination sources(boolean sources) {
     if (!sources) return this;
@@ -159,9 +160,11 @@ public final class Pagination extends Expr {
   }
 
   /**
-   * Define if the pagination should include events of not
+   * Define if the pagination should return events or not.
+   * By default events are not returned.
    *
-   * @return a new pagination with events option set
+   * @param events a boolean value
+   * @return this {@link Pagination} instance
    */
   public Pagination events(Expr events) {
     this.events = Optional.of(events);
@@ -169,9 +172,11 @@ public final class Pagination extends Expr {
   }
 
   /**
-   * Define if the pagination should include events of not
+   * Define if the pagination should return events or not.
+   * By default events are not returned.
    *
-   * @return a new pagination with events option set
+   * @param events a boolean value
+   * @return this {@link Pagination} instance
    */
   public Pagination events(boolean events) {
     if (!events) return this;

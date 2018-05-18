@@ -4,7 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 
 /**
- * Represents the result of an operation. Usually a coercion operation.
+ * Represents the result of an operation. Usually a conversion operation.
  *
  * @see Codec
  */

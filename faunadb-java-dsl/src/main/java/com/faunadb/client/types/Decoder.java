@@ -19,6 +19,18 @@ import static java.lang.reflect.Modifier.isAbstract;
 
 /**
  * FaunaDB {@link Value} to object decoder.
+ *
+ * The {@link Decoder} is capable of decoding user defined classes as long
+ * as properly annotated with: {@link FaunaField}, {@link FaunaConstructor}, {@link FaunaIgnore}, and {@link FaunaEnum}.
+ *
+ * @see Decoder#decode(Value, Type)
+ * @see Decoder#decode(Value, Class)
+ * @see FaunaField
+ * @see FaunaConstructor
+ * @see FaunaEnum
+ * @see FaunaIgnore
+ * @see Encoder
+ * @see Value#to(Class)
  */
 @SuppressWarnings("unchecked")
 public final class Decoder {
@@ -28,21 +40,20 @@ public final class Decoder {
   /**
    * Decode a FaunaDB {@link Value} to a specified type.
    *
-   * <p>This method is useful if you need to decode collections.</p>
+   * <p>This method is useful if you need to decode collections or key/value maps.</p>
    *
    * <pre>{@code
-   *     ArrayV array = new ArrayV(Arrays.asList(new StringV("str1"), new StringV("str2")));
-   *
-   *     Result<List<String>> listStrings = Decoder.decode(array, Types.arrayListOf(String.class));
-   *     Result<Set<String>> setStrings = Decoder.decode(array, Types.hashSetOf(String.class));
+   *     Result<List<String>> listStrings = Decoder.decode(result, Types.arrayListOf(String.class));
+   *     Result<Set<String>> setStrings = Decoder.decode(result, Types.hashSetOf(String.class));
    * }</pre>
-   *
-   * See {@link Types} for more information.
    *
    * @param <T>     The return type of the method.
    * @param value   The FaunaDB {@link Value} to be decoded.
    * @param dstType The {@link Type} in which value should be decoded.
    * @return A {@link Result} instance of type {@link T}
+   * @see Types
+   * @see Value#asCollectionOf(Class)
+   * @see Value#asMapOf(Class)
    */
   public static <T> Result<T> decode(Value value, Type dstType) {
     if (value == null || value == NullV.NULL)
@@ -61,23 +72,23 @@ public final class Decoder {
    * <p>Use this method to decode user defined types like:</p>
    *
    * <pre>{@code
-   *     Result<User> user = Decoder.decode(new ObjectV(...), User.class);
+   *     Result<User> user = Decoder.decode(result, User.class);
    * }</pre>
    *
    * <p>It's possible to decode primitive types and arrays of primitive types</p>
    *
    * <pre>{@code
-   *     Result<String> string = Decoder.decode(new StringV("string"), String.class);
-   *     Result<long> longValue = Decoder.decode(new LongV(10), long.class);
-   *     Result<int> intValue =  Decoder.decode(new LongV(10), int.class);
-   *
-   *     Result<int[]> arrayInt = Decoder.decode(new ArrayV(...), int[].class);
+   *     Result<String> string = Decoder.decode(result, String.class);
+   *     Result<long> longValue = Decoder.decode(result, long.class);
+   *     Result<int> intValue =  Decoder.decode(result, int.class);
+   *     Result<int[]> arrayInt = Decoder.decode(result, int[].class);
    * }</pre>
    *
    * @param <T>     The return type of the method.
    * @param value   The FaunaDB {@link Value} to be decoded.
    * @param dstType The {@link Class} in which value should be decoded.
    * @return A {@link Result} instance of type {@link T}
+   * @see Value#to(Class)
    */
   public static <T> Result<T> decode(Value value, Class<T> dstType) {
     return decode(value, (Type)dstType);

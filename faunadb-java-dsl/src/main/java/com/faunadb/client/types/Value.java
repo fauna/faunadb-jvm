@@ -28,40 +28,43 @@ import static com.google.common.primitives.Bytes.asList;
 import static java.lang.String.format;
 
 /**
- * Represents any scalar or non-scalar value in the FaunaDB query language. FaunaDB value types consist of
- * all of the JSON value types, as well as the FaunaDB-specific types, {@link RefV} and {@link SetRefV}.
- * <p>
- * Scalar values are {@link LongV}, {@link StringV}, {@link DoubleV}, {@link BooleanV}, {@link NullV},
- * {@link RefV}, and {@link SetRefV}.
- * <p>
- * Non-scalar values are {@link ObjectV} and {@link ArrayV}.
- * <p>
- * This interface itself does not have any directly accessible data. It must first be coerced into a type before
- * its data can be accessed.
- * <p>
- * <b>Example</b>: Consider the {@link Value} node modeling the root of the tree:
- * <pre>{@code
- * {
- *   "ref": { "@ref": "some/ref" },
- *   "data": { "someKey": "string1", "someKey2": 123 }
- * }}</pre>
- * <p>
- * The result tree can be accessed using:
- * <pre>{@code
- *   Field<RefV> ref = Field.at("ref").to(Codec.REF);
- *   Field<String> someKey = Field.at("data", "someKey").to(Codec.STRING);
- *   Field<String> nonExistingKey = Field.at("non-existing-key").to(Codec.LONG);
+ * {@link Value} represents query responses from FaunaDB.
+ * Instances of {@link Value} should be treated as opaque vales until converted to a native type.
  *
- *   node.get(ref); // new RefV("some/ref")
- *   node.get(someKey); // "string1"
- *   node.getOptional(nonExistingKey) // Optional.absent()
- * }</pre>
- * <p>
- * The interface also has helpers to transverse values without {@link Field} references:
+ * Available conversion methods are:
+ * <ul>
+ *   <li>{@link Value#to(Class)}</li>
+ *   <li>{@link Value#to(Codec)}</li>
+ *   <li>{@link Value#get(Field)}</li>
+ *   <li>{@link Value#getOptional(Field)}</li>
+ *   <li>{@link Value#collect(Field)}</li>
+ *   <li>{@link Value#asCollectionOf(Class)}</li>
+ *   <li>{@link Value#asMapOf(Class)}</li>
+ * </ul>
+ *
+ * Value trees can be traversed using one of the following methods:
+ * <ul>
+ *   <li>{@link Value#at(int...)}</li>
+ *   <li>{@link Value#at(String...)}</li>
+ * </ul>
+ *
+ * <p>Examples:</p>
+ *
+ * Using the traversal API:
  * <pre>{@code
- *   node.at("ref").to(Codec.REF).get(); // new RefV("some/ref")
- *   node.at("data", "someKey").to(Codec.STRING).get() // "string1"
- *   node.at("non-existing-key").to(Codec.LONG).getOptional() // Optional.absent()
+ *   Value result = client.query(getUserQuery).get();
+ *
+ *   String name = result
+ *     .at("data", "name")
+ *     .to(String.class)
+ *     .get();
+ * }</pre>
+ *
+ * Using a field extractor:
+ * <pre>{@code
+ *   Field<String> name = Field.at("data", "name").to(String.class);
+ *   Value result = client.query(getUserQuery).get();
+ *   String name = result.get(name);
  * }</pre>
  *
  * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Value Types</a>
@@ -75,11 +78,11 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Attempts to coerce this value using the {@link Codec} passed.
+   * Attempts to convert the value using the {@link Codec} passed.
    *
-   * @param <T> the type to coerce to
-   * @param codec codec function to attempt coercion
-   * @return the {@link Result} of the coercion
+   * @param <T> the type to convert to
+   * @param codec codec function to attempt conversion
+   * @return the {@link Result} of the conversion
    * @see Codec
    */
   public final <T> Result<T> to(Codec<T> codec) {
@@ -87,11 +90,11 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Attempts to decode this value using the {@link Decoder} into the specified type.
+   * Attempts to decode the value using the reflection {@link Decoder}.
    *
-   * @param <T> the type to coerce to
+   * @param <T> the type to convert to
    * @param clazz a class type to convert
-   * @return the {@link Result} of the coercion
+   * @return the {@link Result} of the conversion
    * @see Decoder
    */
   public final <T> Result<T> to(Class<T> clazz) {
@@ -99,10 +102,10 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Attempts to encode an object using an {@link Encoder} into a {@link Value} type.
+   * Attempts to encode an object as a {@link Value} using the reflection {@link Encoder}.
    *
-   * @param <T> the type to coerce from
-   * @param obj the object instance to convert
+   * @param <T> the type to convert from
+   * @param obj the object instance to encode
    * @return the {@link Result} of the conversion
    */
   public static <T> Result<Value> from(T obj) {
@@ -110,12 +113,11 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Attempts to coerce this value to a {@link Map}.
-   * This object must be an instance of {@link ObjectV}.
+   * Attempts to convert the value to a {@link Map}.
    *
-   * @param <T> the type of the values on map
-   * @param valueType the type of the values.
-   * @return a {@link Result} with the resulting map containing the keys/values.
+   * @param <T> the type of the values on {@link Map}
+   * @param valueType the type of the desired {@link Map}'s values.
+   * @return a {@link Result} containing the resulting {@link Map}.
    * @see Decoder
    * @see Types
    */
@@ -124,12 +126,11 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Attempts to coerce this value to a {@link Collection}.
-   * This object must be an instance of {@link ArrayV}.
+   * Attempts to convert the value to a {@link Collection}.
    *
-   * @param <T> the type of the elements on the collection
-   * @param elementType the type of the elements in the collection.
-   * @return a {@link Result} with the resulting collection.
+   * @param <T> the type of the elements on the {@link Collection}
+   * @param elementType the type of the elements in the {@link Collection}.
+   * @return a {@link Result} containing the resulting {@link Collection}.
    * @see Decoder
    * @see Types
    */
@@ -138,12 +139,12 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Extract a {@link Field} from this node
+   * Extract a {@link Field} from the value.
    *
    * @param <T> the type of returned field
-   * @param field field to extract
-   * @return the resulting value of extracting the {@link Field} from this node
-   * @throws IllegalStateException if {@link Field} does not exists on this node
+   * @param field the {@link Field} to extract
+   * @return the resulting value of extracting the {@link Field} from this value
+   * @throws IllegalStateException if {@link Field} does not exists on this value
    * @see Field
    */
   public final <T> T get(Field<T> field) {
@@ -151,11 +152,12 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Attempts to extract a {@link Field} from this node
+   * Safely attempts to extract a {@link Field} from this value.
    *
    * @param <T> the type of returned field
-   * @param field field to extract
-   * @return An {@link Optional} with the resulting value if the field's extraction was successful
+   * @param field {@link Field} to extract
+   * @return An {@link Optional} containing the resulting value, if the field extraction was successful.
+   * It returns {@link Optional#absent()}, otherwise.
    * @see Field
    */
   public final <T> Optional<T> getOptional(Field<T> field) {
@@ -163,28 +165,20 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Loop through this node collecting the {@link Field} passed, assuming the node is an instance of {@link ArrayV}
-   * <p>
-   * <b>Example</b>: Consider the {@link Value} node modeling the root of the tree:
-   * <pre>{@code
-   * {
-   *   "data": {
-   *     "arrayOfStrings": ["Jhon", "Bill"],
-   *     "arrayOfObjects": [ {"name": "Jhon"}, {"name": "Bill"} ]
-   *    }
-   * }}</pre>
-   * <p>
-   * The result tree can be accessed using:
-   * <pre>{@code
-   *   node.get("arrayOfStrings").collect(Field.to(Codec.STRING)); // ["Jhon", "Bill"]
+   * Assuming the underlying value is a collection, it collects the {@link Field} provided
+   * for all elements in the collection.
    *
-   *   Field<String> name = Field.at("name").to(Codec.STRING);
-   *   node.get("arrayOfObjects").collect(name); // ["Jhon", "Bill"]
+   * <p>For example:</p>
+   *
+   * <pre>{@code
+   *   Field<String> userName = Field.at("name").to(String.class);
+   *   Value result = client.query(getAllUsersQuery).get();
+   *   List<String> userNames = result.at("data").collect(userName);
    * }</pre>
    *
-   * @param <T> the type of the elements
-   * @param field field to extract from each array value
-   * @return a {@link ImmutableList} with the collected {@link Field}s
+   * @param <T> the type of the elements in the resulting {@link List}
+   * @param field the {@link Field} to extract from each element in the underlying collection
+   * @return a {@link ImmutableList} with the collected fields
    * @see Field
    */
   public final <T> ImmutableList<T> collect(Field<T> field) {
@@ -192,20 +186,34 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Navigate through object's keys, assuming value is an instance of {@link ObjectV}.
+   * Assuming the underlying value is a key/value map, it traverses to a desired path.
    *
-   * @param keys path to navigate to
-   * @return {@link Value} under the path or {@link NullV}
+   * <p>For example:</p>
+   *
+   * <pre>{@code
+   *   Value result = client.query(getUser).get();
+   *   Value zipCode = result.at("data", "address", "zipCode");
+   * }</pre>
+   *
+   * @param keys the object keys to traverse
+   * @return the {@link Value} under the path provided
    */
   public final Value at(String... keys) {
     return Field.at(keys).get(this).getOrElse(NullV.NULL);
   }
 
   /**
-   * Navigate through array's indexes, assuming value is an instance of {@link ArrayV}
+   * Assuming the underlying value is a collection, it traverses to a desired path.
    *
-   * @param indexes path to navigate to
-   * @return {@link Value} under the path or {@link NullV}
+   * <p>For example:</p>
+   *
+   * <pre>{@code
+   *   Value result = client.query(getAllUsers).get();
+   *   Value firstUser = result.at("data").at(0);
+   * }</pre>
+   *
+   * @param indexes the collection indexes to traverse
+   * @return the {@link Value} under the path provided
    */
   public final Value at(int... indexes) {
     return Field.at(indexes).get(this).getOrElse(NullV.NULL);
@@ -213,7 +221,10 @@ public abstract class Value extends Expr {
 
   /**
    * Represents a scalar value at the FaunaDB query language.
-   * See {@link Value}
+   *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
+   *
+   * @see Value
    */
   @JsonDeserialize(using = JsonDeserializer.None.class) // Disables generic value deserializer for scalar values
   static abstract class ScalarValue<T> extends Value {
@@ -244,9 +255,13 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Represents an Object value in the FaunaDB query language. Objects are polymorphic dictionaries.
+   * Represents an Object value in the FaunaDB query language.
+   * Objects are polymorphic dictionaries.
+   *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
    *
    * @see Language#Obj
+   * @see Value
    */
   @JsonDeserialize(using = Deserializer.ObjectDeserializer.class)
   public static final class ObjectV extends Value {
@@ -282,9 +297,13 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Represents an array value in the FaunaDB query language. Arrays are polymorphic ordered lists of other values.
+   * Represents an array value in the FaunaDB query language.
+   * Arrays are polymorphic ordered lists of other values.
+   *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
    *
    * @see Language#Arr
+   * @see Value
    */
   @JsonDeserialize(using = Deserializer.ArrayDeserializer.class)
   public static final class ArrayV extends Value {
@@ -321,9 +340,12 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Represents a Boolean value in the FaunaDB query language.
+   * Represents a boolean value in the FaunaDB query language.
+   *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
    *
    * @see Language#Value(boolean)
+   * @see Value
    */
   public static final class BooleanV extends ScalarValue<Boolean> {
 
@@ -347,9 +369,12 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Represents a Double value in the FaunaDB query language.
+   * Represents a double value in the FaunaDB query language.
+   *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
    *
    * @see Language#Value(double)
+   * @see Value
    */
   public static final class DoubleV extends ScalarValue<Double> {
     public DoubleV(double value) {
@@ -364,9 +389,12 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Represents a Long value in the FaunaDB query language.
+   * Represents a long value in the FaunaDB query language.
+   *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
    *
    * @see Language#Value(long)
+   * @see Value
    */
   public static final class LongV extends ScalarValue<Long> {
     public LongV(long value) {
@@ -381,9 +409,12 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Represents a String value in the FaunaDB query language.
+   * Represents a string value in the FaunaDB query language.
+   *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
    *
    * @see Language#Value(String)
+   * @see Value
    */
   public static final class StringV extends ScalarValue<String> {
     public StringV(String value) {
@@ -400,7 +431,10 @@ public abstract class Value extends Expr {
   /**
    * Represents a null value in the FaunaDB query language.
    *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
+   *
    * @see Language#Null()
+   * @see Value
    */
   public static final class NullV extends Value {
 
@@ -434,9 +468,12 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Represents a Timestamp value in the FaunaDB query language.
+   * Represents a timestamp value in the FaunaDB query language.
+   *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
    *
    * @see Language#Value(Instant)
+   * @see Value
    */
   public static final class TimeV extends ScalarValue<HighPrecisionTime> {
 
@@ -462,9 +499,12 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * Represents a Date value in the FaunaDB query language.
+   * Represents a date value in the FaunaDB query language.
+   *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
    *
    * @see Language#Value(LocalDate)
+   * @see Value
    */
   public static final class DateV extends ScalarValue<LocalDate> {
 
@@ -487,7 +527,10 @@ public abstract class Value extends Expr {
   /**
    * A FaunaDB set literal.
    *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
+   *
    * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   * @see Value
    */
   public static final class SetRefV extends ScalarValue<ImmutableMap<String, Value>> {
 
@@ -496,9 +539,11 @@ public abstract class Value extends Expr {
     }
 
     /**
-     * Extact SetRefV structure
+     * Extract SetRefV structure
      *
-     * @return SetRefV structure
+     * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
+     *
+     * @return SetRefV internal structure
      */
     public ImmutableMap<String, Value> parameters() {
       return value;
@@ -511,6 +556,13 @@ public abstract class Value extends Expr {
     }
   }
 
+  /**
+   * The {@link RefV} internal ID representation.
+   *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
+   *
+   * @see RefV
+   */
   @JsonInclude(JsonInclude.Include.NON_ABSENT)
   public static class RefID {
     @JsonProperty("id")       private final String id;
@@ -542,9 +594,15 @@ public abstract class Value extends Expr {
   }
 
   /**
-   * A FaunaDB ref type.
+   * A FaunaDB reference type.
+   *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
    *
    * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   * @see Language#Ref(String)
+   * @see Language#Ref(Expr, Expr)
+   * @see Language#Ref(Expr, String)
+   * @see Value
    */
   public static final class RefV extends Value.ScalarValue<RefID> {
 
@@ -600,6 +658,13 @@ public abstract class Value extends Expr {
     }
   }
 
+  /**
+   * Builtin reference types.
+   *
+   * @see Language#Ref(Expr, Expr)
+   * @see Language#Ref(Expr, String)
+   * @see RefV
+   */
   public static final class Native {
     private Native() {}
 
@@ -625,7 +690,11 @@ public abstract class Value extends Expr {
   /**
    * Represents a blob value in the FaunaDB query language.
    *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
+   *
    * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   * @see Language#Value(byte[])
+   * @see Value
    */
   public static final class BytesV extends ScalarValue<byte[]> {
 
@@ -671,7 +740,10 @@ public abstract class Value extends Expr {
   /**
    * Represents a query value in the FaunaDB query language.
    *
+   * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
+   *
    * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   * @see Value
    */
   @JsonDeserialize(using = JsonDeserializer.None.class) // Disables generic value deserializer for query values
   public static final class QueryV extends Value {

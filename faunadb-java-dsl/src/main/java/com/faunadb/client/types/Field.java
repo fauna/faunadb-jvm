@@ -7,10 +7,20 @@ import com.google.common.collect.ImmutableList;
 import static java.lang.String.format;
 
 /**
- * A field extractor for a FaunaDB {@link Value}
+ * A field extractor for a FaunaDB {@link Value}.
+ *
+ * <p>The field extractor can be used to extract field's values from key/value maps
+ * or collections returned by FaunaDB.</p>
+ *
+ * <p>Example:</p>
+ *
+ * <pre>{@code
+ * Field<String> userNameField = Field.at("data", "name").to(String.class);
+ * Value result = client.query(getUser).get();
+ * String name = result.get(userNameField);
+ * }</pre>
  *
  * @see Value
- * @see Codec
  */
 public final class Field<T> {
 
@@ -61,33 +71,35 @@ public final class Field<T> {
   }
 
   /**
-   * Creates a field that extracts its value from a object path, assuming the value
-   * is an instance of {@link com.faunadb.client.types.Value.ObjectV}.
+   * Creates a field that extracts the underlying value from the path provided, assuming the {@link Value} instance
+   * is a key/value map.
    *
-   * @param keys path to the field
-   * @return the field extractor
+   * @param keys the path to the desired field
+   * @return a new {@link Field} instance
+   * @see Field
+   * @see Value
    */
   public static Field<Value> at(String... keys) {
     return new Field<>(Path.from(keys), Codec.VALUE);
   }
 
   /**
-   * Creates a field that extracts its value from a array index, assuming the value
-   * is an instance of {@link com.faunadb.client.types.Value.ArrayV}.
+   * Creates a field that extracts the underlying value from the indexes provided, assuming the {@link Value} instance
+   * is a collection or nested collections.
    *
-   * @param indexes path to the field
-   * @return the field extractor
+   * @param indexes the path to the desired field
+   * @return a new {@link Field} instance
    */
   public static Field<Value> at(int... indexes) {
     return new Field<>(Path.from(indexes), Codec.VALUE);
   }
 
   /**
-   * Creates a field that coerces its value using the codec passed
+   * Creates a field that converts its underlying value using the {@link Codec} provided.
    *
-   * @param <T> the type of the field
-   * @param codec codec used to coerce the field's value
-   * @return the field extractor
+   * @param <T> the desired final type
+   * @param codec {@link Codec} used to convert the field's value
+   * @return a new {@link Field} instance
    */
   public static <T> Field<T> as(Codec<T> codec) {
     return new Field<>(Path.empty(), codec);
@@ -112,33 +124,33 @@ public final class Field<T> {
   }
 
   /**
-   * Creates a field extractor composed with another nested field
+   * Creates a field extractor composed with another nested {@link Field} instance.
    *
-   * @param <A> the type of the field
-   * @param other nested field to compose with
-   * @return a new field extractor with the nested field
+   * @param <A> the desired final type
+   * @param other a nested {@link Field} to compose with
+   * @return a new {@link Field} instance
    */
   public <A> Field<A> at(Field<A> other) {
     return new Field<>(path.subPath(other.path), other.codec);
   }
 
   /**
-   * Creates a field extractor that coerces its value using the codec passed
+   * Creates a field extractor that converts its value using the codec provided.
    *
-   * @param <A> the type of the field
-   * @param codec codec to be used to coerce the field's value
-   * @return a new field that coerces its value using the codec passed
+   * @param <A> the desired final type
+   * @param codec the {@link Codec} to be used to convert the field's underlying value
+   * @return a new {@link Field} instance
    */
   public <A> Field<A> to(Codec<A> codec) {
     return new Field<>(path, codec);
   }
 
   /**
-   * Creates a field extractor that coerces its value to the class passed
+   * Creates a field extractor that converts its value to the class provided.
    *
-   * @param <A> the type of the field
-   * @param type class to be used to coerce the field's value
-   * @return a new {@link Field} that coerces its value using the class passed
+   * @param <A> the desired final type
+   * @param type the class to be used to convert the field's value
+   * @return a new {@link Field} instance
    */
   public <A> Field<A> to(final Class<A> type) {
     return new Field<>(path, new Codec<A>() {
@@ -155,12 +167,12 @@ public final class Field<T> {
   }
 
   /**
-   * Creates a field extractor that collects each inner value of an array using the nested {@link Field} passed,
-   * assuming the target value is an instance of {@link com.faunadb.client.types.Value.ArrayV}
+   * Assuming the {@link Value} instance is a collection, creates a field extractor that collects
+   * the {@link Field} provided for each element in the underlying collection.
    *
-   * @param <A> the type of the field
-   * @param field field to be extracted from each array's element
-   * @return a new field that collects each inner value using the field passed
+   * @param <A> the desired final type for each collection element
+   * @param field the {@link Field} to be extracted from each collection element
+   * @return a new {@link Field} instance
    */
   public <A> Field<ImmutableList<A>> collect(Field<A> field) {
     return new Field<>(path, new CollectionCodec<>(path, field));
