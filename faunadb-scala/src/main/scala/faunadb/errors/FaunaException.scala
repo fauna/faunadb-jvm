@@ -1,6 +1,6 @@
 package faunadb.errors
 
-import faunadb.QueryErrorResponse
+import faunadb.{QueryError, QueryErrorResponse}
 
 object FaunaException {
   private[errors] def respToError(response: QueryErrorResponse) = {
@@ -12,8 +12,8 @@ class FaunaException(response: Option[QueryErrorResponse], msg: String) extends 
   def this(msg: String) = this(None, msg)
   def this(resp: QueryErrorResponse) = this(Some(resp), FaunaException.respToError(resp))
 
-  def errors = response.get.errors
-  def status = response.get.status
+  def errors: IndexedSeq[QueryError] = response.map(_.errors).getOrElse(IndexedSeq.empty)
+  def status: Int = response.map(_.status).getOrElse(0)
 }
 
 /**
@@ -67,7 +67,7 @@ class PermissionDeniedException(response: Option[QueryErrorResponse], message: S
   def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
 }
 
-class UnknownException(response: Option[QueryErrorResponse], message: String) extends FaunaException(message) {
+class UnknownException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
   def this(message: String) = this(None, message)
   def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
 }
