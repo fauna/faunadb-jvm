@@ -1,3 +1,6 @@
+4.0.2
+* Adds ability to combine Fields
+
 4.0.1
 * Fix JavaDoc errors
 
