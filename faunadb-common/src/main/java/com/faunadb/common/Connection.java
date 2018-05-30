@@ -27,11 +27,13 @@ import static java.lang.String.format;
 
 /**
  * The HTTP Connection adapter for FaunaDB drivers.
- * <p>
- * Relies on <a href="https://github.com/AsyncHttpClient/async-http-client">async-http-client</a>
- * for the underlying implementation.
+ *
+ * <p>Relies on <a href="https://github.com/AsyncHttpClient/async-http-client">async-http-client</a>
+ * for the underlying implementation.</p>
+ *
+ * <p>The {@link Connection#close()} method must be called in order to
+ * release {@link Connection} I/O resources</p>
  */
-
 public final class Connection implements AutoCloseable {
 
   private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
@@ -49,15 +51,17 @@ public final class Connection implements AutoCloseable {
   }
 
   /**
-   * Returns a new {@link Connection.Builder}.
+   * Returns a new {@link Builder} instance.
+   *
+   * @return a new {@link Builder}
    */
   public static Builder builder() {
     return new Builder();
   }
 
   /**
-   * A builder for creating an instance of {@link Connection}. Use {@link Connection#builder} to obtain
-   * an instance of this builder.
+   * A builder for the {@link Connection} instance. Use the {@link Connection#builder} method to create
+   * an instance of the {@link Builder} class.
    */
   public static class Builder {
 
@@ -70,11 +74,11 @@ public final class Connection implements AutoCloseable {
     }
 
     /**
-     * Sets the FaunaDB root URL for the built {@link Connection}.
+     * Sets the FaunaDB root URL for the {@link Connection} instance.
      *
      * @param root the root URL, as a RFC 2396 formatted string. Example: https://db.fauna.com
      * @return this {@link Builder} object
-     * @throws MalformedURLException if {@code root} is not RFC 2396.
+     * @throws MalformedURLException if a malformed url is provided
      */
     public Builder withFaunaRoot(String root) throws MalformedURLException {
       this.faunaRoot = new URL(root);
@@ -82,7 +86,7 @@ public final class Connection implements AutoCloseable {
     }
 
     /**
-     * Sets the FaunaDB root URL for the built {@link Connection}.
+     * Sets the FaunaDB root URL for the {@link Connection} instance.
      *
      * @param root the root URL
      * @return this {@link Builder} object
@@ -93,10 +97,9 @@ public final class Connection implements AutoCloseable {
     }
 
     /**
-     * Sets the Auth Token that the built {@link Connection} will provide to FaunaDB. This must be provided in order
-     * for client to authenticate with FaunaDB.
+     * Sets the authentication token or key for the {@link Connection} instance.
      *
-     * @param token the auth token.
+     * @param token the auth token or key
      * @return this {@link Builder} object
      */
     public Builder withAuthToken(String token) {
@@ -105,8 +108,8 @@ public final class Connection implements AutoCloseable {
     }
 
     /**
-     * Sets a custom {@link AsyncHttpClient} implementation that the built {@link Connection} will use. This custom implementation
-     * can be provided to control the behavior of the underlying HTTP transport.
+     * Sets a custom {@link AsyncHttpClient} implementation for the {@link Connection} instance.
+     * A custom implementation can be provided to control the behavior of the underlying HTTP transport.
      *
      * @param client the custom {@link AsyncHttpClient} instance
      * @return this {@link Builder} object
@@ -117,9 +120,10 @@ public final class Connection implements AutoCloseable {
     }
 
     /**
-     * Sets a {@link MetricRegistry} that the {@link Connection} will use to register and track Connection-level statistics.
+     * Sets a {@link MetricRegistry} for the {@link Connection} instance.
+     * The {@link MetricRegistry} will be used to track connection level statistics.
      *
-     * @param registry the MetricRegistry instance.
+     * @param registry the {@link MetricRegistry} instance.
      * @return this {@link Builder} object
      */
     public Builder withMetrics(MetricRegistry registry) {
@@ -128,7 +132,8 @@ public final class Connection implements AutoCloseable {
     }
 
     /**
-     * Returns a newly constructed {@link Connection} with configuration based on the settings of this {@link Builder}.
+     * @return a newly constructed {@link Connection} with its configuration based on
+     * the settings of the {@link Builder} instance.
      */
     public Connection build() {
       MetricRegistry registry;
@@ -183,10 +188,11 @@ public final class Connection implements AutoCloseable {
   }
 
   /**
-   * Creates a new short live connection sharing its underneath {@link AsyncHttpClient}. Queries submited to a
-   * session connection will be authenticated with the token provided.
+   * Creates a new {@link Connection} sharing its underneath I/O resources. Queries submitted to a
+   * session connection will be authenticated with the token provided. The {@link #close()} method
+   * must be called before releasing the connection.
    *
-   * @param authToken token that will be used to authenticate requests
+   * @param authToken the token or key to be used to authenticate requests to the new {@link Connection}
    * @return a new {@link Connection}
    */
   public Connection newSessionConnection(String authToken) {
@@ -197,8 +203,7 @@ public final class Connection implements AutoCloseable {
   }
 
   /**
-   * Releases any resources being held by the HTTP client. Also closes the underlying
-   * {@link AsyncHttpClient}.
+   * Releases any resources being held by the {@link Connection} instance.
    */
   @Override
   public void close() {
@@ -210,7 +215,7 @@ public final class Connection implements AutoCloseable {
    * Issues a {@code GET} request with no parameters.
    *
    * @param path the relative path of the resource.
-   * @return a {@code ListenableFuture} containing the HTTP Response.
+   * @return a {@link ListenableFuture} containing the HTTP Response.
    * @throws IOException if the HTTP request cannot be issued.
    */
   public ListenableFuture<Response> get(String path) throws IOException {

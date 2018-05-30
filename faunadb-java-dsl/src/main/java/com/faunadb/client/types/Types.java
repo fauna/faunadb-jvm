@@ -11,7 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.lang.String.format;
 
 /**
- * Helper class which contains convenience methods for creating types used to decode user-defined classes.
+ * Helper class which contains convenience methods for creating types used to decode types.
+ *
+ * @see Decoder
  */
 public final class Types {
   private Types() {

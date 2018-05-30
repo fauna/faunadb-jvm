@@ -18,6 +18,17 @@ import static java.lang.String.format;
 
 /**
  * FaunaDB object to {@link Value} encoder.
+ *
+ * The {@link Encoder} is capable of encoding user defined classes as long
+ * as properly annotated with: {@link FaunaField}, {@link FaunaConstructor}, {@link FaunaIgnore}, and {@link FaunaEnum}.
+ *
+ * @see Encoder#encode(Object)
+ * @see FaunaField
+ * @see FaunaConstructor
+ * @see FaunaEnum
+ * @see FaunaIgnore
+ * @see Decoder
+ * @see com.faunadb.client.query.Language#Value(Object)
  */
 @SuppressWarnings("unchecked")
 public final class Encoder {
@@ -27,23 +38,12 @@ public final class Encoder {
   private final Stack<Object> stack = new Stack<>();
 
   /**
-   * Encode the specified object into a corresponding FaunaDB value.
-   *
-   * <pre>{@code
-   * encode(10) => new LongV(10)
-   * encode(3.14) => new DoubleV(3.14)
-   * encode(true) => BooleanV.TRUE
-   * encode(null) => NullV.NULL
-   * encode("a string") => new StringV("a string")
-   * encode(new int[] {1, 2}) => new ArrayV(Arrays.asList(1, 2))
-   * encode(Arrays.asList(1, 2)) => new ArrayV(Arrays.asList(1, 2))
-   * encode(new byte[] {1, 2}) => new ByteV(new byte[] {1, 2})
-   * encode(user) => new ObjectV(ImmutableMap.of("user_name", new StringV("john"), "password", new StringV("s3cr3t")))
-   * }</pre>
+   * Encode the specified object into a {@link Value} instance.
    *
    * @param obj Any instance of user defined classes, primitive values or any
    *            generic collection like {@link java.util.List}, {@link java.util.Set} or {@link java.util.Map}
    * @return A FaunaDB {@link Value} corresponding to the given argument
+   * @see com.faunadb.client.query.Language#Value(Object)
    */
   public static Result<Value> encode(Object obj) {
     try {

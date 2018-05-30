@@ -87,26 +87,29 @@ Download from the Maven central repository:
 ##### Basic Usage
 
 ```java
-import com.faunadb.client.*;
-import com.faunadb.client.types.*;
-import com.faunadb.client.types.Value.*;
-import com.google.common.collect.*;
+import com.faunadb.client.FaunaClient;
 
 import static com.faunadb.client.query.Language.*;
 
+/**
+ * This example connects to FaunaDB Cloud using the secret provided
+ * and creates a new database named "my-first-database"
+ */
 public class Main {
-  public static void main(String[] args) throws Exception {
-    FaunaClient client = FaunaClient.builder()
-      .withSecret("your-secret-here")
-      .build();
+    public static void main(String[] args) throws Exception {
+        FaunaClient client =
+            FaunaClient.builder()
+                .withSecret("put-your-key-secret-here")
+                .build();
 
-    ImmutableList<RefV> indexes = client.query(Paginate(Indexes())).get()
-      .at("data").collect(Field.as(Codec.REF));
+        client.query(
+            CreateDatabase(
+                Obj("name", Value("my-first-database"))
+            )
+        ).get();
 
-    System.out.println(indexes);
-
-    client.close();
-  }
+        client.close();
+    }
 }
 ```
 
@@ -123,24 +126,30 @@ libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "2.2.0")
 ##### Basic Usage
 
 ```scala
-import faunadb.FaunaClient
+import faunadb._
 import faunadb.query._
-import faunadb.values._
 import scala.concurrent._
 import scala.concurrent.duration._
 
+/**
+  * This example connects to FaunaDB Cloud using the secret provided
+  * and creates a new database named "my-first-database"
+  */
 object Main extends App {
+
   import ExecutionContext.Implicits._
 
-  val client = FaunaClient(secret = "your-secret-here")
-
-  val indexes = client
-    .query(Paginate(Indexes()))
-    .map(value => value("data").to[Seq[RefV]].get)
-
-  println(
-    Await.result(indexes, Duration.Inf)
+  val client = FaunaClient(
+    secret = "put-your-secret-here"
   )
+
+  val result = client.query(
+    CreateDatabase(
+      Obj("name" -> "my-first-database")
+    )
+  )
+
+  Await.result(result, Duration.Inf)
 
   client.close()
 }

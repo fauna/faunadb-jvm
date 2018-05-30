@@ -2,6 +2,9 @@ package com.faunadb.client.query;
 
 /**
  * A query language expression. Constructors for this class are at the {@link Language} class.
+ * Expressions are not evaluated until sent to a FaunaDB server.
+ *
+ * @see Language
  */
 public abstract class Expr {
 

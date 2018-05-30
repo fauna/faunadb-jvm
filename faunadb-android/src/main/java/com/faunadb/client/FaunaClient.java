@@ -191,7 +191,7 @@ public class FaunaClient {
    * {@link com.faunadb.client.query.Language} class.
    * <p>
    * Responses are modeled as a general response tree. Each node is a {@link Value}, and
-   * can be coerced to structured types through various methods on that class.
+   * can be converted to structured types through various methods on that class.
    *
    * @param expr The query expression to be sent to FaunaDB.
    * @return A {@link ListenableFuture} containing the root node of the Response tree.
