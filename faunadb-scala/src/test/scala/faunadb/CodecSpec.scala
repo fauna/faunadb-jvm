@@ -2,7 +2,7 @@ package faunadb
 
 import faunadb.values._
 import faunadb.values.time.HighPrecisionTime
-import org.joda.time.LocalDate
+import org.joda.time.{ LocalDate, Instant }
 import org.scalatest.{ FlatSpec, Matchers }
 
 class CodecSpec extends FlatSpec with Matchers {
@@ -22,7 +22,7 @@ class CodecSpec extends FlatSpec with Matchers {
     BooleanV(true).to[Boolean].get shouldBe true
 
     DateV("1970-01-03").to[LocalDate].get shouldBe LocalDate.parse("1970-01-03")
-
+    TimeV("1970-01-01T00:05:00.000000000Z").to[Instant].get shouldBe Instant.parse("1970-01-01T00:05:00.000000000Z")
     TimeV("1970-01-01T00:05:00.000000000Z").to[HighPrecisionTime].get shouldBe HighPrecisionTime.parse("1970-01-01T00:05:00.000000000Z")
 
     BytesV(1, 2, 3, 4).to[Array[Byte]].get shouldBe Array[Byte](1, 2, 3, 4)
@@ -160,6 +160,7 @@ class CodecSpec extends FlatSpec with Matchers {
     (false: Value) shouldBe FalseV
 
     (LocalDate.parse("1970-01-03"): Value) shouldBe DateV("1970-01-03")
+    (Instant.parse("1970-01-01T00:05:00.000000000Z"): Value) shouldBe TimeV("1970-01-01T00:05:00.000000000Z")
     (HighPrecisionTime.parse("1970-01-01T00:05:00.000000000Z"): Value) shouldBe TimeV("1970-01-01T00:05:00.000000000Z")
 
     (Array[Byte](1, 2, 3, 4): Value) shouldBe BytesV(1, 2, 3, 4)

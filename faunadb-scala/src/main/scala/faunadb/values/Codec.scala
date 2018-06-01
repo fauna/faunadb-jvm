@@ -256,6 +256,10 @@ object Encoder {
     def encode(t: Boolean) = BooleanV(t)
   }
 
+  implicit object InstantEncoder extends Encoder[Instant] {
+    override def encode(t: Instant): Value = TimeV(t)
+  }
+
   implicit object LocalDateEncoder extends Encoder[LocalDate] {
     def encode(t: LocalDate) = if (t != null) DateV(t) else NullV
   }
