@@ -39,7 +39,7 @@ And then adding the following utility method:
 Now the return value can be pretty printed by calling:
 
 ```java
-    Value results = adminClient.query( ....
+    Value results = adminClient.query( ....  )
     System.out.println("Query results:\n " + toPrettyJson(results));
 ```
 
@@ -231,7 +231,7 @@ That query returns a list of resource references to all the spells in the index.
 
 ### How to work with user defined classes
 
-Instead of manually creating your objects via the DSL (e.g. the ObjectV), you can use annotations to automatically encode and decode the class to user-defined types.  These transform the types into the equivalent `Value` types.
+Instead of manually creating your objects via the DSL (e.g. the Obj()), you can use annotations to automatically encode and decode the class to user-defined types.  These transform the types into the equivalent `Value` types.
 
 For example a Spell class could be used that defines the fields and constructor:
 
@@ -300,7 +300,7 @@ To persist an instance of `Spell` in FaunaDB:
 Read the spell we just created and convert from a `Value` type back to the `Spell` type:
 
 ```java
-    Value.RefV dragonRef = storeSpellResult.at("ref").to(Value.RefV.class).get();
+    Value dragonRef = storeSpellResult.at("ref");
     Value getDragonResult = client.query(
         Select(Value("data"),
             Get(dragonRef)
@@ -353,17 +353,17 @@ Read a list of all `Spells` out of the `Spells` index and decode back to a Java 
     //Lambda Variable for each spell ref
     String REF_SPELL_ID = "NXT_SPELL";
 
-    //Select causes the return data to be stored in the data field that is expected when the data is covered to a collection
-    //The Map is equivalent to a functional map which maps over the set of all values returned by the paginate.
+    //Map is equivalent to a functional map which maps over the set of all values returned by the paginate.
     //Then for each value in the list it runs the lambda function which gets and returns the value.
+    //Map returns the data in a structure like this -> {"data": [ {"data": ...}, {"data": ...} ]} so the data field needs to be selected out.
+    //SelectAll does this by selecting the nested data with the Path("data", "data")
     Value findAllSpells = client.query(
-        Select(Value("data"),
+        SelectAll(Path("data", "data"),
             Map(
                 Paginate(
                     Match(Index(Value(INDEX_NAME)))
                 ),
-                Lambda(Value(REF_SPELL_ID), Select(Value("data"), Get(Var(REF_SPELL_ID))))
-            )
+                Lambda(Value(REF_SPELL_ID), Get(Var(REF_SPELL_ID))))
         )
     ).get();
 

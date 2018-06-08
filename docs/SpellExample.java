@@ -269,17 +269,17 @@ public class SpellExample {
         //Lambda Variable for each spell ref
         String REF_SPELL_ID = "NXT_SPELL";
 
-        //Select causes the return data to be stored in the data field that is expected when the data is covered to a collection
-        //The Map is equivalent to a functional map which maps over the set of all values returned by the paginate.
+        //Map is equivalent to a functional map which maps over the set of all values returned by the paginate.
         //Then for each value in the list it runs the lambda function which gets and returns the value.
+        //Map returns the data in a structure like this -> {"data": [ {"data": ...}, {"data": ...} ]} so the data field needs to be selected out.
+        //SelectAll does this by selecting the nested data with the Path("data", "data")
         Value findAllSpells = client.query(
-            Select(Value("data"),
+            SelectAll(Path("data", "data"),
                 Map(
                     Paginate(
                         Match(Index(Value(INDEX_NAME)))
                     ),
-                    Lambda(Value(REF_SPELL_ID), Select(Value("data"), Get(Var(REF_SPELL_ID))))
-                )
+                    Lambda(Value(REF_SPELL_ID), Get(Var(REF_SPELL_ID))))
             )
         ).get();
 
