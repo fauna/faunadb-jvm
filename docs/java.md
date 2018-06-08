@@ -343,12 +343,15 @@ To persist a Java list of `Spell` to FaunaDB encode the list into a `Value`:
     //Lambda Variable for each spell
     String NXT_SPELL = "NXT_SPELL";
 
+    //Encode the list of spells into an expression
+    Expr encodedSpellsList = Value(spellList);
+
     //This query can be approximately read as for each spell in the list of spells evaluate the lambda function.
     //That lambda function creates a temporary variable with each spell in the list and passes it to the create function.
     //The create function then stores that spell in the database
     Value spellsListSave = client.query(
         Foreach(
-            Value(spellList),
+            encodedSpellsList,
             Lambda(Value(NXT_SPELL),
                 Create(
                     Class(Value(SPELLS_CLASS)),
