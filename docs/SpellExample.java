@@ -25,9 +25,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.FaunaClient;
+import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,7 +80,7 @@ public class SpellExample {
         String DB_NAME = "demo";
 
         Value dbResults = adminClient.query(
-            Arr(
+            Do(
                 If(
                     Exists(Database(DB_NAME)),
                     Delete(Database(DB_NAME)),
@@ -159,7 +161,8 @@ public class SpellExample {
         ).get();
         System.out.println("Added spell to class " + SPELLS_CLASS + ":\n " + toPrettyJson(addHippoResults) + "\n");
 
-        Value.RefV hippoRef = addHippoResults.at("ref").to(Value.RefV.class).get();
+        //The results at 'ref' are are a resource pointer to the class that was just created.
+        Value hippoRef = addHippoResults.at("ref");
         System.out.println("hippoRef = " + hippoRef);
 
         /*
@@ -167,11 +170,7 @@ public class SpellExample {
          */
 
         Value getHippoResults = client.query(
-            Get(Ref(
-                Class("spells"),
-                Value(hippoRef.getId())
-                )
-            )
+            Get(hippoRef)
         ).get();
         System.out.println("Hippo Spells:\n " + toPrettyJson(getHippoResults) + "\n");
 
@@ -180,24 +179,18 @@ public class SpellExample {
         String element = data.get(Field.at("element")).to(String.class).get();
         System.out.println("spell element = " + element);
 
-        Value.ObjectV objectV = getHippoResults.at("data").to(Value.ObjectV.class).get();
-        System.out.println("objectV = " + objectV);
-
         /*
          * Query for all the spells in the index
          */
         Value queryIndexResults = client.query(
-            Select(Value("data"),
+            SelectAll(Path("data", "id"),
                 Paginate(
                     Match(Index(Value(INDEX_NAME)))
                 ))
         ).get();
-        System.out.println("All spells:\n " + toPrettyJson(queryIndexResults) + "\n");
 
-        //convert the query results to a collection of refrences
-        Collection<Value.RefV> refVCollection = queryIndexResults.asCollectionOf(Value.RefV.class).get();
-        List<String> listOfIds = refVCollection.stream().map(refV -> refV.getId()).collect(Collectors.toList());
-        System.out.println("Spell ref ids = " + listOfIds);
+        Collection<String>  spellsRefIds = queryIndexResults.asCollectionOf(String.class).get();
+        System.out.println("spellsRefIds = " + spellsRefIds);
 
         /*
          * Store a Spell java class
@@ -214,12 +207,10 @@ public class SpellExample {
         /*
          * Read the spell we just created
          */
-        Value.RefV dragonRef = storeSpellResult.at("ref").to(Value.RefV.class).get();
+        Value dragonRef = storeSpellResult.at("ref");
         Value getDragonResult = client.query(
             Select(Value("data"),
-                Get(
-                    Ref(Class(SPELLS_CLASS), Value(dragonRef.getId()))
-                )
+                Get(dragonRef)
             )
         ).get();
         Spell spell = getDragonResult.to(Spell.class).get();

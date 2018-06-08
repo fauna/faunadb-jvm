@@ -227,20 +227,18 @@ The `query` method takes an `Expr` object. `Expr` objects can be composed with o
 
 ```java
     Value queryIndexResults = client.query(
-        Select(Value("data"),
+        SelectAll(Path("data", "id"),
             Paginate(
-            Match(Index(Value(INDEX_NAME)))
-        ))
+                Match(Index(Value(INDEX_NAME)))
+            ))
     ).get();
-    System.out.println("All spells:\n " + toPrettyJson(queryIndexResults) + "\n");
 ```
 
 That query returns a list of resource references to all the spells in the index.  The list of references can be extracted from the results by using:
 
 ```java
-    Collection<Value.RefV> refVCollection = queryIndexResults.asCollectionOf(Value.RefV.class).get();
-    List<String> listOfIds = refVCollection.stream().map(refV -> refV.getId()).collect(Collectors.toList());
-    System.out.println("Spell ref ids = " + listOfIds);
+    Collection<String>  spellsRefIds = queryIndexResults.asCollectionOf(String.class).get();
+    System.out.println("spellsRefIds = " + spellsRefIds);
 ```
 
 
