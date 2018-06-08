@@ -290,7 +290,16 @@ For example a Spell class could be used that defines the fields and constructor:
     }
 ```
 
-Then a spell can be saved using:
+There are three attributes that can be used to change the behavior of the `Encoder` and `Decoder`:
+
+- `FaunaField`: Used to override a custom field name and/or provide a default value for that field. If this attribute is not specified, the member name will be used instead. Can be used on fields, properties and constructor arguments.
+- `FaunaConstructor`: Used to mark a constructor or a public static method as the method used to instantiate the specified type. This attribute can be used only once per class.
+- `FaunaIgnore`: Used to ignore a specific member. Can be used on fields, properties and constructors arguments. If used on a constructor argument, that argument must have a default value.
+
+### Encoding and decoding user defined classes
+
+To persist an instance of `Spell` in FaunaDB:
+
 
 ```java
     Spell newSpell = new Spell("Water Dragon's Claw", "water", 25);
@@ -303,7 +312,7 @@ Then a spell can be saved using:
     System.out.println("Stored spell:\n " + toPrettyJson(storeSpellResult));
 ```
 
-Read the spell we just created:
+Read the spell we just created and convert from a `Value` type back to the `Spell` type:
 
 ```java
     Value.RefV dragonRef = storeSpellResult.at("ref").to(Value.RefV.class).get();
@@ -318,4 +327,64 @@ Read the spell we just created:
     ).get();
     Spell spell = getDragonResult.to(Spell.class).get();
     System.out.println("dragon spell: " + spell);
+```
+
+### Encoding and decoding lists of user defined classes
+
+To persist a Java list of `Spell` to FaunaDB encode the list into a `Value`:
+
+
+```java
+    Spell spellOne = new Spell("Chill Touch", "ice", 18);
+    Spell spellTwo = new Spell("Dancing Lights", "fire", 45);
+    Spell spellThree = new Spell("Fire Bolt", "fire", 32);
+    List<Spell> spellList = Arrays.asList(spellOne, spellTwo, spellThree);
+
+    //Lambda Variable for each spell
+    String NXT_SPELL = "NXT_SPELL";
+
+    //This query can be approximately read as for each spell in the list of spells evaluate the lambda function.
+    //That lambda function creates a temporary variable with each spell in the list and passes it to the create function.
+    //The create function then stores that spell in the database
+    Value spellsListSave = client.query(
+        Foreach(
+            Value(spellList),
+            Lambda(Value(NXT_SPELL),
+                Create(
+                    Class(Value(SPELLS_CLASS)),
+                    Obj("data", Var(NXT_SPELL))
+                )
+            )
+        )
+    ).get();
+
+    System.out.println("Created list of spells from java list: \n" + toPrettyJson(spellsListSave));
+    Collection<Spell> spellCollection = spellsListSave.asCollectionOf(Spell.class).get();
+    System.out.println("save " + spellCollection.size() + " spells:");
+    spellCollection.forEach(nextSpell -> System.out.println("   " + nextSpell));
+```
+
+Read a list of all `Spells` out of the `Spells` index and decode back to a Java List of `Spells`:
+
+```java
+    //Lambda Variable for each spell ref
+    String REF_SPELL_ID = "NXT_SPELL";
+
+    //Select causes the return data to be stored in the data field that is expected when the data is covered to a collection
+    //The Map is equivalent to a functional map which maps over the set of all values returned by the paginate.
+    //Then for each value in the list it runs the lambda function which gets and returns the value.
+    Value findAllSpells = client.query(
+        Select(Value("data"),
+            Map(
+                Paginate(
+                    Match(Index(Value(INDEX_NAME)))
+                ),
+                Lambda(Value(REF_SPELL_ID), Select(Value("data"), Get(Var(REF_SPELL_ID))))
+            )
+        )
+    ).get();
+
+    Collection<Spell> allSpellsCollection = findAllSpells.asCollectionOf(Spell.class).get();
+    System.out.println("read " + allSpellsCollection.size() + " spells:");
+    allSpellsCollection.forEach(nextSpell -> System.out.println("   " + nextSpell));
 ```

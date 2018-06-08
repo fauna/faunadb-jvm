@@ -217,15 +217,74 @@ public class SpellExample {
         Value.RefV dragonRef = storeSpellResult.at("ref").to(Value.RefV.class).get();
         Value getDragonResult = client.query(
             Select(Value("data"),
-                Get(Ref(
-                    Class(SPELLS_CLASS),
-                    Value(dragonRef.getId())
-                    )
+                Get(
+                    Ref(Class(SPELLS_CLASS), Value(dragonRef.getId()))
                 )
             )
         ).get();
         Spell spell = getDragonResult.to(Spell.class).get();
         System.out.println("dragon spell: " + spell);
+
+        /*
+         * Store a list of Spells
+         */
+
+        Spell spellOne = new Spell("Chill Touch", "ice", 18);
+        Spell spellTwo = new Spell("Dancing Lights", "fire", 45);
+        Spell spellThree = new Spell("Fire Bolt", "fire", 32);
+        List<Spell> spellList = Arrays.asList(spellOne, spellTwo, spellThree);
+
+        //Lambda Variable for each spell
+        String NXT_SPELL = "NXT_SPELL";
+
+        //This query can be approximately read as for each spell in the list of spells evaluate the lambda function.
+        //That lambda function creates a temporary variable with each spell in the list and passes it to the create function.
+        //The create function then stores that spell in the database
+        Value spellsListSave = client.query(
+            Foreach(
+                Value(spellList),
+                Lambda(Value(NXT_SPELL),
+                    Create(
+                        Class(Value(SPELLS_CLASS)),
+                        Obj("data", Var(NXT_SPELL))
+                    )
+                )
+            )
+        ).get();
+
+        System.out.println("Created list of spells from java list: \n" + toPrettyJson(spellsListSave));
+        Collection<Spell> spellCollection = spellsListSave.asCollectionOf(Spell.class).get();
+        System.out.println("save " + spellCollection.size() + " spells:");
+        spellCollection.forEach(nextSpell -> System.out.println("   " + nextSpell));
+
+        System.out.println("\n");
+
+        /*
+         * Read all Spells for the Spells Index
+         */
+
+        //Lambda Variable for each spell ref
+        String REF_SPELL_ID = "NXT_SPELL";
+
+        //Select causes the return data to be stored in the data field that is expected when the data is covered to a collection
+        //The Map is equivalent to a functional map which maps over the set of all values returned by the paginate.
+        //Then for each value in the list it runs the lambda function which gets and returns the value.
+        Value findAllSpells = client.query(
+            Select(Value("data"),
+                Map(
+                    Paginate(
+                        Match(Index(Value(INDEX_NAME)))
+                    ),
+                    Lambda(Value(REF_SPELL_ID), Select(Value("data"), Get(Var(REF_SPELL_ID))))
+                )
+            )
+        ).get();
+
+        Collection<Spell> allSpellsCollection = findAllSpells.asCollectionOf(Spell.class).get();
+        System.out.println("read " + allSpellsCollection.size() + " spells:");
+        allSpellsCollection.forEach(nextSpell -> System.out.println("   " + nextSpell));
+
+        System.out.println("\n");
 
         /*
          * Just to keep things neat and tidy, delete the database and close the client connection
