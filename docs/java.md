@@ -65,7 +65,7 @@ If you are using the FaunaDB-Cloud version:
     String DB_NAME = "demo";
 
     Value dbResults = adminClient.query(
-        Arr(
+        Do(
             If(
                 Exists(Database(DB_NAME)),
                 Delete(Database(DB_NAME)),
@@ -158,36 +158,12 @@ Adding data to a class returns a reference to the resource with the reference, a
   }
 }```
 
-Objects fields are accessed through `at` methods of `Value` class. It's possible to access fields by names if the value represents an object or by index if it represents an array. Also it's possible to convert `Value` class to its primitive correspondent using `to` methods specifying a type.  For example to retrieve the resource reference of the object use the following to get the `ref` field and convert it to a RefV:
+Objects fields are accessed through `at` methods of `Value` class. It's possible to access fields by names if the value represents an object or by index if it represents an array. Also it's possible to convert `Value` class to its primitive correspondent using `to` methods specifying a type.  For example to retrieve the resource reference of the returned Value use the following to get the `ref` field:
 
 ```java
-    Value.RefV hippoRef = addHippoResults.at("ref").to(Value.RefV.class).get();
+    //The results at 'ref' are are a resource pointer to the class that was just created.
+    Value hippoRef = addHippoResults.at("ref");
     System.out.println("hippoRef = " + hippoRef);
-```
-
-#### How to safely work with result objects
-
-This object represents the result of an operation and it might be success or a failure. All conversion operations returns an object like this. This way it's possible to avoid check for nullability everywhere in the code.
-
-```java
-    Optional<Value.RefV> optHippoRef = addHippoResults.at("ref").to(Value.RefV.class).getOptional();
-    if (optHippoRef.isPresent()) {
-        System.out.println("hippoRef id = " + optHippoRef.get().getId());
-        processHippos(optHippoRef.get());
-    }
-    else {
-        System.out.println("Something went wrong creating the hippo");
-    }
-```
-
-Optionally it's possible transform one `Result<T>` into another `Result<T>` of different type using `map` and `flatMap`:
-
-If the `result` represents an failure all calls to `map` and `flatMap` are ignored and it returns a new failure with the same error message. See `com.faunadb.client.types.Result` for details.
-
-```java
-    String refID = addHippoResults.at("ref").to(Value.RefV.class).map(ref1 -> ref1.getId()).get();
-    System.out.println("refID = " + refID);
-
 ```
 
 #### How to execute a query
@@ -196,11 +172,7 @@ The `query` method takes an `Expr` object. `Expr` objects can be composed with o
 
 ```java
     Value getHippoResults = client.query(
-        Get(Ref(
-            Class(SPELLS_CLASS),
-            Value(hippoRef.getId())
-            )
-        )
+        Select(Value("data"),Get(hippoRef))
     ).get();
     System.out.println("Hippo Spells:\n " + toPrettyJson(getHippoResults) + "\n");
 ```
@@ -210,15 +182,30 @@ The `query` method takes an `Expr` object. `Expr` objects can be composed with o
 That query returns the data in the form of a json object.  The data can be extracted from the results by using:
 
 ```java
-    Value data = getHippoResults.get(Field.at("data"));
-    String element = data.get(Field.at("element")).to(String.class).get();
+    //convert the hippo results into primitive elements
+    String element = getHippoResults.get(Field.at("element").to(String.class));
     System.out.println("spell element = " + element);
-
-    Value.ObjectV objectV = getHippoResults.at("data").to(Value.ObjectV.class).get();
-    System.out.println("objectV = " + objectV);
 ```
 
 Later on we will show a better method that uses User Defined types to transform this automatically
+
+#### How to safely work with result objects
+
+This object represents the result of an operation and it might be success or a failure. All conversion operations returns an object like this. This way it's possible to avoid check for nullability everywhere in the code.
+
+```java
+    //This would return an empty option if the field is not found or the conversion fails
+    Optional<String> optSpellElement = getHippoResults.getOptional(Field.at("element").to(String.class));
+    if (optSpellElement.isPresent()) {
+        String element2 = optSpellElement.get();
+        System.out.println("optional spell element 2 = " + element2);
+    }
+    else {
+        System.out.println("Something went wrong reading the spell");
+    }
+```
+
+Optionally it's possible transform one `Result<T>` into another `Result<T>` of different type using `map` and `flatMap`.  If the `result` represents an failure all calls to `map` and `flatMap` are ignored and it returns a new failure with the same error message. See `com.faunadb.client.types.Result` for details.
 
 
 #### How to execute a list query and retrieve a collection of the results
@@ -316,11 +303,7 @@ Read the spell we just created and convert from a `Value` type back to the `Spel
     Value.RefV dragonRef = storeSpellResult.at("ref").to(Value.RefV.class).get();
     Value getDragonResult = client.query(
         Select(Value("data"),
-            Get(Ref(
-                Class(SPELLS_CLASS),
-                Value(dragonRef.getId())
-                )
-            )
+            Get(dragonRef)
         )
     ).get();
     Spell spell = getDragonResult.to(Spell.class).get();
@@ -330,7 +313,6 @@ Read the spell we just created and convert from a `Value` type back to the `Spel
 ### Encoding and decoding lists of user defined classes
 
 To persist a Java list of `Spell` to FaunaDB encode the list into a `Value`:
-
 
 ```java
     Spell spellOne = new Spell("Chill Touch", "ice", 18);

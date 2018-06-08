@@ -28,11 +28,11 @@ import com.faunadb.client.FaunaClient;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
+import com.google.common.base.Optional;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.faunadb.client.query.Language.*;
 
@@ -170,14 +170,23 @@ public class SpellExample {
          */
 
         Value getHippoResults = client.query(
-            Get(hippoRef)
+            Select(Value("data"),Get(hippoRef))
         ).get();
-        System.out.println("Hippo Spells:\n " + toPrettyJson(getHippoResults) + "\n");
+        System.out.println("Hippo Spell:\n " + toPrettyJson(getHippoResults) + "\n");
 
         //convert the hippo results into primitive elements
-        Value data = getHippoResults.get(Field.at("data"));
-        String element = data.get(Field.at("element")).to(String.class).get();
+        String element = getHippoResults.get(Field.at("element").to(String.class));
         System.out.println("spell element = " + element);
+
+        //This would return an empty option if the field is not found or the conversion fails
+        Optional<String> optSpellElement = getHippoResults.getOptional(Field.at("element").to(String.class));
+        if (optSpellElement.isPresent()) {
+            String element2 = optSpellElement.get();
+            System.out.println("optional spell element 2 = " + element2);
+        }
+        else {
+            System.out.println("Something went wrong reading the spell");
+        }
 
         /*
          * Query for all the spells in the index
