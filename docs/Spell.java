@@ -10,7 +10,7 @@ public class Spell {
     @FaunaField private String element;
     @FaunaField private int cost;
 
-    @FaunaIgnore  private String notUsed;
+    @FaunaIgnore private String notUsed;
 
     @FaunaConstructor
     public Spell(@FaunaField("name") String name, @FaunaField("element") String element, @FaunaField("cost") int cost) {

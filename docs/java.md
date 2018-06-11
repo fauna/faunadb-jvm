@@ -49,7 +49,7 @@ An admin connection should only be used to create top level databases.  After th
 
 If you are using the FaunaDB-Cloud version:
  - remove the 'withEndpoint line below
- - substitute your secret for "secret" below
+ - "substitute "secret" for your authentication key's secret
 
 ```java
     FaunaClient adminClient = FaunaClient.builder()
@@ -109,8 +109,7 @@ After the database is created, a new key specific to that database can be used t
 
     Value indexResults = client.query(
         CreateIndex(
-            Obj("name", Value(INDEX_NAME), "source", Class(Value(SPELLS_CLASS))
-            )
+            Obj("name", Value(INDEX_NAME), "source", Class(Value(SPELLS_CLASS)))
         )
     ).get();
     System.out.println("Create Index for " + DB_NAME + ":\n " + toPrettyJson(indexResults) + "\n");
@@ -161,7 +160,7 @@ Adding data to a class returns a reference to the resource with the reference, a
 Objects fields are accessed through `at` methods of `Value` class. It's possible to access fields by names if the value represents an object or by index if it represents an array. Also it's possible to convert `Value` class to its primitive correspondent using `to` methods specifying a type.  For example to retrieve the resource reference of the returned Value use the following to get the `ref` field:
 
 ```java
-    //The results at 'ref' are are a resource pointer to the class that was just created.
+    //The results at 'ref' are a resource pointer to the class that was just created.
     Value hippoRef = addHippoResults.at("ref");
     System.out.println("hippoRef = " + hippoRef);
 ```
@@ -183,7 +182,7 @@ That query returns the data in the form of a json object.  The data can be extra
 
 ```java
     //convert the hippo results into primitive elements
-    String element = getHippoResults.get(Field.at("element").to(String.class));
+    String element = getHippoResults.at("element").to(String.class).get();
     System.out.println("spell element = " + element);
 ```
 
@@ -195,7 +194,7 @@ This object represents the result of an operation and it might be success or a f
 
 ```java
     //This would return an empty option if the field is not found or the conversion fails
-    Optional<String> optSpellElement = getHippoResults.getOptional(Field.at("element").to(String.class));
+    Optional<String> optSpellElement = getHippoResults.at("element").to(String.class).getOptional();
     if (optSpellElement.isPresent()) {
         String element2 = optSpellElement.get();
         System.out.println("optional spell element 2 = " + element2);

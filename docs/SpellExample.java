@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.fauna.learn;
 
 /*
@@ -36,14 +20,6 @@ import java.util.List;
 
 import static com.faunadb.client.query.Language.*;
 
-/*
- * These are the required imports for Fauna.
- *
- * For these examples we are using the 2.1.0 version of the JVM driver. Also notice that we aliasing
- * the query and values part of the API to make it more obvious we we are using Fauna functionality.
- *
- */
-
 public class SpellExample {
 
     private static ObjectMapper mapper = getMapper();
@@ -64,14 +40,13 @@ public class SpellExample {
          *
          * If you are using the FaunaDB-Cloud version:
          *  - remove the 'withEndpoint line below
-         *  - substitute your secret for "secret" below
+         *  - "substitute "secret" for your authentication key's secret
          */
         FaunaClient adminClient = FaunaClient.builder()
             .withEndpoint("http://127.0.0.1:8443")
             .withSecret("secret")
             .build();
         System.out.println("Succesfully connected to FaunaDB as Admin!");
-
 
         /*
          * Create a database
@@ -101,7 +76,6 @@ public class SpellExample {
         String key = keyResults.at("secret").to(String.class).get();
         FaunaClient client = adminClient.newSessionClient(key);
         System.out.println("Connected to Fauna database " + DB_NAME + " with server role\n");
-        adminClient.close();
 
 
         /*
@@ -119,8 +93,7 @@ public class SpellExample {
 
         Value indexResults = client.query(
             CreateIndex(
-                Obj("name", Value(INDEX_NAME), "source", Class(Value(SPELLS_CLASS))
-                )
+                Obj("name", Value(INDEX_NAME), "source", Class(Value(SPELLS_CLASS)))
             )
         ).get();
         System.out.println("Create Index for " + DB_NAME + ":\n " + toPrettyJson(indexResults) + "\n");
@@ -175,11 +148,11 @@ public class SpellExample {
         System.out.println("Hippo Spell:\n " + toPrettyJson(getHippoResults) + "\n");
 
         //convert the hippo results into primitive elements
-        String element = getHippoResults.get(Field.at("element").to(String.class));
+        String element = getHippoResults.at("element").to(String.class).get();
         System.out.println("spell element = " + element);
 
         //This would return an empty option if the field is not found or the conversion fails
-        Optional<String> optSpellElement = getHippoResults.getOptional(Field.at("element").to(String.class));
+        Optional<String> optSpellElement = getHippoResults.at("element").to(String.class).getOptional();
         if (optSpellElement.isPresent()) {
             String element2 = optSpellElement.get();
             System.out.println("optional spell element 2 = " + element2);
@@ -293,13 +266,11 @@ public class SpellExample {
          * Just to keep things neat and tidy, delete the database and close the client connection
          */
         deleteDB(adminClient, DB_NAME);
+        adminClient.close();
         System.out.println("Disconnected from FaunaDB as Admin!");
-
-        // add this at the end of execution to make things shut down nicely
-        System.exit(0);
     }
 
-    private static void deleteDB(FaunaClient adminClient, String dbName) throws InterruptedException, java.util.concurrent.ExecutionException, JsonProcessingException {
+    private static void deleteDB(FaunaClient adminClient, String dbName) throws Exception {
         /*
          * Delete the Database created
          */

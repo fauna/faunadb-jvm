@@ -26,7 +26,7 @@ Javadocs and Scaladocs are hosted on GitHub:
 Details Documentation for each language:
 
 * [Java](docs/java.md)
-* [Scala](docs/java.md)
+* [Scala](docs/scala.md)
 
 ## Dependencies
 
