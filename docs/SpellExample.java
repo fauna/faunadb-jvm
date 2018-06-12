@@ -1,16 +1,10 @@
 package com.fauna.learn;
 
-/*
- * These imports are for basic functionality around logging and JSON handling and Futures.
- * They should best be thought of as a convenience items for our demo apps.
- */
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.FaunaClient;
 import com.faunadb.client.query.Expr;
-import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.google.common.base.Optional;
 
@@ -39,8 +33,8 @@ public class SpellExample {
          * Create an admin connection to FaunaDB.
          *
          * If you are using the FaunaDB-Cloud version:
-         *  - remove the 'withEndpoint line below
-         *  - "substitute "secret" for your authentication key's secret
+         *  - remove the 'withEndpoint' line below
+         *  - substitute your secret for "secret" below
          */
         FaunaClient adminClient = FaunaClient.builder()
             .withEndpoint("http://127.0.0.1:8443")
@@ -74,10 +68,23 @@ public class SpellExample {
         ).get();
 
         String key = keyResults.at("secret").to(String.class).get();
-        FaunaClient client = adminClient.newSessionClient(key);
-        System.out.println("Connected to Fauna database " + DB_NAME + " with server role\n");
 
+        //Create the client query in a try-with-resources to ensure it gets closed.
+        //Because a Fauna Client implements AutoCloseable it will be closed when the try block finishes
+        try (FaunaClient client = adminClient.newSessionClient(key)) {
+            System.out.println("Connected to Fauna database " + DB_NAME + " with server role\n");
+            runSpellExamples(DB_NAME, client);
+        }
 
+        /*
+         * Delete the database and close the admin connection
+         */
+        deleteDB(adminClient, DB_NAME);
+        adminClient.close();
+        System.out.println("Disconnected from FaunaDB as Admin!");
+    }
+
+    private static void runSpellExamples(String DB_NAME, FaunaClient client) throws Exception {
         /*
          * Create the spell class and index
          */
@@ -97,8 +104,7 @@ public class SpellExample {
             )
         ).get();
         System.out.println("Create Index for " + DB_NAME + ":\n " + toPrettyJson(indexResults) + "\n");
-
-
+        
         /*
          * Add some entries to the spells class
          */
@@ -134,7 +140,7 @@ public class SpellExample {
         ).get();
         System.out.println("Added spell to class " + SPELLS_CLASS + ":\n " + toPrettyJson(addHippoResults) + "\n");
 
-        //The results at 'ref' are are a resource pointer to the class that was just created.
+        //The results at 'ref' are a resource pointer to the class that was just created.
         Value hippoRef = addHippoResults.at("ref");
         System.out.println("hippoRef = " + hippoRef);
 
@@ -143,7 +149,7 @@ public class SpellExample {
          */
 
         Value getHippoResults = client.query(
-            Select(Value("data"),Get(hippoRef))
+            Select(Value("data"), Get(hippoRef))
         ).get();
         System.out.println("Hippo Spell:\n " + toPrettyJson(getHippoResults) + "\n");
 
@@ -156,8 +162,7 @@ public class SpellExample {
         if (optSpellElement.isPresent()) {
             String element2 = optSpellElement.get();
             System.out.println("optional spell element 2 = " + element2);
-        }
-        else {
+        } else {
             System.out.println("Something went wrong reading the spell");
         }
 
@@ -171,7 +176,7 @@ public class SpellExample {
                 ))
         ).get();
 
-        Collection<String>  spellsRefIds = queryIndexResults.asCollectionOf(String.class).get();
+        Collection<String> spellsRefIds = queryIndexResults.asCollectionOf(String.class).get();
         System.out.println("spellsRefIds = " + spellsRefIds);
 
         /*
@@ -242,10 +247,9 @@ public class SpellExample {
         //Lambda Variable for each spell ref
         String REF_SPELL_ID = "NXT_SPELL";
 
-        //Map is equivalent to a functional map which maps over the set of all values returned by the paginate.
+        //Select causes the return data to be stored in the data field that is expected when the data is covered to a collection
+        //The Map is equivalent to a functional map which maps over the set of all values returned by the paginate.
         //Then for each value in the list it runs the lambda function which gets and returns the value.
-        //Map returns the data in a structure like this -> {"data": [ {"data": ...}, {"data": ...} ]} so the data field needs to be selected out.
-        //SelectAll does this by selecting the nested data with the Path("data", "data")
         Value findAllSpells = client.query(
             SelectAll(Path("data", "data"),
                 Map(
@@ -259,15 +263,6 @@ public class SpellExample {
         Collection<Spell> allSpellsCollection = findAllSpells.asCollectionOf(Spell.class).get();
         System.out.println("read " + allSpellsCollection.size() + " spells:");
         allSpellsCollection.forEach(nextSpell -> System.out.println("   " + nextSpell));
-
-        System.out.println("\n");
-
-        /*
-         * Just to keep things neat and tidy, delete the database and close the client connection
-         */
-        deleteDB(adminClient, DB_NAME);
-        adminClient.close();
-        System.out.println("Disconnected from FaunaDB as Admin!");
     }
 
     private static void deleteDB(FaunaClient adminClient, String dbName) throws Exception {

@@ -48,8 +48,8 @@ Now the return value can be pretty printed by calling:
 An admin connection should only be used to create top level databases.  After the database is created, a separate client connection should be created.
 
 If you are using the FaunaDB-Cloud version:
- - remove the 'withEndpoint line below
- - "substitute "secret" for your authentication key's secret
+ - remove the 'withEndpoint' line below
+ - substitute "secret" for your authentication key's secret
 
 ```java
     FaunaClient adminClient = FaunaClient.builder()
@@ -89,12 +89,9 @@ After the database is created, a new key specific to that database can be used t
     String key = keyResults.at("secret").to(String.class).get();
     FaunaClient client = adminClient.newSessionClient(key);
     System.out.println("Connected to Fauna database " + DB_NAME + " with server role\n");
-    //tidy things up by closing the admin connection
-    adminClient.close();
 ```
 
 #### How to create a class and index
-
 
 ```java
     String SPELLS_CLASS = "spells";
