@@ -3,46 +3,6 @@
 
 [The complete Java example is here](SpellExample.java)
 
-#### How to parse query results
-
-
-Every fauna query returns a `ListenableFuture<Value>`.  Value is the json representation of the query response.  It can be pretty printed by adding a jackson dependency:
-
-```xml
-  <dependencies>
-  ...
-    <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>2.9.5</version>
-    </dependency>
-  ...
-</dependencies>
-```
-
-And then adding the following utility method:
-
-```java
-    private static ObjectMapper mapper = getMapper();
-
-    private static ObjectMapper getMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return mapper;
-    }
-
-    private static String toPrettyJson(Value value) throws JsonProcessingException {
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(value);
-    }
-```
-
-Now the return value can be pretty printed by calling:
-
-```java
-    Value results = adminClient.query( ....  )
-    System.out.println("Query results:\n " + toPrettyJson(results));
-```
-
 #### How to create an admin connection to Fauna.
 
 An admin connection should only be used to create top level databases.  After the database is created, a separate client connection should be created.
@@ -74,7 +34,7 @@ If you are using the FaunaDB-Cloud version:
             CreateDatabase(Obj("name", Value(DB_NAME)))
         )
     ).get();
-    System.out.println("Successfully created database: " + DB_NAME + ":\n " + toPrettyJson(dbResults));
+    System.out.println("Successfully created database: " + dbResults.at("name").to(String.class).get() + "\n" + dbResults + "\n");
 ```
 
 #### How to create a client connection to the database
@@ -102,14 +62,14 @@ After the database is created, a new key specific to that database can be used t
             Obj("name", Value(SPELLS_CLASS))
         )
     ).get();
-    System.out.println("Create Class for " + DB_NAME + ":\n " + toPrettyJson(classResults) + "\n");
+    System.out.println("Create Class for " + DB_NAME + ":\n " + classResults + "\n");
 
     Value indexResults = client.query(
         CreateIndex(
             Obj("name", Value(INDEX_NAME), "source", Class(Value(SPELLS_CLASS)))
         )
     ).get();
-    System.out.println("Create Index for " + DB_NAME + ":\n " + toPrettyJson(indexResults) + "\n");
+    System.out.println("Create Index for " + DB_NAME + ":\n " + indexResults + "\n");
 ```
 
 #### How to add entries to a class
@@ -123,7 +83,7 @@ After the database is created, a new key specific to that database can be used t
             )
         )
     ).get();
-    System.out.println("Added spell to class " + SPELLS_CLASS + ":\n " + toPrettyJson(addFireResults) + "\n");
+    System.out.println("Added spell to class " + SPELLS_CLASS + ":\n " + addFireResults + "\n");
 
     Value addHippoResults = client.query(
         Create(
@@ -133,7 +93,7 @@ After the database is created, a new key specific to that database can be used t
             )
         )
     ).get();
-    System.out.println("Added spell to class " + SPELLS_CLASS + ":\n " + toPrettyJson(addHippoResults) + "\n");
+    System.out.println("Added spell to class " + SPELLS_CLASS + ":\n " + addHippoResults + "\n");
 
 ```
 
@@ -170,7 +130,7 @@ The `query` method takes an `Expr` object. `Expr` objects can be composed with o
     Value getHippoResults = client.query(
         Select(Value("data"),Get(hippoRef))
     ).get();
-    System.out.println("Hippo Spells:\n " + toPrettyJson(getHippoResults) + "\n");
+    System.out.println("Hippo Spells:\n " + getHippoResults + "\n");
 ```
 
 #### How to retrieve the values from a query result
@@ -290,7 +250,7 @@ To persist an instance of `Spell` in FaunaDB:
             Obj("data", Value(newSpell))
         )
     ).get();
-    System.out.println("Stored spell:\n " + toPrettyJson(storeSpellResult));
+    System.out.println("Stored spell:\n " + storeSpellResult);
 ```
 
 Read the spell we just created and convert from a `Value` type back to the `Spell` type:
@@ -337,7 +297,7 @@ To persist a Java list of `Spell` to FaunaDB encode the list into a `Value`:
         )
     ).get();
 
-    System.out.println("Created list of spells from java list: \n" + toPrettyJson(spellsListSave));
+    System.out.println("Created list of spells from java list: \n" + spellsListSave);
     Collection<Spell> spellCollection = spellsListSave.asCollectionOf(Spell.class).get();
     System.out.println("save " + spellCollection.size() + " spells:");
     spellCollection.forEach(nextSpell -> System.out.println("   " + nextSpell));
