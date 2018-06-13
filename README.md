@@ -23,6 +23,11 @@ Javadocs and Scaladocs are hosted on GitHub:
 * [faunadb-android](http://fauna.github.io/faunadb-jvm/2.2.0/faunadb-android/api/)
 * [faunadb-scala](http://fauna.github.io/faunadb-jvm/2.2.0/faunadb-scala/api/)
 
+Details Documentation for each language:
+
+* [Java](docs/java.md)
+* [Scala](docs/scala.md)
+
 ## Dependencies
 
 ### Shared
@@ -84,7 +89,7 @@ Download from the Maven central repository:
 </dependencies>
 ```
 
-##### Basic Usage
+##### Basic Java Usage
 
 ```java
 import com.faunadb.client.FaunaClient;
@@ -97,12 +102,14 @@ import static com.faunadb.client.query.Language.*;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
-        FaunaClient client =
+
+        //Create an admin connection to FaunaDB.
+        FaunaClient adminClient =
             FaunaClient.builder()
                 .withSecret("put-your-key-secret-here")
                 .build();
 
-        client.query(
+        adminClient.query(
             CreateDatabase(
                 Obj("name", Value("my-first-database"))
             )
@@ -112,6 +119,8 @@ public class Main {
     }
 }
 ```
+
+[Detailed Java Documentation can be found here](docs/java.md)
 
 ### Scala
 
