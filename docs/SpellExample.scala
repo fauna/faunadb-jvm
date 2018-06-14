@@ -8,7 +8,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
  * These are the required imports for Fauna.
  *
  * For these examples we are using the 2.2.0 version of the JVM driver. Also notice that we are doing a global import on
- * the query and values part of the API to make it more obvious we we are using Fauna functionality.
+ * the query and values part of the API to make it more obvious we are using Fauna functionality.
  *
  */
 
@@ -125,7 +125,7 @@ object SpellExample  {
     ))
     println(s"Added spell to class $SPELLS_CLASS:\n $addHippoResults \n")
 
-    //The results at 'ref' are a resource pointer to the class that was just created.
+    //The results at 'ref' are a pointer to the instance of the class that was just created.
     val hippoRef = addHippoResults("ref")
     println(s"hippoRef = $hippoRef \n")
 

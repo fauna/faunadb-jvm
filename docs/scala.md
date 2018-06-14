@@ -114,7 +114,7 @@ Adding data to a class returns a reference to the resource with the reference, a
 Objects fields are accessed through the default method of `Value` class. It's possible to access fields by names if the value represents an object or by index if it represents an array. For example to retrieve the resource reference of the returned Value use the following to get the `ref` field:
 
 ```scala
-    //The results at 'ref' are a resource pointer to the class that was just created.
+    //The results at 'ref' are a pointer to the instance of the class that was just created.
     val hippoRef = addHippoResults("ref")
     println(s"hippoRef = $hippoRef \n")
 ```
