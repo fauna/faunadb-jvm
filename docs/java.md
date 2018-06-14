@@ -114,7 +114,7 @@ Adding data to a class returns a reference to the resource with the reference, a
   }
 }```
 
-Objects fields are accessed through `at` methods of `Value` class. It's possible to access fields by names if the value represents an object or by index if it represents an array. Also it's possible to convert `Value` class to its primitive correspondent using `to` methods specifying a type.  For example to retrieve the resource reference of the returned Value use the following to get the `ref` field:
+Objects fields are accessed through `at` methods of `Value` class. It's possible to access fields by names if the value represents an object or by index if it represents an array.  For example to retrieve the resource reference of the returned Value use the following to get the `ref` field:
 
 ```java
     //The results at 'ref' are a resource pointer to the class that was just created.
@@ -135,20 +135,19 @@ The `query` method takes an `Expr` object. `Expr` objects can be composed with o
 
 #### How to retrieve the values from a query result
 
-That query returns the data in the form of a json object.  The data can be extracted from the results by using:
+That query returns the data in the form of a json object.  It's possible to convert `Value` class to its primitive correspondent using `to` methods specifying a type. For example the data can be extracted from the results by using:
 
 ```java
     //convert the hippo results into primitive elements
-        //convert the hippo results into primitive elements
-        String name = readHippoResults.at("name").to(String.class).get();
-        Integer cost = readHippoResults.at("cost").to(Integer.class).get();
-        String element = readHippoResults.at("element").to(String.class).get();
+    String name = readHippoResults.at("name").to(String.class).get();
+    Integer cost = readHippoResults.at("cost").to(Integer.class).get();
+    String element = readHippoResults.at("element").to(String.class).get();
 
-        System.out.println(String.format(
-            "Spell Details: Name=%s, Const=%d, Element=%s", name, cost, element));
+    System.out.println(String.format(
+        "Spell Details: Name=%s, Const=%d, Element=%s", name, cost, element));
 ```
 
-Later on we will show a better method that uses User Defined types to transform this automatically
+Later on we will show a better method for converting to native types with User Defined types that do this transformation automatically.
 
 #### How to safely work with result objects
 
