@@ -2,7 +2,7 @@
 
 [The complete Scala example is here](SpellExample.scala)
 
-### Handling Fauna query results
+#### Handling Fauna query results\\
 
 A fauna query returns a future of a result.  In real production code you should never block on a future and instead handle it async with map, flatMap, etc.
 
@@ -14,7 +14,7 @@ This small helper method is used to make wrapping every call in await easier:
     def await[T](f: Future[T]): T = Await.result(f, 5.second)
 ```
 
-#### How to create an admin connection to Fauna.
+#### How to create an admin connection to Fauna.\\
 
 An admin connection should only be used to create top level databases.  After the database is created, a separate client connection should be created.
 
@@ -26,7 +26,7 @@ If you are using the FaunaDB-Cloud version:
    val adminClient = FaunaClient("secret", "http://127.0.0.1:8443")
 ```
 
-#### How to conditionally create a database
+#### How to conditionally create a database\\
 
 ```scala
     val DB_NAME = "demo"
@@ -44,7 +44,7 @@ If you are using the FaunaDB-Cloud version:
     println(s"Successfully created database ${dbResults("name").to[String].get} :\n $dbResults \n")
 ```
 
-#### How to create a client connection to the database
+#### How to create a client connection to the database\\
 
 After the database is created, a new key specific to that database can be used to create a client connection to that database.
 
@@ -108,7 +108,8 @@ Adding data to a class returns a reference to the resource with the reference, a
       ....
     }
   }
-}```
+}
+```
 
 Objects fields are accessed through the default method of `Value` class. It's possible to access fields by names if the value represents an object or by index if it represents an array. For example to retrieve the resource reference of the returned Value use the following to get the `ref` field:
 
@@ -120,7 +121,7 @@ Objects fields are accessed through the default method of `Value` class. It's po
 
 #### How to execute a query
 
-The `query` method takes an `Expr` object. `Expr` objects can be composed with others `Expr` to create complex query objects. `com.faunadb.client.query.Language` is a helper class where you can find all available expressions in the library.
+The `query` method takes an `Expr` object. `Expr` objects can be composed with others `Expr` to create complex query objects. `faunadb.query` is a helper package where you can find all available expressions in the library.
 
 ```scala
     Value readHippoResults = client.query(
@@ -184,7 +185,7 @@ That query returns a list of resource references to all the spells in the index.
 ```
 
 
-### How to work with user defined classes
+#### How to work with user defined classes
 
 Instead of manually creating your objects via the DSL (e.g. the Obj()), you can use case classes and codec to automatically encode and decode the class to user-defined types.  These transform the types into the equivalent `Value` types.
 
