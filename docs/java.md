@@ -3,7 +3,7 @@
 
 [The complete Java example is here](SpellExample.java)
 
-#### How to create an admin connection to Fauna.\\
+### How to create an admin connection to Fauna.
 
 An admin connection should only be used to create top level databases.  After the database is created, a separate client connection should be created.
 
@@ -19,7 +19,7 @@ If you are using the FaunaDB-Cloud version:
 
 ```
 
-#### How to conditionally create a database
+### How to conditionally create a database
 
 ```java
     String DB_NAME = "demo";
@@ -37,7 +37,7 @@ If you are using the FaunaDB-Cloud version:
     System.out.println("Successfully created database: " + dbResults.at("name").to(String.class).get() + "\n" + dbResults + "\n");
 ```
 
-#### How to create a client connection to the database
+### How to create a client connection to the database
 
 After the database is created, a new key specific to that database can be used to create a client connection to that database.
 
@@ -51,7 +51,7 @@ After the database is created, a new key specific to that database can be used t
     System.out.println("Connected to Fauna database " + DB_NAME + " with server role\n");
 ```
 
-#### How to create a class and index
+### How to create a class and index
 
 ```java
     String SPELLS_CLASS = "spells";
@@ -72,7 +72,7 @@ After the database is created, a new key specific to that database can be used t
     System.out.println("Create Index for " + DB_NAME + ":\n " + indexResults + "\n");
 ```
 
-#### How to add entries to a class
+### How to add entries to a class
 
 ```java
     Value addFireResults = client.query(
@@ -97,7 +97,7 @@ After the database is created, a new key specific to that database can be used t
 
 ```
 
-#### How to access objects fields and convert to primitive values
+### How to access objects fields and convert to primitive values
 
 Adding data to a class returns a reference to the resource with the reference, a timestamp and the corresponding object in a json structure like:
 
@@ -122,7 +122,7 @@ Objects fields are accessed through `at` methods of `Value` class. It's possible
     System.out.println("hippoRef = " + hippoRef);
 ```
 
-#### How to execute a query
+### How to execute a query
 
 The `query` method takes an `Expr` object. `Expr` objects can be composed with others `Expr` to create complex query objects. `com.faunadb.client.query.Language` is a helper class where you can find all available expressions in the library.
 
@@ -133,7 +133,7 @@ The `query` method takes an `Expr` object. `Expr` objects can be composed with o
     System.out.println("Hippo Spells:\n " + readHippoResults + "\n");
 ```
 
-#### How to retrieve the values from a query result
+### How to retrieve the values from a query result
 
 That query returns the data in the form of a json object.  It's possible to convert `Value` class to its primitive correspondent using `to` methods specifying a type. For example the data can be extracted from the results by using:
 
@@ -149,7 +149,7 @@ That query returns the data in the form of a json object.  It's possible to conv
 
 Later on we will show a better method for converting to native types with User Defined types that do this transformation automatically.
 
-#### How to safely work with result objects
+### How to safely work with result objects
 
 This object represents the result of an operation and it might be success or a failure. All conversion operations returns an object like this. This way it's possible to avoid check for nullability everywhere in the code.
 
@@ -168,7 +168,7 @@ This object represents the result of an operation and it might be success or a f
 Optionally it's possible transform one `Result<T>` into another `Result<T>` of different type using `map` and `flatMap`.  If the `result` represents an failure all calls to `map` and `flatMap` are ignored and it returns a new failure with the same error message. See `com.faunadb.client.types.Result` for details.
 
 
-#### How to execute a list query and retrieve a collection of the results
+### How to execute a list query and retrieve a collection of the results
 
 The `query` method takes an `Expr` object. `Expr` objects can be composed with others `Expr` to create complex query objects. `com.faunadb.client.query.Language` is a helper class where you can find all available expressions in the library.
 
@@ -189,7 +189,7 @@ That query returns a list of resource references to all the spells in the index.
 ```
 
 
-#### How to work with user defined classes
+### How to work with user defined classes
 
 Instead of manually creating your objects via the DSL (e.g. the Obj()), you can use annotations to automatically encode and decode the class to user-defined types.  These transform the types into the equivalent `Value` types.
 
@@ -241,7 +241,7 @@ There are three attributes that can be used to change the behavior of the `Encod
 - `FaunaConstructor`: Used to mark a constructor or a public static method as the method used to instantiate the specified type. This attribute can be used only once per class.
 - `FaunaIgnore`: Used to ignore a specific member. Can be used on fields, properties and constructors arguments. If used on a constructor argument, that argument must have a default value.
 
-#### Encoding and decoding user defined classes
+### Encoding and decoding user defined classes
 
 To persist an instance of `Spell` in FaunaDB:
 
@@ -270,7 +270,7 @@ Read the spell we just created and convert from a `Value` type back to the `Spel
     System.out.println("dragon spell: " + spell);
 ```
 
-#### Encoding and decoding lists of user defined classes
+### Encoding and decoding lists of user defined classes
 
 To persist a Java list of `Spell` to FaunaDB encode the list into a `Value`:
 

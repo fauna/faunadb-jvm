@@ -2,7 +2,7 @@
 
 [The complete Scala example is here](SpellExample.scala)
 
-#### Handling Fauna query results\\
+### Handling Fauna query results
 
 A fauna query returns a future of a result.  In real production code you should never block on a future and instead handle it async with map, flatMap, etc.
 
@@ -14,7 +14,7 @@ This small helper method is used to make wrapping every call in await easier:
     def await[T](f: Future[T]): T = Await.result(f, 5.second)
 ```
 
-#### How to create an admin connection to Fauna.\\
+### How to create an admin connection to Fauna.
 
 An admin connection should only be used to create top level databases.  After the database is created, a separate client connection should be created.
 
@@ -26,7 +26,7 @@ If you are using the FaunaDB-Cloud version:
    val adminClient = FaunaClient("secret", "http://127.0.0.1:8443")
 ```
 
-#### How to conditionally create a database\\
+### How to conditionally create a database
 
 ```scala
     val DB_NAME = "demo"
@@ -44,7 +44,7 @@ If you are using the FaunaDB-Cloud version:
     println(s"Successfully created database ${dbResults("name").to[String].get} :\n $dbResults \n")
 ```
 
-#### How to create a client connection to the database\\
+### How to create a client connection to the database
 
 After the database is created, a new key specific to that database can be used to create a client connection to that database.
 
@@ -56,7 +56,7 @@ After the database is created, a new key specific to that database can be used t
     val client = adminClient.sessionClient(key)
 ```
 
-#### How to create a class and index
+### How to create a class and index
 
 ```scala
     val SPELLS_CLASS = "spells"
@@ -75,7 +75,7 @@ After the database is created, a new key specific to that database can be used t
     println(s"Create Index for $DB_NAME:\n $indexResults\n")
 ```
 
-#### How to add entries to a class
+### How to add entries to a class
 
 ```scala
     val addFireResults = await(client.query(
@@ -93,7 +93,7 @@ After the database is created, a new key specific to that database can be used t
     println(s"Added spell to class $SPELLS_CLASS:\n $addHippoResults \n")
 ```
 
-#### How to access objects fields and convert to primitive values
+### How to access objects fields and convert to primitive values
 
 Adding data to a class returns a reference to the resource with the reference, a timestamp and the corresponding object in a json structure like:
 
@@ -119,7 +119,7 @@ Objects fields are accessed through the default method of `Value` class. It's po
     println(s"hippoRef = $hippoRef \n")
 ```
 
-#### How to execute a query
+### How to execute a query
 
 The `query` method takes an `Expr` object. `Expr` objects can be composed with others `Expr` to create complex query objects. `faunadb.query` is a helper package where you can find all available expressions in the library.
 
@@ -130,7 +130,7 @@ The `query` method takes an `Expr` object. `Expr` objects can be composed with o
     System.out.println("Hippo Spells:\n " + readHippoResults + "\n");
 ```
 
-#### How to retrieve the values from a query result
+### How to retrieve the values from a query result
 
 That query returns the data in the form of a json object. It's possible to convert `Value` class to its primitive correspondent using `to` methods specifying a type.  For example the data can be extracted from the results by using:
 
@@ -144,7 +144,7 @@ That query returns the data in the form of a json object. It's possible to conve
 
 Later on we will show a better method for converting to native types with User Defined types that do this transformation automatically.
 
-#### How to safely work with result objects
+### How to safely work with result objects
 
 This object represents the result of an operation and it might be success or a failure. All conversion operations returns an object like this. This way it's possible to avoid check for nullability everywhere in the code.
 
@@ -159,8 +159,7 @@ This object represents the result of an operation and it might be success or a f
 
 Optionally it's possible transform one `Result[T]` into another `Result[T]` of different type using `map` and `flatMap`.  If the `result` represents an failure all calls to `map` and `flatMap` are ignored and it returns a new failure with the same error message. See `faunadb.values.Result` for details.
 
-
-#### How to execute a list query and retrieve a collection of the results
+### How to execute a list query and retrieve a collection of the results
 
 The `query` method takes an `Expr` object. `Expr` objects can be composed with others `Expr` to create complex query objects. `faunadb.query` is a helper package where you can find all available expressions in the library.
 
@@ -185,7 +184,7 @@ That query returns a list of resource references to all the spells in the index.
 ```
 
 
-#### How to work with user defined classes
+### How to work with user defined classes
 
 Instead of manually creating your objects via the DSL (e.g. the Obj()), you can use case classes and codec to automatically encode and decode the class to user-defined types.  These transform the types into the equivalent `Value` types.
 
