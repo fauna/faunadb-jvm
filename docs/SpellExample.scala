@@ -194,9 +194,9 @@ object SpellExample  {
     */
     for {
       dragonSpellVal <- client.query(Select(Value("data"), Get(dragonRef)))
-      dragonSpell = dragonSpellVal.to[Spell].get
+      dragonSpell <- dragonSpellVal.to[Spell].toOpt
       hippoSpellVal <- client.query(Select(Value("data"), Get(hippoRef)))
-      hippoSpell = hippoSpellVal.to[Spell].get
+      hippoSpell <- hippoSpellVal.to[Spell].toOpt
     }
     yield {
       //process all spells retrieved
