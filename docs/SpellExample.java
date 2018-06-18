@@ -25,7 +25,7 @@ public class SpellExample {
          *
          * If you are using the FaunaDB-Cloud version:
          *  - remove the 'withEndpoint' line below
-         *  - substitute your secret for "secret" below
+         *  - substitute "secret" for your authentication key's secret
          */
         FaunaClient adminClient = FaunaClient.builder()
             .withEndpoint("http://127.0.0.1:8443")
@@ -151,7 +151,7 @@ public class SpellExample {
         String element = readHippoResults.at("element").to(String.class).get();
 
         System.out.println(String.format(
-            "Spell Details: Name=%s, Const=%d, Element=%s", name, cost, element));
+            "Spell Details: Name=%s, Cost=%d, Element=%s", name, cost, element));
 
 
         //This would return an empty option if the field is not found or the conversion fails
