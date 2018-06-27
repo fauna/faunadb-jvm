@@ -53,7 +53,7 @@ public final class Language {
   /**
    * Enumeration for time units.
    *
-   * @see <a href="https://fauna.com/documentation/queries#time_functions">FaunaDB Time Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#time-and-date">FaunaDB Time Functions</a>
    * @see #Epoch(Expr, TimeUnit)
    */
   public enum TimeUnit {
@@ -72,7 +72,7 @@ public final class Language {
   /**
    * Enumeration for event action types.
    *
-   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see #Insert(Expr, Expr, Action, Expr)
    * @see #Remove(Expr, Expr, Action)
    */
@@ -90,7 +90,7 @@ public final class Language {
   /**
    * Enumeration for casefold normalizers.
    *
-   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Casefold(Expr, Normalizer)
    */
   public enum Normalizer {
@@ -111,7 +111,7 @@ public final class Language {
    * Builder for let expressions.
    * To complete the let binding, the {@link LetBinding#in(Expr)} method must be called.
    *
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    * @see #Let(Map)
    * @see #Let(String, Expr)
    */
@@ -137,7 +137,7 @@ public final class Language {
    * Builder for path selectors. This builder must be constructed using
    * either the {@link #Path(String...)} or {@link #Path(int...)} functions.
    *
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    * @see #Contains(Path, Expr)
    * @see #Select(Path, Expr)
    * @see #Select(Path, Expr, Expr)
@@ -656,7 +656,7 @@ public final class Language {
    *
    * @param msg a message to be used when aborting the transaction
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    */
   public static Expr Abort(String msg) {
     return Abort(Value(msg));
@@ -667,7 +667,7 @@ public final class Language {
    *
    * @param msg a message to be used when aborting the transaction. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    */
   public static Expr Abort(Expr msg) {
     return Fn.apply("abort", msg);
@@ -679,7 +679,7 @@ public final class Language {
    * @param ref the reference to the user defined function to be called. Type: Reference
    * @param args the list of arguments for the given user defined function
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    */
   public static Expr Call(Expr ref, List<? extends  Expr> args) {
     return Fn.apply("call", ref, "arguments", varargs(args));
@@ -691,7 +691,7 @@ public final class Language {
    * @param ref the reference to the user defined function to be called. Type: Reference
    * @param args the arguments for the given user defined function
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    */
   public static Expr Call(Expr ref, Expr... args) {
     return Call(ref, ImmutableList.copyOf(args));
@@ -702,7 +702,7 @@ public final class Language {
    *
    * @param lambda a lambda type
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    * @see #CreateFunction(Expr)
    * @see #Lambda(Expr, Expr)
    */
@@ -717,7 +717,7 @@ public final class Language {
    * @param timestamp the read timestamp. Type: Timestamp
    * @param expr the scoped expression
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    * @see #Time(Expr)
    * @see #Value(Instant)
    * @see #Value(HighPrecisionTime)
@@ -752,7 +752,7 @@ public final class Language {
    *
    * @param bindings a {@link Map} of variable names to values.
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -776,7 +776,7 @@ public final class Language {
    * @param v1 the variable name
    * @param d1 the variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -802,7 +802,7 @@ public final class Language {
    * @param v2 the second variable name
    * @param d2 the second variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -834,7 +834,7 @@ public final class Language {
    * @param v3 the third variable name
    * @param d3 the third variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -869,7 +869,7 @@ public final class Language {
    * @param v4 the fourth variable name
    * @param d4 the fourth variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -907,7 +907,7 @@ public final class Language {
    * @param v5 the fifth variable name
    * @param d5 the fitfh variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -920,7 +920,7 @@ public final class Language {
    *
    * @param name the referred variable name
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    * @see #Let(Map)
    * @see #Lambda(Expr, Expr)
    */
@@ -935,7 +935,7 @@ public final class Language {
    * @param thenExpr the then branch for the if expression
    * @param elseExpr the else branch for the if expression
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    */
   public static Expr If(Expr condition, Expr thenExpr, Expr elseExpr) {
     return Fn.apply("if", condition, "then", thenExpr, "else", elseExpr);
@@ -947,7 +947,7 @@ public final class Language {
    *
    * @param exprs a list of expressions to be evaluated sequentially
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    */
   public static Expr Do(List<? extends Expr> exprs) {
     return Fn.apply("do", varargs(exprs));
@@ -959,7 +959,7 @@ public final class Language {
    *
    * @param exprs a list of expressions to be evaluated sequentially
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    */
   public static Expr Do(Expr... exprs) {
     return Do(ImmutableList.copyOf(exprs));
@@ -1007,7 +1007,7 @@ public final class Language {
    * @param var the lambda's parameter binding. Type: String or an Array of strings
    * @param expr the lambda's function body. Type: An expression.
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic_forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    * @see #Map(Expr, Expr)
    * @see #Foreach(Expr, Expr)
    * @see #Filter(Expr, Expr)
@@ -1028,7 +1028,7 @@ public final class Language {
    * @param collection the source collection. Type: Collection.
    * @param lambda the lambda function to be applied for each element in the given collection. Type: A lambda function.
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
    * @see #Lambda(Expr, Expr)
    */
   public static Expr Map(Expr collection, Expr lambda) {
@@ -1045,7 +1045,7 @@ public final class Language {
    * @param collection the source collection. Type: Collection.
    * @param lambda the lambda function to be applied for each element in the given collection. Type: A lambda function.
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
    * @see #Lambda(Expr, Expr)
    */
   public static Expr Foreach(Expr collection, Expr lambda) {
@@ -1059,7 +1059,7 @@ public final class Language {
    * @param collection the source collection. Type: Collection
    * @param lambda the filter lambda. Type: A lambda expression that returns a boolean value
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
    */
   public static Expr Filter(Expr collection, Expr lambda) {
     return Fn.apply("filter", lambda, "collection", collection);
@@ -1071,7 +1071,7 @@ public final class Language {
    * @param num the number of elements to be taken from the source collection. Type: Number
    * @param collection the source collection. Type: Collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
    */
   public static Expr Take(Expr num, Expr collection) {
     return Fn.apply("take", num, "collection", collection);
@@ -1083,7 +1083,7 @@ public final class Language {
    * @param num the number of elements to be dropped from the source collection. Type: Number
    * @param collection the source collection. Type: Collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
    */
   public static Expr Drop(Expr num, Expr collection) {
     return Fn.apply("drop", num, "collection", collection);
@@ -1095,7 +1095,7 @@ public final class Language {
    * @param elements the elements to be prepended to the source collection. Type: Array
    * @param collection the source collection. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
    */
   public static Expr Prepend(Expr elements, Expr collection) {
     return Fn.apply("prepend", elements, "collection", collection);
@@ -1107,7 +1107,7 @@ public final class Language {
    * @param elements the elements to be appended to the source collection. Type: Array
    * @param collection the source collection. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
    */
   public static Expr Append(Expr elements, Expr collection) {
     return Fn.apply("append", elements, "collection", collection);
@@ -1118,7 +1118,7 @@ public final class Language {
    *
    * @param collection the source collection to check for emptiness. Type: Collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
    */
   public static Expr IsEmpty(Expr collection) {
     return Fn.apply("is_empty", collection);
@@ -1129,7 +1129,7 @@ public final class Language {
    *
    * @param collection the source collection to check for non-emptiness. Type: Collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#collection_functions">FaunaDB Collection Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
    */
   public static Expr IsNonEmpty(Expr collection) {
     return Fn.apply("is_nonempty", collection);
@@ -1140,7 +1140,7 @@ public final class Language {
    *
    * @param ref the reference to be retrieved. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
    * @see #Ref(Expr, String)
    */
   public static Expr Get(Expr ref) {
@@ -1153,7 +1153,7 @@ public final class Language {
    * @param ref the reference to be retrieved. Type: Reference
    * @param timestamp the timestamp from which the reference's data will be retrieved. Type: Timestamp
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
    * @see #Ref(Expr, String)
    * @see #Time(Expr)
    * @see #Value(Instant)
@@ -1169,7 +1169,7 @@ public final class Language {
    *
    * @param secret the key's secret string. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
    */
   public static Expr KeyFromSecret(Expr secret) {
     return Fn.apply("key_from_secret", secret);
@@ -1220,7 +1220,7 @@ public final class Language {
    * @param resource the resource to paginate
    * @return a {@link Pagination} builder
    * @see Pagination
-   * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
    * @see #Match(Expr)
    * @see #Map(Expr, Expr)
    * @see #Foreach(Expr, Expr)
@@ -1235,7 +1235,7 @@ public final class Language {
    *
    * @param ref the reference to check for existence. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
    * @see #Ref(Expr, String)
    */
   public static Expr Exists(Expr ref) {
@@ -1248,7 +1248,7 @@ public final class Language {
    * @param ref the reference to check for existence. Type: Reference
    * @param timestamp a timestamp to check for ref's existence. Type: Timestamp
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
    * @see #Ref(Expr, String)
    */
   public static Expr Exists(Expr ref, Expr timestamp) {
@@ -1261,7 +1261,7 @@ public final class Language {
    * @param ref the class reference for which a new instance will be created. Type: Reference
    * @param params the parameters used to create the new instance. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see #Class(Expr)
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
@@ -1277,7 +1277,7 @@ public final class Language {
    * @param ref the resource reference to update. Type: Reference
    * @param params the parameters used to update the new instance. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
    */
@@ -1291,7 +1291,7 @@ public final class Language {
    * @param ref the resource reference to be replaced. Type: Reference
    * @param params the parameters used to replace the resource's old values. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
    */
@@ -1304,7 +1304,7 @@ public final class Language {
    *
    * @param ref the resource reference to be deleted. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see #Ref(Expr, String)
    */
   public static Expr Delete(Expr ref) {
@@ -1320,7 +1320,7 @@ public final class Language {
    * @param action the event action. Type: action
    * @param params the event's parameters. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see Action
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
@@ -1341,7 +1341,7 @@ public final class Language {
    * @param action the event action
    * @param params the event's parameters. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
    * @see #Time(Expr)
@@ -1359,7 +1359,7 @@ public final class Language {
    * @param timestamp the timestamp in which the event happened. Type: Timestamp
    * @param action the event's action. Type: event action
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see Action
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
@@ -1378,7 +1378,7 @@ public final class Language {
    * @param timestamp the timestamp in which the event happened. Type: Timestamp
    * @param action the event's action
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
    * @see #Time(Expr)
@@ -1394,7 +1394,7 @@ public final class Language {
    *
    * @param params the class's configuration parameters. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see #Obj(Map)
    */
   public static Expr CreateClass(Expr params) {
@@ -1414,7 +1414,7 @@ public final class Language {
    * }</pre>
    *
    * @param params the database's configuration parameters. Type: Object
-   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see #Obj(Map)
    */
   public static Expr CreateDatabase(Expr params) {
@@ -1426,7 +1426,7 @@ public final class Language {
    *
    * @param params the key's configuration parameters: Type Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see #Obj(Map)
    */
   public static Expr CreateKey(Expr params) {
@@ -1438,7 +1438,7 @@ public final class Language {
    *
    * @param params the index's configuration parameter. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see #Obj(Map)
    */
   public static Expr CreateIndex(Expr params) {
@@ -1450,7 +1450,7 @@ public final class Language {
    *
    * @param params the function's configuration parameters. Type: Object
    * @return a new {@link Expr} instnace
-   * @see <a href="https://fauna.com/documentation/queries#write_functions">FaunaDB Write Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see #Obj(Map)
    */
   public static Expr CreateFunction(Expr params) {
@@ -1617,7 +1617,7 @@ public final class Language {
    * @param ref the token's owner reference. Type: Reference
    * @param params the token's configuration object. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#authentication">FaunaDB Authentication Functions</a>
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
    */
@@ -1633,7 +1633,7 @@ public final class Language {
    * @param invalidateAll if the Logout function should delete all tokens
    *                      associated with the current session. Type: Boolean
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#authentication">FaunaDB Authentication Functions</a>
    * @see #Login(Expr, Expr)
    */
   public static Expr Logout(Expr invalidateAll) {
@@ -1646,7 +1646,7 @@ public final class Language {
    * @param ref the reference to authenticate. Type: Reference
    * @param password the authentication password. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#authentication">FaunaDB Authentication Functions</a>
    */
   public static Expr Identify(Expr ref, Expr password) {
     return Fn.apply("identify", ref, "password", password);
@@ -1656,7 +1656,7 @@ public final class Language {
    * Returns the reference associated with the authentication token used for the current request.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#authentication">FaunaDB Authentication Functions</a>
    * @see #Login(Expr, Expr)
    */
   public static Expr Identity() {
@@ -1667,7 +1667,7 @@ public final class Language {
    * Returns true if the authentication used for the request has an identity.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#auth_functions">FaunaDB Authentication Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#authentication">FaunaDB Authentication Functions</a>
    * @see #Identity()
    * @see #Identify(Expr, Expr)
    * @see #Login(Expr, Expr)
@@ -1681,7 +1681,7 @@ public final class Language {
    *
    * @param terms a list of strings. Type: Array of strings
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    * @see #Value(String)
    */
@@ -1695,7 +1695,7 @@ public final class Language {
    * @param terms a list of strings. Type: Array of strings
    * @param separator a string to separate each element in the result. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    * @see #Value(String)
    */
@@ -1710,7 +1710,7 @@ public final class Language {
    *
    * @param str the string to be normalized. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see <a href="https://www.w3.org/TR/charmod-norm/">W3C Character Model for the World Wide Web: String Matching</a>
    * @see #Casefold(Expr, Normalizer)
    */
@@ -1725,7 +1725,7 @@ public final class Language {
    * @param str the string to be normalized. Type: String
    * @param normalizer the string normalizer to use. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see <a href="https://www.w3.org/TR/charmod-norm/">W3C Character Model for the World Wide Web: String Matching</a>
    * @see #Casefold(Expr, Normalizer)
    */
@@ -1739,7 +1739,7 @@ public final class Language {
    * @param str the string to be normalized. Type: String
    * @param normalizer the string normalizer to use
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see <a href="https://www.w3.org/TR/charmod-norm/">W3C Character Model for the World Wide Web: String Matching</a>
    * @see #Casefold(Expr, Normalizer)
    */
@@ -1754,7 +1754,7 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    * @see #Value(long)
    */
@@ -1769,7 +1769,7 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    * @see #Value(String)
    * @see #Value(long)
@@ -1783,7 +1783,7 @@ public final class Language {
    *
    * @param terms the list of values to tokenize. Type: Array of strings
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    * @see #Value(String)
    */
@@ -1796,7 +1796,7 @@ public final class Language {
    *
    * @param terms the list of values to tokenize. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string_functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    * @see #Value(String)
    */
@@ -1810,7 +1810,7 @@ public final class Language {
    *
    * @param str an ISO-8601 formatted string or the string literal "now"
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#time_functions">FaunaDB Time and Date Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#time-and-date">FaunaDB Time and Date Functions</a>
    * @see #Value(String)
    */
   public static Expr Time(Expr str) {
@@ -1823,7 +1823,7 @@ public final class Language {
    * @param num the number of units. Type: Number
    * @param unit the unit type
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#time_functions">FaunaDB Time and Date Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#time-and-date">FaunaDB Time and Date Functions</a>
    * @see TimeUnit
    * @see #Value(long)
    */
@@ -1844,7 +1844,7 @@ public final class Language {
    * @param num the number of units. Type: Number
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#time_functions">FaunaDB Time and Date Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#time-and-date">FaunaDB Time and Date Functions</a>
    * @see #Value(long)
    */
   public static Expr Epoch(Expr num, Expr unit) {
@@ -1856,7 +1856,7 @@ public final class Language {
    *
    * @param str an ISO-8601 formatted date string
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#time_functions">FaunaDB Time and Date Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#time-and-date">FaunaDB Time and Date Functions</a>
    * @see #Value(String)
    */
   public static Expr Date(Expr str) {
@@ -1869,7 +1869,7 @@ public final class Language {
    * @deprecated Use NewId() instead.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    * @see #Ref(Expr, Expr)
    */
   @Deprecated
@@ -1881,7 +1881,7 @@ public final class Language {
    * Returns a new string identifier suitable for use when constructing references.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    * @see #Ref(Expr, Expr)
    */
   public static Expr NewId() {
@@ -1893,7 +1893,7 @@ public final class Language {
    *
    * @param name the class name. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Class(Expr name) {
     return Fn.apply("class", name);
@@ -1904,7 +1904,7 @@ public final class Language {
    *
    * @param name the class name
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Class(String name) {
     return Class(Value(name));
@@ -1916,7 +1916,7 @@ public final class Language {
    * @param name the class name. Type: String
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    * @see #Database(String)
    */
   public static Expr Class(Expr name, Expr database) {
@@ -1929,7 +1929,7 @@ public final class Language {
    * @param name the class name
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    * @see #Database(String)
    */
   public static Expr Class(String name, Expr database) {
@@ -1941,7 +1941,7 @@ public final class Language {
    *
    * @param name the database name. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Database(Expr name) {
     return Fn.apply("database", name);
@@ -1952,7 +1952,7 @@ public final class Language {
    *
    * @param name the database name
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Database(String name) {
     return Database(Value(name));
@@ -1964,7 +1964,7 @@ public final class Language {
    * @param name the database name. Type: String
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Database(Expr name, Expr database) {
       return Fn.apply("database", name, "scope", database);
@@ -1976,7 +1976,7 @@ public final class Language {
    * @param name the database name
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Database(String name, Expr database) {
     return Database(Value(name), database);
@@ -1987,7 +1987,7 @@ public final class Language {
    *
    * @param name the index name. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Index(Expr name) {
     return Fn.apply("index", name);
@@ -1998,7 +1998,7 @@ public final class Language {
    *
    * @param name the index name
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Index(String name) {
     return Index(Value(name));
@@ -2010,7 +2010,7 @@ public final class Language {
    * @param name the index name. Type: String
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Index(Expr name, Expr database) {
     return Fn.apply("index", name, "scope", database);
@@ -2022,7 +2022,7 @@ public final class Language {
    * @param name the index name
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Index(String name, Expr database) {
     return Index(Value(name), database);
@@ -2033,7 +2033,7 @@ public final class Language {
    *
    * @param name the user defined function name. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Function(Expr name) {
     return Fn.apply("function", name);
@@ -2044,7 +2044,7 @@ public final class Language {
    *
    * @param name the user defined function name
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Function(String name) {
     return Function(Value(name));
@@ -2056,7 +2056,7 @@ public final class Language {
    * @param name the user defined function name. Type: String
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Function(Expr name, Expr database) {
     return Fn.apply("function", name, "scope", database);
@@ -2068,7 +2068,7 @@ public final class Language {
    * @param name the user defined function name
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Function(String name, Expr database) {
     return Function(Value(name), database);
@@ -2079,7 +2079,7 @@ public final class Language {
    *
    * @param values the values to test equivalence for
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Equals(List<? extends Expr> values) {
     return Fn.apply("equals", varargs(values));
@@ -2090,7 +2090,7 @@ public final class Language {
    *
    * @param values the values to test equivalence for
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Equals(Expr... values) {
     return Equals(ImmutableList.copyOf(values));
@@ -2106,7 +2106,7 @@ public final class Language {
    * @param path the desired path to check for presence. Type: Array
    * @param in the target value. Type: Object or Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    * @see #Contains(Path, Expr)
    */
   public static Expr Contains(Expr path, Expr in) {
@@ -2119,7 +2119,7 @@ public final class Language {
    * @param path the desired path to check for presence
    * @param in the target value. Type: Object or Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Contains(Path path, Expr in) {
     return Contains(Arr(path.segments), in);
@@ -2165,7 +2165,7 @@ public final class Language {
    * @param path the path to the desired value. Type: Array
    * @param from the target resource. Type: Object or Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
    * @see #Select(Path, Expr)
    */
   public static Expr Select(Expr path, Expr from) {
@@ -2183,7 +2183,7 @@ public final class Language {
    * @param from the target resource. Type: Object or Array
    * @param defaultValue the default value to return if the desired path doesn't exist
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
    * @see #Select(Path, Expr, Expr)
    */
   public static Expr Select(Expr path, Expr from, Expr defaultValue) {
@@ -2196,7 +2196,7 @@ public final class Language {
    * @param path the path to the desired value
    * @param from the target resource. Type: Object or Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
    */
   public static Expr Select(Path path, Expr from) {
     return Select(Arr(path.segments), from);
@@ -2210,7 +2210,7 @@ public final class Language {
    * @param from the target resource. Type: Object or Array
    * @param defaultValue the default value to return if the desired path doesn't exist
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
    */
   public static Expr Select(Path path, Expr from, Expr defaultValue) {
     return Select(Arr(path.segments), from, defaultValue);
@@ -2226,7 +2226,7 @@ public final class Language {
    * @param path the path to the desired value. Type: Array
    * @param from the collection to traverse. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
    * @see #Select(Path, Expr)
    */
   public static Expr SelectAll(Expr path, Expr from) {
@@ -2239,7 +2239,7 @@ public final class Language {
    * @param path the path to the desired value
    * @param from the collection to traverse. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
    */
   public static Expr SelectAll(Path path, Expr from) {
     return SelectAll(Arr(path.segments), from);
@@ -2250,7 +2250,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Add(List<? extends Expr> values) {
     return Fn.apply("add", varargs(values));
@@ -2261,7 +2261,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Add(Expr... values) {
     return Add(ImmutableList.copyOf(values));
@@ -2272,7 +2272,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Multiply(List<? extends Expr> values) {
     return Fn.apply("multiply", varargs(values));
@@ -2283,7 +2283,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Multiply(Expr... values) {
     return Multiply(ImmutableList.copyOf(values));
@@ -2294,7 +2294,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Subtract(List<? extends Expr> values) {
     return Fn.apply("subtract", varargs(values));
@@ -2305,7 +2305,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Subtract(Expr... values) {
     return Subtract(ImmutableList.copyOf(values));
@@ -2316,7 +2316,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Divide(List<? extends Expr> values) {
     return Fn.apply("divide", varargs(values));
@@ -2327,7 +2327,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Divide(Expr... values) {
     return Divide(ImmutableList.copyOf(values));
@@ -2338,7 +2338,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Modulo(List<? extends Expr> values) {
     return Fn.apply("modulo", varargs(values));
@@ -2349,7 +2349,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Modulo(Expr... values) {
     return Modulo(ImmutableList.copyOf(values));
@@ -2360,7 +2360,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr LT(List<? extends Expr> values) {
     return Fn.apply("lt", varargs(values));
@@ -2371,7 +2371,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr LT(Expr... values) {
     return LT(ImmutableList.copyOf(values));
@@ -2383,7 +2383,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr LTE(List<? extends Expr> values) {
     return Fn.apply("lte", varargs(values));
@@ -2395,7 +2395,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr LTE(Expr... values) {
     return LTE(ImmutableList.copyOf(values));
@@ -2406,7 +2406,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr GT(List<? extends Expr> values) {
     return Fn.apply("gt", varargs(values));
@@ -2417,7 +2417,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr GT(Expr... values) {
     return GT(ImmutableList.copyOf(values));
@@ -2429,7 +2429,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr GTE(List<? extends Expr> values) {
     return Fn.apply("gte", varargs(values));
@@ -2441,7 +2441,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr GTE(Expr... values) {
     return GTE(ImmutableList.copyOf(values));
@@ -2452,7 +2452,7 @@ public final class Language {
    *
    * @param values a collection of boolean values. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr And(List<? extends Expr> values) {
     return Fn.apply("and", varargs(values));
@@ -2463,7 +2463,7 @@ public final class Language {
    *
    * @param values a collection of boolean values. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr And(Expr... values) {
     return And(ImmutableList.copyOf(values));
@@ -2474,7 +2474,7 @@ public final class Language {
    *
    * @param values a collection of boolean values. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr Or(List<? extends Expr> values) {
     return Fn.apply("or", varargs(values));
@@ -2485,7 +2485,7 @@ public final class Language {
    *
    * @param values a collection of boolean values. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr Or(Expr... values) {
     return Or(ImmutableList.copyOf(values));
@@ -2496,7 +2496,7 @@ public final class Language {
    *
    * @param bool a boolean value. Type: Boolean
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#misc_functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr Not(Expr bool) {
     return Fn.apply("not", bool);
