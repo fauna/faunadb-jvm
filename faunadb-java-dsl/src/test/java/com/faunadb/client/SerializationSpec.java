@@ -1006,6 +1006,26 @@ public class SerializationSpec {
       "{\"at\":{\"time\":\"1970-01-01T00:00:00+00:00\"},\"expr\":{\"get\":{\"@ref\":{\"id\":\"classes\"}}}}");
   }
 
+  @Test
+  public void shouldSerializeToString() throws Exception {
+    assertJson(ToString(Value(100)), "{\"to_string\":100}");
+  }
+
+  @Test
+  public void shouldSerializeToNumber() throws Exception {
+    assertJson(ToString(Value("100")), "{\"to_string\":\"100\"}");
+  }
+
+  @Test
+  public void shouldSerializeToTime() throws Exception {
+    assertJson(ToTime(Value("1970-01-01T00:00:00Z")), "{\"to_time\":\"1970-01-01T00:00:00Z\"}");
+  }
+
+  @Test
+  public void shouldSerializeToDate() throws Exception {
+    assertJson(ToDate(Value("1970-01-01")), "{\"to_date\":\"1970-01-01\"}");
+  }
+
   private void assertJson(Expr expr, String jsonString) throws JsonProcessingException {
     assertThat(json.writeValueAsString(expr),
       equalTo(jsonString));

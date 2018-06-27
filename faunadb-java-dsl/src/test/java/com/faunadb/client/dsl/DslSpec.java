@@ -987,6 +987,33 @@ public abstract class DslSpec {
   }
 
   @Test
+  public void shouldEvalToStringExpression() throws Exception {
+    Value res = query(ToString(Value(100))).get();
+    assertThat(res.to(STRING).get(), equalTo("100"));
+  }
+
+  @Test
+  public void shouldEvalToNumberExpression() throws Exception {
+    Value res1 = query(ToNumber(Value("100"))).get();
+    assertThat(res1.to(LONG).get(), equalTo(100L));
+
+    Value res2 = query(ToNumber(Value("3.14"))).get();
+    assertThat(res2.to(DOUBLE).get(), equalTo(3.14));
+  }
+
+  @Test
+  public void shouldEvalToTimeExpression() throws Exception {
+    Value res = query(ToTime(Value("1970-01-01T00:00:00Z"))).get();
+    assertThat(res.to(TIME).get(), equalTo(new Instant(0)));
+  }
+
+  @Test
+  public void shouldEvalToDateExpression() throws Exception {
+    Value res = query(ToDate(Value("1970-01-01"))).get();
+    assertThat(res.to(DATE).get(), equalTo(new LocalDate(0, UTC)));
+  }
+
+  @Test
   public void shouldEvalEpochExpression() throws Exception {
     ImmutableList<Value> res = query(ImmutableList.of(
       Epoch(Value(30), SECOND),
