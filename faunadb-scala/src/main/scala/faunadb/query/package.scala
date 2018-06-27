@@ -182,7 +182,7 @@ package object query {
   /**
     * A Abort expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
     */
   def Abort(msg: Expr): Expr =
     Expr(ObjectV("abort" -> msg.value))
@@ -190,7 +190,7 @@ package object query {
   /**
     * A Call expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
     */
   def Call(ref: Expr, arguments: Expr*) =
     Expr(ObjectV("call" -> ref.value, "arguments" -> varargs(arguments)))
@@ -198,7 +198,7 @@ package object query {
   /**
     * A Query expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
     */
   def Query(fn: Expr => Expr): Expr = macro QueryMacros.query
   def Query(fn: (Expr, Expr) => Expr): Expr = macro QueryMacros.query
@@ -217,7 +217,7 @@ package object query {
   /**
     * A At expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
     */
   def At(timestamp: Expr, expr: Expr) =
     Expr(ObjectV("at" -> timestamp.value, "expr" -> expr.value))
@@ -225,7 +225,7 @@ package object query {
   /**
     * A Let expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
     */
 
   def Let(block: => Any): Expr = macro QueryMacros.let
@@ -236,7 +236,7 @@ package object query {
   /**
     * A Var expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
     */
   def Var(name: String): Expr =
     Expr(ObjectV("var" -> StringV(name)))
@@ -244,7 +244,7 @@ package object query {
   /**
    * An If expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
    */
   def If(pred: Expr, `then`: Expr, `else`: Expr): Expr =
     Expr(ObjectV("if" -> pred.value, "then" -> `then`.value, "else" -> `else`.value))
@@ -252,7 +252,7 @@ package object query {
   /**
    * A Do expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
    */
   def Do(exprs: Expr*): Expr =
     Expr(ObjectV("do" -> varargs(exprs)))
@@ -260,7 +260,7 @@ package object query {
   /**
    * A Lambda expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
    */
   def Lambda(fn: Expr => Expr): Expr = macro QueryMacros.lambda
   def Lambda(fn: (Expr, Expr) => Expr): Expr = macro QueryMacros.lambda
@@ -281,7 +281,7 @@ package object query {
   /**
    * A Map expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#collection_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
    */
   def Map(collection: Expr, lambda: Expr): Expr =
     Expr(ObjectV("map" -> lambda.value, "collection" -> collection.value))
@@ -289,7 +289,7 @@ package object query {
   /**
    * A Foreach expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#collection_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
    */
   def Foreach(collection: Expr, lambda: Expr): Expr =
     Expr(ObjectV("foreach" -> lambda.value, "collection" -> collection.value))
@@ -297,7 +297,7 @@ package object query {
   /**
     * A Filter expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#collection_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
     */
   def Filter(collection: Expr, lambda: Expr): Expr =
     Expr(ObjectV("filter" -> lambda.value, "collection" -> collection.value))
@@ -305,7 +305,7 @@ package object query {
   /**
     * A Prepend expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#collection_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
     */
   def Prepend(elems: Expr, collection: Expr): Expr =
     Expr(ObjectV("prepend" -> elems.value, "collection" -> collection.value))
@@ -313,7 +313,7 @@ package object query {
   /**
     * An Append expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#collection_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
     */
   def Append(elems: Expr, collection: Expr): Expr =
     Expr(ObjectV("append" -> elems.value, "collection" -> collection.value))
@@ -321,7 +321,7 @@ package object query {
   /**
     * A Take expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#collection_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
     */
   def Take(num: Expr, collection: Expr): Expr =
     Expr(ObjectV("take" -> num.value, "collection" -> collection.value))
@@ -329,7 +329,7 @@ package object query {
   /**
     * A Drop expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#collection_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
     */
   def Drop(num: Expr, collection: Expr): Expr =
     Expr(ObjectV("drop" -> num.value, "collection" -> collection.value))
@@ -337,7 +337,7 @@ package object query {
   /**
     * A IsEmpty expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#collection_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
     */
   def IsEmpty(collection: Expr): Expr =
     Expr(ObjectV("is_empty" -> collection.value))
@@ -345,7 +345,7 @@ package object query {
   /**
     * A IsNonEmpty expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#collection_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
     */
   def IsNonEmpty(collection: Expr): Expr =
     Expr(ObjectV("is_nonempty" -> collection.value))
@@ -355,7 +355,7 @@ package object query {
   /**
    * A Get expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#read_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#read-functions]]
    */
   def Get(resource: Expr): Expr =
     Expr(ObjectV("get" -> resource.value))
@@ -366,7 +366,7 @@ package object query {
   /**
     * A KeyFromSecret expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#read_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#read-functions]]
     */
   def KeyFromSecret(secret: Expr) =
     Expr(ObjectV("key_from_secret" -> secret.value))
@@ -374,7 +374,7 @@ package object query {
   /**
    * A Paginate expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#read_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#read-functions]]
    */
   def Paginate(
     resource: Expr,
@@ -406,7 +406,7 @@ package object query {
   /**
    * An Exists expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#read_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#read-functions]]
    */
   def Exists(ref: Expr): Expr =
     Expr(ObjectV("exists" -> ref.value))
@@ -419,7 +419,7 @@ package object query {
   /**
    * A Create expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
    */
   def Create(ref: Expr, params: Expr): Expr =
     Expr(ObjectV("create" -> ref.value, "params" -> params.value))
@@ -427,7 +427,7 @@ package object query {
   /**
    * An Update expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
    */
   def Update(ref: Expr, params: Expr): Expr =
     Expr(ObjectV("update" -> ref.value, "params" -> params.value))
@@ -435,7 +435,7 @@ package object query {
   /**
    * A Replace expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
    */
   def Replace(ref: Expr, params: Expr): Expr =
     Expr(ObjectV("replace" -> ref.value, "params" -> params.value))
@@ -443,7 +443,7 @@ package object query {
   /**
    * A Delete expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
    */
   def Delete(ref: Expr): Expr =
     Expr(ObjectV("delete" -> ref.value))
@@ -451,7 +451,7 @@ package object query {
   /**
     * An Insert expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
     */
   def Insert(ref: Expr, ts: Expr, action: Action, params: Expr): Expr =
     Insert(ref, ts, action.expr, params)
@@ -462,7 +462,7 @@ package object query {
   /**
     * A Remove expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
     */
   def Remove(ref: Expr, ts: Expr, action: Action): Expr =
     Remove(ref, ts, action.expr)
@@ -473,7 +473,7 @@ package object query {
   /**
     * A Create Class expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
     */
   def CreateClass(params: Expr): Expr =
     Expr(ObjectV("create_class" -> params.value))
@@ -481,7 +481,7 @@ package object query {
   /**
     * A Create Database expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
     */
   def CreateDatabase(params: Expr): Expr =
     Expr(ObjectV("create_database" -> params.value))
@@ -489,7 +489,7 @@ package object query {
   /**
     * A Create Key expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
     */
   def CreateKey(params: Expr): Expr =
     Expr(ObjectV("create_key" -> params.value))
@@ -497,7 +497,7 @@ package object query {
   /**
     * A Create Index expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
     */
   def CreateIndex(params: Expr): Expr =
     Expr(ObjectV("create_index" -> params.value))
@@ -505,7 +505,7 @@ package object query {
   /**
     * A Create Function expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#write_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
     */
   def CreateFunction(params: Expr): Expr =
     Expr(ObjectV("create_function" -> params.value))
@@ -581,7 +581,7 @@ package object query {
   /**
     * A Login expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#auth_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#authentication]]
     */
   def Login(ref: Expr, params: Expr): Expr =
     Expr(ObjectV("login" -> ref.value, "params" -> params.value))
@@ -589,7 +589,7 @@ package object query {
   /**
     * A Logout expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#auth_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#authentication]]
     */
   def Logout(invalidateAll: Expr): Expr =
     Expr(ObjectV("logout" -> invalidateAll.value))
@@ -597,7 +597,7 @@ package object query {
   /**
     * An Identify expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#auth_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#authentication]]
     */
   def Identify(ref: Expr, password: Expr): Expr =
     Expr(ObjectV("identify" -> ref.value, "password" -> password.value))
@@ -605,7 +605,7 @@ package object query {
   /**
     * An Identity expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#auth_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#authentication]]
     */
   def Identity(): Expr =
     Expr(ObjectV("identity" -> NullV))
@@ -613,7 +613,7 @@ package object query {
   /**
     * An HasIdentity expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#auth_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#authentication]]
     */
   def HasIdentity(): Expr =
     Expr(ObjectV("has_identity" -> NullV))
@@ -623,7 +623,7 @@ package object query {
   /**
    * A Concat expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#string_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
    */
   def Concat(term: Expr): Expr =
     Expr(ObjectV("concat" -> term.value))
@@ -634,7 +634,7 @@ package object query {
   /**
    * A Casefold expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#string_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
    */
   def Casefold(term: Expr): Expr =
     Expr(ObjectV("casefold" -> term.value))
@@ -648,7 +648,7 @@ package object query {
   /**
     * A NGram expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#string_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
     */
   def NGram(terms: Expr, min: Expr = NullV, max: Expr = NullV): Expr = {
     val b = Seq.newBuilder[(String, Value)]
@@ -664,7 +664,7 @@ package object query {
   /**
     * A Time expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#time_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#time-and-date]]
     */
   def Time(str: Expr): Expr =
     Expr(ObjectV("time" -> str.value))
@@ -672,7 +672,7 @@ package object query {
   /**
     * An Epoch expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#time_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#time-and-date]]
     */
   def Epoch(num: Expr, unit: TimeUnit): Expr =
     Epoch(num, unit.expr)
@@ -683,7 +683,7 @@ package object query {
   /**
     * A Date expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#time_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#time-and-date]]
     */
   def Date(str: Expr): Expr =
     Expr(ObjectV("date" -> str.value))
@@ -693,7 +693,7 @@ package object query {
   /**
     * A Next Id expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#miscellaneous]]
     */
   @deprecated("use NewId instead")
   def NextId(): Expr =
@@ -702,7 +702,7 @@ package object query {
   /**
     * A New Id expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#miscellaneous]]
     */
   def NewId(): Expr =
     Expr(ObjectV("new_id" -> NullV))
@@ -710,7 +710,7 @@ package object query {
   /**
     * A Class expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
     */
   def Class(name: Expr): Expr =
     Expr(ObjectV("class" -> name.value))
@@ -718,7 +718,7 @@ package object query {
   /**
     * A Class expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
     */
   def Class(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("class" -> name.value, "scope" -> scope.value))
@@ -726,7 +726,7 @@ package object query {
   /**
     * A Database expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
     */
   def Database(name: Expr): Expr =
     Expr(ObjectV("database" -> name.value))
@@ -734,7 +734,7 @@ package object query {
   /**
     * A Database expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
     */
   def Database(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("database" -> name.value, "scope" -> scope.value))
@@ -742,7 +742,7 @@ package object query {
   /**
     * An Index expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
     */
   def Index(name: Expr): Expr =
     Expr(ObjectV("index" -> name.value))
@@ -750,7 +750,7 @@ package object query {
   /**
     * An Index expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
     */
   def Index(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("index" -> name.value, "scope" -> scope.value))
@@ -758,7 +758,7 @@ package object query {
   /**
     * A Function expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
     */
   def Function(name: Expr): Expr =
     Expr(ObjectV("function" -> name.value))
@@ -766,7 +766,7 @@ package object query {
   /**
     * A Function expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
     */
   def Function(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("function" -> name.value, "scope" -> scope.value))
@@ -774,7 +774,7 @@ package object query {
   /**
    * An Equals expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#miscellaneous]]
    */
   def Equals(terms: Expr*): Expr =
     Expr(ObjectV("equals" -> varargs(terms)))
@@ -782,7 +782,7 @@ package object query {
   /**
    * A Contains expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#miscellaneous]]
    */
   def Contains(path: Expr, in: Expr): Expr =
     Expr(ObjectV("contains" -> path.value, "in" -> in.value))
@@ -790,7 +790,7 @@ package object query {
   /**
    * A Select expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#miscellaneous]]
    */
   def Select(path: Expr, from: Expr): Expr =
     Expr(ObjectV("select" -> path.value, "from" -> from.value))
@@ -801,7 +801,7 @@ package object query {
   /**
     * A SelectAll expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#miscellaneous]]
     */
   def SelectAll(path: Expr, from: Expr): Expr =
     Expr(ObjectV("select_all" -> path.value, "from" -> from.value))
@@ -809,7 +809,7 @@ package object query {
   /**
    * An Add expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
    */
   def Add(terms: Expr*): Expr =
     Expr(ObjectV("add" -> varargs(terms)))
@@ -817,7 +817,7 @@ package object query {
   /**
    * A Multiply expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
    */
   def Multiply(terms: Expr*): Expr =
     Expr(ObjectV("multiply" -> varargs(terms)))
@@ -825,7 +825,7 @@ package object query {
   /**
    * A Subtract expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
    */
   def Subtract(terms: Expr*): Expr =
     Expr(ObjectV("subtract" -> varargs(terms)))
@@ -833,7 +833,7 @@ package object query {
   /**
    * A Divide expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
    */
   def Divide(terms: Expr*): Expr =
     Expr(ObjectV("divide" -> varargs(terms)))
@@ -841,7 +841,7 @@ package object query {
   /**
     * A Modulo expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
     */
   def Modulo(terms: Expr*): Expr =
     Expr(ObjectV("modulo" -> varargs(terms)))
@@ -849,7 +849,7 @@ package object query {
   /**
     * A LT expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#logical-functions]]
     */
   def LT(terms: Expr*): Expr =
     Expr(ObjectV("lt" -> varargs(terms)))
@@ -857,7 +857,7 @@ package object query {
   /**
     * A LTE expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#logical-functions]]
     */
   def LTE(terms: Expr*): Expr =
     Expr(ObjectV("lte" -> varargs(terms)))
@@ -865,7 +865,7 @@ package object query {
   /**
     * A GT expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#logical-functions]]
     */
   def GT(terms: Expr*): Expr =
     Expr(ObjectV("gt" -> varargs(terms)))
@@ -873,7 +873,7 @@ package object query {
   /**
     * A GTE expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#logical-functions]]
     */
   def GTE(terms: Expr*): Expr =
     Expr(ObjectV("gte" -> varargs(terms)))
@@ -881,7 +881,7 @@ package object query {
   /**
     * An And expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#logical-functions]]
     */
   def And(terms: Expr*): Expr =
     Expr(ObjectV("and" -> varargs(terms)))
@@ -889,7 +889,7 @@ package object query {
   /**
     * An Or expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#logical-functions]]
     */
   def Or(terms: Expr*): Expr =
     Expr(ObjectV("or" -> varargs(terms)))
@@ -897,7 +897,7 @@ package object query {
   /**
     * A Not expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#misc_functions]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#logical-functions]]
     */
   def Not(term: Expr): Expr =
     Expr(ObjectV("not" -> term.value))
