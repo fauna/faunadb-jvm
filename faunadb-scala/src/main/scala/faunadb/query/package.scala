@@ -790,7 +790,7 @@ package object query {
   /**
    * A Select expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#miscellaneous]]
+   * '''Reference''': [[https://fauna.com/documentation/queries#read-functions]]
    */
   def Select(path: Expr, from: Expr): Expr =
     Expr(ObjectV("select" -> path.value, "from" -> from.value))
@@ -801,10 +801,13 @@ package object query {
   /**
     * A SelectAll expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#miscellaneous]]
+    * '''Reference''': [[https://fauna.com/documentation/queries#read-functions]]
     */
   def SelectAll(path: Expr, from: Expr): Expr =
     Expr(ObjectV("select_all" -> path.value, "from" -> from.value))
+
+  def SelectAll(path: Expr, from: Expr, default: Expr): Expr =
+    Expr(ObjectV("select_all" -> path.value, "from" -> from.value, "default" -> default.value))
 
   /**
    * An Add expression.
