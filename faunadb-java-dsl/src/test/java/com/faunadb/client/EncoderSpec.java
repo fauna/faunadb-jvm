@@ -2,12 +2,12 @@ package com.faunadb.client;
 
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
-import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.collect.ImmutableMap;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 import org.junit.Test;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 import static com.faunadb.client.types.Encoder.encode;
@@ -19,6 +19,11 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 public class EncoderSpec {
+
+    private Instant parseInstant(String str) {
+        return Instant.from(DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(str));
+    }
+
     @Test
     public void shouldEncodePrimitives() {
         assertEquals(NullV.NULL, encode(null).get());
@@ -39,8 +44,7 @@ public class EncoderSpec {
 
         assertEquals(new DateV(LocalDate.parse("1970-01-01")), encode(LocalDate.parse("1970-01-01")).get());
 
-        assertEquals(new TimeV(HighPrecisionTime.parse("1970-01-01T00:05:02.010000000Z")), encode(HighPrecisionTime.parse("1970-01-01T00:05:02.010000000Z")).get());
-        assertEquals(new TimeV(HighPrecisionTime.parse("1970-01-01T00:05:02.010000000Z")), encode(Instant.parse("1970-01-01T00:05:02.010000000Z")).get());
+        assertEquals(new TimeV(parseInstant("1970-01-01T00:05:02.010000000Z")), encode(parseInstant("1970-01-01T00:05:02.010000000Z")).get());
 
         assertEquals(new BytesV(new byte[] {1, 2, 3, 4}), encode(new byte[] {1, 2, 3, 4}).get());
     }
@@ -70,7 +74,7 @@ public class EncoderSpec {
         assertEquals(new LongV(10), encode(new LongV(10)).get());
         assertEquals(new DoubleV(10), encode(new DoubleV(10)).get());
         assertEquals(new DateV(LocalDate.parse("1970-01-01")), encode(new DateV(LocalDate.parse("1970-01-01"))).get());
-        assertEquals(new TimeV(HighPrecisionTime.parse("1970-01-01T00:05:02.010000000Z")), encode(new TimeV(HighPrecisionTime.parse("1970-01-01T00:05:02.010000000Z"))).get());
+        assertEquals(new TimeV(parseInstant("1970-01-01T00:05:02.010000000Z")), encode(new TimeV(parseInstant("1970-01-01T00:05:02.010000000Z"))).get());
         assertEquals(new BytesV(new byte[] {1, 2, 3, 4}), encode(new BytesV(new byte[] {1, 2, 3, 4})).get());
         assertEquals(new RefV("123", new RefV("widgets", Native.CLASSES)), encode(new RefV("123", new RefV("widgets", Native.CLASSES))).get());
         assertEquals(new SetRefV(ImmutableMap.<String, Value>of()), encode(new SetRefV(ImmutableMap.<String, Value>of())).get());

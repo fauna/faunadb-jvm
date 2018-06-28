@@ -4,14 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Value.*;
-import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
 
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.Class;
@@ -143,31 +143,12 @@ public class SerializationSpec {
 
   @Test
   public void shouldSerializeInstantValue() throws Exception {
-    assertJson(Value(new Instant(0)), "{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}");
-  }
-
-  @Test
-  public void shouldSerializeHighPrecisionTimeValue() throws Exception {
-    Instant initialTime = new Instant(10)
-      .plus(Duration.standardMinutes(5))
-      .plus(Duration.standardSeconds(2));
-
-    assertJson(Value(HighPrecisionTime.fromInstant(initialTime)),
-      "{\"@ts\":\"1970-01-01T00:05:02.010000000Z\"}");
-
-    assertJson(Value(HighPrecisionTime.fromInstantWithMicros(initialTime, 1005)),
-      "{\"@ts\":\"1970-01-01T00:05:02.011005000Z\"}");
-
-    assertJson(Value(HighPrecisionTime.fromInstantWithNanos(initialTime, 20005)),
-      "{\"@ts\":\"1970-01-01T00:05:02.010020005Z\"}");
-
-    assertJson(Value(HighPrecisionTime.fromInstantWithNanos(initialTime, 3021001)),
-      "{\"@ts\":\"1970-01-01T00:05:02.013021001Z\"}");
+    assertJson(Value(Instant.ofEpochMilli(0)), "{\"@ts\":\"1970-01-01T00:00:00Z\"}");
   }
 
   @Test
   public void shouldSerializeDateValue() throws Exception {
-    assertJson(Value(new LocalDate(2015, 1, 15)), "{\"@date\":\"2015-01-15\"}");
+    assertJson(Value(LocalDate.of(2015, 1, 15)), "{\"@date\":\"2015-01-15\"}");
   }
 
   @Test
@@ -397,8 +378,8 @@ public class SerializationSpec {
     );
 
     assertJson(
-      Get(new RefV("104979509692858368", new RefV("spells", Native.CLASSES)), Value(new Instant(0))),
-      "{\"get\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}}"
+      Get(new RefV("104979509692858368", new RefV("spells", Native.CLASSES)), Value(Instant.ofEpochMilli(0))),
+      "{\"get\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}}"
     );
   }
 
@@ -456,8 +437,8 @@ public class SerializationSpec {
     );
 
     assertJson(
-      Exists(new RefV("104979509692858368", new RefV("spells", Native.CLASSES)), Value(new Instant(0))),
-      "{\"exists\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}}"
+      Exists(new RefV("104979509692858368", new RefV("spells", Native.CLASSES)), Value(Instant.ofEpochMilli(0))),
+      "{\"exists\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}}"
     );
   }
 
@@ -505,22 +486,22 @@ public class SerializationSpec {
     assertJson(
       Insert(
         new RefV("104979509696660483", new RefV("spells", Native.CLASSES)),
-        Value(new Instant(0)),
+        Value(Instant.ofEpochMilli(0)),
         Action.CREATE,
         Obj("data", Obj("name", Value("test")))
       ),
-      "{\"insert\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}," +
+      "{\"insert\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}," +
         "\"action\":\"create\",\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"test\"}}}}}"
     );
 
     assertJson(
       Insert(
         new RefV("104979509696660483", new RefV("spells", Native.CLASSES)),
-        Value(new Instant(0)),
+        Value(Instant.ofEpochMilli(0)),
         Value("create"),
         Obj("data", Obj("name", Value("test")))
       ),
-      "{\"insert\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"}," +
+      "{\"insert\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}," +
         "\"action\":\"create\",\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"test\"}}}}}"
     );
   }
@@ -530,21 +511,21 @@ public class SerializationSpec {
     assertJson(
       Remove(
         new RefV("104979509696660483", new RefV("spells", Native.CLASSES)),
-        Value(new Instant(0)),
+        Value(Instant.ofEpochMilli(0)),
         Action.DELETE
       ),
       "{\"remove\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}," +
-        "\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"},\"action\":\"delete\"}"
+        "\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"},\"action\":\"delete\"}"
     );
 
     assertJson(
       Remove(
         new RefV("104979509696660483", new RefV("spells", Native.CLASSES)),
-        Value(new Instant(0)),
+        Value(Instant.ofEpochMilli(0)),
         Value("delete")
       ),
       "{\"remove\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}," +
-        "\"ts\":{\"@ts\":\"1970-01-01T00:00:00.000000000Z\"},\"action\":\"delete\"}"
+        "\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"},\"action\":\"delete\"}"
     );
   }
 

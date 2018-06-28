@@ -5,19 +5,20 @@ import com.faunadb.client.errors.NotFoundException;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
-import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static com.faunadb.client.query.Language.Action.CREATE;
@@ -31,7 +32,6 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.collection.IsArrayContainingInOrder.arrayContaining;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.assertThat;
 
 public abstract class DslSpec {
@@ -983,7 +983,7 @@ public abstract class DslSpec {
   @Test
   public void shouldEvalTimeExpression() throws Exception {
     Value res = query(Time(Value("1970-01-01T00:00:00-04:00"))).get();
-    assertThat(res.to(TIME).get(), equalTo(new Instant(0).plus(Duration.standardHours(4))));
+    assertThat(res.to(TIME).get(), equalTo(Instant.ofEpochMilli(0).plus(4, ChronoUnit.HOURS)));
   }
 
   @Test
@@ -1004,13 +1004,13 @@ public abstract class DslSpec {
   @Test
   public void shouldEvalToTimeExpression() throws Exception {
     Value res = query(ToTime(Value("1970-01-01T00:00:00Z"))).get();
-    assertThat(res.to(TIME).get(), equalTo(new Instant(0)));
+    assertThat(res.to(TIME).get(), equalTo(Instant.ofEpochMilli(0)));
   }
 
   @Test
   public void shouldEvalToDateExpression() throws Exception {
     Value res = query(ToDate(Value("1970-01-01"))).get();
-    assertThat(res.to(DATE).get(), equalTo(new LocalDate(0, UTC)));
+    assertThat(res.to(DATE).get(), equalTo(LocalDate.ofEpochDay(0)));
   }
 
   @Test
@@ -1022,54 +1022,16 @@ public abstract class DslSpec {
       Epoch(Value(30), NANOSECOND)
     )).get();
 
-    assertThat(res.get(0).to(TIME).get(), equalTo(new Instant(0).plus(Duration.standardSeconds(30))));
-    assertThat(res.get(1).to(TIME).get(), equalTo(new Instant(0).plus(Duration.millis(30))));
-    assertThat(res.get(2).to(HP_TIME).get(), equalTo(HighPrecisionTime.fromInstantWithMicros(new Instant(0), 30)));
-    assertThat(res.get(3).to(HP_TIME).get(), equalTo(HighPrecisionTime.fromInstantWithNanos(new Instant(0), 30)));
-  }
-
-  @Test
-  public void shouldOverflowOnHighPrecisionTime() throws Exception {
-    ImmutableList<Value> res = query(ImmutableList.of(
-      Epoch(Value(1001), MICROSECOND),
-      Epoch(Value(1001), NANOSECOND)
-    )).get();
-
-    HighPrecisionTime micros = res.get(0).to(HP_TIME).get();
-    assertThat(micros.toInstant(), equalTo(new Instant(1)));
-    assertThat(micros.getMillisecondsFromEpoch(), equalTo(1L));
-    assertThat(micros.getNanosecondsOffset(), equalTo(1001000L));
-
-    HighPrecisionTime nanos = res.get(1).to(HP_TIME).get();
-    assertThat(nanos.toInstant(), equalTo(new Instant(0)));
-    assertThat(nanos.getMillisecondsFromEpoch(), equalTo(0L));
-    assertThat(nanos.getNanosecondsOffset(), equalTo(1001L));
-  }
-
-  @Test
-  public void shouldBeAbleToSortHighPrecisionTime() throws Exception {
-    Value res = query(Arr(
-      Epoch(Value(42), NANOSECOND),
-      Epoch(Value(50), MILLISECOND),
-      Epoch(Value(30), MICROSECOND),
-      Epoch(Value(1), SECOND)
-    )).get();
-
-    HighPrecisionTime[] times = res.collect(Field.as(HP_TIME)).toArray(new HighPrecisionTime[0]);
-    Arrays.sort(times);
-
-    assertThat(times, arrayContaining(
-      HighPrecisionTime.fromInstantWithNanos(new Instant(0), 42),
-      HighPrecisionTime.fromInstantWithMicros(new Instant(0), 30),
-      HighPrecisionTime.fromInstant(new Instant(50)),
-      HighPrecisionTime.fromInstant(new Instant(1000))
-    ));
+    assertThat(res.get(0).to(TIME).get(), equalTo(Instant.ofEpochMilli(0).plus(30, ChronoUnit.SECONDS)));
+    assertThat(res.get(1).to(TIME).get(), equalTo(Instant.ofEpochMilli(30)));
+    assertThat(res.get(2).to(TIME).get(), equalTo(Instant.ofEpochMilli(0).plus(30, ChronoUnit.MICROS)));
+    assertThat(res.get(3).to(TIME).get(), equalTo(Instant.ofEpochMilli(0).plus(30, ChronoUnit.NANOS)));
   }
 
   @Test
   public void shouldEvalDateExpression() throws Exception {
     Value res = query(Date(Value("1970-01-02"))).get();
-    assertThat(res.to(DATE).get(), equalTo(new LocalDate(0, UTC).plusDays(1)));
+    assertThat(res.to(DATE).get(), equalTo(LocalDate.ofEpochDay(1)));
   }
 
   @Test

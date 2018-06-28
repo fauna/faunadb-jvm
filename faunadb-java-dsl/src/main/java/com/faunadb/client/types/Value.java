@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
-import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
@@ -14,9 +13,10 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.BaseEncoding;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -475,19 +475,19 @@ public abstract class Value extends Expr {
    * @see Language#Value(Instant)
    * @see Value
    */
-  public static final class TimeV extends ScalarValue<HighPrecisionTime> {
+  public static final class TimeV extends ScalarValue<Instant> {
 
-    public TimeV(HighPrecisionTime value) {
+    public TimeV(Instant value) {
       super(value);
     }
 
     @JsonCreator
     private TimeV(@JsonProperty("@ts") String value) {
-      this(HighPrecisionTime.parse(value));
+      this(Instant.from(DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(value)));
     }
 
     Instant truncated() {
-      return value.toInstant();
+      return value;
     }
 
     @Override

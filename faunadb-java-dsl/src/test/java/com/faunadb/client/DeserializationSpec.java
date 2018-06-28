@@ -4,22 +4,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.Native;
-import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import static com.faunadb.client.types.Codec.*;
 import static com.faunadb.client.types.Value.RefV;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.joda.time.DateTimeZone.UTC;
+import static java.time.ZoneOffset.UTC;
 import static org.junit.Assert.assertThat;
 
 public class DeserializationSpec {
@@ -74,37 +74,19 @@ public class DeserializationSpec {
   @Test
   public void shouldDeserializeDate() throws IOException {
     assertThat(parsed("{ \"@date\": \"1970-01-03\" }").to(DATE).get(),
-      equalTo(new LocalDate(0, UTC).plusDays(2)));
+               equalTo(LocalDate.ofEpochDay(2)));
   }
 
   @Test
   public void shouldDeserializeTime() throws IOException {
     assertThat(parsed("{ \"@ts\": \"1970-01-01T00:05:00Z\" }").to(TIME).get(),
-      equalTo(new Instant(0).plus(Duration.standardMinutes(5))));
+               equalTo(Instant.ofEpochMilli(0).plus(5, ChronoUnit.MINUTES)));
 
     assertThat(parsed("{ \"@ts\": \"1970-01-01T00:00:05Z\" }").to(TIME).get(),
-      equalTo(new Instant(0).plus(Duration.standardSeconds(5))));
+               equalTo(Instant.ofEpochMilli(0).plus(5, ChronoUnit.SECONDS)));
 
     assertThat(parsed("{ \"@ts\": \"1970-01-01T00:00:00.005Z\" }").to(TIME).get(),
-      equalTo(new Instant(5)));
-  }
-
-  @Test
-  public void shouldIgnoreHightPrecisionWhenConvertingToTime() throws IOException {
-    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:00:00.000005Z\" }").to(TIME).get(),
-      equalTo(new Instant(0)));
-
-    assertThat(parsed("{ \"@ts\": \"1970-01-01T00:00:00.00000005Z\" }").to(TIME).get(),
-      equalTo(new Instant(0)));
-  }
-
-  @Test
-  public void shouldDeserializeHighPrecisionTime() throws Exception {
-    HighPrecisionTime micro = parsed("{ \"@ts\": \"1970-01-01T00:00:00.000005Z\" }").to(HP_TIME).get();
-    assertThat(micro, equalTo(new HighPrecisionTime(0, 5000)));
-
-    HighPrecisionTime nano = parsed("{ \"@ts\": \"1970-01-01T00:00:00.000000005Z\" }").to(HP_TIME).get();
-    assertThat(nano, equalTo(new HighPrecisionTime(0, 5)));
+      equalTo(Instant.ofEpochMilli(5)));
   }
 
   @Test

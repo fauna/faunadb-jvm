@@ -4,10 +4,9 @@ import faunadb.errors.{ BadRequestException, NotFoundException, PermissionDenied
 import faunadb.query.TimeUnit._
 import faunadb.query._
 import faunadb.values._
-import faunadb.values.time._
-import org.joda.time
-import org.joda.time.DateTimeZone.UTC
-import org.joda.time.{ Instant, LocalDate }
+import java.time.{ Instant, LocalDate }
+import java.time.ZoneOffset.UTC
+import java.time.temporal.ChronoUnit
 import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -556,19 +555,19 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     numR should equal (100L)
 
     val timeF = client.query(ToTime("1970-01-01T00:00:00Z"))
-    val timeR = await(timeF).to[TimeV].get.time.toInstant
-    timeR should equal (new Instant(0))
+    val timeR = await(timeF).to[TimeV].get.toInstant
+    timeR should equal (Instant.ofEpochMilli(0))
 
     val dateF = client.query(ToDate("1970-01-01"))
     val dateR = await(dateF).to[DateV].get.localDate
-    dateR should equal (new LocalDate(0, UTC))
+    dateR should equal (LocalDate.ofEpochDay(0))
   }
 
   it should "test date and time functions" in {
     val timeF = client.query(Time("1970-01-01T00:00:00-04:00"))
     val timeR = await(timeF)
-    timeR.to[TimeV].get.time.toInstant shouldBe new Instant(0).plus(time.Duration.standardHours(4))
-    timeR.to[Instant].get shouldBe new Instant(0).plus(time.Duration.standardHours(4))
+    timeR.to[TimeV].get.toInstant shouldBe Instant.ofEpochMilli(0).plus(4, ChronoUnit.HOURS)
+    timeR.to[Instant].get shouldBe Instant.ofEpochMilli(0).plus(4, ChronoUnit.HOURS)
 
     val epochR = await(client.query(Arr(
       Epoch(30, Second),
@@ -577,20 +576,20 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       Epoch(40, Microsecond)
     )))
 
-    epochR.collect(Field.to[HighPrecisionTime]).get.sorted shouldBe Seq(
-      HighPrecisionTime(new Instant(0), nanosToAdd = 42),
-      HighPrecisionTime(new Instant(0), microsToAdd = 40),
-      HighPrecisionTime(new Instant(10)),
-      HighPrecisionTime(new Instant(30000))
+    epochR.collect(Field.to[Instant]).get.sorted shouldBe Seq(
+      Instant.ofEpochMilli(0).plus(42, ChronoUnit.NANOS),
+      Instant.ofEpochMilli(0).plus(40, ChronoUnit.MICROS),
+      Instant.ofEpochMilli(10),
+      Instant.ofEpochMilli(30000)
     )
 
-    epochR(0).to[TimeV].get.time.toInstant shouldBe new Instant(0).plus(time.Duration.standardSeconds(30))
-    epochR(0).to[Instant].get shouldBe new Instant(0).plus(time.Duration.standardSeconds(30))
+    epochR(0).to[TimeV].get.toInstant shouldBe Instant.ofEpochMilli(0).plus(30, ChronoUnit.SECONDS)
+    epochR(0).to[Instant].get shouldBe Instant.ofEpochMilli(0).plus(30, ChronoUnit.SECONDS)
 
     val dateF = client.query(query.Date("1970-01-02"))
     val dateR = await(dateF)
-    dateR.to[DateV].get.localDate shouldBe new LocalDate(0, UTC).plusDays(1)
-    dateR.to[LocalDate].get shouldBe new LocalDate(0, UTC).plusDays(1)
+    dateR.to[DateV].get.localDate shouldBe LocalDate.ofEpochDay(1)
+    dateR.to[LocalDate].get shouldBe LocalDate.ofEpochDay(1)
   }
 
   it should "test authentication functions" in {

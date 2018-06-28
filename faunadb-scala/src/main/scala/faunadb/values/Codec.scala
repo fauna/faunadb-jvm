@@ -1,6 +1,6 @@
 package faunadb.values
 
-import org.joda.time.{ Instant, LocalDate }
+import java.time.{ Instant, LocalDate }
 import scala.collection.generic.CanBuildFrom
 import scala.language.experimental.macros
 import scala.language.higherKinds
@@ -123,7 +123,7 @@ object Decoder {
   implicit object InstantDecoder extends Decoder[Instant] {
     def decode(v: Value, path: FieldPath) =
       v match {
-        case TimeV(time) => Result.successful(time.toInstant, path)
+        case TimeV(time) => Result.successful(time, path)
         case v => Result.Unexpected(v, "Timestamp", path)
       }
   }
@@ -257,7 +257,7 @@ object Encoder {
   }
 
   implicit object InstantEncoder extends Encoder[Instant] {
-    override def encode(t: Instant): Value = TimeV(t)
+    override def encode(t: Instant): Value = if (t != null) TimeV(t) else NullV
   }
 
   implicit object LocalDateEncoder extends Encoder[LocalDate] {

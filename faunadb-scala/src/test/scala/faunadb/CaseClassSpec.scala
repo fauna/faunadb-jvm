@@ -1,7 +1,7 @@
 package faunadb
 
 import faunadb.values.Codec
-import org.joda.time.{ Instant, LocalDate }
+import java.time.{ Instant, LocalDate }
 
 /**
   * This class only exist to test Codec.caseClass macro compilation without importing `faunadb.values._`
