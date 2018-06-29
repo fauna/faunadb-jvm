@@ -2238,11 +2238,37 @@ public final class Language {
    *
    * @param path the path to the desired value
    * @param from the collection to traverse. Type: Array
+   * @param defaultValue the default value to return if the desired path doesn't exist
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr SelectAll(Expr path, Expr from, Expr defaultValue) {
+      return Fn.apply("select_all", path, "from", from, "default", defaultValue);
+  }
+
+  /**
+   * Selects the desired path for each element in the given array.
+   *
+   * @param path the path to the desired value
+   * @param from the collection to traverse. Type: Array
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
    */
   public static Expr SelectAll(Path path, Expr from) {
     return SelectAll(Arr(path.segments), from);
+  }
+
+  /**
+   * Selects the desired path for each element in the given array.
+   *
+   * @param path the path to the desired value
+   * @param from the collection to traverse. Type: Array
+   * @param defaultValue the default value to return if the desired path doesn't exist
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
+   */
+  public static Expr SelectAll(Path path, Expr from, Expr defaultValue) {
+      return SelectAll(Arr(path.segments), from, defaultValue);
   }
 
   /**
