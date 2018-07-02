@@ -2,8 +2,8 @@ package com.faunadb.client.types;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -49,8 +49,8 @@ public final class Field<T> {
       new Function<List<Value>, Result<List<A>>>() {
         @Override
         public Result<List<A>> apply(List<Value> values) {
-          ImmutableList.Builder<A> success = ImmutableList.builder();
-          ImmutableList.Builder<String> failures = ImmutableList.builder();
+          List<A> success = new ArrayList<>();
+          List<String> failures = new ArrayList<>();
 
           for (int i = 0; i < values.size(); i++) {
             Result<A> res = field.get(values.get(i));
@@ -63,11 +63,10 @@ public final class Field<T> {
             }
           }
 
-          ImmutableList<String> allErrors = failures.build();
-          if (!allErrors.isEmpty())
-            return Result.fail(format("Failed to collect values: %s", Joiner.on(", ").join(allErrors)));
+          if (!failures.isEmpty())
+            return Result.fail(format("Failed to collect values: %s", Joiner.on(", ").join(failures)));
 
-          return Result.<List<A>>success(success.build());
+          return Result.<List<A>>success(success);
         }
       };
   }

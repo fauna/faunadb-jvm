@@ -2,8 +2,9 @@ package com.faunadb.client.errors;
 
 import com.faunadb.client.HttpResponses;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ public class FaunaException extends RuntimeException {
     if (response.isPresent()) {
       return response.get().errors();
     } else {
-      return ImmutableList.of();
+      return Collections.emptyList();
     }
   }
 
@@ -55,11 +56,12 @@ public class FaunaException extends RuntimeException {
   }
 
   private static String constructErrorMessage(List<HttpResponses.QueryError> errors) {
-    ImmutableList.Builder<String> messages = ImmutableList.builder();
+    List<String> messages = new ArrayList<>();
+
     for (HttpResponses.QueryError error : errors) {
       messages.add(error.code() + ": " + error.description());
     }
 
-    return Joiner.on(", ").join(messages.build());
+    return Joiner.on(", ").join(messages);
   }
 }

@@ -2,9 +2,10 @@ package com.faunadb.client.types;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -84,25 +85,25 @@ final class Path {
   }
 
   static Path empty() {
-    return new Path(ImmutableList.<Segment>of());
+    return new Path(Collections.<Segment>emptyList());
   }
 
   static Path from(String... keys) {
-    ImmutableList.Builder<Segment> segments = ImmutableList.builder();
+    List<Segment> segments = new ArrayList<>();
 
     for (String key : keys)
       segments.add(new ObjectKey(key));
 
-    return new Path(segments.build());
+    return new Path(Collections.unmodifiableList(segments));
   }
 
   static Path from(int... indexes) {
-    ImmutableList.Builder<Segment> segments = ImmutableList.builder();
+    List<Segment> segments = new ArrayList<>();
 
     for (Integer index : indexes)
       segments.add(new ArrayIndex(index));
 
-    return new Path(segments.build());
+    return new Path(Collections.unmodifiableList(segments));
   }
 
   private final List<Segment> segments;
@@ -112,11 +113,11 @@ final class Path {
   }
 
   Path subPath(Path other) {
-    ImmutableList.Builder<Segment> newSegments = ImmutableList.builder();
+    List<Segment> newSegments = new ArrayList<>();
     newSegments.addAll(segments);
     newSegments.addAll(other.segments);
 
-    return new Path(newSegments.build());
+    return new Path(Collections.unmodifiableList(newSegments));
   }
 
   Result<Value> get(Value root) {

@@ -7,7 +7,6 @@ import com.faunadb.client.errors.UnauthorizedException;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
-import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

@@ -3,9 +3,9 @@ package com.faunadb.client.types;
 import com.faunadb.client.types.Value.*;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -369,7 +369,7 @@ final class Transformations {
   final static Function<List<Value>, Value> LIST_TO_VALUE = new Function<List<Value>, Value>() {
     @Override
     public Value apply(List<Value> input) {
-        return new ArrayV(ImmutableList.copyOf(input));
+        return new ArrayV(Collections.unmodifiableList(input));
     }
   };
 

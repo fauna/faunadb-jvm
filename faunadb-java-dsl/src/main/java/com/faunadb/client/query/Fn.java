@@ -1,9 +1,9 @@
 package com.faunadb.client.query;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +31,7 @@ final class Fn {
 
   private static final class UnescapedArray extends Unescaped<List<Expr>> {
     private UnescapedArray(List<? extends Expr> body) {
-      super(ImmutableList.copyOf(body));
+      super(Collections.unmodifiableList(body));
     }
   }
 

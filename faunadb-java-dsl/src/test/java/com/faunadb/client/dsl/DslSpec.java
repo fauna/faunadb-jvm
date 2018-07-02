@@ -5,7 +5,6 @@ import com.faunadb.client.errors.NotFoundException;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.junit.Before;
@@ -78,13 +77,13 @@ public abstract class DslSpec {
 
     initialized = true;
 
-    query(ImmutableList.of(
+    query(Arrays.asList(
       CreateClass(Obj("name", Value("spells"))),
       CreateClass(Obj("name", Value("characters"))),
       CreateClass(Obj("name", Value("spellbooks")))
     )).get();
 
-    query(ImmutableList.of(
+    query(Arrays.asList(
       CreateIndex(Obj(
         "name", Value("all_spells"),
         "source", Class("spells")
@@ -235,7 +234,7 @@ public abstract class DslSpec {
 
   @Test
   public void shouldBeAbleToIssueABatchedQuery() throws Exception {
-    List<Value> results = query(ImmutableList.of(
+    List<Value> results = query(Arrays.asList(
       Get(magicMissile),
       Get(thor)
     )).get();
@@ -244,7 +243,7 @@ public abstract class DslSpec {
     assertThat(results.get(0).get(NAME_FIELD), equalTo("Magic Missile"));
     assertThat(results.get(1).get(NAME_FIELD), equalTo("Thor"));
 
-    List<Value> data = query(ImmutableList.of(
+    List<Value> data = query(Arrays.asList(
       new ObjectV(ImmutableMap.of("k1", new StringV("v1"))),
       new ObjectV(ImmutableMap.of("k2", new StringV("v2")))
     )).get();
@@ -369,7 +368,7 @@ public abstract class DslSpec {
       Paginate(Events(ref))
     ).get().get(DATA);
 
-    List<Event> events = ImmutableList.copyOf(data.asCollectionOf(Event.class).get());
+    List<Event> events = new ArrayList<>(data.asCollectionOf(Event.class).get());
 
     assertThat(events, hasSize(3));
 
@@ -401,7 +400,7 @@ public abstract class DslSpec {
       Paginate(Events(Singleton(ref)))
     ).get().get(DATA);
 
-    List<Event> events = ImmutableList.copyOf(data.asCollectionOf(Event.class).get());
+    List<Event> events = new ArrayList<>(data.asCollectionOf(Event.class).get());
 
     assertThat(events, hasSize(2));
 
@@ -1014,7 +1013,7 @@ public abstract class DslSpec {
 
   @Test
   public void shouldEvalEpochExpression() throws Exception {
-    List<Value> res = query(ImmutableList.of(
+    List<Value> res = query(Arrays.asList(
       Epoch(Value(30), SECOND),
       Epoch(Value(30), MILLISECOND),
       Epoch(Value(30), MICROSECOND),

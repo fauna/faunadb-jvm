@@ -9,7 +9,6 @@ import com.faunadb.client.query.Language;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.BaseEncoding;
 
@@ -18,6 +17,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -308,16 +308,16 @@ public abstract class Value extends Expr {
   @JsonDeserialize(using = Deserializer.ArrayDeserializer.class)
   public static final class ArrayV extends Value {
 
-    final ImmutableList<Value> values;
+    final List<Value> values;
 
     public ArrayV(List<? extends Value> values) {
       requireNonNull(values);
-      this.values = ImmutableList.copyOf(values);
+      this.values = Collections.unmodifiableList(values);
     }
 
     @Override
     @JsonValue
-    protected ImmutableList<Value> toJson() {
+    protected List<Value> toJson() {
       return values;
     }
 
