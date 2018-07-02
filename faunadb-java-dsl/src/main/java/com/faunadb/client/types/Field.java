@@ -4,6 +4,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 
+import java.util.List;
+
 import static java.lang.String.format;
 
 /**
@@ -24,7 +26,7 @@ import static java.lang.String.format;
  */
 public final class Field<T> {
 
-  private final class CollectionCodec<A> implements Codec<ImmutableList<A>> {
+  private final class CollectionCodec<A> implements Codec<List<A>> {
     private final Path path;
     private final Field<A> field;
 
@@ -34,19 +36,19 @@ public final class Field<T> {
     }
 
     @Override
-    public Result<ImmutableList<A>> decode(Value input) {
-      return input.to(ARRAY).flatMap(toList);
+    public Result<List<A>> decode(Value input) {
+      return input.to(ARRAY).<List<A>>flatMap(toList);
     }
 
     @Override
-    public Result<Value> encode(ImmutableList<A> value) {
+    public Result<Value> encode(List<A> value) {
       throw new IllegalArgumentException("not implemented");
     }
 
-    private final Function<ImmutableList<Value>, Result<ImmutableList<A>>> toList =
-      new Function<ImmutableList<Value>, Result<ImmutableList<A>>>() {
+    private final Function<List<Value>, Result<List<A>>> toList =
+      new Function<List<Value>, Result<List<A>>>() {
         @Override
-        public Result<ImmutableList<A>> apply(ImmutableList<Value> values) {
+        public Result<List<A>> apply(List<Value> values) {
           ImmutableList.Builder<A> success = ImmutableList.builder();
           ImmutableList.Builder<String> failures = ImmutableList.builder();
 
@@ -65,7 +67,7 @@ public final class Field<T> {
           if (!allErrors.isEmpty())
             return Result.fail(format("Failed to collect values: %s", Joiner.on(", ").join(allErrors)));
 
-          return Result.success(success.build());
+          return Result.<List<A>>success(success.build());
         }
       };
   }
@@ -174,7 +176,7 @@ public final class Field<T> {
    * @param field the {@link Field} to be extracted from each collection element
    * @return a new {@link Field} instance
    */
-  public <A> Field<ImmutableList<A>> collect(Field<A> field) {
+  public <A> Field<List<A>> collect(Field<A> field) {
     return new Field<>(path, new CollectionCodec<>(path, field));
   }
 

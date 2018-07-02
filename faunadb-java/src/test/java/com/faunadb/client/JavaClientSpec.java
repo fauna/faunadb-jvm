@@ -13,6 +13,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.faunadb.client.query.Language.Class;
@@ -192,9 +193,15 @@ public class JavaClientSpec extends DslSpec {
 
     Expr allNestedClasses = Classes(nestedDatabase);
 
+    List<RefV> results = new ArrayList();
+
+    results.add(new RefV("a_class", Native.CLASSES,
+                         new RefV("child-database", Native.DATABASES,
+                                  new RefV("parent-database", Native.DATABASES))));
+
     assertThat(
       serverClient.query(Paginate(allNestedClasses)).get().get(REF_LIST),
-      equalTo(ImmutableList.of(new RefV("a_class", Native.CLASSES, new RefV("child-database", Native.DATABASES, new RefV("parent-database", Native.DATABASES)))))
+      equalTo(results)
     );
   }
 
@@ -230,7 +237,7 @@ public class JavaClientSpec extends DslSpec {
   }
 
   @Override
-  protected ListenableFuture<ImmutableList<Value>> query(List<? extends Expr> exprs) {
+  protected ListenableFuture<List<Value>> query(List<? extends Expr> exprs) {
     return serverClient.query(exprs);
   }
 

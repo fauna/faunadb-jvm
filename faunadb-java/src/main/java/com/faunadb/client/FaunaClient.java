@@ -201,10 +201,10 @@ public class FaunaClient implements AutoCloseable {
    * @param exprs the list of queries to be sent to FaunaDB.
    * @return a {@link ListenableFuture} containing an ordered list of the query's responses.
    */
-  public ListenableFuture<ImmutableList<Value>> query(List<? extends Expr> exprs) {
-    return transform(performRequest(json.valueToTree(exprs)), new Function<Value, ImmutableList<Value>>() {
+  public ListenableFuture<List<Value>> query(List<? extends Expr> exprs) {
+    return transform(performRequest(json.valueToTree(exprs)), new Function<Value, List<Value>>() {
       @Override
-      public ImmutableList<Value> apply(Value result) {
+      public List<Value> apply(Value result) {
         return result.collect(Field.as(VALUE));
       }
     });

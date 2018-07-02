@@ -50,7 +50,7 @@ public abstract class DslSpec {
   protected static final Field<Long> TS_FIELD = Field.at("ts").to(LONG);
   protected static final Field<RefV> REF_FIELD = Field.at("ref").to(REF);
   protected static final Field<RefV> INSTANCE_FIELD = Field.at("instance").to(REF);
-  protected static final Field<ImmutableList<RefV>> REF_LIST = DATA.collect(Field.as(REF));
+  protected static final Field<List<RefV>> REF_LIST = DATA.collect(Field.as(REF));
 
   protected static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).to(STRING);
   protected static final Field<String> ELEMENT_FIELD = DATA.at(Field.at("element")).to(STRING);
@@ -67,7 +67,7 @@ public abstract class DslSpec {
   protected static RefV thorSpell2;
 
   protected abstract ListenableFuture<Value> query(Expr expr);
-  protected abstract ListenableFuture<ImmutableList<Value>> query(List<? extends Expr> exprs);
+  protected abstract ListenableFuture<List<Value>> query(List<? extends Expr> exprs);
 
   private static boolean initialized = false;
 
@@ -235,7 +235,7 @@ public abstract class DslSpec {
 
   @Test
   public void shouldBeAbleToIssueABatchedQuery() throws Exception {
-    ImmutableList<Value> results = query(ImmutableList.of(
+    List<Value> results = query(ImmutableList.of(
       Get(magicMissile),
       Get(thor)
     )).get();
@@ -244,7 +244,7 @@ public abstract class DslSpec {
     assertThat(results.get(0).get(NAME_FIELD), equalTo("Magic Missile"));
     assertThat(results.get(1).get(NAME_FIELD), equalTo("Thor"));
 
-    ImmutableList<Value> data = query(ImmutableList.of(
+    List<Value> data = query(ImmutableList.of(
       new ObjectV(ImmutableMap.of("k1", new StringV("v1"))),
       new ObjectV(ImmutableMap.of("k2", new StringV("v2")))
     )).get();
@@ -1014,7 +1014,7 @@ public abstract class DslSpec {
 
   @Test
   public void shouldEvalEpochExpression() throws Exception {
-    ImmutableList<Value> res = query(ImmutableList.of(
+    List<Value> res = query(ImmutableList.of(
       Epoch(Value(30), SECOND),
       Epoch(Value(30), MILLISECOND),
       Epoch(Value(30), MICROSECOND),

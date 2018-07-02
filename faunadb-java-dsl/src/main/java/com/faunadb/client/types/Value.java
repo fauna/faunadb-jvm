@@ -178,10 +178,10 @@ public abstract class Value extends Expr {
    *
    * @param <T> the type of the elements in the resulting {@link List}
    * @param field the {@link Field} to extract from each element in the underlying collection
-   * @return a {@link ImmutableList} with the collected fields
+   * @return a {@link List} with the collected fields
    * @see Field
    */
-  public final <T> ImmutableList<T> collect(Field<T> field) {
+  public final <T> List<T> collect(Field<T> field) {
     return Field.root().collect(field).get(this).get();
   }
 

@@ -68,9 +68,9 @@ final class Path {
 
     @Override
     public Result<Value> get(Value root) {
-      return root.to(ARRAY).flatMap(new Function<ImmutableList<Value>, Result<Value>>() {
+      return root.to(ARRAY).flatMap(new Function<List<Value>, Result<Value>>() {
         @Override
-        public Result<Value> apply(ImmutableList<Value> array) {
+        public Result<Value> apply(List<Value> array) {
           try {
             return Result.success(array.get(segment));
           } catch (IndexOutOfBoundsException ign) {

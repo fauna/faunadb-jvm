@@ -6,6 +6,8 @@ import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import java.util.List;
+
 import static java.lang.String.format;
 
 import java.time.Instant;
@@ -157,9 +159,9 @@ public interface Codec<T> {
   Codec<LocalDate> DATE = Transformations.mapTo(DateV.class, Transformations.<DateV, LocalDate>scalarValue(), Transformations.LOCAL_DATE_TO_VALUE);
 
   /**
-   * Converts a {@link Value} to an {@link ImmutableList} of {@link Value}
+   * Converts a {@link Value} to an {@link List} of {@link Value}
    */
-  Codec<ImmutableList<Value>> ARRAY = Transformations.mapTo(ArrayV.class, Transformations.VALUE_TO_LIST, Transformations.LIST_TO_VALUE);
+  Codec<List<Value>> ARRAY = Transformations.mapTo(ArrayV.class, Transformations.VALUE_TO_LIST, Transformations.LIST_TO_VALUE);
 
   /**
    * Converts a {@link Value} to an {@link ImmutableMap} of {@link String} to {@link Value}
@@ -363,10 +365,10 @@ final class Transformations {
     }
   };
 
-  final static Function<ImmutableList<Value>, Value> LIST_TO_VALUE = new Function<ImmutableList<Value>, Value>() {
+  final static Function<List<Value>, Value> LIST_TO_VALUE = new Function<List<Value>, Value>() {
     @Override
-    public Value apply(ImmutableList<Value> input) {
-      return new ArrayV(input);
+    public Value apply(List<Value> input) {
+        return new ArrayV(ImmutableList.copyOf(input));
     }
   };
 
@@ -386,9 +388,9 @@ final class Transformations {
     }
   };
 
-  final static Function<ArrayV, ImmutableList<Value>> VALUE_TO_LIST = new Function<ArrayV, ImmutableList<Value>>() {
+  final static Function<ArrayV, List<Value>> VALUE_TO_LIST = new Function<ArrayV, List<Value>>() {
     @Override
-    public ImmutableList<Value> apply(ArrayV input) {
+    public List<Value> apply(ArrayV input) {
       return input.values;
     }
   };

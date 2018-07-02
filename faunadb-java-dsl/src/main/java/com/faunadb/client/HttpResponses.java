@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.collect.ImmutableList;
 
 import java.io.IOException;
+import java.util.List;
 
 public class HttpResponses {
   static class Codec {
@@ -109,7 +110,7 @@ public class HttpResponses {
       return description;
     }
 
-    public ImmutableList<String> field() {
+    public List<String> field() {
       return field;
     }
   }
@@ -121,17 +122,17 @@ public class HttpResponses {
     private final String description;
     private final ImmutableList<ValidationFailure> failures;
 
-    public QueryError(ImmutableList<String> position,
+    public QueryError(List<String> position,
                       String code,
                       String description,
                       ImmutableList<ValidationFailure> failures) {
-      this.position = position;
+      this.position = ImmutableList.copyOf(position);
       this.code = code;
       this.description = description;
       this.failures = failures;
     }
 
-    public ImmutableList<String> position() {
+    public List<String> position() {
       return position;
     }
 
@@ -143,14 +144,14 @@ public class HttpResponses {
       return description;
     }
 
-    public ImmutableList<ValidationFailure> failures() {
+    public List<ValidationFailure> failures() {
       return failures;
     }
   }
 
   public static class QueryErrorResponse {
-    public static QueryErrorResponse create(int status, ImmutableList<QueryError> errors) {
-      return new QueryErrorResponse(status, errors);
+    public static QueryErrorResponse create(int status, List<QueryError> errors) {
+      return new QueryErrorResponse(status, ImmutableList.copyOf(errors));
     }
 
     private final int status;
@@ -165,7 +166,7 @@ public class HttpResponses {
       return status;
     }
 
-    public ImmutableList<QueryError> errors() {
+    public List<QueryError> errors() {
       return errors;
     }
   }

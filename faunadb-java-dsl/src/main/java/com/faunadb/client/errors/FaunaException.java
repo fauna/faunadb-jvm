@@ -4,6 +4,7 @@ import com.faunadb.client.HttpResponses;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -32,7 +33,7 @@ public class FaunaException extends RuntimeException {
    *
    * @return a list of errors
    */
-  public ImmutableList<HttpResponses.QueryError> errors() {
+  public List<HttpResponses.QueryError> errors() {
     if (response.isPresent()) {
       return response.get().errors();
     } else {
@@ -53,7 +54,7 @@ public class FaunaException extends RuntimeException {
     }
   }
 
-  private static String constructErrorMessage(ImmutableList<HttpResponses.QueryError> errors) {
+  private static String constructErrorMessage(List<HttpResponses.QueryError> errors) {
     ImmutableList.Builder<String> messages = ImmutableList.builder();
     for (HttpResponses.QueryError error : errors) {
       messages.add(error.code() + ": " + error.description());

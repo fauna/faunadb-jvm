@@ -154,7 +154,7 @@ public final class Decoder {
 
   private static Collection<Object> toCollection(Value value, CollectionType dstType) {
     try {
-      ImmutableList<Value> values = value.to(Codec.ARRAY).get();
+      List<Value> values = value.to(Codec.ARRAY).get();
 
       SimpleType elementType = dstType.getElementType();
 
@@ -195,7 +195,7 @@ public final class Decoder {
   }
 
   private static Object toArray(Value value, Class<?> dstType) {
-    ImmutableList<Value> values = value.to(Codec.ARRAY).get();
+    List<Value> values = value.to(Codec.ARRAY).get();
 
     SimpleType componentType = Types.of(dstType.getComponentType());
 
