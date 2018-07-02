@@ -247,7 +247,7 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
       "junit" % "junit" % "4.12" % "test"
     ),
 
-    platformTarget in Android := "android-16",
+    platformTarget in Android := "android-26",
     buildToolsVersion in Android := Some("26.0.0"),
     showSdkProgress in Android := true,
     useProguard := true,
