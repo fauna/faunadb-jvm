@@ -714,6 +714,10 @@ public final class Language {
     return Fn.apply("at", timestamp, "expr", expr);
   }
 
+  public static Expr At(Instant timestamp, Expr expr) {
+    return At(new TimeV(timestamp), expr);
+  }
+
   /**
    * Bind values to one or more variables.
    * Variables must be accessed using the {@link #Var(String)} function.
@@ -1005,6 +1009,10 @@ public final class Language {
     return Fn.apply("lambda", var, "expr", expr);
   }
 
+  public static Expr Lambda(String var, Expr expr) {
+    return Lambda(new StringV(var), expr);
+  }
+
   /**
    * Applies the given lambda to each element of the provided collection, and returns
    * the results of each application in a new collection of the same type.
@@ -1065,6 +1073,10 @@ public final class Language {
     return Fn.apply("take", num, "collection", collection);
   }
 
+  public static Expr Take(long num, Expr collection) {
+    return Take(new LongV(num), collection);
+  }
+
   /**
    * Returns a new collection containing after dropping the given number of elements from the provided collection.
    *
@@ -1075,6 +1087,10 @@ public final class Language {
    */
   public static Expr Drop(Expr num, Expr collection) {
     return Fn.apply("drop", num, "collection", collection);
+  }
+
+  public static Expr Drop(long num, Expr collection) {
+    return Drop(new LongV(num), collection);
   }
 
   /**
@@ -1151,6 +1167,10 @@ public final class Language {
     return Fn.apply("get", ref, "ts", timestamp);
   }
 
+  public static Expr Get(Expr ref, Instant timestamp) {
+    return Get(ref, new TimeV(timestamp));
+  }
+
   /**
    * Retrieves the key object given the key's secret string.
    *
@@ -1160,6 +1180,10 @@ public final class Language {
    */
   public static Expr KeyFromSecret(Expr secret) {
     return Fn.apply("key_from_secret", secret);
+  }
+
+  public static Expr KeyFromSecret(String secret) {
+    return KeyFromSecret(new StringV(secret));
   }
 
   /**
@@ -1625,6 +1649,10 @@ public final class Language {
     return Fn.apply("logout", invalidateAll);
   }
 
+  public static Expr Logout(boolean invalidateAll) {
+    return Logout(BooleanV.valueOf(invalidateAll));
+  }
+
   /**
    * Checks the given password against the reference's credentials, retuning true if valid, or false otherwise.
    *
@@ -1635,6 +1663,10 @@ public final class Language {
    */
   public static Expr Identify(Expr ref, Expr password) {
     return Fn.apply("identify", ref, "password", password);
+  }
+
+  public static Expr Identify(Expr ref, String password) {
+    return Identify(ref, new StringV(password));
   }
 
   /**
@@ -1703,6 +1735,10 @@ public final class Language {
     return Fn.apply("casefold", str);
   }
 
+  public static Expr Casefold(String str) {
+    return Casefold(new StringV(str));
+  }
+
   /**
    * Normalizes strings according to the Unicode Standard, section 5.18 "Case Mappings", and the normalizer provided.
    * Pre-defined normalizers are available for the overload {@link #Casefold(Expr, Normalizer)}.
@@ -1718,6 +1754,10 @@ public final class Language {
     return Fn.apply("casefold", str, "normalizer", normalizer);
   }
 
+  public static Expr Casefold(String str, Expr normalizer) {
+    return Casefold(new StringV(str), normalizer);
+  }
+
   /**
    * Normalizes strings according to the Unicode Standard, section 5.18 "Case Mappings", and the normalizer provided.
    *
@@ -1730,6 +1770,10 @@ public final class Language {
    */
   public static Expr Casefold(Expr str, Normalizer normalizer) {
     return Casefold(str, normalizer.value);
+  }
+
+  public static Expr Casefold(String str, Normalizer normalizer) {
+    return Casefold(new StringV(str), normalizer.value);
   }
 
   /**
@@ -1747,6 +1791,34 @@ public final class Language {
     return Fn.apply("ngram", terms, "min", min, "max", max);
   }
 
+  public static Expr NGram(String terms, Expr min, Expr max) {
+    return NGram(new StringV(terms), min, max);
+  }
+
+  public static Expr NGram(Expr terms, long min, Expr max) {
+    return NGram(terms, new LongV(min), max);
+  }
+
+  public static Expr NGram(String terms, long min, Expr max) {
+    return NGram(terms, new LongV(min), max);
+  }
+
+  public static Expr NGram(Expr terms, Expr min, long max) {
+    return NGram(terms, min, new LongV(max));
+  }
+
+  public static Expr NGram(String terms, Expr min, long max) {
+    return NGram(terms, min, new LongV(max));
+  }
+
+  public static Expr NGram(Expr terms, long min, long max) {
+    return NGram(terms, new LongV(min), new LongV(max));
+  }
+
+  public static Expr NGram(String terms, long min, long max) {
+    return NGram(terms, new LongV(min), new LongV(max));
+  }
+
   /**
    * Tokenize the input into n-grams of the given sizes.
    *
@@ -1762,6 +1834,7 @@ public final class Language {
   public static Expr NGram(List<Expr> terms, Expr min, Expr max) {
     return NGram(varargs(terms), min, max);
   }
+
 
   /**
    * Tokenize the input into n-grams of the 1 and 2 elements in size.
@@ -1785,8 +1858,12 @@ public final class Language {
    * @see #Arr(List)
    * @see #Value(String)
    */
-  public static Expr NGram(Expr terms) {
-    return Fn.apply("ngram", terms);
+  public static Expr NGram(Expr term) {
+    return Fn.apply("ngram", term);
+  }
+
+  public static Expr NGram(String term) {
+    return NGram(new StringV(term));
   }
 
   /**
@@ -1802,6 +1879,10 @@ public final class Language {
     return Fn.apply("time", str);
   }
 
+  public static Expr Time(String str) {
+    return Time(new StringV(str));
+  }
+
   /**
    * Constructs a timestamp relative to the epoch "1970-01-01T00:00:00Z" given a unit type and a number of units.
    *
@@ -1814,6 +1895,10 @@ public final class Language {
    */
   public static Expr Epoch(Expr num, TimeUnit unit) {
     return Epoch(num, unit.value);
+  }
+
+  public static Expr Epoch(long num, TimeUnit unit) {
+    return Epoch(new LongV(num), unit);
   }
 
   /**
@@ -1836,6 +1921,18 @@ public final class Language {
     return Fn.apply("epoch", num, "unit", unit);
   }
 
+  public static Expr Epoch(Expr num, String unit) {
+    return Epoch(num, new StringV(unit));
+  }
+
+  public static Expr Epoch(long num, Expr unit) {
+    return Epoch(new LongV(num), unit);
+  }
+
+  public static Expr Epoch(long num, String unit) {
+    return Epoch(new LongV(num), new StringV(unit));
+  }
+
   /**
    * Creates a date from an ISO-8601 formatted date string.
    *
@@ -1846,6 +1943,10 @@ public final class Language {
    */
   public static Expr Date(Expr str) {
     return Fn.apply("date", str);
+  }
+
+  public static Expr Date(String str) {
+    return Date(new StringV(str));
   }
 
   /**
