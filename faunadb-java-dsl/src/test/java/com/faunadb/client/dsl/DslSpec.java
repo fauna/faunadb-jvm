@@ -5,7 +5,6 @@ import com.faunadb.client.errors.NotFoundException;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.junit.Before;
 import org.junit.Rule;
@@ -243,9 +242,15 @@ public abstract class DslSpec {
     assertThat(results.get(0).get(NAME_FIELD), equalTo("Magic Missile"));
     assertThat(results.get(1).get(NAME_FIELD), equalTo("Thor"));
 
+    Map<String, Value> k1 = new HashMap<>();
+    k1.put("k1", new StringV("v1"));
+
+    Map<String, Value> k2 = new HashMap<>();
+    k2.put("k2", new StringV("v2"));
+    
     List<Value> data = query(Arrays.asList(
-      new ObjectV(ImmutableMap.of("k1", new StringV("v1"))),
-      new ObjectV(ImmutableMap.of("k2", new StringV("v2")))
+            new ObjectV(k1),
+            new ObjectV(k2)
     )).get();
 
     assertThat(data, hasSize(2));

@@ -1,9 +1,9 @@
 package com.faunadb.client.query;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.common.collect.ImmutableMap;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +25,7 @@ final class Fn {
 
   private static final class UnescapedObject extends Unescaped<Map<String, Expr>> {
     private UnescapedObject(Map<String, ? extends Expr> body) {
-      super(ImmutableMap.copyOf(body));
+      super(Collections.unmodifiableMap(body));
     }
   }
 
@@ -44,19 +44,33 @@ final class Fn {
   }
 
   static Expr apply(String k1, Expr p1) {
-    return apply(ImmutableMap.of(k1, p1));
+    Map<String, Expr> kvs = new LinkedHashMap<>();
+    kvs.put(k1, p1);
+    return apply(kvs);
   }
 
   static Expr apply(String k1, Expr p1, String k2, Expr p2) {
-    return apply(ImmutableMap.of(k1, p1, k2, p2));
+    Map<String, Expr> kvs = new LinkedHashMap<>();
+    kvs.put(k1, p1);
+    kvs.put(k2, p2);
+    return apply(kvs);
   }
 
   static Expr apply(String k1, Expr p1, String k2, Expr p2, String k3, Expr p3) {
-    return apply(ImmutableMap.of(k1, p1, k2, p2, k3, p3));
+    Map<String, Expr> kvs = new LinkedHashMap<>();
+    kvs.put(k1, p1);
+    kvs.put(k2, p2);
+    kvs.put(k3, p3);
+    return apply(kvs);
   }
 
   static Expr apply(String k1, Expr p1, String k2, Expr p2, String k3, Expr p3, String k4, Expr p4) {
-    return apply(ImmutableMap.of(k1, p1, k2, p2, k3, p3, k4, p4));
+    Map<String, Expr> kvs = new LinkedHashMap<>();
+    kvs.put(k1, p1);
+    kvs.put(k2, p2);
+    kvs.put(k3, p3);
+    kvs.put(k4, p4);
+    return apply(kvs);
   }
 
 }

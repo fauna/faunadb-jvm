@@ -7,11 +7,11 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -129,14 +129,14 @@ class Deserializer {
     ObjectV deserializeTree(final JsonNode tree, final ObjectMapper json, JsonLocation loc)
       throws JsonParseException {
 
-      ImmutableMap.Builder<String, Value> values = ImmutableMap.builder();
+      Map<String, Value> values = new LinkedHashMap<>();
 
       for (Iterator<Map.Entry<String, JsonNode>> entries = tree.fields(); entries.hasNext(); ) {
         Map.Entry<String, JsonNode> entry = entries.next();
         values.put(entry.getKey(), toValueOrNullV(entry.getValue(), json));
       }
 
-      return new ObjectV(values.build());
+      return new ObjectV(Collections.unmodifiableMap(values));
     }
   }
 

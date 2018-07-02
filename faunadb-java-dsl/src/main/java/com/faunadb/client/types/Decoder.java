@@ -6,7 +6,6 @@ import com.faunadb.client.types.Types.MapType;
 import com.faunadb.client.types.Types.SimpleType;
 import com.faunadb.client.types.Value.BytesV;
 import com.faunadb.client.types.Value.NullV;
-import com.google.common.collect.ImmutableMap;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;

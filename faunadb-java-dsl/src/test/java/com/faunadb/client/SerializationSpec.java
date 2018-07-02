@@ -3,8 +3,8 @@ package com.faunadb.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.query.Expr;
+import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.*;
-import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,6 +12,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.Class;
@@ -48,12 +50,12 @@ public class SerializationSpec {
         Obj("data", Value("str"))
       ), "[\"a string\",10,{\"object\":{\"data\":\"str\"}}]");
 
+    Map<String, Value> obj = new LinkedHashMap<>();
+    obj.put("value", new StringV("test"));
+    
     assertJson(
-      Arr(
-        new ObjectV(ImmutableMap.of(
-          "value", new StringV("test")
-        ))
-      ), "[{\"object\":{\"value\":\"test\"}}]");
+        Arr(new ObjectV(obj)),
+        "[{\"object\":{\"value\":\"test\"}}]");
 
     assertJson(
       Arr(Arrays.asList(
@@ -70,12 +72,14 @@ public class SerializationSpec {
       Obj("k1", Value("v1")),
       "{\"object\":{\"k1\":\"v1\"}}");
 
+    Map<String, Value> v1 = new LinkedHashMap<>();
+    Map<String, Value> v2 = new LinkedHashMap<>();
+
+    v2.put("v2", new StringV("test"));
+    v1.put("v1", new ObjectV(v2));
+    
     assertJson(
-      Obj(
-        "k1", new ObjectV(ImmutableMap.of(
-          "v1", new ObjectV(ImmutableMap.of(
-            "v2", new StringV("test")))
-        ))),
+      Obj("k1", new ObjectV(v1)),
       "{\"object\":{\"k1\":{\"object\":{\"v1\":{\"object\":{\"v2\":\"test\"}}}}}}");
 
     assertJson(
@@ -112,11 +116,13 @@ public class SerializationSpec {
       ),
       "{\"object\":{\"k1\":\"v1\",\"k2\":\"v2\",\"k3\":\"v3\",\"k4\":\"v4\",\"k5\":\"v5\"}}");
 
+    Map<String, Expr> kvs = new LinkedHashMap<>();
+
+    kvs.put("k1", Value("v1"));
+    kvs.put("k2", Value("v2"));
+
     assertJson(
-      Obj(ImmutableMap.of(
-        "k1", Value("v1"),
-        "k2", Value("v2"))
-      ),
+      Obj(kvs),
       "{\"object\":{\"k1\":\"v1\",\"k2\":\"v2\"}}");
   }
 
@@ -229,12 +235,13 @@ public class SerializationSpec {
         Value("x")
       ), "{\"let\":{\"v1\":\"x1\",\"v2\":\"x2\",\"v3\":\"x3\",\"v4\":\"x4\",\"v5\":\"x5\"},\"in\":\"x\"}");
 
+    Map<String, Expr> vs = new LinkedHashMap<>();
+
+    vs.put("v1", Value("x1"));
+    vs.put("v2", Value("x2"));
+
     assertJson(
-      Let(ImmutableMap.of(
-        "v1", Value("x1"),
-        "v2", Value("x2")
-        )
-      ).in(
+        Let(vs).in(
         Value("x")
       ), "{\"let\":{\"v1\":\"x1\",\"v2\":\"x2\"},\"in\":\"x\"}");
   }

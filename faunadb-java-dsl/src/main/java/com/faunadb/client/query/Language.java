@@ -2,13 +2,13 @@ package com.faunadb.client.query;
 
 import com.faunadb.client.types.Encoder;
 import com.faunadb.client.types.Value.*;
-import com.google.common.collect.ImmutableMap;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -120,7 +120,7 @@ public final class Language {
 
     private final Expr bindings;
 
-    private LetBinding(ImmutableMap<String, Expr> bindings) {
+    private LetBinding(Map<String, Expr> bindings) {
       this.bindings = Fn.apply(bindings);
     }
 
@@ -542,7 +542,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Obj() {
-    return Obj(ImmutableMap.<String, Expr>of());
+    return Obj(Collections.<String, Expr>emptyMap());
   }
 
   /**
@@ -554,7 +554,9 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Obj(String k1, Expr v1) {
-    return Obj(ImmutableMap.of(k1, v1));
+    Map<String, Expr> obj = new LinkedHashMap<>();
+    obj.put(k1, v1);
+    return Obj(Collections.unmodifiableMap(obj));
   }
 
   /**
@@ -568,7 +570,10 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Obj(String k1, Expr v1, String k2, Expr v2) {
-    return Obj(ImmutableMap.of(k1, v1, k2, v2));
+    Map<String, Expr> obj = new LinkedHashMap<>();
+    obj.put(k1, v1);
+    obj.put(k2, v2);
+    return Obj(Collections.unmodifiableMap(obj));
   }
 
   /**
@@ -584,7 +589,11 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Obj(String k1, Expr v1, String k2, Expr v2, String k3, Expr v3) {
-    return Obj(ImmutableMap.of(k1, v1, k2, v2, k3, v3));
+    Map<String, Expr> obj = new LinkedHashMap<>();
+    obj.put(k1, v1);
+    obj.put(k2, v2);
+    obj.put(k3, v3);
+    return Obj(Collections.unmodifiableMap(obj));
   }
 
   /**
@@ -602,7 +611,12 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Obj(String k1, Expr v1, String k2, Expr v2, String k3, Expr v3, String k4, Expr v4) {
-    return Obj(ImmutableMap.of(k1, v1, k2, v2, k3, v3, k4, v4));
+    Map<String, Expr> obj = new LinkedHashMap<>();
+    obj.put(k1, v1);
+    obj.put(k2, v2);
+    obj.put(k3, v3);
+    obj.put(k4, v4);
+    return Obj(Collections.unmodifiableMap(obj));
   }
 
   /**
@@ -622,7 +636,13 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Obj(String k1, Expr v1, String k2, Expr v2, String k3, Expr v3, String k4, Expr v4, String k5, Expr v5) {
-    return Obj(ImmutableMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5));
+    Map<String, Expr> obj = new LinkedHashMap<>();
+    obj.put(k1, v1);
+    obj.put(k2, v2);
+    obj.put(k3, v3);
+    obj.put(k4, v4);
+    obj.put(k5, v5);
+    return Obj(Collections.unmodifiableMap(obj));
   }
 
   /**
@@ -766,7 +786,7 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(Map<String, ? extends Expr> bindings) {
-    return new LetBinding(ImmutableMap.copyOf(bindings));
+    return new LetBinding(Collections.unmodifiableMap(bindings));
   }
 
   /**
@@ -790,7 +810,9 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1) {
-    return Let(ImmutableMap.of(v1, d1));
+    Map<String, Expr> let = new LinkedHashMap<>();
+    let.put(v1, d1);
+    return Let(Collections.unmodifiableMap(let));
   }
 
   /**
@@ -816,7 +838,10 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2) {
-    return Let(ImmutableMap.of(v1, d1, v2, d2));
+    Map<String, Expr> let = new LinkedHashMap<>();
+    let.put(v1, d1);
+    let.put(v2, d2);
+    return Let(Collections.unmodifiableMap(let));
   }
 
   /**
@@ -848,7 +873,11 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3) {
-    return Let(ImmutableMap.of(v1, d1, v2, d2, v3, d3));
+    Map<String, Expr> let = new LinkedHashMap<>();
+    let.put(v1, d1);
+    let.put(v2, d2);
+    let.put(v3, d3);
+    return Let(Collections.unmodifiableMap(let));
   }
 
   /**
@@ -883,7 +912,12 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3, String v4, Expr d4) {
-    return Let(ImmutableMap.of(v1, d1, v2, d2, v3, d3, v4, d4));
+    Map<String, Expr> let = new LinkedHashMap<>();
+    let.put(v1, d1);
+    let.put(v2, d2);
+    let.put(v3, d3);
+    let.put(v4, d4);
+    return Let(Collections.unmodifiableMap(let));
   }
 
   /**
@@ -921,7 +955,13 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3, String v4, Expr d4, String v5, Expr d5) {
-    return Let(ImmutableMap.of(v1, d1, v2, d2, v3, d3, v4, d4, v5, d5));
+    Map<String, Expr> let = new LinkedHashMap<>();
+    let.put(v1, d1);
+    let.put(v2, d2);
+    let.put(v3, d3);
+    let.put(v4, d4);
+    let.put(v5, d5);
+    return Let(Collections.unmodifiableMap(let));
   }
 
   /**

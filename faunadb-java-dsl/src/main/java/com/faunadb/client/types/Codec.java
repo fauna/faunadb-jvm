@@ -3,7 +3,6 @@ package com.faunadb.client.types;
 import com.faunadb.client.types.Value.*;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
-import com.google.common.collect.ImmutableMap;
 
 import java.util.Collections;
 import java.util.List;

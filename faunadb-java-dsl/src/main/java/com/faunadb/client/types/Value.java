@@ -9,7 +9,6 @@ import com.faunadb.client.query.Language;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.io.BaseEncoding;
 
 import java.time.Instant;
@@ -18,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -266,17 +266,19 @@ public abstract class Value extends Expr {
   @JsonDeserialize(using = Deserializer.ObjectDeserializer.class)
   public static final class ObjectV extends Value {
 
-    final ImmutableMap<String, Value> values;
+    final Map<String, Value> values;
 
     public ObjectV(Map<String, ? extends Value> values) {
       requireNonNull(values);
-      this.values = ImmutableMap.copyOf(values);
+      this.values = Collections.unmodifiableMap(values);
     }
 
     @Override
     @JsonValue
-    protected ImmutableMap<String, ImmutableMap<String, Value>> toJson() {
-      return ImmutableMap.of("object", values);
+    protected Map<String, Map<String, Value>> toJson() {
+        Map<String, Map<String, Value>> kvs = new HashMap<>();
+        kvs.put("object", values);
+        return Collections.unmodifiableMap(kvs);
     }
 
     @Override
@@ -532,9 +534,9 @@ public abstract class Value extends Expr {
    * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
    * @see Value
    */
-  public static final class SetRefV extends ScalarValue<ImmutableMap<String, Value>> {
+  public static final class SetRefV extends ScalarValue<Map<String, Value>> {
 
-    public SetRefV(@JsonProperty("@set") ImmutableMap<String, Value> parameters) {
+    public SetRefV(@JsonProperty("@set") Map<String, Value> parameters) {
       super(parameters);
     }
 
@@ -551,7 +553,7 @@ public abstract class Value extends Expr {
 
     @Override
     @JsonProperty("@set")
-    protected ImmutableMap<String, Value> toJson() {
+    protected Map<String, Value> toJson() {
       return value;
     }
   }
