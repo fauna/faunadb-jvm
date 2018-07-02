@@ -13,6 +13,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.faunadb.client.types.Codec.*;
@@ -144,7 +145,7 @@ public class DeserializationSpec {
         "}"
     );
 
-    ImmutableMap<String, Value> set = parsed.to(SET_REF).get().parameters();
+    Map<String, Value> set = parsed.to(SET_REF).get().parameters();
     assertThat(set.get("terms").to(STRING).get(), equalTo("fire"));
     assertThat(set.get("match").to(REF).get(),
       equalTo(new RefV("spells_by_element", Native.INDEXES)));

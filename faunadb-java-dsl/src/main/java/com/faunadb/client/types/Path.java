@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.faunadb.client.types.Codec.ARRAY;
 import static com.faunadb.client.types.Codec.OBJECT;
@@ -47,9 +48,9 @@ final class Path {
 
     @Override
     public Result<Value> get(Value root) {
-      return root.to(OBJECT).flatMap(new Function<ImmutableMap<String, Value>, Result<Value>>() {
+      return root.to(OBJECT).flatMap(new Function<Map<String, Value>, Result<Value>>() {
         @Override
-        public Result<Value> apply(ImmutableMap<String, Value> obj) {
+        public Result<Value> apply(Map<String, Value> obj) {
           Value value = obj.get(segment);
           if (value != null)
             return Result.success(value);

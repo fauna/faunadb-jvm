@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.String.format;
 
@@ -164,9 +165,9 @@ public interface Codec<T> {
   Codec<List<Value>> ARRAY = Transformations.mapTo(ArrayV.class, Transformations.VALUE_TO_LIST, Transformations.LIST_TO_VALUE);
 
   /**
-   * Converts a {@link Value} to an {@link ImmutableMap} of {@link String} to {@link Value}
+   * Converts a {@link Value} to a {@link Map} of {@link String} to {@link Value}
    */
-  Codec<ImmutableMap<String, Value>> OBJECT = Transformations.mapTo(ObjectV.class, Transformations.VALUE_TO_MAP, Transformations.MAP_TO_VALUE);
+  Codec<Map<String, Value>> OBJECT = Transformations.mapTo(ObjectV.class, Transformations.VALUE_TO_MAP, Transformations.MAP_TO_VALUE);
 
   /**
    * Converts a {@link Value} to an array of bytes
@@ -358,9 +359,9 @@ final class Transformations {
     }
   };
 
-  final static Function<ImmutableMap<String, Value>, Value> MAP_TO_VALUE = new Function<ImmutableMap<String, Value>, Value>() {
+  final static Function<Map<String, Value>, Value> MAP_TO_VALUE = new Function<Map<String, Value>, Value>() {
     @Override
-    public Value apply(ImmutableMap<String, Value> input) {
+    public Value apply(Map<String, Value> input) {
       return new ObjectV(input);
     }
   };
@@ -395,9 +396,9 @@ final class Transformations {
     }
   };
 
-  final static Function<ObjectV, ImmutableMap<String, Value>> VALUE_TO_MAP = new Function<ObjectV, ImmutableMap<String, Value>>() {
+  final static Function<ObjectV, Map<String, Value>> VALUE_TO_MAP = new Function<ObjectV, Map<String, Value>>() {
     @Override
-    public ImmutableMap<String, Value> apply(ObjectV input) {
+    public Map<String, Value> apply(ObjectV input) {
       return input.values;
     }
   };

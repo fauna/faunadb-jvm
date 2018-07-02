@@ -545,7 +545,7 @@ public abstract class Value extends Expr {
      *
      * @return SetRefV internal structure
      */
-    public ImmutableMap<String, Value> parameters() {
+    public Map<String, Value> parameters() {
       return value;
     }
 

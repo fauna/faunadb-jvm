@@ -128,7 +128,7 @@ public final class Decoder {
 
   private static Map<String, Object> toMap(Value value, MapType dstType) {
     try {
-      ImmutableMap<String, Value> values = value.to(Codec.OBJECT).get();
+      Map<String, Value> values = value.to(Codec.OBJECT).get();
 
       Map<String, Object> map = (Map<String, Object>) getConcreteClass(dstType.getRawClass()).newInstance();
 

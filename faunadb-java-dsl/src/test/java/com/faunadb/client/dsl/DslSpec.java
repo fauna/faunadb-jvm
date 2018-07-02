@@ -488,7 +488,7 @@ public abstract class DslSpec {
         Value("arcane"))
     ).get();
 
-    ImmutableMap<String, Value> set = res.to(SET_REF).get().parameters();
+    Map<String, Value> set = res.to(SET_REF).get().parameters();
     assertThat(set.get("terms").to(STRING).get(), equalTo("arcane"));
     assertThat(set.get("match").to(REF).get(),
       equalTo(new RefV("spells_by_element", Native.INDEXES)));
