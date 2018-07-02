@@ -3,11 +3,11 @@ package com.fauna.learn;
 import com.faunadb.client.FaunaClient;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Value;
-import com.google.common.base.Optional;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static com.faunadb.client.query.Language.*;
 

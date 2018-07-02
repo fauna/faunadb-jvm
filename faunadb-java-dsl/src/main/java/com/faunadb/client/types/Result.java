@@ -1,7 +1,8 @@
 package com.faunadb.client.types;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
+
+import java.util.Optional;
 
 /**
  * Represents the result of an operation. Usually a conversion operation.
@@ -98,7 +99,7 @@ public abstract class Result<T> {
 
     @Override
     public Optional<A> getOptional() {
-      return Optional.absent();
+      return Optional.empty();
     }
 
     @Override
@@ -230,7 +231,7 @@ public abstract class Result<T> {
    * @return the result value or null
    */
   public T orNull() {
-    return getOptional().orNull();
+    return getOptional().orElse(null);
   }
 
 }

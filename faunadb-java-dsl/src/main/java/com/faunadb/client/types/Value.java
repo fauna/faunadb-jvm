@@ -8,7 +8,6 @@ import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -21,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.faunadb.client.util.Objects.requireNonNull;
 import static com.google.common.base.Joiner.on;
@@ -621,12 +621,12 @@ public abstract class Value extends Expr {
 
     @JsonIgnore
     public Optional<RefV> getClazz() {
-      return Optional.fromNullable(value.clazz);
+      return Optional.ofNullable(value.clazz);
     }
 
     @JsonIgnore
     public Optional<RefV> getDatabase() {
-      return Optional.fromNullable(value.database);
+      return Optional.ofNullable(value.database);
     }
 
     @Override

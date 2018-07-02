@@ -5,7 +5,6 @@ import com.faunadb.client.errors.NotFoundException;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -215,9 +214,9 @@ public abstract class DslSpec {
     assertThat(testField.at("string").to(STRING).get(), equalTo("sup"));
     assertThat(testField.at("num").to(LONG).get(), equalTo(1234L));
     assertThat(testField.at("bool").to(BOOLEAN).get(), is(true));
-    assertThat(testField.at("bool").to(STRING).getOptional(), is(Optional.<String>absent()));
-    assertThat(testField.at("credentials").to(VALUE).getOptional(), is(Optional.<Value>absent()));
-    assertThat(testField.at("credentials", "password").to(STRING).getOptional(), is(Optional.<String>absent()));
+    assertThat(testField.at("bool").to(STRING).getOptional(), is(Optional.<String>empty()));
+    assertThat(testField.at("credentials").to(VALUE).getOptional(), is(Optional.<Value>empty()));
+    assertThat(testField.at("credentials", "password").to(STRING).getOptional(), is(Optional.<String>empty()));
 
     Value array = testField.at("array");
     assertThat(array.to(ARRAY).get(), hasSize(4));
@@ -225,7 +224,7 @@ public abstract class DslSpec {
     assertThat(array.at(1).to(STRING).get(), equalTo("2"));
     assertThat(array.at(2).to(DOUBLE).get(), equalTo(3.4));
     assertThat(array.at(3).at("name").to(STRING).get(), equalTo("JR"));
-    assertThat(array.at(4).to(VALUE).getOptional(), is(Optional.<Value>absent()));
+    assertThat(array.at(4).to(VALUE).getOptional(), is(Optional.<Value>empty()));
   }
 
   @Test
@@ -277,7 +276,7 @@ public abstract class DslSpec {
     assertThat(updatedInstance.get(REF_FIELD), equalTo(createdInstance.get(REF_FIELD)));
     assertThat(updatedInstance.get(NAME_FIELD), equalTo("Faerie Fire"));
     assertThat(updatedInstance.get(ELEMENT_FIELD), equalTo("arcane"));
-    assertThat(updatedInstance.getOptional(COST_FIELD), is(Optional.<Long>absent()));
+    assertThat(updatedInstance.getOptional(COST_FIELD), is(Optional.<Long>empty()));
   }
 
   @Test
@@ -467,7 +466,7 @@ public abstract class DslSpec {
 
     assertThat(page1.get(DATA).to(ARRAY).get(), hasSize(3));
     assertThat(page1.at("after"), notNullValue());
-    assertThat(page1.at("before").to(VALUE).getOptional(), is(Optional.<Value>absent()));
+    assertThat(page1.at("before").to(VALUE).getOptional(), is(Optional.<Value>empty()));
 
     Value page2 = query(
       Paginate(Match(Index("all_spells")))
@@ -478,7 +477,7 @@ public abstract class DslSpec {
     assertThat(page2.get(DATA).to(ARRAY).get(), hasSize(3));
     assertThat(page2.get(DATA), not(page1.at("data")));
     assertThat(page2.at("before"), notNullValue());
-    assertThat(page2.at("after").to(VALUE).getOptional(), is(Optional.<Value>absent()));
+    assertThat(page2.at("after").to(VALUE).getOptional(), is(Optional.<Value>empty()));
   }
 
   @Test

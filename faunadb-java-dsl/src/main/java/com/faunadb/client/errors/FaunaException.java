@@ -2,8 +2,9 @@ package com.faunadb.client.errors;
 
 import com.faunadb.client.HttpResponses;
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+
+import java.util.Optional;
 
 /**
  * The base type for all FaunaDB exceptions.
@@ -18,12 +19,12 @@ public class FaunaException extends RuntimeException {
 
   public FaunaException(String message) {
     super(message);
-    this.response = Optional.absent();
+    this.response = Optional.empty();
   }
 
   public FaunaException(String message, Throwable cause) {
     super(message, cause);
-    this.response = Optional.absent();
+    this.response = Optional.empty();
   }
 
   /**

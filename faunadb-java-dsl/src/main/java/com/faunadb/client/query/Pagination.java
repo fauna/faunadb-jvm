@@ -3,10 +3,11 @@ package com.faunadb.client.query;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.LongV;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import java.time.Instant;
+
+import java.util.Optional;
 
 import static com.faunadb.client.util.Objects.requireNonNull;
 
@@ -44,11 +45,11 @@ public final class Pagination extends Expr {
   }
 
   private final Expr resource;
-  private Optional<Cursor> cursor = Optional.absent();
-  private Optional<Expr> ts = Optional.absent();
-  private Optional<Expr> size = Optional.absent();
-  private Optional<Expr> sources = Optional.absent();
-  private Optional<Expr> events = Optional.absent();
+  private Optional<Cursor> cursor = Optional.empty();
+  private Optional<Expr> ts = Optional.empty();
+  private Optional<Expr> size = Optional.empty();
+  private Optional<Expr> sources = Optional.empty();
+  private Optional<Expr> events = Optional.empty();
 
   Pagination(Expr resource) {
     this.resource = resource;

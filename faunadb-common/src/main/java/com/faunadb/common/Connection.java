@@ -4,7 +4,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.ning.http.client.*;
@@ -20,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -353,10 +353,10 @@ public final class Connection implements AutoCloseable {
 
   private void logSuccess(Request request, Response response) {
     if (log.isDebugEnabled()) {
-      String data = Optional.fromNullable(request.getStringData()).or("");
-      String host = Optional.fromNullable(response.getHeader(X_FAUNADB_HOST)).or("Unknown");
-      String build = Optional.fromNullable(response.getHeader(X_FAUNADB_BUILD)).or("Unknown");
-      String body = Optional.fromNullable(getResponseBody(response)).or("");
+      String data = Optional.ofNullable(request.getStringData()).orElse("");
+      String host = Optional.ofNullable(response.getHeader(X_FAUNADB_HOST)).orElse("Unknown");
+      String build = Optional.ofNullable(response.getHeader(X_FAUNADB_BUILD)).orElse("Unknown");
+      String body = Optional.ofNullable(getResponseBody(response)).orElse("");
 
       log.debug(
         format("Request: %s %s: %s. Response: Status=%d, Fauna Host: %s, Fauna Build: %s: %s",
@@ -373,7 +373,7 @@ public final class Connection implements AutoCloseable {
   }
 
   private void logFailure(Request request, Throwable ex) {
-    String data = Optional.fromNullable(request.getStringData()).or("");
+    String data = Optional.ofNullable(request.getStringData()).orElse("");
 
     log.info(
       format("Request: %s %s: %s. Failed: %s",
