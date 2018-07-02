@@ -546,6 +546,24 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     notR shouldBe true
   }
 
+  it should "test conversion functions" in {
+    val strF = client.query(ToString(100L))
+    val strR = await(strF).to[String].get
+    strR should equal ("100")
+
+    val numF = client.query(ToNumber("100"))
+    val numR = await(numF).to[Long].get
+    numR should equal (100L)
+
+    val timeF = client.query(ToTime("1970-01-01T00:00:00Z"))
+    val timeR = await(timeF).to[TimeV].get.time.toInstant
+    timeR should equal (new Instant(0))
+
+    val dateF = client.query(ToDate("1970-01-01"))
+    val dateR = await(dateF).to[DateV].get.localDate
+    dateR should equal (new LocalDate(0, UTC))
+  }
+
   it should "test date and time functions" in {
     val timeF = client.query(Time("1970-01-01T00:00:00-04:00"))
     val timeR = await(timeF)

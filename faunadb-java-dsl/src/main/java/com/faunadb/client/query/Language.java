@@ -2528,4 +2528,43 @@ public final class Language {
     return Fn.apply("not", bool);
   }
 
+  /**
+   * Casts an expression to a string value, if possible.
+   *
+   * @param value an expression. Type: Any
+   * @return a new {@link Expr}
+   */
+  public static Expr ToString(Expr value) {
+    return Fn.apply("to_string", value);
+  }
+
+  /**
+   * Casts an expression to a numeric value, if possible.
+   *
+   * @param value an expression. Type: Any
+   * @return a new {@link Expr}
+   */
+  public static Expr ToNumber(Expr value) {
+    return Fn.apply("to_number", value);
+  }
+
+  /**
+   * Casts an expression to a time value, if possible.
+   *
+   * @param value an expression. Type: Any
+   * @return a new {@link Expr}
+   */
+  public static Expr ToTime(Expr value) {
+    return Fn.apply("to_time", value);
+  }
+
+  /**
+   * Casts an expression to a date value, if possible.
+   *
+   * @param value an expression. Type: Any
+   * @return a new {@link Expr}
+   */
+  public static Expr ToDate(Expr value) {
+    return Fn.apply("to_date", value);
+  }
 }
