@@ -134,7 +134,7 @@ public final class Language {
 
   /**
    * Builder for path selectors. This builder must be constructed using
-   * either the {@link #Path(String...)} or {@link #Path(int...)} functions.
+   * either the {@link Path#at(String...)} or {@link Path#at(int...)} functions.
    *
    * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    * @see #Contains(Path, Expr)
@@ -157,6 +157,7 @@ public final class Language {
     /**
      * Narrow to a specific path in a object key.
      *
+     * @param others path selectors
      * @return a new narrowed path
      */
     public Path at(String... others) {
@@ -170,6 +171,7 @@ public final class Language {
     /**
      * Narrow to a specific element index in an array.
      *
+     * @param others path selectors
      * @return a new narrowed path
      */
     public Path at(int... others) {
@@ -707,7 +709,6 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    * @see #Time(Expr)
    * @see #Value(Instant)
-   * @see #Value(HighPrecisionTime)
    */
   public static Expr At(Expr timestamp, Expr expr) {
     return Fn.apply("at", timestamp, "expr", expr);
@@ -1144,7 +1145,6 @@ public final class Language {
    * @see #Ref(Expr, String)
    * @see #Time(Expr)
    * @see #Value(Instant)
-   * @see #Value(HighPrecisionTime)
    * @see #At(Expr, Expr)
    */
   public static Expr Get(Expr ref, Expr timestamp) {
@@ -1313,7 +1313,6 @@ public final class Language {
    * @see #Obj(Map)
    * @see #Time(Expr)
    * @see #Value(Instant)
-   * @see #Value(HighPrecisionTime)
    */
   public static Expr Insert(Expr ref, Expr timestamp, Expr action, Expr params) {
     return Fn.apply("insert", ref, "ts", timestamp, "action", action, "params", params);
@@ -1333,7 +1332,6 @@ public final class Language {
    * @see #Obj(Map)
    * @see #Time(Expr)
    * @see #Value(Instant)
-   * @see #Value(HighPrecisionTime)
    */
   public static Expr Insert(Expr ref, Expr timestamp, Action action, Expr params) {
     return Insert(ref, timestamp, action.value, params);
@@ -1352,7 +1350,6 @@ public final class Language {
    * @see #Obj(Map)
    * @see #Time(Expr)
    * @see #Value(Instant)
-   * @see #Value(HighPrecisionTime)
    */
   public static Expr Remove(Expr ref, Expr timestamp, Expr action) {
     return Fn.apply("remove", ref, "ts", timestamp, "action", action);
@@ -1370,7 +1367,6 @@ public final class Language {
    * @see #Obj(Map)
    * @see #Time(Expr)
    * @see #Value(Instant)
-   * @see #Value(HighPrecisionTime)
    */
   public static Expr Remove(Expr ref, Expr timestamp, Action action) {
     return Remove(ref, timestamp, action.value);
@@ -1401,6 +1397,7 @@ public final class Language {
    * }</pre>
    *
    * @param params the database's configuration parameters. Type: Object
+   * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#write-functions">FaunaDB Write Functions</a>
    * @see #Obj(Map)
    */
@@ -1514,6 +1511,7 @@ public final class Language {
    * Returns the set of resources present in at least on of the sets provided.
    *
    * @param sets the sets to execute the union operation. Type: Array of sets
+   * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#sets">FaunaDB Set Functions</a>
    * @see #Match(Expr)
    */

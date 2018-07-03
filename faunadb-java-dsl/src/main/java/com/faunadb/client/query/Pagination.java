@@ -98,7 +98,6 @@ public final class Pagination extends Expr {
    * @return this {@link Pagination} instance
    * @see Language#Time(Expr)
    * @see Language#Value(Instant)
-   * @see Language#Value(com.faunadb.client.types.time.HighPrecisionTime)
    */
   public Pagination ts(Expr ts) {
     this.ts = Optional.of(ts);

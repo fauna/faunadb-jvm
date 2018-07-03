@@ -71,7 +71,7 @@ public interface Codec<T> {
   Result<Value> encode(T value);
 
   /**
-   * Convert a {@link Value} to itself. Returns a {@link com.faunadb.client.types.Result.Failure} if null.
+   * Convert a {@link Value} to itself. Returns a failed {@link Result} if null.
    */
   Codec<Value> VALUE = new Codec<Value>() {
     @Override

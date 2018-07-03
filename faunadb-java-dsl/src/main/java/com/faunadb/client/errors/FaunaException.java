@@ -28,6 +28,8 @@ public class FaunaException extends RuntimeException {
 
   /**
    * Gets the list of errors that caused the query to fail.
+   *
+   * @return a list of errors
    */
   public ImmutableList<HttpResponses.QueryError> errors() {
     if (response.isPresent()) {
@@ -39,6 +41,8 @@ public class FaunaException extends RuntimeException {
 
   /**
    * Gets the HTTP status code of the underlying error response.
+   *
+   * @return HTTP status code
    */
   public int status() {
     if (response.isPresent()) {

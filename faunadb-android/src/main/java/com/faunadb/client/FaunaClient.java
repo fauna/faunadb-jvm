@@ -176,6 +176,7 @@ public class FaunaClient {
 
   /**
    * Frees any resources held by the client. Also closes the underlying {@link OkHttpClient}.
+   *
    */
   public void close() throws IOException {
     if (refCount.decrementAndGet() == 0) {
