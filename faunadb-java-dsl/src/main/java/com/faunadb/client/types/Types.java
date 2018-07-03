@@ -1,10 +1,10 @@
 package com.faunadb.client.types;
 
 import com.faunadb.client.errors.FaunaException;
-import org.joda.time.Instant;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 

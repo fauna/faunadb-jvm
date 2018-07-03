@@ -2,12 +2,11 @@ package com.faunadb.client.query;
 
 import com.faunadb.client.types.Encoder;
 import com.faunadb.client.types.Value.*;
-import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -470,18 +469,6 @@ public final class Language {
    * @see Instant
    */
   public static Expr Value(Instant value) {
-    return new TimeV(HighPrecisionTime.fromInstant(value));
-  }
-
-  /**
-   * Encodes the given {@link HighPrecisionTime} as an {@link Expr} instance.
-   *
-   * @param value the timestamp to be encoded
-   * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
-   * @see HighPrecisionTime
-   */
-  public static Expr Value(HighPrecisionTime value) {
     return new TimeV(value);
   }
 

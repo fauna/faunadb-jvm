@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import faunadb.query._
 import faunadb.values._
-import faunadb.values.time._
-import org.joda.time.DateTimeZone.UTC
-import org.joda.time.{ Duration, Instant, LocalDate }
+import java.time.{ Duration, Instant, LocalDate }
+import java.time.ZoneOffset.UTC
+import java.time.temporal.ChronoUnit
 import org.scalatest.{ FlatSpec, Matchers }
 
 class SerializationSpec extends FlatSpec with Matchers {
@@ -208,28 +208,28 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize date and ts" in {
-    val ts = TimeV(new Instant(0).plus(Duration.standardMinutes(5)))
-    json.writeValueAsString(ts) shouldBe "{\"@ts\":\"1970-01-01T00:05:00.000000000Z\"}"
+    val ts = TimeV(Instant.ofEpochMilli(0).plus(5, ChronoUnit.MINUTES))
+    json.writeValueAsString(ts) shouldBe "{\"@ts\":\"1970-01-01T00:05:00Z\"}"
 
-    val withMillis = TimeV(HighPrecisionTime(new Instant(1)))
-    json.writeValueAsString(withMillis) shouldBe "{\"@ts\":\"1970-01-01T00:00:00.001000000Z\"}"
+    val withMillis = TimeV(Instant.ofEpochMilli(1))
+    json.writeValueAsString(withMillis) shouldBe "{\"@ts\":\"1970-01-01T00:00:00.001Z\"}"
 
-    val withMicros = TimeV(HighPrecisionTime(new Instant(1), microsToAdd=1001))
-    json.writeValueAsString(withMicros) shouldBe "{\"@ts\":\"1970-01-01T00:00:00.002001000Z\"}"
+    val withMicros = TimeV(Instant.ofEpochMilli(1).plus(1001, ChronoUnit.MICROS))
+    json.writeValueAsString(withMicros) shouldBe "{\"@ts\":\"1970-01-01T00:00:00.002001Z\"}"
 
-    val withNanos = TimeV(HighPrecisionTime(new Instant(1), nanosToAdd=1001))
+    val withNanos = TimeV(Instant.ofEpochMilli(1).plus(1001, ChronoUnit.NANOS))
     json.writeValueAsString(withNanos) shouldBe "{\"@ts\":\"1970-01-01T00:00:00.001001001Z\"}"
 
-    val microsOverflow = TimeV(HighPrecisionTime(new Instant(1000), microsToAdd=1777777777))
-    json.writeValueAsString(microsOverflow) shouldBe "{\"@ts\":\"1970-01-01T00:29:38.777777000Z\"}"
+    val microsOverflow = TimeV(Instant.ofEpochMilli(1000).plus(1777777777, ChronoUnit.MICROS))
+    json.writeValueAsString(microsOverflow) shouldBe "{\"@ts\":\"1970-01-01T00:29:38.777777Z\"}"
 
-    val nanosOverflow = TimeV(HighPrecisionTime(new Instant(1000), nanosToAdd=1999999999))
+    val nanosOverflow = TimeV(Instant.ofEpochMilli(1000).plus(1999999999, ChronoUnit.NANOS))
     json.writeValueAsString(nanosOverflow) shouldBe "{\"@ts\":\"1970-01-01T00:00:02.999999999Z\"}"
 
-    val microAndNanosOverflow = TimeV(HighPrecisionTime(new Instant(1000), microsToAdd = 1000000, nanosToAdd = 1000000000))
-    json.writeValueAsString(microAndNanosOverflow) shouldBe "{\"@ts\":\"1970-01-01T00:00:03.000000000Z\"}"
+    val microAndNanosOverflow = TimeV(Instant.ofEpochMilli(1000).plus(1000000, ChronoUnit.MICROS).plus(1000000000, ChronoUnit.NANOS))
+    json.writeValueAsString(microAndNanosOverflow) shouldBe "{\"@ts\":\"1970-01-01T00:00:03Z\"}"
 
-    val date = DateV(new LocalDate(0, UTC).plusDays(2))
+    val date = DateV(LocalDate.ofEpochDay(0).plusDays(2))
     json.writeValueAsString(date) shouldBe "{\"@date\":\"1970-01-03\"}"
   }
 

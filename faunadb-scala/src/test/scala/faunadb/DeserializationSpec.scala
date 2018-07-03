@@ -2,9 +2,9 @@ package faunadb
 
 import com.fasterxml.jackson.databind.{ JsonMappingException, ObjectMapper }
 import faunadb.values._
-import faunadb.values.time._
-import org.joda.time.DateTimeZone.UTC
-import org.joda.time.{ Duration, Instant, LocalDate }
+import java.time.{ Instant, LocalDate }
+import java.time.ZoneOffset.UTC
+import java.time.temporal.ChronoUnit
 import org.scalatest.{ FlatSpec, Matchers }
 
 class DeserializationSpec extends FlatSpec with Matchers {
@@ -91,31 +91,27 @@ class DeserializationSpec extends FlatSpec with Matchers {
   }
 
   it should "deserialize ts" in {
-    val fiveMinutes = new Instant(0).plus(Duration.standardMinutes(5))
+    val fiveMinutes = Instant.ofEpochMilli(0).plus(5, ChronoUnit.MINUTES)
 
     val time = json.readValue("""{"@ts":"1970-01-01T00:05:00Z"}""", classOf[Value])
     time should equal (TimeV(fiveMinutes))
     time.to[Instant].get should equal (fiveMinutes)
-    time.to[HighPrecisionTime].get should equal (HighPrecisionTime(fiveMinutes))
 
     val withMillis = json.readValue("""{"@ts":"1970-01-01T00:05:00.001Z"}""", classOf[Value])
-    withMillis should equal (TimeV(HighPrecisionTime(fiveMinutes.plus(1))))
-    withMillis.to[Instant].get should equal (fiveMinutes.plus(1))
+    withMillis.to[Instant].get should equal (fiveMinutes.plus(1, ChronoUnit.MILLIS))
 
     val withMicros = json.readValue("""{"@ts":"1970-01-01T00:05:00.001442Z"}""", classOf[Value]).to[TimeV].get
-    withMicros should equal (TimeV(HighPrecisionTime(fiveMinutes.plus(1), microsToAdd = 442)))
-    withMicros.to[Instant].get should equal (fiveMinutes.plus(1))
+    withMicros.to[Instant].get should equal (fiveMinutes.plus(1, ChronoUnit.MILLIS).plus(442, ChronoUnit.MICROS))
 
     val withNanos = json.readValue("""{"@ts":"1970-01-01T00:05:00.001442042Z"}""", classOf[Value])
-    withNanos should equal (TimeV(HighPrecisionTime(fiveMinutes.plus(1), 442, 42)))
-    withNanos.to[Instant].get should equal (fiveMinutes.plus(1))
+    withNanos.to[Instant].get should equal (fiveMinutes.plus(1, ChronoUnit.MILLIS).plus(442, ChronoUnit.MICROS).plus(42, ChronoUnit.NANOS))
   }
 
   it should "deserialize date" in {
     val toDeserialize = """{"@date":"1970-01-03"}"""
     val parsed = json.readValue(toDeserialize, classOf[Value])
 
-    parsed should equal (DateV(new LocalDate(0, UTC).plusDays(2)))
+    parsed should equal (DateV(LocalDate.ofEpochDay(0).plusDays(2)))
   }
 
   it should "deserialize bytes" in {

@@ -1,15 +1,15 @@
 package com.faunadb.client.types;
 
 import com.faunadb.client.types.Value.*;
-import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 
 import static java.lang.String.format;
+
+import java.time.Instant;
+import java.time.LocalDate;
 
 /**
  * Codec instances are used to convert a {@link Value} to a concrete type.
@@ -130,11 +130,6 @@ public interface Codec<T> {
    * Converts a {@link Value} to an {@link Instant}
    */
   Codec<Instant> TIME = Transformations.mapTo(TimeV.class, Transformations.VALUE_TO_INSTANT, Transformations.INSTANT_TO_VALUE);
-
-  /**
-   * Converts a {@link Value} to a {@link HighPrecisionTime}
-   */
-  Codec<HighPrecisionTime> HP_TIME = Transformations.mapTo(TimeV.class, Transformations.<TimeV, HighPrecisionTime>scalarValue(), Transformations.HP_TIME_TO_VALUE);
 
   /**
    * Converts a {@link Value} to a {@link String}
@@ -350,13 +345,6 @@ final class Transformations {
   final static Function<Instant, Value> INSTANT_TO_VALUE = new Function<Instant, Value>() {
     @Override
     public Value apply(Instant input) {
-      return new TimeV(HighPrecisionTime.fromInstant(input));
-    }
-  };
-
-  final static Function<HighPrecisionTime, Value> HP_TIME_TO_VALUE = new Function<HighPrecisionTime, Value>() {
-    @Override
-    public Value apply(HighPrecisionTime input) {
       return new TimeV(input);
     }
   };

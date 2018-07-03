@@ -1,13 +1,13 @@
 package faunadb.values
 
 import java.nio.ByteBuffer
+import java.time.{ Instant, LocalDate }
+import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.node.NullNode
 import com.google.common.io.BaseEncoding
 import faunadb.jackson._
-import faunadb.values.time._
-import org.joda.time.{ Instant, LocalDate }
 import scala.annotation.meta.{ field, getter, param }
 
 /**
@@ -154,13 +154,12 @@ object Native {
 case class SetRefV(@JsonProperty("@set") parameters: Value) extends ScalarValue
 
 /** A Timestamp value. */
-case class TimeV(@(JsonIgnore @param @field @getter) time: HighPrecisionTime) extends ScalarValue {
+case class TimeV(@(JsonIgnore @param @field @getter) toInstant: Instant) extends ScalarValue {
   @JsonProperty("@ts")
-  val strValue = time.toString
+  val strValue = toInstant.toString
 }
 object TimeV {
-  def apply(value: String): TimeV = TimeV(HighPrecisionTime.parse(value))
-  def apply(value: Instant): TimeV = TimeV(HighPrecisionTime(value))
+  def apply(value: String): TimeV = TimeV(Instant.from(ISO_OFFSET_DATE_TIME.parse(value)))
 }
 
 /** A Date value. */

@@ -2,12 +2,12 @@ package com.faunadb.client;
 
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
-import com.faunadb.client.types.time.HighPrecisionTime;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.faunadb.client.types.Decoder.decode;
@@ -24,6 +24,10 @@ public class DecoderSpec {
     private static final ObjectV EMPTY_OBJECT = new ObjectV(Collections.<String, Value>emptyMap());
     private static final ArrayV EMPTY_ARRAY = new ArrayV(Collections.<Value>emptyList());
 
+    private Instant parseInstant(String str) {
+        return Instant.from(DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(str));
+    }
+    
     @Test
     public void shouldDecodePrimitives() {
         assertEquals("a string", decode(new StringV("a string"), String.class).get());
@@ -54,9 +58,7 @@ public class DecoderSpec {
 
         assertEquals(LocalDate.parse("1970-01-01"), decode(new DateV(LocalDate.parse("1970-01-01")), LocalDate.class).get());
 
-        assertEquals(HighPrecisionTime.parse("1970-01-01T00:05:02.010000000Z"), decode(new TimeV(HighPrecisionTime.parse("1970-01-01T00:05:02.010000000Z")), HighPrecisionTime.class).get());
-
-        assertEquals(Instant.parse("1970-01-01T00:05:02.010000000Z"), decode(new TimeV(HighPrecisionTime.parse("1970-01-01T00:05:02.010000000Z")), Instant.class).get());
+        assertEquals(parseInstant("1970-01-01T00:05:02.010000000Z"), decode(new TimeV(parseInstant("1970-01-01T00:05:02.010000000Z")), Instant.class).get());
 
         assertArrayEquals(new byte[] {1, 2, 3}, decode(new BytesV(new byte[] {1, 2, 3}), byte[].class).get());
     }
@@ -80,7 +82,7 @@ public class DecoderSpec {
 
         assertEquals(new DateV(LocalDate.parse("1970-01-01")), decode(new DateV(LocalDate.parse("1970-01-01")), DateV.class).get());
 
-        assertEquals(new TimeV(HighPrecisionTime.parse("1970-01-01T00:05:02.010000000Z")), decode(new TimeV(HighPrecisionTime.parse("1970-01-01T00:05:02.010000000Z")), TimeV.class).get());
+        assertEquals(new TimeV(parseInstant("1970-01-01T00:05:02.010000000Z")), decode(new TimeV(parseInstant("1970-01-01T00:05:02.010000000Z")), TimeV.class).get());
     }
 
     @Test

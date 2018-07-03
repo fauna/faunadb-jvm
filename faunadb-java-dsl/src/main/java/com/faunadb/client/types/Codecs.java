@@ -2,11 +2,10 @@ package com.faunadb.client.types;
 
 import com.faunadb.client.errors.FaunaException;
 import com.faunadb.client.types.Value.ObjectV;
-import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Function;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -44,7 +43,6 @@ final class Codecs {
     CODECS.put(Double.class, Codec.DOUBLE);
     CODECS.put(double.class, Codec.DOUBLE);
     CODECS.put(LocalDate.class, Codec.DATE);
-    CODECS.put(HighPrecisionTime.class, Codec.HP_TIME);
     CODECS.put(Instant.class, Codec.TIME);
   }
 

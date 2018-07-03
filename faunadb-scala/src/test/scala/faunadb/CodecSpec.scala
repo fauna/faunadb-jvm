@@ -1,8 +1,7 @@
 package faunadb
 
 import faunadb.values._
-import faunadb.values.time.HighPrecisionTime
-import org.joda.time.{ LocalDate, Instant }
+import java.time.{ LocalDate, Instant }
 import org.scalatest.{ FlatSpec, Matchers }
 
 class CodecSpec extends FlatSpec with Matchers {
@@ -23,14 +22,13 @@ class CodecSpec extends FlatSpec with Matchers {
 
     DateV("1970-01-03").to[LocalDate].get shouldBe LocalDate.parse("1970-01-03")
     TimeV("1970-01-01T00:05:00.000000000Z").to[Instant].get shouldBe Instant.parse("1970-01-01T00:05:00.000000000Z")
-    TimeV("1970-01-01T00:05:00.000000000Z").to[HighPrecisionTime].get shouldBe HighPrecisionTime.parse("1970-01-01T00:05:00.000000000Z")
 
     BytesV(1, 2, 3, 4).to[Array[Byte]].get shouldBe Array[Byte](1, 2, 3, 4)
   }
 
   it should "decode nullable types" in {
     NullV.to[Option[LocalDate]].get shouldBe None
-    NullV.to[Option[HighPrecisionTime]].get shouldBe None
+    NullV.to[Option[Instant]].get shouldBe None
     NullV.to[Option[String]].get shouldBe None
     NullV.to[Option[Array[Byte]]].get shouldBe None
     NullV.to[Option[Array[Long]]].get shouldBe None
@@ -161,7 +159,6 @@ class CodecSpec extends FlatSpec with Matchers {
 
     (LocalDate.parse("1970-01-03"): Value) shouldBe DateV("1970-01-03")
     (Instant.parse("1970-01-01T00:05:00.000000000Z"): Value) shouldBe TimeV("1970-01-01T00:05:00.000000000Z")
-    (HighPrecisionTime.parse("1970-01-01T00:05:00.000000000Z"): Value) shouldBe TimeV("1970-01-01T00:05:00.000000000Z")
 
     (Array[Byte](1, 2, 3, 4): Value) shouldBe BytesV(1, 2, 3, 4)
   }
@@ -171,7 +168,7 @@ class CodecSpec extends FlatSpec with Matchers {
 
     ((null: String): Value) shouldBe NullV
     ((null: LocalDate): Value) shouldBe NullV
-    ((null: HighPrecisionTime): Value) shouldBe NullV
+    ((null: Instant): Value) shouldBe NullV
     ((null: Array[Byte]): Value) shouldBe NullV
     ((null: Array[Long]): Value) shouldBe NullV
     ((null: Seq[Long]): Value) shouldBe NullV
