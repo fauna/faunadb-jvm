@@ -65,6 +65,7 @@ public class FaunaClient implements AutoCloseable {
 
   /**
    * Creates a new {@link Builder}
+   * @return {@link Builder}
    */
   public static Builder builder() {
     return new Builder();
@@ -99,6 +100,7 @@ public class FaunaClient implements AutoCloseable {
      *
      * @param endpoint the root endpoint URL
      * @return this {@link Builder} object
+     * @throws MalformedURLException if the endpoint is invalid
      */
     public Builder withEndpoint(String endpoint) throws MalformedURLException {
       this.endpoint = new URL(endpoint);
@@ -131,6 +133,7 @@ public class FaunaClient implements AutoCloseable {
 
     /**
      * Returns a newly constructed {@link FaunaClient} with configuration based on the settings of this {@link Builder}.
+     * @return {@link FaunaClient}
      */
     public FaunaClient build() {
       Connection.Builder builder = Connection.builder()
