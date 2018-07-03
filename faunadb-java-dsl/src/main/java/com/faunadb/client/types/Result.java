@@ -224,4 +224,13 @@ public abstract class Result<T> {
    */
   public abstract <U> Result<U> flatMap(Function<T, Result<U>> fn);
 
+  /**
+   * Extracts the resulting value or returns null if the operation has failed.
+   *
+   * @return the result value or null
+   */
+  public T orNull() {
+    return getOptional().orNull();
+  }
+
 }
