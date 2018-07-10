@@ -714,6 +714,15 @@ public final class Language {
     return Fn.apply("at", timestamp, "expr", expr);
   }
 
+  /**
+   * Execute the reads associated with the given expression at the timestamp provided.
+   * Writes are still executed at the current transaction time.
+   *
+   * @param timestamp the read timestamp.
+   * @param expr the scoped expression
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
+   */
   public static Expr At(Instant timestamp, Expr expr) {
     return At(new TimeV(timestamp), expr);
   }
@@ -1004,11 +1013,22 @@ public final class Language {
    * @see #Foreach(Expr, Expr)
    * @see #Filter(Expr, Expr)
    * @see #Query(Expr)
+   * @see #Value(String)
+   * @see #Arr(List)
    */
   public static Expr Lambda(Expr var, Expr expr) {
     return Fn.apply("lambda", var, "expr", expr);
   }
 
+  /**
+   * Creates an anonymous function that binds one or more variables in the expression provided.
+   *
+   * @param var the lambda's parameter binding.
+   * @param expr the lambda's function body. Type: An expression.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
+   * @see #Lambda(Expr, Expr)
+   */
   public static Expr Lambda(String var, Expr expr) {
     return Lambda(new StringV(var), expr);
   }
@@ -1073,6 +1093,14 @@ public final class Language {
     return Fn.apply("take", num, "collection", collection);
   }
 
+  /**
+   * Returns a new collection containing the given number of elements taken from the provided collection.
+   *
+   * @param num the number of elements to be taken from the source collection.
+   * @param collection the source collection. Type: Collection
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
+   */
   public static Expr Take(long num, Expr collection) {
     return Take(new LongV(num), collection);
   }
@@ -1089,6 +1117,14 @@ public final class Language {
     return Fn.apply("drop", num, "collection", collection);
   }
 
+  /**
+   * Returns a new collection containing after dropping the given number of elements from the provided collection.
+   *
+   * @param num the number of elements to be dropped from the source collection.
+   * @param collection the source collection. Type: Collection
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
+   */
   public static Expr Drop(long num, Expr collection) {
     return Drop(new LongV(num), collection);
   }
@@ -1167,6 +1203,18 @@ public final class Language {
     return Fn.apply("get", ref, "ts", timestamp);
   }
 
+  /**
+   * Retrieves the instance identified by the given reference at a specific point in time.
+   *
+   * @param ref the reference to be retrieved. Type: Reference
+   * @param timestamp the timestamp from which the reference's data will be retrieved.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
+   * @see #Ref(Expr, String)
+   * @see #Time(Expr)
+   * @see #Value(Instant)
+   * @see #At(Expr, Expr)
+   */
   public static Expr Get(Expr ref, Instant timestamp) {
     return Get(ref, new TimeV(timestamp));
   }
@@ -1182,6 +1230,13 @@ public final class Language {
     return Fn.apply("key_from_secret", secret);
   }
 
+  /**
+   * Retrieves the key object given the key's secret string.
+   *
+   * @param secret the key's secret string.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#read-functions">FaunaDB Read Functions</a>
+   */
   public static Expr KeyFromSecret(String secret) {
     return KeyFromSecret(new StringV(secret));
   }
@@ -1635,8 +1690,8 @@ public final class Language {
   }
 
   /**
-   * Delete authentication tokens. 
-   * If {@code invalidateAll} is true, deletes all tokens associated with the current session. 
+   * Delete authentication tokens.
+   * If {@code invalidateAll} is true, deletes all tokens associated with the current session.
    * Otherwise, deletes only the token used for the current request.
    *
    * @param invalidateAll if the Logout function should delete all tokens
@@ -1649,6 +1704,17 @@ public final class Language {
     return Fn.apply("logout", invalidateAll);
   }
 
+  /**
+   * Delete authentication tokens.
+   * If {@code invalidateAll} is true, deletes all tokens associated with the current session.
+   * Otherwise, deletes only the token used for the current request.
+   *
+   * @param invalidateAll if the Logout function should delete all tokens
+   *                      associated with the current session.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#authentication">FaunaDB Authentication Functions</a>
+   * @see #Login(Expr, Expr)
+   */
   public static Expr Logout(boolean invalidateAll) {
     return Logout(BooleanV.valueOf(invalidateAll));
   }
@@ -1665,6 +1731,14 @@ public final class Language {
     return Fn.apply("identify", ref, "password", password);
   }
 
+  /**
+   * Checks the given password against the reference's credentials, retuning true if valid, or false otherwise.
+   *
+   * @param ref the reference to authenticate. Type: Reference
+   * @param password the authentication password.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#authentication">FaunaDB Authentication Functions</a>
+   */
   public static Expr Identify(Expr ref, String password) {
     return Identify(ref, new StringV(password));
   }
@@ -1735,6 +1809,17 @@ public final class Language {
     return Fn.apply("casefold", str);
   }
 
+  /**
+   * Normalizes strings according to the Unicode Standard, section 5.18 "Case Mappings". By default, it uses
+   * NKFCCaseFold as recommended by W3C. In order to use a specific string normalizer,
+   * see {@link #Casefold(Expr, Normalizer)}.
+   *
+   * @param str the string to be normalized.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://www.w3.org/TR/charmod-norm/">W3C Character Model for the World Wide Web: String Matching</a>
+   * @see #Casefold(Expr, Normalizer)
+   */
   public static Expr Casefold(String str) {
     return Casefold(new StringV(str));
   }
@@ -1754,6 +1839,17 @@ public final class Language {
     return Fn.apply("casefold", str, "normalizer", normalizer);
   }
 
+  /**
+   * Normalizes strings according to the Unicode Standard, section 5.18 "Case Mappings", and the normalizer provided.
+   * Pre-defined normalizers are available for the overload {@link #Casefold(Expr, Normalizer)}.
+   *
+   * @param str the string to be normalized.
+   * @param normalizer the string normalizer to use. Type: String
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://www.w3.org/TR/charmod-norm/">W3C Character Model for the World Wide Web: String Matching</a>
+   * @see #Casefold(Expr, Normalizer)
+   */
   public static Expr Casefold(String str, Expr normalizer) {
     return Casefold(new StringV(str), normalizer);
   }
@@ -1766,12 +1862,21 @@ public final class Language {
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see <a href="https://www.w3.org/TR/charmod-norm/">W3C Character Model for the World Wide Web: String Matching</a>
-   * @see #Casefold(Expr, Normalizer)
    */
   public static Expr Casefold(Expr str, Normalizer normalizer) {
     return Casefold(str, normalizer.value);
   }
 
+  /**
+   * Normalizes strings according to the Unicode Standard, section 5.18 "Case Mappings", and the normalizer provided.
+   *
+   * @param str the string to be normalized.
+   * @param normalizer the string normalizer to use
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://www.w3.org/TR/charmod-norm/">W3C Character Model for the World Wide Web: String Matching</a>
+   * @see #Casefold(Expr, Normalizer)
+   */
   public static Expr Casefold(String str, Normalizer normalizer) {
     return Casefold(new StringV(str), normalizer.value);
   }
@@ -1791,30 +1896,102 @@ public final class Language {
     return Fn.apply("ngram", terms, "min", min, "max", max);
   }
 
+  /**
+   * Tokenize the input into n-grams of the given sizes.
+   *
+   * @param terms the value to tokenize.
+   * @param min the minimum size for the n-grams. Type: Number
+   * @param max the maximum size for the n-grams. Type: Number
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(long)
+   */
   public static Expr NGram(String terms, Expr min, Expr max) {
     return NGram(new StringV(terms), min, max);
   }
 
+  /**
+   * Tokenize the input into n-grams of the given sizes.
+   *
+   * @param terms the value to tokenize. Type: String
+   * @param min the minimum size for the n-grams.
+   * @param max the maximum size for the n-grams. Type: Number
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   * @see #Value(long)
+   */
   public static Expr NGram(Expr terms, long min, Expr max) {
     return NGram(terms, new LongV(min), max);
   }
 
+  /**
+   * Tokenize the input into n-grams of the given sizes.
+   *
+   * @param terms the value to tokenize.
+   * @param min the minimum size for the n-grams.
+   * @param max the maximum size for the n-grams. Type: Number
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(long)
+   */
   public static Expr NGram(String terms, long min, Expr max) {
     return NGram(terms, new LongV(min), max);
   }
 
+  /**
+   * Tokenize the input into n-grams of the given sizes.
+   *
+   * @param terms the value to tokenize. Type: String
+   * @param min the minimum size for the n-grams. Type: Number
+   * @param max the maximum size for the n-grams.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   * @see #Value(long)
+   */
   public static Expr NGram(Expr terms, Expr min, long max) {
     return NGram(terms, min, new LongV(max));
   }
 
+  /**
+   * Tokenize the input into n-grams of the given sizes.
+   *
+   * @param terms the value to tokenize.
+   * @param min the minimum size for the n-grams. Type: Number
+   * @param max the maximum size for the n-grams.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   * @see #Value(long)
+   */
   public static Expr NGram(String terms, Expr min, long max) {
     return NGram(terms, min, new LongV(max));
   }
 
+  /**
+   * Tokenize the input into n-grams of the given sizes.
+   *
+   * @param terms the value to tokenize. Type: String
+   * @param min the minimum size for the n-grams.
+   * @param max the maximum size for the n-grams.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
   public static Expr NGram(Expr terms, long min, long max) {
     return NGram(terms, new LongV(min), new LongV(max));
   }
 
+  /**
+   * Tokenize the input into n-grams of the given sizes.
+   *
+   * @param terms the value to tokenize.
+   * @param min the minimum size for the n-grams.
+   * @param max the maximum size for the n-grams.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   */
   public static Expr NGram(String terms, long min, long max) {
     return NGram(terms, new LongV(min), new LongV(max));
   }
@@ -1852,7 +2029,7 @@ public final class Language {
   /**
    * Tokenize the input into n-grams of the 1 and 2 elements in size.
    *
-   * @param terms the list of values to tokenize. Type: String
+   * @param term the term to tokenize. Type: String
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
@@ -1862,8 +2039,29 @@ public final class Language {
     return Fn.apply("ngram", term);
   }
 
+  /**
+   * Tokenize the input into n-grams of the 1 and 2 elements in size.
+   *
+   * @param term the value to tokenize.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Arr(List)
+   */
   public static Expr NGram(String term) {
     return NGram(new StringV(term));
+  }
+
+  /**
+   * Creates a new timestamp from an ISO-8601 offset date/time string. A special string "now" can be used to get the
+   * current transaction time. Multiple references to "now" within the same query will be equal.
+   *
+   * @param str an ISO-8601 formatted string or the string literal "now". Type: String
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#time-and-date">FaunaDB Time and Date Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Time(Expr str) {
+    return Fn.apply("time", str);
   }
 
   /**
@@ -1873,12 +2071,7 @@ public final class Language {
    * @param str an ISO-8601 formatted string or the string literal "now"
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#time-and-date">FaunaDB Time and Date Functions</a>
-   * @see #Value(String)
    */
-  public static Expr Time(Expr str) {
-    return Fn.apply("time", str);
-  }
-
   public static Expr Time(String str) {
     return Time(new StringV(str));
   }
@@ -1897,6 +2090,15 @@ public final class Language {
     return Epoch(num, unit.value);
   }
 
+  /**
+   * Constructs a timestamp relative to the epoch "1970-01-01T00:00:00Z" given a unit type and a number of units.
+   *
+   * @param num the number of units.
+   * @param unit the unit type
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#time-and-date">FaunaDB Time and Date Functions</a>
+   * @see TimeUnit
+   */
   public static Expr Epoch(long num, TimeUnit unit) {
     return Epoch(new LongV(num), unit);
   }
@@ -1921,14 +2123,40 @@ public final class Language {
     return Fn.apply("epoch", num, "unit", unit);
   }
 
+  /**
+   * Constructs a timestamp relative to the epoch "1970-01-01T00:00:00Z" given a unit type and a number of units.
+   *
+   * @param num the number of units. Type: Number
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#time-and-date">FaunaDB Time and Date Functions</a>
+   * @see #Value(long)
+   */
   public static Expr Epoch(Expr num, String unit) {
     return Epoch(num, new StringV(unit));
   }
 
+  /**
+   * Constructs a timestamp relative to the epoch "1970-01-01T00:00:00Z" given a unit type and a number of units.
+   *
+   * @param num the number of units.
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#time-and-date">FaunaDB Time and Date Functions</a>
+   * @see #Value(String)
+   */
   public static Expr Epoch(long num, Expr unit) {
     return Epoch(new LongV(num), unit);
   }
 
+  /**
+   * Constructs a timestamp relative to the epoch "1970-01-01T00:00:00Z" given a unit type and a number of units.
+   *
+   * @param num the number of units.
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#time-and-date">FaunaDB Time and Date Functions</a>
+   */
   public static Expr Epoch(long num, String unit) {
     return Epoch(new LongV(num), new StringV(unit));
   }
@@ -1936,7 +2164,7 @@ public final class Language {
   /**
    * Creates a date from an ISO-8601 formatted date string.
    *
-   * @param str an ISO-8601 formatted date string
+   * @param str an ISO-8601 formatted date string. Type: String
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#time-and-date">FaunaDB Time and Date Functions</a>
    * @see #Value(String)
@@ -1945,6 +2173,13 @@ public final class Language {
     return Fn.apply("date", str);
   }
 
+  /**
+   * Creates a date from an ISO-8601 formatted date string.
+   *
+   * @param str an ISO-8601 formatted date string
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#time-and-date">FaunaDB Time and Date Functions</a>
+   */
   public static Expr Date(String str) {
     return Date(new StringV(str));
   }
