@@ -219,7 +219,7 @@ package object query {
     *
     * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
     */
-  def At(timestamp: Expr, expr: Expr) =
+  def At(timestamp: Expr, expr: Expr): Expr =
     Expr(ObjectV("at" -> timestamp.value, "expr" -> expr.value))
 
   /**
@@ -273,7 +273,7 @@ package object query {
   def Lambda(fn: (Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr) => Expr): Expr = macro QueryMacros.lambda
   def Lambda(fn: (Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr) => Expr): Expr = macro QueryMacros.lambda
 
-  def Lambda(lambda: Expr, expr: Expr) =
+  def Lambda(lambda: Expr, expr: Expr): Expr =
     Expr(ObjectV("lambda" -> lambda.value, "expr" -> expr.value))
 
   // Collection Functions
@@ -368,7 +368,7 @@ package object query {
     *
     * '''Reference''': [[https://fauna.com/documentation/queries#read-functions]]
     */
-  def KeyFromSecret(secret: Expr) =
+  def KeyFromSecret(secret: Expr): Expr =
     Expr(ObjectV("key_from_secret" -> secret.value))
 
   /**

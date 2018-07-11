@@ -91,7 +91,11 @@ class SerializationSpec extends FlatSpec with Matchers {
     val lambda4 = Lambda(Not(_))
     json.writeValueAsString(lambda4) should equal ("""{"lambda":"x$3","expr":{"not":{"var":"x$3"}}}""")
 
+    val lambda5 = Lambda("a", Var("a"))
+    json.writeValueAsString(lambda5) should equal ("""{"lambda":"a","expr":{"var":"a"}}""")
+
     json.writeValueAsString(At(1L, Get(Native.Classes))) should equal ("""{"at":1,"expr":{"get":{"@ref":{"id":"classes"}}}}""")
+    json.writeValueAsString(At(Instant.ofEpochMilli(0), Get(Native.Classes))) should equal ("""{"at":{"@ts":"1970-01-01T00:00:00Z"},"expr":{"get":{"@ref":{"id":"classes"}}}}""")
   }
 
   it should "serialize collections" in {
@@ -124,6 +128,8 @@ class SerializationSpec extends FlatSpec with Matchers {
     val ref = RefV("ref1", RefV("some", Native.Classes))
     val get = Get(ref)
     json.writeValueAsString(get) shouldBe "{\"get\":{\"@ref\":{\"id\":\"ref1\",\"class\":{\"@ref\":{\"id\":\"some\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}}"
+
+    json.writeValueAsString(Get(Native.Classes, Instant.ofEpochMilli(0))) shouldBe """{"get":{"@ref":{"id":"classes"}},"ts":{"@ts":"1970-01-01T00:00:00Z"}}"""
 
     val paginate1 = Paginate(Union(Match(RefV("some_index", Native.Indexes), "term"), Match(RefV("some_index", Native.Indexes), "term2")))
     json.writeValueAsString(paginate1) shouldBe "{\"paginate\":{\"union\":[{\"match\":\"term\",\"index\":{\"@ref\":{\"id\":\"some_index\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}},{\"match\":\"term2\",\"index\":{\"@ref\":{\"id\":\"some_index\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}]}}"
@@ -248,6 +254,8 @@ class SerializationSpec extends FlatSpec with Matchers {
 
     val hasIdentity = HasIdentity()
     json.writeValueAsString(hasIdentity) shouldBe "{\"has_identity\":null}"
+
+    json.writeValueAsString(KeyFromSecret("sekrit")) shouldBe """{"key_from_secret":"sekrit"}"""
   }
 
   it should "serialize date and time functions" in {

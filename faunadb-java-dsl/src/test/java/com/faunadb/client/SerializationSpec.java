@@ -283,6 +283,12 @@ public class SerializationSpec {
       Lambda(Arr(Value("x"), Value("_")),
         If(Var("x"), Value(42), Value(45))
       ), "{\"lambda\":[\"x\",\"_\"],\"expr\":{\"if\":{\"var\":\"x\"},\"then\":42,\"else\":45}}");
+
+    assertJson(
+      Lambda("x",
+        If(Var("x"), Value(42), Value(45))
+      ), "{\"lambda\":\"x\",\"expr\":{\"if\":{\"var\":\"x\"},\"then\":42,\"else\":45}}");
+
   }
 
   @Test
@@ -320,6 +326,13 @@ public class SerializationSpec {
         Arr(Value(1), Value(2), Value(3))
       ), "{\"take\":2,\"collection\":[1,2,3]}"
     );
+
+    assertJson(
+      Take(
+        2L,
+        Arr(Value(1), Value(2), Value(3))
+      ), "{\"take\":2,\"collection\":[1,2,3]}"
+    );
   }
 
   @Test
@@ -330,6 +343,14 @@ public class SerializationSpec {
         Arr(Value(1), Value(2), Value(3))
       ), "{\"drop\":2,\"collection\":[1,2,3]}"
     );
+
+    assertJson(
+      Drop(
+        2L,
+        Arr(Value(1), Value(2), Value(3))
+      ), "{\"drop\":2,\"collection\":[1,2,3]}"
+    );
+
   }
 
   @Test
@@ -381,11 +402,17 @@ public class SerializationSpec {
       Get(new RefV("104979509692858368", new RefV("spells", Native.CLASSES)), Value(Instant.ofEpochMilli(0))),
       "{\"get\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}}"
     );
+
+    assertJson(
+      Get(new RefV("104979509692858368", new RefV("spells", Native.CLASSES)), Instant.ofEpochMilli(0)),
+      "{\"get\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}}"
+    );
   }
 
   @Test
   public void shouldSerializeKeyFromSecret() throws Exception {
     assertJson(KeyFromSecret(Value("s3cr3t")), "{\"key_from_secret\":\"s3cr3t\"}");
+    assertJson(KeyFromSecret("s3cr3t"), "{\"key_from_secret\":\"s3cr3t\"}");
   }
 
   @Test
@@ -690,12 +717,18 @@ public class SerializationSpec {
   @Test
   public void shouldSerializeLogout() throws Exception {
     assertJson(Logout(Value(true)), "{\"logout\":true}");
+    assertJson(Logout(true), "{\"logout\":true}");
   }
 
   @Test
   public void shouldSerializeIdentify() throws Exception {
     assertJson(
       Identify(new RefV("104979509695139637", new RefV("characters", Native.CLASSES)), Value("abracadabra")),
+      "{\"identify\":{\"@ref\":{\"id\":\"104979509695139637\",\"class\":{\"@ref\":{\"id\":\"characters\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"password\":\"abracadabra\"}"
+    );
+
+    assertJson(
+      Identify(new RefV("104979509695139637", new RefV("characters", Native.CLASSES)), "abracadabra"),
       "{\"identify\":{\"@ref\":{\"id\":\"104979509695139637\",\"class\":{\"@ref\":{\"id\":\"characters\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"password\":\"abracadabra\"}"
     );
   }
@@ -735,18 +768,29 @@ public class SerializationSpec {
   @Test
   public void shouldSerializeCasefold() throws Exception {
     assertJson(Casefold(Value("Hen Wen")), "{\"casefold\":\"Hen Wen\"}");
+    assertJson(Casefold("Hen Wen"), "{\"casefold\":\"Hen Wen\"}");
 
     assertJson(Casefold(Value("Hen Wen"), Normalizer.NFD), "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFD\"}");
+    assertJson(Casefold("Hen Wen", Normalizer.NFD), "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFD\"}");
     assertJson(Casefold(Value("Hen Wen"), Value("NFD")), "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFD\"}");
+    assertJson(Casefold("Hen Wen", Value("NFD")), "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFD\"}");
   }
 
   @Test
   public void shouldSerializeNGram() throws Exception {
     assertJson(NGram(Value("str")), "{\"ngram\":\"str\"}");
+    assertJson(NGram("str"), "{\"ngram\":\"str\"}");
     assertJson(NGram(Arr(Value("str0"), Value("str1"))), "{\"ngram\":[\"str0\",\"str1\"]}");
     assertJson(NGram(ImmutableList.of(Value("str0"), Value("str1"))), "{\"ngram\":[\"str0\",\"str1\"]}");
 
     assertJson(NGram(Value("str"), Value(2), Value(4)), "{\"ngram\":\"str\",\"min\":2,\"max\":4}");
+    assertJson(NGram("str", Value(2), Value(4)), "{\"ngram\":\"str\",\"min\":2,\"max\":4}");
+    assertJson(NGram(Value("str"), 2L, Value(4)), "{\"ngram\":\"str\",\"min\":2,\"max\":4}");
+    assertJson(NGram("str", 2L, Value(4)), "{\"ngram\":\"str\",\"min\":2,\"max\":4}");
+    assertJson(NGram(Value("str"), Value(2), 4L), "{\"ngram\":\"str\",\"min\":2,\"max\":4}");
+    assertJson(NGram("str", Value(2), 4L), "{\"ngram\":\"str\",\"min\":2,\"max\":4}");
+    assertJson(NGram(Value("str"), 2L, 4L), "{\"ngram\":\"str\",\"min\":2,\"max\":4}");
+    assertJson(NGram("str", 2L, 4L), "{\"ngram\":\"str\",\"min\":2,\"max\":4}");
     assertJson(NGram(Arr(Value("str0"), Value("str1")), Value(2), Value(4)), "{\"ngram\":[\"str0\",\"str1\"],\"min\":2,\"max\":4}");
     assertJson(NGram(ImmutableList.of(Value("str0"), Value("str1")), Value(2), Value(4)), "{\"ngram\":[\"str0\",\"str1\"],\"min\":2,\"max\":4}");
   }
@@ -757,24 +801,46 @@ public class SerializationSpec {
       Time(Value("1970-01-01T00:00:00+00:00")),
       "{\"time\":\"1970-01-01T00:00:00+00:00\"}"
     );
+
+    assertJson(
+      Time("1970-01-01T00:00:00+00:00"),
+      "{\"time\":\"1970-01-01T00:00:00+00:00\"}"
+    );
   }
 
   @Test
   public void shouldSerializeEpoch() throws Exception {
     assertJson(Epoch(Value(0), SECOND), "{\"epoch\":0,\"unit\":\"second\"}");
+    assertJson(Epoch(0L, SECOND), "{\"epoch\":0,\"unit\":\"second\"}");
     assertJson(Epoch(Value(0), MILLISECOND), "{\"epoch\":0,\"unit\":\"millisecond\"}");
+    assertJson(Epoch(0L, MILLISECOND), "{\"epoch\":0,\"unit\":\"millisecond\"}");
     assertJson(Epoch(Value(0), MICROSECOND), "{\"epoch\":0,\"unit\":\"microsecond\"}");
+    assertJson(Epoch(0L, MICROSECOND), "{\"epoch\":0,\"unit\":\"microsecond\"}");
     assertJson(Epoch(Value(0), NANOSECOND), "{\"epoch\":0,\"unit\":\"nanosecond\"}");
+    assertJson(Epoch(0L, NANOSECOND), "{\"epoch\":0,\"unit\":\"nanosecond\"}");
 
     assertJson(Epoch(Value(0), Value("second")), "{\"epoch\":0,\"unit\":\"second\"}");
+    assertJson(Epoch(Value(0), "second"), "{\"epoch\":0,\"unit\":\"second\"}");
+    assertJson(Epoch(0L, Value("second")), "{\"epoch\":0,\"unit\":\"second\"}");
+    assertJson(Epoch(0L, "second"), "{\"epoch\":0,\"unit\":\"second\"}");
     assertJson(Epoch(Value(0), Value("millisecond")), "{\"epoch\":0,\"unit\":\"millisecond\"}");
+    assertJson(Epoch(Value(0), "millisecond"), "{\"epoch\":0,\"unit\":\"millisecond\"}");
+    assertJson(Epoch(0L, Value("millisecond")), "{\"epoch\":0,\"unit\":\"millisecond\"}");
+    assertJson(Epoch(0L, "millisecond"), "{\"epoch\":0,\"unit\":\"millisecond\"}");
     assertJson(Epoch(Value(0), Value("microsecond")), "{\"epoch\":0,\"unit\":\"microsecond\"}");
+    assertJson(Epoch(Value(0), "microsecond"), "{\"epoch\":0,\"unit\":\"microsecond\"}");
+    assertJson(Epoch(0L, Value("microsecond")), "{\"epoch\":0,\"unit\":\"microsecond\"}");
+    assertJson(Epoch(0L, "microsecond"), "{\"epoch\":0,\"unit\":\"microsecond\"}");
     assertJson(Epoch(Value(0), Value("nanosecond")), "{\"epoch\":0,\"unit\":\"nanosecond\"}");
+    assertJson(Epoch(Value(0), "nanosecond"), "{\"epoch\":0,\"unit\":\"nanosecond\"}");
+    assertJson(Epoch(0L, Value("nanosecond")), "{\"epoch\":0,\"unit\":\"nanosecond\"}");
+    assertJson(Epoch(0L, "nanosecond"), "{\"epoch\":0,\"unit\":\"nanosecond\"}");
   }
 
   @Test
   public void shouldSerializeDate() throws Exception {
     assertJson(Date(Value("1970-01-01")), "{\"date\":\"1970-01-01\"}");
+    assertJson(Date("1970-01-01"), "{\"date\":\"1970-01-01\"}");
   }
 
   @Test
@@ -985,6 +1051,8 @@ public class SerializationSpec {
     assertJson(At(Value(1L), Get(Native.CLASSES)), "{\"at\":1,\"expr\":{\"get\":{\"@ref\":{\"id\":\"classes\"}}}}");
     assertJson(At(Time(Value("1970-01-01T00:00:00+00:00")), Get(Native.CLASSES)),
       "{\"at\":{\"time\":\"1970-01-01T00:00:00+00:00\"},\"expr\":{\"get\":{\"@ref\":{\"id\":\"classes\"}}}}");
+    assertJson(At(Instant.ofEpochMilli(0), Get(Native.CLASSES)),
+      "{\"at\":{\"@ts\":\"1970-01-01T00:00:00Z\"},\"expr\":{\"get\":{\"@ref\":{\"id\":\"classes\"}}}}");
   }
 
   @Test
