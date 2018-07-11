@@ -10,6 +10,9 @@ from a UnknownException on the Scala driver
 * Add Result.orNull()
 * Replace Joda Time with the JSR 310 API
 * Remove support for Android < 8.0, and Java < 8
+* Additional variants of At(), Lambda(), Take(), Drop(), Get(),
+KeyFromSecret(), Logout(), Identify(), Casefold(), NGram(), Time(),
+Epoch(), and Date()
 
 2.2.0
 * Adds codecs to Map type
