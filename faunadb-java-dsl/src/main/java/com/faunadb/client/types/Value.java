@@ -126,6 +126,19 @@ public abstract class Value extends Expr {
   }
 
   /**
+   * Attempts to convert the value to a {@link Map}.
+   *
+   * @param <T> the type of the values in the {@link Map}
+   * @param valueType the type of the values in the {@link Map}
+   * @return a {@link Map}
+   * @see Decoder
+   * @see Types
+   */
+  public final <T> Map<String, T> toMap(Class<T> valueType) {
+    return asMapOf(valueType).get();
+  }
+
+  /**
    * Attempts to convert the value to a {@link Collection}.
    *
    * @param <T> the type of the elements on the {@link Collection}
@@ -136,6 +149,19 @@ public abstract class Value extends Expr {
    */
   public final <T> Result<Collection<T>> asCollectionOf(Class<T> elementType) {
     return Decoder.decode(this, Types.arrayListOf(elementType));
+  }
+
+  /**
+   * Attempts to convert the value to a {@link Collection}.
+   *
+   * @param <T> the type of the elements in the {@link Collection}
+   * @param elementType the type of the elements in the {@link Collection}
+   * @return a new collection
+   * @see Decoder
+   * @see Types
+   */
+  public final <T> Collection<T> collect(Class<T> elementType) {
+    return asCollectionOf(elementType).get();
   }
 
   /**
@@ -152,16 +178,47 @@ public abstract class Value extends Expr {
   }
 
   /**
+   * Attempts to decode the value using the reflection {@link Decoder}.
+   *
+   * @param <T> the type to convert to
+   * @param clazz a class type to convert
+   * @return the converted result
+   * @see Decoder
+   */
+  public final <T> T get(Class<T> clazz) {
+    return to(clazz).get();
+  }
+
+  /**
    * Safely attempts to extract a {@link Field} from this value.
    *
    * @param <T> the type of returned field
    * @param field {@link Field} to extract
    * @return An {@link Optional} containing the resulting value, if the field extraction was successful.
-   * It returns {@link Optional#absent()}, otherwise.
+   * It returns {@link Optional#empty()}, otherwise.
    * @see Field
    */
   public final <T> Optional<T> getOptional(Field<T> field) {
     return field.get(this).getOptional();
+  }
+
+  /**
+   * Converts this into an {@link Optional}.
+   *
+   * @return An {@link Optional} containing this value, if present.
+   */
+  @JsonIgnore
+  public Optional<Value> getOptional() {
+    return Optional.of(this);
+  }
+
+  /**
+   * Returns this value, or returns null if no value is present.
+   *
+   * @return the value or null
+   */
+  public final Value orNull() {
+    return getOptional().orElse(null);
   }
 
   /**
@@ -443,6 +500,12 @@ public abstract class Value extends Expr {
     public static final NullV NULL = new NullV();
 
     private NullV() {
+    }
+
+    @Override
+    @JsonIgnore
+    public Optional<Value> getOptional() {
+      return Optional.empty();
     }
 
     @Override
