@@ -1,12 +1,12 @@
 package com.faunadb.client.types;
 
 import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.faunadb.client.types.Codec.ARRAY;
 import static com.faunadb.client.types.Codec.OBJECT;
@@ -146,7 +146,9 @@ final class Path {
 
   @Override
   public String toString() {
-    return Joiner.on("/").join(segments);
+    return segments.stream()
+      .map(Segment::toString)
+      .collect(Collectors.joining("/"));
   }
 
 }

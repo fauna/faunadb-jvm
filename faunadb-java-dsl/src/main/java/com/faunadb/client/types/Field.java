@@ -1,7 +1,6 @@
 package com.faunadb.client.types;
 
 import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,8 +62,9 @@ public final class Field<T> {
             }
           }
 
-          if (!failures.isEmpty())
-            return Result.fail(format("Failed to collect values: %s", Joiner.on(", ").join(failures)));
+          if (!failures.isEmpty()) {
+            return Result.fail(format("Failed to collect values: %s", String.join(", ", failures)));
+          }
 
           return Result.<List<A>>success(success);
         }

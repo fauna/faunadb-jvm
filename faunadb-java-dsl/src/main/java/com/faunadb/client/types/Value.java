@@ -21,9 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.faunadb.client.util.Objects.requireNonNull;
-import static com.google.common.base.Joiner.on;
 import static com.google.common.primitives.Bytes.asList;
 import static java.lang.String.format;
 
@@ -728,14 +728,11 @@ public abstract class Value extends Expr {
 
     @Override
     public String toString() {
-      String str = FluentIterable.from(asList(value)).transform(new Function<Byte, String>() {
-        @Override
-        public String apply(Byte input) {
-          return format("0x%02x", input);
-        }
-      }).join(on(", "));
+     String str = asList(value).stream()
+       .map(b -> format("0x%02x", b))
+       .collect(Collectors.joining(", "));
 
-      return format("BytesV(%s)", str);
+     return format("BytesV(%s)", str);
     }
   }
 
