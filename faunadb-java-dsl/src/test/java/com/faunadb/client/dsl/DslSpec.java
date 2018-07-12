@@ -5,9 +5,6 @@ import com.faunadb.client.errors.NotFoundException;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,7 +48,7 @@ public abstract class DslSpec {
   protected static final Field<Long> TS_FIELD = Field.at("ts").to(LONG);
   protected static final Field<RefV> REF_FIELD = Field.at("ref").to(REF);
   protected static final Field<RefV> INSTANCE_FIELD = Field.at("instance").to(REF);
-  protected static final Field<ImmutableList<RefV>> REF_LIST = DATA.collect(Field.as(REF));
+  protected static final Field<List<RefV>> REF_LIST = DATA.collect(Field.as(REF));
 
   protected static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).to(STRING);
   protected static final Field<String> ELEMENT_FIELD = DATA.at(Field.at("element")).to(STRING);
@@ -68,7 +65,7 @@ public abstract class DslSpec {
   protected static RefV thorSpell2;
 
   protected abstract ListenableFuture<Value> query(Expr expr);
-  protected abstract ListenableFuture<ImmutableList<Value>> query(List<? extends Expr> exprs);
+  protected abstract ListenableFuture<List<Value>> query(List<? extends Expr> exprs);
 
   private static boolean initialized = false;
 
@@ -79,13 +76,13 @@ public abstract class DslSpec {
 
     initialized = true;
 
-    query(ImmutableList.of(
+    query(Arrays.asList(
       CreateClass(Obj("name", Value("spells"))),
       CreateClass(Obj("name", Value("characters"))),
       CreateClass(Obj("name", Value("spellbooks")))
     )).get();
 
-    query(ImmutableList.of(
+    query(Arrays.asList(
       CreateIndex(Obj(
         "name", Value("all_spells"),
         "source", Class("spells")
@@ -215,9 +212,9 @@ public abstract class DslSpec {
     assertThat(testField.at("string").to(STRING).get(), equalTo("sup"));
     assertThat(testField.at("num").to(LONG).get(), equalTo(1234L));
     assertThat(testField.at("bool").to(BOOLEAN).get(), is(true));
-    assertThat(testField.at("bool").to(STRING).getOptional(), is(Optional.<String>absent()));
-    assertThat(testField.at("credentials").to(VALUE).getOptional(), is(Optional.<Value>absent()));
-    assertThat(testField.at("credentials", "password").to(STRING).getOptional(), is(Optional.<String>absent()));
+    assertThat(testField.at("bool").to(STRING).getOptional(), is(Optional.<String>empty()));
+    assertThat(testField.at("credentials").to(VALUE).getOptional(), is(Optional.<Value>empty()));
+    assertThat(testField.at("credentials", "password").to(STRING).getOptional(), is(Optional.<String>empty()));
 
     Value array = testField.at("array");
     assertThat(array.to(ARRAY).get(), hasSize(4));
@@ -225,7 +222,7 @@ public abstract class DslSpec {
     assertThat(array.at(1).to(STRING).get(), equalTo("2"));
     assertThat(array.at(2).to(DOUBLE).get(), equalTo(3.4));
     assertThat(array.at(3).at("name").to(STRING).get(), equalTo("JR"));
-    assertThat(array.at(4).to(VALUE).getOptional(), is(Optional.<Value>absent()));
+    assertThat(array.at(4).to(VALUE).getOptional(), is(Optional.<Value>empty()));
   }
 
   @Test
@@ -236,7 +233,7 @@ public abstract class DslSpec {
 
   @Test
   public void shouldBeAbleToIssueABatchedQuery() throws Exception {
-    ImmutableList<Value> results = query(ImmutableList.of(
+    List<Value> results = query(Arrays.asList(
       Get(magicMissile),
       Get(thor)
     )).get();
@@ -245,9 +242,15 @@ public abstract class DslSpec {
     assertThat(results.get(0).get(NAME_FIELD), equalTo("Magic Missile"));
     assertThat(results.get(1).get(NAME_FIELD), equalTo("Thor"));
 
-    ImmutableList<Value> data = query(ImmutableList.of(
-      new ObjectV(ImmutableMap.of("k1", new StringV("v1"))),
-      new ObjectV(ImmutableMap.of("k2", new StringV("v2")))
+    Map<String, Value> k1 = new HashMap<>();
+    k1.put("k1", new StringV("v1"));
+
+    Map<String, Value> k2 = new HashMap<>();
+    k2.put("k2", new StringV("v2"));
+    
+    List<Value> data = query(Arrays.asList(
+            new ObjectV(k1),
+            new ObjectV(k2)
     )).get();
 
     assertThat(data, hasSize(2));
@@ -277,7 +280,7 @@ public abstract class DslSpec {
     assertThat(updatedInstance.get(REF_FIELD), equalTo(createdInstance.get(REF_FIELD)));
     assertThat(updatedInstance.get(NAME_FIELD), equalTo("Faerie Fire"));
     assertThat(updatedInstance.get(ELEMENT_FIELD), equalTo("arcane"));
-    assertThat(updatedInstance.getOptional(COST_FIELD), is(Optional.<Long>absent()));
+    assertThat(updatedInstance.getOptional(COST_FIELD), is(Optional.<Long>empty()));
   }
 
   @Test
@@ -370,7 +373,7 @@ public abstract class DslSpec {
       Paginate(Events(ref))
     ).get().get(DATA);
 
-    List<Event> events = ImmutableList.copyOf(data.asCollectionOf(Event.class).get());
+    List<Event> events = new ArrayList<>(data.asCollectionOf(Event.class).get());
 
     assertThat(events, hasSize(3));
 
@@ -402,7 +405,7 @@ public abstract class DslSpec {
       Paginate(Events(Singleton(ref)))
     ).get().get(DATA);
 
-    List<Event> events = ImmutableList.copyOf(data.asCollectionOf(Event.class).get());
+    List<Event> events = new ArrayList<>(data.asCollectionOf(Event.class).get());
 
     assertThat(events, hasSize(2));
 
@@ -467,7 +470,7 @@ public abstract class DslSpec {
 
     assertThat(page1.get(DATA).to(ARRAY).get(), hasSize(3));
     assertThat(page1.at("after"), notNullValue());
-    assertThat(page1.at("before").to(VALUE).getOptional(), is(Optional.<Value>absent()));
+    assertThat(page1.at("before").to(VALUE).getOptional(), is(Optional.<Value>empty()));
 
     Value page2 = query(
       Paginate(Match(Index("all_spells")))
@@ -478,7 +481,7 @@ public abstract class DslSpec {
     assertThat(page2.get(DATA).to(ARRAY).get(), hasSize(3));
     assertThat(page2.get(DATA), not(page1.at("data")));
     assertThat(page2.at("before"), notNullValue());
-    assertThat(page2.at("after").to(VALUE).getOptional(), is(Optional.<Value>absent()));
+    assertThat(page2.at("after").to(VALUE).getOptional(), is(Optional.<Value>empty()));
   }
 
   @Test
@@ -489,7 +492,7 @@ public abstract class DslSpec {
         Value("arcane"))
     ).get();
 
-    ImmutableMap<String, Value> set = res.to(SET_REF).get().parameters();
+    Map<String, Value> set = res.to(SET_REF).get().parameters();
     assertThat(set.get("terms").to(STRING).get(), equalTo("arcane"));
     assertThat(set.get("match").to(REF).get(),
       equalTo(new RefV("spells_by_element", Native.INDEXES)));
@@ -1015,7 +1018,7 @@ public abstract class DslSpec {
 
   @Test
   public void shouldEvalEpochExpression() throws Exception {
-    ImmutableList<Value> res = query(ImmutableList.of(
+    List<Value> res = query(Arrays.asList(
       Epoch(Value(30), SECOND),
       Epoch(Value(30), MILLISECOND),
       Epoch(Value(30), MICROSECOND),

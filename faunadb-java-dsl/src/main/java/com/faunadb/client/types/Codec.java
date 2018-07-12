@@ -3,8 +3,10 @@ package com.faunadb.client.types;
 import com.faunadb.client.types.Value.*;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static java.lang.String.format;
 
@@ -157,14 +159,14 @@ public interface Codec<T> {
   Codec<LocalDate> DATE = Transformations.mapTo(DateV.class, Transformations.<DateV, LocalDate>scalarValue(), Transformations.LOCAL_DATE_TO_VALUE);
 
   /**
-   * Converts a {@link Value} to an {@link ImmutableList} of {@link Value}
+   * Converts a {@link Value} to an {@link List} of {@link Value}
    */
-  Codec<ImmutableList<Value>> ARRAY = Transformations.mapTo(ArrayV.class, Transformations.VALUE_TO_LIST, Transformations.LIST_TO_VALUE);
+  Codec<List<Value>> ARRAY = Transformations.mapTo(ArrayV.class, Transformations.VALUE_TO_LIST, Transformations.LIST_TO_VALUE);
 
   /**
-   * Converts a {@link Value} to an {@link ImmutableMap} of {@link String} to {@link Value}
+   * Converts a {@link Value} to a {@link Map} of {@link String} to {@link Value}
    */
-  Codec<ImmutableMap<String, Value>> OBJECT = Transformations.mapTo(ObjectV.class, Transformations.VALUE_TO_MAP, Transformations.MAP_TO_VALUE);
+  Codec<Map<String, Value>> OBJECT = Transformations.mapTo(ObjectV.class, Transformations.VALUE_TO_MAP, Transformations.MAP_TO_VALUE);
 
   /**
    * Converts a {@link Value} to an array of bytes
@@ -356,17 +358,17 @@ final class Transformations {
     }
   };
 
-  final static Function<ImmutableMap<String, Value>, Value> MAP_TO_VALUE = new Function<ImmutableMap<String, Value>, Value>() {
+  final static Function<Map<String, Value>, Value> MAP_TO_VALUE = new Function<Map<String, Value>, Value>() {
     @Override
-    public Value apply(ImmutableMap<String, Value> input) {
+    public Value apply(Map<String, Value> input) {
       return new ObjectV(input);
     }
   };
 
-  final static Function<ImmutableList<Value>, Value> LIST_TO_VALUE = new Function<ImmutableList<Value>, Value>() {
+  final static Function<List<Value>, Value> LIST_TO_VALUE = new Function<List<Value>, Value>() {
     @Override
-    public Value apply(ImmutableList<Value> input) {
-      return new ArrayV(input);
+    public Value apply(List<Value> input) {
+        return new ArrayV(Collections.unmodifiableList(input));
     }
   };
 
@@ -386,16 +388,16 @@ final class Transformations {
     }
   };
 
-  final static Function<ArrayV, ImmutableList<Value>> VALUE_TO_LIST = new Function<ArrayV, ImmutableList<Value>>() {
+  final static Function<ArrayV, List<Value>> VALUE_TO_LIST = new Function<ArrayV, List<Value>>() {
     @Override
-    public ImmutableList<Value> apply(ArrayV input) {
+    public List<Value> apply(ArrayV input) {
       return input.values;
     }
   };
 
-  final static Function<ObjectV, ImmutableMap<String, Value>> VALUE_TO_MAP = new Function<ObjectV, ImmutableMap<String, Value>>() {
+  final static Function<ObjectV, Map<String, Value>> VALUE_TO_MAP = new Function<ObjectV, Map<String, Value>>() {
     @Override
-    public ImmutableMap<String, Value> apply(ObjectV input) {
+    public Map<String, Value> apply(ObjectV input) {
       return input.values;
     }
   };

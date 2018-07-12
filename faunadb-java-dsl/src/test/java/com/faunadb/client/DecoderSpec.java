@@ -11,7 +11,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.faunadb.client.types.Decoder.decode;
-import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
@@ -156,14 +155,27 @@ public class DecoderSpec {
 
     @Test
     public void shouldDecodeMaps() {
-        assertEquals(
-                newHashMap(of("a", 10L)),
-                decode(new ObjectV(of("a", new LongV(10))), Types.hashMapOf(long.class)).get()
-        );
+        Map<String, Long> a = new LinkedHashMap<>();
+        a.put("a", 10L);
+
+        Map<String, Value> b = new LinkedHashMap<>();
+        b.put("a", new LongV(10));
 
         assertEquals(
-                newHashMap(of("a", 10)),
-                decode(new ObjectV(of("a", new LongV(10))), Types.hashMapOf(int.class)).get()
+                 newHashMap(a),
+                 decode(new ObjectV(b), Types.hashMapOf(long.class)).get()
+        );
+
+
+        Map<String, Integer> c = new LinkedHashMap<>();
+        c.put("a", 10);
+
+        Map<String, Value> d = new LinkedHashMap<>();
+        d.put("a", new LongV(10));
+        
+        assertEquals(
+                newHashMap(c),
+                decode(new ObjectV(d), Types.hashMapOf(int.class)).get()
         );
     }
 
@@ -233,20 +245,29 @@ public class DecoderSpec {
 
     @Test
     public void shouldDecodeSimpleObjects() {
+        Map<String, String> simple = new LinkedHashMap<>();
+        simple.put("key", "value");
+        
         SimpleObject obj = new SimpleObject();
         obj.setStrField("value");
         obj.setLongField(10);
         obj.setListStrField(newArrayList("value1", "value2"));
         obj.setSetLongField(newHashSet(1L, 2L, 3L));
-        obj.setMapStrToStr(newHashMap(of("key", "value")));
+        obj.setMapStrToStr(newHashMap(simple));
 
-        ObjectV objectV = new ObjectV(of(
-                "strField", new StringV("value"),
-                "longField", new LongV(10),
-                "listStrField", new ArrayV(asList(new StringV("value1"), new StringV("value2"))),
-                "setLongField", new ArrayV(asList(new LongV(1), new LongV(2), new LongV(3))),
-                "mapStrToStr", new ObjectV(of("key", new StringV("value")))
-        ));
+        Map<String, Value> kvs = new LinkedHashMap<>();
+
+        kvs.put("strField", new StringV("value"));
+        kvs.put("longField", new LongV(10));
+        kvs.put("listStrField", new ArrayV(asList(new StringV("value1"), new StringV("value2"))));
+        kvs.put("setLongField", new ArrayV(asList(new LongV(1), new LongV(2), new LongV(3))));
+
+        Map<String, Value> map = new LinkedHashMap<>();
+        map.put("key", new StringV("value"));
+
+        kvs.put("mapStrToStr", new ObjectV(map));
+
+        ObjectV objectV = new ObjectV(kvs);
         assertEquals(obj, decode(objectV, SimpleObject.class).get());
     }
 
@@ -278,7 +299,11 @@ public class DecoderSpec {
     public void shouldDecodeObjectsWithConstructor() {
         ObjectWithConstructor obj = new ObjectWithConstructor("value");
 
-        ObjectV objectV = new ObjectV(of("strField", new StringV("value")));
+        Map<String, Value> kvs = new LinkedHashMap<>();
+
+        kvs.put("strField", new StringV("value"));
+
+        ObjectV objectV = new ObjectV(kvs);
 
         assertEquals(obj, decode(objectV, ObjectWithConstructor.class).get());
     }
@@ -313,7 +338,10 @@ public class DecoderSpec {
     public void shouldDecodeObjectsWithStaticCreator() {
         ObjectWithStaticCreator obj = new ObjectWithStaticCreator("value", 10);
 
-        ObjectV objectV = new ObjectV(of("strField", new StringV("value")));
+        Map<String, Value> kvs = new LinkedHashMap<>();
+        kvs.put("strField", new StringV("value"));
+        
+        ObjectV objectV = new ObjectV(kvs);
 
         assertEquals(obj, decode(objectV, ObjectWithStaticCreator.class).get());
     }
@@ -351,7 +379,11 @@ public class DecoderSpec {
         obj.strField = "value";
         obj.longField = 10;
 
-        ObjectV objectV = new ObjectV(of("strField", new StringV("value"), "longField", new LongV(10)));
+        Map<String, Value> kvs = new LinkedHashMap<>();
+        kvs.put("strField", new StringV("value"));
+        kvs.put("longField", new LongV(10));
+        
+        ObjectV objectV = new ObjectV(kvs);
 
         assertEquals(obj, decode(objectV, ObjectWithCreatorAndPropertiesMixed.class).get());
     }
@@ -421,10 +453,13 @@ public class DecoderSpec {
 
     @Test
     public void shouldIgnoreFieldAnnotated() {
-        ObjectWithFieldsIgnored obj = decode(new ObjectV(of(
-                "fieldIgnored", new StringV("should be ignored"),
-                "fieldNotIgnored", new StringV("value")
-        )), ObjectWithFieldsIgnored.class).get();
+        Map<String, Value> kvs = new LinkedHashMap<>();
+
+        kvs.put("fieldIgnored", new StringV("should be ignored"));
+        kvs.put("fieldNotIgnored", new StringV("value"));
+        
+        ObjectWithFieldsIgnored obj = decode(new ObjectV(kvs),
+            ObjectWithFieldsIgnored.class).get();
 
         assertEquals("value", obj.fieldNotIgnored);
         assertEquals("initial value", obj.fieldIgnored);
@@ -485,7 +520,14 @@ public class DecoderSpec {
         assertEquals((Integer) 10, new LongV(10).to(int.class).get());
 
         assertEquals(newArrayList(10, 20), new ArrayV(newArrayList(new LongV(10), new LongV(20))).asCollectionOf(int.class).get());
-        assertEquals(newHashMap(of("key", "value")), new ObjectV(of("key", new StringV("value"))).asMapOf(String.class).get());
+
+        Map<String, String> in = new LinkedHashMap<>();
+        in.put("key", "value");
+
+        Map<String, Value> out = new LinkedHashMap<>();
+        out.put("key", new StringV("value"));
+
+        assertEquals(newHashMap(in), new ObjectV(out).asMapOf(String.class).get());
 
         assertArrayEquals(new int[]{10, 20}, new ArrayV(newArrayList(new LongV(10), new LongV(20))).to(int[].class).get());
     }
@@ -500,7 +542,12 @@ public class DecoderSpec {
 
     @Test
     public void shouldApplyDefaultValuesForFieldsWhenNull() throws IOException {
-        ClassWithDefaults classWithDefaults = decode(new ObjectV(of("nullableField", NullV.NULL, "nonNullableField", NullV.NULL)), ClassWithDefaults.class).get();
+        Map<String, Value> obj = new LinkedHashMap<>();
+
+        obj.put("nullableField", NullV.NULL);
+        obj.put("nonNullableField", NullV.NULL);
+
+        ClassWithDefaults classWithDefaults = decode(new ObjectV(obj), ClassWithDefaults.class).get();
 
         assertNull(classWithDefaults.nullableField);
         assertEquals(0, classWithDefaults.nonNullableField);

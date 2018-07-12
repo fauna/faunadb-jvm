@@ -1,9 +1,12 @@
 package com.faunadb.client.errors;
 
 import com.faunadb.client.HttpResponses;
-import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * The base type for all FaunaDB exceptions.
@@ -18,12 +21,12 @@ public class FaunaException extends RuntimeException {
 
   public FaunaException(String message) {
     super(message);
-    this.response = Optional.absent();
+    this.response = Optional.empty();
   }
 
   public FaunaException(String message, Throwable cause) {
     super(message, cause);
-    this.response = Optional.absent();
+    this.response = Optional.empty();
   }
 
   /**
@@ -31,11 +34,11 @@ public class FaunaException extends RuntimeException {
    *
    * @return a list of errors
    */
-  public ImmutableList<HttpResponses.QueryError> errors() {
+  public List<HttpResponses.QueryError> errors() {
     if (response.isPresent()) {
       return response.get().errors();
     } else {
-      return ImmutableList.of();
+      return Collections.emptyList();
     }
   }
 
@@ -52,12 +55,13 @@ public class FaunaException extends RuntimeException {
     }
   }
 
-  private static String constructErrorMessage(ImmutableList<HttpResponses.QueryError> errors) {
-    ImmutableList.Builder<String> messages = ImmutableList.builder();
+  private static String constructErrorMessage(List<HttpResponses.QueryError> errors) {
+    List<String> messages = new ArrayList<>();
+
     for (HttpResponses.QueryError error : errors) {
       messages.add(error.code() + ": " + error.description());
     }
 
-    return Joiner.on(", ").join(messages.build());
+    return String.join(", ", messages);
   }
 }

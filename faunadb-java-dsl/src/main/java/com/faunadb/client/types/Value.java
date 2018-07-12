@@ -8,10 +8,7 @@ import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.io.BaseEncoding;
 
 import java.time.Instant;
@@ -19,11 +16,14 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.faunadb.client.util.Objects.requireNonNull;
-import static com.google.common.base.Joiner.on;
 import static com.google.common.primitives.Bytes.asList;
 import static java.lang.String.format;
 
@@ -178,10 +178,10 @@ public abstract class Value extends Expr {
    *
    * @param <T> the type of the elements in the resulting {@link List}
    * @param field the {@link Field} to extract from each element in the underlying collection
-   * @return a {@link ImmutableList} with the collected fields
+   * @return a {@link List} with the collected fields
    * @see Field
    */
-  public final <T> ImmutableList<T> collect(Field<T> field) {
+  public final <T> List<T> collect(Field<T> field) {
     return Field.root().collect(field).get(this).get();
   }
 
@@ -266,17 +266,19 @@ public abstract class Value extends Expr {
   @JsonDeserialize(using = Deserializer.ObjectDeserializer.class)
   public static final class ObjectV extends Value {
 
-    final ImmutableMap<String, Value> values;
+    final Map<String, Value> values;
 
     public ObjectV(Map<String, ? extends Value> values) {
       requireNonNull(values);
-      this.values = ImmutableMap.copyOf(values);
+      this.values = Collections.unmodifiableMap(values);
     }
 
     @Override
     @JsonValue
-    protected ImmutableMap<String, ImmutableMap<String, Value>> toJson() {
-      return ImmutableMap.of("object", values);
+    protected Map<String, Map<String, Value>> toJson() {
+        Map<String, Map<String, Value>> kvs = new HashMap<>();
+        kvs.put("object", values);
+        return Collections.unmodifiableMap(kvs);
     }
 
     @Override
@@ -308,16 +310,16 @@ public abstract class Value extends Expr {
   @JsonDeserialize(using = Deserializer.ArrayDeserializer.class)
   public static final class ArrayV extends Value {
 
-    final ImmutableList<Value> values;
+    final List<Value> values;
 
     public ArrayV(List<? extends Value> values) {
       requireNonNull(values);
-      this.values = ImmutableList.copyOf(values);
+      this.values = Collections.unmodifiableList(values);
     }
 
     @Override
     @JsonValue
-    protected ImmutableList<Value> toJson() {
+    protected List<Value> toJson() {
       return values;
     }
 
@@ -532,9 +534,9 @@ public abstract class Value extends Expr {
    * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
    * @see Value
    */
-  public static final class SetRefV extends ScalarValue<ImmutableMap<String, Value>> {
+  public static final class SetRefV extends ScalarValue<Map<String, Value>> {
 
-    public SetRefV(@JsonProperty("@set") ImmutableMap<String, Value> parameters) {
+    public SetRefV(@JsonProperty("@set") Map<String, Value> parameters) {
       super(parameters);
     }
 
@@ -545,13 +547,13 @@ public abstract class Value extends Expr {
      *
      * @return SetRefV internal structure
      */
-    public ImmutableMap<String, Value> parameters() {
+    public Map<String, Value> parameters() {
       return value;
     }
 
     @Override
     @JsonProperty("@set")
-    protected ImmutableMap<String, Value> toJson() {
+    protected Map<String, Value> toJson() {
       return value;
     }
   }
@@ -621,12 +623,12 @@ public abstract class Value extends Expr {
 
     @JsonIgnore
     public Optional<RefV> getClazz() {
-      return Optional.fromNullable(value.clazz);
+      return Optional.ofNullable(value.clazz);
     }
 
     @JsonIgnore
     public Optional<RefV> getDatabase() {
-      return Optional.fromNullable(value.database);
+      return Optional.ofNullable(value.database);
     }
 
     @Override
@@ -726,14 +728,11 @@ public abstract class Value extends Expr {
 
     @Override
     public String toString() {
-      String str = FluentIterable.from(asList(value)).transform(new Function<Byte, String>() {
-        @Override
-        public String apply(Byte input) {
-          return format("0x%02x", input);
-        }
-      }).join(on(", "));
+     String str = asList(value).stream()
+       .map(b -> format("0x%02x", b))
+       .collect(Collectors.joining(", "));
 
-      return format("BytesV(%s)", str);
+     return format("BytesV(%s)", str);
     }
   }
 

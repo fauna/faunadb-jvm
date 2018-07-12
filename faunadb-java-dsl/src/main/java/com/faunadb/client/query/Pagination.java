@@ -3,10 +3,13 @@ package com.faunadb.client.query;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.LongV;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import java.time.Instant;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.faunadb.client.util.Objects.requireNonNull;
 
@@ -44,11 +47,11 @@ public final class Pagination extends Expr {
   }
 
   private final Expr resource;
-  private Optional<Cursor> cursor = Optional.absent();
-  private Optional<Expr> ts = Optional.absent();
-  private Optional<Expr> size = Optional.absent();
-  private Optional<Expr> sources = Optional.absent();
-  private Optional<Expr> events = Optional.absent();
+  private Optional<Cursor> cursor = Optional.empty();
+  private Optional<Expr> ts = Optional.empty();
+  private Optional<Expr> size = Optional.empty();
+  private Optional<Expr> sources = Optional.empty();
+  private Optional<Expr> events = Optional.empty();
 
   Pagination(Expr resource) {
     this.resource = resource;
@@ -56,8 +59,8 @@ public final class Pagination extends Expr {
 
   @Override
   @JsonValue
-  protected ImmutableMap<String, Expr> toJson() {
-    ImmutableMap.Builder<String, Expr> res = ImmutableMap.builder();
+  protected Map<String, Expr> toJson() {
+    Map<String, Expr> res = new LinkedHashMap<>();
     res.put("paginate", resource);
 
     if (cursor.isPresent()) res.put(cursor.get().name, cursor.get().ref);
@@ -66,7 +69,7 @@ public final class Pagination extends Expr {
     if (ts.isPresent()) res.put("ts", ts.get());
     if (size.isPresent()) res.put("size", size.get());
 
-    return res.build();
+    return Collections.unmodifiableMap(res);
   }
 
   /**

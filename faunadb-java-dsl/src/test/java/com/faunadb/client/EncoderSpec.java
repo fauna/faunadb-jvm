@@ -2,16 +2,17 @@ package com.faunadb.client;
 
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
-import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static com.faunadb.client.types.Encoder.encode;
-import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
@@ -77,9 +78,13 @@ public class EncoderSpec {
         assertEquals(new TimeV(parseInstant("1970-01-01T00:05:02.010000000Z")), encode(new TimeV(parseInstant("1970-01-01T00:05:02.010000000Z"))).get());
         assertEquals(new BytesV(new byte[] {1, 2, 3, 4}), encode(new BytesV(new byte[] {1, 2, 3, 4})).get());
         assertEquals(new RefV("123", new RefV("widgets", Native.CLASSES)), encode(new RefV("123", new RefV("widgets", Native.CLASSES))).get());
-        assertEquals(new SetRefV(ImmutableMap.<String, Value>of()), encode(new SetRefV(ImmutableMap.<String, Value>of())).get());
+        assertEquals(new SetRefV(Collections.<String, Value>emptyMap()), encode(new SetRefV(Collections.<String, Value>emptyMap())).get());
         assertEquals(new ArrayV(asList(new LongV(1))), encode(new ArrayV(asList(new LongV(1)))).get());
-        assertEquals(new ObjectV(of("key", new StringV("value"))), encode(new ObjectV(of("key", new StringV("value")))).get());
+
+        Map<String, Value> obj = new LinkedHashMap<>();
+        obj.put("key", new StringV("value"));
+
+        assertEquals(new ObjectV(obj), encode(new ObjectV(obj)).get());
     }
 
     static class ObjectWithGetter {
@@ -127,9 +132,23 @@ public class EncoderSpec {
 
     @Test
     public void shouldEncodeObjects() {
-        assertEquals(new ObjectV(of("name", new StringV("name changed in getter"))), encode(new ObjectWithGetter("name")).get());
-        assertEquals(new ObjectV(of("name", new StringV("name not changed in getter"))), encode(new ObjectWithField("name not changed in getter")).get());
-        assertEquals(new ObjectV(of("a", new StringV("a"), "c", new StringV("c"))), encode(new ObjectWithIgnore()).get());
+        Map<String, Value> changed = new LinkedHashMap<>();
+
+        changed.put("name", new StringV("name changed in getter"));
+        
+        assertEquals(new ObjectV(changed), encode(new ObjectWithGetter("name")).get());
+
+        Map<String, Value> unchanged = new LinkedHashMap<>();
+
+        unchanged.put("name", new StringV("name not changed in getter"));
+
+        assertEquals(new ObjectV(unchanged), encode(new ObjectWithField("name not changed in getter")).get());
+
+        Map<String, Value> ignored = new LinkedHashMap<>();
+        ignored.put("a", new StringV("a"));
+        ignored.put("c", new StringV("c"));
+
+        assertEquals(new ObjectV(ignored), encode(new ObjectWithIgnore()).get());
     }
 
     static class User {
@@ -141,7 +160,12 @@ public class EncoderSpec {
 
     @Test
     public void shouldEncodeArrayOfObjects() {
-        ObjectV user = new ObjectV(of("name", new StringV("john"), "age", new LongV(30)));
+        Map<String, Value> obj = new LinkedHashMap<>();
+        
+        obj.put("name", new StringV("john"));
+        obj.put("age", new LongV(30));
+        
+        ObjectV user = new ObjectV(obj);
 
         assertEquals(new ArrayV(asList(user, user)), encode(new Object[] { new User(), new User() }).get());
     }
@@ -154,7 +178,13 @@ public class EncoderSpec {
 
     @Test
     public void shouldEncodeMaps() {
-        assertEquals(new ObjectV(of("a", new StringV("b"))), encode(of("a", "b")).get());
+        Map<String, Value> obj = new LinkedHashMap<>();
+        Map<String, String> enc = new LinkedHashMap<>();
+
+        obj.put("a", new StringV("b"));
+        enc.put("a", "b");
+
+        assertEquals(new ObjectV(obj), encode(enc).get());
     }
 
     static class Node {
@@ -207,8 +237,13 @@ public class EncoderSpec {
 
     @Test
     public void shouldRenameFieldName() {
+        Map<String, Value> obj = new LinkedHashMap<>();
+
+        obj.put("field1_renamed", new StringV("value1"));
+        obj.put("field2_renamed", new StringV("value2"));
+
         assertEquals(
-                new ObjectV(of("field1_renamed", new StringV("value1"), "field2_renamed", new StringV("value2"))),
+                new ObjectV(obj),
                 encode(new ObjectRenamed()).get()
         );
     }
@@ -225,8 +260,13 @@ public class EncoderSpec {
 
     @Test
     public void shouldCreateTwoPropertiesIfFieldAndGetterAreAnnotated() {
+        Map<String, Value> obj = new LinkedHashMap<>();
+
+        obj.put("field1", new StringV("value"));
+        obj.put("field2", new StringV("value"));
+
         assertEquals(
-                new ObjectV(of("field1", new StringV("value"), "field2", new StringV("value"))),
+                new ObjectV(obj),
                 encode(new ObjectRenamed2()).get()
         );
     }

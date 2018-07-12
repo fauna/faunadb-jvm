@@ -2,11 +2,13 @@ package com.faunadb.client.query;
 
 import com.faunadb.client.types.Encoder;
 import com.faunadb.client.types.Value.*;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -118,7 +120,7 @@ public final class Language {
 
     private final Expr bindings;
 
-    private LetBinding(ImmutableMap<String, Expr> bindings) {
+    private LetBinding(Map<String, Expr> bindings) {
       this.bindings = Fn.apply(bindings);
     }
 
@@ -144,13 +146,13 @@ public final class Language {
    */
   public static final class Path {
 
-    private final ImmutableList<Expr> segments;
+    private final List<Expr> segments;
 
     private Path() {
-      this(ImmutableList.<Expr>of());
+      this(Collections.<Expr>emptyList());
     }
 
-    private Path(ImmutableList<Expr> segments) {
+    private Path(List<Expr> segments) {
       this.segments = segments;
     }
 
@@ -161,11 +163,14 @@ public final class Language {
      * @return a new narrowed path
      */
     public Path at(String... others) {
-      ImmutableList.Builder<Expr> all = ImmutableList.<Expr>builder().addAll(segments);
-      for (String segment : others)
-        all.add(Value(segment));
+      List<Expr> all = new ArrayList<>();
+      all.addAll(segments);
 
-      return new Path(all.build());
+      for (String segment : others) {
+        all.add(Value(segment));
+      }
+
+      return new Path(Collections.unmodifiableList(all));
     }
 
     /**
@@ -175,11 +180,14 @@ public final class Language {
      * @return a new narrowed path
      */
     public Path at(int... others) {
-      ImmutableList.Builder<Expr> all = ImmutableList.<Expr>builder().addAll(segments);
-      for (int segment : others)
-        all.add(Value(segment));
+      List<Expr> all = new ArrayList<>();
+      all.addAll(segments);
 
-      return new Path(all.build());
+      for (int segment : others) {
+        all.add(Value(segment));
+      }
+
+      return new Path(Collections.unmodifiableList(all));
     }
 
   }
@@ -534,7 +542,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Obj() {
-    return Obj(ImmutableMap.<String, Expr>of());
+    return Obj(Collections.<String, Expr>emptyMap());
   }
 
   /**
@@ -546,7 +554,9 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Obj(String k1, Expr v1) {
-    return Obj(ImmutableMap.of(k1, v1));
+    Map<String, Expr> obj = new LinkedHashMap<>();
+    obj.put(k1, v1);
+    return Obj(Collections.unmodifiableMap(obj));
   }
 
   /**
@@ -560,7 +570,10 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Obj(String k1, Expr v1, String k2, Expr v2) {
-    return Obj(ImmutableMap.of(k1, v1, k2, v2));
+    Map<String, Expr> obj = new LinkedHashMap<>();
+    obj.put(k1, v1);
+    obj.put(k2, v2);
+    return Obj(Collections.unmodifiableMap(obj));
   }
 
   /**
@@ -576,7 +589,11 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Obj(String k1, Expr v1, String k2, Expr v2, String k3, Expr v3) {
-    return Obj(ImmutableMap.of(k1, v1, k2, v2, k3, v3));
+    Map<String, Expr> obj = new LinkedHashMap<>();
+    obj.put(k1, v1);
+    obj.put(k2, v2);
+    obj.put(k3, v3);
+    return Obj(Collections.unmodifiableMap(obj));
   }
 
   /**
@@ -594,7 +611,12 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Obj(String k1, Expr v1, String k2, Expr v2, String k3, Expr v3, String k4, Expr v4) {
-    return Obj(ImmutableMap.of(k1, v1, k2, v2, k3, v3, k4, v4));
+    Map<String, Expr> obj = new LinkedHashMap<>();
+    obj.put(k1, v1);
+    obj.put(k2, v2);
+    obj.put(k3, v3);
+    obj.put(k4, v4);
+    return Obj(Collections.unmodifiableMap(obj));
   }
 
   /**
@@ -614,7 +636,13 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Obj(String k1, Expr v1, String k2, Expr v2, String k3, Expr v3, String k4, Expr v4, String k5, Expr v5) {
-    return Obj(ImmutableMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5));
+    Map<String, Expr> obj = new LinkedHashMap<>();
+    obj.put(k1, v1);
+    obj.put(k2, v2);
+    obj.put(k3, v3);
+    obj.put(k4, v4);
+    obj.put(k5, v5);
+    return Obj(Collections.unmodifiableMap(obj));
   }
 
   /**
@@ -637,7 +665,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Values</a>
    */
   public static Expr Arr(Expr... values) {
-    return Arr(ImmutableList.copyOf(values));
+    return Arr(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**
@@ -683,7 +711,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    */
   public static Expr Call(Expr ref, Expr... args) {
-    return Call(ref, ImmutableList.copyOf(args));
+    return Call(ref, Collections.unmodifiableList(Arrays.asList(args)));
   }
 
   /**
@@ -758,7 +786,7 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(Map<String, ? extends Expr> bindings) {
-    return new LetBinding(ImmutableMap.copyOf(bindings));
+    return new LetBinding(Collections.unmodifiableMap(bindings));
   }
 
   /**
@@ -782,7 +810,9 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1) {
-    return Let(ImmutableMap.of(v1, d1));
+    Map<String, Expr> let = new LinkedHashMap<>();
+    let.put(v1, d1);
+    return Let(Collections.unmodifiableMap(let));
   }
 
   /**
@@ -808,7 +838,10 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2) {
-    return Let(ImmutableMap.of(v1, d1, v2, d2));
+    Map<String, Expr> let = new LinkedHashMap<>();
+    let.put(v1, d1);
+    let.put(v2, d2);
+    return Let(Collections.unmodifiableMap(let));
   }
 
   /**
@@ -840,7 +873,11 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3) {
-    return Let(ImmutableMap.of(v1, d1, v2, d2, v3, d3));
+    Map<String, Expr> let = new LinkedHashMap<>();
+    let.put(v1, d1);
+    let.put(v2, d2);
+    let.put(v3, d3);
+    return Let(Collections.unmodifiableMap(let));
   }
 
   /**
@@ -875,7 +912,12 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3, String v4, Expr d4) {
-    return Let(ImmutableMap.of(v1, d1, v2, d2, v3, d3, v4, d4));
+    Map<String, Expr> let = new LinkedHashMap<>();
+    let.put(v1, d1);
+    let.put(v2, d2);
+    let.put(v3, d3);
+    let.put(v4, d4);
+    return Let(Collections.unmodifiableMap(let));
   }
 
   /**
@@ -913,7 +955,13 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3, String v4, Expr d4, String v5, Expr d5) {
-    return Let(ImmutableMap.of(v1, d1, v2, d2, v3, d3, v4, d4, v5, d5));
+    Map<String, Expr> let = new LinkedHashMap<>();
+    let.put(v1, d1);
+    let.put(v2, d2);
+    let.put(v3, d3);
+    let.put(v4, d4);
+    let.put(v5, d5);
+    return Let(Collections.unmodifiableMap(let));
   }
 
   /**
@@ -963,7 +1011,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    */
   public static Expr Do(Expr... exprs) {
-    return Do(ImmutableList.copyOf(exprs));
+    return Do(Collections.unmodifiableList(Arrays.asList(exprs)));
   }
 
   /**
@@ -1595,7 +1643,7 @@ public final class Language {
    * @see #Match(Expr)
    */
   public static Expr Union(Expr... sets) {
-    return Union(ImmutableList.copyOf(sets));
+    return Union(Collections.unmodifiableList(Arrays.asList(sets)));
   }
 
   /**
@@ -1619,7 +1667,7 @@ public final class Language {
    * @see #Match(Expr)
    */
   public static Expr Intersection(Expr... sets) {
-    return Intersection(ImmutableList.copyOf(sets));
+    return Intersection(Collections.unmodifiableList(Arrays.asList(sets)));
   }
 
   /**
@@ -1643,7 +1691,7 @@ public final class Language {
    * @see #Match(Expr)
    */
   public static Expr Difference(Expr... sets) {
-    return Difference(ImmutableList.copyOf(sets));
+    return Difference(Collections.unmodifiableList(Arrays.asList(sets)));
   }
 
   /**
@@ -2414,7 +2462,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Equals(Expr... values) {
-    return Equals(ImmutableList.copyOf(values));
+    return Equals(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**
@@ -2611,7 +2659,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Add(Expr... values) {
-    return Add(ImmutableList.copyOf(values));
+    return Add(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**
@@ -2633,7 +2681,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Multiply(Expr... values) {
-    return Multiply(ImmutableList.copyOf(values));
+    return Multiply(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**
@@ -2655,7 +2703,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Subtract(Expr... values) {
-    return Subtract(ImmutableList.copyOf(values));
+    return Subtract(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**
@@ -2677,7 +2725,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Divide(Expr... values) {
-    return Divide(ImmutableList.copyOf(values));
+    return Divide(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**
@@ -2699,7 +2747,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Modulo(Expr... values) {
-    return Modulo(ImmutableList.copyOf(values));
+    return Modulo(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**
@@ -2721,7 +2769,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr LT(Expr... values) {
-    return LT(ImmutableList.copyOf(values));
+    return LT(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**
@@ -2745,7 +2793,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr LTE(Expr... values) {
-    return LTE(ImmutableList.copyOf(values));
+    return LTE(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**
@@ -2767,7 +2815,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr GT(Expr... values) {
-    return GT(ImmutableList.copyOf(values));
+    return GT(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**
@@ -2791,7 +2839,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr GTE(Expr... values) {
-    return GTE(ImmutableList.copyOf(values));
+    return GTE(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**
@@ -2813,7 +2861,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr And(Expr... values) {
-    return And(ImmutableList.copyOf(values));
+    return And(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**
@@ -2835,7 +2883,7 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#logical-functions">FaunaDB Logical Functions</a>
    */
   public static Expr Or(Expr... values) {
-    return Or(ImmutableList.copyOf(values));
+    return Or(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**

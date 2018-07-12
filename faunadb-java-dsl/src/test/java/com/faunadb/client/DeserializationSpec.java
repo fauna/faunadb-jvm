@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.Native;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,6 +12,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.faunadb.client.types.Codec.*;
 import static com.faunadb.client.types.Value.RefV;
@@ -121,10 +121,10 @@ public class DeserializationSpec {
   @Test
   public void shouldDeserializeNull() throws Exception {
     assertThat(parsed("{ \"resources\": null }").at("resources").to(STRING).getOptional(),
-      is(Optional.<String>absent()));
+      is(Optional.<String>empty()));
 
     assertThat(parsed("[1, null]").at(1).to(STRING).getOptional(),
-      is(Optional.<String>absent()));
+      is(Optional.<String>empty()));
   }
 
   @Test
@@ -144,7 +144,7 @@ public class DeserializationSpec {
         "}"
     );
 
-    ImmutableMap<String, Value> set = parsed.to(SET_REF).get().parameters();
+    Map<String, Value> set = parsed.to(SET_REF).get().parameters();
     assertThat(set.get("terms").to(STRING).get(), equalTo("fire"));
     assertThat(set.get("match").to(REF).get(),
       equalTo(new RefV("spells_by_element", Native.INDEXES)));

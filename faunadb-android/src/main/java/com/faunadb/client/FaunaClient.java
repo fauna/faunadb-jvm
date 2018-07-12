@@ -9,7 +9,6 @@ import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -19,6 +18,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -214,10 +214,10 @@ public class FaunaClient {
    * @param exprs the list of query expressions to be sent to FaunaDB.
    * @return a {@link ListenableFuture} containing an ordered list of root response nodes.
    */
-  public ListenableFuture<ImmutableList<Value>> query(List<? extends Expr> exprs) {
-    return transform(performRequest(json.valueToTree(exprs)), new Function<Value, ImmutableList<Value>>() {
+  public ListenableFuture<List<Value>> query(List<? extends Expr> exprs) {
+    return transform(performRequest(json.valueToTree(exprs)), new Function<Value, List<Value>>() {
       @Override
-      public ImmutableList<Value> apply(Value result) {
+      public List<Value> apply(Value result) {
         return result.collect(Field.as(VALUE));
       }
     });
@@ -265,13 +265,13 @@ public class FaunaClient {
     if (status >= 300) {
       try {
         ArrayNode errors = (ArrayNode) parseResponseBody(response).get("errors");
-        ImmutableList.Builder<HttpResponses.QueryError> errorBuilder = ImmutableList.builder();
+        List<HttpResponses.QueryError> errorBuilder = new ArrayList<>();
 
         for (JsonNode errorNode : errors) {
           errorBuilder.add(json.treeToValue(errorNode, HttpResponses.QueryError.class));
         }
 
-        HttpResponses.QueryErrorResponse errorResponse = HttpResponses.QueryErrorResponse.create(status, errorBuilder.build());
+        HttpResponses.QueryErrorResponse errorResponse = HttpResponses.QueryErrorResponse.create(status, errorBuilder);
 
         switch (status) {
           case 400:

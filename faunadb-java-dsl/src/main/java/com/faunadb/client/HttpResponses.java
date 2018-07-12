@@ -8,9 +8,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.google.common.collect.ImmutableList;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class HttpResponses {
   static class Codec {
@@ -25,7 +27,7 @@ public class HttpResponses {
           throw new JsonParseException("Cannot deserialize ValidationFailure: no 'field' field.", jsonParser.getTokenLocation());
         }
 
-        ImmutableList<String> field = json.convertValue(tree.get("field"), tf.constructCollectionType(ImmutableList.class, String.class));
+        List<String> field = json.convertValue(tree.get("field"), tf.constructCollectionType(ArrayList.class, String.class));
 
         if (!tree.has("code")) {
           throw new JsonParseException("Cannot deserialize ValidationFailure: no 'code' field.", jsonParser.getTokenLocation());
@@ -54,11 +56,11 @@ public class HttpResponses {
 
         TypeFactory tf = deserializationContext.getTypeFactory();
 
-        ImmutableList<String> position;
+        List<String> position;
         if (tree.has("position")) {
-          position = json.convertValue(tree.get("position"), tf.constructCollectionType(ImmutableList.class, String.class));
+          position = json.convertValue(tree.get("position"), tf.constructCollectionType(ArrayList.class, String.class));
         } else {
-          position = ImmutableList.of();
+          position = Collections.emptyList();
         }
 
         if (!tree.has("code")) {
@@ -74,11 +76,11 @@ public class HttpResponses {
           throw new JsonParseException("Cannot deserialize QueryError: no 'description' field.", jsonParser.getTokenLocation());
         }
 
-        ImmutableList<ValidationFailure> failures;
+        List<ValidationFailure> failures;
         if (tree.has("failures")) {
-          failures = json.convertValue(tree.get("failures"), tf.constructCollectionType(ImmutableList.class, ValidationFailure.class));
+          failures = json.convertValue(tree.get("failures"), tf.constructCollectionType(ArrayList.class, ValidationFailure.class));
         } else {
-          failures = ImmutableList.of();
+          failures = Collections.emptyList();
         }
 
         return new QueryError(position, code, description, failures);
@@ -88,15 +90,15 @@ public class HttpResponses {
 
   @JsonDeserialize(using = Codec.ValidationFailureDeserializer.class)
   public static class ValidationFailure {
-    private final ImmutableList<String> field;
+    private final List<String> field;
     private final String code;
     private final String description;
 
     public ValidationFailure(
-      ImmutableList<String> field,
+      List<String> field,
       String code,
       String description) {
-      this.field = field;
+      this.field = Collections.unmodifiableList(field);
       this.code = code;
       this.description = description;
     }
@@ -109,29 +111,29 @@ public class HttpResponses {
       return description;
     }
 
-    public ImmutableList<String> field() {
+    public List<String> field() {
       return field;
     }
   }
 
   @JsonDeserialize(using = Codec.QueryErrorDeserializer.class)
   public static class QueryError {
-    private final ImmutableList<String> position;
+    private final List<String> position;
     private final String code;
     private final String description;
-    private final ImmutableList<ValidationFailure> failures;
+    private final List<ValidationFailure> failures;
 
-    public QueryError(ImmutableList<String> position,
+    public QueryError(List<String> position,
                       String code,
                       String description,
-                      ImmutableList<ValidationFailure> failures) {
-      this.position = position;
+                      List<ValidationFailure> failures) {
+      this.position = Collections.unmodifiableList(position);
       this.code = code;
       this.description = description;
-      this.failures = failures;
+      this.failures = Collections.unmodifiableList(failures);
     }
 
-    public ImmutableList<String> position() {
+    public List<String> position() {
       return position;
     }
 
@@ -143,20 +145,20 @@ public class HttpResponses {
       return description;
     }
 
-    public ImmutableList<ValidationFailure> failures() {
+    public List<ValidationFailure> failures() {
       return failures;
     }
   }
 
   public static class QueryErrorResponse {
-    public static QueryErrorResponse create(int status, ImmutableList<QueryError> errors) {
-      return new QueryErrorResponse(status, errors);
+    public static QueryErrorResponse create(int status, List<QueryError> errors) {
+      return new QueryErrorResponse(status, Collections.unmodifiableList(errors));
     }
 
     private final int status;
-    private final ImmutableList<QueryError> errors;
+    private final List<QueryError> errors;
 
-    QueryErrorResponse(int status, ImmutableList<QueryError> errors) {
+    QueryErrorResponse(int status, List<QueryError> errors) {
       this.status = status;
       this.errors = errors;
     }
@@ -165,7 +167,7 @@ public class HttpResponses {
       return status;
     }
 
-    public ImmutableList<QueryError> errors() {
+    public List<QueryError> errors() {
       return errors;
     }
   }

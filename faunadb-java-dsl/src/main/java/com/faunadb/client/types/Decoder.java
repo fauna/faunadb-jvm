@@ -6,8 +6,6 @@ import com.faunadb.client.types.Types.MapType;
 import com.faunadb.client.types.Types.SimpleType;
 import com.faunadb.client.types.Value.BytesV;
 import com.faunadb.client.types.Value.NullV;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
@@ -128,7 +126,7 @@ public final class Decoder {
 
   private static Map<String, Object> toMap(Value value, MapType dstType) {
     try {
-      ImmutableMap<String, Value> values = value.to(Codec.OBJECT).get();
+      Map<String, Value> values = value.to(Codec.OBJECT).get();
 
       Map<String, Object> map = (Map<String, Object>) getConcreteClass(dstType.getRawClass()).newInstance();
 
@@ -154,7 +152,7 @@ public final class Decoder {
 
   private static Collection<Object> toCollection(Value value, CollectionType dstType) {
     try {
-      ImmutableList<Value> values = value.to(Codec.ARRAY).get();
+      List<Value> values = value.to(Codec.ARRAY).get();
 
       SimpleType elementType = dstType.getElementType();
 
@@ -195,7 +193,7 @@ public final class Decoder {
   }
 
   private static Object toArray(Value value, Class<?> dstType) {
-    ImmutableList<Value> values = value.to(Codec.ARRAY).get();
+    List<Value> values = value.to(Codec.ARRAY).get();
 
     SimpleType componentType = Types.of(dstType.getComponentType());
 

@@ -10,10 +10,12 @@ import com.faunadb.client.types.Result;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.NullV;
 import com.faunadb.client.types.Value.ObjectV;
-import com.google.common.collect.ImmutableMap;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static com.faunadb.client.types.Codec.OBJECT;
 import static com.faunadb.client.types.Codec.STRING;
@@ -52,7 +54,7 @@ public class ObjectCodecSpec {
   }
 
   class NestedValueObject {
-    @JsonProperty ImmutableMap<String, String> aMap;
+    @JsonProperty Map<String, String> aMap;
     @JsonProperty ValueObject nested;
   }
 
@@ -65,7 +67,10 @@ public class ObjectCodecSpec {
 
   @Test
   public void shouldConvertASingleMap() {
-    ObjectV obj = json.convertValue(ImmutableMap.of("test", "value"), ObjectV.class);
+    Map<String, String> map = new LinkedHashMap<>();
+    map.put("test", "value");
+      
+    ObjectV obj = json.convertValue(map, ObjectV.class);
     assertThat(obj.at("test").to(STRING).get(), equalTo("value"));
 
     JsonNode node = this.json.valueToTree(obj);
@@ -90,8 +95,11 @@ public class ObjectCodecSpec {
 
   @Test
   public void shouldConvertNestedObject() {
+    Map<String, String> map = new LinkedHashMap<>();
+    map.put("some", "value");
+      
     NestedValueObject nested = new NestedValueObject();
-    nested.aMap = ImmutableMap.of("some", "value");
+    nested.aMap = map;
     nested.nested = new ValueObject();
     nested.nested.something = "huh";
     nested.nested.another = null;
@@ -111,15 +119,18 @@ public class ObjectCodecSpec {
 
   @Test
   public void shouldBeAbleToUseCustomCodec() throws Exception {
-    ObjectV obj = new ObjectV(ImmutableMap.of(
-      "data", new ObjectV(ImmutableMap.of(
-        "name", new Value.StringV("Jhon"),
-        "age", new Value.LongV(42)
-      ))
-    ));
+    Map<String, Value> kvs = new LinkedHashMap<>();
+    Map<String, Value> data = new LinkedHashMap<>();
+
+    data.put("name", new Value.StringV("John"));
+    data.put("age", new Value.LongV(42));
+
+    kvs.put("data", new ObjectV(data));
+
+    ObjectV obj = new ObjectV(kvs);
 
     CustomObject custom = obj.to(CUSTOM_OBJECT).get();
-    assertThat(custom.name, equalTo("Jhon"));
+    assertThat(custom.name, equalTo("John"));
     assertThat(custom.age, equalTo(42));
   }
 }
