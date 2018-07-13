@@ -3,7 +3,9 @@ package com.faunadb.client.types;
 import com.google.common.base.Function;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.String.format;
 
@@ -25,7 +27,7 @@ import static java.lang.String.format;
  */
 public final class Field<T> {
 
-  private final class CollectionCodec<A> implements Codec<List<A>> {
+  private static final class CollectionCodec<A> implements Codec<List<A>> {
     private final Path path;
     private final Field<A> field;
 
@@ -71,6 +73,53 @@ public final class Field<T> {
       };
   }
 
+  private static final class MapCodec<A> implements Codec<Map<String, A>> {
+    private final Path path;
+    private final Field<A> field;
+
+    public MapCodec(Path path, Field<A> field) {
+      this.path = path;
+      this.field = field;
+    }
+
+    @Override
+    public Result<Map<String, A>> decode(Value input) {
+      return input.to(OBJECT).<Map<String, A>>flatMap(toMap);
+    }
+
+    @Override
+    public Result<Value> encode(Map<String, A> value) {
+      throw new UnsupportedOperationException("not implemented");
+    }
+
+    private final Function<Map<String, Value>, Result<Map<String, A>>> toMap =
+      new Function<Map<String, Value>, Result<Map<String, A>>>() {
+
+        @Override
+        public Result<Map<String, A>> apply(Map<String, Value> values) {
+          Map<String, A> success = new LinkedHashMap<>();
+          List<String> failures = new ArrayList<>();
+
+          for (Map.Entry<String, Value> entry: values.entrySet()) {
+            Result<A> res = field.get(entry.getValue());
+
+            if (res.isSuccess()) {
+              success.put(entry.getKey(), res.get());
+            } else {
+              Path subPath = path.subPath(Path.from(entry.getKey())).subPath(field.path);
+              failures.add(format("\"%s\" %s", subPath, res));
+            }
+          }
+
+          if (!failures.isEmpty()) {
+            return Result.fail(format("Failed to collect values: %s", String.join(", ", failures)));
+          }
+
+          return Result.<Map<String, A>>success(success);
+        }
+      };
+    }
+
   /**
    * Creates a field that extracts the underlying value from the path provided, assuming the {@link Value} instance
    * is a key/value map.
@@ -104,6 +153,32 @@ public final class Field<T> {
    */
   public static <T> Field<T> as(Codec<T> codec) {
     return new Field<>(Path.empty(), codec);
+  }
+
+  /**
+   * Creates a field that converts its underyling value to the {@link Class} provided.
+   *
+   * @param <T> the desired final type
+   * @return a new {@link Field} instance
+   */
+  public static <T> Field<T> as(Class<T> clazz) {
+    return root().to(clazz);
+  }
+
+  /**
+   * Assuming the {@link Value} instance is a collection, creates a field extractor that collects
+   * the {@link Field} provided for each element in the underlying collection.
+   *
+   * @param <A> the desired final type for each collection element
+   * @param field the {@link Field} to be extracted from each collection element
+   * @return a new {@link Field} instance
+   */
+  public static <A> Field<List<A>> asListOf(Field<A> field) {
+    return new Field<>(Path.empty(), new CollectionCodec<>(Path.empty(), field));
+  }
+
+  public static <A> Field<Map<String, A>> asMapOf(Field<A> field) {
+    return new Field<>(Path.empty(), new MapCodec<>(Path.empty(), field));
   }
 
   static Field<Value> root() {
