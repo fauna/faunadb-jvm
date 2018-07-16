@@ -5,15 +5,14 @@ import com.faunadb.client.types.Value.ArrayV;
 import com.faunadb.client.types.Value.ObjectV;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Stack;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.newArrayListWithCapacity;
-import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.String.format;
 
 /**
@@ -103,7 +102,7 @@ public final class Encoder {
   }
 
   private Value wrapMap(Map<?, ?> obj) {
-    Map<String, Value> values = newHashMap();
+    Map<String, Value> values = new HashMap<>();
 
     for (Entry<?, ?> entry : obj.entrySet()) {
       values.put(entry.getKey().toString(), encodeImpl(entry.getValue()));
@@ -115,7 +114,7 @@ public final class Encoder {
   private Value wrapIterable(Iterable<?> obj) {
     Iterator<?> iterator = obj.iterator();
 
-    List<Value> values = newArrayList();
+    List<Value> values = new ArrayList<>();
     while (iterator.hasNext()) {
       values.add(encodeImpl(iterator.next()));
     }
@@ -125,7 +124,7 @@ public final class Encoder {
 
   private Value wrapArray(Object obj) {
     int length = Array.getLength(obj);
-    List<Value> values = newArrayListWithCapacity(length);
+    List<Value> values = new ArrayList<>(length);
 
     for (int i = 0; i < length; i++) {
       values.add(encodeImpl(Array.get(obj, i)));

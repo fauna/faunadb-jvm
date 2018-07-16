@@ -6,11 +6,11 @@ import com.google.common.base.Function;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.faunadb.client.types.Constructors.createDecoder;
-import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.String.format;
 
 final class Codecs {
@@ -20,7 +20,7 @@ final class Codecs {
     Value encode(Encoder encoder, Object value);
   }
 
-  private static final Map<Class<?>, Codec<?>> CODECS = newHashMap();
+  private static final Map<Class<?>, Codec<?>> CODECS = new HashMap<>();
   private static final ConcurrentHashMap<Class<?>, EncoderEntryCache> ENCODERS = new ConcurrentHashMap<>();
   private static final ConcurrentHashMap<Class<?>, Function<Value, Object>> DECODERS = new ConcurrentHashMap<>();
 
@@ -86,7 +86,7 @@ final class Codecs {
     return new EncoderEntryCache() {
       @Override
       public Value encode(Encoder encoder, Object value) {
-        Map<String, Value> fields = newHashMap();
+        Map<String, Value> fields = new HashMap<>();
 
         for (Properties.Property property : readProperties) {
           try {

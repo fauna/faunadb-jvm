@@ -13,12 +13,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import static com.faunadb.client.types.Decoder.decodeImpl;
 import static com.google.common.collect.Collections2.filter;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
 
 final class Constructors {
@@ -114,8 +114,8 @@ final class Constructors {
       if (names.length == 0)
         return properties;
 
-      final Set<String> namesToRemove = newHashSet(names);
-      return filter(newArrayList(properties), new Predicate<Property>() {
+      final Set<String> namesToRemove = new HashSet<>(Arrays.asList(names));
+      return filter(Arrays.asList(properties), new Predicate<Property>() {
         @Override
         public boolean apply(Property input) {
           return !namesToRemove.contains(input.getName());

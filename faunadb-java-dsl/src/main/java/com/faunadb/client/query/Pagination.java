@@ -3,7 +3,6 @@ package com.faunadb.client.query;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.LongV;
-import com.google.common.collect.ImmutableMap;
 
 import java.time.Instant;
 import java.util.Collections;

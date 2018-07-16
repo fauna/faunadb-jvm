@@ -2,11 +2,10 @@ package com.faunadb.client.types;
 
 import com.faunadb.client.types.Value.StringV;
 
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.google.common.collect.Maps.newEnumMap;
-import static com.google.common.collect.Maps.newHashMap;
 
 final class Enums {
   private Enums() {}
@@ -19,7 +18,7 @@ final class Enums {
     Map<Enum, StringV> enumMap = ENCODING_MAP.get(enumClass);
 
     if (enumMap == null) {
-      enumMap = newEnumMap(enumClass);
+      enumMap = new EnumMap<>(enumClass);
 
       for (Enum en : enumClass.getEnumConstants()) {
         try {
@@ -43,7 +42,7 @@ final class Enums {
     Map<String, Enum> enumMap = DECODING_MAP.get(enumClass);
 
     if (enumMap == null) {
-      enumMap = newHashMap();
+      enumMap = new HashMap<>();
 
       for (Map.Entry<Enum, StringV> entry : getEncodingMap(enumClass).entrySet()) {
         enumMap.put(entry.getValue().value, entry.getKey());
