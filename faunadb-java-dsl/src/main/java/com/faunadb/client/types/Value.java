@@ -21,7 +21,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.faunadb.client.util.Objects.requireNonNull;
 import static com.google.common.primitives.Bytes.asList;
 import static java.lang.String.format;
 
@@ -288,7 +287,7 @@ public abstract class Value extends Expr {
     final T value;
 
     ScalarValue(T value) {
-      this.value = requireNonNull(value);
+      this.value = Objects.requireNonNull(value);
     }
 
     @Override
@@ -324,7 +323,7 @@ public abstract class Value extends Expr {
     final Map<String, Value> values;
 
     public ObjectV(Map<String, ? extends Value> values) {
-      requireNonNull(values);
+      Objects.requireNonNull(values);
       this.values = Collections.unmodifiableMap(values);
     }
 
@@ -368,7 +367,7 @@ public abstract class Value extends Expr {
     final List<Value> values;
 
     public ArrayV(List<? extends Value> values) {
-      requireNonNull(values);
+      Objects.requireNonNull(values);
       this.values = Collections.unmodifiableList(values);
     }
 

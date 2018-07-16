@@ -8,9 +8,8 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-
-import static com.faunadb.client.util.Objects.requireNonNull;
 
 /**
  * A pagination expression. Instances of this class are not thread safe and must not be
@@ -28,8 +27,8 @@ public final class Pagination extends Expr {
     private final Expr ref;
 
     private Cursor(String name, Expr ref) {
-      this.name = requireNonNull(name);
-      this.ref = requireNonNull(ref);
+      this.name = Objects.requireNonNull(name);
+      this.ref = Objects.requireNonNull(ref);
     }
   }
 
