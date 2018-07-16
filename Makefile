@@ -27,6 +27,7 @@ test:
 jenkins-test:
 	sbt clean
 	sbt test
+	sbt publishLocal
 
 docker-wait:
 	dockerize -wait $(FAUNA_SCHEME)://$(FAUNA_DOMAIN):$(FAUNA_PORT)/ping -timeout $(FAUNA_TIMEOUT)
