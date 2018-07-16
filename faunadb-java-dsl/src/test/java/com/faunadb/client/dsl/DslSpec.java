@@ -566,6 +566,16 @@ public abstract class DslSpec {
   }
 
   @Test
+  public void shouldMapOverCollectionsLambda() throws Exception {
+      Value res = query(
+        Map(
+          Arr(Value(1), Value(2), Value(3)),
+          i -> Add(i, Value(1)))).get();
+
+    assertThat(res.collect(Field.as(LONG)), contains(2L, 3L, 4L));
+  }
+
+  @Test
   public void shouldExecuteForeachExpression() throws Exception {
     Value res = query(
       Foreach(
@@ -583,6 +593,21 @@ public abstract class DslSpec {
   }
 
   @Test
+  public void shouldForeachWithLambda() throws Exception {
+    Value cls = onARandomClass();
+    Value res = query(
+      Foreach(
+        Arr(
+          Value("Fireball Level 1"),
+          Value("Fireball Level 2")),
+        spell -> Create(cls, Obj("data", Obj("name", spell))))
+    ).get();
+
+    assertThat(res.collect(Field.as(STRING)),
+      contains("Fireball Level 1", "Fireball Level 2"));
+  }
+
+  @Test
   public void shouldFilterACollection() throws Exception {
     Value filtered = query(
       Filter(
@@ -592,6 +617,17 @@ public abstract class DslSpec {
             Value(0),
             Modulo(Var("i"), Value(2)))
         )
+      )).get();
+
+    assertThat(filtered.collect(Field.as(LONG)), contains(2L));
+  }
+
+  @Test
+  public void shouldFilterACollectionLambda() throws Exception {
+    Value filtered = query(
+      Filter(
+        Arr(Value(1), Value(2), Value(3)),
+        i -> Equals(Value(0), Modulo(i, Value(2)))
       )).get();
 
     assertThat(filtered.collect(Field.as(LONG)), contains(2L));
@@ -765,6 +801,17 @@ public abstract class DslSpec {
 
     assertThat(join.get(REF_LIST),
       contains(thorSpell1, thorSpell2));
+  }
+
+  @Test
+  public void shouldPaginateLambdaJoin() throws Exception {
+      Value join = query(
+        Paginate(
+          Join(
+               Match(Index("spellbooks_by_owner"), thor),
+               spellbook -> Match(Index("spells_by_spellbook"), spellbook)))).get();
+
+      assertThat(join.get(REF_LIST), contains(thorSpell1, thorSpell2));
   }
 
   @Test

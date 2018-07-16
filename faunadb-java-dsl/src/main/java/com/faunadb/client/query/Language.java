@@ -11,6 +11,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
+
+import static com.faunadb.client.util.SymbolGenerator.genSym;
 
 /**
  * The {@link Language} class contains static constructors for the FaunaDB Query Language expressions.
@@ -1100,6 +1103,26 @@ public final class Language {
   }
 
   /**
+   * Applies the given lambda to each element of the provided
+   * collections, and returns the results of each application in a
+   * new collection of the same type.
+   *
+   * Map applies the lambda function concurrently to each element in
+   * the collection. Side-effects do not affect evaluation of other
+   * lambda applications. The order of possible refs being generated
+   * within the lambda are non-deterministic.
+   *
+   * @param collection the source collection. Type: Collection.
+   * @param lambda the lambda function to be applied for each element in the given collection.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
+   */
+  public static Expr Map(Expr collection, UnaryOperator<Expr> lambda) {
+    String sym = genSym("map");
+    return Map(collection, Lambda(sym, lambda.apply(Var(sym))));
+  }
+
+  /**
    * Applies the given lambda to each element of the provided collection.
    *
    * Foreach applies the lambda function concurrently to each element in the collection. Side-effects do not affect
@@ -1117,6 +1140,25 @@ public final class Language {
   }
 
   /**
+   * Applies the given lambda to each element of the provided
+   * collection.
+   *
+   * Foreach applies the lambda function concurrently to each element
+   * in the collection. Side-effects do not affect evaluation of other
+   * lambda applications. The order of possible refs being generated
+   * within the lambda are non-deterministic.
+   *
+   * @param collection the source collection. Type: Collection.
+   * @param lambda the lambda function to be applied for each element in the given collection.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
+   */
+  public static Expr Foreach(Expr collection, UnaryOperator<Expr> lambda) {
+    String sym = genSym("foreach");
+    return Foreach(collection, Lambda(sym, lambda.apply(Var(sym))));
+  }
+
+  /**
    * Applies the given lambda to each element of the collection provided, and
    * returns a new collection containing only the elements for which the lambda returns true.
    *
@@ -1124,9 +1166,25 @@ public final class Language {
    * @param lambda the filter lambda. Type: A lambda expression that returns a boolean value
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
+   * @see #Lambda(Expr, Expr)
    */
   public static Expr Filter(Expr collection, Expr lambda) {
     return Fn.apply("filter", lambda, "collection", collection);
+  }
+
+  /**
+   * Applies the given lambda to each element of the collection
+   * provided, and returns a new collection containing only the
+   * elements for which the lambda returns true.
+   *
+   * @param collection the source collection. Type: Collection
+   * @param lambda the filter lambda. Type: A lambda expression that returns a boolean value
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#collections">FaunaDB Collection Functions</a>
+   */
+  public static Expr Filter(Expr collection, UnaryOperator<Expr> lambda) {
+    String sym = genSym("filter");
+    return Filter(collection, Lambda(sym, lambda.apply(Var(sym))));
   }
 
   /**
@@ -1709,7 +1767,7 @@ public final class Language {
   /**
    * Derives a set of resources from applying each instance of the source set to the target parameter.
    * The target parameter can assume two forms: a index reference, and a lambda function.
-   * When the target is an index reference, Join will match each result of the source set with the target index's terms
+   * When the target is an index reference, Join will match each result of the source set with the target index's terms.
    * When target is a lambda function, each result from the source set will be passed as the lambda's arguments.
    *
    * @param source the source set. Type: Array or Set.
@@ -1721,6 +1779,21 @@ public final class Language {
    */
   public static Expr Join(Expr source, Expr target) {
     return Fn.apply("join", source, "with", target);
+  }
+
+  /**
+   * Derives a set of resources from applying each instance of the
+   * source set to the target parameter.  Each instance from the
+   * source set will be passed as the lambda argument.
+   *
+   * @param source the source set. Type: Array or Set.
+   * @param lambda the join target.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#sets">FaunaDB Set Functions</a>
+   */
+  public static Expr Join(Expr source, UnaryOperator<Expr> lambda) {
+    String sym = genSym("join");
+    return Join(source, Lambda(sym, lambda.apply(Var(sym))));
   }
 
   /**
