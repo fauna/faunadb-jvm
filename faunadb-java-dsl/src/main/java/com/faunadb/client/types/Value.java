@@ -6,9 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
-import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.collect.FluentIterable;
 import com.google.common.io.BaseEncoding;
 
 import java.time.Instant;
@@ -20,10 +17,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.faunadb.client.util.Objects.requireNonNull;
 import static com.google.common.primitives.Bytes.asList;
 import static java.lang.String.format;
 
@@ -290,7 +287,7 @@ public abstract class Value extends Expr {
     final T value;
 
     ScalarValue(T value) {
-      this.value = requireNonNull(value);
+      this.value = Objects.requireNonNull(value);
     }
 
     @Override
@@ -326,7 +323,7 @@ public abstract class Value extends Expr {
     final Map<String, Value> values;
 
     public ObjectV(Map<String, ? extends Value> values) {
-      requireNonNull(values);
+      Objects.requireNonNull(values);
       this.values = Collections.unmodifiableMap(values);
     }
 
@@ -370,7 +367,7 @@ public abstract class Value extends Expr {
     final List<Value> values;
 
     public ArrayV(List<? extends Value> values) {
-      requireNonNull(values);
+      Objects.requireNonNull(values);
       this.values = Collections.unmodifiableList(values);
     }
 
@@ -647,14 +644,14 @@ public abstract class Value extends Expr {
 
       RefID other = (RefID) obj;
 
-      return Objects.equal(id, other.id) &&
-        Objects.equal(clazz, other.clazz) &&
-        Objects.equal(database, other.database);
+      return Objects.equals(id, other.id) &&
+        Objects.equals(clazz, other.clazz) &&
+        Objects.equals(database, other.database);
     }
 
     @Override
     public int hashCode() {
-      return Objects.hashCode(id, clazz, database);
+      return Objects.hash(id, clazz, database);
     }
   }
 
@@ -707,7 +704,7 @@ public abstract class Value extends Expr {
 
       RefV other = (RefV) obj;
 
-      return Objects.equal(value, other.value);
+      return Objects.equals(value, other.value);
     }
 
     @Override
