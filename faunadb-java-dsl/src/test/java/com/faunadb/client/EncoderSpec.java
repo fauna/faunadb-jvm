@@ -9,12 +9,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static com.faunadb.client.types.Encoder.encode;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
@@ -172,8 +171,8 @@ public class EncoderSpec {
 
     @Test
     public void shouldEncodeCollections() {
-        assertEquals(new ArrayV(asList(new LongV(1), new LongV(2))), encode(newArrayList(1, 2)).get());
-        assertEquals(new ArrayV(asList(new LongV(1), new LongV(2))), encode(newHashSet(1, 2)).get());
+        assertEquals(new ArrayV(asList(new LongV(1), new LongV(2))), encode(Arrays.asList(1, 2)).get());
+        assertEquals(new ArrayV(asList(new LongV(1), new LongV(2))), encode(new HashSet<>(Arrays.asList(1, 2))).get());
     }
 
     @Test

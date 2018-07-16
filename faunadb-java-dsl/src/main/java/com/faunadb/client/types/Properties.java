@@ -7,11 +7,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.String.format;
 
 class Properties {
@@ -34,7 +34,7 @@ class Properties {
   }
 
   private static Property[] getProperties(Class<?> clazz, boolean isWrite) {
-    Map<String, Field> fields = newHashMap();
+    Map<String, Field> fields = new HashMap<>();
 
     for (Field field : clazz.getDeclaredFields()) {
       if ((field.getModifiers() & Modifier.STATIC) != 0)
@@ -57,7 +57,7 @@ class Properties {
       }
     }
 
-    Map<String, Method> props = newHashMap();
+    Map<String, Method> props = new HashMap<>();
 
     for (Method method : clazz.getMethods()) {
       if ((method.getModifiers() & (Modifier.PUBLIC & ~Modifier.STATIC)) == 0)
@@ -85,7 +85,7 @@ class Properties {
       }
     }
 
-    List<Property> allProps = newArrayList();
+    List<Property> allProps = new ArrayList<>();
 
     for (Map.Entry<String, Field> entry : fields.entrySet())
       allProps.add(new FieldProperty(entry.getKey(), entry.getValue()));

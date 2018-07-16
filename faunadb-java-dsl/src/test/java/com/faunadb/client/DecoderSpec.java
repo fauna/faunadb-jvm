@@ -11,9 +11,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.faunadb.client.types.Decoder.decode;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
@@ -25,6 +22,10 @@ public class DecoderSpec {
 
     private Instant parseInstant(String str) {
         return Instant.from(DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(str));
+    }
+
+    private <T> HashSet<T> newHashSet(T... members) {
+        return new HashSet<>(asList(members));
     }
     
     @Test
@@ -101,27 +102,27 @@ public class DecoderSpec {
         //lists
 
         assertEquals(
-                newArrayList(1L, 2L, 3L),
+                asList(1L, 2L, 3L),
                 decode(new ArrayV(asList(new LongV(1), new LongV(2), new LongV(3))), Types.arrayListOf(long.class)).get()
         );
 
         assertEquals(
-                newArrayList(1, 2, 3),
+                asList(1, 2, 3),
                 decode(new ArrayV(asList(new LongV(1), new LongV(2), new LongV(3))), Types.arrayListOf(int.class)).get()
         );
 
         assertEquals(
-                newArrayList((short)1, (short)2, (short)3),
+                asList((short)1, (short)2, (short)3),
                 decode(new ArrayV(asList(new LongV(1), new LongV(2), new LongV(3))), Types.arrayListOf(short.class)).get()
         );
 
         assertEquals(
-                newArrayList((byte)1, (byte)2, (byte)3),
+                asList((byte)1, (byte)2, (byte)3),
                 decode(new ArrayV(asList(new LongV(1), new LongV(2), new LongV(3))), Types.arrayListOf(byte.class)).get()
         );
 
         assertEquals(
-                newArrayList((char)1, (char)2, (char)3),
+                asList((char)1, (char)2, (char)3),
                 decode(new ArrayV(asList(new LongV(1), new LongV(2), new LongV(3))), Types.arrayListOf(char.class)).get()
         );
 
@@ -162,7 +163,7 @@ public class DecoderSpec {
         b.put("a", new LongV(10));
 
         assertEquals(
-                 newHashMap(a),
+                 a,
                  decode(new ObjectV(b), Types.hashMapOf(long.class)).get()
         );
 
@@ -174,7 +175,7 @@ public class DecoderSpec {
         d.put("a", new LongV(10));
         
         assertEquals(
-                newHashMap(c),
+                c,
                 decode(new ObjectV(d), Types.hashMapOf(int.class)).get()
         );
     }
@@ -251,9 +252,9 @@ public class DecoderSpec {
         SimpleObject obj = new SimpleObject();
         obj.setStrField("value");
         obj.setLongField(10);
-        obj.setListStrField(newArrayList("value1", "value2"));
+        obj.setListStrField(asList("value1", "value2"));
         obj.setSetLongField(newHashSet(1L, 2L, 3L));
-        obj.setMapStrToStr(newHashMap(simple));
+        obj.setMapStrToStr(simple);
 
         Map<String, Value> kvs = new LinkedHashMap<>();
 
@@ -519,7 +520,7 @@ public class DecoderSpec {
         assertEquals((Long) 10L, new LongV(10).to(long.class).get());
         assertEquals((Integer) 10, new LongV(10).to(int.class).get());
 
-        assertEquals(newArrayList(10, 20), new ArrayV(newArrayList(new LongV(10), new LongV(20))).asCollectionOf(int.class).get());
+        assertEquals(asList(10, 20), new ArrayV(asList(new LongV(10), new LongV(20))).asCollectionOf(int.class).get());
 
         Map<String, String> in = new LinkedHashMap<>();
         in.put("key", "value");
@@ -527,9 +528,9 @@ public class DecoderSpec {
         Map<String, Value> out = new LinkedHashMap<>();
         out.put("key", new StringV("value"));
 
-        assertEquals(newHashMap(in), new ObjectV(out).asMapOf(String.class).get());
+        assertEquals(in, new ObjectV(out).asMapOf(String.class).get());
 
-        assertArrayEquals(new int[]{10, 20}, new ArrayV(newArrayList(new LongV(10), new LongV(20))).to(int[].class).get());
+        assertArrayEquals(new int[]{10, 20}, new ArrayV(asList(new LongV(10), new LongV(20))).to(int[].class).get());
     }
 
     static class ClassWithDefaults {
