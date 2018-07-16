@@ -14,6 +14,7 @@ from a UnknownException on the Scala driver
 * Additional variants of At(), Lambda(), Take(), Drop(), Get(),
 KeyFromSecret(), Logout(), Identify(), Casefold(), NGram(), Time(),
 Epoch(), and Date()
+* Add FaunaClient.query(Expr...)
 
 2.2.0
 * Adds codecs to Map type
