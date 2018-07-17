@@ -4,9 +4,6 @@ import com.faunadb.client.errors.FaunaException;
 import com.faunadb.client.types.Properties.Property;
 import com.faunadb.client.types.Types.SimpleType;
 import com.faunadb.client.types.Value.ObjectV;
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
-import com.google.common.base.Predicate;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -16,6 +13,8 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static com.faunadb.client.types.Decoder.decodeImpl;
 import static com.google.common.collect.Collections2.filter;
@@ -115,12 +114,10 @@ final class Constructors {
         return properties;
 
       final Set<String> namesToRemove = new HashSet<>(Arrays.asList(names));
-      return filter(Arrays.asList(properties), new Predicate<Property>() {
-        @Override
-        public boolean apply(Property input) {
-          return !namesToRemove.contains(input.getName());
-        }
-      }).toArray(new Property[0]);
+
+      return Arrays.asList(properties).stream()
+          .filter(input -> !namesToRemove.contains(input.getName()))
+          .toArray(Property[]::new);
     }
 
     private String[] getParameterNames(Annotation[][] parameterAnnotations) {

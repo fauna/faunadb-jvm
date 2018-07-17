@@ -1,12 +1,11 @@
 package com.faunadb.client.types;
 
 import com.faunadb.client.types.Value.*;
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static java.lang.String.format;
 
@@ -96,12 +95,12 @@ public interface Codec<T> {
   /**
    * Converts a {@link Value} to a {@link RefV}
    */
-  Codec<RefV> REF = Transformations.mapTo(RefV.class, Functions.<RefV>identity(), Transformations.<RefV, Value>upCast());
+  Codec<RefV> REF = Transformations.mapTo(RefV.class, Function.<RefV>identity(), Transformations.<RefV, Value>upCast());
 
   /**
    * Converts a {@link Value} to a {@link SetRefV}
    */
-  Codec<SetRefV> SET_REF = Transformations.mapTo(SetRefV.class, Functions.<SetRefV>identity(), Transformations.<SetRefV, Value>upCast());
+  Codec<SetRefV> SET_REF = Transformations.mapTo(SetRefV.class, Function.<SetRefV>identity(), Transformations.<SetRefV, Value>upCast());
 
   /**
    * Converts a {@link Value} to a {@link Long}
@@ -239,7 +238,7 @@ final class Transformations {
 
   @SuppressWarnings("unchecked")
   static <I extends O, O> Function<I, O> upCast() {
-    return (Function) Functions.identity();
+    return (Function) Function.identity();
   }
 
   /// Cast functions
