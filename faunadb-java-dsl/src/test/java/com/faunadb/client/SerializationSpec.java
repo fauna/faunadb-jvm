@@ -1087,4 +1087,28 @@ public class SerializationSpec {
       equalTo(jsonString));
   }
 
+
+  @Test
+  public void shouldPrintUsefully() throws Exception {
+    Map<String, Value> k1 = new java.util.HashMap<>();
+    k1.put("k1", new StringV("v1"));
+
+    assertThat(new ObjectV(k1).toString(), equalTo("{k1: \"v1\"}"));
+    assertThat(new ArrayV(Arrays.asList(new StringV("v1"), new StringV("v2"))).toString(),
+               equalTo("[\"v1\", \"v2\"]"));
+    assertThat(BooleanV.valueOf(true).toString(), equalTo("true"));
+    assertThat(new DoubleV(3.14).toString(), equalTo("3.14"));
+    assertThat(new LongV(42).toString(), equalTo("42"));
+    assertThat(new StringV("string").toString(), equalTo("\"string\""));
+    assertThat(NullV.NULL.toString(), equalTo("null"));
+    assertThat(new TimeV(Instant.ofEpochMilli(0)).toString(), equalTo("1970-01-01T00:00:00Z"));
+    assertThat(new DateV(LocalDate.ofEpochDay(0)).toString(), equalTo("1970-01-01"));
+    assertThat(new BytesV("DEADBEEF").toString(), equalTo("[0x0c 0x40 0x03 0x04 0x41 0x05]"));
+    assertThat(new SetRefV(k1).toString(), equalTo("{@set = {k1: \"v1\"}}"));
+    assertThat(Native.CLASSES.toString(), equalTo("ref(id = \"classes\")"));
+    assertThat(new RefV("42",
+                        new RefV("people", Native.CLASSES),
+                        new RefV("db", Native.DATABASES)).toString(),
+               equalTo("ref(id = \"42\", class = ref(id = \"people\", class = ref(id = \"classes\")), database = ref(id = \"db\", class = ref(id = \"databases\")))"));
+  }
 }
