@@ -10,7 +10,6 @@ import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
-import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.ning.http.client.AsyncHttpClient;
@@ -24,6 +23,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 import static com.faunadb.client.types.Codec.VALUE;
 import static com.google.common.util.concurrent.Futures.transform;
@@ -216,12 +216,8 @@ public class FaunaClient implements AutoCloseable {
    * @return a {@link ListenableFuture} containing an ordered list of the query's responses.
    */
   public ListenableFuture<List<Value>> query(List<? extends Expr> exprs) {
-    return transform(performRequest(json.valueToTree(exprs)), new Function<Value, List<Value>>() {
-      @Override
-      public List<Value> apply(Value result) {
-        return result.collect(Field.as(VALUE));
-      }
-    });
+      return transform(performRequest(json.valueToTree(exprs)),
+                       result -> result.collect(Field.as(VALUE)));
   }
 
   private ListenableFuture<Value> performRequest(JsonNode body) {
