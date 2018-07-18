@@ -21,7 +21,6 @@ import static com.faunadb.client.types.Codec.*;
 import static com.faunadb.client.types.Value.Native;
 import static com.faunadb.client.types.Value.NullV.NULL;
 import static com.faunadb.client.types.Value.RefV;
-import static com.google.common.base.Functions.constant;
 import static com.google.common.util.concurrent.Futures.catching;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -41,7 +40,7 @@ public class JavaClientSpec extends DslSpec {
   public static void setUpClient() throws Exception {
     rootClient = createFaunaClient(ROOT_TOKEN);
 
-    catching(rootClient.query(Delete(DB_REF)), BadRequestException.class, constant(NULL)).get();
+    catching(rootClient.query(Delete(DB_REF)), BadRequestException.class, x -> NULL).get();
     rootClient.query(CreateDatabase(Obj("name", Value(DB_NAME)))).get();
 
     Value serverKey = rootClient.query(CreateKey(Obj("database", DB_REF, "role", Value("server")))).get();
@@ -53,7 +52,7 @@ public class JavaClientSpec extends DslSpec {
 
   @AfterClass
   public static void closeClients() throws Exception {
-    catching(rootClient.query(Delete(DB_REF)), BadRequestException.class, constant(NULL)).get();
+    catching(rootClient.query(Delete(DB_REF)), BadRequestException.class, x -> NULL).get();
     rootClient.close();
     serverClient.close();
     adminClient.close();

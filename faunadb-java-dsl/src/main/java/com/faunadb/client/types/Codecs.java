@@ -2,13 +2,13 @@ package com.faunadb.client.types;
 
 import com.faunadb.client.errors.FaunaException;
 import com.faunadb.client.types.Value.ObjectV;
-import com.google.common.base.Function;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import static com.faunadb.client.types.Constructors.createDecoder;
 import static java.lang.String.format;

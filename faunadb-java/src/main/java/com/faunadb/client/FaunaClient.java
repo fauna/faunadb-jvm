@@ -10,7 +10,6 @@ import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
-import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.ning.http.client.AsyncHttpClient;
@@ -24,6 +23,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 import static com.faunadb.client.types.Codec.VALUE;
 import static com.google.common.util.concurrent.Futures.transform;
@@ -216,30 +216,25 @@ public class FaunaClient implements AutoCloseable {
    * @return a {@link ListenableFuture} containing an ordered list of the query's responses.
    */
   public ListenableFuture<List<Value>> query(List<? extends Expr> exprs) {
-    return transform(performRequest(json.valueToTree(exprs)), new Function<Value, List<Value>>() {
-      @Override
-      public List<Value> apply(Value result) {
-        return result.collect(Field.as(VALUE));
-      }
-    });
+      return transform(performRequest(json.valueToTree(exprs)),
+                       result -> result.collect(Field.as(VALUE)));
+  }
+
+  private Value handleResponse(Response response) {
+    try {
+      handleQueryErrors(response);
+
+      JsonNode responseBody = parseResponseBody(response);
+      JsonNode resource = responseBody.get("resource");
+      return json.treeToValue(resource, Value.class);
+    } catch (IOException ex) {
+      throw new AssertionError(ex);
+    }
   }
 
   private ListenableFuture<Value> performRequest(JsonNode body) {
     try {
-      return handleNetworkExceptions(transform(connection.post("", body), new Function<Response, Value>() {
-        @Override
-        public Value apply(Response response) {
-          try {
-            handleQueryErrors(response);
-
-            JsonNode responseBody = parseResponseBody(response);
-            JsonNode resource = responseBody.get("resource");
-            return json.treeToValue(resource, Value.class);
-          } catch (IOException ex) {
-            throw new AssertionError(ex);
-          }
-        }
-      }));
+        return handleNetworkExceptions(transform(connection.post("", body), r -> handleResponse(r)));
     } catch (IOException ex) {
       return Futures.immediateFailedFuture(ex);
     }
@@ -285,20 +280,13 @@ public class FaunaClient implements AutoCloseable {
     }
   }
 
-  private <V> ListenableFuture<V> handleNetworkExceptions(ListenableFuture<V> f) {
-    ListenableFuture<V> f1 = Futures.catching(f, ConnectException.class, new Function<ConnectException, V>() {
-      @Override
-      public V apply(ConnectException input) {
-        throw new UnavailableException(input.getMessage());
-      }
-    });
+  private <V> V unavailable(Exception ex) {
+      throw new UnavailableException(ex.getMessage());
+  }
 
-    return Futures.catching(f1, TimeoutException.class, new Function<TimeoutException, V>() {
-      @Override
-      public V apply(TimeoutException input) {
-        throw new UnavailableException(input.getMessage());
-      }
-    });
+  private <V> ListenableFuture<V> handleNetworkExceptions(ListenableFuture<V> f) {
+      ListenableFuture<V> f1 = Futures.catching(f, ConnectException.class, ex -> unavailable(ex));
+      return Futures.catching(f1, TimeoutException.class, ex -> unavailable(ex));
   }
 
   private JsonNode parseResponseBody(Response response) throws IOException {

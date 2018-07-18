@@ -1,8 +1,7 @@
 package com.faunadb.client.types;
 
-import com.google.common.base.Function;
-
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Represents the result of an operation. Usually a conversion operation.
