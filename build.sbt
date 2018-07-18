@@ -2,7 +2,6 @@ import de.johoop.jacoco4sbt.XMLReport
 
 val driverVersion = "3.0.0-SNAPSHOT"
 val asyncHttpClientVersion = "1.9.39"
-val guavaVersion = "21.0"
 val jacksonVersion = "2.8.8"
 val jacksonDocVersion = "2.8"
 val metricsVersion = "3.1.0"
@@ -11,7 +10,6 @@ val scalaVersions = Seq("2.11.8", scalaDefaultVersion)
 
 val javaDocUrl = "http://docs.oracle.com/javase/7/docs/api/"
 val asyncHttpClientDocUrl = s"http://static.javadoc.io/com.ning/async-http-client/$asyncHttpClientVersion/"
-val guavaDocUrl = s"http://google.github.io/guava/releases/$guavaVersion/api/docs/"
 val jacksonDocUrl = s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/"
 val metricsDocUrl = s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/"
 val okHttpDocUrl = "https://square.github.io/okhttp/3.x/okhttp/"
@@ -84,15 +82,14 @@ lazy val common = project.in(file("faunadb-common"))
 
     javacOptions in (Compile, doc) := Seq("-source", "1.8",
       "-link", javaDocUrl,
-      "-link", guavaDocUrl,
       "-link", jacksonDocUrl,
       "-link", metricsDocUrl,
       "-linkoffline", asyncHttpClientDocUrl, s"./faunadb-common/doc/com.ning/async-http-client/$asyncHttpClientVersion/"
     ),
 
     libraryDependencies ++= Seq(
+      "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % jacksonVersion,
       "com.ning" % "async-http-client" % asyncHttpClientVersion,
-      "com.google.guava" % "guava" % guavaVersion,
       "io.dropwizard.metrics" % "metrics-core" % metricsVersion,
       "org.slf4j" % "slf4j-api" % "1.7.7",
       "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
@@ -152,15 +149,13 @@ lazy val javaDsl = project.in(file("faunadb-java-dsl"))
 
     javacOptions in (Compile, doc) := Seq("-source", "1.8",
       "-link", javaDocUrl,
-      "-link", guavaDocUrl,
       "-link", jacksonDocUrl,
       "-link", metricsDocUrl
     ),
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
     libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,
-      "com.google.guava" % "guava" % "19.0",
+      "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % jacksonVersion,
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
       "org.yaml" % "snakeyaml" % "1.14" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test",
@@ -183,7 +178,6 @@ lazy val java = project.in(file("faunadb-java"))
 
     javacOptions in (Compile, doc) := Seq("-source", "1.8",
       "-link", javaDocUrl,
-      "-link", guavaDocUrl,
       "-link", jacksonDocUrl,
       "-link", metricsDocUrl,
       "-linkoffline", commonApiUrl, "./faunadb-common/target/api",
@@ -194,7 +188,6 @@ lazy val java = project.in(file("faunadb-java"))
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
 
     libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
       "org.yaml" % "snakeyaml" % "1.14" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test",
@@ -218,7 +211,6 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
 
     javacOptions in (Compile, doc) := Seq("-source", "1.8",
       "-link", javaDocUrl,
-      "-link", guavaDocUrl,
       "-link", jacksonDocUrl,
       "-link", okHttpDocUrl,
       "-linkoffline", javaDslApiUrl, "./faunadb-java-dsl/target/api"
@@ -228,7 +220,6 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
 
     libraryDependencies ++= Seq(
       "com.squareup.okhttp3" % "okhttp" % "3.4.1",
-      "com.google.guava" % "guava" % "19.0",
       "com.google.code.findbugs" % "jsr305" % "2.0.1",
       "com.novocode" % "junit-interface" % "0.11" % "test",
       "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
@@ -249,13 +240,6 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
     publishArtifact in (Compile, packageSrc) := true,
 
     proguardOptions in Android ++= Seq(
-      //Guava
-      "-dontwarn sun.misc.Unsafe",
-      "-dontwarn java.lang.ClassValue",
-      "-dontwarn java.lang.SafeVarargs",
-      "-dontwarn com.google.j2objc.annotations.Weak",
-      "-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement",
-
       //Jackson
       // We can ignore the databind package as long as we don't obfuscate the annotations package
       "-dontwarn com.fasterxml.jackson.databind.**",

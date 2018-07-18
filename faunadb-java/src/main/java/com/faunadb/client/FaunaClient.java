@@ -4,7 +4,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
@@ -145,7 +144,7 @@ public class FaunaClient implements AutoCloseable {
     }
   }
 
-  private final ObjectMapper json = new ObjectMapper().registerModule(new GuavaModule());
+  private final ObjectMapper json = new ObjectMapper().findAndRegisterModules();
   private final Connection connection;
 
   private FaunaClient(Connection connection) {

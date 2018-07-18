@@ -1,7 +1,6 @@
 package com.faunadb.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.Native;
 import org.junit.Before;
@@ -28,7 +27,7 @@ public class DeserializationSpec {
 
   @Before
   public void setUp() throws Exception {
-    json = new ObjectMapper().registerModule(new GuavaModule());
+    json = new ObjectMapper().findAndRegisterModules();
   }
 
   @Test
