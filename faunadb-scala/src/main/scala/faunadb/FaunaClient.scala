@@ -8,11 +8,11 @@ import com.faunadb.common.Connection
 import com.ning.http.client.{ AsyncHttpClient, Response => HttpResponse }
 import faunadb.errors._
 import faunadb.query.Expr
-import faunadb.util.FutureImplicits._
 import faunadb.values.{ ArrayV, NullV, Value }
 import java.net.ConnectException
 import java.util.concurrent.TimeoutException
 import scala.collection.JavaConverters._
+import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.control.NonFatal
 
@@ -95,7 +95,7 @@ class FaunaClient(connection: Connection) {
     *         future is returned.
     */
   def query(expr: Expr)(implicit ec: ExecutionContext): Future[Value] =
-    connection.post("", json.valueToTree(expr)).asScalaFuture.map { resp =>
+    connection.post("", json.valueToTree(expr)).toScala.map { resp =>
       handleQueryErrors(resp)
       val rv = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
       if (rv eq null) NullV else rv
@@ -112,7 +112,7 @@ class FaunaClient(connection: Connection) {
     *         query fails, a failed future is returned.
     */
   def query(exprs: Iterable[Expr])(implicit ec: ExecutionContext): Future[IndexedSeq[Value]] =
-    connection.post("", json.valueToTree(exprs)).asScalaFuture.map { resp =>
+    connection.post("", json.valueToTree(exprs)).toScala.map { resp =>
       handleQueryErrors(resp)
       val arr = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
       arr.asInstanceOf[ArrayV].elems

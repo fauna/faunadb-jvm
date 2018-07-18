@@ -8,10 +8,6 @@ import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
-import com.google.common.base.Function;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
 
 import java.io.IOError;
 import java.io.IOException;
@@ -20,19 +16,21 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import okhttp3.*;
 
 import static com.faunadb.client.types.Codec.VALUE;
-import static com.google.common.util.concurrent.Futures.transform;
 
 /**
  * The Java native client for FaunaDB.
  * <p>
- * This client is asynchronous, so all methods that perform latent operations return a {@link ListenableFuture}.
+ * This client is asynchronous, so all methods that perform latent operations return a {@link CompletableFuture}.
  * <p>
  * Queries are constructed by using the static helpers in the {@link com.faunadb.client.query.Language} package.
  * <p>
@@ -195,11 +193,11 @@ public class FaunaClient {
    * can be converted to structured types through various methods on that class.
    *
    * @param expr The query expression to be sent to FaunaDB.
-   * @return A {@link ListenableFuture} containing the root node of the Response tree.
+   * @return A {@link CompletableFuture} containing the root node of the Response tree.
    * @see Value
    * @see com.faunadb.client.query.Language
    */
-  public ListenableFuture<Value> query(Expr expr) {
+  public CompletableFuture<Value> query(Expr expr) {
     return performRequest(json.valueToTree(expr));
   }
 
@@ -212,18 +210,17 @@ public class FaunaClient {
    * See {@link FaunaClient#query(Expr)} for more information on the individual queries.
    *
    * @param exprs the list of query expressions to be sent to FaunaDB.
-   * @return a {@link ListenableFuture} containing an ordered list of root response nodes.
+   * @return a {@link CompletableFuture} containing an ordered list of root response nodes.
    */
-  public ListenableFuture<List<Value>> query(List<? extends Expr> exprs) {
-    return transform(performRequest(json.valueToTree(exprs)), new Function<Value, List<Value>>() {
-      @Override
-      public List<Value> apply(Value result) {
-        return result.collect(Field.as(VALUE));
-      }
-    });
+  public CompletableFuture<List<Value>> query(List<? extends Expr> exprs) {
+      return performRequest(json.valueToTree(exprs)).thenApply(new Function<Value, List<Value>>() {
+              public List<Value> apply(Value result) {
+                  return result.collect(Field.as(VALUE));
+              }
+          });
   }
 
-  private ListenableFuture<Value> performRequest(JsonNode body) {
+  private CompletableFuture<Value> performRequest(JsonNode body) {
     try {
       Request request = new Request.Builder()
               .url(endpoint)
@@ -232,12 +229,12 @@ public class FaunaClient {
               .addHeader("X-FaunaDB-API-Version", "2.1")
               .build();
 
-      final SettableFuture<Value> rv = SettableFuture.create();
+      final CompletableFuture<Value> rv = new CompletableFuture();
 
       client.newCall(request).enqueue(new Callback() {
         @Override
         public void onFailure(Call call, IOException ex) {
-          rv.setException(ex);
+          rv.completeExceptionally(ex);
         }
 
         @Override
@@ -247,16 +244,18 @@ public class FaunaClient {
 
             JsonNode responseBody = parseResponseBody(response);
             JsonNode resource = responseBody.get("resource");
-            rv.set(json.treeToValue(resource, Value.class));
+            rv.complete(json.treeToValue(resource, Value.class));
           } catch (Exception ex) {
-            rv.setException(ex);
+            rv.completeExceptionally(ex);
           }
         }
       });
 
       return handleNetworkExceptions(rv);
     } catch (Exception ex) {
-      return Futures.immediateCancelledFuture();
+        CompletableFuture<Value> oops = new CompletableFuture();
+        oops.completeExceptionally(ex);
+        return oops;
     }
   }
 
@@ -300,18 +299,15 @@ public class FaunaClient {
     }
   }
 
-  private <V> ListenableFuture<V> handleNetworkExceptions(ListenableFuture<V> f) {
-    ListenableFuture<V> f1 = Futures.catching(f, ConnectException.class, new Function<ConnectException, V>() {
-      @Override
-      public V apply(ConnectException input) {
-        throw new UnavailableException(input.getMessage());
-      }
-    });
-
-    return Futures.catching(f1, TimeoutException.class, new Function<TimeoutException, V>() {
-      @Override
-      public V apply(TimeoutException input) {
-        throw new UnavailableException(input.getMessage());
+  private <V> CompletableFuture<V> handleNetworkExceptions(CompletableFuture<V> f) {
+    return f.whenComplete(new BiConsumer<V, Throwable>() {
+      public void accept(V v, Throwable ex) {
+        if (ex == null) {
+          return;
+        } else if (ex instanceof ConnectException ||
+                   ex instanceof TimeoutException) {
+          throw new UnavailableException(ex.getMessage());
+        }
       }
     });
   }

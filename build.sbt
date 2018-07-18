@@ -114,6 +114,7 @@ lazy val scala = project.in(file("faunadb-scala"))
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
+      "org.scala-lang.modules" % "scala-java8-compat_2.12" % "0.9.0",
       "org.scalatest" %% "scalatest" % "3.0.3" % "test"),
 
     autoAPIMappings := true,
@@ -236,6 +237,7 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
 
     platformTarget in Android := "android-26",
     buildToolsVersion in Android := Some("26.0.0"),
+    minSdkVersion in Android := "26",
     showSdkProgress in Android := true,
     useProguard := true,
     useProguardInDebug := true,

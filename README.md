@@ -12,7 +12,7 @@ This repository contains the FaunaDB drivers for the JVM languages. Currently, J
 * Java and Scala clients share the same underlying library [faunadb-common](./faunadb-common).
 * Java and Android clients share the same dsl library [faunadb-java-dsl](./faunadb-java-dsl).
 * Supports [Dropwizard Metrics](https://dropwizard.github.io/metrics/3.1.0/) hooks for stats reporting (except Android).
-* Support Android 4.1 (API level 16)
+* Support Android 8.0 (API level 26)
 
 ## Documentation
 
@@ -39,12 +39,10 @@ Details Documentation for each language:
 ### Android
 
 * [OkHttp client](http://square.github.io/okhttp/) for the HTTP transport.
-* [Google Guava](https://github.com/google/guava), for collections and ListenableFutures.
 
 ### Java
 
-* Java 7
-* [Google Guava](https://github.com/google/guava), for collections and ListenableFutures.
+* Java 8
 
 ### Scala
 

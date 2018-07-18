@@ -7,7 +7,6 @@ import com.faunadb.client.errors.UnauthorizedException;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
-import com.google.common.util.concurrent.ListenableFuture;
 import org.hamcrest.CoreMatchers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -16,6 +15,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 
 import static com.faunadb.client.query.Language.Class;
 import static com.faunadb.client.query.Language.*;
@@ -23,8 +24,6 @@ import static com.faunadb.client.types.Codec.*;
 import static com.faunadb.client.types.Value.Native;
 import static com.faunadb.client.types.Value.NullV.NULL;
 import static com.faunadb.client.types.Value.RefV;
-import static com.google.common.base.Functions.constant;
-import static com.google.common.util.concurrent.Futures.catching;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -42,7 +41,16 @@ public class AndroidClientSpec extends DslSpec {
   public static void setUpClient() throws Exception {
     rootClient = createFaunaClient(ROOT_TOKEN);
 
-    catching(rootClient.query(Delete(DB_REF)), BadRequestException.class, constant(NULL)).get();
+    rootClient.query(Delete(DB_REF)).handle(new BiFunction<Value, Throwable, Value>() {
+       public Value apply(Value v, Throwable ex) {
+         if (ex instanceof BadRequestException) {
+           return NULL;
+         } else {
+           return v;
+         }
+       }
+    });
+
     rootClient.query(CreateDatabase(Obj("name", Value(DB_NAME)))).get();
 
     Value serverKey = rootClient.query(CreateKey(Obj("database", DB_REF, "role", Value("server")))).get();
@@ -54,7 +62,15 @@ public class AndroidClientSpec extends DslSpec {
 
   @AfterClass
   public static void closeClients() throws Exception {
-    catching(rootClient.query(Delete(DB_REF)), BadRequestException.class, constant(NULL)).get();
+    rootClient.query(Delete(DB_REF)).handle(new BiFunction<Value, Throwable, Value>() {
+      public Value apply(Value v, Throwable ex) {
+        if (ex instanceof BadRequestException) {
+          return NULL;
+        } else {
+          return v;
+        }
+      }
+    });
     rootClient.close();
     serverClient.close();
     adminClient.close();
@@ -259,12 +275,12 @@ public class AndroidClientSpec extends DslSpec {
   }
 
   @Override
-  protected ListenableFuture<Value> query(Expr expr) {
+  protected CompletableFuture<Value> query(Expr expr) {
     return serverClient.query(expr);
   }
 
   @Override
-  protected ListenableFuture<List<Value>> query(List<? extends Expr> exprs) {
+  protected CompletableFuture<List<Value>> query(List<? extends Expr> exprs) {
     return serverClient.query(exprs);
   }
 
