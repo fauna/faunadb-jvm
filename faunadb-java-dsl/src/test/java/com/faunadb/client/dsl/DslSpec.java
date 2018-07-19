@@ -5,7 +5,6 @@ import com.faunadb.client.errors.NotFoundException;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
-import com.google.common.util.concurrent.ListenableFuture;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,6 +16,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
@@ -64,8 +64,8 @@ public abstract class DslSpec {
   protected static RefV thorSpell1;
   protected static RefV thorSpell2;
 
-  protected abstract ListenableFuture<Value> query(Expr expr);
-  protected abstract ListenableFuture<List<Value>> query(List<? extends Expr> exprs);
+  protected abstract CompletableFuture<Value> query(Expr expr);
+  protected abstract CompletableFuture<List<Value>> query(List<? extends Expr> exprs);
 
   private static boolean initialized = false;
 

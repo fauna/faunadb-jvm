@@ -4,8 +4,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
 import com.ning.http.client.*;
 import com.ning.http.util.Base64;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
@@ -20,6 +18,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -218,7 +217,7 @@ public final class Connection implements AutoCloseable {
    * @return a {@link ListenableFuture} containing the HTTP Response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public ListenableFuture<Response> get(String path) throws IOException {
+  public CompletableFuture<Response> get(String path) throws IOException {
     Request request = new RequestBuilder("GET")
       .setUrl(mkUrl(path))
       .build();
@@ -234,7 +233,7 @@ public final class Connection implements AutoCloseable {
    * @return a {@code ListenableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public ListenableFuture<Response> get(String path, Map<String, List<String>> params) throws IOException {
+  public CompletableFuture<Response> get(String path, Map<String, List<String>> params) throws IOException {
     Request request = new RequestBuilder("GET")
       .setUrl(mkUrl(path))
       .setQueryParams(params)
@@ -251,7 +250,7 @@ public final class Connection implements AutoCloseable {
    * @return a {@link ListenableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public ListenableFuture<Response> post(String path, JsonNode body) throws IOException {
+  public CompletableFuture<Response> post(String path, JsonNode body) throws IOException {
     Request request = new RequestBuilder("POST")
       .setUrl(mkUrl(path))
       .setBody(json.writeValueAsString(body))
@@ -269,7 +268,7 @@ public final class Connection implements AutoCloseable {
    * @return a {@link ListenableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public ListenableFuture<Response> put(String path, JsonNode body) throws IOException {
+  public CompletableFuture<Response> put(String path, JsonNode body) throws IOException {
     Request request = new RequestBuilder("PUT")
       .setUrl(mkUrl(path))
       .setBody(json.writeValueAsString(body))
@@ -287,7 +286,7 @@ public final class Connection implements AutoCloseable {
    * @return a {@link ListenableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public ListenableFuture<Response> patch(String path, JsonNode body) throws IOException {
+  public CompletableFuture<Response> patch(String path, JsonNode body) throws IOException {
     Request request = new RequestBuilder("PATCH")
       .setUrl(mkUrl(path))
       .setBody(json.writeValueAsString(body))
@@ -297,9 +296,9 @@ public final class Connection implements AutoCloseable {
     return performRequest(request);
   }
 
-  private ListenableFuture<Response> performRequest(final Request request) {
+  private CompletableFuture<Response> performRequest(final Request request) {
     final Timer.Context ctx = registry.timer("fauna-request").time();
-    final SettableFuture<Response> rv = SettableFuture.create();
+    final CompletableFuture<Response> rv = new CompletableFuture();
 
     AsyncHttpClient.BoundRequestBuilder req = client.prepareRequest(request)
       .addHeader("Authorization", authHeader)
@@ -314,14 +313,14 @@ public final class Connection implements AutoCloseable {
         @Override
         public void onThrowable(Throwable t) {
           ctx.stop();
-          rv.setException(t);
+          rv.completeExceptionally(t);
           logFailure(request, t);
         }
 
         @Override
         public Response onCompleted(Response response) throws Exception {
           ctx.stop();
-          rv.set(response);
+          rv.complete(response);
 
           String txnTimeHeader = response.getHeader("X-Txn-Time");
           if (txnTimeHeader != null) {

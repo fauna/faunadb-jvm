@@ -10,8 +10,6 @@ import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
 
@@ -22,11 +20,11 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
 import static com.faunadb.client.types.Codec.VALUE;
-import static com.google.common.util.concurrent.Futures.transform;
 
 /**
  * The Java native client for FaunaDB.
@@ -187,7 +185,7 @@ public class FaunaClient implements AutoCloseable {
    * @see Value
    * @see com.faunadb.client.query.Language
    */
-  public ListenableFuture<Value> query(Expr expr) {
+  public CompletableFuture<Value> query(Expr expr) {
     return performRequest(json.valueToTree(expr));
   }
 
@@ -201,7 +199,7 @@ public class FaunaClient implements AutoCloseable {
    * @param exprs the list of queries to be sent to FaunaDB.
    * @return a {@link ListenableFuture} containing an ordered list of the query's responses.
    */
-  public ListenableFuture<List<Value>> query(Expr... exprs) {
+  public CompletableFuture<List<Value>> query(Expr... exprs) {
     return query(exprs);
   }
 
@@ -215,9 +213,8 @@ public class FaunaClient implements AutoCloseable {
    * @param exprs the list of queries to be sent to FaunaDB.
    * @return a {@link ListenableFuture} containing an ordered list of the query's responses.
    */
-  public ListenableFuture<List<Value>> query(List<? extends Expr> exprs) {
-      return transform(performRequest(json.valueToTree(exprs)),
-                       result -> result.collect(Field.as(VALUE)));
+  public CompletableFuture<List<Value>> query(List<? extends Expr> exprs) {
+      return performRequest(json.valueToTree(exprs)).thenApply(result -> result.collect(Field.as(VALUE)));
   }
 
   private Value handleResponse(Response response) {
@@ -232,11 +229,13 @@ public class FaunaClient implements AutoCloseable {
     }
   }
 
-  private ListenableFuture<Value> performRequest(JsonNode body) {
+  private CompletableFuture<Value> performRequest(JsonNode body) {
     try {
-        return handleNetworkExceptions(transform(connection.post("", body), r -> handleResponse(r)));
+        return handleNetworkExceptions(connection.post("", body).thenApply(r -> handleResponse(r)));
     } catch (IOException ex) {
-      return Futures.immediateFailedFuture(ex);
+        CompletableFuture<Value> oops = new CompletableFuture();
+        oops.completeExceptionally(ex);
+        return oops;
     }
   }
 
@@ -280,13 +279,15 @@ public class FaunaClient implements AutoCloseable {
     }
   }
 
-  private <V> V unavailable(Exception ex) {
-      throw new UnavailableException(ex.getMessage());
-  }
-
-  private <V> ListenableFuture<V> handleNetworkExceptions(ListenableFuture<V> f) {
-      ListenableFuture<V> f1 = Futures.catching(f, ConnectException.class, ex -> unavailable(ex));
-      return Futures.catching(f1, TimeoutException.class, ex -> unavailable(ex));
+  private <V> CompletableFuture<V> handleNetworkExceptions(CompletableFuture<V> f) {
+      return f.whenComplete((v, ex) -> {
+              if (ex == null) {
+                  return;
+              } else if (ex instanceof ConnectException ||
+                         ex instanceof TimeoutException) {
+                  throw new UnavailableException(ex.getMessage());
+              }
+          });
   }
 
   private JsonNode parseResponseBody(Response response) throws IOException {
