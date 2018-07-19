@@ -17,7 +17,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.faunadb.client.types.Decoder.decodeImpl;
-import static com.google.common.collect.Collections2.filter;
 import static java.lang.String.format;
 
 final class Constructors {

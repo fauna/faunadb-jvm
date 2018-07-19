@@ -3,7 +3,6 @@ package com.faunadb.client;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.types.Codec;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Result;
@@ -62,7 +61,7 @@ public class ObjectCodecSpec {
 
   @Before
   public void setUp() throws Exception {
-    json = new ObjectMapper().registerModule(new GuavaModule());
+    json = new ObjectMapper().findAndRegisterModules();
   }
 
   @Test

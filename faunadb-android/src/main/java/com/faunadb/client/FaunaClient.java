@@ -3,7 +3,6 @@ package com.faunadb.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
@@ -140,7 +139,7 @@ public class FaunaClient {
     }
   }
 
-  private final ObjectMapper json = new ObjectMapper().registerModule(new GuavaModule());
+  private final ObjectMapper json = new ObjectMapper().findAndRegisterModules();
   private final OkHttpClient client;
   private final URL endpoint;
   private final String authHeader;

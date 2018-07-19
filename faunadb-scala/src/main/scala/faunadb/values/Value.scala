@@ -3,10 +3,10 @@ package faunadb.values
 import java.nio.ByteBuffer
 import java.time.{ Instant, LocalDate }
 import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
+import java.util.Base64;
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.node.NullNode
-import com.google.common.io.BaseEncoding
 import faunadb.jackson._
 import scala.annotation.meta.{ field, getter, param }
 
@@ -173,7 +173,7 @@ object DateV {
 
 case class BytesV(@(JsonIgnore @param @field @getter) bytes: Array[Byte]) extends ScalarValue {
   @JsonProperty("@bytes")
-  lazy val strValue = BaseEncoding.base64Url().encode(bytes)
+  lazy val strValue = Base64.getUrlEncoder.encodeToString(bytes)
 
   override def equals(obj: Any): Boolean =
     obj match {
@@ -187,7 +187,7 @@ case class BytesV(@(JsonIgnore @param @field @getter) bytes: Array[Byte]) extend
 }
 object BytesV {
   def apply(bytes: Int*): BytesV = BytesV(bytes map { _.toByte } toArray)
-  def apply(value: String): BytesV = BytesV(BaseEncoding.base64Url().decode(value))
+  def apply(value: String): BytesV = BytesV(Base64.getUrlDecoder.decode(value))
 }
 
 case class QueryV(@JsonProperty("@query") lambda: ObjectV) extends Value

@@ -6,12 +6,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
-import com.google.common.io.BaseEncoding;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,7 +21,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.google.common.primitives.Bytes.asList;
 import static java.lang.String.format;
 
 /**
@@ -766,13 +765,13 @@ public abstract class Value extends Expr {
 
     @JsonCreator
     public BytesV(@JsonProperty("@bytes") String urlSafeBase64) {
-      super(BaseEncoding.base64Url().decode(urlSafeBase64));
+      super(Base64.getUrlDecoder().decode(urlSafeBase64));
     }
 
     @Override
     @JsonProperty("@bytes")
     protected Object toJson() {
-      return BaseEncoding.base64Url().encode(value);
+      return Base64.getUrlEncoder().encodeToString(value);
     }
 
     @Override
@@ -788,7 +787,7 @@ public abstract class Value extends Expr {
 
     @Override
     public String toString() {
-     String str = asList(value).stream()
+      String str = Arrays.asList(value).stream()
        .map(b -> format("0x%02x", b))
        .collect(Collectors.joining(", "));
 
