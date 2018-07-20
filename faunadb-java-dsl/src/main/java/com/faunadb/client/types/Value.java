@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.lang.String.format;
 
@@ -302,7 +303,7 @@ public abstract class Value extends Expr {
 
     @Override
     public String toString() {
-      return format("%s(%s)", getClass().getSimpleName(), value);
+      return value.toString();
     }
 
   }
@@ -347,7 +348,10 @@ public abstract class Value extends Expr {
 
     @Override
     public String toString() {
-      return format("ObjectV(%s)", values);
+        return values.entrySet()
+            .stream()
+            .map(e -> String.join(": ", Arrays.asList(e.getKey(), String.valueOf(e.getValue()))))
+            .collect(Collectors.joining(", ", "{", "}"));
     }
   }
 
@@ -390,7 +394,11 @@ public abstract class Value extends Expr {
 
     @Override
     public String toString() {
-      return format("Arr(%s)", values);
+        Iterable<String> vals = values.stream()
+            .map(String::valueOf)
+            .collect(Collectors.toList());
+
+        return format("[%s]", String.join(", ", vals));
     }
   }
 
@@ -481,6 +489,11 @@ public abstract class Value extends Expr {
     protected String toJson() {
       return value;
     }
+
+    @Override
+    public String toString() {
+        return format("\"%s\"", value);
+    }
   }
 
   /**
@@ -523,7 +536,7 @@ public abstract class Value extends Expr {
 
     @Override
     public String toString() {
-      return "NullV";
+      return "null";
     }
 
   }
@@ -614,6 +627,16 @@ public abstract class Value extends Expr {
     @JsonProperty("@set")
     protected Map<String, Value> toJson() {
       return value;
+    }
+
+    @Override
+    public String toString() {
+        String set = value.entrySet()
+            .stream()
+            .map(e -> String.join(": ", Arrays.asList(e.getKey(), String.valueOf(e.getValue()))))
+            .collect(Collectors.joining(", ", "{", "}"));
+
+        return format("{@set = %s}", set);
     }
   }
 
@@ -715,7 +738,7 @@ public abstract class Value extends Expr {
     public String toString() {
       String cls = value.clazz != null ? format(", class = %s", value.clazz) : "";
       String db = value.database != null ? format(", database = %s", value.database) : "";
-      return format("%s(id = \"%s\"%s%s)", getClass().getSimpleName(), value.id, cls, db);
+      return format("ref(id = \"%s\"%s%s)", value.id, cls, db);
     }
   }
 
@@ -787,11 +810,9 @@ public abstract class Value extends Expr {
 
     @Override
     public String toString() {
-      String str = Arrays.asList(value).stream()
-       .map(b -> format("0x%02x", b))
-       .collect(Collectors.joining(", "));
-
-     return format("BytesV(%s)", str);
+        return IntStream.range(0, value.length)
+            .mapToObj(i -> format("0x%02x", value[i]))
+            .collect(Collectors.joining(" ", "[", "]"));
     }
   }
 
