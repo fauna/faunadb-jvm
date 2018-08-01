@@ -29,7 +29,7 @@ import static com.faunadb.client.types.Codec.VALUE;
  * The Java native client for FaunaDB.
  *
  * <p>The client is asynchronous. All methods that performs latent operations
- * return an instance of {@link ListenableFuture}.</p>
+ * return an instance of {@link CompletableFuture}.</p>
  *
  * <p>The {@link FaunaClient#close()} method must be called in order to
  * release the {@link FaunaClient} I/O resources.</p>
@@ -180,7 +180,7 @@ public class FaunaClient implements AutoCloseable {
    * {@link Value} instances can be converted to native types. See {@link Value} class for details.
    *
    * @param expr the query to be executed.
-   * @return a {@link ListenableFuture} containing the root node of the response tree.
+   * @return a {@link CompletableFuture} containing the root node of the response tree.
    * @see Value
    * @see com.faunadb.client.query.Language
    */
@@ -196,7 +196,7 @@ public class FaunaClient implements AutoCloseable {
    * <p>
    *
    * @param exprs the list of queries to be sent to FaunaDB.
-   * @return a {@link ListenableFuture} containing an ordered list of the query's responses.
+   * @return a {@link CompletableFuture} containing an ordered list of the query's responses.
    */
   public CompletableFuture<List<Value>> query(Expr... exprs) {
     return query(exprs);
@@ -210,7 +210,7 @@ public class FaunaClient implements AutoCloseable {
    * <p>
    *
    * @param exprs the list of queries to be sent to FaunaDB.
-   * @return a {@link ListenableFuture} containing an ordered list of the query's responses.
+   * @return a {@link CompletableFuture} containing an ordered list of the query's responses.
    */
   public CompletableFuture<List<Value>> query(List<? extends Expr> exprs) {
       return performRequest(json.valueToTree(exprs)).thenApply(result -> result.collect(Field.as(VALUE)));
