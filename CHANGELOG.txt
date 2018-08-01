@@ -1,4 +1,6 @@
-3.0.0-SNAPSHOT
+2.6.0-SNAPSHOT
+
+2.5.0
 * Adds support to NGram() function
 * Reverses the argument order of Append() and Prepend() functions
 * Adds support to IsEmpty() and IsNonEmpty() functions
