@@ -1351,7 +1351,7 @@ public final class Language {
    * Returns a Page object that groups a page of results and cursors for retrieving pages before or after
    * the current page. Pages are collections and can be passed directly to some functions such as
    * {@link #Map(Expr, Expr)}, {@link #Foreach(Expr, Expr)}, or {@link #Filter(Expr, Expr)}.
-   * Transformations are applied to the Page’s data array; cursors are passed through.
+   * Transformations are applied to the Page's data array; cursors are passed through.
    *
    * <p>Example:</p>
    * <pre>{@code
