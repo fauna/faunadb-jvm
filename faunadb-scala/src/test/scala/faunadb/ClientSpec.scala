@@ -471,6 +471,142 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(client.query(NGram(Arr("john", "doe"), 3, 4))).to[Seq[String]].get shouldBe Seq("joh", "john", "ohn", "doe")
   }
 
+  it should "test math functions" in {
+
+    val absF = client.query(Abs(-100L))
+    val absR = await(absF).to[Long].get
+    absR shouldBe 100L
+
+    val acosF = client.query(Trunc(Acos(0.5D), 2))
+    val acosR = await(acosF).to[Double].get
+    acosR shouldBe 1.04D
+
+    val addF = client.query(Add(100L, 10L))
+    val addR = await(addF).to[Long].get
+    addR shouldBe 110L
+
+    val asinF = client.query(Trunc(Asin(0.5D), 2))
+    val asinR = await(asinF).to[Double].get
+    asinR shouldBe 0.52D
+
+    val atanF = client.query(Trunc(Atan(0.5D), 2))
+    val atanR = await(atanF).to[Double].get
+    atanR shouldBe 0.46D
+
+    val bitandF = client.query(BitAnd(15L, 7L, 3L))
+    val bitandR = await(bitandF).to[Long].get
+    bitandR shouldBe 3L
+
+    val bitnotF = client.query(BitNot(3L))
+    val bitnotR = await(bitnotF).to[Long].get
+    bitnotR shouldBe -4L
+
+    val bitorF = client.query(BitOr(15L, 7L, 3L))
+    val bitorR = await(bitorF).to[Long].get
+    bitorR shouldBe 15L
+
+    val bitxorF = client.query(BitXor(2L, 1L))
+    val bitxorR = await(bitxorF).to[Long].get
+    bitxorR shouldBe 3L
+
+    val ceilF = client.query(Ceil(1.01D))
+    val ceilR = await(ceilF).to[Double].get
+    ceilR shouldBe 2.0D
+
+    val cosF = client.query(Trunc(Cos(0.5D), 2))
+    val cosR = await(cosF).to[Double].get
+    cosR shouldBe 0.87D
+
+    val coshF = client.query(Trunc(Cosh(2L),2))
+    val coshR = await(coshF).to[Double].get
+    coshR shouldBe 3.76D
+
+    val degreesF = client.query(Trunc(Degrees(2.0D),2))
+    val degreesR = await(degreesF).to[Double].get
+    degreesR shouldBe 114.59D
+
+    val divideF = client.query(Divide(100L, 10L))
+    val divideR = await(divideF).to[Long].get
+    divideR shouldBe 10L
+
+    val expF = client.query(Trunc(Exp(2L), 2))
+    val expR = await(expF).to[Double].get
+    expR shouldBe 7.38D
+
+    val floorF = client.query(Floor(1.91D))
+    val floorR = await(floorF).to[Double].get
+    floorR shouldBe 1.0D
+
+    val hypotF = client.query(Hypot(3D, 4D))
+    val  hypotR = await(hypotF).to[Double].get
+    hypotR shouldBe 5.0D
+
+    val lnF = client.query(Trunc(Ln(2L),2))
+    val lnR = await(lnF).to[Double].get
+    lnR shouldBe 0.69D
+
+    val logF = client.query(Trunc(Log(2L),2))
+    val logR = await(logF).to[Double].get
+    logR shouldBe 0.30D
+
+    val maxF = client.query(Max(101L, 10L, 1L))
+    val maxR = await(maxF).to[Long].get
+    maxR shouldBe 101L
+
+    val minF = client.query(Min(101L, 10L))
+    val minR = await(minF).to[Long].get
+    minR shouldBe 10L
+
+    val moduloF = client.query(Modulo(101L, 10L))
+    val moduloR = await(moduloF).to[Long].get
+    moduloR shouldBe 1L
+
+    val multiplyF = client.query(Multiply(100L, 10L))
+    val multiplyR = await(multiplyF).to[Long].get
+    multiplyR shouldBe 1000L
+
+    val radiansF = client.query(Trunc(Radians(500), 2))
+    val radiansR = await(radiansF).to[Double].get
+    radiansR shouldBe 8.72D
+
+    val roundF = client.query(Round(12345.6789))
+    val roundR = await(roundF).to[Double].get
+    roundR shouldBe 12345.68D
+
+    val signF = client.query(Sign(3L))
+    val signR = await(signF).to[Long].get
+    signR shouldBe 1L
+
+    val sinF = client.query(Trunc(Sin(0.5D), 2))
+    val sinR = await(sinF).to[Double].get
+    sinR shouldBe 0.47D
+
+    val sinhF = client.query(Trunc(Sinh(0.5D), 2))
+    val sinhR = await(sinhF).to[Double].get
+    sinhR shouldBe 0.52D
+
+    val sqrtF = client.query(Sqrt(16L))
+    val sqrtR = await(sqrtF).to[Double].get
+    sqrtR shouldBe 4L
+
+    val subtractF = client.query(Subtract(100L, 10L))
+    val subtractR = await(subtractF).to[Long].get
+    subtractR shouldBe 90L
+
+    val tanF = client.query(Trunc(Tan(0.5D), 2))
+    val tanR = await(tanF).to[Double].get
+    tanR shouldBe 0.54D
+
+    val tanhF = client.query(Trunc(Tanh(0.5D), 2))
+    val tanhR = await(tanhF).to[Double].get
+    tanhR shouldBe 0.46D
+
+    val truncF = client.query(Trunc(123.456D, 2L))
+    val truncR = await(truncF).to[Double].get
+    truncR shouldBe 123.45D
+
+  }
+
   it should "test miscellaneous functions" in {
     val newIdF = client.query(NewId())
     val newIdR = await(newIdF).to[String].get
@@ -511,26 +647,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(client.query(SelectAll("foo", Arr(Obj("foo" -> "bar"), Obj("foo" -> "baz"), Obj("a" -> "b"))))) shouldBe ArrayV("bar", "baz")
     await(client.query(SelectAll("foo" / "bar", Arr(Obj("foo" -> Obj("bar" -> 1)), Obj("foo" -> Obj("bar" -> 2)))))) shouldBe ArrayV(1, 2)
     await(client.query(SelectAll("foo" / 0, Arr(Obj("foo" -> Arr(0, 1)), Obj("foo" -> Arr(2, 3)))))) shouldBe ArrayV(0, 2)
-
-    val addF = client.query(Add(100L, 10L))
-    val addR = await(addF).to[Long].get
-    addR shouldBe 110L
-
-    val multiplyF = client.query(Multiply(100L, 10L))
-    val multiplyR = await(multiplyF).to[Long].get
-    multiplyR shouldBe 1000L
-
-    val subtractF = client.query(Subtract(100L, 10L))
-    val subtractR = await(subtractF).to[Long].get
-    subtractR shouldBe 90L
-
-    val divideF = client.query(Divide(100L, 10L))
-    val divideR = await(divideF).to[Long].get
-    divideR shouldBe 10L
-
-    val moduloF = client.query(Modulo(101L, 10L))
-    val moduloR = await(moduloF).to[Long].get
-    moduloR shouldBe 1L
 
     val andF = client.query(And(true, false))
     val andR = await(andF).to[Boolean].get
@@ -592,31 +708,31 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     dateR.to[LocalDate].get shouldBe LocalDate.ofEpochDay(1)
   }
 
-  it should "test authentication functions" in {
-    val createF = client.query(Create(Class("spells"), Obj("credentials" -> Obj("password" -> "abcdefg"))))
-    val createR = await(createF)
+   it should "test authentication functions" in {
+      val createF = client.query(Create(Class("spells"), Obj("credentials" -> Obj("password" -> "abcdefg"))))
+      val createR = await(createF)
 
-    // Login
-    val loginF = client.query(Login(createR(RefField), Obj("password" -> "abcdefg")))
-    val secret = await(loginF)(SecretField).get
+      // Login
+      val loginF = client.query(Login(createR(RefField), Obj("password" -> "abcdefg")))
+      val secret = await(loginF)(SecretField).get
 
-    // HasIdentity
-    val hasIdentity = client.sessionWith(secret)(_.query(HasIdentity()))
-    await(hasIdentity).to[Boolean].get shouldBe true
+      // HasIdentity
+      val hasIdentity = client.sessionWith(secret)(_.query(HasIdentity()))
+      await(hasIdentity).to[Boolean].get shouldBe true
 
-    // Identity
-    val identity = client.sessionWith(secret)(_.query(Identity()))
-    await(identity).to[RefV].get shouldBe createR(RefField).get
+      // Identity
+      val identity = client.sessionWith(secret)(_.query(Identity()))
+      await(identity).to[RefV].get shouldBe createR(RefField).get
 
-    // Logout
-    val loggedOut = client.sessionWith(secret)(_.query(Logout(false)))
-    await(loggedOut).to[Boolean].get shouldBe true
+      // Logout
+      val loggedOut = client.sessionWith(secret)(_.query(Logout(false)))
+      await(loggedOut).to[Boolean].get shouldBe true
 
-    // Identify
-    val identifyF = client.query(Identify(createR(RefField), "abcdefg"))
-    val identifyR = await(identifyF)
-    identifyR.to[Boolean].get shouldBe true
-  }
+      // Identify
+      val identifyF = client.query(Identify(createR(RefField), "abcdefg"))
+      val identifyR = await(identifyF)
+      identifyR.to[Boolean].get shouldBe true
+      }
 
   it should "create session client" in {
     val otherClient = client.sessionClient(config("root_token"))

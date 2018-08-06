@@ -810,12 +810,188 @@ package object query {
     Expr(ObjectV("select_all" -> path.value, "from" -> from.value, "default" -> default.value))
 
   /**
+   * An Abs expression.
+   *
+   * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+   */
+  def Abs(num: Expr): Expr =
+    Expr(ObjectV("abs" -> num.value))
+
+  /**
+    * An Acos expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Acos(num: Expr): Expr =
+    Expr(ObjectV("acos" -> num.value))
+
+  /**
    * An Add expression.
    *
    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
    */
   def Add(terms: Expr*): Expr =
     Expr(ObjectV("add" -> varargs(terms)))
+
+  /**
+    * An Asin expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Asin(num: Expr): Expr =
+    Expr(ObjectV("asin" -> num.value))
+
+  /**
+    * An Atan expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Atan(num: Expr): Expr =
+    Expr(ObjectV("atan" -> num.value))
+
+  /**
+    * An BitAnd expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def BitAnd(terms: Expr*): Expr =
+    Expr(ObjectV("bitand" -> varargs(terms)))
+
+  /**
+    * A BitNot expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def BitNot(num: Expr): Expr =
+    Expr(ObjectV("bitnot" -> num.value))
+
+  /**
+    * An BitOr expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def BitOr(terms: Expr*): Expr =
+    Expr(ObjectV("bitor" -> varargs(terms)))
+
+  /**
+    * An BitXor expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def BitXor(terms: Expr*): Expr =
+    Expr(ObjectV("bitxor" -> varargs(terms)))
+
+  /**
+    * A Ceil expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Ceil(num: Expr): Expr =
+    Expr(ObjectV("ceil" -> num.value))
+
+  /**
+    * A Cos expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Cos(num: Expr): Expr =
+    Expr(ObjectV("cos" -> num.value))
+
+  /**
+    * A Cosh expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Cosh(num: Expr): Expr =
+    Expr(ObjectV("cosh" -> num.value))
+
+  /**
+    * A Degrees expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Degrees(num: Expr): Expr =
+    Expr(ObjectV("degrees" -> num.value))
+
+  /**
+    * A Divide expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Divide(terms: Expr*): Expr =
+    Expr(ObjectV("divide" -> varargs(terms)))
+
+  /**
+    * An Exp expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Exp(num: Expr): Expr =
+    Expr(ObjectV("exp" -> num.value))
+
+  /**
+    * A Floor expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Floor(num: Expr): Expr =
+    Expr(ObjectV("floor" -> num.value))
+
+  /**
+    * A Hypot expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Hypot(num: Expr): Expr =
+    Expr(ObjectV("hypot" -> num.value))
+
+  /**
+    * A Hypot expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Hypot(num: Expr, exp: Expr): Expr =
+    Expr(ObjectV("hypot" -> num.value, "b" -> exp.value))
+
+  /**
+    * A ln expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Ln(num: Expr): Expr =
+    Expr(ObjectV("ln" -> num.value))
+
+  /**
+    * A Log expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Log(num: Expr): Expr =
+    Expr(ObjectV("log" -> num.value))
+
+  /**
+    * A Max expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Max(terms: Expr*): Expr =
+    Expr(ObjectV("max" -> varargs(terms)))
+
+  /**
+    * A Min expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Min(terms: Expr*): Expr =
+    Expr(ObjectV("min" -> varargs(terms)))
+
+  /**
+    * A Modulo expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Modulo(terms: Expr*): Expr =
+    Expr(ObjectV("modulo" -> varargs(terms)))
 
   /**
    * A Multiply expression.
@@ -826,6 +1002,78 @@ package object query {
     Expr(ObjectV("multiply" -> varargs(terms)))
 
   /**
+    * A Pow expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Pow(num: Expr): Expr =
+    Expr(ObjectV("pow" -> num.value))
+
+  /**
+    * A Pow expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Pow(num: Expr, exp: Expr): Expr =
+    Expr(ObjectV("pow" -> num.value, "exp" -> exp.value))
+
+  /**
+    * A Radians expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Radians(num: Expr): Expr =
+    Expr(ObjectV("radians" -> num.value))
+
+  /**
+    * A Round expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Round(num: Expr): Expr =
+    Expr(ObjectV("round" -> num.value))
+
+  /**
+    * A Round expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Round(num: Expr, precision: Expr): Expr =
+    Expr(ObjectV("round" -> num.value, "precision" -> precision.value))
+
+  /**
+    * A sign expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Sign(num: Expr): Expr =
+    Expr(ObjectV("sign" -> num.value))
+
+  /**
+    * A sin expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Sin(num: Expr): Expr =
+    Expr(ObjectV("sin" -> num.value))
+
+  /**
+    * A sinh expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Sinh(num: Expr): Expr =
+    Expr(ObjectV("sinh" -> num.value))
+
+  /**
+    * A sqrt expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Sqrt(num: Expr): Expr =
+    Expr(ObjectV("sqrt" -> num.value))
+
+  /**
    * A Subtract expression.
    *
    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
@@ -834,20 +1082,36 @@ package object query {
     Expr(ObjectV("subtract" -> varargs(terms)))
 
   /**
-   * A Divide expression.
-   *
-   * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
-   */
-  def Divide(terms: Expr*): Expr =
-    Expr(ObjectV("divide" -> varargs(terms)))
-
-  /**
-    * A Modulo expression.
+    * A Tan expression.
     *
     * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
     */
-  def Modulo(terms: Expr*): Expr =
-    Expr(ObjectV("modulo" -> varargs(terms)))
+  def Tan(num: Expr): Expr =
+    Expr(ObjectV("tan" -> num.value))
+
+  /**
+    * A Tanh expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Tanh(num: Expr): Expr =
+    Expr(ObjectV("tanh" -> num.value))
+
+  /**
+    * A Trunc expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Trunc(num: Expr): Expr =
+    Expr(ObjectV("trunc" -> num.value))
+
+  /**
+    * A Trunc expression.
+    *
+    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    */
+  def Trunc(num: Expr, precision: Expr): Expr =
+    Expr(ObjectV("trunc" -> num.value, "precision" -> precision.value))
 
   /**
     * A LT expression.
