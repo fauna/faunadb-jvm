@@ -25,13 +25,11 @@ test:
 	sbt test
 
 jenkins-test:
-	sbt clean
-	sbt test
-	sbt publishLocal
+	sbt clean; \
+	sbt test; \
+	result=$$?; \
+	cp */target/test-reports/*.xml results/; \
+	exit $$result
 
 docker-wait:
 	dockerize -wait $(FAUNA_SCHEME)://$(FAUNA_DOMAIN):$(FAUNA_PORT)/ping -timeout $(FAUNA_TIMEOUT)
-
-docker-test:
-	docker build -f Dockerfile.test -t faunadb-jvm-test:latest --build-arg RUNTIME_IMAGE=$(RUNTIME_IMAGE) .
-	docker run $(DOCKER_RUN_FLAGS) faunadb-jvm-test:latest
