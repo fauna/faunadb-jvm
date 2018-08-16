@@ -2003,13 +2003,623 @@ public final class Language {
   }
 
   /**
+   * FindStr function returns
+   *
+   * @param value a strings
+   * @param find a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(Expr value, Expr find) {
+    return Fn.apply("findstr", value, "find", find);
+  }
+
+  /**
+   * FindStr function returns
+   *
+   * @param value a strings
+   * @param find a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(String value, Expr find) {
+    return FindStr(new StringV(value), find);
+  }
+
+  /**
+   * FindStr function returns
+   *
+   * @param value a strings
+   * @param find a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(Expr value, String find) {
+    return FindStr(value, new StringV(find));
+  }
+
+  /**
+   * FindStr function returns
+   *
+   * @param value a strings
+   * @param find a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(String value, String find) {
+    return FindStr(new StringV(value), new StringV(find));
+  }
+
+  /**
+   * FindStr function returns
+   *
+   * @param value a strings
+   * @param find a substring to locate
+   * @param start a position to start the search
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(Expr value, Expr find, Expr start) {
+    return Fn.apply("findstr", value, "find", find, "start", start);
+  }
+  /**
+   * FindStr function returns
+   *
+   * @param value a strings
+   * @param find a substring to locate
+   * @param start a position to start the search
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(Expr value, Expr find, long start) {
+    return FindStr(value, find, new LongV(start));
+  }
+
+  /**
+   * FindStr function returns
+   *
+   * @param value a strings
+   * @param find a substring to locate
+   * @param start a position to start the search
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(Expr value, String find, Expr start) {
+    return FindStr(value, new StringV(find), start);
+  }
+  /**
+   * FindStr function returns
+   *
+   * @param value a strings
+   * @param find a substring to locate
+   * @param start a position to start the search
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(String value, Expr find, long start) {
+    return FindStr(new StringV(value), find, new LongV(start));
+  }
+
+  /**
+   * FindStr function returns
+   *
+   * @param value a strings
+   * @param find a substring to locate
+   * @param start a position to start the search
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(String value, String find, Expr start) {
+    return FindStr(new StringV(value), new StringV(find), start);
+  }
+  /**
+   * FindStr function returns
+   *
+   * @param value a strings
+   * @param find a substring to locate
+   * @param start a position to start the search
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(String value, String find, long start) {
+    return FindStr(new StringV(value), new StringV(find), new LongV(start));
+  }
+
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, Expr pattern) {
+    return Fn.apply("findstrregex", value, "pattern", pattern);
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, String pattern) {
+    return FindStrRegex(value, new StringV(pattern));
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, Expr pattern) {
+    return FindStrRegex(new StringV(value), pattern);
+  }
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, String pattern) {
+    return FindStrRegex(new String(value), new StringV(pattern));
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, Expr pattern, Expr start) {
+    return Fn.apply("findstrregex", value, "pattern", pattern, "start", start);
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, Expr pattern, Expr start) {
+    return FindStrRegex(new StringV(value), pattern, start);
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, String pattern, Expr start) {
+    return FindStrRegex(value, new StringV(pattern), start);
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, String pattern, Expr start) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), start);
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, Expr pattern, Long start) {
+    return FindStrRegex(value, pattern, new LongV(start));
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, Expr pattern, Long start) {
+    return FindStrRegex(new StringV(value), pattern, new LongV(start));
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, String pattern, Long start) {
+    return FindStrRegex(value, new StringV(pattern), new LongV(start));
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, String pattern, Long start) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), new LongV(start));
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, Expr pattern, Expr start, Expr num_results) {
+    return Fn.apply("findstrregex", value, "pattern", pattern, "start", start, "num_results", num_results);
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, Expr pattern, Expr start, Expr num_results) {
+    return FindStrRegex(new StringV(value), pattern, start, num_results);
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, String pattern, Expr start, Expr num_results) {
+    return FindStrRegex(value, new StringV(pattern), start, num_results);
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, String pattern, Expr start, Expr num_results) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), start, num_results);
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, Expr pattern, Long start, Expr num_results) {
+    return FindStrRegex(value, pattern, new LongV(start), num_results);
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, Expr pattern, Long start, Expr num_results) {
+    return FindStrRegex(new StringV(value), pattern, new LongV(start), num_results);
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, String pattern, Long start, Expr num_results) {
+    return FindStrRegex(value, new StringV(pattern), new LongV(start), num_results);
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, String pattern, Long start, Expr num_results) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), new LongV(start), num_results);
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, Expr pattern, Expr start, long num_results) {
+    return FindStrRegex(value, pattern, start, new LongV(num_results));
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, Expr pattern, Expr start, long num_results) {
+    return FindStrRegex(new StringV(value), pattern, start, new LongV(num_results));
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, String pattern, Expr start, long num_results) {
+    return FindStrRegex(value, new StringV(pattern), start, new LongV(num_results));
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, String pattern, Expr start, long num_results) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), start, new LongV(num_results));
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, Expr pattern, Long start, long num_results) {
+    return FindStrRegex(value, pattern, new LongV(start), new LongV(num_results));
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, Expr pattern, Long start, long num_results) {
+    return FindStrRegex(new StringV(value), pattern, new LongV(start), new LongV(num_results));
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, String pattern, Long start, long num_results) {
+    return FindStrRegex(value, new StringV(pattern), new LongV(start), new LongV(num_results));
+  }
+
+  /**
+   * FindStrRegex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param start a substring to locate
+   * @param num_results a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, String pattern, Long start, long num_results) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), new LongV(start), new LongV(num_results));
+  }
+
+
+  /**
+   * Length function returns the number of characters in the string
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Length(Expr value) {
+    return Fn.apply("length", value);
+  }
+
+  /**
+   * Length function returns the number of characters in the string
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Length(String value) {
+    return Length(new StringV(value));
+  }
+
+  /**
+   * Lower function returns a
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr LowerCase(Expr value) {
+    return Fn.apply("lowercase", value);
+  }
+
+  /**
+   * Lower function returns a
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr LowerCase(String value) {
+    return LowerCase(new StringV(value));
+  }
+
+  /**
+   * LTrim function returns a new string with
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr LTrim(Expr value) {
+    return Fn.apply("ltrim", value);
+  }
+
+  /**
+   * LTrim function returns a new string with
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr LTrim(String value) {
+    return LTrim(new StringV(value));
+  }
+
+  /**
    * Tokenize the input into n-grams of the given sizes.
    *
    * @param terms the value to tokenize. Type: String
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    * @see #Value(long)
    */
@@ -2024,7 +2634,7 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(long)
    */
   public static Expr NGram(String terms, Expr min, Expr max) {
@@ -2038,7 +2648,7 @@ public final class Language {
    * @param min the minimum size for the n-grams.
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    * @see #Value(long)
    */
@@ -2053,7 +2663,7 @@ public final class Language {
    * @param min the minimum size for the n-grams.
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(long)
    */
   public static Expr NGram(String terms, long min, Expr max) {
@@ -2067,7 +2677,7 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    * @see #Value(long)
    */
@@ -2082,7 +2692,7 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    * @see #Value(long)
    */
@@ -2097,7 +2707,7 @@ public final class Language {
    * @param min the minimum size for the n-grams.
    * @param max the maximum size for the n-grams.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr NGram(Expr terms, long min, long max) {
@@ -2111,7 +2721,7 @@ public final class Language {
    * @param min the minimum size for the n-grams.
    * @param max the maximum size for the n-grams.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    */
   public static Expr NGram(String terms, long min, long max) {
     return NGram(terms, new LongV(min), new LongV(max));
@@ -2124,7 +2734,7 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    * @see #Value(String)
    * @see #Value(long)
@@ -2139,7 +2749,7 @@ public final class Language {
    *
    * @param terms the list of values to tokenize. Type: Array of strings
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    * @see #Value(String)
    */
@@ -2152,7 +2762,7 @@ public final class Language {
    *
    * @param term the term to tokenize. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    * @see #Value(String)
    */
@@ -2165,11 +2775,864 @@ public final class Language {
    *
    * @param term the value to tokenize.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    */
   public static Expr NGram(String term) {
     return NGram(new StringV(term));
+  }
+
+
+  /**
+   * Repeat function returns a string the specified number of times
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Repeat(Expr value) {
+    return Fn.apply("repeat", value);
+  }
+
+  /**
+   * Repeat function returns a string the specified number of times
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Repeat(String value) {
+    return Repeat( new StringV(value));
+  }
+
+  /**
+   * Repeat function returns a string concatenanted the specified number of times
+   *
+   * @param value a strings
+   * @param number an integer value indicate the number of times to repeat the string
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Repeat(Expr value, Expr number) {
+    return Fn.apply("repeat", value, "number", number);
+  }
+
+  /**
+   * Repeat function returns a string concatenanted the specified number of times
+   *
+   * @param value a strings
+   * @param number an integer value indicate the number of times to repeat the string
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Repeat(String value, Expr number) {
+    return Repeat(new StringV(value), number);
+  }
+
+  /**
+   * Repeat function returns a string concatenanted the specified number of times
+   *
+   * @param value a strings
+   * @param number an integer value indicate the number of times to repeat the string
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Repeat(Expr value, long number) {
+    return Repeat(value, new LongV(number));
+  }
+
+  /**
+   * Repeat function returns a string concatenanted the specified number of times
+   *
+   * @param value a strings
+   * @param number an integer value indicate the number of times to repeat the string
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Repeat(String value, long number) {
+    return Repeat(new StringV(value), new LongV(number));
+  }
+
+  /**
+   * ReplaceStr function returns a string the specified number of times
+   *
+   * @param value a strings
+   * @param find a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(Expr value, Expr find, Expr replace) {
+    return Fn.apply("replacestr", value, "find", find, "replace", replace);
+  }
+
+  /**
+   * ReplaceStr function returns a string the specified number of times
+   *
+   * @param value a strings
+   * @param find a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(String value, Expr find, Expr replace) {
+    return ReplaceStr(new StringV(value), find, replace);
+  }
+
+  /**
+   * ReplaceStr function returns a string the specified number of times
+   *
+   * @param value a strings
+   * @param find a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(Expr value, String find, Expr replace) {
+    return ReplaceStr(value, new StringV(find), replace);
+  }
+
+  /**
+   * ReplaceStr function returns a string the specified number of times
+   *
+   * @param value a strings
+   * @param find a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(String value, String find, Expr replace) {
+    return ReplaceStr(new StringV(value), new StringV(find), replace);
+  }
+
+  /**
+   * ReplaceStr function returns a string the specified number of times
+   *
+   * @param value a strings
+   * @param find a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(Expr value, Expr find, String replace) {
+    return ReplaceStr(value, find, new StringV(replace));
+  }
+
+  /**
+   * ReplaceStr function returns a string the specified number of times
+   *
+   * @param value a strings
+   * @param find a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(String value, Expr find, String replace) {
+    return ReplaceStr(new StringV(value), find, new StringV(replace));
+  }
+
+  /**
+   * ReplaceStr function returns a string the specified number of times
+   *
+   * @param value a strings
+   * @param find a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(Expr value, String find, String replace) {
+    return ReplaceStr(value, new StringV(find), new StringV(replace));
+  }
+
+  /**
+   * ReplaceStr function returns a string the specified number of times
+   *
+   * @param value a strings
+   * @param find a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(String value, String find, String replace) {
+    return ReplaceStr(new StringV(value), new StringV(find), new StringV(replace));
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, Expr pattern, Expr replace) {
+    return Fn.apply("replacestrregex", value, "pattern", pattern, "replace", replace);
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, Expr pattern, Expr replace) {
+    return ReplaceStrRegex(new StringV(value), pattern, replace);
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, String pattern, Expr replace) {
+    return ReplaceStrRegex(value, new StringV(pattern), replace);
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, String pattern, Expr replace) {
+    return ReplaceStrRegex(new StringV(value), new StringV(pattern), replace);
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, Expr pattern, String replace) {
+    return ReplaceStrRegex(value, pattern, new StringV(replace));
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, Expr pattern, String replace) {
+    return ReplaceStrRegex(new StringV(value), pattern, new StringV(replace));
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, String pattern, String replace) {
+    return ReplaceStrRegex(value, new StringV(pattern), replace);
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, String pattern, String replace) {
+    return ReplaceStrRegex(new StringV(value), new StringV(pattern), replace);
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, Expr pattern, Expr replace, Expr first) {
+    return Fn.apply("replacestrregex", value, "pattern", pattern, "replace", replace, "first", first);
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, Expr pattern, Expr replace, Expr first) {
+    return ReplaceStrRegex(new StringV(value), pattern, replace, first);
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, String pattern, Expr replace, Expr first) {
+    return ReplaceStrRegex(value, new StringV(pattern), replace, first);
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, String pattern, Expr replace, Expr first) {
+    return ReplaceStrRegex(new StringV(value), new StringV(pattern), replace, first);
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, Expr pattern, String replace, Expr first) {
+    return ReplaceStrRegex(value, pattern, new StringV(replace), first);
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, Expr pattern, String replace, Expr first) {
+    return ReplaceStrRegex(new StringV(value), pattern, new StringV(replace), first);
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, String pattern, String replace, Expr first) {
+    return ReplaceStrRegex(value, new StringV(pattern), new StringV(replace), first);
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, String pattern, String replace, Expr first) {
+    return ReplaceStrRegex(new StringV(value), new StringV(pattern), new StringV(replace), first);
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, Expr pattern, Expr replace, Boolean first) {
+    return ReplaceStrRegex(value, pattern, replace, BooleanV.valueOf(first));
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, Expr pattern, Expr replace, boolean first) {
+    return ReplaceStrRegex(new StringV(value), pattern, replace, BooleanV.valueOf(first));
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, String pattern, Expr replace, boolean first) {
+    return ReplaceStrRegex(value, new StringV(pattern), replace, BooleanV.valueOf(first));
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, String pattern, Expr replace, boolean first) {
+    return ReplaceStrRegex(new StringV(value), new StringV(pattern), replace, BooleanV.valueOf(first));
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, Expr pattern, String replace, boolean first) {
+    return ReplaceStrRegex(value, pattern, new StringV(replace), BooleanV.valueOf(first));
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, Expr pattern, String replace, boolean first) {
+    return ReplaceStrRegex(new StringV(value), pattern, new StringV(replace), BooleanV.valueOf(first));
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, String pattern, String replace, boolean first) {
+    return ReplaceStrRegex(value, new StringV(pattern), new StringV(replace), BooleanV.valueOf(first));
+  }
+
+  /**
+   * replacestrregex function returns
+   *
+   * @param value a strings
+   * @param pattern a substring to locate
+   * @param replace a substring to locate
+   * @param first a substring to locate
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, String pattern, String replace, boolean first) {
+    return ReplaceStrRegex(new StringV(value), new StringV(pattern), new StringV(replace), BooleanV.valueOf(first));
+  }
+
+  /**
+   * RTrim function returns
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr RTrim(Expr value) {
+    return Fn.apply("rtrim", value);
+  }
+
+  /**
+   * RTrim function returns
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr RTrim(String value) {
+    return RTrim(new StringV(value));
+  }
+
+  /**
+   * Space function returns
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Space(Expr value) {
+    return Fn.apply("space", value);
+  }
+
+  /**
+   * Space function returns
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Space(Long value) {
+    return Space(new LongV(value));
+  }
+
+  /**
+   * Space function returns
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Space(Integer value) {
+    return Space(new LongV(value));
+  }
+
+  /**
+   * SubString function returns
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(Expr value) {
+    return Fn.apply("substring", value);
+  }
+
+  /**
+   * SubString function returns
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(String value) {
+    return SubString(new StringV(value));
+  }
+
+  /**
+   * SubString function returns
+   *
+   * @param value a strings
+   * @param start an integer value
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(Expr value, Expr start) {
+    return Fn.apply("substring", value, "start", start);
+  }
+
+  /**
+   * SubString function returns
+   *
+   * @param value a strings
+   * @param start an integer value
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(String value, Expr start) {
+    return SubString(new StringV(value), start);
+  }
+
+  /**
+   * SubString function returns
+   *
+   * @param value a strings
+   * @param start an integer value
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(Expr value, long start) {
+    return SubString(value, new LongV(start));
+  }
+
+  /**
+   * SubString function returns
+   *
+   * @param value a strings
+   * @param start an integer value
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(String value, long start) {
+    return SubString(new StringV(value), new LongV(start));
+  }
+
+  /**
+   * SubString function returns
+   *
+   * @param value a strings
+   * @param start an integer value
+   * @param length an integer value
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(Expr value, Expr start, Expr length) {
+    return Fn.apply("substring", value, "start", start, "length", length);
+  }
+
+  /**
+   * SubString function returns
+   *
+   * @param value a strings
+   * @param start an integer value
+   * @param length an integer value
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(String value, Expr start, Expr length) {
+    return SubString(new StringV(value), start, length);
+  }
+
+  /**
+   * SubString function returns
+   *
+   * @param value a strings
+   * @param start an integer value
+   * @param length an integer value
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(Expr value, long start, Expr length) {
+    return SubString(value, new LongV(start), length);
+  }
+
+  /**
+   * SubString function returns
+   *
+   * @param value a strings
+   * @param start an integer value
+   * @param length an integer value
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(String value, long start, Expr length) {
+    return SubString(new StringV(value), new LongV(start), length);
+  }
+
+  /**
+   * SubString function returns
+   *
+   * @param value a strings
+   * @param start an integer value
+   * @param length an integer value
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(Expr value, long start, long length) {
+    return SubString(value, new LongV(start), new LongV(length));
+  }
+
+  /**
+   * SubString function returns
+   *
+   * @param value a strings
+   * @param start an integer value
+   * @param length an integer value
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(Expr value, Expr start, long length) {
+    return SubString(value, start, new LongV(length));
+  }
+
+  /**
+   * SubString function returns
+   *
+   * @param value a strings
+   * @param start an integer value
+   * @param length an integer value
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(String value, Expr start, long length) {
+    return SubString(new StringV(value), start, new LongV(length));
+  }
+
+  /**
+   * SubString function returns
+   *
+   * @param value a strings
+   * @param start an integer value
+   * @param length an integer value
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(String value, long start, long length) {
+    return SubString(new StringV(value), new LongV(start), new LongV(length));
+  }
+
+  /**
+   * TitleCase function returns a string with the first letter in each word capitalized
+   *
+   * @param value a strings which the first letter in each word will be capitalized and all else lowercased.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr TitleCase(Expr value) {
+    return Fn.apply("titlecase", value);
+  }
+
+  /**
+   * TitleCase function returns a string with the first letter in each word capitalized
+   *
+   * @param value a strings which the first letter in each word will be capitalized and all else lowercased.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr TitleCase(String value) {
+    return TitleCase(new StringV(value));
+  }
+
+  /**
+   * Trim function returns
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Trim(Expr value) {
+    return Fn.apply("trim", value);
+  }
+
+  /**
+   * Trim function returns
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Trim(String value) {
+    return Trim(new StringV(value));
+  }
+
+  /**
+   * Upper function returns
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr UpperCase(Expr value) {
+    return Fn.apply("uppercase", value);
+  }
+
+  /**
+   * Upper function returns
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr UpperCase(String value) {
+    return UpperCase(new StringV(value));
   }
 
   /**

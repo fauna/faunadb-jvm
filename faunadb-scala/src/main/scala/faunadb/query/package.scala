@@ -646,6 +646,342 @@ package object query {
     Expr(ObjectV("casefold" -> term.value, "normalizer" -> normalizer.value))
 
   /**
+   * A FindStr expression
+   *
+   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   */
+  def FindStr(value: Expr, find: Expr) : Expr =
+    Expr(ObjectV("findstr" -> value.value, "find" -> find.value))
+
+  /**
+    * A FindStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStr(value: String, find: Expr) : Expr =
+    Expr(ObjectV("findstr" -> StringV(value), "find" -> find.value))
+
+  /**
+    * A FindStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStr(value: Expr, find: String) : Expr =
+    Expr(ObjectV("findstr" -> value.value, "find" -> StringV(find) ))
+
+  /**
+    * A FindStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStr(value: String, find: String) : Expr =
+    Expr(ObjectV("findstr" -> StringV(value), "find" -> StringV(find)))
+
+  /**
+    * A FindStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStr(value: Expr, find: Expr, start: Expr) : Expr =
+    Expr(ObjectV("findstr" -> value.value, "find" -> find.value, "start" -> start.value))
+
+  /**
+    * A FindStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStr(value: String, find: Expr, start: Expr) : Expr =
+    Expr(ObjectV("findstr" -> StringV(value), "find" -> find.value, "start" -> start.value))
+
+  /**
+    * A FindStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStr(value: Expr, find: String, start: Expr) : Expr =
+    Expr(ObjectV("findstr" -> value.value, "find" -> StringV(find), "start" -> start.value))
+
+  /**
+    * A FindStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStr(value: String, find: String, start: Expr) : Expr =
+    Expr(ObjectV("findstr" -> StringV(value), "find" -> StringV(find), "start" -> start.value))
+
+  /**
+    * A FindStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStr(value: Expr, find: Expr, start: Long) : Expr =
+    Expr(ObjectV("findstr" -> value.value, "find" -> find.value, "start" -> LongV(start)))
+
+  /**
+    * A FindStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStr(value: String, find: Expr, start: Long) : Expr =
+    Expr(ObjectV("findstr" -> StringV(value), "find" -> find.value, "start" -> LongV(start)))
+
+  /**
+    * A FindStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStr(value: Expr, find: String, start: Long) : Expr =
+    Expr(ObjectV("findstr" -> value.value, "find" -> StringV(find), "start" -> LongV(start)))
+
+  /**
+    * A FindStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStr(value: String, find: String, start: Long) : Expr =
+    Expr(ObjectV("findstr" -> StringV(value), "find" -> StringV(find), "start" -> LongV(start)))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: Expr, pattern: Expr, start: Expr) : Expr =
+    Expr(ObjectV("findstrregex" -> value.value, "pattern" -> pattern.value, "start" -> start.value))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: String, pattern: Expr, start: Expr) : Expr =
+    Expr(ObjectV("findstrregex" -> StringV(value), "pattern" -> pattern.value, "start" -> start.value))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: Expr, pattern: String, start: Expr) : Expr =
+    Expr(ObjectV("findstrregex" -> value.value, "pattern" -> StringV(pattern), "start" -> start.value))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: String, pattern: String, start: Expr) : Expr =
+    Expr(ObjectV("findstrregex" -> StringV(value), "pattern" -> StringV(pattern), "start" -> start.value))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: Expr, pattern: Expr, start: Long) : Expr =
+    Expr(ObjectV("findstrregex" -> value.value, "pattern" -> pattern.value, "start" -> LongV(start)))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: String, pattern: Expr, start: Long) : Expr =
+    Expr(ObjectV("findstrregex" -> StringV(value), "pattern" -> pattern.value, "start" -> LongV(start)))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: Expr, pattern: String, start: Long) : Expr =
+    Expr(ObjectV("findstrregex" -> value.value, "pattern" -> StringV(pattern), "start" -> LongV(start)))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: String, pattern: String, start: Long) : Expr =
+    Expr(ObjectV("findstrregex" -> StringV(value), "pattern" -> StringV(pattern), "start" -> LongV(start)))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: Expr, pattern: Expr, start: Expr, num_results: Expr) : Expr =
+    Expr(ObjectV("findstrregex" -> value.value, "pattern" -> pattern.value, "start" -> start.value, "num_results" -> num_results.value))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: String, pattern: Expr, start: Expr, num_results: Expr) : Expr =
+    Expr(ObjectV("findstrregex" -> StringV(value), "pattern" -> pattern.value, "start" -> start.value, "num_results" -> num_results.value))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: Expr, pattern: String, start: Expr, num_results: Expr) : Expr =
+    Expr(ObjectV("findstrregex" -> value.value, "pattern" -> StringV(pattern), "start" -> start.value, "num_results" -> num_results.value))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: String, pattern: String, start: Expr, num_results: Expr) : Expr =
+    Expr(ObjectV("findstrregex" -> StringV(value), "pattern" -> StringV(pattern), "start" -> start.value, "num_results" -> num_results.value))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: Expr, pattern: Expr, start: Long, num_results: Expr) : Expr =
+    Expr(ObjectV("findstrregex" -> value.value, "pattern" -> pattern.value, "start" -> LongV(start), "num_results" -> num_results.value))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: String, pattern: Expr, start: Long, num_results: Expr) : Expr =
+    Expr(ObjectV("findstrregex" -> StringV(value), "pattern" -> pattern.value, "start" -> LongV(start), "num_results" -> num_results.value))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: Expr, pattern: String, start: Long, num_results: Expr) : Expr =
+    Expr(ObjectV("findstrregex" -> value.value, "pattern" -> StringV(pattern), "start" -> LongV(start), "num_results" -> num_results.value))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: String, pattern: String, start: Long, num_results: Expr) : Expr =
+    Expr(ObjectV("findstrregex" -> StringV(value), "pattern" -> StringV(pattern), "start" -> LongV(start), "num_results" -> num_results.value))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: Expr, pattern: Expr, start: Expr, num_results: Long) : Expr =
+    Expr(ObjectV("findstrregex" -> value.value, "pattern" -> pattern.value, "start" -> start.value, "num_results" -> LongV(num_results)))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: String, pattern: Expr, start: Expr, num_results: Long) : Expr =
+    Expr(ObjectV("findstrregex" -> StringV(value), "pattern" -> pattern.value, "start" -> start.value, "num_results" -> LongV(num_results)))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: Expr, pattern: String, start: Expr, num_results: Long) : Expr =
+    Expr(ObjectV("findstrregex" -> value.value, "pattern" -> StringV(pattern), "start" -> start.value, "num_results" -> LongV(num_results)))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: String, pattern: String, start: Expr, num_results: Long) : Expr =
+    Expr(ObjectV("findstrregex" -> StringV(value), "pattern" -> StringV(pattern), "start" -> start.value, "num_results" -> LongV(num_results)))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: Expr, pattern: Expr, start: Long, num_results: Long) : Expr =
+    Expr(ObjectV("findstrregex" -> value.value, "pattern" -> pattern.value, "start" -> LongV(start), "num_results" -> LongV(num_results)))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: String, pattern: Expr, start: Long, num_results: Long) : Expr =
+    Expr(ObjectV("findstrregex" -> StringV(value), "pattern" -> pattern.value, "start" -> LongV(start), "num_results" -> LongV(num_results)))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: Expr, pattern: String, start: Long, num_results: Long) : Expr =
+    Expr(ObjectV("findstrregex" -> value.value, "pattern" -> StringV(pattern), "start" -> LongV(start), "num_results" -> LongV(num_results)))
+
+  /**
+    * A FindStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def FindStrRegex(value: String, pattern: String, start: Long, num_results: Long) : Expr =
+    Expr(ObjectV("findstrregex" -> StringV(value), "pattern" -> StringV(pattern), "start" -> LongV(start), "num_results" -> LongV(num_results)))
+
+  /**
+   * A Length expression
+   *
+   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   */
+  def Length(value: Expr) : Expr =
+    Expr(ObjectV("length" -> value.value ))
+
+  /**
+    * A Length expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def Length(value: String) : Expr =
+    Expr(ObjectV("length" -> StringV(value)))
+
+  /**
+   * A LowerCase expression
+   *
+   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   */
+  def LowerCase(value: Expr) : Expr =
+    Expr(ObjectV("lowercase" -> value.value))
+
+  /**
+    * A LowerCase expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def LowerCase(value: String) : Expr =
+    Expr(ObjectV("lowercase" -> StringV(value)))
+
+  /**
+   * A LTrim expression
+   *
+   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   */
+  def LTrim(value: Expr) : Expr =
+    Expr(ObjectV("ltrim" -> value.value ))
+
+  /**
+    * A LTrim expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def LTrim(value: String) : Expr =
+    Expr(ObjectV("ltrim" -> StringV(value)))
+
+  /**
     * A NGram expression.
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
@@ -658,6 +994,519 @@ package object query {
     if (max != Expr(NullV)) b += "max" -> max.value
     Expr(ObjectV(b.result(): _*))
   }
+
+  /**
+   * A Repeat expression
+   *
+   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   */
+  def Repeat(value: Expr) : Expr =
+    Expr(ObjectV("repeat" -> value.value ))
+
+  /**
+    * A Repeat expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def Repeat(value: String) : Expr =
+    Expr(ObjectV("repeat" -> StringV(value)))
+
+  /**
+    * A Repeat expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def Repeat(value: Expr, number: Expr) : Expr =
+    Expr(ObjectV("repeat" -> value.value, "number" -> number.value))
+
+  /**
+    * A Repeat expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def Repeat(value: String, number: Long) : Expr =
+    Expr(ObjectV("repeat" -> StringV(value), "number" -> LongV(number)))
+
+  /**
+   * A ReplaceStr expression
+   *
+   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   */
+  def ReplaceStr(value: Expr, source: Expr, replace: Expr) : Expr =
+    Expr(ObjectV("replacestr" -> value.value, "source" -> source.value, "replace" -> replace.value))
+
+  /**
+    * A ReplaceStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStr(value: String, source: Expr, replace: Expr) : Expr =
+    Expr(ObjectV("replacestr" -> StringV(value), "source" -> source.value, "replace" -> replace.value))
+
+  /**
+    * A ReplaceStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStr(value: Expr, source: String, replace: Expr) : Expr =
+    Expr(ObjectV("replacestr" -> value.value, "source" -> StringV(source), "replace" -> replace.value))
+
+  /**
+    * A ReplaceStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStr(value: String, source: String, replace: Expr) : Expr =
+    Expr(ObjectV("replacestr" -> StringV(value), "source" -> StringV(source), "replace" -> replace.value))
+
+  /**
+    * A ReplaceStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStr(value: Expr, source: Expr, replace: String) : Expr =
+    Expr(ObjectV("replacestr" -> value.value, "source" -> source.value, "replace" -> StringV(replace)))
+
+  /**
+    * A ReplaceStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStr(value: String, source: Expr, replace: String) : Expr =
+    Expr(ObjectV("replacestr" -> StringV(value), "source" -> source.value, "replace" -> StringV(replace)))
+
+  /**
+    * A ReplaceStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStr(value: Expr, source: String, replace: String) : Expr =
+    Expr(ObjectV("replacestr" -> value.value, "source" -> StringV(source), "replace" -> StringV(replace)))
+
+  /**
+    * A ReplaceStr expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStr(value: String, source: String, replace: String) : Expr =
+    Expr(ObjectV("replacestr" -> StringV(value), "find" -> StringV(source), "replace" -> StringV(replace)))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: Expr, pattern: Expr, replace: Expr) : Expr =
+    Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> pattern.value, "replace" -> replace.value))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: String, pattern: Expr, replace: Expr) : Expr =
+    Expr(ObjectV("replacestrregex" -> StringV(value), "pattern" -> pattern.value, "replace" -> replace.value))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: Expr, pattern: String, replace: Expr) : Expr =
+    Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> StringV(pattern), "replace" -> replace.value))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: String, pattern: String, replace: Expr) : Expr =
+    Expr(ObjectV("replacestrregex" -> StringV(value), "pattern" -> StringV(pattern), "replace" -> replace.value))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: Expr, pattern: Expr, replace: String) : Expr =
+    Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> pattern.value, "replace" -> StringV(replace)))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: String, pattern: Expr, replace: String) : Expr =
+    Expr(ObjectV("replacestrregex" -> StringV(value), "pattern" -> pattern.value, "replace" -> StringV(replace)))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: Expr, pattern: String, replace: String) : Expr =
+    Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> StringV(pattern), "replace" -> StringV(replace)))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: String, pattern: String, replace: String) : Expr =
+    Expr(ObjectV("replacestrregex" -> StringV(value), "pattern" -> StringV(pattern), "replace" -> StringV(replace)))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: Expr, pattern: Expr, replace: Expr, first: Expr) : Expr =
+    Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> pattern.value, "replace" -> replace.value, "first" -> first.value))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: String, pattern: Expr, replace: Expr, first: Expr) : Expr =
+    Expr(ObjectV("replacestrregex" -> StringV(value), "pattern" -> pattern.value, "replace" -> replace.value, "first" -> first.value))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: Expr, pattern: String, replace: Expr, first: Expr) : Expr =
+    Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> StringV(pattern), "replace" -> replace.value, "first" -> first.value))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: String, pattern: String, replace: Expr, first: Expr) : Expr =
+    Expr(ObjectV("replacestrregex" -> StringV(value), "pattern" -> StringV(pattern), "replace" -> replace.value, "first" -> first.value))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: Expr, pattern: Expr, replace: String, first: Expr) : Expr =
+    Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> pattern.value, "replace" -> StringV(replace), "first" -> first.value))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: String, pattern: Expr, replace: String, first: Expr) : Expr =
+    Expr(ObjectV("replacestrregex" -> StringV(value), "pattern" -> pattern.value, "replace" -> StringV(replace), "first" -> first.value))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: Expr, pattern: String, replace: String, first: Expr) : Expr =
+    Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> StringV(pattern), "replace" -> StringV(replace), "first" -> first.value))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: String, pattern: String, replace: String, first: Expr) : Expr =
+    Expr(ObjectV("replacestrregex" -> StringV(value), "pattern" -> StringV(pattern), "replace" -> StringV(replace), "first" -> first.value))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: Expr, pattern: Expr, replace: Expr, first: Boolean) : Expr =
+    Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> pattern.value, "replace" -> replace.value, "first" -> BooleanV(first)))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: String, pattern: Expr, replace: Expr, first: Boolean) : Expr =
+    Expr(ObjectV("replacestrregex" -> StringV(value), "pattern" -> pattern.value, "replace" -> replace.value, "first" -> BooleanV(first)))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: Expr, pattern: String, replace: Expr, first: Boolean) : Expr =
+    Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> StringV(pattern), "replace" -> replace.value, "first" -> BooleanV(first)))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: String, pattern: String, replace: Expr, first: Boolean) : Expr =
+    Expr(ObjectV("replacestrregex" -> StringV(value), "pattern" -> StringV(pattern), "replace" -> replace.value, "first" -> BooleanV(first)))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: Expr, pattern: Expr, replace: String, first: Boolean) : Expr =
+    Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> pattern.value, "replace" -> StringV(replace), "first" -> BooleanV(first)))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: String, pattern: Expr, replace: String, first: Boolean) : Expr =
+    Expr(ObjectV("replacestrregex" -> StringV(value), "pattern" -> pattern.value, "replace" -> StringV(replace), "first" -> BooleanV(first)))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: Expr, pattern: String, replace: String, first: Boolean) : Expr =
+    Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> StringV(pattern), "replace" -> StringV(replace), "first" -> BooleanV(first)))
+
+  /**
+    * A ReplaceStrRegex expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def ReplaceStrRegex(value: String, pattern: String, replace: String, first: Boolean) : Expr =
+    Expr(ObjectV("replacestrregex" -> StringV(value), "pattern" -> StringV(pattern), "replace" -> StringV(replace), "first" -> BooleanV(first)))
+
+  /**
+    * A RegexSubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def RegexSubString(value: Expr, pattern: Expr) : Expr =
+    Expr(ObjectV("segex_substring" -> value.value, "pattern" -> pattern.value))
+
+  /**
+    * A RegexSubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def RegexSubString(value: String, pattern: Expr) : Expr =
+    Expr(ObjectV("segex_substring" -> StringV(value), "pattern" -> pattern.value))
+
+  /**
+    * A RegexSubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def RegexSubString(value: Expr, pattern: String) : Expr =
+    Expr(ObjectV("segex_substring" -> value.value, "pattern" -> StringV(pattern)))
+
+  /**
+    * A RegexSubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def RegexSubString(value: String, pattern: String) : Expr =
+    Expr(ObjectV("segex_substring" -> StringV(value), "pattern" -> StringV(pattern)))
+
+
+  /**
+   * A RTrim expression
+   *
+   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   */
+  def RTrim(value: Expr) : Expr =
+    Expr(ObjectV("rtrim" -> value.value))
+
+  /**
+    * A RTrim expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def RTrim(value: String) : Expr =
+    Expr(ObjectV("rtrim" -> StringV(value)))
+
+  /**
+   * A Space expression
+   *
+   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   */
+  def Space(value: Expr) : Expr =
+    Expr(ObjectV("space" -> value.value ))
+
+  /**
+    * A Space expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def Space(value: String) : Expr =
+    Expr(ObjectV("space" -> StringV(value)))
+
+  /**
+    * A SubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def SubString(value: Expr) : Expr =
+    Expr(ObjectV("substring" -> value.value))
+
+  /**
+    * A SubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def SubString(value: String) : Expr =
+    Expr(ObjectV("substring" -> StringV(value)))
+
+  /**
+   * A SubString expression
+   *
+   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   */
+  def SubString(value: Expr, start: Expr) : Expr =
+    Expr(ObjectV("substring" -> value.value, "start" -> start.value))
+
+  /**
+    * A SubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def SubString(value: String, start: Expr) : Expr =
+    Expr(ObjectV("substring" -> StringV(value), "start" -> start.value))
+
+  /**
+    * A SubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def SubString(value: Expr, start: Long) : Expr =
+    Expr(ObjectV("substring" -> value.value, "start" -> LongV(start)))
+
+  /**
+    * A SubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def SubString(value: String, start: Long) : Expr =
+    Expr(ObjectV("substring" -> StringV(value), "start" -> LongV(start)))
+
+  /**
+   * A SubString expression
+   *
+   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   */
+  def SubString(value: Expr, start: Expr, length: Expr) : Expr =
+    Expr(ObjectV("substring" -> value.value, "start" -> start.value, "length" -> length.value))
+
+  /**
+    * A SubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def SubString(value: String, start: Expr, length: Expr) : Expr =
+    Expr(ObjectV("substring" -> StringV(value), "start" -> start.value, "length" -> length.value))
+
+  /**
+    * A SubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def SubString(value: Expr, start: String, length: Expr) : Expr =
+    Expr(ObjectV("substring" -> value.value, "start" -> StringV(start), "length" -> length.value))
+
+  /**
+    * A SubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def SubString(value: String, start: String, length: Expr) : Expr =
+    Expr(ObjectV("substring" -> StringV(value), "start" -> StringV(start), "length" -> length.value))
+
+  /**
+    * A SubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def SubString(value: Expr, start: Expr, length: Long) : Expr =
+    Expr(ObjectV("substring" -> value.value, "start" -> start.value, "length" -> LongV(length)))
+
+  /**
+    * A SubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def SubString(value: String, start: Expr, length: Long) : Expr =
+    Expr(ObjectV("substring" -> StringV(value), "start" -> start.value, "length" -> LongV(length)))
+
+  /**
+    * A SubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def SubString(value: Expr, start: String, length: Long) : Expr =
+    Expr(ObjectV("substring" -> value.value, "start" -> StringV(start), "length" -> LongV(length)))
+
+  /**
+    * A SubString expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def SubString(value: String, start: String, length: Long) : Expr =
+    Expr(ObjectV("substring" -> StringV(value), "start" -> StringV(start), "length" -> LongV(length)))
+
+  /**
+    * A TitleCase expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def TitleCase(value: Expr) : Expr =
+    Expr(ObjectV("titlecase" -> value.value ))
+
+  /**
+    * A TitleCase expression
+    *
+    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    */
+  def TitleCase(value: String) : Expr =
+    Expr(ObjectV("titlecase" -> StringV(value)))
+
+  /**
+   * A Trim expression
+   *
+   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   */
+  def Trim(term: Expr) : Expr =
+    Expr(ObjectV("trim" -> term.value ))
+
+  /**
+   * A Trim expression
+   *
+   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   */
+  def Trim(term: String) : Expr =
+    Expr(ObjectV("trim" -> StringV(term)))
+
+  /**
+   * A UpperCase expression
+   *
+   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   */
+  def UpperCase(term: Expr) : Expr =
+    Expr(ObjectV("uppercase" -> term.value ))
+
+  /**
+   * A Upper expression
+   *
+   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   */
+  def UpperCase(term: String) : Expr =
+    Expr(ObjectV("uppercase" -> StringV(term)))
 
   // Time Functions
 
