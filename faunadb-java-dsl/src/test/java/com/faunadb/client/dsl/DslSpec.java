@@ -870,6 +870,44 @@ public abstract class DslSpec {
   }
 
   @Test
+  public void shouldEvalFindStrExpression() throws Exception {
+    Value res = query(FindStr(Value("fire and  Ice"), Value("fire"))).get();
+    assertThat(res.to(LONG).get(), equalTo(0L));
+    Value res1 = query(FindStr("hello TO aLL", "TO")).get();
+    assertThat(res1.to(LONG).get(), equalTo(6L));
+    Value res2 = query(FindStr("hello TO aLL", "aLL", 6)).get();
+    assertThat(res2.to(LONG).get(), equalTo(9L));
+  }
+
+  @Test
+  public void shouldEvalLengthExpression() throws Exception {
+    Value res = query(Length(Value("fire and  Ice"))).get();
+    assertThat(res.to(LONG).get(), equalTo(13L));
+    Value res1 = query(Length("hello")).get();
+    assertThat(res1.to(LONG).get(), equalTo(5L));
+    Value res2 = query(Length("")).get();
+    assertThat(res2.to(LONG).get(), equalTo(0L));
+  }
+
+  @Test
+  public void shouldEvalLowerExpression() throws Exception {
+    Value res = query(LowerCase(Value("fire and  Ice"))).get();
+    assertThat(res.to(STRING).get(), equalTo("fire and  ice"));
+    Value res1 = query(LowerCase("hello TO aLL")).get();
+    assertThat(res1.to(STRING).get(), equalTo("hello to all"));
+  }
+
+  @Test
+  public void shouldEvalLTrimExpression() throws Exception {
+    Value res0 = query(LTrim("   fire")).get();
+    assertThat(res0.to(STRING).get(), equalTo("fire"));
+    Value res = query(LTrim(Value("\t\tfire and ice"))).get();
+    assertThat(res.to(STRING).get(), equalTo("fire and ice"));
+    Value res1 = query(LTrim("\n\n\nhello to all")).get();
+    assertThat(res1.to(STRING).get(), equalTo("hello to all"));
+  }
+
+  @Test
   public void shouldEvalNGramExpression() throws Exception {
     assertThat(
       query(NGram(Value("what"))).get().asCollectionOf(String.class).get(),
@@ -888,6 +926,82 @@ public abstract class DslSpec {
       query(NGram(Arr(Value("john"), Value("doe")), Value(3), Value(4))).get().asCollectionOf(String.class).get(),
       contains("joh", "john", "ohn", "doe")
     );
+  }
+
+  @Test
+  public void shouldEvalRepeatExpression() throws Exception {
+    Value res = query(Repeat("f")).get();
+    assertThat(res.to(STRING).get(), equalTo("ff"));
+    Value res1 = query(Repeat("abc",3)).get();
+    assertThat(res1.to(STRING).get(), equalTo("abcabcabc"));
+  }
+
+ @Test
+  public void shouldEvalReplaceStringExpression() throws Exception {
+    Value res = query(ReplaceStr("fire and ice and everything nice","and","or")).get();
+    assertThat(res.to(STRING).get(), equalTo("fire or ice or everything nice"));
+  }
+
+  @Test
+  public void shouldEvalReplaceStrRegexExpression() throws Exception {
+    Value res = query(ReplaceStrRegex("fire and ice and everything nice","and","or")).get();
+    assertThat(res.to(STRING).get(), equalTo("fire or ice or everything nice"));
+    Value res1 = query(ReplaceStrRegex("fire and ice and everything nice","and","or",true)).get();
+    assertThat(res1.to(STRING).get(), equalTo("fire or ice and everything nice"));
+  }
+
+  @Test
+  public void shouldEvalRTrimExpression() throws Exception {
+    Value res = query(RTrim("fire   ")).get();
+    assertThat(res.to(STRING).get(), equalTo("fire"));
+    Value res1 = query(RTrim("ice\t\t\t")).get();
+    assertThat(res1.to(STRING).get(), equalTo("ice"));
+    Value res2 = query(RTrim("nice\n\n\n")).get();
+    assertThat(res2.to(STRING).get(), equalTo("nice"));
+  }
+
+  @Test
+  public void shouldEvalSpaceExpression() throws Exception {
+    Value res = query(Space(1)).get();
+    assertThat(res.to(STRING).get(), equalTo(" "));
+    Value res1 = query(Space(4)).get();
+    assertThat(res1.to(STRING).get(), equalTo("    "));
+  }
+
+  @Test
+  public void shouldEvalSubStringExpression() throws Exception {
+    Value res = query(SubString("basketball")).get();
+    assertThat(res.to(STRING).get(), equalTo("basketball"));
+    Value res1 = query(SubString("basketball", 6)).get();
+    assertThat(res1.to(STRING).get(), equalTo("ball"));
+    Value res2 = query(SubString("basketball", 6,2)).get();
+    assertThat(res2.to(STRING).get(), equalTo("ba"));
+  }
+
+  @Test
+  public void shouldEvalTrimExpression() throws Exception {
+    Value res = query(Trim("   fire   ")).get();
+    assertThat(res.to(STRING).get(), equalTo("fire"));
+    Value res1 = query(Trim("\t\t\tice\t\t\t")).get();
+    assertThat(res1.to(STRING).get(), equalTo("ice"));
+    Value res2 = query(Trim("\n\n\nnice\n\n\n")).get();
+    assertThat(res2.to(STRING).get(), equalTo("nice"));
+  }
+
+  @Test
+  public void shouldEvalUpperExpression() throws Exception {
+    Value res = query(UpperCase(Value("fire and  Ice"))).get();
+    assertThat(res.to(STRING).get(), equalTo("FIRE AND  ICE"));
+    Value res1 = query(UpperCase("hello TO aLL")).get();
+    assertThat(res1.to(STRING).get(), equalTo("HELLO TO ALL"));
+  }
+
+  @Test
+  public void shouldEvalTitleCaseExpression() throws Exception {
+    Value res = query(TitleCase(Value("fire and  Ice"))).get();
+    assertThat(res.to(STRING).get(), equalTo("Fire And  Ice"));
+    Value res1 = query(TitleCase("hello TO aLL")).get();
+    assertThat(res1.to(STRING).get(), equalTo("Hello To All"));
   }
 
   @Test

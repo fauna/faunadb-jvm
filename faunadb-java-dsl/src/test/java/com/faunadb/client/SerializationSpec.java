@@ -789,6 +789,42 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeFindStr() throws Exception {
+    assertJson(FindStr("ABCDEF", "ABC"), "{\"findstr\":\"ABCDEF\",\"find\":\"ABC\"}");
+    assertJson(FindStr(Value("AABCDEFF"), Value("AABC")), "{\"findstr\":\"AABCDEFF\",\"find\":\"AABC\"}");
+    assertJson(FindStr("ABCDEF","ABC", 1), "{\"findstr\":\"ABCDEF\",\"find\":\"ABC\",\"start\":1}");
+    assertJson(FindStr(Value("AABCDEFF"), Value("AABC"), Value(1)), "{\"findstr\":\"AABCDEFF\",\"find\":\"AABC\",\"start\":1}");
+  }
+
+  @Test
+  public void shouldSerializeFindStrRegex() throws Exception {
+    assertJson(FindStrRegex("ABCDEF", "BCD"), "{\"findstrregex\":\"ABCDEF\",\"pattern\":\"BCD\"}");
+    assertJson(FindStrRegex(Value("abcdef"), Value("bcd")), "{\"findstrregex\":\"abcdef\",\"pattern\":\"bcd\"}");
+    assertJson(FindStrRegex("ABCDEF", "BCD", 1L), "{\"findstrregex\":\"ABCDEF\",\"pattern\":\"BCD\",\"start\":1}");
+    assertJson(FindStrRegex(Value("abcdef"), Value("bcd"), Value(1)), "{\"findstrregex\":\"abcdef\",\"pattern\":\"bcd\",\"start\":1}");
+    assertJson(FindStrRegex("ABCDEF", "BCD", 1L, 3L), "{\"findstrregex\":\"ABCDEF\",\"pattern\":\"BCD\",\"start\":1,\"num_results\":3}");
+    assertJson(FindStrRegex(Value("abcdef"), Value("bcd"), Value(1), Value(4)), "{\"findstrregex\":\"abcdef\",\"pattern\":\"bcd\",\"start\":1,\"num_results\":4}");
+  }
+
+  @Test
+  public void shouldSerializeLength() throws Exception {
+    assertJson(Length("ABC"), "{\"length\":\"ABC\"}");
+    assertJson(Length(Value("DEF")), "{\"length\":\"DEF\"}");
+  }
+
+  @Test
+  public void shouldSerializeLower() throws Exception {
+    assertJson(LowerCase("ABC"), "{\"lowercase\":\"ABC\"}");
+    assertJson(LowerCase(Value("DEF")), "{\"lowercase\":\"DEF\"}");
+  }
+
+  @Test
+  public void shouldSerializeLTrim() throws Exception {
+    assertJson(LTrim("ABC"), "{\"ltrim\":\"ABC\"}");
+    assertJson(LTrim(Value("DEF")), "{\"ltrim\":\"DEF\"}");
+  }
+
+  @Test
   public void shouldSerializeNGram() throws Exception {
     assertJson(NGram(Value("str")), "{\"ngram\":\"str\"}");
     assertJson(NGram("str"), "{\"ngram\":\"str\"}");
@@ -805,6 +841,69 @@ public class SerializationSpec {
     assertJson(NGram("str", 2L, 4L), "{\"ngram\":\"str\",\"min\":2,\"max\":4}");
     assertJson(NGram(Arr(Value("str0"), Value("str1")), Value(2), Value(4)), "{\"ngram\":[\"str0\",\"str1\"],\"min\":2,\"max\":4}");
     assertJson(NGram(Arrays.asList(Value("str0"), Value("str1")), Value(2), Value(4)), "{\"ngram\":[\"str0\",\"str1\"],\"min\":2,\"max\":4}");
+  }
+
+  @Test
+  public void shouldSerializeRepeat() throws Exception {
+    assertJson(Repeat("ABC"), "{\"repeat\":\"ABC\"}");
+    assertJson(Repeat(Value("abc")), "{\"repeat\":\"abc\"}");
+    assertJson(Repeat("ABC", 2L), "{\"repeat\":\"ABC\",\"number\":2}");
+    assertJson(Repeat(Value("abc"), Value(2)), "{\"repeat\":\"abc\",\"number\":2}");
+  }
+
+  @Test
+  public void shouldSerializeReplaceStr() throws Exception {
+    assertJson(ReplaceStr("ABCDEF", "BCD","CAR"), "{\"replacestr\":\"ABCDEF\",\"find\":\"BCD\",\"replace\":\"CAR\"}");
+    assertJson(ReplaceStr(Value("abcdef"), Value("bcd"), Value("car")), "{\"replacestr\":\"abcdef\",\"find\":\"bcd\",\"replace\":\"car\"}");
+  }
+
+  @Test
+  public void shouldSerializeReplaceStrRegex() throws Exception {
+    assertJson(ReplaceStrRegex("ABCDEF", "BCD","CAR"), "{\"replacestrregex\":\"ABCDEF\",\"pattern\":\"BCD\",\"replace\":\"CAR\"}");
+    assertJson(ReplaceStrRegex(Value("abcdef"), Value("bcd"), Value("car")), "{\"replacestrregex\":\"abcdef\",\"pattern\":\"bcd\",\"replace\":\"car\"}");
+    assertJson(ReplaceStrRegex("ABCDEF", "BCD","CAR",true), "{\"replacestrregex\":\"ABCDEF\",\"pattern\":\"BCD\",\"replace\":\"CAR\",\"first\":true}");
+    assertJson(ReplaceStrRegex(Value("abcdef"), Value("bcd"), Value("car"), Value(true)), "{\"replacestrregex\":\"abcdef\",\"pattern\":\"bcd\",\"replace\":\"car\",\"first\":true}");
+  }
+
+  @Test
+  public void shouldSerializeRTrim() throws Exception {
+    assertJson(RTrim("ABC"), "{\"rtrim\":\"ABC\"}");
+    assertJson(RTrim(Value("DEF")), "{\"rtrim\":\"DEF\"}");
+  }
+
+  @Test
+  public void shouldSerializeSpace() throws Exception {
+    assertJson(Space(2), "{\"space\":2}");
+    assertJson(Space(2L), "{\"space\":2}");
+    assertJson(Space(Value(2)), "{\"space\":2}");
+  }
+
+  @Test
+  public void shouldSerializeSubString() throws Exception {
+    assertJson(SubString("ABC"), "{\"substring\":\"ABC\"}");
+    assertJson(SubString(Value("abc")), "{\"substring\":\"abc\"}");
+    assertJson(SubString("ABC", 2L), "{\"substring\":\"ABC\",\"start\":2}");
+    assertJson(SubString(Value("abc"), Value(2)), "{\"substring\":\"abc\",\"start\":2}");
+    assertJson(SubString("ABC", 2, 3), "{\"substring\":\"ABC\",\"start\":2,\"length\":3}");
+    assertJson(SubString(Value("abc"), Value(2), Value(3)), "{\"substring\":\"abc\",\"start\":2,\"length\":3}");
+  }
+
+  @Test
+  public void shouldSerializeTrim() throws Exception {
+    assertJson(Trim("ABC"), "{\"trim\":\"ABC\"}");
+    assertJson(Trim(Value("DEF")), "{\"trim\":\"DEF\"}");
+  }
+
+  @Test
+  public void shouldSerializeUpper() throws Exception {
+    assertJson(UpperCase("ABC"), "{\"uppercase\":\"ABC\"}");
+    assertJson(UpperCase(Value("DEF")), "{\"uppercase\":\"DEF\"}");
+  }
+
+  @Test
+  public void shouldSerializeTitleCase() throws Exception {
+    assertJson(TitleCase("ABC"), "{\"titlecase\":\"ABC\"}");
+    assertJson(TitleCase(Value("DEF")), "{\"titlecase\":\"DEF\"}");
   }
 
   @Test

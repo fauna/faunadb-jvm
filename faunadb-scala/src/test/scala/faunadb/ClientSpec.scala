@@ -455,6 +455,21 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test string functions" in {
+    await(client.query(FindStr("heLLo world","world"))).to[Long].get shouldBe 6L
+    await(client.query(Length("heLLo world"))).to[Long].get shouldBe 11L
+    await(client.query(LowerCase("hEllO wORLd"))).to[String].get shouldBe "hello world"
+    await(client.query(LTrim("   hello world"))).to[String].get shouldBe "hello world"
+    await(client.query(ReplaceStrRegex("hello world","hello","bye"))).to[String].get shouldBe "bye world"
+    await(client.query(Repeat("bye "))).to[String].get shouldBe "bye bye "
+    await(client.query(Repeat("bye ",3))).to[String].get shouldBe "bye bye bye "
+    await(client.query(ReplaceStr("hello world","hello","bye"))).to[String].get shouldBe "bye world"
+    await(client.query(RTrim("hello world    "))).to[String].get shouldBe "hello world"
+    await(client.query(Space(4))).to[String].get shouldBe "    "
+    await(client.query(SubString("heLLo world", 6))).to[String].get shouldBe "world"
+    await(client.query(Trim("    hello world    "))).to[String].get shouldBe "hello world"
+    await(client.query(TitleCase("heLLo worlD"))).to[String].get shouldBe "Hello World"
+    await(client.query(UpperCase("hello world"))).to[String].get shouldBe "HELLO WORLD"
+
     await(client.query(Casefold("Hen Wen"))).to[String].get shouldBe "hen wen"
 
     // https://unicode.org/reports/tr15/
