@@ -9,21 +9,20 @@ import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Response;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Response;
 
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
 import static com.faunadb.client.types.Codec.VALUE;
+import static io.netty.util.CharsetUtil.UTF_8;
 
 /**
  * The Java native client for FaunaDB.
@@ -57,8 +56,6 @@ import static com.faunadb.client.types.Codec.VALUE;
  * @see com.faunadb.client.query.Language
  */
 public class FaunaClient implements AutoCloseable {
-
-  private static final String UTF8 = "UTF-8";
 
   /**
    * Creates a new {@link Builder}
@@ -290,6 +287,6 @@ public class FaunaClient implements AutoCloseable {
   }
 
   private JsonNode parseResponseBody(Response response) throws IOException {
-    return json.readTree(response.getResponseBody(UTF8));
+    return json.readTree(response.getResponseBody(UTF_8));
   }
 }
