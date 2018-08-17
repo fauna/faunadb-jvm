@@ -1,9 +1,9 @@
 package com.faunadb.common;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Request;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.BoundRequestBuilder;
+import org.asynchttpclient.Request;
 
-import java.io.IOError;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,11 +25,14 @@ final class RefAwareHttpClient implements AutoCloseable {
   @Override
   public void close() {
     if (refCount.decrementAndGet() < INITIAL_REF_COUNT && !delegate.isClosed()) {
-      delegate.close();
+      try {
+        delegate.close();
+      } catch (IOException e) {
+      }
     }
   }
 
-  AsyncHttpClient.BoundRequestBuilder prepareRequest(Request request) {
+  BoundRequestBuilder prepareRequest(Request request) {
     return delegate.prepareRequest(request);
   }
 

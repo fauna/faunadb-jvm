@@ -4,9 +4,11 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ning.http.client.*;
-import com.ning.http.util.Base64;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.base64.Base64;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import org.asynchttpclient.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static io.netty.util.CharsetUtil.US_ASCII;
 import static java.lang.String.format;
 
 /**
@@ -143,8 +146,8 @@ public final class Connection implements AutoCloseable {
 
       AsyncHttpClient httpClient;
       if (client == null) {
-        httpClient = new AsyncHttpClient(
-          new AsyncHttpClientConfig.Builder()
+        httpClient = new DefaultAsyncHttpClient(
+          new DefaultAsyncHttpClientConfig.Builder()
             .setConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_MS)
             .setRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
             .setPooledConnectionIdleTimeout(DEFAULT_IDLE_TIMEOUT_MS)
@@ -165,7 +168,6 @@ public final class Connection implements AutoCloseable {
     }
   }
 
-  private static final String ASCII = "ASCII";
   private static final String X_FAUNADB_HOST = "X-FaunaDB-Host";
   private static final String X_FAUNADB_BUILD = "X-FaunaDB-Build";
 
@@ -254,7 +256,7 @@ public final class Connection implements AutoCloseable {
     Request request = new RequestBuilder("POST")
       .setUrl(mkUrl(path))
       .setBody(json.writeValueAsString(body))
-      .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json; charset=utf-8")
+      .setHeader(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=utf-8")
       .build();
 
     return performRequest(request);
@@ -272,7 +274,7 @@ public final class Connection implements AutoCloseable {
     Request request = new RequestBuilder("PUT")
       .setUrl(mkUrl(path))
       .setBody(json.writeValueAsString(body))
-      .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json; charset=utf-8")
+      .setHeader(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=utf-8")
       .build();
 
     return performRequest(request);
@@ -290,7 +292,7 @@ public final class Connection implements AutoCloseable {
     Request request = new RequestBuilder("PATCH")
       .setUrl(mkUrl(path))
       .setBody(json.writeValueAsString(body))
-      .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json; charset=utf-8")
+      .setHeader(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=utf-8")
       .build();
 
     return performRequest(request);
@@ -300,7 +302,7 @@ public final class Connection implements AutoCloseable {
     final Timer.Context ctx = registry.timer("fauna-request").time();
     final CompletableFuture<Response> rv = new CompletableFuture();
 
-    AsyncHttpClient.BoundRequestBuilder req = client.prepareRequest(request)
+    BoundRequestBuilder req = client.prepareRequest(request)
       .addHeader("Authorization", authHeader)
       .setHeader("X-FaunaDB-API-Version", "2.1");
 
@@ -364,11 +366,7 @@ public final class Connection implements AutoCloseable {
   }
 
   private String getResponseBody(Response response) {
-    try {
-      return response.getResponseBody();
-    } catch (IOException e) {
-      return null;
-    }
+    return response.getResponseBody();
   }
 
   private void logFailure(Request request, Throwable ex) {
@@ -380,11 +378,8 @@ public final class Connection implements AutoCloseable {
   }
 
   private static String generateAuthHeader(String authToken) {
-    try {
-      String token = authToken + ":";
-      return "Basic " + Base64.encode(token.getBytes(ASCII));
-    } catch (UnsupportedEncodingException e) {
-      throw new IllegalStateException(e); // If ASCII is not supported there is no recovery action to be taken
-    }
+    String token = authToken + ":";
+    ByteBuf byteBuf = Unpooled.wrappedBuffer(token.getBytes(US_ASCII));
+    return "Basic " + Base64.encode(byteBuf).toString(US_ASCII);
   }
 }

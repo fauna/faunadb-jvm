@@ -1,7 +1,7 @@
 import de.johoop.jacoco4sbt.XMLReport
 
 val driverVersion = "2.6.0-SNAPSHOT"
-val asyncHttpClientVersion = "1.9.39"
+val asyncHttpClientVersion = "2.5.2"
 val jacksonVersion = "2.8.8"
 val jacksonDocVersion = "2.8"
 val metricsVersion = "3.1.0"
@@ -83,13 +83,12 @@ lazy val common = project.in(file("faunadb-common"))
     javacOptions in (Compile, doc) := Seq("-source", "1.8",
       "-link", javaDocUrl,
       "-link", jacksonDocUrl,
-      "-link", metricsDocUrl,
-      "-linkoffline", asyncHttpClientDocUrl, s"./faunadb-common/doc/com.ning/async-http-client/$asyncHttpClientVersion/"
+      "-link", metricsDocUrl
     ),
 
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % jacksonVersion,
-      "com.ning" % "async-http-client" % asyncHttpClientVersion,
+      "org.asynchttpclient" % "async-http-client" % asyncHttpClientVersion,
       "io.dropwizard.metrics" % "metrics-core" % metricsVersion,
       "org.slf4j" % "slf4j-api" % "1.7.7",
       "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
@@ -129,7 +128,7 @@ lazy val scala = project.in(file("faunadb-scala"))
       }.head
 
       Map(
-        findDep("com.ning", "async-http-client") -> url(asyncHttpClientDocUrl),
+        findDep("org.asynchttpclient", "async-http-client") -> url(asyncHttpClientDocUrl),
         findDep("com.fasterxml.jackson.core", "jackson-databind") -> url(jacksonDocUrl),
         findDep("io.dropwizard.metrics", "metrics-core") -> url(metricsDocUrl))
     },

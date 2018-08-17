@@ -5,12 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.common.Connection
-import com.ning.http.client.{ AsyncHttpClient, Response => HttpResponse }
 import faunadb.errors._
 import faunadb.query.Expr
 import faunadb.values.{ ArrayV, NullV, Value }
 import java.net.ConnectException
 import java.util.concurrent.TimeoutException
+import io.netty.util.CharsetUtil.UTF_8
+import org.asynchttpclient.{ AsyncHttpClient, Response }
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ ExecutionContext, Future }
@@ -27,7 +28,7 @@ object FaunaClient {
     * @param secret The secret material of the auth key used. See [[https://fauna.com/documentation#authentication-key_access]]
     * @param endpoint URL of the FaunaDB service to connect to. Defaults to https://db.fauna.com
     * @param metrics An optional [[com.codahale.metrics.MetricRegistry]] to record stats.
-    * @param httpClient An optional custom [[com.ning.http.client.AsyncHttpClient]].
+    * @param httpClient An optional custom [[org.asynchttpclient.AsyncHttpClient]].
     * @return A configured FaunaClient instance.
     */
   def apply(
@@ -49,7 +50,7 @@ object FaunaClient {
 /**
   * The Scala native client for FaunaDB.
   *
-  * Create a new client using [[FaunaClient.apply]].
+  * Create a new client using [[faunadb.FaunaClient.apply]].
   *
   * Query requests are made asynchronously: All methods will return a
   * [[scala.concurrent.Future]].
@@ -78,8 +79,6 @@ object FaunaClient {
   * @constructor create a new client with a configured [[com.faunadb.common.Connection]].
   */
 class FaunaClient(connection: Connection) {
-
-  private[this] val UTF8 = "UTF-8"
 
   private[this] val json = new ObjectMapper
   json.registerModule(new DefaultScalaModule)
@@ -151,7 +150,7 @@ class FaunaClient(connection: Connection) {
       throw new TimeoutException(ex.getMessage)
   }
 
-  private def handleQueryErrors(response: HttpResponse) =
+  private def handleQueryErrors(response: Response) =
     response.getStatusCode match {
       case x if x >= 300 =>
         try {
@@ -179,8 +178,8 @@ class FaunaClient(connection: Connection) {
       case _ =>
     }
 
-  private def parseResponseBody(response: HttpResponse) = {
-    val body = response.getResponseBody(UTF8)
+  private def parseResponseBody(response: Response) = {
+    val body = response.getResponseBody(UTF_8)
     json.readTree(body)
   }
 }
