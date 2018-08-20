@@ -1,4 +1,5 @@
 2.6.0-SNAPSHOT
+* Upgrade async-http-client library
 
 2.5.2
 * Adds support to NGram() function
