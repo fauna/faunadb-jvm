@@ -197,9 +197,9 @@ lazy val java = project.in(file("faunadb-java"))
   )
 
 lazy val javaAndroid = project.in(file("faunadb-android"))
+  .enablePlugins(AndroidApp)
   .dependsOn(javaDsl % "test->test;compile->compile")
   .settings(publishSettings: _*)
-  .settings(androidBuild: _*)
   .settings(
     name := "faunadb-android",
     crossPaths := false,
