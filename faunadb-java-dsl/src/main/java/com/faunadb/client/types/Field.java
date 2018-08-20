@@ -157,6 +157,7 @@ public final class Field<T> {
   /**
    * Creates a field that converts its underyling value to the {@link Class} provided.
    *
+   * @param clazz the desired class type
    * @param <T> the desired final type
    * @return a new {@link Field} instance
    */

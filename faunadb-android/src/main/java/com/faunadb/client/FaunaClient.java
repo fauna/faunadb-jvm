@@ -175,7 +175,7 @@ public class FaunaClient {
    * Frees any resources held by the client. Also closes the underlying {@link OkHttpClient}.
    *
    */
-  public void close() throws IOException {
+  public void close() {
     if (refCount.decrementAndGet() == 0) {
       client.dispatcher().executorService().shutdown();
       client.connectionPool().evictAll();
