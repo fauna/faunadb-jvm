@@ -73,6 +73,15 @@ class SerializationSpec extends FlatSpec with Matchers {
       Get(RefV("ref1", RefV("some", Native.Classes))))
     json.writeValueAsString(doForm) shouldBe "{\"do\":[{\"create\":{\"@ref\":{\"id\":\"ref1\",\"class\":{\"@ref\":{\"id\":\"some\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Hen Wen\"}}}}},{\"get\":{\"@ref\":{\"id\":\"ref1\",\"class\":{\"@ref\":{\"id\":\"some\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}}]}"
 
+    val doOneElement = Do(Ref(Class("cls"), 1))
+    json.writeValueAsString(doOneElement) shouldBe "{\"do\":[{\"ref\":{\"class\":\"cls\"},\"id\":1}]}"
+
+    val doTwoElement = Do(1, 2)
+    json.writeValueAsString(doTwoElement) shouldBe "{\"do\":[1,2]}"
+
+    val doTwoElement2 = Do(Arr(1, 2))
+    json.writeValueAsString(doTwoElement2) shouldBe "{\"do\":[[1,2]]}"
+
     val select = Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings", "lunchings"))))
     json.writeValueAsString(select) shouldBe "{\"select\":[\"favorites\",\"foods\",1],\"from\":{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}"
 
