@@ -1375,6 +1375,19 @@ public abstract class DslSpec {
     );
   }
 
+  @Test
+  public void shouldNotBreakDoWithOneElement() throws Exception {
+    assertThat(
+      query(Do(Value(1))).get().to(Long.class).get(),
+      equalTo(1L)
+    );
+
+    assertThat(
+      query(Do(Value(1), Value(2))).get().to(Long.class).get(),
+      equalTo(2L)
+    );
+  }
+
   protected RefV onARandomClass() throws Exception {
 
     Value clazz = query(
