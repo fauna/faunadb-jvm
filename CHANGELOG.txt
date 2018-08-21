@@ -1,5 +1,6 @@
 2.6.0-SNAPSHOT
 * Upgrade async-http-client library
+* Fix a bug on Do() function that was preventing expressions with only one statement
 
 2.5.2
 * Adds support to NGram() function
