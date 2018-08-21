@@ -2,6 +2,7 @@
 * Upgrade async-http-client library
 * Fix a bug on Do() function that was preventing expressions with only one statement
 * Support backrefs in Let() bindings. Requires FaunaDB 2.6.0.
+* Add stdlib string functions FindStr(), FindStrRegex(), Length(), Lower(), LTrim(), Repeat(), ReplaceStr(), ReplaceStrRegex(), RTrim(), Space(), SubString(), TitleCase(), Trim(), Upper()
 
 2.5.2
 * Adds support to NGram() function
