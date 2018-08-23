@@ -171,12 +171,12 @@ object Decoder {
   trait ArrayDecoder[T] extends Decoder[Array[T]]
 
   implicit def ArrayDecoder[T: Decoder](implicit ev: ClassTag[T]) = new ArrayDecoder[T] {
-    override def decode(v: Value, path: FieldPath): Result[Array[T]] =
+    def decode(v: Value, path: FieldPath): Result[Array[T]] =
       Field.collect(Field.to[T]).get(v).map(x => x.toArray[T])
   }
 
   implicit object ByteArrayDecoder extends ArrayDecoder[Byte] {
-    override def decode(v: Value, path: FieldPath): Result[Array[Byte]] =
+    def decode(v: Value, path: FieldPath): Result[Array[Byte]] =
       v match {
         case BytesV(b) => Result.successful(b, path)
         case v => Result.Unexpected(v, "Bytes", path)
@@ -257,7 +257,7 @@ object Encoder {
   }
 
   implicit object InstantEncoder extends Encoder[Instant] {
-    override def encode(t: Instant): Value = if (t != null) TimeV(t) else NullV
+    def encode(t: Instant): Value = if (t != null) TimeV(t) else NullV
   }
 
   implicit object LocalDateEncoder extends Encoder[LocalDate] {
@@ -311,7 +311,7 @@ object Encoder {
   }
 
   implicit def MapEncoder[T: Encoder](implicit encoder: Encoder[T]) = new Encoder[Map[String, T]] {
-    override def encode(t: Map[String, T]): Value = ObjectV(t mapValues(encoder.encode))
+    def encode(t: Map[String, T]): Value = ObjectV(t mapValues(encoder.encode))
   }
 
   class OptionEncoder[Opt <: Option[T], T: Encoder] extends Encoder[Opt] {
