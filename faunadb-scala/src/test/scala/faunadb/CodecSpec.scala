@@ -168,7 +168,7 @@ class CodecSpec extends FlatSpec with Matchers {
     val obj4 = ObjectV("tpe" -> StringV("x"), "x" -> FalseV)
     the [ValueReadException] thrownBy {
       obj4.to[EnumTrait].get
-    } should have message "Error at /tpe: Expected Union Tag value; found faunadb.values.StringV."
+    } should have message """Error at /tpe: Expected Union tag: true, 2, or "a"; found faunadb.values.StringV."""
   }
 
   // Encoding

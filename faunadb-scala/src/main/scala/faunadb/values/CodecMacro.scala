@@ -66,6 +66,15 @@ class CodecMacro(val c: blackbox.Context) {
     val decodes = tags zip codecs map { case (t, c) => cq"`$t` => $c.decode(value, path)" }
     val encodes = vtypes zip tags zip codecs map { case ((vt, t), c) => cq"v: $vt => ($t, $c.encode(v))" }
 
+    val expectedMsg = {
+      val values = tagImpls match {
+        case Seq(a) => s"$a"
+        case Seq(a, b) => s"$a or $b"
+        case init :+ last => s"${init mkString ", "}, or $last"
+      }
+      s"Union tag: $values"
+    }
+
     q"""new $M.UnionCodec[$tpe] {
       ..$tagDefs
       ..$codecDefs
@@ -73,7 +82,7 @@ class CodecMacro(val c: blackbox.Context) {
       def decode(value: $M.Value, path: $M.FieldPath): $M.Result[$tpe] = {
         value($tagLit) flatMap {
           case ..$decodes
-          case v => $M.Result.Unexpected(v, "Union Tag", path ++ $tagLit)
+          case v => $M.Result.Unexpected(v, $expectedMsg, path ++ $tagLit)
         }
       }
 
