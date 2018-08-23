@@ -128,6 +128,9 @@ class CodecSpec extends FlatSpec with Matchers {
 
     val obj2 = ObjectV("a" -> StringV("a"), "b" -> NullV)
     obj2.to[ClassWithOption].get shouldBe ClassWithOption("a", None)
+
+    val obj3 = ObjectV("a" -> StringV("a"))
+    obj3.to[ClassWithOption].get shouldBe ClassWithOption("a", None)
   }
 
   case class ClassWithEither(either: Either[String, Long])
@@ -293,4 +296,3 @@ class CodecSpec extends FlatSpec with Matchers {
   }
 
 }
-
