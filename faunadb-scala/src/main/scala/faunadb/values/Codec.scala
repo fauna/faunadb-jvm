@@ -311,7 +311,7 @@ object Encoder {
   }
 
   implicit def MapEncoder[T: Encoder](implicit encoder: Encoder[T]) = new Encoder[Map[String, T]] {
-    def encode(t: Map[String, T]): Value = ObjectV(t mapValues(encoder.encode))
+    def encode(t: Map[String, T]): Value = ObjectV(t map { case (k, v) => k -> encoder.encode(v) })
   }
 
   class OptionEncoder[Opt <: Option[T], T: Encoder] extends Encoder[Opt] {
