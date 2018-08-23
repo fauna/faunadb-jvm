@@ -168,7 +168,7 @@ class CodecSpec extends FlatSpec with Matchers {
     val obj4 = ObjectV("tpe" -> StringV("x"), "x" -> FalseV)
     the [ValueReadException] thrownBy {
       obj4.to[EnumTrait].get
-    } should have message """Error at /tpe: Expected Union tag: true, 2, or "a"; found faunadb.values.StringV."""
+    } should have message """Error at /tpe: Expected Union tag: true, 2, or "a"; found value StringV(x) of type faunadb.values.StringV."""
   }
 
   // Encoding
@@ -302,23 +302,23 @@ class CodecSpec extends FlatSpec with Matchers {
   it should "test for runtime errors" in {
     the [ValueReadException] thrownBy {
       StringV("10").to[List[Long]].get
-    } should have message "Error at /: Expected Array; found faunadb.values.StringV."
+    } should have message "Error at /: Expected Array; found value StringV(10) of type faunadb.values.StringV."
 
     the [ValueReadException] thrownBy {
       ArrayV(StringV("10")).to[List[Long]].get
-    } should have message "Error at /0: Expected Long; found faunadb.values.StringV."
+    } should have message "Error at /0: Expected Long; found value StringV(10) of type faunadb.values.StringV."
 
     the [ValueReadException] thrownBy {
       ObjectV("either" -> DoubleV(10)).to[ClassWithEither].get
-    } should have message "Error at /either: Expected Either String or long; found faunadb.values.DoubleV."
+    } should have message "Error at /either: Expected Either String or long; found value DoubleV(10.0) of type faunadb.values.DoubleV."
 
     the [ValueReadException] thrownBy {
       ObjectV("x" -> LongV(10), "y" -> LongV(20)).to[Map[String, String]].get
-    } should have message "Error at /x: Expected String; found faunadb.values.LongV., Error at /y: Expected String; found faunadb.values.LongV."
+    } should have message "Error at /x: Expected String; found value LongV(10) of type faunadb.values.LongV., Error at /y: Expected String; found value LongV(20) of type faunadb.values.LongV."
 
     the [ValueReadException] thrownBy {
       ObjectV("a" -> ObjectV("x" -> LongV(1), "y" -> LongV(2))).to[Map[String, Map[String, String]]].get
-    } should have message "Error at /a/x: Expected String; found faunadb.values.LongV., Error at /a/y: Expected String; found faunadb.values.LongV."
+    } should have message "Error at /a/x: Expected String; found value LongV(1) of type faunadb.values.LongV., Error at /a/y: Expected String; found value LongV(2) of type faunadb.values.LongV."
   }
 
 }
