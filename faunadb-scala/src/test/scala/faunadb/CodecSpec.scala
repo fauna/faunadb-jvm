@@ -39,8 +39,8 @@ class CodecSpec extends FlatSpec with Matchers {
 
   case class Order(customer: String, products: Seq[Product])
 
-  implicit val productCodec: Codec[Product] = Codec.caseClass[Product]
-  implicit val orderCodec: Codec[Order] = Codec.caseClass[Order]
+  implicit val productCodec: Codec[Product] = Codec.Record[Product]
+  implicit val orderCodec: Codec[Order] = Codec.Record[Order]
 
   it should "decode to object" in {
     val product = ObjectV("description" -> StringV("laptop"), "price" -> DoubleV(999))
@@ -104,9 +104,9 @@ class CodecSpec extends FlatSpec with Matchers {
 
   case class NonGenericClass(x: Int)
 
-  implicit val nonGenericClass: Codec[NonGenericClass] = Codec.caseClass[NonGenericClass]
-  implicit val genericCodec1: Codec[GenericClass[Int, String]] = Codec.caseClass[GenericClass[Int, String]]
-  implicit val genericCodec2: Codec[GenericClass[Long, Double]] = Codec.caseClass[GenericClass[Long, Double]]
+  implicit val nonGenericClass: Codec[NonGenericClass] = Codec.Record[NonGenericClass]
+  implicit val genericCodec1: Codec[GenericClass[Int, String]] = Codec.Record[GenericClass[Int, String]]
+  implicit val genericCodec2: Codec[GenericClass[Long, Double]] = Codec.Record[GenericClass[Long, Double]]
 
   it should "decode using generic types" in {
     val obj1 = ObjectV("a" -> LongV(10), "b" -> StringV("str"), "c" -> ObjectV("x" -> LongV(10)))
@@ -120,7 +120,7 @@ class CodecSpec extends FlatSpec with Matchers {
 
   case class ClassWithOption(a: String, b: Option[Long])
 
-  implicit val classWithOptionCodec: Codec[ClassWithOption] = Codec.caseClass[ClassWithOption]
+  implicit val classWithOptionCodec: Codec[ClassWithOption] = Codec.Record[ClassWithOption]
 
   it should "decode class with Option" in {
     val obj1 = ObjectV("a" -> StringV("a"), "b" -> LongV(10))
@@ -132,7 +132,7 @@ class CodecSpec extends FlatSpec with Matchers {
 
   case class ClassWithEither(either: Either[String, Long])
 
-  implicit val classWithEither: Codec[ClassWithEither] = Codec.caseClass[ClassWithEither]
+  implicit val classWithEither: Codec[ClassWithEither] = Codec.Record[ClassWithEither]
 
   it should "decode class with Either" in {
     val obj1 = ObjectV("either" -> StringV("string value"))
@@ -140,6 +140,35 @@ class CodecSpec extends FlatSpec with Matchers {
 
     val obj2 = ObjectV("either" -> LongV(10))
     obj2.to[ClassWithEither].get shouldBe ClassWithEither(Right(10))
+  }
+
+  sealed trait EnumTrait
+  case class Variant1(i: Int) extends EnumTrait
+  case class Variant2(s: String) extends EnumTrait
+  case class Variant3(b: Boolean) extends EnumTrait
+
+  implicit val enumTrait = Codec.Union[EnumTrait]("tpe")(
+    true -> Codec.Record[Variant1],
+    2 -> Codec.Record[Variant2],
+    "a" -> Codec.Record[Variant3])
+
+  it should "decode enum trait" in {
+    val obj1 = ObjectV("tpe" -> TrueV, "i" -> LongV(2))
+    obj1.to[EnumTrait].get shouldBe Variant1(2)
+    (Variant1(2): Value) shouldBe obj1
+
+    val obj2 = ObjectV("tpe" -> LongV(2), "s" -> StringV("foo"))
+    obj2.to[EnumTrait].get shouldBe Variant2("foo")
+    Value[EnumTrait](Variant2("foo")) shouldBe obj2
+
+    val obj3 = ObjectV("tpe" -> StringV("a"), "b" -> TrueV)
+    obj3.to[EnumTrait].get shouldBe Variant3(true)
+    Value[EnumTrait](Variant3(true)) shouldBe obj3
+
+    val obj4 = ObjectV("tpe" -> StringV("x"), "x" -> FalseV)
+    the [ValueReadException] thrownBy {
+      obj4.to[EnumTrait].get
+    } should have message "Error at /tpe: Expected Union Tag value; found faunadb.values.StringV."
   }
 
   // Encoding

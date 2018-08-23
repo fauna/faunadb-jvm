@@ -329,10 +329,23 @@ object Encoder {
   implicit def EitherEncoder[A: Encoder, B: Encoder] = new EitherEncoder[A, B, Either[A, B]]
   implicit def LeftEncoder[A: Encoder] = new EitherEncoder[A, Nothing, Left[A, Nothing]]
   implicit def RightEncoder[B: Encoder] = new EitherEncoder[Nothing, B, Right[Nothing, B]]
+
+  // hack around our need for local contravariance for tagged union encoding
+  implicit def UnionVariantEncoder[T](implicit enc: UnionCodec[_ >: T]): Encoder[T] =
+    enc.asInstanceOf[Encoder[T]]
 }
 
 trait Codec[T] extends Decoder[T] with Encoder[T]
 
+// base class for macro-generated record style case-class codecs
+trait RecordCodec[T] extends Codec[T]
+
+// base class for macro-generated union codecs
+trait UnionCodec[T] extends Codec[T]
+
 object Codec {
-  def caseClass[T]: Codec[T] = macro CodecMacro.caseClassImpl[T]
+  @deprecated("Use Codec.Record[T] instead", "2.6.0")
+  def caseClass[T]: RecordCodec[T] = macro CodecMacro.recordImpl[T]
+  def Record[T]: RecordCodec[T] = macro CodecMacro.recordImpl[T]
+  def Union[T](tagField: String)(variants: (Any, Codec[_ <: T])*): UnionCodec[T] = macro CodecMacro.unionImpl[T]
 }
