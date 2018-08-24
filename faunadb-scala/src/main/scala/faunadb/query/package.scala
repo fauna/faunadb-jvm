@@ -231,7 +231,7 @@ package object query {
   def Let(block: => Any): Expr = macro QueryMacros.let
 
   def Let(bindings: Seq[(String, Expr)], in: Expr): Expr =
-    Expr(ObjectV("let" -> ObjectV(unwrapPairs(bindings): _*), "in" -> in.value))
+    Expr(ObjectV("let" -> ArrayV(unwrapPairs(bindings) map { ObjectV(_) }: _*), "in" -> in.value))
 
   /**
     * A Var expression.
