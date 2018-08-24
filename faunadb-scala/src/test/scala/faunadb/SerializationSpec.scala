@@ -65,6 +65,10 @@ class SerializationSpec extends FlatSpec with Matchers {
     val let5 = Let { val x = 1; val _ = "2"; x }
     json.writeValueAsString(let5) shouldBe "{\"let\":{\"x\":1,\"_\":\"2\"},\"in\":{\"var\":\"x\"}}"
 
+    val let6 = Let { val x = 1; val y = Add(x, 2); y }
+    println(json.writeValueAsString(let6))
+    json.writeValueAsString(let6) shouldBe """{"let":{"x":1,"y":{"add":[{"var":"x"},2]}},"in":{"var":"y"}}"""
+
     val ifForm = If(true, "was true", "was false")
     json.writeValueAsString(ifForm) shouldBe "{\"if\":true,\"then\":\"was true\",\"else\":\"was false\"}"
 
