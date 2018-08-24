@@ -262,9 +262,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test basic forms" in {
-    val letF = client.query(Let { val x = 1; val y = 2; x })
+    val letF = client.query(Let { val x = 1; val y = Add(x, 2); y })
     val letR = await(letF)
-    letR.to[Long].get shouldBe 1
+    letR.to[Long].get shouldBe 3
 
     val ifF = client.query(If(true, "was true", "was false"))
     val ifR = await(ifF)
