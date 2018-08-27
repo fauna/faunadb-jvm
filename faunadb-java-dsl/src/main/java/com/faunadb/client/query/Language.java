@@ -2003,11 +2003,11 @@ public final class Language {
   }
 
   /**
-   * FindStr function returns
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
    *
    * @param value a strings
-   * @param find a substring to locate
-   * @return a new {@link Expr} instance
+   * @param find  a substring to locate
+   * @return      the offset of where the substring starts or -1 if not found
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2016,11 +2016,11 @@ public final class Language {
   }
 
   /**
-   * FindStr function returns
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
    *
    * @param value a strings
-   * @param find a substring to locate
-   * @return a new {@link Expr} instance
+   * @param find  a substring to locate
+   * @return      the offset of where the substring starts or -1 if not found
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2029,11 +2029,12 @@ public final class Language {
   }
 
   /**
-   * FindStr function returns
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
    *
    * @param value a strings
-   * @param find a substring to locate
-   * @return a new {@link Expr} instance
+   * @param find  a substring to locate
+   * @return      the offset of where the substring starts or -1 if not found
+   * @return      the offset of where the substring starts or -1 if not found
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2042,11 +2043,12 @@ public final class Language {
   }
 
   /**
-   * FindStr function returns
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
    *
    * @param value a strings
-   * @param find a substring to locate
-   * @return a new {@link Expr} instance
+   * @param find  a substring to locate
+   * @return      the offset of where the substring starts or -1 if not found
+   * @return      the offset of where the substring starts or -1 if not found
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2055,12 +2057,12 @@ public final class Language {
   }
 
   /**
-   * FindStr function returns
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
    *
    * @param value a strings
-   * @param find a substring to locate
+   * @param find  a substring to locate
    * @param start a position to start the search
-   * @return a new {@link Expr} instance
+   * @return      the offset of where the substring starts or -1 if not found
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2069,11 +2071,12 @@ public final class Language {
   }
   /**
    * FindStr function returns
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
    *
    * @param value a strings
-   * @param find a substring to locate
+   * @param find  a substring to locate
    * @param start a position to start the search
-   * @return a new {@link Expr} instance
+   * @return      the offset of where the substring starts or -1 if not found
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2082,12 +2085,12 @@ public final class Language {
   }
 
   /**
-   * FindStr function returns
+   * FindStr function used to searches a string for a substring and locates the location of the substring in the string
    *
    * @param value a strings
-   * @param find a substring to locate
+   * @param find  a substring to locate
    * @param start a position to start the search
-   * @return a new {@link Expr} instance
+   * @return      the offset of where the substring starts or -1 if not found
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2095,12 +2098,12 @@ public final class Language {
     return FindStr(value, new StringV(find), start);
   }
   /**
-   * FindStr function returns
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
    *
    * @param value a strings
-   * @param find a substring to locate
+   * @param find  a substring to locate
    * @param start a position to start the search
-   * @return a new {@link Expr} instance
+   * @return      the offset of where the substring starts or -1 if not found
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2109,12 +2112,12 @@ public final class Language {
   }
 
   /**
-   * FindStr function returns
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
    *
    * @param value a strings
-   * @param find a substring to locate
+   * @param find  a substring to locate
    * @param start a position to start the search
-   * @return a new {@link Expr} instance
+   * @return      the offset of where the substring starts or -1 if not found
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2122,12 +2125,12 @@ public final class Language {
     return FindStr(new StringV(value), new StringV(find), start);
   }
   /**
-   * FindStr function returns
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
    *
    * @param value a strings
-   * @param find a substring to locate
+   * @param find  a substring to locate
    * @param start a position to start the search
-   * @return a new {@link Expr} instance
+   * @return      the offset of where the substring starts or -1 if not found
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2137,11 +2140,11 @@ public final class Language {
 
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2150,11 +2153,11 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2163,11 +2166,11 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2175,11 +2178,11 @@ public final class Language {
     return FindStrRegex(new StringV(value), pattern);
   }
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2188,12 +2191,12 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2202,12 +2205,12 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2216,12 +2219,12 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2230,12 +2233,12 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2244,12 +2247,12 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2258,12 +2261,12 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2272,12 +2275,12 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2286,12 +2289,12 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2300,13 +2303,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2315,13 +2318,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2330,13 +2333,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2345,13 +2348,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2360,13 +2363,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2375,13 +2378,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2390,13 +2393,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2405,13 +2408,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2420,13 +2423,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2435,13 +2438,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2450,13 +2453,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2465,13 +2468,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2480,13 +2483,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2495,13 +2498,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2510,13 +2513,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2525,13 +2528,13 @@ public final class Language {
   }
 
   /**
-   * FindStrRegex function returns
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
    *
-   * @param value a strings
+   * @param value   a string to search
    * @param pattern a substring to locate
    * @param start a substring to locate
    * @param num_results a substring to locate
-   * @return a new {@link Expr} instance
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2541,10 +2544,10 @@ public final class Language {
 
 
   /**
-   * Length function returns the number of characters in the string
+   * Length function returns the number of characters (codepoints) in the string
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value   a string to determine the length of
+   * @return        the length of the string as a long
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2553,10 +2556,10 @@ public final class Language {
   }
 
   /**
-   * Length function returns the number of characters in the string
+   * Length function returns the number of characters (codepoints) in the string
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value   a string to determine the length of
+   * @return        the length of the string as a long
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2565,10 +2568,10 @@ public final class Language {
   }
 
   /**
-   * Lower function returns a
+   * Lower function returns all letters in the string in lowercase
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value a string to lowercase
+   * @return      a string with all lowercase letters
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2577,10 +2580,10 @@ public final class Language {
   }
 
   /**
-   * Lower function returns a
+   * Lower function returns all letters in the string in lowercase
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value a string to lowercase
+   * @return      a string with all lowercase letters
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2589,10 +2592,10 @@ public final class Language {
   }
 
   /**
-   * LTrim function returns a new string with
+   * LTrim function returns a new string with leading white space removed
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value a string to trim leading white space.
+   * @return      the string with leading white space removed
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2601,10 +2604,10 @@ public final class Language {
   }
 
   /**
-   * LTrim function returns a new string with
+   * LTrim function returns a new string with leading white space removed
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value a string to trim leading white space.
+   * @return      the string with leading white space removed
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2860,11 +2863,12 @@ public final class Language {
   }
 
   /**
-   * ReplaceStr function returns a string the specified number of times
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
    *
-   * @param value a strings
-   * @param find a strings
-   * @return a new {@link Expr} instance
+   * @param value   the source string
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2873,11 +2877,12 @@ public final class Language {
   }
 
   /**
-   * ReplaceStr function returns a string the specified number of times
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
    *
-   * @param value a strings
-   * @param find a strings
-   * @return a new {@link Expr} instance
+   * @param value   the source string
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2886,11 +2891,12 @@ public final class Language {
   }
 
   /**
-   * ReplaceStr function returns a string the specified number of times
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
    *
-   * @param value a strings
-   * @param find a strings
-   * @return a new {@link Expr} instance
+   * @param value   the source string
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2899,11 +2905,12 @@ public final class Language {
   }
 
   /**
-   * ReplaceStr function returns a string the specified number of times
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
    *
-   * @param value a strings
-   * @param find a strings
-   * @return a new {@link Expr} instance
+   * @param value   the source string
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2912,11 +2919,12 @@ public final class Language {
   }
 
   /**
-   * ReplaceStr function returns a string the specified number of times
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
    *
-   * @param value a strings
-   * @param find a strings
-   * @return a new {@link Expr} instance
+   * @param value   the source string
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2925,11 +2933,12 @@ public final class Language {
   }
 
   /**
-   * ReplaceStr function returns a string the specified number of times
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
    *
-   * @param value a strings
-   * @param find a strings
-   * @return a new {@link Expr} instance
+   * @param value   the source string
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2938,11 +2947,12 @@ public final class Language {
   }
 
   /**
-   * ReplaceStr function returns a string the specified number of times
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
    *
-   * @param value a strings
-   * @param find a strings
-   * @return a new {@link Expr} instance
+   * @param value   the source string
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2951,11 +2961,12 @@ public final class Language {
   }
 
   /**
-   * ReplaceStr function returns a string the specified number of times
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
    *
-   * @param value a strings
-   * @param find a strings
-   * @return a new {@link Expr} instance
+   * @param value   the source string
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2964,11 +2975,11 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -2978,11 +2989,11 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -2992,11 +3003,11 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3006,11 +3017,11 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3020,11 +3031,11 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3034,11 +3045,11 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3048,11 +3059,11 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3062,11 +3073,11 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3076,12 +3087,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3091,12 +3102,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3106,12 +3117,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3121,12 +3132,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3136,12 +3147,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3151,12 +3162,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3166,12 +3177,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3181,12 +3192,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3196,12 +3207,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3211,12 +3222,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3226,12 +3237,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3241,12 +3252,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3256,12 +3267,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3271,12 +3282,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3286,12 +3297,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3301,12 +3312,12 @@ public final class Language {
   }
 
   /**
-   * replacestrregex function returns
+   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
-   * @param value a strings
-   * @param pattern a substring to locate
-   * @param replace a substring to locate
-   * @param first a substring to locate
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3316,10 +3327,10 @@ public final class Language {
   }
 
   /**
-   * RTrim function returns
+   * RTrim function returns a new string with trailing whitespace removed
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value a string to trim whitespace.
+   * @return      the string with trailing whitespace removed
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3328,10 +3339,10 @@ public final class Language {
   }
 
   /**
-   * RTrim function returns
+   * RTrim function returns a new string with trailing whitespace removed
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value a string to trim whitespace.
+   * @return      the string with trailing whitespace removed
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3340,10 +3351,10 @@ public final class Language {
   }
 
   /**
-   * Space function returns
+   * Space function returns "N" number of spaces
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value the number of spaces
+   * @return      a string with spaces
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3352,10 +3363,10 @@ public final class Language {
   }
 
   /**
-   * Space function returns
+   * Space function returns "N" number of spaces
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value the number of spaces
+   * @return      a string with spaces
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3366,8 +3377,8 @@ public final class Language {
   /**
    * Space function returns
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value the number of spaces
+   * @return      a string with spaces
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3376,10 +3387,10 @@ public final class Language {
   }
 
   /**
-   * SubString function returns
+   * SubString function returns a subset of the source string
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value the source string
+   * @return      a new string contain a subset of the source string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3388,10 +3399,10 @@ public final class Language {
   }
 
   /**
-   * SubString function returns
+   * SubString function returns a subset of the source string
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value the source string
+   * @return      a new string contain a subset of the source string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3400,11 +3411,11 @@ public final class Language {
   }
 
   /**
-   * SubString function returns
+   * SubString function returns a subset of the source string
    *
-   * @param value a strings
-   * @param start an integer value
-   * @return a new {@link Expr} instance
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @return      a new string contain a subset of the source string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3413,11 +3424,11 @@ public final class Language {
   }
 
   /**
-   * SubString function returns
+   * SubString function returns a subset of the source string
    *
-   * @param value a strings
-   * @param start an integer value
-   * @return a new {@link Expr} instance
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @return      a new string contain a subset of the source string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3426,11 +3437,11 @@ public final class Language {
   }
 
   /**
-   * SubString function returns
+   * SubString function returns a subset of the source string
    *
-   * @param value a strings
-   * @param start an integer value
-   * @return a new {@link Expr} instance
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @return      a new string contain a subset of the source string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3439,11 +3450,11 @@ public final class Language {
   }
 
   /**
-   * SubString function returns
+   * SubString function returns a subset of the source string
    *
-   * @param value a strings
-   * @param start an integer value
-   * @return a new {@link Expr} instance
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @return      a new string contain a subset of the source string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3452,12 +3463,12 @@ public final class Language {
   }
 
   /**
-   * SubString function returns
+   * SubString function returns a subset of the source string
    *
-   * @param value a strings
-   * @param start an integer value
-   * @param length an integer value
-   * @return a new {@link Expr} instance
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned
+   * @return       a new string contain a subset of the source string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3466,12 +3477,12 @@ public final class Language {
   }
 
   /**
-   * SubString function returns
+   * SubString function returns a subset of the source string
    *
-   * @param value a strings
-   * @param start an integer value
-   * @param length an integer value
-   * @return a new {@link Expr} instance
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned
+   * @return       a new string contain a subset of the source string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3480,12 +3491,12 @@ public final class Language {
   }
 
   /**
-   * SubString function returns
+   * SubString function returns a subset of the source string
    *
-   * @param value a strings
-   * @param start an integer value
-   * @param length an integer value
-   * @return a new {@link Expr} instance
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned
+   * @return       a new string contain a subset of the source string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3494,12 +3505,12 @@ public final class Language {
   }
 
   /**
-   * SubString function returns
+   * SubString function returns a subset of the source string
    *
-   * @param value a strings
-   * @param start an integer value
-   * @param length an integer value
-   * @return a new {@link Expr} instance
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned
+   * @return       a new string contain a subset of the source string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3508,12 +3519,12 @@ public final class Language {
   }
 
   /**
-   * SubString function returns
+   * SubString function returns a subset of the source string
    *
-   * @param value a strings
-   * @param start an integer value
-   * @param length an integer value
-   * @return a new {@link Expr} instance
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned
+   * @return       a new string contain a subset of the source string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3522,12 +3533,12 @@ public final class Language {
   }
 
   /**
-   * SubString function returns
+   * SubString function returns a subset of the source string
    *
-   * @param value a strings
-   * @param start an integer value
-   * @param length an integer value
-   * @return a new {@link Expr} instance
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned
+   * @return       a new string contain a subset of the source string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3536,12 +3547,12 @@ public final class Language {
   }
 
   /**
-   * SubString function returns
+   * SubString function returns a subset of the source string
    *
-   * @param value a strings
-   * @param start an integer value
-   * @param length an integer value
-   * @return a new {@link Expr} instance
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned
+   * @return       a new string contain a subset of the source string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3550,12 +3561,12 @@ public final class Language {
   }
 
   /**
-   * SubString function returns
+   * SubString function returns a subset of the source string
    *
-   * @param value a strings
-   * @param start an integer value
-   * @param length an integer value
-   * @return a new {@link Expr} instance
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned
+   * @return       a new string contain a subset of the source string
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3566,8 +3577,8 @@ public final class Language {
   /**
    * TitleCase function returns a string with the first letter in each word capitalized
    *
-   * @param value a strings which the first letter in each word will be capitalized and all else lowercased.
-   * @return a new {@link Expr} instance
+   * @param value a strings to TitleCase
+   * @return      a new string in TitleCase
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3578,8 +3589,8 @@ public final class Language {
   /**
    * TitleCase function returns a string with the first letter in each word capitalized
    *
-   * @param value a strings which the first letter in each word will be capitalized and all else lowercased.
-   * @return a new {@link Expr} instance
+   * @param value a strings to TitleCase
+   * @return      a new string in TitleCase
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3588,6 +3599,10 @@ public final class Language {
   }
 
   /**
+   * Trim function returns a new string with leading and trailing whitespace removed
+   *
+   * @param value a string to trim white space.
+   * @return      the string with leading and trailing whitespace removed
    * Trim function returns
    *
    * @param value a strings
@@ -3600,10 +3615,10 @@ public final class Language {
   }
 
   /**
-   * Trim function returns
+   * Trim function returns a new string with leading and trailing whitespace removed
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value a string to trim white space.
+   * @return      the string with leading and trailing whitespace removed
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3612,10 +3627,10 @@ public final class Language {
   }
 
   /**
-   * Upper function returns
+   * UpperCase function returns all letters in the string in uppercase
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value a string to uppercase
+   * @return      a string with all uppercase letters
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -3624,10 +3639,10 @@ public final class Language {
   }
 
   /**
-   * Upper function returns
+   * UpperCase function returns all letters in the string in uppercase
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
+   * @param value a string to uppercase
+   * @return      a string with all uppercase letters
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
