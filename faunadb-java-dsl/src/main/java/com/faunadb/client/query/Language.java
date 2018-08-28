@@ -2975,7 +2975,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -2989,7 +2989,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3003,7 +3003,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3017,7 +3017,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3031,7 +3031,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3045,7 +3045,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3059,7 +3059,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3073,7 +3073,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3087,7 +3087,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3102,7 +3102,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3117,7 +3117,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3132,7 +3132,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3147,7 +3147,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3162,7 +3162,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3177,7 +3177,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3192,7 +3192,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3207,7 +3207,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3222,7 +3222,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3237,7 +3237,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3252,7 +3252,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3267,7 +3267,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3282,7 +3282,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3297,7 +3297,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
@@ -3312,7 +3312,7 @@ public final class Language {
   }
 
   /**
-   * replacestrregex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
    *
    * @param value the source string
    * @param pattern a java regular expression to locate
