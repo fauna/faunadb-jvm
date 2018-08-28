@@ -2195,7 +2195,7 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
+   * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -2209,7 +2209,7 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
+   * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -2223,7 +2223,7 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
+   * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -2237,7 +2237,7 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
+   * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -2251,12 +2251,12 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
+   * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(Expr value, Expr pattern, Long start) {
+  public static Expr FindStrRegex(Expr value, Expr pattern, long start) {
     return FindStrRegex(value, pattern, new LongV(start));
   }
 
@@ -2265,12 +2265,12 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
+   * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(String value, Expr pattern, Long start) {
+  public static Expr FindStrRegex(String value, Expr pattern, long start) {
     return FindStrRegex(new StringV(value), pattern, new LongV(start));
   }
 
@@ -2279,12 +2279,12 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
+   * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(Expr value, String pattern, Long start) {
+  public static Expr FindStrRegex(Expr value, String pattern, long start) {
     return FindStrRegex(value, new StringV(pattern), new LongV(start));
   }
 
@@ -2293,12 +2293,12 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
+   * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(String value, String pattern, Long start) {
+  public static Expr FindStrRegex(String value, String pattern, long start) {
     return FindStrRegex(new StringV(value), new StringV(pattern), new LongV(start));
   }
 
@@ -2307,14 +2307,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(Expr value, Expr pattern, Expr start, Expr num_results) {
-    return Fn.apply("findstrregex", value, "pattern", pattern, "start", start, "num_results", num_results);
+  public static Expr FindStrRegex(Expr value, Expr pattern, Expr start, Expr numResults) {
+    return Fn.apply("findstrregex", value, "pattern", pattern, "start", start, "num_results", numResults);
   }
 
   /**
@@ -2322,14 +2322,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(String value, Expr pattern, Expr start, Expr num_results) {
-    return FindStrRegex(new StringV(value), pattern, start, num_results);
+  public static Expr FindStrRegex(String value, Expr pattern, Expr start, Expr numResults) {
+    return FindStrRegex(new StringV(value), pattern, start, numResults);
   }
 
   /**
@@ -2337,14 +2337,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(Expr value, String pattern, Expr start, Expr num_results) {
-    return FindStrRegex(value, new StringV(pattern), start, num_results);
+  public static Expr FindStrRegex(Expr value, String pattern, Expr start, Expr numResults) {
+    return FindStrRegex(value, new StringV(pattern), start, numResults);
   }
 
   /**
@@ -2352,14 +2352,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(String value, String pattern, Expr start, Expr num_results) {
-    return FindStrRegex(new StringV(value), new StringV(pattern), start, num_results);
+  public static Expr FindStrRegex(String value, String pattern, Expr start, Expr numResults) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), start, numResults);
   }
 
   /**
@@ -2367,14 +2367,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(Expr value, Expr pattern, Long start, Expr num_results) {
-    return FindStrRegex(value, pattern, new LongV(start), num_results);
+  public static Expr FindStrRegex(Expr value, Expr pattern, long start, Expr numResults) {
+    return FindStrRegex(value, pattern, new LongV(start), numResults);
   }
 
   /**
@@ -2382,14 +2382,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(String value, Expr pattern, Long start, Expr num_results) {
-    return FindStrRegex(new StringV(value), pattern, new LongV(start), num_results);
+  public static Expr FindStrRegex(String value, Expr pattern, long start, Expr numResults) {
+    return FindStrRegex(new StringV(value), pattern, new LongV(start), numResults);
   }
 
   /**
@@ -2397,14 +2397,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(Expr value, String pattern, Long start, Expr num_results) {
-    return FindStrRegex(value, new StringV(pattern), new LongV(start), num_results);
+  public static Expr FindStrRegex(Expr value, String pattern, long start, Expr numResults) {
+    return FindStrRegex(value, new StringV(pattern), new LongV(start), numResults);
   }
 
   /**
@@ -2412,14 +2412,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(String value, String pattern, Long start, Expr num_results) {
-    return FindStrRegex(new StringV(value), new StringV(pattern), new LongV(start), num_results);
+  public static Expr FindStrRegex(String value, String pattern, long start, Expr numResults) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), new LongV(start), numResults);
   }
 
   /**
@@ -2427,14 +2427,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(Expr value, Expr pattern, Expr start, long num_results) {
-    return FindStrRegex(value, pattern, start, new LongV(num_results));
+  public static Expr FindStrRegex(Expr value, Expr pattern, Expr start, long numResults) {
+    return FindStrRegex(value, pattern, start, new LongV(numResults));
   }
 
   /**
@@ -2442,14 +2442,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(String value, Expr pattern, Expr start, long num_results) {
-    return FindStrRegex(new StringV(value), pattern, start, new LongV(num_results));
+  public static Expr FindStrRegex(String value, Expr pattern, Expr start, long numResults) {
+    return FindStrRegex(new StringV(value), pattern, start, new LongV(numResults));
   }
 
   /**
@@ -2457,14 +2457,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(Expr value, String pattern, Expr start, long num_results) {
-    return FindStrRegex(value, new StringV(pattern), start, new LongV(num_results));
+  public static Expr FindStrRegex(Expr value, String pattern, Expr start, long numResults) {
+    return FindStrRegex(value, new StringV(pattern), start, new LongV(numResults));
   }
 
   /**
@@ -2472,14 +2472,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(String value, String pattern, Expr start, long num_results) {
-    return FindStrRegex(new StringV(value), new StringV(pattern), start, new LongV(num_results));
+  public static Expr FindStrRegex(String value, String pattern, Expr start, long numResults) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), start, new LongV(numResults));
   }
 
   /**
@@ -2487,14 +2487,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(Expr value, Expr pattern, Long start, long num_results) {
-    return FindStrRegex(value, pattern, new LongV(start), new LongV(num_results));
+  public static Expr FindStrRegex(Expr value, Expr pattern, long start, long numResults) {
+    return FindStrRegex(value, pattern, new LongV(start), new LongV(numResults));
   }
 
   /**
@@ -2502,14 +2502,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(String value, Expr pattern, Long start, long num_results) {
-    return FindStrRegex(new StringV(value), pattern, new LongV(start), new LongV(num_results));
+  public static Expr FindStrRegex(String value, Expr pattern, long start, long numResults) {
+    return FindStrRegex(new StringV(value), pattern, new LongV(start), new LongV(numResults));
   }
 
   /**
@@ -2517,14 +2517,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(Expr value, String pattern, Long start, long num_results) {
-    return FindStrRegex(value, new StringV(pattern), new LongV(start), new LongV(num_results));
+  public static Expr FindStrRegex(Expr value, String pattern, long start, long numResults) {
+    return FindStrRegex(value, new StringV(pattern), new LongV(start), new LongV(numResults));
   }
 
   /**
@@ -2532,14 +2532,14 @@ public final class Language {
    *
    * @param value   a string to search
    * @param pattern a substring to locate
-   * @param start a substring to locate
-   * @param num_results a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
    * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
-  public static Expr FindStrRegex(String value, String pattern, Long start, long num_results) {
-    return FindStrRegex(new StringV(value), new StringV(pattern), new LongV(start), new LongV(num_results));
+  public static Expr FindStrRegex(String value, String pattern, long start, long numResults) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), new LongV(start), new LongV(numResults));
   }
 
 
@@ -2807,7 +2807,7 @@ public final class Language {
    * @see #Value(String)
    */
   public static Expr Repeat(String value) {
-    return Repeat( new StringV(value));
+    return Repeat(new StringV(value));
   }
 
   /**
