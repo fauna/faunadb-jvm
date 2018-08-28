@@ -123,7 +123,7 @@ public final class Language {
 
     private final Expr bindings;
 
-    private LetBinding(Map<String, Expr> bindings) {
+    private LetBinding(List<Expr> bindings) {
       this.bindings = Fn.apply(bindings);
     }
 
@@ -787,9 +787,18 @@ public final class Language {
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
    * @see #Var(String)
    * @see LetBinding
+   *
+   * @deprecated As of release 2.6.0, use alternate Let forms.
    */
+  @Deprecated
   public static LetBinding Let(Map<String, ? extends Expr> bindings) {
-    return new LetBinding(Collections.unmodifiableMap(bindings));
+    List<Expr> let = new ArrayList<>();
+
+    for (Map.Entry<String, ? extends Expr> b : bindings.entrySet()) {
+      let.add(Fn.apply(b.getKey(), b.getValue()));
+    }
+
+    return new LetBinding(let);
   }
 
   /**
@@ -813,9 +822,9 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1) {
-    Map<String, Expr> let = new LinkedHashMap<>();
-    let.put(v1, d1);
-    return Let(Collections.unmodifiableMap(let));
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    return new LetBinding(let);
   }
 
   /**
@@ -841,10 +850,10 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2) {
-    Map<String, Expr> let = new LinkedHashMap<>();
-    let.put(v1, d1);
-    let.put(v2, d2);
-    return Let(Collections.unmodifiableMap(let));
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    let.add(Fn.apply(v2, d2));
+    return new LetBinding(let);
   }
 
   /**
@@ -876,11 +885,11 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3) {
-    Map<String, Expr> let = new LinkedHashMap<>();
-    let.put(v1, d1);
-    let.put(v2, d2);
-    let.put(v3, d3);
-    return Let(Collections.unmodifiableMap(let));
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    let.add(Fn.apply(v2, d2));
+    let.add(Fn.apply(v3, d3));
+    return new LetBinding(let);
   }
 
   /**
@@ -915,12 +924,12 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3, String v4, Expr d4) {
-    Map<String, Expr> let = new LinkedHashMap<>();
-    let.put(v1, d1);
-    let.put(v2, d2);
-    let.put(v3, d3);
-    let.put(v4, d4);
-    return Let(Collections.unmodifiableMap(let));
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    let.add(Fn.apply(v2, d2));
+    let.add(Fn.apply(v3, d3));
+    let.add(Fn.apply(v4, d4));
+    return new LetBinding(let);
   }
 
   /**
@@ -935,7 +944,7 @@ public final class Language {
    *     "b", Value(2),
    *     "c", Value(3),
    *     "d", Value(4),
-   *     "e", Value(4),
+   *     "e", Value(5),
    *   ).in(
    *     Add(Var("a"), Var("b"), Var("c"), Var("d"), Var("e"))
    *   )
@@ -958,13 +967,169 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3, String v4, Expr d4, String v5, Expr d5) {
-    Map<String, Expr> let = new LinkedHashMap<>();
-    let.put(v1, d1);
-    let.put(v2, d2);
-    let.put(v3, d3);
-    let.put(v4, d4);
-    let.put(v5, d5);
-    return Let(Collections.unmodifiableMap(let));
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    let.add(Fn.apply(v2, d2));
+    let.add(Fn.apply(v3, d3));
+    let.add(Fn.apply(v4, d4));
+    let.add(Fn.apply(v5, d5));
+    return new LetBinding(let);
+  }
+
+  /**
+   * Bind values to one or more variables.
+   * Variables must be accessed using the {@link #Var(String)} function.
+   *
+   * <p>Example:</p>
+   * <pre>{@code
+   * client.query(
+   *   Let(
+   *     "a", Value(1),
+   *     "b", Value(2),
+   *     "c", Value(3),
+   *     "d", Value(4),
+   *     "e", Value(5),
+   *     "f", Value(6),
+   *   ).in(
+   *     Add(Var("a"), Var("b"), Var("c"), Var("d"), Var("e"), Var("f"))
+   *   )
+   * ).get()
+   * }</pre>
+   *
+   * @param v1 the first variable name
+   * @param d1 the first variable value
+   * @param v2 the second variable name
+   * @param d2 the second variable value
+   * @param v3 the third variable name
+   * @param d3 the third variable value
+   * @param v4 the fourth variable name
+   * @param d4 the fourth variable value
+   * @param v5 the fifth variable name
+   * @param d5 the fitfh variable value
+   * @param v6 the sixth variable name
+   * @param d6 the sixth variable value
+   * @return a new {@link LetBinding} instance
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
+   * @see #Var(String)
+   * @see LetBinding
+   */
+  public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3, String v4, Expr d4, String v5, Expr d5, String v6, Expr d6) {
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    let.add(Fn.apply(v2, d2));
+    let.add(Fn.apply(v3, d3));
+    let.add(Fn.apply(v4, d4));
+    let.add(Fn.apply(v5, d5));
+    let.add(Fn.apply(v6, d6));
+    return new LetBinding(let);
+  }
+
+  /**
+   * Bind values to one or more variables.
+   * Variables must be accessed using the {@link #Var(String)} function.
+   *
+   * <p>Example:</p>
+   * <pre>{@code
+   * client.query(
+   *   Let(
+   *     "a", Value(1),
+   *     "b", Value(2),
+   *     "c", Value(3),
+   *     "d", Value(4),
+   *     "e", Value(5),
+   *     "f", Value(6),
+   *     "g", Value(7),
+   *   ).in(
+   *     Add(Var("a"), Var("b"), Var("c"), Var("d"), Var("e"), Var("f"), Var("g"))
+   *   )
+   * ).get()
+   * }</pre>
+   *
+   * @param v1 the first variable name
+   * @param d1 the first variable value
+   * @param v2 the second variable name
+   * @param d2 the second variable value
+   * @param v3 the third variable name
+   * @param d3 the third variable value
+   * @param v4 the fourth variable name
+   * @param d4 the fourth variable value
+   * @param v5 the fifth variable name
+   * @param d5 the fitfh variable value
+   * @param v6 the sixth variable name
+   * @param d6 the sixth variable value
+   * @param v7 the seventh variable name
+   * @param d7 the seventh variable value
+   * @return a new {@link LetBinding} instance
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
+   * @see #Var(String)
+   * @see LetBinding
+   */
+  public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3, String v4, Expr d4, String v5, Expr d5, String v6, Expr d6, String v7, Expr d7) {
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    let.add(Fn.apply(v2, d2));
+    let.add(Fn.apply(v3, d3));
+    let.add(Fn.apply(v4, d4));
+    let.add(Fn.apply(v5, d5));
+    let.add(Fn.apply(v6, d6));
+    let.add(Fn.apply(v7, d7));
+    return new LetBinding(let);
+  }
+
+  /**
+   * Bind values to one or more variables.
+   * Variables must be accessed using the {@link #Var(String)} function.
+   *
+   * <p>Example:</p>
+   * <pre>{@code
+   * client.query(
+   *   Let(
+   *     "a", Value(1),
+   *     "b", Value(2),
+   *     "c", Value(3),
+   *     "d", Value(4),
+   *     "e", Value(5),
+   *     "f", Value(6),
+   *     "g", Value(7),
+   *     "g", Value(8),
+   *   ).in(
+   *     Add(Var("a"), Var("b"), Var("c"), Var("d"), Var("e"), Var("f"), Var("g"), Var("h"))
+   *   )
+   * ).get()
+   * }</pre>
+   *
+   * @param v1 the first variable name
+   * @param d1 the first variable value
+   * @param v2 the second variable name
+   * @param d2 the second variable value
+   * @param v3 the third variable name
+   * @param d3 the third variable value
+   * @param v4 the fourth variable name
+   * @param d4 the fourth variable value
+   * @param v5 the fifth variable name
+   * @param d5 the fitfh variable value
+   * @param v6 the sixth variable name
+   * @param d6 the sixth variable value
+   * @param v7 the seventh variable name
+   * @param d7 the seventh variable value
+   * @param v8 the eighth variable name
+   * @param d8 the eighth variable value
+   * @return a new {@link LetBinding} instance
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
+   * @see #Var(String)
+   * @see LetBinding
+   */
+  public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3, String v4, Expr d4, String v5, Expr d5, String v6, Expr d6, String v7, Expr d7, String v8, Expr d8) {
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    let.add(Fn.apply(v2, d2));
+    let.add(Fn.apply(v3, d3));
+    let.add(Fn.apply(v4, d4));
+    let.add(Fn.apply(v5, d5));
+    let.add(Fn.apply(v6, d6));
+    let.add(Fn.apply(v7, d7));
+    let.add(Fn.apply(v8, d8));
+    return new LetBinding(let);
   }
 
   /**

@@ -52,7 +52,7 @@ public class SerializationSpec {
 
     Map<String, Value> obj = new LinkedHashMap<>();
     obj.put("value", new StringV("test"));
-    
+
     assertJson(
         Arr(new ObjectV(obj)),
         "[{\"object\":{\"value\":\"test\"}}]");
@@ -77,7 +77,7 @@ public class SerializationSpec {
 
     v2.put("v2", new StringV("test"));
     v1.put("v1", new ObjectV(v2));
-    
+
     assertJson(
       Obj("k1", new ObjectV(v1)),
       "{\"object\":{\"k1\":{\"object\":{\"v1\":{\"object\":{\"v2\":\"test\"}}}}}}");
@@ -188,14 +188,14 @@ public class SerializationSpec {
         "v1", Obj("x1", Value("y1"))
       ).in(
         Value("x")
-      ), "{\"let\":{\"v1\":{\"object\":{\"x1\":\"y1\"}}},\"in\":\"x\"}");
+      ), "{\"let\":[{\"v1\":{\"object\":{\"x1\":\"y1\"}}}],\"in\":\"x\"}");
 
     assertJson(
       Let(
         "v1", Value("x1")
       ).in(
         Value("x")
-      ), "{\"let\":{\"v1\":\"x1\"},\"in\":\"x\"}");
+      ), "{\"let\":[{\"v1\":\"x1\"}],\"in\":\"x\"}");
 
     assertJson(
       Let(
@@ -203,7 +203,7 @@ public class SerializationSpec {
         "v2", Value("x2")
       ).in(
         Value("x")
-      ), "{\"let\":{\"v1\":\"x1\",\"v2\":\"x2\"},\"in\":\"x\"}");
+      ), "{\"let\":[{\"v1\":\"x1\"},{\"v2\":\"x2\"}],\"in\":\"x\"}");
 
     assertJson(
       Let(
@@ -212,7 +212,7 @@ public class SerializationSpec {
         "v3", Value("x3")
       ).in(
         Value("x")
-      ), "{\"let\":{\"v1\":\"x1\",\"v2\":\"x2\",\"v3\":\"x3\"},\"in\":\"x\"}");
+      ), "{\"let\":[{\"v1\":\"x1\"},{\"v2\":\"x2\"},{\"v3\":\"x3\"}],\"in\":\"x\"}");
 
     assertJson(
       Let(
@@ -222,7 +222,7 @@ public class SerializationSpec {
         "v4", Value("x4")
       ).in(
         Value("x")
-      ), "{\"let\":{\"v1\":\"x1\",\"v2\":\"x2\",\"v3\":\"x3\",\"v4\":\"x4\"},\"in\":\"x\"}");
+      ), "{\"let\":[{\"v1\":\"x1\"},{\"v2\":\"x2\"},{\"v3\":\"x3\"},{\"v4\":\"x4\"}],\"in\":\"x\"}");
 
     assertJson(
       Let(
@@ -233,7 +233,7 @@ public class SerializationSpec {
         "v5", Value("x5")
       ).in(
         Value("x")
-      ), "{\"let\":{\"v1\":\"x1\",\"v2\":\"x2\",\"v3\":\"x3\",\"v4\":\"x4\",\"v5\":\"x5\"},\"in\":\"x\"}");
+      ), "{\"let\":[{\"v1\":\"x1\"},{\"v2\":\"x2\"},{\"v3\":\"x3\"},{\"v4\":\"x4\"},{\"v5\":\"x5\"}],\"in\":\"x\"}");
 
     Map<String, Expr> vs = new LinkedHashMap<>();
 
@@ -243,7 +243,7 @@ public class SerializationSpec {
     assertJson(
         Let(vs).in(
         Value("x")
-      ), "{\"let\":{\"v1\":\"x1\",\"v2\":\"x2\"},\"in\":\"x\"}");
+      ), "{\"let\":[{\"v1\":\"x1\"},{\"v2\":\"x2\"}],\"in\":\"x\"}");
   }
 
   @Test
