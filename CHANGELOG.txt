@@ -4,6 +4,7 @@
 * Support backrefs in Let() bindings. Requires FaunaDB 2.6.0.
 * Add stdlib string functions FindStr(), FindStrRegex(), Length(), Lower(), LTrim(), Repeat(), ReplaceStr(), ReplaceStrRegex(), RTrim(), Space(), SubString(), TitleCase(), Trim(), Upper()
 * Scala: Adds support for encoding sealed trait ADTs as tagged unions
+* Scala: Adds Codec.Alias
 
 2.5.2
 * Adds support to NGram() function

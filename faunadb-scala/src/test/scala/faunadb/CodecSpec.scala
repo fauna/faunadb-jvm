@@ -100,6 +100,22 @@ class CodecSpec extends FlatSpec with Matchers {
     products.to[Map[String, Product]].get shouldBe Map("product1" -> Product("laptop", 999), "product2" -> Product("mouse", 9.99))
   }
 
+  it should "decode aliases" in {
+    case class Wrapped(s: String)
+    implicit val wrappedCodec = Codec.Alias[Wrapped, String](_.s, Wrapped(_))
+
+    val v1 = StringV("hello")
+    v1.to[Wrapped].get shouldBe Wrapped("hello")
+    (Wrapped("hello"): Value) shouldBe v1
+
+    case class DoubleWrapped(w: Wrapped)
+    implicit val doubleWrappedCodec = Codec.Alias[DoubleWrapped, Wrapped](_.w, DoubleWrapped(_))
+
+    val v2 = StringV("hello")
+    v2.to[DoubleWrapped].get shouldBe DoubleWrapped(Wrapped("hello"))
+    (DoubleWrapped(Wrapped("hello")): Value) shouldBe v2
+  }
+
   case class GenericClass[T, U](a: T, b: U, c: NonGenericClass)
 
   case class NonGenericClass(x: Int)
