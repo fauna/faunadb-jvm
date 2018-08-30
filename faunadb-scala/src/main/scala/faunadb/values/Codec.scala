@@ -344,6 +344,11 @@ trait RecordCodec[T] extends Codec[T]
 trait UnionCodec[T] extends Codec[T]
 
 object Codec {
+  def Alias[T, S](to: T => S, from: S => T)(implicit enc: Encoder[S], dec: Decoder[S]): Codec[T] = new Codec[T] {
+    def encode(t: T) = enc.encode(to(t))
+    def decode(v: Value, path: FieldPath) = dec.decode(v, path) map from
+  }
+
   @deprecated("Use Codec.Record[T] instead", "2.6.0")
   def caseClass[T]: RecordCodec[T] = macro CodecMacro.recordImpl[T]
 
