@@ -48,7 +48,11 @@ class CodecMacro(val c: blackbox.Context) {
       }
     }
 
-    q"for (..$fieldsFragments) yield new $tpe(..${fields.map(varName)})"
+    if (fieldsFragments.nonEmpty) {
+      q"for (..$fieldsFragments) yield new $tpe(..${fields.map(varName)})"
+    } else {
+      q"new $tpe"
+    }
   }
 
   def unionImpl[T: WeakTypeTag](tagField: Tree)(variants: Tree*) = {
