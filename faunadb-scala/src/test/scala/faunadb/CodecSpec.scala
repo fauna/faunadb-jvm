@@ -146,29 +146,35 @@ class CodecSpec extends FlatSpec with Matchers {
   case class Variant1(i: Int) extends EnumTrait
   case class Variant2(s: String) extends EnumTrait
   case class Variant3(b: Boolean) extends EnumTrait
+  case object Variant4 extends EnumTrait
 
   implicit val enumTrait = Codec.Union[EnumTrait]("tpe")(
     true -> Codec.Record[Variant1],
     2 -> Codec.Record[Variant2],
-    "a" -> Codec.Record[Variant3])
+    "a" -> Codec.Record[Variant3],
+    "4" -> Codec.Record(Variant4))
 
-  it should "decode enum trait" in {
+  it should "encode/decode enum trait" in {
     val obj1 = ObjectV("tpe" -> TrueV, "i" -> LongV(2))
     obj1.to[EnumTrait].get shouldBe Variant1(2)
     (Variant1(2): Value) shouldBe obj1
 
     val obj2 = ObjectV("tpe" -> LongV(2), "s" -> StringV("foo"))
     obj2.to[EnumTrait].get shouldBe Variant2("foo")
-    Value[EnumTrait](Variant2("foo")) shouldBe obj2
+    (Variant2("foo"): Value) shouldBe obj2
 
     val obj3 = ObjectV("tpe" -> StringV("a"), "b" -> TrueV)
     obj3.to[EnumTrait].get shouldBe Variant3(true)
-    Value[EnumTrait](Variant3(true)) shouldBe obj3
+    (Variant3(true): Value) shouldBe obj3
 
-    val obj4 = ObjectV("tpe" -> StringV("x"), "x" -> FalseV)
+    val obj4 = ObjectV("tpe" -> StringV("4"))
+    obj4.to[EnumTrait].get shouldBe Variant4
+    (Variant4: Value) shouldBe obj4
+
+    val obj5 = ObjectV("tpe" -> StringV("x"), "x" -> FalseV)
     the [ValueReadException] thrownBy {
-      obj4.to[EnumTrait].get
-    } should have message """Error at /tpe: Expected Union tag: true, 2, or "a"; found value StringV(x) of type faunadb.values.StringV."""
+      obj5.to[EnumTrait].get
+    } should have message """Error at /tpe: Expected Union tag: true, 2, "a", or "4"; found value StringV(x) of type faunadb.values.StringV."""
   }
 
   // Encoding

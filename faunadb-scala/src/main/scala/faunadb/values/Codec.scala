@@ -346,6 +346,17 @@ trait UnionCodec[T] extends Codec[T]
 object Codec {
   @deprecated("Use Codec.Record[T] instead", "2.6.0")
   def caseClass[T]: RecordCodec[T] = macro CodecMacro.recordImpl[T]
+
   def Record[T]: RecordCodec[T] = macro CodecMacro.recordImpl[T]
+
+  def Record[T](t: T): RecordCodec[T] = new RecordCodec[T] {
+    def encode(t: T) = ObjectV.empty
+    def decode(v: Value, path: FieldPath) =
+      v match {
+        case ObjectV(_) => VSuccess(t, path)
+        case _          => Result.Unexpected(v, "Map", path)
+      }
+  }
+
   def Union[T](tagField: String)(variants: (Any, Codec[_ <: T])*): UnionCodec[T] = macro CodecMacro.unionImpl[T]
 }
