@@ -1,3 +1,6 @@
+1.2.1
+* Fix NoSuchElementException when parsing empty object
+
 1.2.0
 * Add support for scala 2.12.x
 * Upgrade jackson to 2.8.8
