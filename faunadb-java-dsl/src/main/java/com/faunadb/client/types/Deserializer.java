@@ -58,7 +58,11 @@ class Deserializer {
     }
 
     private Value deserializeSpecial(JsonNode tree, ObjectMapper json) {
+      if (tree.size() == 0)
+        return json.convertValue(tree, ObjectV.class);
+
       String firstField = tree.fieldNames().next();
+
       switch (firstField) {
         case "@ref":
           return json.convertValue(tree, RefV.class);

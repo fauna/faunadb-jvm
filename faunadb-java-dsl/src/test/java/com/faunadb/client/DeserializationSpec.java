@@ -3,6 +3,7 @@ package com.faunadb.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.faunadb.client.types.Value;
+import com.faunadb.client.types.Value.ObjectV;
 import com.faunadb.client.types.Value.RefV;
 import com.faunadb.client.types.time.HighPrecisionTime;
 import com.google.common.base.Optional;
@@ -133,6 +134,13 @@ public class DeserializationSpec {
     assertThat(parsed.at("data", "refField").to(REF).get(), equalTo(new RefV("classes/spells/93044099909681152")));
     assertThat(parsed.at("data", "elements").at(0).to(STRING).get(), equalTo("fire"));
     assertThat(parsed.at("data", "elements").at(1).to(STRING).get(), equalTo("air"));
+  }
+
+  @Test
+  public void shouldDeserializeEmptyObject() throws Exception {
+    Value parsed = parsed("{}");
+
+    assertThat(parsed, equalTo((Value)new ObjectV(ImmutableMap.<String, Value>of())));
   }
 
   @Test
