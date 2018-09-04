@@ -516,4 +516,10 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     await(client.query(Call(Ref("functions/concat_with_slash"), "a", "b"))).to[String].get shouldBe "a/b"
   }
+
+  it should "not break do with one element" in {
+    await(client.query(Do(1))).to[Long].get shouldBe 1
+    await(client.query(Do(1, 2))).to[Long].get shouldBe 2
+    await(client.query(Do(Arr(1, 2)))).to[Seq[Long]].get shouldBe Seq(1L, 2L)
+  }
 }

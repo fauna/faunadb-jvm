@@ -200,7 +200,7 @@ package object query {
    * '''Reference''': [[https://fauna.com/documentation/queries#basic_forms]]
    */
   def Do(exprs: Expr*): Expr =
-    Expr(ObjectV("do" -> varargs(exprs)))
+    Expr(ObjectV("do" -> ArrayV(unwrap(exprs): _*)))
 
   /**
    * A Lambda expression.
