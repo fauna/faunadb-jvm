@@ -3,6 +3,8 @@ package com.faunadb.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.Native;
+import com.faunadb.client.types.Value.ObjectV;
+import com.faunadb.client.types.Value.RefV;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,6 +13,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -115,6 +118,13 @@ public class DeserializationSpec {
     assertThat(parsed.at("data", "refField").to(REF).get(), equalTo(new RefV("93044099909681152", new RefV("spells", Native.CLASSES))));
     assertThat(parsed.at("data", "elements").at(0).to(STRING).get(), equalTo("fire"));
     assertThat(parsed.at("data", "elements").at(1).to(STRING).get(), equalTo("air"));
+  }
+
+  @Test
+  public void shouldDeserializeEmptyObject() throws Exception {
+    Value parsed = parsed("{}");
+
+    assertThat(parsed, equalTo((Value)new ObjectV(new HashMap(0))));
   }
 
   @Test
