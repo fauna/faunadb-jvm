@@ -270,6 +270,11 @@ public class SerializationSpec {
   public void shouldSerializeDo() throws Exception {
     assertJson(
       Do(
+        Value("x")
+      ), "{\"do\":[\"x\"]}");
+
+    assertJson(
+      Do(
         If(Value(true), Value("x"), Value("y")),
         Value(42)
       ), "{\"do\":[{\"if\":true,\"then\":\"x\",\"else\":\"y\"},42]}");
@@ -284,7 +289,7 @@ public class SerializationSpec {
       Do(Arr(
         If(Value(true), Value("xx"), Value("yy")),
         Value(45)
-      )), "{\"do\":[{\"if\":true,\"then\":\"xx\",\"else\":\"yy\"},45]}");
+      )), "{\"do\":[[{\"if\":true,\"then\":\"xx\",\"else\":\"yy\"},45]]}");
   }
 
   @Test
