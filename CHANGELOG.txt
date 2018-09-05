@@ -1,4 +1,4 @@
-2.6.0-SNAPSHOT
+2.5.4
 * Scala: Adds support for encoding sealed trait ADTs as tagged unions
 
 2.5.3
