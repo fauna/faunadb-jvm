@@ -1,7 +1,7 @@
 import de.johoop.jacoco4sbt.XMLReport
 
-val driverVersion = "1.2.2"
-val asyncHttpClientVersion = "1.9.39"
+val driverVersion = "1.2.3"
+val asyncHttpClientVersion = "2.5.2"
 val guavaVersion = "19.0"
 val jacksonVersion = "2.8.8"
 val jacksonDocVersion = "2.8"
@@ -12,7 +12,7 @@ val scalaDefaultVersion = "2.12.2"
 val scalaVersions = Seq("2.11.8", scalaDefaultVersion)
 
 val javaDocUrl = "http://docs.oracle.com/javase/7/docs/api/"
-val asyncHttpClientDocUrl = s"http://static.javadoc.io/com.ning/async-http-client/$asyncHttpClientVersion/"
+val asyncHttpClientDocUrl = s"https://www.javadoc.io/doc/org.asynchttpclient/async-http-client/$asyncHttpClientVersion"
 val guavaDocUrl = s"http://google.github.io/guava/releases/$guavaVersion/api/docs/"
 val jacksonDocUrl = s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/"
 val metricsDocUrl = s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/"
@@ -72,19 +72,19 @@ lazy val common = project.in(file("faunadb-common"))
     crossPaths := false,
     autoScalaLibrary := false,
     exportJars := true,
-    javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
+    javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
     apiURL := Some(url(commonApiUrl)),
 
-    javacOptions in (Compile, doc) := Seq("-source", "1.7",
+    javacOptions in (Compile, doc) := Seq("-source", "1.8",
       "-link", javaDocUrl,
       "-link", guavaDocUrl,
       "-link", jacksonDocUrl,
       "-link", metricsDocUrl,
-      "-linkoffline", asyncHttpClientDocUrl, s"./faunadb-common/doc/com.ning/async-http-client/$asyncHttpClientVersion/"
+      "-link", asyncHttpClientDocUrl
     ),
 
     libraryDependencies ++= Seq(
-      "com.ning" % "async-http-client" % asyncHttpClientVersion,
+      "org.asynchttpclient" % "async-http-client" % asyncHttpClientVersion,
       "com.google.guava" % "guava" % guavaVersion,
       "io.dropwizard.metrics" % "metrics-core" % metricsVersion,
       "org.slf4j" % "slf4j-api" % "1.7.7",
@@ -106,6 +106,7 @@ lazy val scala = project.in(file("faunadb-scala"))
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
+      "org.asynchttpclient" % "async-http-client" % asyncHttpClientVersion,
       "joda-time" % "joda-time" % jodaTimeVersion,
       "org.joda" % "joda-convert" % jodaConvert,
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
@@ -126,7 +127,6 @@ lazy val scala = project.in(file("faunadb-scala"))
       }.head
 
       Map(
-        findDep("com.ning", "async-http-client") -> url(asyncHttpClientDocUrl),
         findDep("com.fasterxml.jackson.core", "jackson-databind") -> url(jacksonDocUrl),
         findDep("io.dropwizard.metrics", "metrics-core") -> url(metricsDocUrl),
         findDep("joda-time", "joda-time") -> url(jodaDocUrl))
@@ -141,11 +141,11 @@ lazy val javaDsl = project.in(file("faunadb-java-dsl"))
     crossPaths := false,
     autoScalaLibrary := false,
     exportJars := true,
-    javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
+    javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
     apiURL := Some(url(javaDslApiUrl)),
 
-    javacOptions in (Compile, doc) := Seq("-source", "1.7",
+    javacOptions in (Compile, doc) := Seq("-source", "1.8",
       "-link", javaDocUrl,
       "-link", guavaDocUrl,
       "-link", jacksonDocUrl,
@@ -175,19 +175,19 @@ lazy val java = project.in(file("faunadb-java"))
     name := "faunadb-java",
     crossPaths := false,
     autoScalaLibrary := false,
-    javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
+    javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
     apiURL := Some(url(javaApiUrl)),
 
-    javacOptions in (Compile, doc) := Seq("-source", "1.7",
+    javacOptions in (Compile, doc) := Seq("-source", "1.8",
       "-link", javaDocUrl,
       "-link", guavaDocUrl,
       "-link", jacksonDocUrl,
       "-link", metricsDocUrl,
       "-link", jodaDocUrl,
+      "-link", asyncHttpClientDocUrl,
       "-linkoffline", commonApiUrl, "./faunadb-common/target/api",
-      "-linkoffline", javaDslApiUrl, "./faunadb-java-dsl/target/api",
-      "-linkoffline", asyncHttpClientDocUrl, s"./faunadb-common/doc/com.ning/async-http-client/$asyncHttpClientVersion/"
+      "-linkoffline", javaDslApiUrl, "./faunadb-java-dsl/target/api"
     ),
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
@@ -213,11 +213,11 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
     name := "faunadb-android",
     crossPaths := false,
     autoScalaLibrary := false,
-    javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
+    javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
     apiURL := Some(url(javaAndroidApiUrl)),
 
-    javacOptions in (Compile, doc) := Seq("-source", "1.7",
+    javacOptions in (Compile, doc) := Seq("-source", "1.8",
       "-link", javaDocUrl,
       "-link", guavaDocUrl,
       "-link", jacksonDocUrl,
@@ -237,8 +237,9 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
       "junit" % "junit" % "4.12" % "test"
     ),
 
-    platformTarget in Android := "android-16",
-    buildToolsVersion in Android := Some("24.0.2"),
+    platformTarget in Android := "android-26",
+    buildToolsVersion in Android := Some("26.0.0"),
+    minSdkVersion in Android := "26",
     showSdkProgress in Android := true,
     useProguard := true,
     useProguardInDebug := true,
