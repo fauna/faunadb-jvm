@@ -6,6 +6,10 @@
 * Scala: Adds support for encoding sealed trait ADTs as tagged unions
 * Scala: Adds Codec.Alias
 
+2.5.3
+* Upgrade async-http-client library
+* Fix a bug on Do() function that was preventing expressions with only one statement
+
 2.5.2
 * Adds support to NGram() function
 * Reverses the argument order of Append() and Prepend() functions
