@@ -14,18 +14,18 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Response;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Response;
 
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import static com.faunadb.client.types.Codec.VALUE;
+import static io.netty.util.CharsetUtil.UTF_8;
 import static com.google.common.util.concurrent.Futures.transform;
 
 /**
@@ -46,8 +46,6 @@ import static com.google.common.util.concurrent.Futures.transform;
  * @see com.faunadb.client.query.Language
  */
 public class FaunaClient implements AutoCloseable {
-
-  private static final String UTF8 = "UTF-8";
 
   /**
    * Creates a new {@link Builder}
@@ -272,6 +270,6 @@ public class FaunaClient implements AutoCloseable {
   }
 
   private JsonNode parseResponseBody(Response response) throws IOException {
-    return json.readTree(response.getResponseBody(UTF8));
+    return json.readTree(response.getResponseBody(UTF_8));
   }
 }
