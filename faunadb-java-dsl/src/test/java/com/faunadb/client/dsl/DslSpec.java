@@ -870,6 +870,44 @@ public abstract class DslSpec {
   }
 
   @Test
+  public void shouldEvalFindStrExpression() throws Exception {
+    Value res = query(FindStr(Value("fire and  Ice"), Value("fire"))).get();
+    assertThat(res.to(LONG).get(), equalTo(0L));
+    Value res1 = query(FindStr("hello TO aLL", "TO")).get();
+    assertThat(res1.to(LONG).get(), equalTo(6L));
+    Value res2 = query(FindStr("hello TO aLL", "aLL", 6)).get();
+    assertThat(res2.to(LONG).get(), equalTo(9L));
+  }
+
+  @Test
+  public void shouldEvalLengthExpression() throws Exception {
+    Value res = query(Length(Value("fire and  Ice"))).get();
+    assertThat(res.to(LONG).get(), equalTo(13L));
+    Value res1 = query(Length("hello")).get();
+    assertThat(res1.to(LONG).get(), equalTo(5L));
+    Value res2 = query(Length("")).get();
+    assertThat(res2.to(LONG).get(), equalTo(0L));
+  }
+
+  @Test
+  public void shouldEvalLowerExpression() throws Exception {
+    Value res = query(LowerCase(Value("fire and  Ice"))).get();
+    assertThat(res.to(STRING).get(), equalTo("fire and  ice"));
+    Value res1 = query(LowerCase("hello TO aLL")).get();
+    assertThat(res1.to(STRING).get(), equalTo("hello to all"));
+  }
+
+  @Test
+  public void shouldEvalLTrimExpression() throws Exception {
+    Value res0 = query(LTrim("   fire")).get();
+    assertThat(res0.to(STRING).get(), equalTo("fire"));
+    Value res = query(LTrim(Value("\t\tfire and ice"))).get();
+    assertThat(res.to(STRING).get(), equalTo("fire and ice"));
+    Value res1 = query(LTrim("\n\n\nhello to all")).get();
+    assertThat(res1.to(STRING).get(), equalTo("hello to all"));
+  }
+
+  @Test
   public void shouldEvalNGramExpression() throws Exception {
     assertThat(
       query(NGram(Value("what"))).get().asCollectionOf(String.class).get(),
@@ -888,6 +926,82 @@ public abstract class DslSpec {
       query(NGram(Arr(Value("john"), Value("doe")), Value(3), Value(4))).get().asCollectionOf(String.class).get(),
       contains("joh", "john", "ohn", "doe")
     );
+  }
+
+  @Test
+  public void shouldEvalRepeatExpression() throws Exception {
+    Value res = query(Repeat("f")).get();
+    assertThat(res.to(STRING).get(), equalTo("ff"));
+    Value res1 = query(Repeat("abc",3)).get();
+    assertThat(res1.to(STRING).get(), equalTo("abcabcabc"));
+  }
+
+ @Test
+  public void shouldEvalReplaceStringExpression() throws Exception {
+    Value res = query(ReplaceStr("fire and ice and everything nice","and","or")).get();
+    assertThat(res.to(STRING).get(), equalTo("fire or ice or everything nice"));
+  }
+
+  @Test
+  public void shouldEvalReplaceStrRegexExpression() throws Exception {
+    Value res = query(ReplaceStrRegex("fire and ice and everything nice","and","or")).get();
+    assertThat(res.to(STRING).get(), equalTo("fire or ice or everything nice"));
+    Value res1 = query(ReplaceStrRegex("fire and ice and everything nice","and","or",true)).get();
+    assertThat(res1.to(STRING).get(), equalTo("fire or ice and everything nice"));
+  }
+
+  @Test
+  public void shouldEvalRTrimExpression() throws Exception {
+    Value res = query(RTrim("fire   ")).get();
+    assertThat(res.to(STRING).get(), equalTo("fire"));
+    Value res1 = query(RTrim("ice\t\t\t")).get();
+    assertThat(res1.to(STRING).get(), equalTo("ice"));
+    Value res2 = query(RTrim("nice\n\n\n")).get();
+    assertThat(res2.to(STRING).get(), equalTo("nice"));
+  }
+
+  @Test
+  public void shouldEvalSpaceExpression() throws Exception {
+    Value res = query(Space(1)).get();
+    assertThat(res.to(STRING).get(), equalTo(" "));
+    Value res1 = query(Space(4)).get();
+    assertThat(res1.to(STRING).get(), equalTo("    "));
+  }
+
+  @Test
+  public void shouldEvalSubStringExpression() throws Exception {
+    Value res = query(SubString("basketball")).get();
+    assertThat(res.to(STRING).get(), equalTo("basketball"));
+    Value res1 = query(SubString("basketball", 6)).get();
+    assertThat(res1.to(STRING).get(), equalTo("ball"));
+    Value res2 = query(SubString("basketball", 6,2)).get();
+    assertThat(res2.to(STRING).get(), equalTo("ba"));
+  }
+
+  @Test
+  public void shouldEvalTrimExpression() throws Exception {
+    Value res = query(Trim("   fire   ")).get();
+    assertThat(res.to(STRING).get(), equalTo("fire"));
+    Value res1 = query(Trim("\t\t\tice\t\t\t")).get();
+    assertThat(res1.to(STRING).get(), equalTo("ice"));
+    Value res2 = query(Trim("\n\n\nnice\n\n\n")).get();
+    assertThat(res2.to(STRING).get(), equalTo("nice"));
+  }
+
+  @Test
+  public void shouldEvalUpperExpression() throws Exception {
+    Value res = query(UpperCase(Value("fire and  Ice"))).get();
+    assertThat(res.to(STRING).get(), equalTo("FIRE AND  ICE"));
+    Value res1 = query(UpperCase("hello TO aLL")).get();
+    assertThat(res1.to(STRING).get(), equalTo("HELLO TO ALL"));
+  }
+
+  @Test
+  public void shouldEvalTitleCaseExpression() throws Exception {
+    Value res = query(TitleCase(Value("fire and  Ice"))).get();
+    assertThat(res.to(STRING).get(), equalTo("Fire And  Ice"));
+    Value res1 = query(TitleCase("hello TO aLL")).get();
+    assertThat(res1.to(STRING).get(), equalTo("Hello To All"));
   }
 
   @Test
@@ -983,21 +1097,81 @@ public abstract class DslSpec {
   }
 
   @Test
+  public void shouldEvalAbs() throws Exception {
+    Value res = query(Abs(Value(-100))).get();
+    assertThat(res.to(LONG).get(), equalTo(100L));
+  }
+
+  @Test
+  public void shouldEvalAcos() throws Exception {
+    Value res = query(Trunc(Acos(Value(0.5)),Value(2))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(1.04D));
+  }
+
+  @Test
   public void shouldEvalAddExpression() throws Exception {
     Value res = query(Add(Value(100), Value(10))).get();
     assertThat(res.to(LONG).get(), equalTo(110L));
   }
 
   @Test
-  public void shouldEvalMultiplyExpression() throws Exception {
-    Value res = query(Multiply(Value(100), Value(10))).get();
-    assertThat(res.to(LONG).get(), equalTo(1000L));
+  public void shouldEvalAsin() throws Exception {
+    Value res = query(Trunc(Asin(Value(0.5)),Value(2))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(0.52D));
   }
 
   @Test
-  public void shouldEvalSubtractExpression() throws Exception {
-    Value res = query(Subtract(Value(100), Value(10))).get();
-    assertThat(res.to(LONG).get(), equalTo(90L));
+  public void shouldEvalAtan() throws Exception {
+    Value res = query(Trunc(Atan(Value(0.5)),Value(2))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(0.46D));
+  }
+
+  @Test
+  public void shouldEvalBitAnd() throws Exception {
+    Value res = query(BitAnd(Value(7), Value(3))).get();
+    assertThat(res.to(LONG).get(), equalTo(3L));
+  }
+
+  @Test
+  public void shouldEvalBitNot() throws Exception {
+    Value res = query(BitNot(Value(3))).get();
+    assertThat(res.to(LONG).get(), equalTo(-4L));
+  }
+
+  @Test
+  public void shouldEvalBitOr() throws Exception {
+    Value res = query(BitOr(Value(6), Value(3))).get();
+    assertThat(res.to(LONG).get(), equalTo(7L));
+  }
+
+  @Test
+  public void shouldEvalBitXOr() throws Exception {
+    Value res = query(BitXor(Value(2), Value(1))).get();
+    assertThat(res.to(LONG).get(), equalTo(3L));
+  }
+
+  @Test
+  public void shouldEvalCeil() throws Exception {
+    Value res = query(Ceil(Value(1.01))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(2.0D));
+  }
+
+  @Test
+  public void shouldEvalCos() throws Exception {
+    Value res = query(Trunc(Cos(Value(0.5)),Value(2))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo( 0.87));
+  }
+
+  @Test
+  public void shouldEvalCosh() throws Exception {
+    Value res = query(Trunc(Cosh(Value(0.5)),Value(2))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo( 1.12));
+  }
+
+  @Test
+  public void shouldEvalDegrees() throws Exception {
+    Value res = query(Trunc(Degrees(Value(2.0)),Value(2))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo( 114.59));
   }
 
   @Test
@@ -1007,9 +1181,105 @@ public abstract class DslSpec {
   }
 
   @Test
+  public void shouldEvalExp() throws Exception {
+    Value res = query(Trunc(Exp(Value(2)), Value(2))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(7.38D));
+  }
+
+  @Test
+  public void shouldEvalFloor() throws Exception {
+    Value res = query(Floor(Value(1.91))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(1.0D));
+  }
+
+  @Test
+  public void shouldEvalHypot() throws Exception {
+    Value res = query(Hypot(Value(3), Value(4))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(5.0D));
+  }
+
+  @Test
+  public void shouldEvalLn() throws Exception {
+    Value res = query(Trunc(Ln(Value(2)), Value(2))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(0.69D));
+  }
+
+  @Test
+  public void shouldEvalLog() throws Exception {
+    Value res = query(Trunc(Log(Value(2)), Value(2))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(0.30D));
+  }
+
+  @Test
+  public void shouldEvalMax() throws Exception {
+    Value res = query(Max(Value(101), Value(10))).get();
+    assertThat(res.to(LONG).get(), equalTo(101L));
+  }
+
+  @Test
+  public void shouldEvalMin() throws Exception {
+    Value res = query(Min(Value(101), Value(10))).get();
+    assertThat(res.to(LONG).get(), equalTo(10L));
+  }
+
+  @Test
   public void shouldEvalModuloExpression() throws Exception {
     Value res = query(Modulo(Value(101), Value(10))).get();
     assertThat(res.to(LONG).get(), equalTo(1L));
+  }
+
+  @Test
+  public void shouldEvalMultiplyExpression() throws Exception {
+    Value res = query(Multiply(Value(100), Value(10))).get();
+    assertThat(res.to(LONG).get(), equalTo(1000L));
+  }
+
+  @Test
+  public void shouldEvalRadians() throws Exception {
+    Value res = query(Trunc(Radians(Value(500.0D)))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(8.72D));
+  }
+
+  @Test
+  public void shouldEvalRound() throws Exception {
+    Value res = query(Round(Value(123.666D),Value(2))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(123.67D));
+  }
+
+  @Test
+  public void shouldEvalSign() throws Exception {
+    Value res = query(Sign(Value(1))).get();
+    assertThat(res.to(LONG).get(), equalTo(1L));
+  }
+
+  @Test
+  public void shouldEvalSin() throws Exception {
+    Value res = query(Trunc(Sin(Value(0.5)),Value(2))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(0.47D));
+  }
+
+  @Test
+  public void shouldEvalSqrt() throws Exception {
+    Value res = query(Sqrt(Value(16))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(4.0D));
+  }
+
+  @Test
+  public void shouldEvalSubtractExpression() throws Exception {
+    Value res = query(Subtract(Value(100), Value(10))).get();
+    assertThat(res.to(LONG).get(), equalTo(90L));
+  }
+
+  @Test
+  public void shouldEvalTan() throws Exception {
+    Value res = query(Trunc(Tan(Value(0.5)),Value(2))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(0.54D));
+  }
+
+  @Test
+  public void shouldEvalTrunc() throws Exception {
+    Value res = query(Trunc(Value(123.456D),Value(2))).get();
+    assertThat(res.to(DOUBLE).get(), equalTo(123.45D));
   }
 
   @Test

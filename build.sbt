@@ -1,6 +1,6 @@
 import de.johoop.jacoco4sbt.XMLReport
 
-val driverVersion = "2.5.5"
+val driverVersion = "2.6.0-SNAPSHOT"
 val asyncHttpClientVersion = "2.5.2"
 val jacksonVersion = "2.8.8"
 val jacksonDocVersion = "2.8"

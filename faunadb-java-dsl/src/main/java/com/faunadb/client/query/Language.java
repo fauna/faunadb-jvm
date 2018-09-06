@@ -123,7 +123,7 @@ public final class Language {
 
     private final Expr bindings;
 
-    private LetBinding(Map<String, Expr> bindings) {
+    private LetBinding(List<Expr> bindings) {
       this.bindings = Fn.apply(bindings);
     }
 
@@ -252,7 +252,7 @@ public final class Language {
    * A reference set must be paginated in order to retrieve its values.
    *
    * @return a new {@link Expr} instance
-   * @see #Paginate(Expr) 
+   * @see #Paginate(Expr)
    */
   public static Expr Classes() {
     return Classes(Null());
@@ -261,7 +261,7 @@ public final class Language {
   /**
    * Returns a reference to a set of all classes in the specified database.
    * A reference set must be paginated in order to retrieve its values.
-   * 
+   *
    * @param scope a reference to a database. Type: Reference
    * @return a new {@link Expr} instance
    * @see #Database(String)
@@ -787,9 +787,18 @@ public final class Language {
    * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
    * @see #Var(String)
    * @see LetBinding
+   *
+   * @deprecated As of release 2.6.0, use alternate Let forms.
    */
+  @Deprecated
   public static LetBinding Let(Map<String, ? extends Expr> bindings) {
-    return new LetBinding(Collections.unmodifiableMap(bindings));
+    List<Expr> let = new ArrayList<>();
+
+    for (Map.Entry<String, ? extends Expr> b : bindings.entrySet()) {
+      let.add(Fn.apply(b.getKey(), b.getValue()));
+    }
+
+    return new LetBinding(let);
   }
 
   /**
@@ -813,9 +822,9 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1) {
-    Map<String, Expr> let = new LinkedHashMap<>();
-    let.put(v1, d1);
-    return Let(Collections.unmodifiableMap(let));
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    return new LetBinding(let);
   }
 
   /**
@@ -841,10 +850,10 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2) {
-    Map<String, Expr> let = new LinkedHashMap<>();
-    let.put(v1, d1);
-    let.put(v2, d2);
-    return Let(Collections.unmodifiableMap(let));
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    let.add(Fn.apply(v2, d2));
+    return new LetBinding(let);
   }
 
   /**
@@ -876,11 +885,11 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3) {
-    Map<String, Expr> let = new LinkedHashMap<>();
-    let.put(v1, d1);
-    let.put(v2, d2);
-    let.put(v3, d3);
-    return Let(Collections.unmodifiableMap(let));
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    let.add(Fn.apply(v2, d2));
+    let.add(Fn.apply(v3, d3));
+    return new LetBinding(let);
   }
 
   /**
@@ -915,12 +924,12 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3, String v4, Expr d4) {
-    Map<String, Expr> let = new LinkedHashMap<>();
-    let.put(v1, d1);
-    let.put(v2, d2);
-    let.put(v3, d3);
-    let.put(v4, d4);
-    return Let(Collections.unmodifiableMap(let));
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    let.add(Fn.apply(v2, d2));
+    let.add(Fn.apply(v3, d3));
+    let.add(Fn.apply(v4, d4));
+    return new LetBinding(let);
   }
 
   /**
@@ -935,7 +944,7 @@ public final class Language {
    *     "b", Value(2),
    *     "c", Value(3),
    *     "d", Value(4),
-   *     "e", Value(4),
+   *     "e", Value(5),
    *   ).in(
    *     Add(Var("a"), Var("b"), Var("c"), Var("d"), Var("e"))
    *   )
@@ -958,13 +967,169 @@ public final class Language {
    * @see LetBinding
    */
   public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3, String v4, Expr d4, String v5, Expr d5) {
-    Map<String, Expr> let = new LinkedHashMap<>();
-    let.put(v1, d1);
-    let.put(v2, d2);
-    let.put(v3, d3);
-    let.put(v4, d4);
-    let.put(v5, d5);
-    return Let(Collections.unmodifiableMap(let));
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    let.add(Fn.apply(v2, d2));
+    let.add(Fn.apply(v3, d3));
+    let.add(Fn.apply(v4, d4));
+    let.add(Fn.apply(v5, d5));
+    return new LetBinding(let);
+  }
+
+  /**
+   * Bind values to one or more variables.
+   * Variables must be accessed using the {@link #Var(String)} function.
+   *
+   * <p>Example:</p>
+   * <pre>{@code
+   * client.query(
+   *   Let(
+   *     "a", Value(1),
+   *     "b", Value(2),
+   *     "c", Value(3),
+   *     "d", Value(4),
+   *     "e", Value(5),
+   *     "f", Value(6),
+   *   ).in(
+   *     Add(Var("a"), Var("b"), Var("c"), Var("d"), Var("e"), Var("f"))
+   *   )
+   * ).get()
+   * }</pre>
+   *
+   * @param v1 the first variable name
+   * @param d1 the first variable value
+   * @param v2 the second variable name
+   * @param d2 the second variable value
+   * @param v3 the third variable name
+   * @param d3 the third variable value
+   * @param v4 the fourth variable name
+   * @param d4 the fourth variable value
+   * @param v5 the fifth variable name
+   * @param d5 the fitfh variable value
+   * @param v6 the sixth variable name
+   * @param d6 the sixth variable value
+   * @return a new {@link LetBinding} instance
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
+   * @see #Var(String)
+   * @see LetBinding
+   */
+  public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3, String v4, Expr d4, String v5, Expr d5, String v6, Expr d6) {
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    let.add(Fn.apply(v2, d2));
+    let.add(Fn.apply(v3, d3));
+    let.add(Fn.apply(v4, d4));
+    let.add(Fn.apply(v5, d5));
+    let.add(Fn.apply(v6, d6));
+    return new LetBinding(let);
+  }
+
+  /**
+   * Bind values to one or more variables.
+   * Variables must be accessed using the {@link #Var(String)} function.
+   *
+   * <p>Example:</p>
+   * <pre>{@code
+   * client.query(
+   *   Let(
+   *     "a", Value(1),
+   *     "b", Value(2),
+   *     "c", Value(3),
+   *     "d", Value(4),
+   *     "e", Value(5),
+   *     "f", Value(6),
+   *     "g", Value(7),
+   *   ).in(
+   *     Add(Var("a"), Var("b"), Var("c"), Var("d"), Var("e"), Var("f"), Var("g"))
+   *   )
+   * ).get()
+   * }</pre>
+   *
+   * @param v1 the first variable name
+   * @param d1 the first variable value
+   * @param v2 the second variable name
+   * @param d2 the second variable value
+   * @param v3 the third variable name
+   * @param d3 the third variable value
+   * @param v4 the fourth variable name
+   * @param d4 the fourth variable value
+   * @param v5 the fifth variable name
+   * @param d5 the fitfh variable value
+   * @param v6 the sixth variable name
+   * @param d6 the sixth variable value
+   * @param v7 the seventh variable name
+   * @param d7 the seventh variable value
+   * @return a new {@link LetBinding} instance
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
+   * @see #Var(String)
+   * @see LetBinding
+   */
+  public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3, String v4, Expr d4, String v5, Expr d5, String v6, Expr d6, String v7, Expr d7) {
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    let.add(Fn.apply(v2, d2));
+    let.add(Fn.apply(v3, d3));
+    let.add(Fn.apply(v4, d4));
+    let.add(Fn.apply(v5, d5));
+    let.add(Fn.apply(v6, d6));
+    let.add(Fn.apply(v7, d7));
+    return new LetBinding(let);
+  }
+
+  /**
+   * Bind values to one or more variables.
+   * Variables must be accessed using the {@link #Var(String)} function.
+   *
+   * <p>Example:</p>
+   * <pre>{@code
+   * client.query(
+   *   Let(
+   *     "a", Value(1),
+   *     "b", Value(2),
+   *     "c", Value(3),
+   *     "d", Value(4),
+   *     "e", Value(5),
+   *     "f", Value(6),
+   *     "g", Value(7),
+   *     "g", Value(8),
+   *   ).in(
+   *     Add(Var("a"), Var("b"), Var("c"), Var("d"), Var("e"), Var("f"), Var("g"), Var("h"))
+   *   )
+   * ).get()
+   * }</pre>
+   *
+   * @param v1 the first variable name
+   * @param d1 the first variable value
+   * @param v2 the second variable name
+   * @param d2 the second variable value
+   * @param v3 the third variable name
+   * @param d3 the third variable value
+   * @param v4 the fourth variable name
+   * @param d4 the fourth variable value
+   * @param v5 the fifth variable name
+   * @param d5 the fitfh variable value
+   * @param v6 the sixth variable name
+   * @param d6 the sixth variable value
+   * @param v7 the seventh variable name
+   * @param d7 the seventh variable value
+   * @param v8 the eighth variable name
+   * @param d8 the eighth variable value
+   * @return a new {@link LetBinding} instance
+   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
+   * @see #Var(String)
+   * @see LetBinding
+   */
+  public static LetBinding Let(String v1, Expr d1, String v2, Expr d2, String v3, Expr d3, String v4, Expr d4, String v5, Expr d5, String v6, Expr d6, String v7, Expr d7, String v8, Expr d8) {
+    List<Expr> let = new ArrayList<>();
+    let.add(Fn.apply(v1, d1));
+    let.add(Fn.apply(v2, d2));
+    let.add(Fn.apply(v3, d3));
+    let.add(Fn.apply(v4, d4));
+    let.add(Fn.apply(v5, d5));
+    let.add(Fn.apply(v6, d6));
+    let.add(Fn.apply(v7, d7));
+    let.add(Fn.apply(v8, d8));
+    return new LetBinding(let);
   }
 
   /**
@@ -2003,6 +2168,619 @@ public final class Language {
   }
 
   /**
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
+   *
+   * @param value a strings
+   * @param find  a substring to locate
+   * @return      the offset of where the substring starts or -1 if not found
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(Expr value, Expr find) {
+    return Fn.apply("findstr", value, "find", find);
+  }
+
+  /**
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
+   *
+   * @param value a strings
+   * @param find  a substring to locate
+   * @return      the offset of where the substring starts or -1 if not found
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(String value, Expr find) {
+    return FindStr(new StringV(value), find);
+  }
+
+  /**
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
+   *
+   * @param value a strings
+   * @param find  a substring to locate
+   * @return      the offset of where the substring starts or -1 if not found
+   * @return      the offset of where the substring starts or -1 if not found
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(Expr value, String find) {
+    return FindStr(value, new StringV(find));
+  }
+
+  /**
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
+   *
+   * @param value a strings
+   * @param find  a substring to locate
+   * @return      the offset of where the substring starts or -1 if not found
+   * @return      the offset of where the substring starts or -1 if not found
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(String value, String find) {
+    return FindStr(new StringV(value), new StringV(find));
+  }
+
+  /**
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
+   *
+   * @param value a strings
+   * @param find  a substring to locate
+   * @param start a position to start the search
+   * @return      the offset of where the substring starts or -1 if not found
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(Expr value, Expr find, Expr start) {
+    return Fn.apply("findstr", value, "find", find, "start", start);
+  }
+  /**
+   * FindStr function returns
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
+   *
+   * @param value a strings
+   * @param find  a substring to locate
+   * @param start a position to start the search
+   * @return      the offset of where the substring starts or -1 if not found
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(Expr value, Expr find, long start) {
+    return FindStr(value, find, new LongV(start));
+  }
+
+  /**
+   * FindStr function used to searches a string for a substring and locates the location of the substring in the string
+   *
+   * @param value a strings
+   * @param find  a substring to locate
+   * @param start a position to start the search
+   * @return      the offset of where the substring starts or -1 if not found
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(Expr value, String find, Expr start) {
+    return FindStr(value, new StringV(find), start);
+  }
+  /**
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
+   *
+   * @param value a strings
+   * @param find  a substring to locate
+   * @param start a position to start the search
+   * @return      the offset of where the substring starts or -1 if not found
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(String value, Expr find, long start) {
+    return FindStr(new StringV(value), find, new LongV(start));
+  }
+
+  /**
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
+   *
+   * @param value a strings
+   * @param find  a substring to locate
+   * @param start a position to start the search
+   * @return      the offset of where the substring starts or -1 if not found
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(String value, String find, Expr start) {
+    return FindStr(new StringV(value), new StringV(find), start);
+  }
+  /**
+   * FindStr function searches a string for a substring and locates the location of the substring in the string
+   *
+   * @param value a strings
+   * @param find  a substring to locate
+   * @param start a position to start the search
+   * @return      the offset of where the substring starts or -1 if not found
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStr(String value, String find, long start) {
+    return FindStr(new StringV(value), new StringV(find), new LongV(start));
+  }
+
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, Expr pattern) {
+    return Fn.apply("findstrregex", value, "pattern", pattern);
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, String pattern) {
+    return FindStrRegex(value, new StringV(pattern));
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, Expr pattern) {
+    return FindStrRegex(new StringV(value), pattern);
+  }
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, String pattern) {
+    return FindStrRegex(new String(value), new StringV(pattern));
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, Expr pattern, Expr start) {
+    return Fn.apply("findstrregex", value, "pattern", pattern, "start", start);
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, Expr pattern, Expr start) {
+    return FindStrRegex(new StringV(value), pattern, start);
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, String pattern, Expr start) {
+    return FindStrRegex(value, new StringV(pattern), start);
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, String pattern, Expr start) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), start);
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, Expr pattern, long start) {
+    return FindStrRegex(value, pattern, new LongV(start));
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, Expr pattern, long start) {
+    return FindStrRegex(new StringV(value), pattern, new LongV(start));
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, String pattern, long start) {
+    return FindStrRegex(value, new StringV(pattern), new LongV(start));
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, String pattern, long start) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), new LongV(start));
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, Expr pattern, Expr start, Expr numResults) {
+    return Fn.apply("findstrregex", value, "pattern", pattern, "start", start, "num_results", numResults);
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, Expr pattern, Expr start, Expr numResults) {
+    return FindStrRegex(new StringV(value), pattern, start, numResults);
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, String pattern, Expr start, Expr numResults) {
+    return FindStrRegex(value, new StringV(pattern), start, numResults);
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, String pattern, Expr start, Expr numResults) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), start, numResults);
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, Expr pattern, long start, Expr numResults) {
+    return FindStrRegex(value, pattern, new LongV(start), numResults);
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, Expr pattern, long start, Expr numResults) {
+    return FindStrRegex(new StringV(value), pattern, new LongV(start), numResults);
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, String pattern, long start, Expr numResults) {
+    return FindStrRegex(value, new StringV(pattern), new LongV(start), numResults);
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, String pattern, long start, Expr numResults) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), new LongV(start), numResults);
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, Expr pattern, Expr start, long numResults) {
+    return FindStrRegex(value, pattern, start, new LongV(numResults));
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, Expr pattern, Expr start, long numResults) {
+    return FindStrRegex(new StringV(value), pattern, start, new LongV(numResults));
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, String pattern, Expr start, long numResults) {
+    return FindStrRegex(value, new StringV(pattern), start, new LongV(numResults));
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, String pattern, Expr start, long numResults) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), start, new LongV(numResults));
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, Expr pattern, long start, long numResults) {
+    return FindStrRegex(value, pattern, new LongV(start), new LongV(numResults));
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, Expr pattern, long start, long numResults) {
+    return FindStrRegex(new StringV(value), pattern, new LongV(start), new LongV(numResults));
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(Expr value, String pattern, long start, long numResults) {
+    return FindStrRegex(value, new StringV(pattern), new LongV(start), new LongV(numResults));
+  }
+
+  /**
+   * FindStrRegex function searches a string for a java pattern and locates all the locations of the pattern in the string
+   *
+   * @param value   a string to search
+   * @param pattern a substring to locate
+   * @param start the offset into the string
+   * @param numResults the maximum number of results
+   * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}] 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr FindStrRegex(String value, String pattern, long start, long numResults) {
+    return FindStrRegex(new StringV(value), new StringV(pattern), new LongV(start), new LongV(numResults));
+  }
+
+
+  /**
+   * Length function returns the number of characters (codepoints) in the string
+   *
+   * @param value   a string to determine the length of
+   * @return        the length of the string as a long
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Length(Expr value) {
+    return Fn.apply("length", value);
+  }
+
+  /**
+   * Length function returns the number of characters (codepoints) in the string
+   *
+   * @param value   a string to determine the length of
+   * @return        the length of the string as a long
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Length(String value) {
+    return Length(new StringV(value));
+  }
+
+  /**
+   * Lower function returns all letters in the string in lowercase
+   *
+   * @param value a string to lowercase
+   * @return      a string with all lowercase letters
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr LowerCase(Expr value) {
+    return Fn.apply("lowercase", value);
+  }
+
+  /**
+   * Lower function returns all letters in the string in lowercase
+   *
+   * @param value a string to lowercase
+   * @return      a string with all lowercase letters
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr LowerCase(String value) {
+    return LowerCase(new StringV(value));
+  }
+
+  /**
+   * LTrim function returns a new string with leading white space removed
+   *
+   * @param value a string to trim leading white space.
+   * @return      the string with leading white space removed
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr LTrim(Expr value) {
+    return Fn.apply("ltrim", value);
+  }
+
+  /**
+   * LTrim function returns a new string with leading white space removed
+   *
+   * @param value a string to trim leading white space.
+   * @return      the string with leading white space removed
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr LTrim(String value) {
+    return LTrim(new StringV(value));
+  }
+
+  /**
    * Tokenize the input into n-grams of the given sizes.
    *
    * @param terms the value to tokenize. Type: String
@@ -2170,6 +2948,871 @@ public final class Language {
    */
   public static Expr NGram(String term) {
     return NGram(new StringV(term));
+  }
+
+
+  /**
+   * Repeat function returns a string the specified number of times
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Repeat(Expr value) {
+    return Fn.apply("repeat", value);
+  }
+
+  /**
+   * Repeat function returns a string the specified number of times
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Repeat(String value) {
+    return Repeat(new StringV(value));
+  }
+
+  /**
+   * Repeat function returns a string concatenanted the specified number of times
+   *
+   * @param value a strings
+   * @param number an integer value indicate the number of times to repeat the string
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Repeat(Expr value, Expr number) {
+    return Fn.apply("repeat", value, "number", number);
+  }
+
+  /**
+   * Repeat function returns a string concatenanted the specified number of times
+   *
+   * @param value a strings
+   * @param number an integer value indicate the number of times to repeat the string
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Repeat(String value, Expr number) {
+    return Repeat(new StringV(value), number);
+  }
+
+  /**
+   * Repeat function returns a string concatenanted the specified number of times
+   *
+   * @param value a strings
+   * @param number an integer value indicate the number of times to repeat the string
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Repeat(Expr value, long number) {
+    return Repeat(value, new LongV(number));
+  }
+
+  /**
+   * Repeat function returns a string concatenanted the specified number of times
+   *
+   * @param value a strings
+   * @param number an integer value indicate the number of times to repeat the string
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Repeat(String value, long number) {
+    return Repeat(new StringV(value), new LongV(number));
+  }
+
+  /**
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
+   *
+   * @param value   the source string 
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(Expr value, Expr find, Expr replace) {
+    return Fn.apply("replacestr", value, "find", find, "replace", replace);
+  }
+
+  /**
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
+   *
+   * @param value   the source string 
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(String value, Expr find, Expr replace) {
+    return ReplaceStr(new StringV(value), find, replace);
+  }
+
+  /**
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
+   *
+   * @param value   the source string 
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(Expr value, String find, Expr replace) {
+    return ReplaceStr(value, new StringV(find), replace);
+  }
+
+  /**
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
+   *
+   * @param value   the source string 
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(String value, String find, Expr replace) {
+    return ReplaceStr(new StringV(value), new StringV(find), replace);
+  }
+
+  /**
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
+   *
+   * @param value   the source string
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(Expr value, Expr find, String replace) {
+    return ReplaceStr(value, find, new StringV(replace));
+  }
+
+  /**
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
+   *
+   * @param value   the source string
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(String value, Expr find, String replace) {
+    return ReplaceStr(new StringV(value), find, new StringV(replace));
+  }
+
+  /**
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
+   *
+   * @param value   the source string
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(Expr value, String find, String replace) {
+    return ReplaceStr(value, new StringV(find), new StringV(replace));
+  }
+
+  /**
+   * ReplaceStr returns a string with every occurence of the "find" string changed to "replace" string
+   *
+   * @param value   the source string
+   * @param find    the substring to locate in in the source string
+   * @param replace the string to replaice the "find" string when located
+   * @return        the new string with every occurence of the "find" string changed to "replace" string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStr(String value, String find, String replace) {
+    return ReplaceStr(new StringV(value), new StringV(find), new StringV(replace));
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, Expr pattern, Expr replace) {
+    return Fn.apply("replacestrregex", value, "pattern", pattern, "replace", replace);
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, Expr pattern, Expr replace) {
+    return ReplaceStrRegex(new StringV(value), pattern, replace);
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, String pattern, Expr replace) {
+    return ReplaceStrRegex(value, new StringV(pattern), replace);
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, String pattern, Expr replace) {
+    return ReplaceStrRegex(new StringV(value), new StringV(pattern), replace);
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, Expr pattern, String replace) {
+    return ReplaceStrRegex(value, pattern, new StringV(replace));
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, Expr pattern, String replace) {
+    return ReplaceStrRegex(new StringV(value), pattern, new StringV(replace));
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, String pattern, String replace) {
+    return ReplaceStrRegex(value, new StringV(pattern), replace);
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, String pattern, String replace) {
+    return ReplaceStrRegex(new StringV(value), new StringV(pattern), replace);
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, Expr pattern, Expr replace, Expr first) {
+    return Fn.apply("replacestrregex", value, "pattern", pattern, "replace", replace, "first", first);
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, Expr pattern, Expr replace, Expr first) {
+    return ReplaceStrRegex(new StringV(value), pattern, replace, first);
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, String pattern, Expr replace, Expr first) {
+    return ReplaceStrRegex(value, new StringV(pattern), replace, first);
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, String pattern, Expr replace, Expr first) {
+    return ReplaceStrRegex(new StringV(value), new StringV(pattern), replace, first);
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, Expr pattern, String replace, Expr first) {
+    return ReplaceStrRegex(value, pattern, new StringV(replace), first);
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, Expr pattern, String replace, Expr first) {
+    return ReplaceStrRegex(new StringV(value), pattern, new StringV(replace), first);
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, String pattern, String replace, Expr first) {
+    return ReplaceStrRegex(value, new StringV(pattern), new StringV(replace), first);
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, String pattern, String replace, Expr first) {
+    return ReplaceStrRegex(new StringV(value), new StringV(pattern), new StringV(replace), first);
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, Expr pattern, Expr replace, Boolean first) {
+    return ReplaceStrRegex(value, pattern, replace, BooleanV.valueOf(first));
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, Expr pattern, Expr replace, boolean first) {
+    return ReplaceStrRegex(new StringV(value), pattern, replace, BooleanV.valueOf(first));
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, String pattern, Expr replace, boolean first) {
+    return ReplaceStrRegex(value, new StringV(pattern), replace, BooleanV.valueOf(first));
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, String pattern, Expr replace, boolean first) {
+    return ReplaceStrRegex(new StringV(value), new StringV(pattern), replace, BooleanV.valueOf(first));
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, Expr pattern, String replace, boolean first) {
+    return ReplaceStrRegex(value, pattern, new StringV(replace), BooleanV.valueOf(first));
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, Expr pattern, String replace, boolean first) {
+    return ReplaceStrRegex(new StringV(value), pattern, new StringV(replace), BooleanV.valueOf(first));
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(Expr value, String pattern, String replace, boolean first) {
+    return ReplaceStrRegex(value, new StringV(pattern), new StringV(replace), BooleanV.valueOf(first));
+  }
+
+  /**
+   * ReplaceStrRegex returns a string with occurence(s) of the java regular expression "pattern" changed to "replace" string
+   *
+   * @param value the source string
+   * @param pattern a java regular expression to locate
+   * @param replace the string to replace the pattern when located
+   * @param first only replace the first found pattern
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr ReplaceStrRegex(String value, String pattern, String replace, boolean first) {
+    return ReplaceStrRegex(new StringV(value), new StringV(pattern), new StringV(replace), BooleanV.valueOf(first));
+  }
+
+  /**
+   * RTrim function returns a new string with trailing whitespace removed
+   *
+   * @param value a string to trim whitespace.
+   * @return      the string with trailing whitespace removed
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr RTrim(Expr value) {
+    return Fn.apply("rtrim", value);
+  }
+
+  /**
+   * RTrim function returns a new string with trailing whitespace removed
+   *
+   * @param value a string to trim whitespace.
+   * @return      the string with trailing whitespace removed
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr RTrim(String value) {
+    return RTrim(new StringV(value));
+  }
+
+  /**
+   * Space function returns "N" number of spaces
+   *
+   * @param value the number of spaces
+   * @return      a string with spaces 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Space(Expr value) {
+    return Fn.apply("space", value);
+  }
+
+  /**
+   * Space function returns "N" number of spaces
+   *
+   * @param value the number of spaces
+   * @return      a string with spaces 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Space(Long value) {
+    return Space(new LongV(value));
+  }
+
+  /**
+   * Space function returns
+   *
+   * @param value the number of spaces
+   * @return      a string with spaces 
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Space(Integer value) {
+    return Space(new LongV(value));
+  }
+
+  /**
+   * SubString function returns a subset of the source string
+   *
+   * @param value the source string
+   * @return      a new string contain a subset of the source string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(Expr value) {
+    return Fn.apply("substring", value);
+  }
+
+  /**
+   * SubString function returns a subset of the source string
+   *
+   * @param value the source string
+   * @return      a new string contain a subset of the source string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(String value) {
+    return SubString(new StringV(value));
+  }
+
+  /**
+   * SubString function returns a subset of the source string
+   *
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @return      a new string contain a subset of the source string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(Expr value, Expr start) {
+    return Fn.apply("substring", value, "start", start);
+  }
+
+  /**
+   * SubString function returns a subset of the source string
+   *
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @return      a new string contain a subset of the source string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(String value, Expr start) {
+    return SubString(new StringV(value), start);
+  }
+
+  /**
+   * SubString function returns a subset of the source string
+   *
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @return      a new string contain a subset of the source string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(Expr value, long start) {
+    return SubString(value, new LongV(start));
+  }
+
+  /**
+   * SubString function returns a subset of the source string
+   *
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @return      a new string contain a subset of the source string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(String value, long start) {
+    return SubString(new StringV(value), new LongV(start));
+  }
+
+  /**
+   * SubString function returns a subset of the source string
+   *
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned 
+   * @return       a new string contain a subset of the source string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(Expr value, Expr start, Expr length) {
+    return Fn.apply("substring", value, "start", start, "length", length);
+  }
+
+  /**
+   * SubString function returns a subset of the source string
+   *
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned 
+   * @return       a new string contain a subset of the source string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(String value, Expr start, Expr length) {
+    return SubString(new StringV(value), start, length);
+  }
+
+  /**
+   * SubString function returns a subset of the source string
+   *
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned 
+   * @return       a new string contain a subset of the source string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(Expr value, long start, Expr length) {
+    return SubString(value, new LongV(start), length);
+  }
+
+  /**
+   * SubString function returns a subset of the source string
+   *
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned 
+   * @return       a new string contain a subset of the source string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(String value, long start, Expr length) {
+    return SubString(new StringV(value), new LongV(start), length);
+  }
+
+  /**
+   * SubString function returns a subset of the source string
+   *
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned 
+   * @return       a new string contain a subset of the source string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(Expr value, long start, long length) {
+    return SubString(value, new LongV(start), new LongV(length));
+  }
+
+  /**
+   * SubString function returns a subset of the source string
+   *
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned 
+   * @return       a new string contain a subset of the source string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(Expr value, Expr start, long length) {
+    return SubString(value, start, new LongV(length));
+  }
+
+  /**
+   * SubString function returns a subset of the source string
+   *
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned 
+   * @return       a new string contain a subset of the source string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(String value, Expr start, long length) {
+    return SubString(new StringV(value), start, new LongV(length));
+  }
+
+  /**
+   * SubString function returns a subset of the source string
+   *
+   * @param value the source string
+   * @param start the position in the source string where SubString starts extracting characters
+   * @param length the number of characters to be returned 
+   * @return       a new string contain a subset of the source string
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr SubString(String value, long start, long length) {
+    return SubString(new StringV(value), new LongV(start), new LongV(length));
+  }
+
+  /**
+   * TitleCase function returns a string with the first letter in each word capitalized
+   *
+   * @param value a strings to TitleCase
+   * @return      a new string in TitleCase
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr TitleCase(Expr value) {
+    return Fn.apply("titlecase", value);
+  }
+
+  /**
+   * TitleCase function returns a string with the first letter in each word capitalized
+   *
+   * @param value a strings to TitleCase
+   * @return      a new string in TitleCase
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr TitleCase(String value) {
+    return TitleCase(new StringV(value));
+  }
+
+  /**
+   * Trim function returns a new string with leading and trailing whitespace removed
+   *
+   * @param value a string to trim white space.
+   * @return      the string with leading and trailing whitespace removed
+   * Trim function returns
+   *
+   * @param value a strings
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Trim(Expr value) {
+    return Fn.apply("trim", value);
+  }
+
+  /**
+   * Trim function returns a new string with leading and trailing whitespace removed
+   *
+   * @param value a string to trim white space.
+   * @return      the string with leading and trailing whitespace removed
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Trim(String value) {
+    return Trim(new StringV(value));
+  }
+
+  /**
+   * UpperCase function returns all letters in the string in uppercase
+   *
+   * @param value a string to uppercase
+   * @return      a string with all uppercase letters
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr UpperCase(Expr value) {
+    return Fn.apply("uppercase", value);
+  }
+
+  /**
+   * UpperCase function returns all letters in the string in uppercase
+   *
+   * @param value a string to uppercase
+   * @return      a string with all uppercase letters
+   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr UpperCase(String value) {
+    return UpperCase(new StringV(value));
   }
 
   /**
@@ -2714,12 +4357,68 @@ public final class Language {
   }
 
   /**
-   * Computes the sum of a list of numbers.
+   * Computes the abs of a number.
    *
-   * @param values the list of numbers. Type: Array
+   * @param value The operand to abs. Type: Number
    * @return a {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
+  public static Expr Abs(Expr value) {
+    return Fn.apply("abs", value);
+  }
+
+  /**
+   * Computes the abs of a number.
+   *
+   * @param value The operand to abs. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Abs(Long value) {
+    return Fn.apply("abs", new LongV(value));
+  }
+
+  /**
+   * Computes the abs of a number.
+   *
+   * @param value The operand to abs. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Abs(Double value) {
+    return Fn.apply("abs", new DoubleV(value));
+  }
+
+  /**
+   * Computes the acos of a numbers.
+   *
+   * @param value The operand to acos. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Acos(Expr value) {
+    return Fn.apply("acos", value);
+  }
+
+  /**
+   * Computes the acos of a numbers.
+   *
+   * @param value The operand to acos. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+    public static Expr Acos(Double value) {
+      return Fn.apply("acos", new DoubleV(value));
+    }
+
+
+    /**
+     * Computes the sum of a list of numbers.
+     *
+     * @param values the list of numbers. Type: Array
+     * @return a {@link Expr} instance
+     * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+     */
   public static Expr Add(List<? extends Expr> values) {
     return Fn.apply("add", varargs(values));
   }
@@ -2736,50 +4435,248 @@ public final class Language {
   }
 
   /**
-   * Computes the product of a list of numbers.
+   * Computes the asin of a numbers.
+   *
+   * @param value The operand to asin. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Asin(Expr value) {
+    return Fn.apply("asin", value);
+  }
+
+  /**
+   * Computes the asin of a numbers.
+   *
+   * @param value The operand to asin. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Asin(Double value) {
+    return Fn.apply("asin", new DoubleV(value));
+  }
+
+  /**
+   * Computes the atan of a numbers.
+   *
+   * @param value The operand to atan. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Atan(Expr value) {
+    return Fn.apply("atan", value);
+  }
+
+  /**
+   * Computes the atan of a numbers.
+   *
+   * @param value The operand to atan. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Atan(Double value) {
+    return Fn.apply("atan", new DoubleV(value));
+  }
+
+  /**
+   * Computes the bitwise and of a list of numbers.
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
-  public static Expr Multiply(List<? extends Expr> values) {
-    return Fn.apply("multiply", varargs(values));
+  public static Expr BitAnd(List<? extends Expr> values) {
+    return Fn.apply("bitand", varargs(values));
   }
 
   /**
-   * Computes the product of a list of numbers.
+   * Computes the bitwise and of a list of numbers.
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
-  public static Expr Multiply(Expr... values) {
-    return Multiply(Collections.unmodifiableList(Arrays.asList(values)));
+  public static Expr BitAnd(Expr... values) {
+    return BitAnd(Arrays.asList(values));
   }
 
   /**
-   * Computes the difference of a list of numbers.
+   * Computes the bitwise NOT of a numbers.
+   *
+   * @param value The operand to atan. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr BitNot(Expr value) {
+    return Fn.apply("bitnot", value);
+  }
+
+  /**
+   * Computes the bitwise NOT of a numbers.
+   *
+   * @param value The operand to atan. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr BitNot(Long value) {
+    return Fn.apply("bitnot", new LongV(value));
+  }
+
+  /**
+   * Computes the bitwise OR of a list of numbers.
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
-  public static Expr Subtract(List<? extends Expr> values) {
-    return Fn.apply("subtract", varargs(values));
+  public static Expr BitOr(List<? extends Expr> values) {
+    return Fn.apply("bitor", varargs(values));
   }
 
   /**
-   * Computes the difference of a list of numbers.
+   * Computes the bitwise OR of a list of numbers.
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
    * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
-  public static Expr Subtract(Expr... values) {
-    return Subtract(Collections.unmodifiableList(Arrays.asList(values)));
+  public static Expr BitOr(Expr... values) {
+    return BitOr(Arrays.asList(values));
   }
 
   /**
+   * Computes the bitwise XOR of a list of numbers.
+   *
+   * @param values the list of numbers. Type: Array
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr BitXor(List<? extends Expr> values) {
+    return Fn.apply("bitxor", varargs(values));
+  }
+
+  /**
+   * Computes the bitwise XOR of a list of numbers.
+   *
+   * @param values the list of numbers. Type: Array
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr BitXor(Expr... values) {
+    return BitXor(Arrays.asList(values));
+  }
+
+  /**
+   * Computes the Ceil of a number.
+   *
+   * @param value The operand to ceil. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Ceil(Expr value) {
+    return Fn.apply("ceil", value);
+  }
+
+  /**
+   * Computes the Ceil of a number.
+   *
+   * @param value The operand to ceil. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Ceil(Long value) {
+    return Fn.apply("ceil", new LongV(value));
+  }
+
+  /**
+   * Computes the Ceil of a number.
+   *
+   * @param value The operand to ceil. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Ceil(Double value) {
+    return Fn.apply("ceil", new DoubleV(value));
+  }
+
+  /**
+   * Computes the cosine of a numbers.
+   *
+   * @param value The operand to cos. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Cos(Expr value) {
+    return Fn.apply("cos", value);
+  }
+
+  /**
+   * Computes the cosine of a numbers.
+   *
+   * @param value The operand to cos. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Cos(Double value) {
+    return Fn.apply("cos", new DoubleV(value));
+  }
+
+  /**
+   * Computes the hyperbolic cosine of a numbers.
+   *
+   * @param value The operand to cosh. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Cosh(Expr value) {
+    return Fn.apply("cosh", value);
+  }
+
+  /**
+   * Computes the hyperbolic cosine of a numbers.
+   *
+   * @param value The operand to cosh. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Cosh(Double value) {
+    return Fn.apply("cosh", new DoubleV(value));
+  }
+
+  /**
+   * Computes the degrees of a numbers.
+   *
+   * @param value The operand to degrees. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Degrees(Expr value) {
+    return Fn.apply("degrees", value);
+  }
+
+  /**
+   * Computes the degrees of a numbers.
+   *
+   * @param value The operand to degrees. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Degrees(Double value) {
+    return Fn.apply("degrees", new DoubleV(value));
+  }
+
+  /**
+   * Computes the degrees of a numbers.
+   *
+   * @param value The operand to degrees. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Degrees(Long value) {
+    return Fn.apply("degrees", new LongV(value));
+  }
+
+  /*
    * Computes the quotient of a list of numbers.
    *
    * @param values the list of numbers. Type: Array
@@ -2802,6 +4699,242 @@ public final class Language {
   }
 
   /**
+   * Computes the exp of a numbers.
+   *
+   * @param value The operand to exp. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Exp(Expr value) {
+    return Fn.apply("exp", value);
+  }
+
+  /**
+   * Computes the exp of a numbers.
+   *
+   * @param value The operand to exp. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Exp(Long value) {
+    return Fn.apply("exp", new LongV(value));
+  }
+
+  /**
+   * Computes the exp of a numbers.
+   *
+   * @param value The operand to exp. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Exp(Double value) {
+    return Fn.apply("exp", new DoubleV(value));
+  }
+
+  /**
+   * Computes the floor of a numbers.
+   *
+   * @param value The operand to floor Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Floor(Expr value) {
+    return Fn.apply("floor", value);
+  }
+
+  /**
+   * Computes the floor of a numbers.
+   *
+   * @param value The operand to floor Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Floor(Long value) {
+    return Fn.apply("floor", new LongV(value));
+  }
+
+  /**
+   * Computes the floor of a numbers.
+   *
+   * @param value The operand to floor Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Floor(Double value) {
+    return Fn.apply("floor", new DoubleV(value));
+  }
+
+  /**
+   * Computes the ln of a numbers.
+   *
+   * @param value The operand to ln. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Ln(Expr value) {
+    return Fn.apply("ln", value);
+  }
+
+  /**
+   * Computes the ln of a numbers.
+   *
+   * @param value The operand to ln. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Ln(Double value) {
+    return Fn.apply("ln", new DoubleV(value));
+  }
+
+  /**
+   * Hypot to calculate a hypotenuse of a right triangle give the 2 sides
+   *
+   * @param num the base. Type: Number
+   * @param exp the exponent, default 2
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Hypot(Expr num, Expr exp) {
+    return Fn.apply("hypot",  num, "b", exp);
+  }
+
+  /**
+   * Hypot to calculate a hypotenuse of a right triangle give the 2 sides
+   *
+   * @param num the base. Type: Number
+   * @param exp the exponent, default 2
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Hypot(Double num, Expr exp) {
+    return Fn.apply("hypot",  new DoubleV(num), "b", exp);
+  }
+
+  /**
+   * Hypot to calculate a hypotenuse of a right triangle give the 2 sides
+   *
+   * @param num the base. Type: Number
+   * @param exp the exponent, default 2
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Hypot(Expr num, Double exp) {
+    return Fn.apply("hypot",  num, "b", new DoubleV(exp));
+  }
+
+  /**
+   * Hypot to calculate a hypotenuse of a right triangle give the 2 sides
+   *
+   * @param num the base. Type: Number
+   * @param exp the exponent, default 2
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Hypot(Double num, Double exp) {
+    return Fn.apply("hypot",  new DoubleV(num), "b", new DoubleV(exp));
+  }
+
+  /**
+   * Hypot to calculate a hypotenuse of a isosceles right triangle give side
+   *
+   * @param num the base. Type: Number
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Hypot(Expr num) {
+    return Fn.apply("hypot",  num);
+  }
+
+  /**
+   * Hypot to calculate a hypotenuse of a isosceles right triangle give side
+   *
+   * @param num the base. Type: Number
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Hypot(Double num) {
+    return Fn.apply("hypot",  new DoubleV(num));
+  }
+
+  /**
+   * Computes the log of a numbers.
+   *
+   * @param value The operand to log. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Log(Expr value) {
+    return Fn.apply("log", value);
+  }
+
+  /**
+   * Computes the log of a numbers.
+   *
+   * @param value The operand to log. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Log(Double value) {
+    return Fn.apply("log", new DoubleV(value));
+  }
+
+  /**
+   * Computes the max in a list of numbers.
+   *
+   * @param values the list of numbers. Type: Array
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Max(List<? extends Expr> values) {
+    return Fn.apply("max", varargs(values));
+  }
+
+  /**
+   * Computes the max in a list of numbers.
+   *
+   * @param values the list of numbers. Type: Array
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Max(Expr... values) {
+    return Max(Arrays.asList(values));
+  }
+
+  /**
+   * Computes the min in a list of numbers.
+   *
+   * @param values the list of numbers. Type: Array
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Min(List<? extends Expr> values) {
+    return Fn.apply("min", varargs(values));
+  }
+
+  /**
+   * Computes the min in a list of numbers.
+   *
+   * @param values the list of numbers. Type: Array
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Min(Expr... values) {
+    return Min(Arrays.asList(values));
+  }
+
+  /**
    * Computes the remainder after division of a list of numbers.
    *
    * @param values the list of numbers. Type: Array
@@ -2821,6 +4954,494 @@ public final class Language {
    */
   public static Expr Modulo(Expr... values) {
     return Modulo(Collections.unmodifiableList(Arrays.asList(values)));
+  }
+
+  /**
+   * Computes the product of a list of numbers.
+   *
+   * @param values the list of numbers. Type: Array
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Multiply(List<? extends Expr> values) {
+    return Fn.apply("multiply", varargs(values));
+  }
+
+  /**
+   * Computes the product of a list of numbers.
+   *
+   * @param values the list of numbers. Type: Array
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Multiply(Expr... values) {
+    return Multiply(Arrays.asList(values));
+  }
+
+  /**
+   * Pow to calculate a number raise to the power of some other number
+   *
+   * @param num the base. Type: Number
+   * @param exp the exponent, default 2
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Pow(Expr num, Expr exp) {
+      return Fn.apply("pow",  num, "exp", exp);
+  }
+
+  /**
+   * Pow to calculate a number raise to the power of some other number
+   *
+   * @param num the base. Type: Number
+   * @param exp the exponent, default 2
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Pow(Double num, Expr exp) {
+    return Fn.apply("pow",  new DoubleV(num), "exp", exp);
+  }
+
+  /**
+   * Pow to calculate a number raise to the power of some other number
+   *
+   * @param num the base. Type: Number
+   * @param exp the exponent, default 2
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Pow(Expr num, Double exp) {
+    return Fn.apply("pow",  num, "exp", new DoubleV(exp));
+  }
+
+  /**
+   * Pow to calculate a number raise to the power of some other number
+   *
+   * @param num the base. Type: Number
+   * @param exp the exponent, default 2
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Pow(Double num, Double exp) {
+    return Fn.apply("pow",  new DoubleV(num), "exp", new DoubleV(exp));
+  }
+
+  /**
+   * Pow to calculate a number raise to the power of some other number
+   *
+   * @param num the base. Type: Number
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Pow(Expr num) {
+    return Fn.apply("pow",  num);
+  }
+
+  /**
+   * Computes the radians of a number.
+   *
+   * @param value The operand to radians. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Radians(Expr value) {
+    return Fn.apply("radians", value);
+  }
+
+  /**
+   * Computes the radians of a number.
+   *
+   * @param value The operand to radians. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Radians(Double value) {
+    return Fn.apply("radians", new DoubleV(value));
+  }
+
+  /**
+   * Round to a given precision
+   *
+   * @param num the number to round. Type: Number
+   * @param precision where to round
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Round(Expr num, Expr precision) {
+    return Fn.apply("round",  num, "precision", precision);
+  }
+
+  /**
+   * Round to a given precision
+   *
+   * @param num the number to round. Type: Number
+   * @param precision where to round
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Round(Double num, Expr precision) {
+    return Fn.apply("round",  new DoubleV(num), "precision", precision);
+  }
+
+  /**
+   * Round to a given precision
+   *
+   * @param num the number to round. Type: Number
+   * @param precision where to round
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Round(Long num, Expr precision) {
+    return Fn.apply("round",  new LongV(num), "precision", precision);
+  }
+
+  /**
+   * Round to a given precision
+   *
+   * @param num the number to round. Type: Number
+   * @param precision where to round
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Round(Expr num, Long precision) {
+    return Fn.apply("round",  num, "precision", new LongV(precision));
+  }
+
+  /**
+   * Round to a given precision
+   *
+   * @param num the number to round. Type: Number
+   * @param precision where to round
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Round(Double num, Long precision) {
+    return Fn.apply("round",  new DoubleV(num), "precision", new LongV(precision));
+  }
+
+  /**
+   * Round to a given precision
+   *
+   * @param num the number to round. Type: Number
+   * @param precision where to round
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Round(Long num, Long precision) {
+    return Fn.apply("round",  new LongV(num), "precision", new LongV(precision));
+  }
+
+  /**
+   * Round to a given precision
+   *
+   * @param num the number to round to 2 decimal places. Type: Number
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Round(Expr num) {
+    return Fn.apply("round",  num);
+  }
+
+  /**
+   * Round to a given precision
+   *
+   * @param num the number to round to 2 decimal places. Type: Number
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   * @see #Value(double)
+   */
+  public static Expr Round(Double num) {
+    return Fn.apply("round",  new DoubleV(num));
+  }
+
+  /**
+   * Computes the sign of a number.
+   *
+   * @param value The operand to log. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Sign(Expr value) {
+    return Fn.apply("sign", value);
+  }
+
+  /**
+   * Computes the sign of a number.
+   *
+   * @param value The operand to log. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Sign(Double value) {
+    return Fn.apply("sign", new DoubleV(value));
+  }
+
+  /**
+   * Computes the sign of a number.
+   *
+   * @param value The operand to log. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Sign(Long value) {
+    return Fn.apply("sign", new LongV(value));
+  }
+
+  /**
+   * Computes the Sin of a number.
+   *
+   * @param value The operand to sin. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Sin(Expr value) {
+    return Fn.apply("sin", value);
+  }
+
+  /**
+   * Computes the Sin of a number.
+   *
+   * @param value The operand to sin. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Sin(Double value) {
+    return Fn.apply("sin", new DoubleV(value));
+  }
+
+  /**
+   * Computes the Sinh of a number.
+   *
+   * @param value The operand to hyperbolic sine. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Sinh(Expr value) {
+    return Fn.apply("sinh", value);
+  }
+
+  /**
+   * Computes the Sinh of a number.
+   *
+   * @param value The operand to hyperbolic sine. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Sinh(Double value) {
+    return Fn.apply("sinh", new DoubleV(value));
+  }
+
+  /**
+   * Computes the square root of a numbers.
+   *
+   * @param value The operand to log. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Sqrt(Expr value) {
+    return Fn.apply("sqrt", value);
+  }
+
+  /**
+   * Computes the square root of a numbers.
+   *
+   * @param value The operand to log. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Sqrt(Double value) {
+    return Fn.apply("sqrt", new DoubleV(value));
+  }
+
+  /**
+   * Computes the difference of a list of numbers.
+   *
+   * @param values the list of numbers. Type: Array
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Subtract(List<? extends Expr> values) {
+    return Fn.apply("subtract", varargs(values));
+  }
+
+  /**
+   * Computes the difference of a list of numbers.
+   *
+   * @param values the list of numbers. Type: Array
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Subtract(Expr... values) {
+    return Subtract(Arrays.asList(values));
+  }
+
+  /**
+   * Computes the tangent of a numbers.
+   *
+   * @param value The operand to tan. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Tan(Expr value) {
+    return Fn.apply("tan", value);
+  }
+
+  /**
+   * Computes the tangent of a numbers.
+   *
+   * @param value The operand to tan. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Tan(Double value) {
+    return Fn.apply("tan", new DoubleV(value));
+  }
+
+  /**
+   * Computes the hyperbolic tangent of a numbers.
+   *
+   * @param value The operand to tanh. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Tanh(Expr value) {
+    return Fn.apply("tanh", value);
+  }
+
+  /**
+   * Computes the hyperbolic tangent of a numbers.
+   *
+   * @param value The operand to tanh. Type: Number
+   * @return a {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   */
+  public static Expr Tanh(Double value) {
+    return Fn.apply("tanh", new DoubleV(value));
+  }
+
+  /**
+   * Truncate to a given precision
+   *
+   * @param num the number to truncate. Type: Number
+   * @param precision where to truncate, default 2
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   */
+  public static Expr Trunc(Expr num, Expr precision) {
+    return Fn.apply("trunc",  num, "precision", precision);
+  }
+
+  /**
+   * Truncate to a given precision
+   *
+   * @param num the number to truncate. Type: Number
+   * @param precision where to truncate, default 2
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   */
+  public static Expr Trunc(Double num, Expr precision) {
+    return Fn.apply("trunc",  new DoubleV(num), "precision", precision);
+  }
+  /**
+   * Truncate to a given precision
+   *
+   * @param num the number to truncate. Type: Number
+   * @param precision where to truncate, default 2
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   */
+  public static Expr Trunc(Long num, Expr precision) {
+    return Fn.apply("trunc",  new LongV(num), "precision", precision);
+  }
+
+  /**
+   * Truncate to a given precision
+   *
+   * @param num the number to truncate. Type: Number
+   * @param precision where to truncate, default 2
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   */
+  public static Expr Trunc(Expr num, Long precision) {
+    return Fn.apply("trunc",  num, "precision", new LongV(precision));
+  }
+
+  /**
+   * Truncate to a given precision
+   *
+   * @param num the number to truncate. Type: Number
+   * @param precision where to truncate, default 2
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   */
+  public static Expr Trunc(Double num, Long precision) {
+    return Fn.apply("trunc",  new DoubleV(num), "precision", new LongV(precision));
+  }
+  /**
+   * Truncate to a given precision
+   *
+   * @param num the number to truncate. Type: Number
+   * @param precision where to truncate, default 2
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   */
+  public static Expr Trunc(Long num, Long precision) {
+    return Fn.apply("trunc",  new LongV(num), "precision", new LongV(precision));
+  }
+
+  /**
+   * Truncate to a given precision
+   *
+   * @param num the number to truncate to 2 decimal places. Type: Number
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   */
+  public static Expr Trunc(Expr num) {
+    return Fn.apply("trunc",  num);
+  }
+
+  /**
+   * Truncate to a given precision
+   *
+   * @param num the number to truncate to 2 decimal places. Type: Number
+   * @return a new {@link Expr} instance
+   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see #Value(long)
+   */
+  public static Expr Trunc(Double num) {
+    return Fn.apply("trunc",  new DoubleV(num));
   }
 
   /**

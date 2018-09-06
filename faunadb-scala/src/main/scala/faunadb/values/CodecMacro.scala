@@ -38,11 +38,13 @@ class CodecMacro(val c: blackbox.Context) {
 
     val fieldsFragments = fields map { field =>
       val variable = q"value(${varName(field).toString})"
+      val decoder = q"implicitly[$M.Decoder[${field._2}]]"
+      val path = q"path ++ ${varName(field).toString}"
 
       if (isOption(field._2)) {
-        fq"${varName(field)} <- $M.VSuccess($variable.to[${field._2.typeArgs.head}].toOpt, ${varName(field).toString})"
+        fq"${varName(field)} <- $decoder.decode($variable.getOrElse($M.NullV), $path)"
       } else {
-        fq"${varName(field)} <- $variable.to[${field._2}]"
+        fq"${varName(field)} <- $decoder.decode($variable, $path)"
       }
     }
 
@@ -114,7 +116,7 @@ class CodecMacro(val c: blackbox.Context) {
 
   private def getFields(tpe: Type): List[(Symbol, Type)] = {
     if (tpe.typeSymbol.isClass && !tpe.typeSymbol.asClass.isCaseClass) {
-      throw new IllegalArgumentException(s"type $tpe is not a case class")
+      c.abort(c.enclosingPosition, s"type `$tpe` is not a case class")
     }
 
     val params = tpe.decl(termNames.CONSTRUCTOR).asMethod.paramLists.flatten

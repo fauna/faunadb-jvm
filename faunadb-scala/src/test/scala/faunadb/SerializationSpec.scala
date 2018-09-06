@@ -51,19 +51,22 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(Abort("a message")) shouldBe "{\"abort\":\"a message\"}"
 
     val let = Let { val x = 1; val y = "2"; x }
-    json.writeValueAsString(let) shouldBe "{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"
+    json.writeValueAsString(let) shouldBe """{"let":[{"x":1},{"y":"2"}],"in":{"var":"x"}}"""
 
     val let2 = Let { val x = 1; val y = "2"; { val z = "foo"; x } }
-    json.writeValueAsString(let2) shouldBe "{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"
+    json.writeValueAsString(let2) shouldBe """{"let":[{"x":1},{"y":"2"}],"in":{"var":"x"}}"""
 
     val let3 = { val x0 = Var("x"); Let { val x = 1; val y = "2"; x0 } }
-    json.writeValueAsString(let3) shouldBe "{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"
+    json.writeValueAsString(let3) shouldBe """{"let":[{"x":1},{"y":"2"}],"in":{"var":"x"}}"""
 
     val let4 = Let(Seq("x" -> 1, "y" -> "2"), Var("x"))
-    json.writeValueAsString(let4) shouldBe "{\"let\":{\"x\":1,\"y\":\"2\"},\"in\":{\"var\":\"x\"}}"
+    json.writeValueAsString(let4) shouldBe """{"let":[{"x":1},{"y":"2"}],"in":{"var":"x"}}"""
 
     val let5 = Let { val x = 1; val _ = "2"; x }
-    json.writeValueAsString(let5) shouldBe "{\"let\":{\"x\":1,\"_\":\"2\"},\"in\":{\"var\":\"x\"}}"
+    json.writeValueAsString(let5) shouldBe """{"let":[{"x":1},{"_":"2"}],"in":{"var":"x"}}"""
+
+    val let6 = Let { val x = 1; val y = Add(x, 2); y }
+    json.writeValueAsString(let6) shouldBe """{"let":[{"x":1},{"y":{"add":[{"var":"x"},2]}}],"in":{"var":"y"}}"""
 
     val ifForm = If(true, "was true", "was false")
     json.writeValueAsString(ifForm) shouldBe "{\"if\":true,\"then\":\"was true\",\"else\":\"was false\"}"

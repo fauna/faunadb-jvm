@@ -1,4 +1,11 @@
+2.6.0-SNAPSHOT
+* Upgrade async-http-client library
+* Fix a bug on Do() function that was preventing expressions with only one statement
+* Support backrefs in Let() bindings. Requires FaunaDB 2.6.0.
+* Add stdlib string functions FindStr(), FindStrRegex(), Length(), Lower(), LTrim(), Repeat(), ReplaceStr(), ReplaceStrRegex(), RTrim(), Space(), SubString(), TitleCase(), Trim(), Upper()
+
 2.5.5
+=======
 * Scala: Adds Codec.Alias
 
 2.5.4
@@ -49,6 +56,9 @@ Epoch(), and Date()
 * Adds support for user class serialization (encode/decode)
 * Remove build dependency on GPG for automation purposes
 * Adds support for recursive references
+
+1.2.1
+* Fix NoSuchElementException when parsing empty object
 
 1.2.0
 * Add support for scala 2.12.x
