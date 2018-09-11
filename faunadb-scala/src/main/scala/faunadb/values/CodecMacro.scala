@@ -93,7 +93,6 @@ class CodecMacro(val c: blackbox.Context) {
       def encode(value: $tpe): $M.Value = {
         val (tag, obj) = value match {
           case ..$encodes
-          case v => throw new RuntimeException("Unable to encode "+${tpe.toString}+" variant $$v.")
         }
 
         obj match {
