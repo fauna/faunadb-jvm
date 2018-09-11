@@ -99,7 +99,7 @@ class CodecMacro(val c: blackbox.Context) {
 
         obj match {
           case $M.ObjectV(fields) => $M.ObjectV(fields + (($tagLit, tag)))
-          case v => throw new RuntimeException("Invalid Union variant: $$v must encode as type ObjectV.")
+          case v => throw new RuntimeException(s"Invalid Union variant: $$v must encode as type ObjectV.")
         }
       }
     }: $M.UnionCodec[$tpe]"""
