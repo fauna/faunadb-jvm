@@ -13,8 +13,7 @@ object Result {
     VFail(List(FieldError("Value not found", path)))
 
   def Unexpected[T](actual: Value, expected: String, path: FieldPath): Result[T] = {
-    val tpe = actual.getClass.getSimpleName.dropRight(1)
-    VFail(List(FieldError(s"Expected $expected; found value $actual of type $tpe.", path)))
+    VFail(List(FieldError(s"Expected $expected; found value $actual of type ${actual.vtype}.", path)))
   }
 
   implicit class ValueResultOps(r: Result[Value]) {

@@ -79,6 +79,10 @@ sealed trait Value {
 
   /** Extract the elements of an ArrayV using the provided field. */
   final def collect[T](field: Field[T]): Result[Seq[T]] = apply(Field.collect(field))
+
+  /** Describe the type that this value will be representing */
+  private[values] val vtype: String
+
 }
 
 /** Companion object to the Value trait. */
@@ -95,25 +99,25 @@ object Value {
   *
   * Arrays, objects, and null are not considered scalar values.
   */
-sealed trait ScalarValue extends Value
+sealed abstract class ScalarValue(@(JsonIgnore @getter) val vtype: String) extends Value
 
 /** A String value. */
-case class StringV(@(JsonValue @getter) value: String) extends ScalarValue {
-  override def toString: String = "\"%s\"".format(value)
+case class StringV(@(JsonValue @getter) value: String) extends ScalarValue("String") {
+  override def toString: String = s""""$value""""
 }
 
 /** A Long value. */
-case class LongV(@(JsonValue @getter) value: Long) extends ScalarValue {
+case class LongV(@(JsonValue @getter) value: Long) extends ScalarValue("Long") {
   override def toString: String = value.toString
 }
 
 /** A Double value. */
-case class DoubleV(@(JsonValue @getter) value: Double) extends ScalarValue {
+case class DoubleV(@(JsonValue @getter) value: Double) extends ScalarValue("Double") {
   override def toString: String = value.toString
 }
 
 /** A Boolean value. */
-sealed abstract class BooleanV(@(JsonValue @getter) val value: Boolean) extends ScalarValue {
+sealed abstract class BooleanV(@(JsonValue @getter) val value: Boolean) extends ScalarValue("Boolean") {
   // satisfy name-based extractor interface
   val isEmpty = false
   val get = value
@@ -132,7 +136,7 @@ object BooleanV {
 /** A Ref. */
 case class RefV(@(JsonIgnore @getter) id: String,
                 @(JsonIgnore @getter) clazz: Option[RefV] = None,
-                @(JsonIgnore @getter) database: Option[RefV] = None) extends ScalarValue {
+                @(JsonIgnore @getter) database: Option[RefV] = None) extends ScalarValue("Ref") {
 
   @JsonProperty("@ref")
   lazy val refValue: Any = RefID(id, clazz, database)
@@ -158,10 +162,11 @@ object Native {
 }
 
 /** A Set Ref. */
-case class SetRefV(@JsonProperty("@set") parameters: Value) extends ScalarValue
+case class SetRefV(@JsonProperty("@set") parameters: Value) extends ScalarValue("SetRef")
 
 /** A Timestamp value. */
-case class TimeV(@(JsonIgnore @param @field @getter) toInstant: Instant) extends ScalarValue {
+case class TimeV(@(JsonIgnore @param @field @getter) toInstant: Instant) extends ScalarValue("Time") {
+
   @JsonProperty("@ts")
   val strValue = toInstant.toString
 }
@@ -170,7 +175,7 @@ object TimeV {
 }
 
 /** A Date value. */
-case class DateV(@(JsonIgnore @param @field @getter) localDate: LocalDate) extends ScalarValue {
+case class DateV(@(JsonIgnore @param @field @getter) localDate: LocalDate) extends ScalarValue("Date") {
   @JsonProperty("@date")
   val strValue = localDate.toString
 }
@@ -178,7 +183,7 @@ object DateV {
   def apply(value: String): DateV = DateV(LocalDate.parse(value))
 }
 
-case class BytesV(@(JsonIgnore @param @field @getter) bytes: Array[Byte]) extends ScalarValue {
+case class BytesV(@(JsonIgnore @param @field @getter) bytes: Array[Byte]) extends ScalarValue("Bytes") {
   @JsonProperty("@bytes")
   lazy val strValue = Base64.getUrlEncoder.encodeToString(bytes)
 
@@ -197,26 +202,34 @@ object BytesV {
   def apply(value: String): BytesV = BytesV(Base64.getUrlDecoder.decode(value))
 }
 
-case class QueryV(@JsonProperty("@query") lambda: ObjectV) extends Value
+case class QueryV(@JsonProperty("@query") lambda: ObjectV) extends Value {
+  @(JsonValue @getter) val vtype: String = "Query"
+}
 
 // Container types and Null
 
 /** An Object value. */
-case class ObjectV(@(JsonValue @getter) fields: Map[String, Value]) extends Value
+case class ObjectV(@(JsonValue @getter) fields: Map[String, Value]) extends Value {
+  @(JsonValue @getter) val vtype: String = "Object"
+}
 object ObjectV {
   val empty = ObjectV()
   def apply(fields: (String, Value)*) = new ObjectV(fields.toMap)
 }
 
 /** An Array. */
-case class ArrayV(@(JsonValue @getter) elems: Vector[Value]) extends Value
+case class ArrayV(@(JsonValue @getter) elems: Vector[Value]) extends Value {
+  @(JsonValue @getter) val vtype: String = "Array"
+}
 object ArrayV {
   val empty = ArrayV()
   def apply(elems: Value*) = new ArrayV(Vector(elems: _*))
 }
 
 /** The Null value. */
-sealed trait NullV extends Value
+sealed trait NullV extends Value {
+  @(JsonValue @getter) val vtype: String = "Null"
+}
 case object NullV extends NullV {
   @(JsonValue @getter) val value = NullNode.instance
 }
