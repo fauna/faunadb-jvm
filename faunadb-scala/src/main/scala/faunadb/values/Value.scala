@@ -98,19 +98,26 @@ object Value {
 sealed trait ScalarValue extends Value
 
 /** A String value. */
-case class StringV(@(JsonValue @getter) value: String) extends ScalarValue
+case class StringV(@(JsonValue @getter) value: String) extends ScalarValue {
+  override def toString: String = "\"%s\"".format(value)
+}
 
 /** A Long value. */
-case class LongV(@(JsonValue @getter) value: Long) extends ScalarValue
+case class LongV(@(JsonValue @getter) value: Long) extends ScalarValue {
+  override def toString: String = value.toString
+}
 
 /** A Double value. */
-case class DoubleV(@(JsonValue @getter) value: Double) extends ScalarValue
+case class DoubleV(@(JsonValue @getter) value: Double) extends ScalarValue {
+  override def toString: String = value.toString
+}
 
 /** A Boolean value. */
 sealed abstract class BooleanV(@(JsonValue @getter) val value: Boolean) extends ScalarValue {
   // satisfy name-based extractor interface
   val isEmpty = false
   val get = value
+  override def toString: String = value.toString
 }
 case object TrueV extends BooleanV(true)
 case object FalseV extends BooleanV(false)
