@@ -99,10 +99,10 @@ object Value {
   *
   * Arrays, objects, and null are not considered scalar values.
   */
-sealed abstract class ScalarValue(@(JsonIgnore @getter) val vtype: String) extends Value
+sealed abstract class ScalarValue(@JsonIgnore val vtype: String) extends Value
 
 /** A String value. */
-case class StringV(@(JsonValue @getter) value: String) extends ScalarValue("String") {
+case class StringV(@JsonValue value: String) extends ScalarValue("String") {
   override def toString: String = s""""$value""""
 }
 
@@ -203,14 +203,14 @@ object BytesV {
 }
 
 case class QueryV(@JsonProperty("@query") lambda: ObjectV) extends Value {
-  @(JsonValue @getter) val vtype: String = "Query"
+  @JsonIgnore val vtype: String = "Query"
 }
 
 // Container types and Null
 
 /** An Object value. */
 case class ObjectV(@(JsonValue @getter) fields: Map[String, Value]) extends Value {
-  @(JsonValue @getter) val vtype: String = "Object"
+  @JsonIgnore val vtype: String = "Object"
 }
 object ObjectV {
   val empty = ObjectV()
@@ -219,7 +219,7 @@ object ObjectV {
 
 /** An Array. */
 case class ArrayV(@(JsonValue @getter) elems: Vector[Value]) extends Value {
-  @(JsonValue @getter) val vtype: String = "Array"
+  @JsonIgnore val vtype: String = "Array"
 }
 object ArrayV {
   val empty = ArrayV()
@@ -228,7 +228,7 @@ object ArrayV {
 
 /** The Null value. */
 sealed trait NullV extends Value {
-  @(JsonValue @getter) val vtype: String = "Null"
+  @JsonIgnore val vtype: String = "Null"
 }
 case object NullV extends NullV {
   @(JsonValue @getter) val value = NullNode.instance
