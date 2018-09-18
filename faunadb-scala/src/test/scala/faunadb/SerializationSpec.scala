@@ -336,4 +336,14 @@ class SerializationSpec extends FlatSpec with Matchers {
     val not = Not(false)
     json.writeValueAsString(not) shouldBe "{\"not\":false}"
   }
+
+  it should "print usefully" in {
+    ArrayV(1, "test").toString shouldBe "[1, \"test\"]"
+    RefV("42", RefV("people", Native.Classes), RefV("db", Native.Databases)).toString shouldBe
+      "ref(id = \"42\", class = ref(id = \"people\", class = ref(id = \"classes\")), database = ref(id = \"db\", class = ref(id = \"databases\")))"
+    ObjectV("k1" -> StringV("v1")).toString shouldBe "{k1: \"v1\"}"
+    ObjectV("k1" -> "v1", "k2" -> 2).toString shouldBe "{k1: \"v1\", k2: 2}"
+    SetRefV(ObjectV("k1" -> StringV("v1"))).toString shouldBe "{@set = {k1: \"v1\"}}"
+
+  }
 }
