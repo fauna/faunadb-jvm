@@ -104,17 +104,17 @@ sealed abstract class ScalarValue(@(JsonIgnore @getter) val vtype: String) exten
 
 /** A String value. */
 case class StringV(@(JsonValue @getter) value: String) extends ScalarValue ("String") {
-  override def toString: String = s""""$value""""
+  override def toString = s""""$value""""
 }
 
 /** A Long value. */
 case class LongV(@(JsonValue @getter) value: Long) extends ScalarValue("Long") {
-  override def toString: String = value.toString
+  override def toString = value.toString
 }
 
 /** A Double value. */
 case class DoubleV(@(JsonValue @getter) value: Double) extends ScalarValue("Double") {
-  override def toString: String = value.toString
+  override def toString = value.toString
 }
 
 /** A Boolean value. */
@@ -122,7 +122,7 @@ sealed abstract class BooleanV(@(JsonValue @getter) val value: Boolean) extends 
   // satisfy name-based extractor interface
   val isEmpty = false
   val get = value
-  override def toString: String = value.toString
+  override def toString = value.toString
 }
 case object TrueV extends BooleanV(true)
 case object FalseV extends BooleanV(false)
@@ -141,6 +141,12 @@ case class RefV(@(JsonIgnore @getter) id: String,
 
   @JsonProperty("@ref")
   lazy val refValue: Any = RefID(id, clazz, database)
+
+  override def toString = {
+    val cls = clazz map { ", class = " + _ } getOrElse ""
+    val db = database map { ", database = " + _ } getOrElse ""
+    s"""ref(id = "$id"$cls$db)"""
+  }
 
   @JsonInclude(JsonInclude.Include.NON_ABSENT)
   private case class RefID(
@@ -163,7 +169,9 @@ object Native {
 }
 
 /** A Set Ref. */
-case class SetRefV(@JsonProperty("@set") parameters: Value) extends ScalarValue("SetRef")
+case class SetRefV(@JsonProperty("@set") parameters: Value) extends ScalarValue("SetRef") {
+  override def toString = s"{@set = $parameters}"
+}
 
 /** A Timestamp value. */
 case class TimeV(@(JsonIgnore @param @field @getter) toInstant: Instant) extends ScalarValue("Time") {
@@ -196,7 +204,7 @@ case class BytesV(@(JsonIgnore @param @field @getter) bytes: Array[Byte]) extend
 
   override def hashCode(): Int = bytes.hashCode()
 
-  override def toString: String = bytes map { s => f"0x$s%02x" } mkString ("BytesV(", ", ", ")")
+  override def toString = bytes map { s => f"0x$s%02x" } mkString ("BytesV(", ", ", ")")
 }
 object BytesV {
   def apply(bytes: Int*): BytesV = BytesV(bytes map { _.toByte } toArray)
@@ -212,6 +220,7 @@ case class QueryV(@JsonProperty("@query") lambda: ObjectV) extends Value {
 /** An Object value. */
 case class ObjectV(@(JsonValue @getter) fields: Map[String, Value]) extends Value {
   @JsonIgnore val vtype: String = "Object"
+  override def toString = fields map { case (k,v) => s"$k: $v" }  mkString ("{", ", ", "}")
 }
 object ObjectV {
   val empty = ObjectV()
@@ -221,6 +230,7 @@ object ObjectV {
 /** An Array. */
 case class ArrayV(@(JsonValue @getter) elems: Vector[Value]) extends Value {
   @JsonIgnore val vtype: String = "Array"
+  override def toString = elems mkString ("[", ", ", "]")
 }
 object ArrayV {
   val empty = ArrayV()
