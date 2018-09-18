@@ -3,7 +3,7 @@ package faunadb.values
 import java.nio.ByteBuffer
 import java.time.{ Instant, LocalDate }
 import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
-import java.util.Base64
+import java.util.Base64;
 
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
@@ -100,10 +100,10 @@ object Value {
   *
   * Arrays, objects, and null are not considered scalar values.
   */
-sealed abstract class ScalarValue(@(JsonIgnore @getter) val vtype: String) extends Value
+sealed abstract class ScalarValue(@(JsonIgnore @field) val vtype: String) extends Value
 
 /** A String value. */
-case class StringV(@(JsonValue @getter) value: String) extends ScalarValue ("String") {
+case class StringV(@(JsonValue @getter) value: String) extends ScalarValue("String") {
   override def toString = s""""$value""""
 }
 
@@ -175,9 +175,9 @@ case class SetRefV(@JsonProperty("@set") parameters: Value) extends ScalarValue(
 
 /** A Timestamp value. */
 case class TimeV(@(JsonIgnore @param @field @getter) toInstant: Instant) extends ScalarValue("Time") {
-
   @JsonProperty("@ts")
   val strValue = toInstant.toString
+  override def toString = strValue
 }
 object TimeV {
   def apply(value: String): TimeV = TimeV(Instant.from(ISO_OFFSET_DATE_TIME.parse(value)))
@@ -187,6 +187,7 @@ object TimeV {
 case class DateV(@(JsonIgnore @param @field @getter) localDate: LocalDate) extends ScalarValue("Date") {
   @JsonProperty("@date")
   val strValue = localDate.toString
+  override def toString = strValue
 }
 object DateV {
   def apply(value: String): DateV = DateV(LocalDate.parse(value))
@@ -204,7 +205,7 @@ case class BytesV(@(JsonIgnore @param @field @getter) bytes: Array[Byte]) extend
 
   override def hashCode(): Int = bytes.hashCode()
 
-  override def toString = bytes map { s => f"0x$s%02x" } mkString ("BytesV(", ", ", ")")
+  override def toString = bytes map { s => f"0x$s%02x" } mkString ("[", " ", "]")
 }
 object BytesV {
   def apply(bytes: Int*): BytesV = BytesV(bytes map { _.toByte } toArray)
@@ -213,6 +214,7 @@ object BytesV {
 
 case class QueryV(@JsonProperty("@query") lambda: ObjectV) extends Value {
   @JsonIgnore val vtype: String = "Query"
+  override def toString = lambda.toString
 }
 
 // Container types and Null
