@@ -3,7 +3,8 @@ package faunadb.values
 import java.nio.ByteBuffer
 import java.time.{ Instant, LocalDate }
 import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
-import java.util.Base64;
+import java.util.Base64
+
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.node.NullNode
@@ -99,10 +100,10 @@ object Value {
   *
   * Arrays, objects, and null are not considered scalar values.
   */
-sealed abstract class ScalarValue(@JsonIgnore val vtype: String) extends Value
+sealed abstract class ScalarValue(@(JsonIgnore @getter) val vtype: String) extends Value
 
 /** A String value. */
-case class StringV(@JsonValue value: String) extends ScalarValue("String") {
+case class StringV(@(JsonValue @getter) value: String) extends ScalarValue ("String") {
   override def toString: String = s""""$value""""
 }
 
