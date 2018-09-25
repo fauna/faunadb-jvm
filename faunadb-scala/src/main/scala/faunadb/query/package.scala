@@ -40,7 +40,7 @@ package query {
   }
 
   /**
-    * Enumeration for time units. Used by [[https://fauna.com/documentation/queries#time_functions]].
+    * Enumeration for time units. Used by [[https://app.fauna.com/documentation/reference/queryapi#time-and-date]].
     */
   sealed abstract class TimeUnit(val expr: Expr)
   object TimeUnit {
@@ -117,7 +117,7 @@ package object query {
     * RefV("123", RefV("widget", Native.Classes))
     * }}}
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#values]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#simple-type]]
     */
   def Ref(value: String): Expr =
     Expr(ObjectV("@ref" -> StringV(value)))
@@ -156,7 +156,7 @@ package object query {
   /**
     * An Array value.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#values]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#simple-type]]
     */
   def Arr(elems: Expr*): Expr =
     Expr(ArrayV(unwrap(elems): _*))
@@ -164,7 +164,7 @@ package object query {
   /**
     * An Object value.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#values]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#simple-type]]
     */
   def Obj(pairs: (String, Expr)*): Expr =
     Expr(ObjectV("object" -> ObjectV(unwrapPairs(pairs): _*)))
@@ -172,7 +172,7 @@ package object query {
   /**
     * A Null value.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#values]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#simple-type]]
     */
   def Null(): Expr =
     Expr(NullV)
@@ -182,7 +182,7 @@ package object query {
   /**
     * A Abort expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#basic-forms]]
     */
   def Abort(msg: Expr): Expr =
     Expr(ObjectV("abort" -> msg.value))
@@ -190,7 +190,7 @@ package object query {
   /**
     * A Call expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#basic-forms]]
     */
   def Call(ref: Expr, arguments: Expr*) =
     Expr(ObjectV("call" -> ref.value, "arguments" -> varargs(arguments)))
@@ -198,7 +198,7 @@ package object query {
   /**
     * A Query expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#basic-forms]]
     */
   def Query(fn: Expr => Expr): Expr = macro QueryMacros.query
   def Query(fn: (Expr, Expr) => Expr): Expr = macro QueryMacros.query
@@ -217,7 +217,7 @@ package object query {
   /**
     * A At expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#basic-forms]]
     */
   def At(timestamp: Expr, expr: Expr): Expr =
     Expr(ObjectV("at" -> timestamp.value, "expr" -> expr.value))
@@ -225,7 +225,7 @@ package object query {
   /**
     * A Let expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#basic-forms]]
     */
 
   def Let(block: => Any): Expr = macro QueryMacros.let
@@ -236,7 +236,7 @@ package object query {
   /**
     * A Var expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#basic-forms]]
     */
   def Var(name: String): Expr =
     Expr(ObjectV("var" -> StringV(name)))
@@ -244,7 +244,7 @@ package object query {
   /**
    * An If expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#basic-forms]]
    */
   def If(pred: Expr, `then`: Expr, `else`: Expr): Expr =
     Expr(ObjectV("if" -> pred.value, "then" -> `then`.value, "else" -> `else`.value))
@@ -252,7 +252,7 @@ package object query {
   /**
    * A Do expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#basic-forms]]
    */
   def Do(exprs: Expr*): Expr =
     Expr(ObjectV("do" -> ArrayV(unwrap(exprs): _*)))
@@ -260,7 +260,7 @@ package object query {
   /**
    * A Lambda expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#basic-forms]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#basic-forms]]
    */
   def Lambda(fn: Expr => Expr): Expr = macro QueryMacros.lambda
   def Lambda(fn: (Expr, Expr) => Expr): Expr = macro QueryMacros.lambda
@@ -281,7 +281,7 @@ package object query {
   /**
    * A Map expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#collections]]
    */
   def Map(collection: Expr, lambda: Expr): Expr =
     Expr(ObjectV("map" -> lambda.value, "collection" -> collection.value))
@@ -289,7 +289,7 @@ package object query {
   /**
    * A Foreach expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#collections]]
    */
   def Foreach(collection: Expr, lambda: Expr): Expr =
     Expr(ObjectV("foreach" -> lambda.value, "collection" -> collection.value))
@@ -297,7 +297,7 @@ package object query {
   /**
     * A Filter expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#collections]]
     */
   def Filter(collection: Expr, lambda: Expr): Expr =
     Expr(ObjectV("filter" -> lambda.value, "collection" -> collection.value))
@@ -305,7 +305,7 @@ package object query {
   /**
     * A Prepend expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#collections]]
     */
   def Prepend(elems: Expr, collection: Expr): Expr =
     Expr(ObjectV("prepend" -> elems.value, "collection" -> collection.value))
@@ -313,7 +313,7 @@ package object query {
   /**
     * An Append expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#collections]]
     */
   def Append(elems: Expr, collection: Expr): Expr =
     Expr(ObjectV("append" -> elems.value, "collection" -> collection.value))
@@ -321,7 +321,7 @@ package object query {
   /**
     * A Take expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#collections]]
     */
   def Take(num: Expr, collection: Expr): Expr =
     Expr(ObjectV("take" -> num.value, "collection" -> collection.value))
@@ -329,7 +329,7 @@ package object query {
   /**
     * A Drop expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#collections]]
     */
   def Drop(num: Expr, collection: Expr): Expr =
     Expr(ObjectV("drop" -> num.value, "collection" -> collection.value))
@@ -337,7 +337,7 @@ package object query {
   /**
     * A IsEmpty expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#collections]]
     */
   def IsEmpty(collection: Expr): Expr =
     Expr(ObjectV("is_empty" -> collection.value))
@@ -345,7 +345,7 @@ package object query {
   /**
     * A IsNonEmpty expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#collections]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#collections]]
     */
   def IsNonEmpty(collection: Expr): Expr =
     Expr(ObjectV("is_nonempty" -> collection.value))
@@ -355,7 +355,7 @@ package object query {
   /**
    * A Get expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#read-functions]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#read-functions]]
    */
   def Get(resource: Expr): Expr =
     Expr(ObjectV("get" -> resource.value))
@@ -366,7 +366,7 @@ package object query {
   /**
     * A KeyFromSecret expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#read-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#read-functions]]
     */
   def KeyFromSecret(secret: Expr): Expr =
     Expr(ObjectV("key_from_secret" -> secret.value))
@@ -374,7 +374,7 @@ package object query {
   /**
    * A Paginate expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#read-functions]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#read-functions]]
    */
   def Paginate(
     resource: Expr,
@@ -406,7 +406,7 @@ package object query {
   /**
    * An Exists expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#read-functions]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#read-functions]]
    */
   def Exists(ref: Expr): Expr =
     Expr(ObjectV("exists" -> ref.value))
@@ -419,7 +419,7 @@ package object query {
   /**
    * A Create expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
    */
   def Create(ref: Expr, params: Expr): Expr =
     Expr(ObjectV("create" -> ref.value, "params" -> params.value))
@@ -427,7 +427,7 @@ package object query {
   /**
    * An Update expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
    */
   def Update(ref: Expr, params: Expr): Expr =
     Expr(ObjectV("update" -> ref.value, "params" -> params.value))
@@ -435,7 +435,7 @@ package object query {
   /**
    * A Replace expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
    */
   def Replace(ref: Expr, params: Expr): Expr =
     Expr(ObjectV("replace" -> ref.value, "params" -> params.value))
@@ -443,7 +443,7 @@ package object query {
   /**
    * A Delete expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
    */
   def Delete(ref: Expr): Expr =
     Expr(ObjectV("delete" -> ref.value))
@@ -451,7 +451,7 @@ package object query {
   /**
     * An Insert expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
     */
   def Insert(ref: Expr, ts: Expr, action: Action, params: Expr): Expr =
     Insert(ref, ts, action.expr, params)
@@ -462,7 +462,7 @@ package object query {
   /**
     * A Remove expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
     */
   def Remove(ref: Expr, ts: Expr, action: Action): Expr =
     Remove(ref, ts, action.expr)
@@ -473,7 +473,7 @@ package object query {
   /**
     * A Create Class expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
     */
   def CreateClass(params: Expr): Expr =
     Expr(ObjectV("create_class" -> params.value))
@@ -481,7 +481,7 @@ package object query {
   /**
     * A Create Database expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
     */
   def CreateDatabase(params: Expr): Expr =
     Expr(ObjectV("create_database" -> params.value))
@@ -489,7 +489,7 @@ package object query {
   /**
     * A Create Key expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
     */
   def CreateKey(params: Expr): Expr =
     Expr(ObjectV("create_key" -> params.value))
@@ -497,7 +497,7 @@ package object query {
   /**
     * A Create Index expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
     */
   def CreateIndex(params: Expr): Expr =
     Expr(ObjectV("create_index" -> params.value))
@@ -505,7 +505,7 @@ package object query {
   /**
     * A Create Function expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#write-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
     */
   def CreateFunction(params: Expr): Expr =
     Expr(ObjectV("create_function" -> params.value))
@@ -515,7 +515,7 @@ package object query {
   /**
     * A Singleton set.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#sets]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#sets]]
     */
   def Singleton(ref: Expr): Expr =
     Expr(ObjectV("singleton" -> ref.value))
@@ -523,7 +523,7 @@ package object query {
   /**
     * A Events set.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#sets]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#sets]]
     */
   def Events(refSet: Expr): Expr =
     Expr(ObjectV("events" -> refSet.value))
@@ -531,7 +531,7 @@ package object query {
   /**
    * A Match set.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#sets]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#sets]]
    */
   def Match(index: Expr, terms: Expr*): Expr =
     Expr(ObjectV("match" -> varargs(terms), "index" -> index.value))
@@ -539,7 +539,7 @@ package object query {
   /**
    * A Union set.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#sets]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#sets]]
    */
   def Union(sets: Expr*): Expr =
     Expr(ObjectV("union" -> varargs(sets)))
@@ -547,7 +547,7 @@ package object query {
   /**
    * An Intersection set.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#sets]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#sets]]
    */
   def Intersection(sets: Expr*): Expr =
     Expr(ObjectV("intersection" -> varargs(sets)))
@@ -555,7 +555,7 @@ package object query {
   /**
    * A Difference set.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#sets]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#sets]]
    */
   def Difference(sets: Expr*): Expr =
     Expr(ObjectV("difference" -> varargs(sets)))
@@ -563,7 +563,7 @@ package object query {
   /**
    * A Distinct set.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#sets]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#sets]]
    */
   def Distinct(set: Expr): Expr =
     Expr(ObjectV("distinct" -> set.value))
@@ -571,7 +571,7 @@ package object query {
   /**
    * A Join set.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#sets]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#sets]]
    */
   def Join(source: Expr, `with`: Expr): Expr =
     Expr(ObjectV("join" -> source.value, "with" -> `with`.value))
@@ -581,7 +581,7 @@ package object query {
   /**
     * A Login expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#authentication]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#authentication]]
     */
   def Login(ref: Expr, params: Expr): Expr =
     Expr(ObjectV("login" -> ref.value, "params" -> params.value))
@@ -589,7 +589,7 @@ package object query {
   /**
     * A Logout expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#authentication]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#authentication]]
     */
   def Logout(invalidateAll: Expr): Expr =
     Expr(ObjectV("logout" -> invalidateAll.value))
@@ -597,7 +597,7 @@ package object query {
   /**
     * An Identify expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#authentication]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#authentication]]
     */
   def Identify(ref: Expr, password: Expr): Expr =
     Expr(ObjectV("identify" -> ref.value, "password" -> password.value))
@@ -605,7 +605,7 @@ package object query {
   /**
     * An Identity expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#authentication]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#authentication]]
     */
   def Identity(): Expr =
     Expr(ObjectV("identity" -> NullV))
@@ -613,7 +613,7 @@ package object query {
   /**
     * An HasIdentity expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#authentication]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#authentication]]
     */
   def HasIdentity(): Expr =
     Expr(ObjectV("has_identity" -> NullV))
@@ -623,7 +623,7 @@ package object query {
   /**
    * A Concat expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def Concat(term: Expr): Expr =
     Expr(ObjectV("concat" -> term.value))
@@ -634,7 +634,7 @@ package object query {
   /**
    * A Casefold expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def Casefold(term: Expr): Expr =
     Expr(ObjectV("casefold" -> term.value))
@@ -648,7 +648,7 @@ package object query {
   /**
    * A FindStr expression
    *
-   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def FindStr(value: Expr, find: Expr): Expr =
     Expr(ObjectV("findstr" -> value.value, "find" -> find.value))
@@ -659,7 +659,7 @@ package object query {
   /**
     * A FindStrRegex expression
     *
-    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def FindStrRegex(value: Expr, pattern: Expr, start: Expr): Expr =
     Expr(ObjectV("findstrregex" -> value.value, "pattern" -> pattern.value, "start" -> start.value))
@@ -667,7 +667,7 @@ package object query {
   /**
     * A FindStrRegex expression
     *
-    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def FindStrRegex(value: Expr, pattern: Expr, start: Expr, num_results: Expr): Expr =
     Expr(ObjectV("findstrregex" -> value.value, "pattern" -> pattern.value, "start" -> start.value, "num_results" -> num_results.value))
@@ -675,7 +675,7 @@ package object query {
   /**
    * A Length expression
    *
-   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def Length(value: Expr): Expr =
     Expr(ObjectV("length" -> value.value ))
@@ -683,7 +683,7 @@ package object query {
   /**
    * A LowerCase expression
    *
-   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def LowerCase(value: Expr): Expr =
     Expr(ObjectV("lowercase" -> value.value))
@@ -691,7 +691,7 @@ package object query {
   /**
    * A LTrim expression
    *
-   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def LTrim(value: Expr): Expr =
     Expr(ObjectV("ltrim" -> value.value ))
@@ -699,7 +699,7 @@ package object query {
   /**
     * A NGram expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def NGram(terms: Expr, min: Expr = NullV, max: Expr = NullV): Expr = {
     val b = Seq.newBuilder[(String, Value)]
@@ -713,7 +713,7 @@ package object query {
   /**
    * A Repeat expression
    *
-   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def Repeat(value: Expr): Expr =
     Expr(ObjectV("repeat" -> value.value ))
@@ -721,7 +721,7 @@ package object query {
   /**
     * A Repeat expression
     *
-    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def Repeat(value: Expr, number: Expr): Expr =
     Expr(ObjectV("repeat" -> value.value, "number" -> number.value))
@@ -729,7 +729,7 @@ package object query {
   /**
    * A ReplaceStr expression
    *
-   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def ReplaceStr(value: Expr, find: Expr, replace: Expr): Expr =
     Expr(ObjectV("replacestr" -> value.value, "find" -> find.value, "replace" -> replace.value))
@@ -737,7 +737,7 @@ package object query {
   /**
     * A ReplaceStrRegex expression
     *
-    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def ReplaceStrRegex(value: Expr, pattern: Expr, replace: Expr): Expr =
     Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> pattern.value, "replace" -> replace.value))
@@ -745,7 +745,7 @@ package object query {
   /**
     * A ReplaceStrRegex expression
     *
-    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def ReplaceStrRegex(value: Expr, pattern: Expr, replace: Expr, first: Expr): Expr =
     Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> pattern.value, "replace" -> replace.value, "first" -> first.value))
@@ -753,7 +753,7 @@ package object query {
   /**
    * A RTrim expression
    *
-   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def RTrim(value: Expr): Expr =
     Expr(ObjectV("rtrim" -> value.value))
@@ -761,7 +761,7 @@ package object query {
   /**
    * A Space expression
    *
-   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def Space(value: Expr): Expr =
     Expr(ObjectV("space" -> value.value ))
@@ -769,7 +769,7 @@ package object query {
   /**
     * A SubString expression
     *
-    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def SubString(value: Expr): Expr =
     Expr(ObjectV("substring" -> value.value))
@@ -777,7 +777,7 @@ package object query {
   /**
    * A SubString expression
    *
-   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def SubString(value: Expr, start: Expr): Expr =
     Expr(ObjectV("substring" -> value.value, "start" -> start.value))
@@ -785,7 +785,7 @@ package object query {
   /**
    * A SubString expression
    *
-   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def SubString(value: Expr, start: Expr, length: Expr): Expr =
     Expr(ObjectV("substring" -> value.value, "start" -> start.value, "length" -> length.value))
@@ -793,7 +793,7 @@ package object query {
   /**
     * A TitleCase expression
     *
-    *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def TitleCase(value: Expr): Expr =
     Expr(ObjectV("titlecase" -> value.value ))
@@ -801,7 +801,7 @@ package object query {
   /**
    * A Trim expression
    *
-   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def Trim(term: Expr): Expr =
     Expr(ObjectV("trim" -> term.value ))
@@ -809,7 +809,7 @@ package object query {
   /**
    * A UpperCase expression
    *
-   *''Reference''': [[https://fauna.com/documentation/queries#string-functions]]
+   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def UpperCase(term: Expr): Expr =
     Expr(ObjectV("uppercase" -> term.value ))
@@ -819,7 +819,7 @@ package object query {
   /**
     * A Time expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#time-and-date]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-and-date]]
     */
   def Time(str: Expr): Expr =
     Expr(ObjectV("time" -> str.value))
@@ -827,7 +827,7 @@ package object query {
   /**
     * An Epoch expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#time-and-date]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-and-date]]
     */
   def Epoch(num: Expr, unit: TimeUnit): Expr =
     Epoch(num, unit.expr)
@@ -838,7 +838,7 @@ package object query {
   /**
     * A Date expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#time-and-date]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-and-date]]
     */
   def Date(str: Expr): Expr =
     Expr(ObjectV("date" -> str.value))
@@ -848,7 +848,7 @@ package object query {
   /**
     * A Next Id expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#miscellaneous]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
   @deprecated("use NewId instead")
   def NextId(): Expr =
@@ -857,7 +857,7 @@ package object query {
   /**
     * A New Id expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#miscellaneous]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
   def NewId(): Expr =
     Expr(ObjectV("new_id" -> NullV))
@@ -865,7 +865,7 @@ package object query {
   /**
     * A Class expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
     */
   def Class(name: Expr): Expr =
     Expr(ObjectV("class" -> name.value))
@@ -873,7 +873,7 @@ package object query {
   /**
     * A Class expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
     */
   def Class(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("class" -> name.value, "scope" -> scope.value))
@@ -881,7 +881,7 @@ package object query {
   /**
     * A Database expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
     */
   def Database(name: Expr): Expr =
     Expr(ObjectV("database" -> name.value))
@@ -889,7 +889,7 @@ package object query {
   /**
     * A Database expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
     */
   def Database(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("database" -> name.value, "scope" -> scope.value))
@@ -897,7 +897,7 @@ package object query {
   /**
     * An Index expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
     */
   def Index(name: Expr): Expr =
     Expr(ObjectV("index" -> name.value))
@@ -905,7 +905,7 @@ package object query {
   /**
     * An Index expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
     */
   def Index(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("index" -> name.value, "scope" -> scope.value))
@@ -913,7 +913,7 @@ package object query {
   /**
     * A Function expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
     */
   def Function(name: Expr): Expr =
     Expr(ObjectV("function" -> name.value))
@@ -921,7 +921,7 @@ package object query {
   /**
     * A Function expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
     */
   def Function(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("function" -> name.value, "scope" -> scope.value))
@@ -929,7 +929,7 @@ package object query {
   /**
    * An Equals expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#miscellaneous]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
    */
   def Equals(terms: Expr*): Expr =
     Expr(ObjectV("equals" -> varargs(terms)))
@@ -937,7 +937,7 @@ package object query {
   /**
    * A Contains expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#miscellaneous]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
    */
   def Contains(path: Expr, in: Expr): Expr =
     Expr(ObjectV("contains" -> path.value, "in" -> in.value))
@@ -945,7 +945,7 @@ package object query {
   /**
    * A Select expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#read-functions]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#read-functions]]
    */
   def Select(path: Expr, from: Expr): Expr =
     Expr(ObjectV("select" -> path.value, "from" -> from.value))
@@ -956,7 +956,7 @@ package object query {
   /**
     * A SelectAll expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#read-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#read-functions]]
     */
   def SelectAll(path: Expr, from: Expr): Expr =
     Expr(ObjectV("select_all" -> path.value, "from" -> from.value))
@@ -967,7 +967,7 @@ package object query {
   /**
    * An Abs expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
    */
   def Abs(num: Expr): Expr =
     Expr(ObjectV("abs" -> num.value))
@@ -975,7 +975,7 @@ package object query {
   /**
     * An Acos expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Acos(num: Expr): Expr =
     Expr(ObjectV("acos" -> num.value))
@@ -983,7 +983,7 @@ package object query {
   /**
    * An Add expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
    */
   def Add(terms: Expr*): Expr =
     Expr(ObjectV("add" -> varargs(terms)))
@@ -991,7 +991,7 @@ package object query {
   /**
     * An Asin expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Asin(num: Expr): Expr =
     Expr(ObjectV("asin" -> num.value))
@@ -999,7 +999,7 @@ package object query {
   /**
     * An Atan expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Atan(num: Expr): Expr =
     Expr(ObjectV("atan" -> num.value))
@@ -1007,7 +1007,7 @@ package object query {
   /**
     * An BitAnd expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def BitAnd(terms: Expr*): Expr =
     Expr(ObjectV("bitand" -> varargs(terms)))
@@ -1015,7 +1015,7 @@ package object query {
   /**
     * A BitNot expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def BitNot(num: Expr): Expr =
     Expr(ObjectV("bitnot" -> num.value))
@@ -1023,7 +1023,7 @@ package object query {
   /**
     * An BitOr expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def BitOr(terms: Expr*): Expr =
     Expr(ObjectV("bitor" -> varargs(terms)))
@@ -1031,7 +1031,7 @@ package object query {
   /**
     * An BitXor expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def BitXor(terms: Expr*): Expr =
     Expr(ObjectV("bitxor" -> varargs(terms)))
@@ -1039,7 +1039,7 @@ package object query {
   /**
     * A Ceil expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Ceil(num: Expr): Expr =
     Expr(ObjectV("ceil" -> num.value))
@@ -1047,7 +1047,7 @@ package object query {
   /**
     * A Cos expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Cos(num: Expr): Expr =
     Expr(ObjectV("cos" -> num.value))
@@ -1055,7 +1055,7 @@ package object query {
   /**
     * A Cosh expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Cosh(num: Expr): Expr =
     Expr(ObjectV("cosh" -> num.value))
@@ -1063,7 +1063,7 @@ package object query {
   /**
     * A Degrees expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Degrees(num: Expr): Expr =
     Expr(ObjectV("degrees" -> num.value))
@@ -1071,7 +1071,7 @@ package object query {
   /**
     * A Divide expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Divide(terms: Expr*): Expr =
     Expr(ObjectV("divide" -> varargs(terms)))
@@ -1079,7 +1079,7 @@ package object query {
   /**
     * An Exp expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Exp(num: Expr): Expr =
     Expr(ObjectV("exp" -> num.value))
@@ -1087,7 +1087,7 @@ package object query {
   /**
     * A Floor expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Floor(num: Expr): Expr =
     Expr(ObjectV("floor" -> num.value))
@@ -1095,7 +1095,7 @@ package object query {
   /**
     * A Hypot expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Hypot(num: Expr): Expr =
     Expr(ObjectV("hypot" -> num.value))
@@ -1103,7 +1103,7 @@ package object query {
   /**
     * A Hypot expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Hypot(num: Expr, exp: Expr): Expr =
     Expr(ObjectV("hypot" -> num.value, "b" -> exp.value))
@@ -1111,7 +1111,7 @@ package object query {
   /**
     * A ln expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Ln(num: Expr): Expr =
     Expr(ObjectV("ln" -> num.value))
@@ -1119,7 +1119,7 @@ package object query {
   /**
     * A Log expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Log(num: Expr): Expr =
     Expr(ObjectV("log" -> num.value))
@@ -1127,7 +1127,7 @@ package object query {
   /**
     * A Max expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Max(terms: Expr*): Expr =
     Expr(ObjectV("max" -> varargs(terms)))
@@ -1135,7 +1135,7 @@ package object query {
   /**
     * A Min expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Min(terms: Expr*): Expr =
     Expr(ObjectV("min" -> varargs(terms)))
@@ -1143,7 +1143,7 @@ package object query {
   /**
     * A Modulo expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Modulo(terms: Expr*): Expr =
     Expr(ObjectV("modulo" -> varargs(terms)))
@@ -1151,7 +1151,7 @@ package object query {
   /**
    * A Multiply expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
    */
   def Multiply(terms: Expr*): Expr =
     Expr(ObjectV("multiply" -> varargs(terms)))
@@ -1159,7 +1159,7 @@ package object query {
   /**
     * A Pow expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Pow(num: Expr): Expr =
     Expr(ObjectV("pow" -> num.value))
@@ -1167,7 +1167,7 @@ package object query {
   /**
     * A Pow expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Pow(num: Expr, exp: Expr): Expr =
     Expr(ObjectV("pow" -> num.value, "exp" -> exp.value))
@@ -1175,7 +1175,7 @@ package object query {
   /**
     * A Radians expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Radians(num: Expr): Expr =
     Expr(ObjectV("radians" -> num.value))
@@ -1183,7 +1183,7 @@ package object query {
   /**
     * A Round expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Round(num: Expr): Expr =
     Expr(ObjectV("round" -> num.value))
@@ -1191,7 +1191,7 @@ package object query {
   /**
     * A Round expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Round(num: Expr, precision: Expr): Expr =
     Expr(ObjectV("round" -> num.value, "precision" -> precision.value))
@@ -1199,7 +1199,7 @@ package object query {
   /**
     * A sign expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Sign(num: Expr): Expr =
     Expr(ObjectV("sign" -> num.value))
@@ -1207,7 +1207,7 @@ package object query {
   /**
     * A sin expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Sin(num: Expr): Expr =
     Expr(ObjectV("sin" -> num.value))
@@ -1215,7 +1215,7 @@ package object query {
   /**
     * A sinh expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Sinh(num: Expr): Expr =
     Expr(ObjectV("sinh" -> num.value))
@@ -1223,7 +1223,7 @@ package object query {
   /**
     * A sqrt expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Sqrt(num: Expr): Expr =
     Expr(ObjectV("sqrt" -> num.value))
@@ -1231,7 +1231,7 @@ package object query {
   /**
    * A Subtract expression.
    *
-   * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
    */
   def Subtract(terms: Expr*): Expr =
     Expr(ObjectV("subtract" -> varargs(terms)))
@@ -1239,7 +1239,7 @@ package object query {
   /**
     * A Tan expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Tan(num: Expr): Expr =
     Expr(ObjectV("tan" -> num.value))
@@ -1247,7 +1247,7 @@ package object query {
   /**
     * A Tanh expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Tanh(num: Expr): Expr =
     Expr(ObjectV("tanh" -> num.value))
@@ -1255,7 +1255,7 @@ package object query {
   /**
     * A Trunc expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Trunc(num: Expr): Expr =
     Expr(ObjectV("trunc" -> num.value))
@@ -1263,7 +1263,7 @@ package object query {
   /**
     * A Trunc expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#mathematical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#mathematical-functions]]
     */
   def Trunc(num: Expr, precision: Expr): Expr =
     Expr(ObjectV("trunc" -> num.value, "precision" -> precision.value))
@@ -1271,7 +1271,7 @@ package object query {
   /**
     * A LT expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#logical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#logical-functions]]
     */
   def LT(terms: Expr*): Expr =
     Expr(ObjectV("lt" -> varargs(terms)))
@@ -1279,7 +1279,7 @@ package object query {
   /**
     * A LTE expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#logical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#logical-functions]]
     */
   def LTE(terms: Expr*): Expr =
     Expr(ObjectV("lte" -> varargs(terms)))
@@ -1287,7 +1287,7 @@ package object query {
   /**
     * A GT expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#logical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#logical-functions]]
     */
   def GT(terms: Expr*): Expr =
     Expr(ObjectV("gt" -> varargs(terms)))
@@ -1295,7 +1295,7 @@ package object query {
   /**
     * A GTE expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#logical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#logical-functions]]
     */
   def GTE(terms: Expr*): Expr =
     Expr(ObjectV("gte" -> varargs(terms)))
@@ -1303,7 +1303,7 @@ package object query {
   /**
     * An And expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#logical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#logical-functions]]
     */
   def And(terms: Expr*): Expr =
     Expr(ObjectV("and" -> varargs(terms)))
@@ -1311,7 +1311,7 @@ package object query {
   /**
     * An Or expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#logical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#logical-functions]]
     */
   def Or(terms: Expr*): Expr =
     Expr(ObjectV("or" -> varargs(terms)))
@@ -1319,7 +1319,7 @@ package object query {
   /**
     * A Not expression.
     *
-    * '''Reference''': [[https://fauna.com/documentation/queries#logical-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#logical-functions]]
     */
   def Not(term: Expr): Expr =
     Expr(ObjectV("not" -> term.value))

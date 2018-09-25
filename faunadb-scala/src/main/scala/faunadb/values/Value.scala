@@ -14,7 +14,7 @@ import scala.annotation.meta.{ field, getter, param }
 /**
   * A FaunaDB value.
   *
-  * '''Reference''': [[https://fauna.com/documentation/queries#values FaunaDB Values]]
+  * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#simple-type FaunaDB Values]]
   *
   * ===Overview===
   *
