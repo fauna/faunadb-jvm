@@ -17,6 +17,7 @@ import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
@@ -196,7 +197,7 @@ public class FaunaClient implements AutoCloseable {
    * @return a {@link CompletableFuture} containing an ordered list of the query's responses.
    */
   public CompletableFuture<List<Value>> query(Expr... exprs) {
-    return query(exprs);
+    return query(Arrays.asList(exprs));
   }
 
   /**

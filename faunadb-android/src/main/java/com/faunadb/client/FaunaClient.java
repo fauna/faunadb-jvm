@@ -14,6 +14,7 @@ import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -198,6 +199,21 @@ public class FaunaClient {
    */
   public CompletableFuture<Value> query(Expr expr) {
     return performRequest(json.valueToTree(expr));
+  }
+
+
+  /**
+   * Issues multiple queries to FaunaDB.
+   * <p>
+   * These queries are sent to FaunaDB in a single request. A list containing all responses is returned
+   * in the same order as the issued queries.
+   * <p>
+   *
+   * @param exprs the list of queries to be sent to FaunaDB.
+   * @return a {@link CompletableFuture} containing an ordered list of the query's responses.
+   */
+  public CompletableFuture<List<Value>> query(Expr... exprs) {
+    return query(Arrays.asList(exprs));
   }
 
   /**
