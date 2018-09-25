@@ -1009,7 +1009,7 @@ public final class Language {
    * @param v6 the sixth variable name
    * @param d6 the sixth variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -1060,7 +1060,7 @@ public final class Language {
    * @param v7 the seventh variable name
    * @param d7 the seventh variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -1115,7 +1115,7 @@ public final class Language {
    * @param v8 the eighth variable name
    * @param d8 the eighth variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://fauna.com/documentation/queries#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -2173,7 +2173,7 @@ public final class Language {
    * @param value a strings
    * @param find  a substring to locate
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStr(Expr value, Expr find) {
@@ -2186,7 +2186,7 @@ public final class Language {
    * @param value a strings
    * @param find  a substring to locate
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStr(String value, Expr find) {
@@ -2200,7 +2200,7 @@ public final class Language {
    * @param find  a substring to locate
    * @return      the offset of where the substring starts or -1 if not found
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStr(Expr value, String find) {
@@ -2214,7 +2214,7 @@ public final class Language {
    * @param find  a substring to locate
    * @return      the offset of where the substring starts or -1 if not found
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStr(String value, String find) {
@@ -2228,7 +2228,7 @@ public final class Language {
    * @param find  a substring to locate
    * @param start a position to start the search
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStr(Expr value, Expr find, Expr start) {
@@ -2242,7 +2242,7 @@ public final class Language {
    * @param find  a substring to locate
    * @param start a position to start the search
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStr(Expr value, Expr find, long start) {
@@ -2256,7 +2256,7 @@ public final class Language {
    * @param find  a substring to locate
    * @param start a position to start the search
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStr(Expr value, String find, Expr start) {
@@ -2269,7 +2269,7 @@ public final class Language {
    * @param find  a substring to locate
    * @param start a position to start the search
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStr(String value, Expr find, long start) {
@@ -2283,7 +2283,7 @@ public final class Language {
    * @param find  a substring to locate
    * @param start a position to start the search
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStr(String value, String find, Expr start) {
@@ -2296,7 +2296,7 @@ public final class Language {
    * @param find  a substring to locate
    * @param start a position to start the search
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStr(String value, String find, long start) {
@@ -2310,7 +2310,7 @@ public final class Language {
    * @param value   a string to search
    * @param pattern a substring to locate
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, Expr pattern) {
@@ -2323,7 +2323,7 @@ public final class Language {
    * @param value   a string to search
    * @param pattern a substring to locate
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, String pattern) {
@@ -2336,7 +2336,7 @@ public final class Language {
    * @param value   a string to search
    * @param pattern a substring to locate
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, Expr pattern) {
@@ -2348,7 +2348,7 @@ public final class Language {
    * @param value   a string to search
    * @param pattern a substring to locate
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, String pattern) {
@@ -2362,7 +2362,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, Expr pattern, Expr start) {
@@ -2376,7 +2376,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, Expr pattern, Expr start) {
@@ -2390,7 +2390,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, String pattern, Expr start) {
@@ -2404,7 +2404,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, String pattern, Expr start) {
@@ -2418,7 +2418,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, Expr pattern, long start) {
@@ -2432,7 +2432,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, Expr pattern, long start) {
@@ -2446,7 +2446,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, String pattern, long start) {
@@ -2460,7 +2460,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, String pattern, long start) {
@@ -2475,7 +2475,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, Expr pattern, Expr start, Expr numResults) {
@@ -2490,7 +2490,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, Expr pattern, Expr start, Expr numResults) {
@@ -2505,7 +2505,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, String pattern, Expr start, Expr numResults) {
@@ -2520,7 +2520,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, String pattern, Expr start, Expr numResults) {
@@ -2535,7 +2535,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, Expr pattern, long start, Expr numResults) {
@@ -2550,7 +2550,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, Expr pattern, long start, Expr numResults) {
@@ -2565,7 +2565,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, String pattern, long start, Expr numResults) {
@@ -2580,7 +2580,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, String pattern, long start, Expr numResults) {
@@ -2595,7 +2595,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, Expr pattern, Expr start, long numResults) {
@@ -2610,7 +2610,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, Expr pattern, Expr start, long numResults) {
@@ -2625,7 +2625,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, String pattern, Expr start, long numResults) {
@@ -2640,7 +2640,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, String pattern, Expr start, long numResults) {
@@ -2655,7 +2655,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, Expr pattern, long start, long numResults) {
@@ -2670,7 +2670,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, Expr pattern, long start, long numResults) {
@@ -2685,7 +2685,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, String pattern, long start, long numResults) {
@@ -2700,7 +2700,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, String pattern, long start, long numResults) {
@@ -2713,7 +2713,7 @@ public final class Language {
    *
    * @param value   a string to determine the length of
    * @return        the length of the string as a long
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr Length(Expr value) {
@@ -2725,7 +2725,7 @@ public final class Language {
    *
    * @param value   a string to determine the length of
    * @return        the length of the string as a long
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr Length(String value) {
@@ -2737,7 +2737,7 @@ public final class Language {
    *
    * @param value a string to lowercase
    * @return      a string with all lowercase letters
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr LowerCase(Expr value) {
@@ -2749,7 +2749,7 @@ public final class Language {
    *
    * @param value a string to lowercase
    * @return      a string with all lowercase letters
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr LowerCase(String value) {
@@ -2761,7 +2761,7 @@ public final class Language {
    *
    * @param value a string to trim leading white space.
    * @return      the string with leading white space removed
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr LTrim(Expr value) {
@@ -2773,7 +2773,7 @@ public final class Language {
    *
    * @param value a string to trim leading white space.
    * @return      the string with leading white space removed
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr LTrim(String value) {
@@ -2787,7 +2787,7 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    * @see #Value(long)
    */
@@ -2802,7 +2802,7 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(long)
    */
   public static Expr NGram(String terms, Expr min, Expr max) {
@@ -2816,7 +2816,7 @@ public final class Language {
    * @param min the minimum size for the n-grams.
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    * @see #Value(long)
    */
@@ -2831,7 +2831,7 @@ public final class Language {
    * @param min the minimum size for the n-grams.
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(long)
    */
   public static Expr NGram(String terms, long min, Expr max) {
@@ -2845,7 +2845,7 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams.
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    * @see #Value(long)
    */
@@ -2860,7 +2860,7 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams.
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    * @see #Value(long)
    */
@@ -2875,7 +2875,7 @@ public final class Language {
    * @param min the minimum size for the n-grams.
    * @param max the maximum size for the n-grams.
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr NGram(Expr terms, long min, long max) {
@@ -2889,7 +2889,7 @@ public final class Language {
    * @param min the minimum size for the n-grams.
    * @param max the maximum size for the n-grams.
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    */
   public static Expr NGram(String terms, long min, long max) {
     return NGram(terms, new LongV(min), new LongV(max));
@@ -2902,7 +2902,7 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    * @see #Value(String)
    * @see #Value(long)
@@ -2917,7 +2917,7 @@ public final class Language {
    *
    * @param terms the list of values to tokenize. Type: Array of strings
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    * @see #Value(String)
    */
@@ -2930,7 +2930,7 @@ public final class Language {
    *
    * @param term the term to tokenize. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    * @see #Value(String)
    */
@@ -2943,7 +2943,7 @@ public final class Language {
    *
    * @param term the value to tokenize.
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    */
   public static Expr NGram(String term) {
@@ -2956,7 +2956,7 @@ public final class Language {
    *
    * @param value a strings
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr Repeat(Expr value) {
@@ -2968,7 +2968,7 @@ public final class Language {
    *
    * @param value a strings
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr Repeat(String value) {
@@ -2981,7 +2981,7 @@ public final class Language {
    * @param value a strings
    * @param number an integer value indicate the number of times to repeat the string
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr Repeat(Expr value, Expr number) {
@@ -2994,7 +2994,7 @@ public final class Language {
    * @param value a strings
    * @param number an integer value indicate the number of times to repeat the string
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr Repeat(String value, Expr number) {
@@ -3007,7 +3007,7 @@ public final class Language {
    * @param value a strings
    * @param number an integer value indicate the number of times to repeat the string
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr Repeat(Expr value, long number) {
@@ -3020,7 +3020,7 @@ public final class Language {
    * @param value a strings
    * @param number an integer value indicate the number of times to repeat the string
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr Repeat(String value, long number) {
@@ -3034,7 +3034,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(Expr value, Expr find, Expr replace) {
@@ -3048,7 +3048,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(String value, Expr find, Expr replace) {
@@ -3062,7 +3062,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(Expr value, String find, Expr replace) {
@@ -3076,7 +3076,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(String value, String find, Expr replace) {
@@ -3090,7 +3090,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(Expr value, Expr find, String replace) {
@@ -3104,7 +3104,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(String value, Expr find, String replace) {
@@ -3118,7 +3118,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(Expr value, String find, String replace) {
@@ -3132,7 +3132,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(String value, String find, String replace) {
@@ -3146,7 +3146,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, Expr pattern, Expr replace) {
@@ -3160,7 +3160,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, Expr pattern, Expr replace) {
@@ -3174,7 +3174,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, String pattern, Expr replace) {
@@ -3188,7 +3188,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, String pattern, Expr replace) {
@@ -3202,7 +3202,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, Expr pattern, String replace) {
@@ -3216,7 +3216,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, Expr pattern, String replace) {
@@ -3230,7 +3230,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, String pattern, String replace) {
@@ -3244,7 +3244,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, String pattern, String replace) {
@@ -3259,7 +3259,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, Expr pattern, Expr replace, Expr first) {
@@ -3274,7 +3274,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, Expr pattern, Expr replace, Expr first) {
@@ -3289,7 +3289,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, String pattern, Expr replace, Expr first) {
@@ -3304,7 +3304,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, String pattern, Expr replace, Expr first) {
@@ -3319,7 +3319,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, Expr pattern, String replace, Expr first) {
@@ -3334,7 +3334,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, Expr pattern, String replace, Expr first) {
@@ -3349,7 +3349,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, String pattern, String replace, Expr first) {
@@ -3496,7 +3496,7 @@ public final class Language {
    *
    * @param value a string to trim whitespace.
    * @return      the string with trailing whitespace removed
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr RTrim(Expr value) {
@@ -3544,7 +3544,7 @@ public final class Language {
    *
    * @param value the number of spaces
    * @return      a string with spaces
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr Space(Integer value) {
@@ -3556,7 +3556,7 @@ public final class Language {
    *
    * @param value the source string
    * @return      a new string contain a subset of the source string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr SubString(Expr value) {
@@ -3568,7 +3568,7 @@ public final class Language {
    *
    * @param value the source string
    * @return      a new string contain a subset of the source string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr SubString(String value) {
@@ -3581,7 +3581,7 @@ public final class Language {
    * @param value the source string
    * @param start the position in the source string where SubString starts extracting characters
    * @return      a new string contain a subset of the source string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr SubString(Expr value, Expr start) {
@@ -3594,7 +3594,7 @@ public final class Language {
    * @param value the source string
    * @param start the position in the source string where SubString starts extracting characters
    * @return      a new string contain a subset of the source string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr SubString(String value, Expr start) {
@@ -3607,7 +3607,7 @@ public final class Language {
    * @param value the source string
    * @param start the position in the source string where SubString starts extracting characters
    * @return      a new string contain a subset of the source string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr SubString(Expr value, long start) {
@@ -3620,7 +3620,7 @@ public final class Language {
    * @param value the source string
    * @param start the position in the source string where SubString starts extracting characters
    * @return      a new string contain a subset of the source string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr SubString(String value, long start) {
@@ -3634,7 +3634,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr SubString(Expr value, Expr start, Expr length) {
@@ -3648,7 +3648,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr SubString(String value, Expr start, Expr length) {
@@ -3662,7 +3662,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr SubString(Expr value, long start, Expr length) {
@@ -3676,7 +3676,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr SubString(String value, long start, Expr length) {
@@ -3690,7 +3690,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr SubString(Expr value, long start, long length) {
@@ -3704,7 +3704,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr SubString(Expr value, Expr start, long length) {
@@ -3718,7 +3718,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr SubString(String value, Expr start, long length) {
@@ -3732,7 +3732,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr SubString(String value, long start, long length) {
@@ -3744,7 +3744,7 @@ public final class Language {
    *
    * @param value a strings to TitleCase
    * @return      a new string in TitleCase
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr TitleCase(Expr value) {
@@ -3756,7 +3756,7 @@ public final class Language {
    *
    * @param value a strings to TitleCase
    * @return      a new string in TitleCase
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr TitleCase(String value) {
@@ -3772,7 +3772,7 @@ public final class Language {
    *
    * @param value a strings
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr Trim(Expr value) {
@@ -3784,7 +3784,7 @@ public final class Language {
    *
    * @param value a string to trim white space.
    * @return      the string with leading and trailing whitespace removed
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr Trim(String value) {
@@ -3796,7 +3796,7 @@ public final class Language {
    *
    * @param value a string to uppercase
    * @return      a string with all uppercase letters
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr UpperCase(Expr value) {
@@ -3808,7 +3808,7 @@ public final class Language {
    *
    * @param value a string to uppercase
    * @return      a string with all uppercase letters
-   * @see <a href="https://fauna.com/documentation/queries#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr UpperCase(String value) {
@@ -4325,7 +4325,7 @@ public final class Language {
    * @param from the collection to traverse. Type: Array
    * @param defaultValue the default value to return if the desired path doesn't exist
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr SelectAll(Expr path, Expr from, Expr defaultValue) {
       return Fn.apply("select_all", path, "from", from, "default", defaultValue);
@@ -4361,7 +4361,7 @@ public final class Language {
    *
    * @param value The operand to abs. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Abs(Expr value) {
     return Fn.apply("abs", value);
@@ -4372,7 +4372,7 @@ public final class Language {
    *
    * @param value The operand to abs. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Abs(Long value) {
     return Fn.apply("abs", new LongV(value));
@@ -4394,7 +4394,7 @@ public final class Language {
    *
    * @param value The operand to acos. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Acos(Expr value) {
     return Fn.apply("acos", value);
@@ -4405,7 +4405,7 @@ public final class Language {
    *
    * @param value The operand to acos. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
     public static Expr Acos(Double value) {
       return Fn.apply("acos", new DoubleV(value));
@@ -4417,7 +4417,7 @@ public final class Language {
      *
      * @param values the list of numbers. Type: Array
      * @return a {@link Expr} instance
-     * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+     * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
      */
   public static Expr Add(List<? extends Expr> values) {
     return Fn.apply("add", varargs(values));
@@ -4439,7 +4439,7 @@ public final class Language {
    *
    * @param value The operand to asin. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Asin(Expr value) {
     return Fn.apply("asin", value);
@@ -4450,7 +4450,7 @@ public final class Language {
    *
    * @param value The operand to asin. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Asin(Double value) {
     return Fn.apply("asin", new DoubleV(value));
@@ -4461,7 +4461,7 @@ public final class Language {
    *
    * @param value The operand to atan. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Atan(Expr value) {
     return Fn.apply("atan", value);
@@ -4472,7 +4472,7 @@ public final class Language {
    *
    * @param value The operand to atan. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Atan(Double value) {
     return Fn.apply("atan", new DoubleV(value));
@@ -4505,7 +4505,7 @@ public final class Language {
    *
    * @param value The operand to atan. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr BitNot(Expr value) {
     return Fn.apply("bitnot", value);
@@ -4516,7 +4516,7 @@ public final class Language {
    *
    * @param value The operand to atan. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr BitNot(Long value) {
     return Fn.apply("bitnot", new LongV(value));
@@ -4549,7 +4549,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr BitXor(List<? extends Expr> values) {
     return Fn.apply("bitxor", varargs(values));
@@ -4560,7 +4560,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr BitXor(Expr... values) {
     return BitXor(Arrays.asList(values));
@@ -4571,7 +4571,7 @@ public final class Language {
    *
    * @param value The operand to ceil. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Ceil(Expr value) {
     return Fn.apply("ceil", value);
@@ -4582,7 +4582,7 @@ public final class Language {
    *
    * @param value The operand to ceil. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Ceil(Long value) {
     return Fn.apply("ceil", new LongV(value));
@@ -4593,7 +4593,7 @@ public final class Language {
    *
    * @param value The operand to ceil. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Ceil(Double value) {
     return Fn.apply("ceil", new DoubleV(value));
@@ -4604,7 +4604,7 @@ public final class Language {
    *
    * @param value The operand to cos. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Cos(Expr value) {
     return Fn.apply("cos", value);
@@ -4615,7 +4615,7 @@ public final class Language {
    *
    * @param value The operand to cos. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Cos(Double value) {
     return Fn.apply("cos", new DoubleV(value));
@@ -4626,7 +4626,7 @@ public final class Language {
    *
    * @param value The operand to cosh. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Cosh(Expr value) {
     return Fn.apply("cosh", value);
@@ -4637,7 +4637,7 @@ public final class Language {
    *
    * @param value The operand to cosh. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Cosh(Double value) {
     return Fn.apply("cosh", new DoubleV(value));
@@ -4648,7 +4648,7 @@ public final class Language {
    *
    * @param value The operand to degrees. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Degrees(Expr value) {
     return Fn.apply("degrees", value);
@@ -4659,7 +4659,7 @@ public final class Language {
    *
    * @param value The operand to degrees. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Degrees(Double value) {
     return Fn.apply("degrees", new DoubleV(value));
@@ -4670,7 +4670,7 @@ public final class Language {
    *
    * @param value The operand to degrees. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Degrees(Long value) {
     return Fn.apply("degrees", new LongV(value));
@@ -4725,7 +4725,7 @@ public final class Language {
    *
    * @param value The operand to exp. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Exp(Double value) {
     return Fn.apply("exp", new DoubleV(value));
@@ -4736,7 +4736,7 @@ public final class Language {
    *
    * @param value The operand to floor Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Floor(Expr value) {
     return Fn.apply("floor", value);
@@ -4747,7 +4747,7 @@ public final class Language {
    *
    * @param value The operand to floor Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Floor(Long value) {
     return Fn.apply("floor", new LongV(value));
@@ -4758,7 +4758,7 @@ public final class Language {
    *
    * @param value The operand to floor Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Floor(Double value) {
     return Fn.apply("floor", new DoubleV(value));
@@ -4769,7 +4769,7 @@ public final class Language {
    *
    * @param value The operand to ln. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Ln(Expr value) {
     return Fn.apply("ln", value);
@@ -4780,7 +4780,7 @@ public final class Language {
    *
    * @param value The operand to ln. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Ln(Double value) {
     return Fn.apply("ln", new DoubleV(value));
@@ -4792,7 +4792,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -4806,7 +4806,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -4820,7 +4820,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -4834,7 +4834,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -4847,7 +4847,7 @@ public final class Language {
    *
    * @param num the base. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -4860,7 +4860,7 @@ public final class Language {
    *
    * @param num the base. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -4873,7 +4873,7 @@ public final class Language {
    *
    * @param value The operand to log. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Log(Expr value) {
     return Fn.apply("log", value);
@@ -4884,7 +4884,7 @@ public final class Language {
    *
    * @param value The operand to log. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Log(Double value) {
     return Fn.apply("log", new DoubleV(value));
@@ -4895,7 +4895,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Max(List<? extends Expr> values) {
     return Fn.apply("max", varargs(values));
@@ -4906,7 +4906,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Max(Expr... values) {
     return Max(Arrays.asList(values));
@@ -4917,7 +4917,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Min(List<? extends Expr> values) {
     return Fn.apply("min", varargs(values));
@@ -4928,7 +4928,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Min(Expr... values) {
     return Min(Arrays.asList(values));
@@ -4939,7 +4939,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Modulo(List<? extends Expr> values) {
     return Fn.apply("modulo", varargs(values));
@@ -4950,7 +4950,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Modulo(Expr... values) {
     return Modulo(Collections.unmodifiableList(Arrays.asList(values)));
@@ -4961,7 +4961,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Multiply(List<? extends Expr> values) {
     return Fn.apply("multiply", varargs(values));
@@ -4972,7 +4972,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Multiply(Expr... values) {
     return Multiply(Arrays.asList(values));
@@ -4984,7 +4984,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -4998,7 +4998,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -5012,7 +5012,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -5026,7 +5026,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -5039,7 +5039,7 @@ public final class Language {
    *
    * @param num the base. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -5052,7 +5052,7 @@ public final class Language {
    *
    * @param value The operand to radians. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Radians(Expr value) {
     return Fn.apply("radians", value);
@@ -5063,7 +5063,7 @@ public final class Language {
    *
    * @param value The operand to radians. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Radians(Double value) {
     return Fn.apply("radians", new DoubleV(value));
@@ -5075,7 +5075,7 @@ public final class Language {
    * @param num the number to round. Type: Number
    * @param precision where to round
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -5089,7 +5089,7 @@ public final class Language {
    * @param num the number to round. Type: Number
    * @param precision where to round
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -5103,7 +5103,7 @@ public final class Language {
    * @param num the number to round. Type: Number
    * @param precision where to round
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -5117,7 +5117,7 @@ public final class Language {
    * @param num the number to round. Type: Number
    * @param precision where to round
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -5131,7 +5131,7 @@ public final class Language {
    * @param num the number to round. Type: Number
    * @param precision where to round
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -5145,7 +5145,7 @@ public final class Language {
    * @param num the number to round. Type: Number
    * @param precision where to round
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -5158,7 +5158,7 @@ public final class Language {
    *
    * @param num the number to round to 2 decimal places. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -5171,7 +5171,7 @@ public final class Language {
    *
    * @param num the number to round to 2 decimal places. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -5184,7 +5184,7 @@ public final class Language {
    *
    * @param value The operand to log. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Sign(Expr value) {
     return Fn.apply("sign", value);
@@ -5195,7 +5195,7 @@ public final class Language {
    *
    * @param value The operand to log. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Sign(Double value) {
     return Fn.apply("sign", new DoubleV(value));
@@ -5206,7 +5206,7 @@ public final class Language {
    *
    * @param value The operand to log. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Sign(Long value) {
     return Fn.apply("sign", new LongV(value));
@@ -5217,7 +5217,7 @@ public final class Language {
    *
    * @param value The operand to sin. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Sin(Expr value) {
     return Fn.apply("sin", value);
@@ -5228,7 +5228,7 @@ public final class Language {
    *
    * @param value The operand to sin. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Sin(Double value) {
     return Fn.apply("sin", new DoubleV(value));
@@ -5239,7 +5239,7 @@ public final class Language {
    *
    * @param value The operand to hyperbolic sine. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Sinh(Expr value) {
     return Fn.apply("sinh", value);
@@ -5250,7 +5250,7 @@ public final class Language {
    *
    * @param value The operand to hyperbolic sine. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Sinh(Double value) {
     return Fn.apply("sinh", new DoubleV(value));
@@ -5261,7 +5261,7 @@ public final class Language {
    *
    * @param value The operand to log. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Sqrt(Expr value) {
     return Fn.apply("sqrt", value);
@@ -5272,7 +5272,7 @@ public final class Language {
    *
    * @param value The operand to log. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Sqrt(Double value) {
     return Fn.apply("sqrt", new DoubleV(value));
@@ -5283,7 +5283,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Subtract(List<? extends Expr> values) {
     return Fn.apply("subtract", varargs(values));
@@ -5294,7 +5294,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Subtract(Expr... values) {
     return Subtract(Arrays.asList(values));
@@ -5305,7 +5305,7 @@ public final class Language {
    *
    * @param value The operand to tan. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Tan(Expr value) {
     return Fn.apply("tan", value);
@@ -5316,7 +5316,7 @@ public final class Language {
    *
    * @param value The operand to tan. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Tan(Double value) {
     return Fn.apply("tan", new DoubleV(value));
@@ -5327,7 +5327,7 @@ public final class Language {
    *
    * @param value The operand to tanh. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Tanh(Expr value) {
     return Fn.apply("tanh", value);
@@ -5338,7 +5338,7 @@ public final class Language {
    *
    * @param value The operand to tanh. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    */
   public static Expr Tanh(Double value) {
     return Fn.apply("tanh", new DoubleV(value));
@@ -5350,7 +5350,7 @@ public final class Language {
    * @param num the number to truncate. Type: Number
    * @param precision where to truncate, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Expr num, Expr precision) {
@@ -5363,7 +5363,7 @@ public final class Language {
    * @param num the number to truncate. Type: Number
    * @param precision where to truncate, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Double num, Expr precision) {
@@ -5375,7 +5375,7 @@ public final class Language {
    * @param num the number to truncate. Type: Number
    * @param precision where to truncate, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Long num, Expr precision) {
@@ -5388,7 +5388,7 @@ public final class Language {
    * @param num the number to truncate. Type: Number
    * @param precision where to truncate, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Expr num, Long precision) {
@@ -5401,7 +5401,7 @@ public final class Language {
    * @param num the number to truncate. Type: Number
    * @param precision where to truncate, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Double num, Long precision) {
@@ -5413,7 +5413,7 @@ public final class Language {
    * @param num the number to truncate. Type: Number
    * @param precision where to truncate, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Long num, Long precision) {
@@ -5425,7 +5425,7 @@ public final class Language {
    *
    * @param num the number to truncate to 2 decimal places. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Expr num) {
@@ -5437,7 +5437,7 @@ public final class Language {
    *
    * @param num the number to truncate to 2 decimal places. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://fauna.com/documentation/queries#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Double num) {
