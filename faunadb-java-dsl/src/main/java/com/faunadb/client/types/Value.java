@@ -64,7 +64,7 @@ import static java.lang.String.format;
  *   String name = result.get(name);
  * }</pre>
  *
- * @see <a href="https://fauna.com/documentation/queries#values">FaunaDB Value Types</a>
+ * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Value Types</a>
  * @see Field
  * @see Codec
  */
@@ -603,7 +603,7 @@ public abstract class Value extends Expr {
    *
    * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
    *
-   * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#special-type">FaunaDB Special Types</a>
    * @see Value
    */
   public static final class SetRefV extends ScalarValue<Map<String, Value>> {
@@ -682,7 +682,7 @@ public abstract class Value extends Expr {
    *
    * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
    *
-   * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#special-type">FaunaDB Special Types</a>
    * @see Language#Ref(String)
    * @see Language#Ref(Expr, Expr)
    * @see Language#Ref(Expr, String)
@@ -776,7 +776,7 @@ public abstract class Value extends Expr {
    *
    * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
    *
-   * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#special-type">FaunaDB Special Types</a>
    * @see Language#Value(byte[])
    * @see Value
    */
@@ -821,7 +821,7 @@ public abstract class Value extends Expr {
    *
    * <p><b>WARNING:</b> Internal API. Must not be used in production code.</p>
    *
-   * @see <a href="https://fauna.com/documentation/queries#values-special_types">FaunaDB Special Types</a>
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#special-type">FaunaDB Special Types</a>
    * @see Value
    */
   @JsonDeserialize(using = JsonDeserializer.None.class) // Disables generic value deserializer for query values

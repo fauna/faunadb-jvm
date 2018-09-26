@@ -17,7 +17,7 @@ import java.util.Optional;
  * <p>
  * See {@link Language#Paginate(Expr)} for details.
  *
- * @see <a href="https://fauna.com/documentation/queries#read_functions">FaunaDB Read Functions</a>
+ * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
  * @see Language#Paginate(Expr)
  */
 public final class Pagination extends Expr {
