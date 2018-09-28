@@ -1,7 +1,7 @@
 import de.johoop.jacoco4sbt.XMLReport
 
 val driverVersion = "2.6.0-SNAPSHOT"
-val asyncHttpClientVersion = "2.5.2"
+val nettyVersion = "4.1.30.Final"
 val jacksonVersion = "2.8.8"
 val jacksonDocVersion = "2.8"
 val metricsVersion = "3.1.0"
@@ -9,7 +9,7 @@ val scalaDefaultVersion = "2.12.2"
 val scalaVersions = Seq("2.11.8", scalaDefaultVersion)
 
 val javaDocUrl = "http://docs.oracle.com/javase/7/docs/api/"
-val asyncHttpClientDocUrl = s"https://www.javadoc.io/doc/org.asynchttpclient/async-http-client/$asyncHttpClientVersion"
+val nettyClientDocUrl = "https://netty.io/4.1/api/index.html"
 val jacksonDocUrl = s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/"
 val metricsDocUrl = s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/"
 val okHttpDocUrl = "https://square.github.io/okhttp/3.x/okhttp/"
@@ -84,12 +84,13 @@ lazy val common = project.in(file("faunadb-common"))
       "-link", javaDocUrl,
       "-link", jacksonDocUrl,
       "-link", metricsDocUrl,
-      "-link", asyncHttpClientDocUrl
+      "-link", nettyClientDocUrl
     ),
 
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % jacksonVersion,
-      "org.asynchttpclient" % "async-http-client" % asyncHttpClientVersion,
+      "io.netty" % "netty-codec-http" % nettyVersion,
+      "io.netty" % "netty-handler" % nettyVersion,
       "io.dropwizard.metrics" % "metrics-core" % metricsVersion,
       "org.slf4j" % "slf4j-api" % "1.7.7",
       "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
@@ -110,7 +111,6 @@ lazy val scala = project.in(file("faunadb-scala"))
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
-      "org.asynchttpclient" % "async-http-client" % asyncHttpClientVersion,
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
       "org.scala-lang.modules" % "scala-java8-compat_2.12" % "0.9.0",
       "org.scalatest" %% "scalatest" % "3.0.3" % "test"
@@ -152,7 +152,7 @@ lazy val javaDsl = project.in(file("faunadb-java-dsl"))
       "-link", javaDocUrl,
       "-link", jacksonDocUrl,
       "-link", metricsDocUrl,
-      "-link", asyncHttpClientDocUrl
+      "-link", nettyClientDocUrl
     ),
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
@@ -182,7 +182,7 @@ lazy val java = project.in(file("faunadb-java"))
       "-link", javaDocUrl,
       "-link", jacksonDocUrl,
       "-link", metricsDocUrl,
-      "-link", asyncHttpClientDocUrl,
+      "-link", nettyClientDocUrl,
       "-linkoffline", commonApiUrl, "./faunadb-common/target/api",
       "-linkoffline", javaDslApiUrl, "./faunadb-java-dsl/target/api"
     ),

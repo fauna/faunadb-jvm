@@ -1,10 +1,11 @@
 package com.faunadb.common;
 
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.BoundRequestBuilder;
-import org.asynchttpclient.Request;
+import com.faunadb.common.http.HttpClient;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 final class RefAwareHttpClient implements AutoCloseable {
@@ -12,9 +13,9 @@ final class RefAwareHttpClient implements AutoCloseable {
   private static final int INITIAL_REF_COUNT = 1;
 
   private final AtomicInteger refCount = new AtomicInteger(INITIAL_REF_COUNT);
-  private final AsyncHttpClient delegate;
+  private final HttpClient delegate;
 
-  RefAwareHttpClient(AsyncHttpClient delegate) {
+  RefAwareHttpClient(HttpClient delegate) {
     this.delegate = delegate;
   }
 
@@ -32,8 +33,8 @@ final class RefAwareHttpClient implements AutoCloseable {
     }
   }
 
-  BoundRequestBuilder prepareRequest(Request request) {
-    return delegate.prepareRequest(request);
+  CompletableFuture<FullHttpResponse> sendRequest(FullHttpRequest request) {
+    return delegate.sendRequest(request);
   }
 
 }

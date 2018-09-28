@@ -10,8 +10,10 @@ import faunadb.query.Expr
 import faunadb.values.{ ArrayV, NullV, Value }
 import java.net.ConnectException
 import java.util.concurrent.TimeoutException
-import io.netty.util.CharsetUtil.UTF_8
-import org.asynchttpclient.{ AsyncHttpClient, Response }
+
+import io.netty.buffer.ByteBufInputStream
+import io.netty.handler.codec.http.FullHttpResponse
+
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ ExecutionContext, Future }
@@ -28,20 +30,17 @@ object FaunaClient {
     * @param secret The secret material of the auth key used. See [[https://fauna.com/documentation#authentication-key_access]]
     * @param endpoint URL of the FaunaDB service to connect to. Defaults to https://db.fauna.com
     * @param metrics An optional [[com.codahale.metrics.MetricRegistry]] to record stats.
-    * @param httpClient An optional custom [[org.asynchttpclient.AsyncHttpClient]].
     * @return A configured FaunaClient instance.
     */
   def apply(
     secret: String = null,
     endpoint: String = null,
-    metrics: MetricRegistry = null,
-    httpClient: AsyncHttpClient = null): FaunaClient = {
+    metrics: MetricRegistry = null): FaunaClient = {
 
     val b = Connection.builder
     if (endpoint ne null) b.withFaunaRoot(endpoint)
     if (secret ne null) b.withAuthToken(secret)
     if (metrics ne null) b.withMetrics(metrics)
-    if (httpClient ne null) b.withHttpClient(httpClient)
 
     new FaunaClient(b.build)
   }
@@ -150,8 +149,8 @@ class FaunaClient(connection: Connection) {
       throw new TimeoutException(ex.getMessage)
   }
 
-  private def handleQueryErrors(response: Response) =
-    response.getStatusCode match {
+  private def handleQueryErrors(response: FullHttpResponse) =
+    response.status().code() match {
       case x if x >= 300 =>
         try {
           val errors = parseResponseBody(response).get("errors").asInstanceOf[ArrayNode]
@@ -170,7 +169,7 @@ class FaunaClient(connection: Connection) {
           }
         } catch {
           case e: FaunaException => throw e
-          case NonFatal(_)       => response.getStatusCode match {
+          case NonFatal(_)       => response.status().code() match {
             case 503   => throw new UnavailableException("Service Unavailable: Unparseable response.")
             case s @ _ => throw new UnknownException(s"Unparseable service $s response.")
           }
@@ -178,8 +177,7 @@ class FaunaClient(connection: Connection) {
       case _ =>
     }
 
-  private def parseResponseBody(response: Response) = {
-    val body = response.getResponseBody(UTF_8)
-    json.readTree(body)
+  private def parseResponseBody(response: FullHttpResponse) = {
+    json.readTree(new ByteBufInputStream(response.content()))
   }
 }

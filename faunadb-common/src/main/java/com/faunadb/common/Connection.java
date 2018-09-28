@@ -4,17 +4,16 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.faunadb.common.http.HttpClient;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.base64.Base64;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import org.asynchttpclient.*;
+import io.netty.handler.codec.http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOError;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -25,12 +24,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static io.netty.util.CharsetUtil.US_ASCII;
+import static io.netty.util.CharsetUtil.UTF_8;
 import static java.lang.String.format;
 
 /**
  * The HTTP Connection adapter for FaunaDB drivers.
  *
- * <p>Relies on <a href="https://github.com/AsyncHttpClient/async-http-client">async-http-client</a>
+ * <p>Relies on <a href="https://netty.io/">Netty</a>
  * for the underlying implementation.</p>
  *
  * <p>The {@link Connection#close()} method must be called in order to
@@ -40,8 +40,6 @@ public final class Connection implements AutoCloseable {
 
   private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
   private static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
-  private static final int DEFAULT_IDLE_TIMEOUT_MS = 4750;
-  private static final int DEFAULT_MAX_RETRIES = 0;
   private static final URL FAUNA_ROOT;
 
   static {
@@ -69,7 +67,6 @@ public final class Connection implements AutoCloseable {
 
     private URL faunaRoot;
     private String authToken;
-    private AsyncHttpClient client;
     private MetricRegistry metricRegistry;
 
     private Builder() {
@@ -110,18 +107,6 @@ public final class Connection implements AutoCloseable {
     }
 
     /**
-     * Sets a custom {@link AsyncHttpClient} implementation for the {@link Connection} instance.
-     * A custom implementation can be provided to control the behavior of the underlying HTTP transport.
-     *
-     * @param client the custom {@link AsyncHttpClient} instance
-     * @return this {@link Builder} object
-     */
-    public Builder withHttpClient(AsyncHttpClient client) {
-      this.client = client;
-      return this;
-    }
-
-    /**
      * Sets a {@link MetricRegistry} for the {@link Connection} instance.
      * The {@link MetricRegistry} will be used to track connection level statistics.
      *
@@ -144,27 +129,17 @@ public final class Connection implements AutoCloseable {
       else
         registry = metricRegistry;
 
-      AsyncHttpClient httpClient;
-      if (client == null) {
-        httpClient = new DefaultAsyncHttpClient(
-          new DefaultAsyncHttpClientConfig.Builder()
-            .setConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_MS)
-            .setRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
-            .setPooledConnectionIdleTimeout(DEFAULT_IDLE_TIMEOUT_MS)
-            .setMaxRequestRetry(DEFAULT_MAX_RETRIES)
-            .build()
-        );
-      } else {
-        httpClient = client;
+      URL root;
+      if (faunaRoot == null) {
+        root = FAUNA_ROOT;
+      }
+      else {
+        root = faunaRoot;
       }
 
-      URL root;
-      if (faunaRoot == null)
-        root = FAUNA_ROOT;
-      else
-        root = faunaRoot;
+      HttpClient http = new HttpClient(root, DEFAULT_CONNECTION_TIMEOUT_MS, DEFAULT_REQUEST_TIMEOUT_MS);
 
-      return new Connection(root, authToken, new RefAwareHttpClient(httpClient), registry);
+      return new Connection(root, authToken, new RefAwareHttpClient(http), registry);
     }
   }
 
@@ -216,14 +191,11 @@ public final class Connection implements AutoCloseable {
    * Issues a {@code GET} request with no parameters.
    *
    * @param path the relative path of the resource.
-   * @return a {@link ListenableFuture} containing the HTTP Response.
+   * @return a {@link CompletableFuture} containing the HTTP Response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<Response> get(String path) throws IOException {
-    Request request = new RequestBuilder("GET")
-      .setUrl(mkUrl(path))
-      .build();
-
+  public CompletableFuture<FullHttpResponse> get(String path) throws IOException {
+    FullHttpRequest request = newRequest(HttpMethod.GET, path);
     return performRequest(request);
   }
 
@@ -232,15 +204,12 @@ public final class Connection implements AutoCloseable {
    *
    * @param path   the relative path of the resource.
    * @param params a map containing the request parameters.
-   * @return a {@code ListenableFuture} containing the HTTP response.
+   * @return a {@code CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<Response> get(String path, Map<String, List<String>> params) throws IOException {
-    Request request = new RequestBuilder("GET")
-      .setUrl(mkUrl(path))
-      .setQueryParams(params)
-      .build();
-
+  public CompletableFuture<FullHttpResponse> get(String path, Map<String, List<String>> params) throws IOException {
+    FullHttpRequest request = newRequest(HttpMethod.GET, path);
+    fixRequestParameters(request, params);
     return performRequest(request);
   }
 
@@ -249,16 +218,11 @@ public final class Connection implements AutoCloseable {
    *
    * @param path the relative path of the resource.
    * @param body the JSON tree that will be serialized into the request body.
-   * @return a {@link ListenableFuture} containing the HTTP response.
+   * @return a {@link CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<Response> post(String path, JsonNode body) throws IOException {
-    Request request = new RequestBuilder("POST")
-      .setUrl(mkUrl(path))
-      .setBody(json.writeValueAsString(body))
-      .setHeader(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=utf-8")
-      .build();
-
+  public CompletableFuture<FullHttpResponse> post(String path, JsonNode body) throws IOException {
+    FullHttpRequest request = newRequest(HttpMethod.POST, path, body);
     return performRequest(request);
   }
 
@@ -267,16 +231,11 @@ public final class Connection implements AutoCloseable {
    *
    * @param path the relative path of the resource.
    * @param body the JSON tree that will be serialized into the request body.
-   * @return a {@link ListenableFuture} containing the HTTP response.
+   * @return a {@link CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<Response> put(String path, JsonNode body) throws IOException {
-    Request request = new RequestBuilder("PUT")
-      .setUrl(mkUrl(path))
-      .setBody(json.writeValueAsString(body))
-      .setHeader(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=utf-8")
-      .build();
-
+  public CompletableFuture<FullHttpResponse> put(String path, JsonNode body) throws IOException {
+    FullHttpRequest request = newRequest(HttpMethod.PUT, path, body);
     return performRequest(request);
   }
 
@@ -285,65 +244,88 @@ public final class Connection implements AutoCloseable {
    *
    * @param path the relative path of the resource.
    * @param body the JSON tree that will be serialized into the request body.
-   * @return a {@link ListenableFuture} containing the HTTP response.
+   * @return a {@link CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<Response> patch(String path, JsonNode body) throws IOException {
-    Request request = new RequestBuilder("PATCH")
-      .setUrl(mkUrl(path))
-      .setBody(json.writeValueAsString(body))
-      .setHeader(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=utf-8")
-      .build();
-
+  public CompletableFuture<FullHttpResponse> patch(String path, JsonNode body) throws IOException {
+    FullHttpRequest request = newRequest(HttpMethod.PATCH, path, body);
     return performRequest(request);
   }
 
-  private CompletableFuture<Response> performRequest(final Request request) {
-    final Timer.Context ctx = registry.timer("fauna-request").time();
-    final CompletableFuture<Response> rv = new CompletableFuture();
+  private FullHttpRequest newRequest(HttpMethod method, String path) throws IOException {
+    return new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, mkUrl(path));
+  }
 
-    BoundRequestBuilder req = client.prepareRequest(request)
-      .addHeader("Authorization", authHeader)
-      .setHeader("X-FaunaDB-API-Version", "2.1");
+  private void fixRequestParameters(FullHttpRequest request, Map<String, List<String>> params) {
+    QueryStringEncoder encoder = new QueryStringEncoder(request.uri());
+
+    for (Map.Entry<String, List<String>> entries : params.entrySet()) {
+      String k = entries.getKey();
+      for (String v : entries.getValue())
+        encoder.addParam(k, v);
+    }
+
+    request.setUri(encoder.toString());
+  }
+
+  private FullHttpRequest newRequest(HttpMethod method, String path, JsonNode body) throws IOException {
+    FullHttpRequest request = newRequest(method, path);
+
+    byte[] jsonBody = json.writeValueAsBytes(body);
+    request.content().clear().writeBytes(jsonBody);
+
+    request.headers().set(HttpHeaderNames.CONTENT_LENGTH, jsonBody.length);
+    request.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=utf-8");
+
+    return request;
+  }
+
+  private CompletableFuture<FullHttpResponse> performRequest(final FullHttpRequest request) {
+    final Timer.Context ctx = registry.timer("fauna-request").time();
+    final CompletableFuture<FullHttpResponse> rv = new CompletableFuture();
+
+    request.headers().add("Authorization", authHeader);
+    request.headers().set("X-FaunaDB-API-Version", "2.1");
 
     long time = txnTime.get();
     if (time > 0) {
-      req = req.setHeader("X-Last-Seen-Txn", Long.toString(time));
+      request.headers().set("X-Last-Seen-Txn", Long.toString(time));
     }
 
-    req.execute(new AsyncCompletionHandler<Response>() {
-        @Override
-        public void onThrowable(Throwable t) {
-          ctx.stop();
-          rv.completeExceptionally(t);
-          logFailure(request, t);
-        }
+    request.retain();
 
-        @Override
-        public Response onCompleted(Response response) throws Exception {
-          ctx.stop();
-          rv.complete(response);
+    client.sendRequest(request).whenCompleteAsync((response, throwable) -> {
 
-          String txnTimeHeader = response.getHeader("X-Txn-Time");
-          if (txnTimeHeader != null) {
-            long newTxnTime = Long.valueOf(txnTimeHeader);
-            boolean cas;
-            do {
-              long oldTxnTime = txnTime.get();
+      ctx.stop();
 
-              if (oldTxnTime < newTxnTime) {
-                cas = txnTime.compareAndSet(oldTxnTime, newTxnTime);
-              } else {
-                // Another query advanced the txnTime past this one.
-                break;
-              }
-            } while(!cas);
+      if (throwable != null) {
+        logFailure(request, throwable);
+        request.release();
+        rv.completeExceptionally(throwable);
+        return;
+      }
+
+      rv.complete(response);
+
+      String txnTimeHeader = response.headers().get("X-Txn-Time");
+      if (txnTimeHeader != null) {
+        long newTxnTime = Long.valueOf(txnTimeHeader);
+        boolean cas;
+        do {
+          long oldTxnTime = txnTime.get();
+
+          if (oldTxnTime < newTxnTime) {
+            cas = txnTime.compareAndSet(oldTxnTime, newTxnTime);
+          } else {
+            // Another query advanced the txnTime past this one.
+            break;
           }
+        } while (!cas);
+      }
 
-          logSuccess(request, response);
-          return response;
-        }
-      });
+      logSuccess(request, response);
+      request.release();
+    });
 
     return rv;
   }
@@ -352,35 +334,29 @@ public final class Connection implements AutoCloseable {
     return new URL(faunaRoot, path).toString();
   }
 
-  private void logSuccess(Request request, Response response) {
+  private void logSuccess(FullHttpRequest request, FullHttpResponse response) {
     if (log.isDebugEnabled()) {
-      String data = Optional.ofNullable(request.getStringData()).orElse("");
-      String host = Optional.ofNullable(response.getHeader(X_FAUNADB_HOST)).orElse("Unknown");
-      String build = Optional.ofNullable(response.getHeader(X_FAUNADB_BUILD)).orElse("Unknown");
-      String body = Optional.ofNullable(getResponseBody(response)).orElse("");
+      String data = Optional.ofNullable(request.content().toString(UTF_8)).orElse("");
+      String body = Optional.ofNullable(response.content().toString(UTF_8)).orElse("");
+      String host = response.headers().get(X_FAUNADB_HOST, "Unknown");
+      String build = response.headers().get(X_FAUNADB_BUILD, "Unknown");
 
       log.debug(
-        format("Request: %s %s: %s. Response: Status=%d, Fauna Host: %s, Fauna Build: %s: %s",
-          request.getMethod(), request.getUrl(), data, response.getStatusCode(), host, build, body));
+        format("Request: %s %s: [%s]. Response: Status=%d, Fauna Host: %s, Fauna Build: %s: %s",
+          request.method(), request.uri(), data, response.status().code(), host, build, body));
     }
   }
 
-  private String getResponseBody(Response response) {
-    return response.getResponseBody();
-  }
-
-  private void logFailure(Request request, Throwable ex) {
-    String data = Optional.ofNullable(request.getStringData()).orElse("");
-
+  private void logFailure(FullHttpRequest request, Throwable ex) {
     log.info(
       format("Request: %s %s: %s. Failed: %s",
-        request.getMethod(), request.getUrl(), data, ex.getMessage()), ex);
+        request.method(), request.uri(), request.content().toString(UTF_8), ex.getMessage()), ex);
   }
 
   private static String generateAuthHeader(String authToken) {
     String token = authToken + ":";
     ByteBuf byteBuf = Unpooled.wrappedBuffer(token.getBytes(US_ASCII));
-    ByteBuf enc =  Base64.encode(byteBuf);
+    ByteBuf enc = Base64.encode(byteBuf);
     String hdr = "Basic " + enc.toString(US_ASCII);
     enc.release();
     return hdr;

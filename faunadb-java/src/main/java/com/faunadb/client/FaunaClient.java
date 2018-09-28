@@ -9,8 +9,8 @@ import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.Response;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.handler.codec.http.FullHttpResponse;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -23,7 +23,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 
 import static com.faunadb.client.types.Codec.VALUE;
-import static io.netty.util.CharsetUtil.UTF_8;
 
 /**
  * The Java native client for FaunaDB.
@@ -74,7 +73,6 @@ public class FaunaClient implements AutoCloseable {
     private String secret;
     private URL endpoint;
     private MetricRegistry registry;
-    private AsyncHttpClient httpClient;
 
     private Builder() {
     }
@@ -115,18 +113,6 @@ public class FaunaClient implements AutoCloseable {
     }
 
     /**
-     * Sets a custom {@link AsyncHttpClient} for the {@link FaunaClient} instance.
-     * A custom implementation can be provided to control the behavior of the underlying HTTP transport.
-     *
-     * @param httpClient the custom {@link AsyncHttpClient} instance
-     * @return this {@link Builder} object
-     */
-    public Builder withHttpClient(AsyncHttpClient httpClient) {
-      this.httpClient = httpClient;
-      return this;
-    }
-
-    /**
      * Returns a newly constructed {@link FaunaClient} with configuration based on the settings of this {@link Builder}.
      * @return {@link FaunaClient}
      */
@@ -136,7 +122,6 @@ public class FaunaClient implements AutoCloseable {
         .withFaunaRoot(endpoint);
 
       if (registry != null) builder.withMetrics(registry);
-      if (httpClient != null) builder.withHttpClient(httpClient);
 
       return new FaunaClient(builder.build());
     }
@@ -214,10 +199,9 @@ public class FaunaClient implements AutoCloseable {
       return performRequest(json.valueToTree(exprs)).thenApply(result -> result.collect(Field.as(VALUE)));
   }
 
-  private Value handleResponse(Response response) {
+  private Value handleResponse(FullHttpResponse response) {
     try {
       handleQueryErrors(response);
-
       JsonNode responseBody = parseResponseBody(response);
       JsonNode resource = responseBody.get("resource");
       return json.treeToValue(resource, Value.class);
@@ -236,8 +220,8 @@ public class FaunaClient implements AutoCloseable {
     }
   }
 
-  private void handleQueryErrors(Response response) throws FaunaException {
-    int status = response.getStatusCode();
+  private void handleQueryErrors(FullHttpResponse response) throws FaunaException {
+    int status = response.status().code();
     if (status >= 300) {
       try {
         ArrayNode errors = (ArrayNode) parseResponseBody(response).get("errors");
@@ -287,7 +271,8 @@ public class FaunaClient implements AutoCloseable {
           });
   }
 
-  private JsonNode parseResponseBody(Response response) throws IOException {
-    return json.readTree(response.getResponseBody(UTF_8));
+  private JsonNode parseResponseBody(FullHttpResponse response) throws IOException {
+    return json.readTree(new ByteBufInputStream(response.content()));
   }
+
 }
