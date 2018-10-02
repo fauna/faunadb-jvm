@@ -4,23 +4,21 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.faunadb/faunadb-common.svg?maxAge=21600)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.faunadb%22)
 [![License](https://img.shields.io/badge/license-MPL_2.0-blue.svg?maxAge=2592000)](https://raw.githubusercontent.com/fauna/faunadb-jvm/master/LICENSE)
 
-This repository contains the FaunaDB drivers for the JVM languages. Currently, Java, Android and Scala clients are implemented.
+This repository contains the FaunaDB drivers for the JVM languages. Currently, Java and Scala clients are implemented.
 
 ### Features
 
 * All drivers fully support the current version of the [FaunaDB API](https://faunadb.com/documentation).
 * Java and Scala clients share the same underlying library [faunadb-common](./faunadb-common).
-* Java and Android clients share the same dsl library [faunadb-java-dsl](./faunadb-java-dsl).
-* Supports [Dropwizard Metrics](https://dropwizard.github.io/metrics/3.1.0/) hooks for stats reporting (except Android).
-* Support Android 8.0 (API level 26)
+* Supports [Dropwizard Metrics](https://dropwizard.github.io/metrics/3.1.0/) hooks for stats reporting.
+* Support Android 8.0 (API level 26).
+* Android projects can use the `faunadb-java` dependency directly.
 
 ## Documentation
 
 Javadocs and Scaladocs are hosted on GitHub:
 
 * [faunadb-java](http://fauna.github.io/faunadb-jvm/2.5.5/faunadb-java/api/)
-* [faunadb-java-dsl](http://fauna.github.io/faunadb-jvm/2.5.5/faunadb-java-dsl/api/)
-* [faunadb-android](http://fauna.github.io/faunadb-jvm/2.5.5/faunadb-android/api/)
 * [faunadb-scala](http://fauna.github.io/faunadb-jvm/2.5.5/faunadb-scala/api/)
 
 Details Documentation for each language:
@@ -35,10 +33,6 @@ Details Documentation for each language:
 * [Jackson](https://github.com/FasterXML/jackson) for JSON parsing.
 * [Netty](http://netty.io/) for the HTTP transport.
 * [Joda Time](http://www.joda.org/joda-time/) for date and time manipulation.
-
-### Android
-
-* [OkHttp client](http://square.github.io/okhttp/) for the HTTP transport.
 
 ### Java
 
@@ -65,21 +59,6 @@ Download from the Maven central repository:
   <dependency>
     <groupId>com.faunadb</groupId>
     <artifactId>faunadb-java</artifactId>
-    <version>2.5.5</version>
-    <scope>compile</scope>
-  </dependency>
-  ...
-</dependencies>
-```
-
-##### faunadb-android/pom.xml:
-
-```xml
-  <dependencies>
-  ...
-  <dependency>
-    <groupId>com.faunadb</groupId>
-    <artifactId>faunadb-android</artifactId>
     <version>2.5.5</version>
     <scope>compile</scope>
   </dependency>

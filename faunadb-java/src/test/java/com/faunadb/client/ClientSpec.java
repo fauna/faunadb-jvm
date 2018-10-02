@@ -1,19 +1,18 @@
-package com.faunadb.client.dsl;
+package com.faunadb.client;
 
 import com.faunadb.client.errors.BadRequestException;
 import com.faunadb.client.errors.NotFoundException;
+import com.faunadb.client.errors.PermissionDeniedException;
+import com.faunadb.client.errors.UnauthorizedException;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import io.netty.util.ResourceLeakDetector;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -24,50 +23,89 @@ import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.Class;
 import static com.faunadb.client.query.Language.TimeUnit.*;
 import static com.faunadb.client.types.Codec.*;
+import static com.faunadb.client.types.Value.NullV.NULL;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.collection.IsArrayContainingInOrder.arrayContaining;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.Is.isA;
 import static org.junit.Assert.assertThat;
 
-public abstract class DslSpec {
+public class ClientSpec {
 
-  protected static final String ROOT_TOKEN = EnvVariables.require("FAUNA_ROOT_KEY");
-  protected static final String ROOT_URL = format("%s://%s:%s",
+  private static final String ROOT_TOKEN = EnvVariables.require("FAUNA_ROOT_KEY");
+  private static final String ROOT_URL = format("%s://%s:%s",
     EnvVariables.getOrElse("FAUNA_SCHEME", "https"),
     EnvVariables.getOrElse("FAUNA_DOMAIN", "db.fauna.com"),
     EnvVariables.getOrElse("FAUNA_PORT", "443")
   );
 
+  private static final String DB_NAME = "faunadb-java-test-" + new Random().nextLong();
+  private static final Expr DB_REF = Database(DB_NAME);
+
+  private static FaunaClient rootClient;
+  private static FaunaClient serverClient;
+  private static FaunaClient adminClient;
+
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  protected static final Field<Value> DATA = Field.at("data");
-  protected static final Field<Spell> SPELL_FIELD = DATA.to(Spell.class);
-  protected static final Field<Long> TS_FIELD = Field.at("ts").to(LONG);
-  protected static final Field<RefV> REF_FIELD = Field.at("ref").to(REF);
-  protected static final Field<RefV> INSTANCE_FIELD = Field.at("instance").to(REF);
-  protected static final Field<List<RefV>> REF_LIST = DATA.collect(Field.as(REF));
+  private static final Field<Value> DATA = Field.at("data");
+  private static final Field<Spell> SPELL_FIELD = DATA.to(Spell.class);
+  private static final Field<Long> TS_FIELD = Field.at("ts").to(LONG);
+  private static final Field<RefV> REF_FIELD = Field.at("ref").to(REF);
+  private static final Field<RefV> INSTANCE_FIELD = Field.at("instance").to(REF);
+  private static final Field<List<RefV>> REF_LIST = DATA.collect(Field.as(REF));
 
-  protected static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).to(STRING);
-  protected static final Field<String> ELEMENT_FIELD = DATA.at(Field.at("element")).to(STRING);
-  protected static final Field<Value> ELEMENTS_LIST = DATA.at(Field.at("elements"));
-  protected static final Field<Long> COST_FIELD = DATA.at(Field.at("cost")).to(LONG);
-  protected static final Field<String> SECRET_FIELD = Field.at("secret").to(STRING);
+  private static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).to(STRING);
+  private static final Field<String> ELEMENT_FIELD = DATA.at(Field.at("element")).to(STRING);
+  private static final Field<Value> ELEMENTS_LIST = DATA.at(Field.at("elements"));
+  private static final Field<Long> COST_FIELD = DATA.at(Field.at("cost")).to(LONG);
+  private static final Field<String> SECRET_FIELD = Field.at("secret").to(STRING);
 
-  protected static RefV magicMissile;
-  protected static RefV fireball;
-  protected static RefV faerieFire;
-  protected static RefV summon;
-  protected static RefV thor;
-  protected static RefV thorSpell1;
-  protected static RefV thorSpell2;
-
-  protected abstract CompletableFuture<Value> query(Expr expr);
-  protected abstract CompletableFuture<List<Value>> query(List<? extends Expr> exprs);
+  private static RefV magicMissile;
+  private static RefV fireball;
+  private static RefV faerieFire;
+  private static RefV summon;
+  private static RefV thor;
+  private static RefV thorSpell1;
+  private static RefV thorSpell2;
 
   private static boolean initialized = false;
+
+  private static Value handleBadRequest(Value v, Throwable ex) {
+    if (ex instanceof BadRequestException) {
+      return NULL;
+    } else {
+      return v;
+    }
+  }
+
+  @BeforeClass
+  public static void setUpClient() throws Exception {
+    ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
+
+    rootClient = createFaunaClient(ROOT_TOKEN);
+
+    rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
+    rootClient.query(CreateDatabase(Obj("name", Value(DB_NAME)))).get();
+
+    Value serverKey = rootClient.query(CreateKey(Obj("database", DB_REF, "role", Value("server")))).get();
+    Value adminKey = rootClient.query(CreateKey(Obj("database", DB_REF, "role", Value("admin")))).get();
+
+    serverClient = rootClient.newSessionClient(serverKey.get(SECRET_FIELD));
+    adminClient = rootClient.newSessionClient(adminKey.get(SECRET_FIELD));
+  }
+
+  @AfterClass
+  public static void closeClients() throws Exception {
+    rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
+    rootClient.close();
+    serverClient.close();
+    adminClient.close();
+  }
 
   @Before
   public void setUpSchema() throws Exception {
@@ -1502,7 +1540,187 @@ public abstract class DslSpec {
     );
   }
 
-  protected RefV onARandomClass() throws Exception {
+
+  @Test
+  public void shouldThrowUnauthorizedOnInvalidSecret() throws Exception {
+    thrown.expectCause(isA(UnauthorizedException.class));
+
+    createFaunaClient("invalid-secret")
+            .query(Get(Ref(Class("spells"), "1234")))
+            .get();
+  }
+
+  @Test
+  public void shouldThrowPermissionDeniedException() throws Exception {
+    thrown.expectCause(isA(PermissionDeniedException.class));
+
+    Value key = rootClient.query(CreateKey(Obj("database", DB_REF, "role", Value("client")))).get();
+
+    FaunaClient client = createFaunaClient(key.get(SECRET_FIELD));
+
+    client.query(Paginate(Databases())).get();
+  }
+
+  @Test
+  public void shouldAuthenticateSession() throws Exception {
+    Value createdInstance = serverClient.query(
+            Create(onARandomClass(),
+                    Obj("credentials",
+                            Obj("password", Value("abcdefg"))))
+    ).get();
+
+    Value auth = serverClient.query(
+            Login(
+                    createdInstance.get(REF_FIELD),
+                    Obj("password", Value("abcdefg")))
+    ).get();
+
+    String secret = auth.get(SECRET_FIELD);
+
+    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
+      Value loggedOut = sessionClient.query(Logout(Value(true))).get();
+      assertThat(loggedOut.to(BOOLEAN).get(), is(true));
+    }
+
+    Value identified = serverClient.query(
+            Identify(
+                    createdInstance.get(REF_FIELD),
+                    Value("wrong-password")
+            )
+    ).get();
+
+    assertThat(identified.to(BOOLEAN).get(), is(false));
+  }
+
+  @Test
+  public void shouldTestHasIdentity() throws Exception {
+    Value createdInstance = serverClient.query(
+            Create(onARandomClass(),
+                    Obj("credentials",
+                            Obj("password", Value("sekret"))))
+    ).get();
+
+    Value auth = serverClient.query(
+            Login(
+                    createdInstance.get(REF_FIELD),
+                    Obj("password", Value("sekret")))
+    ).get();
+
+    String secret = auth.get(SECRET_FIELD);
+
+    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
+      assertThat(
+              sessionClient.query(HasIdentity()).get().to(BOOLEAN).get(),
+              equalTo(true)
+      );
+    }
+  }
+
+  @Test
+  public void shouldTestIdentity() throws Exception {
+    Value createdInstance = serverClient.query(
+            Create(onARandomClass(),
+                    Obj("credentials",
+                            Obj("password", Value("sekret"))))
+    ).get();
+
+    Value auth = serverClient.query(
+            Login(
+                    createdInstance.get(REF_FIELD),
+                    Obj("password", Value("sekret")))
+    ).get();
+
+    String secret = auth.get(SECRET_FIELD);
+
+    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
+      assertThat(
+              sessionClient.query(Identity()).get(),
+              equalTo((Value) createdInstance.get(REF_FIELD))
+      );
+    }
+  }
+
+  @Test
+  public void shouldGetKeyFromSecret() throws Exception {
+    Value key = rootClient.query(
+            CreateKey(Obj("database", DB_REF, "role", Value("server")))
+    ).get();
+
+    Value secret = key.at("secret");
+
+    assertThat(rootClient.query(Get(key.get(REF_FIELD))).get(),
+            equalTo(rootClient.query(KeyFromSecret(secret)).get()));
+  }
+
+  @Test
+  public void shouldTestNestedReferences() throws Exception {
+    FaunaClient client1 = createNewDatabase(adminClient, "parent-database");
+    createNewDatabase(client1, "child-database");
+
+    Value key = client1.query(CreateKey(Obj("database", Database(Value("child-database")), "role", Value("server")))).get();
+
+    FaunaClient client2 = client1.newSessionClient(key.get(SECRET_FIELD));
+
+    client2.query(CreateClass(Obj("name", Value("a_class")))).get();
+
+    Expr nestedDatabase = Database("child-database", Database("parent-database"));
+
+    Expr nestedClassRef = Class("a_class", nestedDatabase);
+
+    assertThat(
+            serverClient.query(Exists(nestedClassRef)).get().to(BOOLEAN).get(),
+            equalTo(true)
+    );
+
+    Expr allNestedClasses = Classes(nestedDatabase);
+
+    List<RefV> results = new ArrayList();
+
+    results.add(new RefV("a_class", Native.CLASSES,
+            new RefV("child-database", Native.DATABASES,
+                    new RefV("parent-database", Native.DATABASES))));
+
+    assertThat(
+            serverClient.query(Paginate(allNestedClasses)).get().get(REF_LIST),
+            equalTo(results)
+    );
+  }
+
+  @Test
+  public void shouldTestNestedKeys() throws Exception {
+    FaunaClient client = createNewDatabase(adminClient, "db-for-keys");
+
+    client.query(CreateDatabase(Obj("name", Value("db-test")))).get();
+
+    Value serverKey = client.query(CreateKey(Obj("database", Database("db-test"), "role", Value("server")))).get().get(REF_FIELD);
+    Value adminKey = client.query(CreateKey(Obj("database", Database("db-test"), "role", Value("admin")))).get().get(REF_FIELD);
+
+    assertThat(
+            client.query(Paginate(Keys())).get().get(DATA).to(ARRAY).get(),
+            hasItems(serverKey, adminKey)
+    );
+
+    assertThat(
+            adminClient.query(Paginate(Keys(Database("db-for-keys")))).get().get(DATA).to(ARRAY).get(),
+            hasItems(serverKey, adminKey)
+    );
+  }
+
+  private CompletableFuture<Value> query(Expr expr) {
+    return serverClient.query(expr);
+  }
+
+  private CompletableFuture<List<Value>> query(List<? extends Expr> exprs) {
+    return serverClient.query(exprs);
+  }
+
+  private FaunaClient createNewDatabase(FaunaClient client, String name) throws Exception {
+    client.query(CreateDatabase(Obj("name", Value(name)))).get();
+    Value key = client.query(CreateKey(Obj("database", Database(Value(name)), "role", Value("admin")))).get();
+    return client.newSessionClient(key.get(SECRET_FIELD));
+  }
+
+  private RefV onARandomClass() throws Exception {
 
     Value clazz = query(
       CreateClass(
@@ -1512,13 +1730,24 @@ public abstract class DslSpec {
     return clazz.get(REF_FIELD);
   }
 
-  protected String randomStartingWith(String... parts) {
+  private String randomStartingWith(String... parts) {
     StringBuilder builder = new StringBuilder();
     for (String part : parts)
       builder.append(part);
 
     builder.append(Math.abs(new Random().nextLong()));
     return builder.toString();
+  }
+
+  private static FaunaClient createFaunaClient(String secret) {
+    try {
+      return FaunaClient.builder()
+              .withEndpoint(ROOT_URL)
+              .withSecret(secret)
+              .build();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 }
 

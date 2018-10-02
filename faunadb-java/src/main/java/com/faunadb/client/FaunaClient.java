@@ -207,6 +207,8 @@ public class FaunaClient implements AutoCloseable {
       return json.treeToValue(resource, Value.class);
     } catch (IOException ex) {
       throw new AssertionError(ex);
+    } finally {
+      response.release();
     }
   }
 

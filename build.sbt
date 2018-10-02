@@ -12,11 +12,9 @@ val javaDocUrl = "http://docs.oracle.com/javase/7/docs/api/"
 val nettyClientDocUrl = "https://netty.io/4.1/api/index.html"
 val jacksonDocUrl = s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/"
 val metricsDocUrl = s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/"
-val okHttpDocUrl = "https://square.github.io/okhttp/3.x/okhttp/"
 
 val commonApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-common/api/"
 val scalaApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-scala/api/"
-val javaDslApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-java-dsl/api/"
 val javaApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-java/api/"
 val javaAndroidApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-android/api/"
 
@@ -68,7 +66,7 @@ lazy val root = (project in file("."))
     crossPaths := false,
     autoScalaLibrary := false
   )
-  .aggregate(common, scala, javaDsl, java, javaAndroid)
+  .aggregate(common, scala, java, javaAndroid)
 
 lazy val common = project.in(file("faunadb-common"))
   .settings(publishSettings: _*)
@@ -137,43 +135,15 @@ lazy val scala = project.in(file("faunadb-scala"))
 
     jacoco.reportFormats in jacoco.Config := Seq(XMLReport()))
 
-lazy val javaDsl = project.in(file("faunadb-java-dsl"))
-  .settings(publishSettings: _*)
-  .settings(
-    name := "faunadb-java-dsl",
-    crossPaths := false,
-    autoScalaLibrary := false,
-    exportJars := true,
-    javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
-    testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
-    apiURL := Some(url(javaDslApiUrl)),
-
-    javacOptions in (Compile, doc) := Seq("-source", "1.8",
-      "-link", javaDocUrl,
-      "-link", jacksonDocUrl,
-      "-link", metricsDocUrl,
-      "-link", nettyClientDocUrl
-    ),
-
-    testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
-    libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % jacksonVersion,
-      "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
-      "org.yaml" % "snakeyaml" % "1.14" % "test",
-      "com.novocode" % "junit-interface" % "0.11" % "test",
-      "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
-      "junit" % "junit" % "4.12" % "test"
-    )
-  )
-
 lazy val java = project.in(file("faunadb-java"))
-  .dependsOn(common, javaDsl % "test->test;compile->compile")
+  .dependsOn(common)
   .settings(jacoco.settings)
   .settings(publishSettings: _*)
   .settings(
     name := "faunadb-java",
     crossPaths := false,
     autoScalaLibrary := false,
+    exportJars := true,
     javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
     apiURL := Some(url(javaApiUrl)),
@@ -183,8 +153,7 @@ lazy val java = project.in(file("faunadb-java"))
       "-link", jacksonDocUrl,
       "-link", metricsDocUrl,
       "-link", nettyClientDocUrl,
-      "-linkoffline", commonApiUrl, "./faunadb-common/target/api",
-      "-linkoffline", javaDslApiUrl, "./faunadb-java-dsl/target/api"
+      "-linkoffline", commonApiUrl, "./faunadb-common/target/api"
     ),
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
@@ -199,29 +168,26 @@ lazy val java = project.in(file("faunadb-java"))
     jacoco.reportFormats in jacoco.Config := Seq(XMLReport())
   )
 
-lazy val javaAndroid = project.in(file("faunadb-android"))
+// This project will not publish any artifacts, the java artifact `faunadb-java` should be used as a regular dependency
+// The sole purpose of it, it's to compile against the android-sdk
+lazy val javaAndroid = project.in(file("faunadb-java"))
   .enablePlugins(AndroidApp)
-  .dependsOn(javaDsl % "test->test;compile->compile")
-  .settings(publishSettings: _*)
+  .dependsOn(common)
   .settings(
     name := "faunadb-android",
     crossPaths := false,
     autoScalaLibrary := false,
     javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
+
     testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
-    apiURL := Some(url(javaAndroidApiUrl)),
 
-    javacOptions in (Compile, doc) := Seq("-source", "1.8",
-      "-link", javaDocUrl,
-      "-link", jacksonDocUrl,
-      "-link", okHttpDocUrl,
-      "-linkoffline", javaDslApiUrl, "./faunadb-java-dsl/target/api"
-    ),
-
+    target := { baseDirectory.value / "target-android" },
+    javacOptions in (Compile, doc) := Seq("-source", "1.8"),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
 
+    retrolambdaEnabled := true,
+
     libraryDependencies ++= Seq(
-      "com.squareup.okhttp3" % "okhttp" % "3.4.1",
       "com.google.code.findbugs" % "jsr305" % "2.0.1",
       "com.novocode" % "junit-interface" % "0.11" % "test",
       "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
@@ -234,29 +200,45 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
     showSdkProgress in Android := true,
     useProguard := true,
     useProguardInDebug := true,
-
-    publishArtifact in Test := false,
-    publishArtifact in Compile := true,
-    publishArtifact in (Compile, packageBin) := true,
-    publishArtifact in (Compile, packageDoc) := true,
-    publishArtifact in (Compile, packageSrc) := true,
+    publishArtifact := false,
 
     proguardOptions in Android ++= Seq(
-      //Jackson
-      // We can ignore the databind package as long as we don't obfuscate the annotations package
-      "-dontwarn com.fasterxml.jackson.databind.**",
-      "-keep class com.fasterxml.jackson.annotation.** { *; }",
-      "-keep class org.codehaus.** { *; }",
+      // We can ignore those warnings from all the 3rd party libraries
 
-      //Okio rules
-      "-dontwarn okio.**",
+      //used by retrolambda
+      "-dontwarn java.lang.invoke.**",
 
-      //OkHttp rules
-      "-keepattributes Signature",
-      "-keepattributes *Annotation*",
-      "-keep class okhttp3.** { *; }",
-      "-keep interface okhttp3.** { *; }",
-      "-dontwarn okhttp3.**",
+      // used by com.fasterxml.jackson.datatype
+      "-dontwarn org.w3c.dom.**",
+      "-dontwarn java.beans.**",
+
+      //used by io.netty
+      "-dontwarn com.google.protobuf.**",
+      "-dontwarn com.jcraft.**",
+      "-dontwarn com.ning.compress.**",
+      "-dontwarn lzma.sdk.**",
+      "-dontwarn net.jpountz.**",
+      "-dontwarn org.apache.commons.logging.**",
+      "-dontwarn org.apache.log4j.**",
+      "-dontwarn org.apache.logging.log4j.**",
+      "-dontwarn org.bouncycastle.**",
+      "-dontwarn org.conscrypt.**",
+      "-dontwarn org.eclipse.jetty.**",
+      "-dontwarn org.jboss.marshalling.**",
+      "-dontwarn sun.security.**",
+      // internals
+      "-dontwarn io.netty.internal.tcnative.**",
+      "-dontwarn io.netty.util.internal.logging.**",
+
+      //used by io.dropwizard.metrics
+      "-dontwarn javax.management.**",
+      "-dontwarn java.lang.management.**",
+      "-dontwarn sun.misc.Unsafe",
+
+      //used by slf4j
+      "-dontwarn org.slf4j.impl.StaticLoggerBinder",
+      "-dontwarn org.slf4j.impl.StaticMDCBinder",
+      "-dontwarn org.slf4j.impl.StaticMarkerBinder",
 
       "-keep class com.faunadb.**"
     ),
@@ -266,7 +248,9 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
       "META-INF/LICENSE.txt",
       "META-INF/LICENSE",
       "META-INF/NOTICE.txt",
-      "META-INF/NOTICE"
+      "META-INF/NOTICE",
+      "META-INF/io.netty.versions.properties",
+      "META-INF/INDEX.LIST"
     ))
   )
 

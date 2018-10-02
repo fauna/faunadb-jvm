@@ -1,4 +1,4 @@
-package com.faunadb.client.dsl;
+package com.faunadb.client;
 
 import java.util.Objects;
 
