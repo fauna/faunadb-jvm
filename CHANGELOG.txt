@@ -1,3 +1,15 @@
+2.6.0
+* Support backrefs in Let() bindings. Requires FaunaDB 2.6.0.
+* Add stdlib math functions Abs(), Asin(), Acos(), Atan(), BitAnd(), BitNot(),
+  BitOr(), BitXor(), Ceil(), Cos(), Cosh(), Degrees(), Divide(), Exp(), Floor(),
+  Hypot(), Ln(), Log(), Max(), Min(), Modulo(), Pow(), Radians(), Round(),
+  Sign(), Sin(), Sinh(), Sqrt(), Tan(), Tanh(), Trunc()
+* Add stdlib string functions FindStr(), FindStrRegex(), Length(), Lower(),
+  LTrim(), Repeat(), ReplaceStr(), ReplaceStrRegex(), RTrim(), Space(),
+  SubString(), TitleCase(), Trim(), Upper()
+* Make codecs tuple aware
+* Expose last seen txn via scala:lastTxnTime and java:getLastTxnTime()
+
 2.5.6
 * Update documentation links
 * Fix NoSuchElementException when parsing an empty object
