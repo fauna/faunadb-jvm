@@ -419,6 +419,31 @@ public final class Language {
   }
 
   /**
+   * Returns a reference to a set of all roles in the database.
+   * A reference set must be paginated in order to retrieve its values.
+   *
+   * @return a new {@link Expr} instance
+   * @see #Paginate(Expr)
+   */
+  public static Expr Roles() {
+    return Roles(Null());
+  }
+
+  /**
+   * Returns a reference to a set of all roles in the specified database.
+   * A reference set must be paginated in order to retrieve its values.
+   *
+   * @param scope a reference to a database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see #Ref(Expr, String)
+   * @see #Database(String)
+   * @see #Paginate(Expr)
+   */
+  public static Expr Roles(Expr scope) {
+    return Fn.apply("roles", scope);
+  }
+
+  /**
    * Encodes the given object using the reflection {@link Encoder}.
    *
    * @param value the object to be encoded
@@ -4202,7 +4227,7 @@ public final class Language {
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    */
   public static Expr Role(Expr name, Expr database) {
-    return Fn.apply("role", name, "database", database);
+    return Fn.apply("role", name, "scope", database);
   }
 
   /**

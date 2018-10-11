@@ -26,7 +26,7 @@ import static com.faunadb.client.types.Codec.*;
 import static com.faunadb.client.types.Value.NullV.NULL;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.collection.IsArrayContainingInOrder.arrayContaining;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
@@ -1453,8 +1453,8 @@ public class ClientSpec {
     adminClient.query(CreateRole(Obj(
       "name", Value("a_role"),
       "privileges", Obj(
-          "resource", Databases(),
-          "actions", Obj("read", Value(true))
+        "resource", Databases(),
+        "actions", Obj("read", Value(true))
       )
     ))).get();
 
@@ -1672,36 +1672,48 @@ public class ClientSpec {
 
   @Test
   public void shouldTestNestedReferences() throws Exception {
-    FaunaClient client1 = createNewDatabase(adminClient, "parent-database");
-    createNewDatabase(client1, "child-database");
+    FaunaClient parentClient = createNewDatabase(adminClient, "parent-database");
+    FaunaClient childClient = createNewDatabase(parentClient, "child-database");
 
-    Value key = client1.query(CreateKey(Obj("database", Database(Value("child-database")), "role", Value("server")))).get();
+    childClient.query(
+      CreateClass(Obj(
+        "name", Value("a_class")
+      ))
+    ).get();
 
-    FaunaClient client2 = client1.newSessionClient(key.get(SECRET_FIELD));
-
-    client2.query(CreateClass(Obj("name", Value("a_class")))).get();
+    childClient.query(
+      CreateRole(Obj(
+        "name", Value("a_role"),
+        "privileges", Obj(
+          "resource", Databases(),
+          "actions", Obj("read", Value(true))
+        )
+      ))
+    ).get();
 
     Expr nestedDatabase = Database("child-database", Database("parent-database"));
-
     Expr nestedClassRef = Class("a_class", nestedDatabase);
+    Expr nestedRoleRef = Role("a_role", nestedDatabase);
 
-    assertThat(
-            serverClient.query(Exists(nestedClassRef)).get().to(BOOLEAN).get(),
-            equalTo(true)
-    );
+    assertThat(adminClient.query(Exists(nestedClassRef)).get(), equalTo(BooleanV.TRUE));
+    assertThat(adminClient.query(Exists(nestedRoleRef)).get(), equalTo(BooleanV.TRUE));
 
-    Expr allNestedClasses = Classes(nestedDatabase);
+    RefV childDBRef =
+      new RefV("child-database", Native.DATABASES,
+        new RefV("parent-database", Native.DATABASES));
 
-    List<RefV> results = new ArrayList();
+    List<RefV> refs = adminClient.query(
+      Paginate(Union(
+        Classes(nestedDatabase),
+        Roles(nestedDatabase)
+      ))
+    ).get().get(REF_LIST);
 
-    results.add(new RefV("a_class", Native.CLASSES,
-            new RefV("child-database", Native.DATABASES,
-                    new RefV("parent-database", Native.DATABASES))));
-
-    assertThat(
-            serverClient.query(Paginate(allNestedClasses)).get().get(REF_LIST),
-            equalTo(results)
-    );
+    assertThat(refs, hasSize(2));
+    assertThat(refs, containsInAnyOrder(
+      new RefV("a_class", Native.CLASSES, childDBRef),
+      new RefV("a_role", Native.ROLES, childDBRef)
+    ));
   }
 
   @Test
