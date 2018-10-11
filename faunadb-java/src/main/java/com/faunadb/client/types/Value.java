@@ -757,6 +757,7 @@ public abstract class Value extends Expr {
     public static final RefV DATABASES = new RefV("databases", null, null);
     public static final RefV KEYS = new RefV("keys", null, null);
     public static final RefV FUNCTIONS = new RefV("functions", null, null);
+    public static final RefV ROLES = new RefV("roles", null, null);
 
     public static RefV fromName(String name) {
       switch (name) {
@@ -765,6 +766,7 @@ public abstract class Value extends Expr {
         case "databases": return DATABASES;
         case "keys": return KEYS;
         case "functions": return FUNCTIONS;
+        case "roles": return ROLES;
       }
 
       return new RefV(name, null, null);

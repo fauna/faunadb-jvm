@@ -1434,7 +1434,7 @@ public class ClientSpec {
     Expr lambda = Lambda(Arr(Value("x"), Value("y")), Concat(Arr(Var("x"), Var("y")), Value("/")));
     query(CreateFunction(Obj("name", Value(functionName), "body", Query(lambda)))).get();
 
-    assertThat(query(Exists(Function(functionName))).get(), equalTo((Value)BooleanV.TRUE));
+    assertThat(query(Exists(Function(functionName))).get(), equalTo(BooleanV.TRUE));
   }
 
   @Test
@@ -1446,6 +1446,19 @@ public class ClientSpec {
       query(Call(Function("concat_with_slash"), Value("a"), Value("b"))).get(),
       equalTo(Value("a/b"))
     );
+  }
+
+  @Test
+  public void shouldCreateRole() throws Exception {
+    adminClient.query(CreateRole(Obj(
+      "name", Value("a_role"),
+      "privileges", Obj(
+          "resource", Databases(),
+          "actions", Obj("read", Value(true))
+      )
+    ))).get();
+
+    assertThat(adminClient.query(Exists(Role("a_role"))).get(), equalTo(BooleanV.TRUE));
   }
 
   static class Spell {
@@ -1485,37 +1498,42 @@ public class ClientSpec {
   public void shouldTestReferences() throws Exception {
     assertThat(
       query(Index("all_spells")).get(),
-      equalTo((Value) new RefV("all_spells", Native.INDEXES))
+      equalTo(new RefV("all_spells", Native.INDEXES))
     );
 
     assertThat(
       query(Class("spells")).get(),
-      equalTo((Value) new RefV("spells", Native.CLASSES))
+      equalTo(new RefV("spells", Native.CLASSES))
     );
 
     assertThat(
       query(Database("faunadb-database")).get(),
-      equalTo((Value) new RefV("faunadb-database", Native.DATABASES))
+      equalTo(new RefV("faunadb-database", Native.DATABASES))
     );
 
     assertThat(
       query(new RefV("1234567890", Native.KEYS)).get(),
-      equalTo((Value) new RefV("1234567890", Native.KEYS))
+      equalTo(new RefV("1234567890", Native.KEYS))
     );
 
     assertThat(
       query(Function("function_name")).get(),
-      equalTo((Value) new RefV("function_name", Native.FUNCTIONS))
+      equalTo(new RefV("function_name", Native.FUNCTIONS))
+    );
+
+    assertThat(
+        query(Role("role_name")).get(),
+        equalTo(new RefV("role_name", Native.ROLES))
     );
 
     assertThat(
       query(Ref(Class("spells"), Value("1234567890"))).get(),
-      equalTo((Value) new RefV("1234567890", new RefV("spells", Native.CLASSES)))
+      equalTo(new RefV("1234567890", new RefV("spells", Native.CLASSES)))
     );
 
     assertThat(
       query(Ref(Class("spells"), "1234567890")).get(),
-      equalTo((Value) new RefV("1234567890", new RefV("spells", Native.CLASSES)))
+      equalTo(new RefV("1234567890", new RefV("spells", Native.CLASSES)))
     );
   }
 
@@ -1523,7 +1541,7 @@ public class ClientSpec {
   public void shouldCreateNestedRefFromString() throws Exception {
     assertThat(
       query(Ref("classes/widget/123")).get(),
-      equalTo((Value) new RefV("123", new RefV("widget", Native.CLASSES)))
+      equalTo(new RefV("123", new RefV("widget", Native.CLASSES)))
     );
   }
 
@@ -1635,7 +1653,7 @@ public class ClientSpec {
     try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
       assertThat(
               sessionClient.query(Identity()).get(),
-              equalTo((Value) createdInstance.get(REF_FIELD))
+              equalTo(createdInstance.get(REF_FIELD))
       );
     }
   }

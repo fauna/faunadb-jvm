@@ -1783,12 +1783,24 @@ public final class Language {
    * Creates a new user defined function in the current database.
    *
    * @param params the function's configuration parameters. Type: Object
-   * @return a new {@link Expr} instnace
+   * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
    * @see #Obj(Map)
    */
   public static Expr CreateFunction(Expr params) {
     return Fn.apply("create_function", params);
+  }
+
+  /**
+   * Creates a new user role in the current database.
+   *
+   * @param params the role's configuration parameters. Type: Object
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see #Obj(Map)
+   */
+  public static Expr CreateRole(Expr params) {
+    return Fn.apply("create_role", params);
   }
 
   /**
@@ -4157,6 +4169,52 @@ public final class Language {
    */
   public static Expr Function(String name, Expr database) {
     return Function(Value(name), database);
+  }
+
+  /**
+   * Creates a reference for the given role name.
+   *
+   * @param name the role name. Type: String
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Role(Expr name) {
+    return Fn.apply("role", name);
+  }
+
+  /**
+   * Creates a reference for the given role name.
+   *
+   * @param name the role name
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Role(String name) {
+    return Role(Value(name));
+  }
+
+  /**
+   * Creates a reference for the given role name, scoped to the database provided.
+   *
+   * @param name the role name. Type: String
+   * @param database the scope database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Role(Expr name, Expr database) {
+    return Fn.apply("role", name, "database", database);
+  }
+
+  /**
+   * Creates a reference for the given role name, scoped to the database provided.
+   *
+   * @param name the role name.
+   * @param database the scope database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Role(String name, Expr database) {
+    return Role(Value(name), database);
   }
 
   /**

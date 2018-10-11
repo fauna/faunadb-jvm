@@ -611,6 +611,33 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeCreateRole() throws Exception {
+    assertJson(
+      CreateRole(Obj(
+          "name", Value("a_role"),
+          "privileges", Arr(Obj(
+              "resource", Databases(),
+              "actions", Obj("read", Value(true))
+          ))
+      )),
+      "{\"create_role\":{\"object\":{\"name\":\"a_role\",\"privileges\":[{\"object\":{" +
+          "\"resource\":{\"databases\":null},\"actions\":{\"object\":{\"read\":true}}}}]}}}"
+    );
+
+    assertJson(
+      CreateRole(Obj(
+          "name", Value("a_role"),
+          "privileges", Obj(
+              "resource", Databases(),
+              "actions", Obj("read", Value(true))
+          )
+      )),
+      "{\"create_role\":{\"object\":{\"name\":\"a_role\",\"privileges\":{\"object\":{" +
+          "\"resource\":{\"databases\":null},\"actions\":{\"object\":{\"read\":true}}}}}}}"
+    );
+  }
+
+  @Test
   public void shouldSerializeSingletonFunction() throws Exception {
     assertJson(
       Singleton(Ref("classes/widget/1")),
