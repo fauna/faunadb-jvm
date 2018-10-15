@@ -141,6 +141,10 @@ package object query {
   def Functions(scope: Expr = NullV): Expr =
     Expr(ObjectV("functions" -> scope.value))
 
+  /** Native reference to all roles */
+  def Roles(scope: Expr = NullV): Expr =
+    Expr(ObjectV("roles" -> scope.value))
+
   /** Native reference to all keys */
   def Keys(scope: Expr = NullV): Expr =
     Expr(ObjectV("keys" -> scope.value))

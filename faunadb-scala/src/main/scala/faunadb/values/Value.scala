@@ -166,6 +166,7 @@ object Native {
   val Databases: RefV = RefV("databases", None, None)
   val Functions: RefV = RefV("functions", None, None)
   val Keys: RefV = RefV("keys", None, None)
+  val Roles: RefV = RefV("roles", None, None)
 }
 
 /** A Set Ref. */

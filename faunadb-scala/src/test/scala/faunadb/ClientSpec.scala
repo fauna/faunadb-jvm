@@ -791,17 +791,33 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "create a role" in {
     val name = s"a_role_${Random.alphanumeric.take(8).mkString}"
 
-    await {
-      rootClient.query(CreateRole(Obj(
-        "name" -> name,
-        "privileges" -> Obj(
-          "resource" -> Classes(),
-          "actions" -> Obj("read" -> true)
-        )
-      )))
-    }
+    await(rootClient.query(CreateRole(Obj(
+      "name" -> name,
+      "privileges" -> Obj(
+        "resource" -> Classes(),
+        "actions" -> Obj("read" -> true)
+      )
+    ))))
 
     await(rootClient.query(Exists(Role(name)))).to[Boolean].get shouldBe true
+  }
+
+  it should "read a role from a nested database" in {
+    val key = await(rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "admin"))))
+    val parentCli = rootClient.sessionClient(key(SecretField).get)
+    val childCli = createNewDatabase(parentCli, "db-for-roles")
+
+    await(childCli.query(CreateRole(Obj(
+      "name" -> "a_role",
+      "privileges" -> Obj(
+        "resource" -> Classes(),
+        "actions" -> Obj("read" -> true)
+      )
+    ))))
+
+    await(childCli.query(Paginate(Roles())))(PageRefs).get shouldBe Seq(RefV("a_role", Native.Roles))
+    await(parentCli.query(Paginate(Roles(Database("db-for-roles")))))(PageRefs).get shouldBe
+      Seq(RefV("a_role", Native.Roles, RefV("db-for-roles", Native.Databases)))
   }
 
   case class Spell(name: String, element: Either[String, Seq[String]], cost: Option[Long])
