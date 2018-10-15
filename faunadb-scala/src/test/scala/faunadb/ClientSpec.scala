@@ -758,7 +758,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       otherClient.close()
   }
 
-  "Fauna Client" should "should not create session clients on a closed client" in {
+  it should "should not create session clients on a closed client" in {
     val newClient = FaunaClient(endpoint = config("root_url"), secret = config("root_token"))
 
     newClient.close()
@@ -786,6 +786,22 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(client.query(CreateFunction(Obj("name" -> "concat_with_slash", "body" -> query))))
 
     await(client.query(Call(Function("concat_with_slash"), "a", "b"))).to[String].get shouldBe "a/b"
+  }
+
+  it should "create a role" in {
+    val name = s"a_role_${Random.alphanumeric.take(8).mkString}"
+
+    await {
+      rootClient.query(CreateRole(Obj(
+        "name" -> name,
+        "privileges" -> Obj(
+          "resource" -> Classes(),
+          "actions" -> Obj("read" -> true)
+        )
+      )))
+    }
+
+    await(rootClient.query(Exists(Role(name)))).to[Boolean].get shouldBe true
   }
 
   case class Spell(name: String, element: Either[String, Seq[String]], cost: Option[Long])

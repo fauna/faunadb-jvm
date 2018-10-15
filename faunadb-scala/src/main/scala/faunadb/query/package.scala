@@ -510,6 +510,14 @@ package object query {
   def CreateFunction(params: Expr): Expr =
     Expr(ObjectV("create_function" -> params.value))
 
+  /**
+    * A Create Role expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
+    */
+  def CreateRole(params: Expr): Expr =
+    Expr(ObjectV("create_role" -> params.value))
+
   // Set Constructors
 
   /**
@@ -925,6 +933,22 @@ package object query {
     */
   def Function(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("function" -> name.value, "scope" -> scope.value))
+
+  /**
+    * A Role expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
+    */
+  def Role(name: Expr): Expr =
+    Expr(ObjectV("role" -> name.value))
+
+  /**
+    * A Role expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
+    */
+  def Role(name: Expr, scope: Expr): Expr =
+    Expr(ObjectV("role" -> name.value, "scope" -> scope.value))
 
   /**
    * An Equals expression.
