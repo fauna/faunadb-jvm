@@ -877,7 +877,7 @@ package object query {
   /**
     * A Class expression.
     *
-    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
   def Class(name: Expr): Expr =
     Expr(ObjectV("class" -> name.value))
@@ -885,7 +885,7 @@ package object query {
   /**
     * A Class expression.
     *
-    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
   def Class(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("class" -> name.value, "scope" -> scope.value))
@@ -893,7 +893,7 @@ package object query {
   /**
     * A Database expression.
     *
-    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
   def Database(name: Expr): Expr =
     Expr(ObjectV("database" -> name.value))
@@ -901,7 +901,7 @@ package object query {
   /**
     * A Database expression.
     *
-    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
   def Database(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("database" -> name.value, "scope" -> scope.value))
@@ -909,7 +909,7 @@ package object query {
   /**
     * An Index expression.
     *
-    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
   def Index(name: Expr): Expr =
     Expr(ObjectV("index" -> name.value))
@@ -917,7 +917,7 @@ package object query {
   /**
     * An Index expression.
     *
-    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
   def Index(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("index" -> name.value, "scope" -> scope.value))
@@ -925,7 +925,7 @@ package object query {
   /**
     * A Function expression.
     *
-    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
   def Function(name: Expr): Expr =
     Expr(ObjectV("function" -> name.value))
@@ -933,7 +933,7 @@ package object query {
   /**
     * A Function expression.
     *
-    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
   def Function(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("function" -> name.value, "scope" -> scope.value))
@@ -941,7 +941,7 @@ package object query {
   /**
     * A Role expression.
     *
-    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
   def Role(name: Expr): Expr =
     Expr(ObjectV("role" -> name.value))
@@ -949,7 +949,7 @@ package object query {
   /**
     * A Role expression.
     *
-    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#helper-functions]]
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
   def Role(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("role" -> name.value, "scope" -> scope.value))
