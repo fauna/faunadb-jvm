@@ -143,6 +143,22 @@ class FaunaClient(connection: Connection) {
   /** Frees any resources held by the client and close the underlying connection. */
   def close(): Unit = connection.close()
 
+  /**
+   * Get the freshest timestamp reported to this client.
+   */
+  def lastTxnTime: Long = connection.getLastTxnTime
+
+  /**
+   * Sync the freshest timestamp seen by this client.
+   *
+   * This has no effect if staler than currently stored timestamp.
+   * WARNING: This should be used only when coordinating timestamps across
+   *          multiple clients. Moving the timestamp arbitrarily forward into
+   *          the future will cause transactions to stall.
+   */
+  def syncLastTxnTime(timestamp: Long): Unit =
+    connection.syncLastTxnTime(timestamp)
+
   private def handleNetworkExceptions[A]: PartialFunction[Throwable, A] = {
     case ex: ConnectException =>
       throw new UnavailableException(ex.getMessage)
