@@ -188,6 +188,35 @@ public final class Connection implements AutoCloseable {
   }
 
   /**
+   * Get the freshest timestamp reported to this client.
+   */
+  public Long getLastTxnTime() {
+    return txnTime.get();
+  }
+
+  /**
+   * Sync the freshest timestamp seen by this client.
+   *
+   * This has no effect if more stale than the currently stored timestamp.
+   * WARNING: This should be used only when coordinating timestamps across
+   *          multiple clients. Moving the timestamp arbitrarily forward into
+   *          the future will cause transactions to stall.
+   */
+  public void syncLastTxnTime(Long newTxnTime) {
+    boolean cas;
+    do {
+      long oldTxnTime = txnTime.get();
+
+      if (oldTxnTime < newTxnTime) {
+        cas = txnTime.compareAndSet(oldTxnTime, newTxnTime);
+      } else {
+        // Another query advanced the txnTime past this one.
+        break;
+      }
+    } while (!cas);
+  }
+
+  /**
    * Issues a {@code GET} request with no parameters.
    *
    * @param path the relative path of the resource.
@@ -309,18 +338,7 @@ public final class Connection implements AutoCloseable {
 
       String txnTimeHeader = response.headers().get("X-Txn-Time");
       if (txnTimeHeader != null) {
-        long newTxnTime = Long.valueOf(txnTimeHeader);
-        boolean cas;
-        do {
-          long oldTxnTime = txnTime.get();
-
-          if (oldTxnTime < newTxnTime) {
-            cas = txnTime.compareAndSet(oldTxnTime, newTxnTime);
-          } else {
-            // Another query advanced the txnTime past this one.
-            break;
-          }
-        } while (!cas);
+        syncLastTxnTime(Long.valueOf(txnTimeHeader));
       }
 
       logSuccess(request, response);
