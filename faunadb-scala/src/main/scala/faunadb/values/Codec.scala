@@ -237,6 +237,123 @@ object Decoder {
         case _ => Result.Unexpected(v, s"Either ${tagA.runtimeClass.getSimpleName} or ${tagB.runtimeClass.getSimpleName}", path)
       }
   }
+
+  implicit def Tuple2Decoder[A: Decoder, B: Decoder] = new Decoder[(A, B)] {
+    def decode(value: Value, path: FieldPath): Result[(A, B)] = {
+      for {
+        v0 <- value(Field(0).to[A])
+        v1 <- value(Field(1).to[B])
+      } yield (v0, v1)
+    }
+  }
+
+  implicit def Tuple3Decoder[A: Decoder, B: Decoder, C: Decoder] = new Decoder[(A, B, C)] {
+    def decode(value: Value, path: FieldPath): Result[(A, B, C)] = {
+      for {
+        v0 <- value(Field(0).to[A])
+        v1 <- value(Field(1).to[B])
+        v2 <- value(Field(2).to[C])
+      } yield (v0, v1, v2)
+    }
+  }
+
+  implicit def Tuple4Decoder[A: Decoder, B: Decoder, C: Decoder, D: Decoder] = new Decoder[(A, B, C, D)] {
+    def decode(value: Value, path: FieldPath): Result[(A, B, C, D)] = {
+      for {
+        v0 <- value(Field(0).to[A])
+        v1 <- value(Field(1).to[B])
+        v2 <- value(Field(2).to[C])
+        v3 <- value(Field(3).to[D])
+      } yield (v0, v1, v2, v3)
+    }
+  }
+
+  implicit def Tuple5Decoder[A: Decoder, B: Decoder, C: Decoder, D: Decoder, E: Decoder] = new Decoder[(A, B, C, D, E)] {
+    def decode(value: Value, path: FieldPath): Result[(A, B, C, D, E)] = {
+      for {
+        v0 <- value(Field(0).to[A])
+        v1 <- value(Field(1).to[B])
+        v2 <- value(Field(2).to[C])
+        v3 <- value(Field(3).to[D])
+        v4 <- value(Field(4).to[E])
+      } yield (v0, v1, v2, v3, v4)
+    }
+  }
+
+  implicit def Tuple6Decoder[A: Decoder, B: Decoder, C: Decoder, D: Decoder, E: Decoder, F: Decoder] = new Decoder[(A, B, C, D, E, F)] {
+    def decode(value: Value, path: FieldPath): Result[(A, B, C, D, E, F)] = {
+      for {
+        v0 <- value(Field(0).to[A])
+        v1 <- value(Field(1).to[B])
+        v2 <- value(Field(2).to[C])
+        v3 <- value(Field(3).to[D])
+        v4 <- value(Field(4).to[E])
+        v5 <- value(Field(5).to[F])
+      } yield (v0, v1, v2, v3, v4, v5)
+    }
+  }
+
+  implicit def Tuple7Decoder[A: Decoder, B: Decoder, C: Decoder, D: Decoder, E: Decoder, F: Decoder, G: Decoder] = new Decoder[(A, B, C, D, E, F, G)] {
+    def decode(value: Value, path: FieldPath): Result[(A, B, C, D, E, F, G)] = {
+      for {
+        v0 <- value(Field(0).to[A])
+        v1 <- value(Field(1).to[B])
+        v2 <- value(Field(2).to[C])
+        v3 <- value(Field(3).to[D])
+        v4 <- value(Field(4).to[E])
+        v5 <- value(Field(5).to[F])
+        v6 <- value(Field(6).to[G])
+      } yield (v0, v1, v2, v3, v4, v5, v6)
+    }
+  }
+
+  implicit def Tuple8Decoder[A: Decoder, B: Decoder, C: Decoder, D: Decoder, E: Decoder, F: Decoder, G: Decoder, H: Decoder] = new Decoder[(A, B, C, D, E, F, G, H)] {
+    def decode(value: Value, path: FieldPath): Result[(A, B, C, D, E, F, G, H)] = {
+      for {
+        v0 <- value(Field(0).to[A])
+        v1 <- value(Field(1).to[B])
+        v2 <- value(Field(2).to[C])
+        v3 <- value(Field(3).to[D])
+        v4 <- value(Field(4).to[E])
+        v5 <- value(Field(5).to[F])
+        v6 <- value(Field(6).to[G])
+        v7 <- value(Field(7).to[H])
+      } yield (v0, v1, v2, v3, v4, v5, v6, v7)
+    }
+  }
+
+  implicit def Tuple9Decoder[A: Decoder, B: Decoder, C: Decoder, D: Decoder, E: Decoder, F: Decoder, G: Decoder, H: Decoder, I: Decoder] = new Decoder[(A, B, C, D, E, F, G, H, I)] {
+    def decode(value: Value, path: FieldPath): Result[(A, B, C, D, E, F, G, H, I)] = {
+      for {
+        v0 <- value(Field(0).to[A])
+        v1 <- value(Field(1).to[B])
+        v2 <- value(Field(2).to[C])
+        v3 <- value(Field(3).to[D])
+        v4 <- value(Field(4).to[E])
+        v5 <- value(Field(5).to[F])
+        v6 <- value(Field(6).to[G])
+        v7 <- value(Field(7).to[H])
+        v8 <- value(Field(8).to[I])
+      } yield (v0, v1, v2, v3, v4, v5, v6, v7, v8)
+    }
+  }
+
+  implicit def Tuple10Decoder[A: Decoder, B: Decoder, C: Decoder, D: Decoder, E: Decoder, F: Decoder, G: Decoder, H: Decoder, I: Decoder, J: Decoder] = new Decoder[(A, B, C, D, E, F, G, H, I, J)] {
+    def decode(value: Value, path: FieldPath): Result[(A, B, C, D, E, F, G, H, I, J)] = {
+      for {
+        v0 <- value(Field(0).to[A])
+        v1 <- value(Field(1).to[B])
+        v2 <- value(Field(2).to[C])
+        v3 <- value(Field(3).to[D])
+        v4 <- value(Field(4).to[E])
+        v5 <- value(Field(5).to[F])
+        v6 <- value(Field(6).to[G])
+        v7 <- value(Field(7).to[H])
+        v8 <- value(Field(8).to[I])
+        v9 <- value(Field(9).to[J])
+      } yield (v0, v1, v2, v3, v4, v5, v6, v7, v8, v9)
+    }
+  }
 }
 
 trait Encoder[T] {
@@ -333,6 +450,42 @@ object Encoder {
   // hack around our need for local contravariance for tagged union encoding
   implicit def UnionVariantEncoder[T](implicit enc: UnionCodec[_ >: T]): Encoder[T] =
     enc.asInstanceOf[Encoder[T]]
+
+  implicit def Tuple2Encoder[A: Encoder, B: Encoder] = new Encoder[(A, B)] {
+    def encode(value: (A, B)): Value = ArrayV(value._1, value._2)
+  }
+
+  implicit def Tuple3Encoder[A: Encoder, B: Encoder, C: Encoder] = new Encoder[(A, B, C)] {
+    def encode(value: (A, B, C)): Value = ArrayV(value._1, value._2, value._3)
+  }
+
+  implicit def Tuple4Encoder[A: Encoder, B: Encoder, C: Encoder, D: Encoder] = new Encoder[(A, B, C, D)] {
+    def encode(value: (A, B, C, D)): Value = ArrayV(value._1, value._2, value._3, value._4)
+  }
+
+  implicit def Tuple5Encoder[A: Encoder, B: Encoder, C: Encoder, D: Encoder, E: Encoder] = new Encoder[(A, B, C, D, E)] {
+    def encode(value: (A, B, C, D, E)): Value = ArrayV(value._1, value._2, value._3, value._4, value._5)
+  }
+
+  implicit def Tuple6Encoder[A: Encoder, B: Encoder, C: Encoder, D: Encoder, E: Encoder, F: Encoder] = new Encoder[(A, B, C, D, E, F)] {
+    def encode(value: (A, B, C, D, E, F)): Value = ArrayV(value._1, value._2, value._3, value._4, value._5, value._6)
+  }
+
+  implicit def Tuple7Encoder[A: Encoder, B: Encoder, C: Encoder, D: Encoder, E: Encoder, F: Encoder, G: Encoder] = new Encoder[(A, B, C, D, E, F, G)] {
+    def encode(value: (A, B, C, D, E, F, G)): Value = ArrayV(value._1, value._2, value._3, value._4, value._5, value._6, value._7)
+  }
+
+  implicit def Tuple8Encoder[A: Encoder, B: Encoder, C: Encoder, D: Encoder, E: Encoder, F: Encoder, G: Encoder, H: Encoder] = new Encoder[(A, B, C, D, E, F, G, H)] {
+    def encode(value: (A, B, C, D, E, F, G, H)): Value = ArrayV(value._1, value._2, value._3, value._4, value._5, value._6, value._7, value._8)
+  }
+
+  implicit def Tuple9Encoder[A: Encoder, B: Encoder, C: Encoder, D: Encoder, E: Encoder, F: Encoder, G: Encoder, H: Encoder, I: Encoder] = new Encoder[(A, B, C, D, E, F, G, H, I)] {
+    def encode(value: (A, B, C, D, E, F, G, H, I)): Value = ArrayV(value._1, value._2, value._3, value._4, value._5, value._6, value._7, value._8, value._9)
+  }
+
+  implicit def Tuple10Encoder[A: Encoder, B: Encoder, C: Encoder, D: Encoder, E: Encoder, F: Encoder, G: Encoder, H: Encoder, I: Encoder, J: Encoder] = new Encoder[(A, B, C, D, E, F, G, H, I, J)] {
+    def encode(value: (A, B, C, D, E, F, G, H, I, J)): Value = ArrayV(value._1, value._2, value._3, value._4, value._5, value._6, value._7, value._8, value._9, value._10)
+  }
 }
 
 trait Codec[T] extends Decoder[T] with Encoder[T]
