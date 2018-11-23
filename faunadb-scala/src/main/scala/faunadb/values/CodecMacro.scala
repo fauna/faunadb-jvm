@@ -20,24 +20,46 @@ class CodecMacro(val c: blackbox.Context) {
   }
 
   private def getEncodedObject(tpe: Type): Tree = {
-    val fields = getFields(tpe) map { field =>
-      val variable = q"value.${varName(field).toTermName}"
+    val isTuple = tpe.typeSymbol.fullName.startsWith("scala.Tuple")
 
-      if (isOption(field._2)) {
-        q"(${varName(field).toString}, ($variable.map(v => v: $M.Value).getOrElse($M.NullV)))"
-      } else {
-        q"(${varName(field).toString}, ($variable: $M.Value))"
+    if (isTuple) {
+      val fields = getFields(tpe) map { field =>
+        val variable = q"value.${varName(field).toTermName}"
+
+        if (isOption(field._2)) {
+          q"($variable.map(v => v: $M.Value).getOrElse($M.NullV))"
+        } else {
+          q"($variable: $M.Value)"
+        }
       }
-    }
 
-    q"$M.ObjectV(..$fields)"
+      q"$M.ArrayV(..$fields)"
+    } else {
+      val fields = getFields(tpe) map { field =>
+        val variable = q"value.${varName(field).toTermName}"
+
+        if (isOption(field._2)) {
+          q"(${varName(field).toString}, ($variable.map(v => v: $M.Value).getOrElse($M.NullV)))"
+        } else {
+          q"(${varName(field).toString}, ($variable: $M.Value))"
+        }
+      }
+
+      q"$M.ObjectV(..$fields)"
+    }
   }
 
   private def getDecodedObject(tpe: Type): Tree = {
     val fields = getFields(tpe)
 
-    val fieldsFragments = fields map { field =>
-      val variable = q"value(${varName(field).toString})"
+    val isTuple = tpe.typeSymbol.fullName.startsWith("scala.Tuple")
+
+    val fieldsFragments = fields.zipWithIndex map { case (field, idx) =>
+      val variable = if (isTuple)
+        q"value($idx)"
+      else
+        q"value(${varName(field).toString})"
+
       val decoder = q"implicitly[$M.Decoder[${field._2}]]"
       val path = q"path ++ ${varName(field).toString}"
 

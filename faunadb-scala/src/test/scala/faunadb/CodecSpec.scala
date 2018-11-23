@@ -196,6 +196,24 @@ class CodecSpec extends FlatSpec with Matchers {
     } should have message """Error at /tpe: Expected Union tag: true, 2, "a", or "4"; found value "x" of type String."""
   }
 
+  it should "decode tuples" in {
+    ArrayV("string", 10L).to[(String, Long)].get shouldBe ("string", 10L)
+    ArrayV("string", 10L, 20D).to[(String, Long, Double)].get shouldBe ("string", 10L, 20D)
+    ArrayV("string", 10L, 20D, ArrayV("str0", "str1")).to[(String, Long, Double, Seq[String])].get shouldBe ("string", 10L, 20D, Seq("str0", "str1"))
+    ArrayV("string", 10L, 20D, ArrayV("str0", "str1"), 0xff).to[(String, Long, Double, Seq[String], Int)].get shouldBe ("string", 10L, 20D, Seq("str0", "str1"), 0xff)
+
+    ArrayV(1, 2, 3, 4, 5, 6).to[(Int, Int, Int, Int, Int, Int)].get shouldBe (1, 2, 3, 4, 5, 6)
+    ArrayV(1, 2, 3, 4, 5, 6, 7).to[(Int, Int, Int, Int, Int, Int, Int)].get shouldBe (1, 2, 3, 4, 5, 6, 7)
+    ArrayV(1, 2, 3, 4, 5, 6, 7, 8).to[(Int, Int, Int, Int, Int, Int, Int, Int)].get shouldBe (1, 2, 3, 4, 5, 6, 7, 8)
+    ArrayV(1, 2, 3, 4, 5, 6, 7, 8, 9).to[(Int, Int, Int, Int, Int, Int, Int, Int, Int)].get shouldBe (1, 2, 3, 4, 5, 6, 7, 8, 9)
+    ArrayV(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).to[(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)].get shouldBe (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+    implicit val tuple11 = Codec.Record[(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)]
+    ArrayV(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11).to[(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)].get shouldBe (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+
+    ArrayV("string", 10L, "not used element").to[(String, Long)].get shouldBe ("string", 10L)
+  }
+
   // Encoding
 
   it should "encode from primitive types" in {
@@ -320,6 +338,22 @@ class CodecSpec extends FlatSpec with Matchers {
     (ClassWithEither(Left("string value")): Value) shouldBe ObjectV("either" -> StringV("string value"))
 
     (ClassWithEither(Right(10)): Value) shouldBe ObjectV("either" -> LongV(10))
+  }
+
+  it should "encode tuples" in {
+    (("string", 10L): Value) shouldBe ArrayV("string", 10L)
+    (("string", 10L, 20D): Value) shouldBe ArrayV("string", 10L, 20D)
+    (("string", 10L, 20D, Seq("str0", "str1")): Value) shouldBe ArrayV("string", 10L, 20D, ArrayV("str0", "str1"))
+    (("string", 10L, 20D, Seq("str0", "str1"), 0xff): Value) shouldBe ArrayV("string", 10L, 20D, ArrayV("str0", "str1"), 0xff)
+
+    ((1, 2, 3, 4, 5, 6): Value) shouldBe ArrayV(1, 2, 3, 4, 5, 6)
+    ((1, 2, 3, 4, 5, 6, 7): Value) shouldBe ArrayV(1, 2, 3, 4, 5, 6, 7)
+    ((1, 2, 3, 4, 5, 6, 7, 8): Value) shouldBe ArrayV(1, 2, 3, 4, 5, 6, 7, 8)
+    ((1, 2, 3, 4, 5, 6, 7, 8, 9): Value) shouldBe ArrayV(1, 2, 3, 4, 5, 6, 7, 8, 9)
+    ((1, 2, 3, 4, 5, 6, 7, 8, 9, 10): Value) shouldBe ArrayV(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+    implicit val tuple11 = Codec.Record[(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)]
+    ((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11): Value) shouldBe ArrayV(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
   }
 
   // Errors
