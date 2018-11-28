@@ -3,6 +3,24 @@
 
 [The complete Java example is here](SpellExample.java)
 
+### How to synchronously wait for a result
+
+The driver's `query` method returns an instance of
+`java.util.concurrent.CompletableFuture`. In order to synchronously wait for the
+query result, use the `CompletableFuture#get(long, TimeUnit)` method.
+
+```java
+    future.get(5, TimeUnit.SECONDS);
+```
+
+Waiting for queries to complete is discourage in production code. Please prefer
+the asynchronous API provided by the `CompletableFuture` class, such as
+`CompletableFuture#whenComplete` or `CompletableFuture#whenCompleteAsync`.
+
+Please note that this documentation uses an overload of the `CompletableFuture#get`
+method without a timeout. Although convenient for testing, this method can lead
+to poor performance in Java 8.
+
 ### How to create an admin connection to Fauna.
 
 An admin connection should only be used to create top level databases.  After the database is created, a separate client connection should be created.
