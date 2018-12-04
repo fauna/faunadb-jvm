@@ -274,7 +274,12 @@ public class FaunaClient implements AutoCloseable {
   }
 
   private JsonNode parseResponseBody(FullHttpResponse response) throws IOException {
-    return json.readTree(new ByteBufInputStream(response.content()));
+    JsonNode body = json.readTree(new ByteBufInputStream(response.content()));
+    if (body == null) {
+      throw new IOException("Invalid JSON.");
+    } else {
+      return body;
+    }
   }
 
 }

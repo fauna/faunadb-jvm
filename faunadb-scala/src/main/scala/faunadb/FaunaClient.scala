@@ -8,6 +8,7 @@ import com.faunadb.common.Connection
 import faunadb.errors._
 import faunadb.query.Expr
 import faunadb.values.{ ArrayV, NullV, Value }
+import java.io.IOException
 import java.net.ConnectException
 import java.util.concurrent.TimeoutException
 
@@ -194,6 +195,11 @@ class FaunaClient(connection: Connection) {
     }
 
   private def parseResponseBody(response: FullHttpResponse) = {
-    json.readTree(new ByteBufInputStream(response.content()))
+    val body = json.readTree(new ByteBufInputStream(response.content()))
+    if (body eq null) {
+      throw new IOException("Invalid JSON.")
+    } else {
+      body
+    }
   }
 }
