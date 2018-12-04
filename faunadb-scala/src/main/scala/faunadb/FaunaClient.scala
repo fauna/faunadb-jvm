@@ -8,6 +8,7 @@ import com.faunadb.common.Connection
 import faunadb.errors._
 import faunadb.query.Expr
 import faunadb.values.{ ArrayV, NullV, Value }
+import java.io.IOException
 import java.net.ConnectException
 import java.util.concurrent.TimeoutException
 import io.netty.util.CharsetUtil.UTF_8
@@ -195,7 +196,11 @@ class FaunaClient(connection: Connection) {
     }
 
   private def parseResponseBody(response: Response) = {
-    val body = response.getResponseBody(UTF_8)
-    json.readTree(body)
+    val body = json.readTree(response.getResponseBody(UTF_8))
+    if (body eq null) {
+      throw new IOException("Invalid JSON.")
+    } else {
+      body
+    }
   }
 }
