@@ -351,7 +351,6 @@ public final class Connection implements AutoCloseable {
         @Override
         public Response onCompleted(Response response) throws Exception {
           ctx.stop();
-          rv.complete(response);
 
           String txnTimeHeader = response.getHeader("X-Txn-Time");
           if (txnTimeHeader != null) {
@@ -359,6 +358,7 @@ public final class Connection implements AutoCloseable {
           }
 
           logSuccess(request, response);
+          rv.complete(response);
           return response;
         }
       });
