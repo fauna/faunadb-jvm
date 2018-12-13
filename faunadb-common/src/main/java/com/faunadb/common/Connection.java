@@ -347,14 +347,14 @@ public final class Connection implements AutoCloseable {
         return;
       }
 
-      rv.complete(response);
-
       String txnTimeHeader = response.headers().get("X-Txn-Time");
       if (txnTimeHeader != null) {
         syncLastTxnTime(Long.valueOf(txnTimeHeader));
       }
 
       logSuccess(request, response);
+
+      rv.complete(response);
       request.release();
     });
 
