@@ -71,6 +71,7 @@ public final class Connection implements AutoCloseable {
     private String authToken;
     private AsyncHttpClient client;
     private MetricRegistry metricRegistry;
+    private long lastSeenTxn;
 
     private Builder() {
     }
@@ -134,6 +135,17 @@ public final class Connection implements AutoCloseable {
     }
 
     /**
+     * Sets the last seen transaction time for the connection.
+     *
+     * @param lastSeenTxn the last seen transaction time in microseconds.
+     * @return this {@link Builder} object
+     */
+    public Builder withLastSeenTxn(long txnTime) {
+      this.lastSeenTxn = txnTime;
+      return this;
+    }
+
+    /**
      * @return a newly constructed {@link Connection} with its configuration based on
      * the settings of the {@link Builder} instance.
      */
@@ -164,7 +176,7 @@ public final class Connection implements AutoCloseable {
       else
         root = faunaRoot;
 
-      return new Connection(root, authToken, new RefAwareHttpClient(httpClient), registry);
+      return new Connection(root, authToken, new RefAwareHttpClient(httpClient), registry, lastSeenTxn);
     }
   }
 
@@ -181,11 +193,12 @@ public final class Connection implements AutoCloseable {
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final AtomicLong txnTime = new AtomicLong(0L);
 
-  private Connection(URL faunaRoot, String authToken, RefAwareHttpClient client, MetricRegistry registry) {
+  private Connection(URL faunaRoot, String authToken, RefAwareHttpClient client, MetricRegistry registry, long lastSeenTxn) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
     this.client = client;
     this.registry = registry;
+    txnTime.set(lastSeenTxn);
   }
 
   /**
@@ -198,7 +211,7 @@ public final class Connection implements AutoCloseable {
    */
   public Connection newSessionConnection(String authToken) {
     if (client.retain())
-      return new Connection(faunaRoot, authToken, client, registry);
+      return new Connection(faunaRoot, authToken, client, registry, txnTime.get());
     else
       throw new IllegalStateException("Can not create a session connection from a closed http connection");
   }
