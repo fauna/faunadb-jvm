@@ -1,3 +1,6 @@
+2.6.1
+* Fixed a bug that prevented the usage of large keys
+
 2.6.0
 * Support backrefs in Let() bindings. Requires FaunaDB 2.6.0.
 * Add stdlib math functions Abs(), Asin(), Acos(), Atan(), BitAnd(), BitNot(),
