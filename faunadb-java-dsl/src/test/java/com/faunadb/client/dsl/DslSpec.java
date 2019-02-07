@@ -247,7 +247,7 @@ public abstract class DslSpec {
 
     Map<String, Value> k2 = new HashMap<>();
     k2.put("k2", new StringV("v2"));
-    
+
     List<Value> data = query(Arrays.asList(
             new ObjectV(k1),
             new ObjectV(k2)

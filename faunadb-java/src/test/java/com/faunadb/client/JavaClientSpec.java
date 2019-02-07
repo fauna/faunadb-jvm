@@ -12,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -23,6 +24,7 @@ import static com.faunadb.client.types.Value.NullV.NULL;
 import static com.faunadb.client.types.Value.RefV;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
 import static org.junit.Assert.assertThat;
@@ -228,6 +230,50 @@ public class JavaClientSpec extends DslSpec {
       adminClient.query(Paginate(Keys(Database("db-for-keys")))).get().get(DATA).to(ARRAY).get(),
       hasItems(serverKey, adminKey)
     );
+  }
+
+  @Test
+  public void shouldAllowForScopedKeys() throws Exception {
+    FaunaClient parentClient = createNewDatabase(adminClient, "scoped-database");
+    FaunaClient childClient = createNewDatabase(parentClient, "child-database1");
+    createNewDatabase(childClient, "child-database2");
+
+    Value key = adminClient.query(
+      CreateKey(Obj(
+        "database", Database("scoped-database"),
+        "role", Value("admin")
+      ))
+    ).get();
+
+    String secret = key.at("secret").get(String.class);
+    String scopedSecret = secret + ":child-database1/child-database2:admin";
+    FaunaClient scopedClient = adminClient.newSessionClient(scopedSecret);
+
+    try {
+      scopedClient.query(
+        CreateClass(Obj(
+          "name", Value("foo")
+        ))
+      ).get();
+    } finally {
+      scopedClient.close();
+    }
+
+    Value classesPage =
+      adminClient.query(
+        Paginate(
+          Classes(
+            Database("child-database2",
+              Database("child-database1",
+                Database("scoped-database")))))
+      ).get();
+
+    Collection<Value> classes =
+      classesPage
+        .at("data")
+        .collect(Value.class);
+
+    assertThat(classes, hasSize(1));
   }
 
   private FaunaClient createNewDatabase(FaunaClient client, String name) throws Exception {

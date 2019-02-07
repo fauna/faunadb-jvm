@@ -411,7 +411,7 @@ public final class Connection implements AutoCloseable {
   private static String generateAuthHeader(String authToken) {
     String token = authToken + ":";
     ByteBuf byteBuf = Unpooled.wrappedBuffer(token.getBytes(US_ASCII));
-    ByteBuf enc =  Base64.encode(byteBuf);
+    ByteBuf enc = Base64.encode(byteBuf, false); // Must not break encoded lines
     String hdr = "Basic " + enc.toString(US_ASCII);
     enc.release();
     return hdr;
