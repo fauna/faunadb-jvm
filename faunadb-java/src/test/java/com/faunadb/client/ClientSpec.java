@@ -1736,6 +1736,50 @@ public class ClientSpec {
     );
   }
 
+  @Test
+  public void shouldAllowForScopedKeys() throws Exception {
+    FaunaClient parentClient = createNewDatabase(adminClient, "scoped-database");
+    FaunaClient childClient = createNewDatabase(parentClient, "child-database1");
+    createNewDatabase(childClient, "child-database2");
+
+    Value key = adminClient.query(
+      CreateKey(Obj(
+        "database", Database("scoped-database"),
+        "role", Value("admin")
+      ))
+    ).get();
+
+    String secret = key.at("secret").get(String.class);
+    String scopedSecret = secret + ":child-database1/child-database2:admin";
+    FaunaClient scopedClient = adminClient.newSessionClient(scopedSecret);
+
+    try {
+      scopedClient.query(
+        CreateClass(Obj(
+          "name", Value("foo")
+        ))
+      ).get();
+    } finally {
+      scopedClient.close();
+    }
+
+    Value classesPage =
+      adminClient.query(
+        Paginate(
+          Classes(
+            Database("child-database2",
+              Database("child-database1",
+                Database("scoped-database")))))
+      ).get();
+
+    Collection<Value> classes =
+      classesPage
+        .at("data")
+        .collect(Value.class);
+
+    assertThat(classes, hasSize(1));
+  }
+
   private CompletableFuture<Value> query(Expr expr) {
     return serverClient.query(expr);
   }
