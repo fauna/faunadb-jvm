@@ -989,9 +989,6 @@ package object query {
   def SelectAll(path: Expr, from: Expr): Expr =
     Expr(ObjectV("select_all" -> path.value, "from" -> from.value))
 
-  def SelectAll(path: Expr, from: Expr, default: Expr): Expr =
-    Expr(ObjectV("select_all" -> path.value, "from" -> from.value, "default" -> default.value))
-
   /**
    * An Abs expression.
    *
