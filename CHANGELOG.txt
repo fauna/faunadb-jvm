@@ -1,3 +1,6 @@
+1.2.5
+* Creates a uber jar for java driver
+
 1.2.4
 * Adds support to X-Last-Seen-Txn header
 

@@ -1,6 +1,6 @@
 import de.johoop.jacoco4sbt.XMLReport
 
-val driverVersion = "1.2.4"
+val driverVersion = "1.2.5"
 val asyncHttpClientVersion = "2.5.2"
 val guavaVersion = "19.0"
 val jacksonVersion = "2.8.8"
@@ -41,6 +41,13 @@ lazy val publishSettings = Seq(
       Some("Releases" at s"$nexus/service/local/staging/deploy/maven2")
     }
   },
+  credentials += Credentials(
+    "Sonatype Nexus Repository Manager",
+    "oss.sonatype.org",
+    sys.env.getOrElse("SONATYPE_USER", ""),
+    sys.env.getOrElse("SONATYPE_PASS", "")
+  ),
+
   pomExtra := (
     <scm>
       <url>git@github.com:fauna/faunadb-jvm.git</url>
@@ -54,7 +61,12 @@ lazy val publishSettings = Seq(
         <organizationUrl>http://fauna.com</organizationUrl>
       </developer>
     </developers>
-  ))
+  ),
+  usePgpKeyHex(sys.env.getOrElse("GPG_SIGNING_KEY", "0")),
+  pgpPassphrase := sys.env.get("GPG_PASSPHRASE") map (_.toArray),
+  pgpSecretRing := file(sys.env.getOrElse("GPG_PRIVATE_KEY", "")),
+  pgpPublicRing := file(sys.env.getOrElse("GPG_PUBLIC_KEY", ""))
+)
 
 lazy val root = (project in file("."))
   .settings(
@@ -63,7 +75,7 @@ lazy val root = (project in file("."))
     crossPaths := false,
     autoScalaLibrary := false
   )
-  .aggregate(common, scala, javaDsl, java, javaAndroid)
+  .aggregate(common, scala, javaDsl, java, javaAndroid, javaShaded, androidShaded)
 
 lazy val common = project.in(file("faunadb-common"))
   .settings(publishSettings: _*)
@@ -158,7 +170,7 @@ lazy val javaDsl = project.in(file("faunadb-java-dsl"))
       "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % jacksonVersion,
       "joda-time" % "joda-time" % jodaTimeVersion,
       "org.joda" % "joda-convert" % jodaConvert,
-      "com.google.guava" % "guava" % "19.0",
+      "com.google.guava" % "guava" % guavaVersion,
       "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
       "org.yaml" % "snakeyaml" % "1.14" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test",
@@ -202,7 +214,27 @@ lazy val java = project.in(file("faunadb-java"))
       "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
       "junit" % "junit" % "4.12" % "test"
     ),
-    jacoco.reportFormats in jacoco.Config := Seq(XMLReport())
+    jacoco.reportFormats in jacoco.Config := Seq(XMLReport()),
+
+    assemblyShadeRules in assembly := Seq(
+      ShadeRule.rename("com.google.**" -> "faunadb.@0").inAll
+    ),
+
+    assemblyOption in assembly ~= {
+      _.copy(includeScala = false)
+    },
+
+    assemblyMergeStrategy in assembly := {
+      case x if x.endsWith("io.netty.versions.properties") =>
+        MergeStrategy.first
+      case x =>
+        val oldStrategy = (assemblyMergeStrategy in assembly).value
+        oldStrategy(x)
+    },
+
+    logLevel in assembly := Level.Info,
+
+    test in assembly := {}
   )
 
 lazy val javaAndroid = project.in(file("faunadb-android"))
@@ -230,7 +262,7 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
 
     libraryDependencies ++= Seq(
       "com.squareup.okhttp3" % "okhttp" % "3.4.1",
-      "com.google.guava" % "guava" % "19.0",
+      "com.google.guava" % "guava" % guavaVersion,
       "com.google.code.findbugs" % "jsr305" % "2.0.1",
       "com.novocode" % "junit-interface" % "0.11" % "test",
       "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
@@ -286,6 +318,42 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
       "META-INF/LICENSE",
       "META-INF/NOTICE.txt",
       "META-INF/NOTICE"
-    ))
+    )),
+
+    assemblyShadeRules in assembly := Seq(
+      ShadeRule.rename("com.google.**" -> "faunadb.@0").inAll
+    ),
+
+    assemblyOption in assembly ~= {
+      _.copy(includeScala = false)
+    },
+
+    logLevel in assembly := Level.Info,
+
+    test in assembly := {}
+  )
+
+lazy val androidShaded = project
+  .settings(publishSettings: _*)
+  .settings(
+    name := "faunadb-android-shaded",
+    crossPaths := false,
+    autoScalaLibrary := false,
+
+    packageBin in Compile := {
+      (assembly in (javaAndroid, Compile)).value
+    }
+  )
+
+lazy val javaShaded = project
+  .settings(publishSettings: _*)
+  .settings(
+    name := "faunadb-java-shaded",
+    crossPaths := false,
+    autoScalaLibrary := false,
+
+    packageBin in Compile := {
+      (assembly in (java, Compile)).value
+    }
   )
 
