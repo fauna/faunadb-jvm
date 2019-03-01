@@ -217,7 +217,7 @@ lazy val java = project.in(file("faunadb-java"))
     jacoco.reportFormats in jacoco.Config := Seq(XMLReport()),
 
     assemblyShadeRules in assembly := Seq(
-      ShadeRule.rename("com.google.**" -> "faunadb.@0").inAll
+      ShadeRule.rename("com.google.common.util.concurrent.**" -> "faunadb.@0").inAll
     ),
 
     assemblyOption in assembly ~= {
@@ -321,7 +321,7 @@ lazy val javaAndroid = project.in(file("faunadb-android"))
     )),
 
     assemblyShadeRules in assembly := Seq(
-      ShadeRule.rename("com.google.**" -> "faunadb.@0").inAll
+      ShadeRule.rename("com.google.common.util.concurrent.**" -> "faunadb.@0").inAll
     ),
 
     assemblyOption in assembly ~= {
