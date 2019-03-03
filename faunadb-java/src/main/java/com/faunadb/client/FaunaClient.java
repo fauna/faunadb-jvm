@@ -278,9 +278,7 @@ public class FaunaClient implements AutoCloseable {
 
   private <V> CompletableFuture<V> handleNetworkExceptions(CompletableFuture<V> f) {
       return f.whenComplete((v, ex) -> {
-              if (ex == null) {
-                  return;
-              } else if (ex instanceof ConnectException ||
+              if (ex instanceof ConnectException ||
                          ex instanceof TimeoutException) {
                   throw new UnavailableException(ex.getMessage());
               }

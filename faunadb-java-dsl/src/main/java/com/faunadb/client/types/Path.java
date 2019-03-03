@@ -24,8 +24,7 @@ final class Path {
 
     @Override
     public boolean equals(Object other) {
-      return other != null &&
-        other instanceof Segment &&
+      return other instanceof Segment &&
         this.segment.equals(((Segment) other).segment);
     }
 
@@ -133,8 +132,7 @@ final class Path {
 
   @Override
   public boolean equals(Object other) {
-    return other != null &&
-      other instanceof Path &&
+    return other instanceof Path &&
       this.segments.equals(((Path) other).segments);
   }
 

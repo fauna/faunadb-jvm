@@ -260,8 +260,7 @@ public final class Field<T> {
 
   @Override
   public boolean equals(Object other) {
-    return other != null &&
-      other instanceof Field &&
+    return other instanceof Field &&
       this.path.equals(((Field) other).path);
   }
 
