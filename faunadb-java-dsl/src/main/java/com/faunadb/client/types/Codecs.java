@@ -69,35 +69,24 @@ final class Codecs {
     if (codec != null)
       return (Codec<Object>) codec;
 
-    EncoderEntryCache encoderEntryCache = ENCODERS.get(type);
-
-    if (encoderEntryCache == null) {
-      encoderEntryCache = createEncoder(type);
-
-      ENCODERS.put(type, encoderEntryCache);
-    }
-
-    return new ObjectEncoder(encoder, encoderEntryCache);
+    return new ObjectEncoder(encoder, ENCODERS.computeIfAbsent(type, Codecs::createEncoder));
   }
 
   private static EncoderEntryCache createEncoder(Class<?> type) {
     final Properties.Property[] readProperties = Properties.getReadProperties(type);
 
-    return new EncoderEntryCache() {
-      @Override
-      public Value encode(Encoder encoder, Object value) {
-        Map<String, Value> fields = new HashMap<>();
+    return (encoder, value) -> {
+      Map<String, Value> fields = new HashMap<>();
 
-        for (Properties.Property property : readProperties) {
-          try {
-            fields.put(property.getName(), encoder.encodeImpl(property.get(value)));
-          } catch (Exception ex) {
-            throw new FaunaException(format("Could not encode field \"%s\". Reason: %s", property.getName(), ex.getMessage()));
-          }
+      for (Properties.Property property : readProperties) {
+        try {
+          fields.put(property.getName(), encoder.encodeImpl(property.get(value)));
+        } catch (Exception ex) {
+          throw new FaunaException(format("Could not encode field \"%s\". Reason: %s", property.getName(), ex.getMessage()));
         }
-
-        return new ObjectV(fields);
       }
+
+      return new ObjectV(fields);
     };
   }
 
