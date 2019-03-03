@@ -803,7 +803,7 @@ public abstract class Value extends Expr {
 
     @Override
     public int hashCode() {
-      return value.hashCode();
+      return Arrays.hashCode(value);
     }
 
     @Override
