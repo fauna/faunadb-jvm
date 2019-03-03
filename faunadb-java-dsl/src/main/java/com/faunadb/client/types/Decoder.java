@@ -31,8 +31,8 @@ import static java.lang.reflect.Modifier.isAbstract;
  */
 @SuppressWarnings("unchecked")
 public final class Decoder {
-  private static final Double DOUBLE_DEFAULT = Double.valueOf(0d);
-  private static final Float FLOAT_DEFAULT = Float.valueOf(0f);
+  private static final Double DOUBLE_DEFAULT = 0d;
+  private static final Float FLOAT_DEFAULT = 0f;
 
   private Decoder() {
   }
@@ -163,9 +163,7 @@ public final class Decoder {
       }
 
       return map;
-    } catch (InstantiationException ex) {
-      return couldNotInstantiateMap(dstType, ex);
-    } catch (IllegalAccessException ex) {
+    } catch (InstantiationException | IllegalAccessException ex) {
       return couldNotInstantiateMap(dstType, ex);
     }
   }
@@ -189,9 +187,7 @@ public final class Decoder {
       }
 
       return collection;
-    } catch (InstantiationException ex) {
-      return couldNotInstantiateCollection(dstType, ex);
-    } catch (IllegalAccessException ex) {
+    } catch (InstantiationException | IllegalAccessException ex) {
       return couldNotInstantiateCollection(dstType, ex);
     }
   }
