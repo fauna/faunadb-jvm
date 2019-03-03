@@ -46,15 +46,12 @@ final class Path {
 
     @Override
     public Result<Value> get(Value root) {
-      return root.to(OBJECT).flatMap(new Function<Map<String, Value>, Result<Value>>() {
-        @Override
-        public Result<Value> apply(Map<String, Value> obj) {
-          Value value = obj.get(segment);
-          if (value != null)
-            return Result.success(value);
+      return root.to(OBJECT).flatMap(obj -> {
+        Value value = obj.get(segment);
+        if (value != null)
+          return Result.success(value);
 
-          return Result.fail(format("Object key \"%s\" not found", segment));
-        }
+        return Result.fail(format("Object key \"%s\" not found", segment));
       });
     }
 
@@ -67,14 +64,11 @@ final class Path {
 
     @Override
     public Result<Value> get(Value root) {
-      return root.to(ARRAY).flatMap(new Function<List<Value>, Result<Value>>() {
-        @Override
-        public Result<Value> apply(List<Value> array) {
-          try {
-            return Result.success(array.get(segment));
-          } catch (IndexOutOfBoundsException ign) {
-            return Result.fail(format("Array index \"%s\" not found", segment));
-          }
+      return root.to(ARRAY).flatMap(array -> {
+        try {
+          return Result.success(array.get(segment));
+        } catch (IndexOutOfBoundsException ign) {
+          return Result.fail(format("Array index \"%s\" not found", segment));
         }
       });
     }
