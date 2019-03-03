@@ -114,8 +114,7 @@ class Deserializer {
 
   static class ArrayDeserializer extends TreeDeserializer<ArrayV> {
     @Override
-    ArrayV deserializeTree(JsonNode tree, final ObjectMapper json, JsonLocation loc)
-      throws JsonParseException {
+    ArrayV deserializeTree(JsonNode tree, final ObjectMapper json, JsonLocation loc) {
 
       List<Value> values = new ArrayList<>();
 
@@ -130,8 +129,7 @@ class Deserializer {
 
   static class ObjectDeserializer extends TreeDeserializer<ObjectV> {
     @Override
-    ObjectV deserializeTree(final JsonNode tree, final ObjectMapper json, JsonLocation loc)
-      throws JsonParseException {
+    ObjectV deserializeTree(final JsonNode tree, final ObjectMapper json, JsonLocation loc) {
 
       Map<String, Value> values = new LinkedHashMap<>();
 
