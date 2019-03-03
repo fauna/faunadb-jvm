@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOError;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -137,7 +136,7 @@ public final class Connection implements AutoCloseable {
     /**
      * Sets the last seen transaction time for the connection.
      *
-     * @param lastSeenTxn the last seen transaction time in microseconds.
+     * @param txnTime the last seen transaction time in microseconds.
      * @return this {@link Builder} object
      */
     public Builder withLastSeenTxn(long txnTime) {
@@ -211,7 +210,7 @@ public final class Connection implements AutoCloseable {
    */
   public Connection newSessionConnection(String authToken) {
     if (client.retain())
-      return new Connection(faunaRoot, authToken, client, registry, txnTime.get());
+      return new Connection(faunaRoot, authToken, client, registry, getLastTxnTime());
     else
       throw new IllegalStateException("Can not create a session connection from a closed http connection");
   }
@@ -342,13 +341,13 @@ public final class Connection implements AutoCloseable {
 
   private CompletableFuture<Response> performRequest(final Request request) {
     final Timer.Context ctx = registry.timer("fauna-request").time();
-    final CompletableFuture<Response> rv = new CompletableFuture();
+    final CompletableFuture<Response> rv = new CompletableFuture<>();
 
     BoundRequestBuilder req = client.prepareRequest(request)
       .addHeader("Authorization", authHeader)
       .setHeader("X-FaunaDB-API-Version", "2.1");
 
-    long time = txnTime.get();
+    long time = getLastTxnTime();
     if (time > 0) {
       req = req.setHeader("X-Last-Seen-Txn", Long.toString(time));
     }
@@ -362,7 +361,7 @@ public final class Connection implements AutoCloseable {
         }
 
         @Override
-        public Response onCompleted(Response response) throws Exception {
+        public Response onCompleted(Response response) {
           ctx.stop();
 
           String txnTimeHeader = response.getHeader("X-Txn-Time");
