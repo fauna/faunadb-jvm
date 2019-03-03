@@ -67,7 +67,7 @@ public final class Field<T> {
             return Result.fail(format("Failed to collect values: %s", String.join(", ", failures)));
           }
 
-          return Result.<List<A>>success(success);
+          return Result.success(success);
         }
       };
   }
@@ -83,7 +83,7 @@ public final class Field<T> {
 
     @Override
     public Result<Map<String, A>> decode(Value input) {
-      return input.to(OBJECT).<Map<String, A>>flatMap(toMap);
+      return input.to(OBJECT).flatMap(toMap);
     }
 
     @Override
@@ -114,7 +114,7 @@ public final class Field<T> {
             return Result.fail(format("Failed to collect values: %s", String.join(", ", failures)));
           }
 
-          return Result.<Map<String, A>>success(success);
+          return Result.success(success);
         }
       };
     }

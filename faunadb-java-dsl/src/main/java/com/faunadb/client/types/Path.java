@@ -83,7 +83,7 @@ final class Path {
   }
 
   static Path empty() {
-    return new Path(Collections.<Segment>emptyList());
+    return new Path(Collections.emptyList());
   }
 
   static Path from(String... keys) {
