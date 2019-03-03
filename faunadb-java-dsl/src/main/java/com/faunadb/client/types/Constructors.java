@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static com.faunadb.client.types.Decoder.decodeImpl;
 import static java.lang.String.format;
@@ -114,7 +113,7 @@ final class Constructors {
 
       final Set<String> namesToRemove = new HashSet<>(Arrays.asList(names));
 
-      return Arrays.asList(properties).stream()
+      return Arrays.stream(properties)
           .filter(input -> !namesToRemove.contains(input.getName()))
           .toArray(Property[]::new);
     }
@@ -128,6 +127,7 @@ final class Constructors {
         for (Annotation annotation : annotations) {
           if (annotation.annotationType() == FaunaField.class) {
             parameterNames[i] = ((FaunaField) annotation).value();
+            break;
           }
         }
 
