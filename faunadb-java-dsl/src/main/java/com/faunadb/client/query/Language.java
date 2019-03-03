@@ -152,7 +152,7 @@ public final class Language {
     private final List<Expr> segments;
 
     private Path() {
-      this(Collections.<Expr>emptyList());
+      this(Collections.emptyList());
     }
 
     private Path(List<Expr> segments) {
@@ -166,7 +166,7 @@ public final class Language {
      * @return a new narrowed path
      */
     public Path at(String... others) {
-      List<Expr> all = new ArrayList<>();
+      List<Expr> all = new ArrayList<>(segments.size() + others.length);
       all.addAll(segments);
 
       for (String segment : others) {
@@ -183,7 +183,7 @@ public final class Language {
      * @return a new narrowed path
      */
     public Path at(int... others) {
-      List<Expr> all = new ArrayList<>();
+      List<Expr> all = new ArrayList<>(segments.size() + others.length);
       all.addAll(segments);
 
       for (int segment : others) {
@@ -2199,7 +2199,6 @@ public final class Language {
    * @param value a strings
    * @param find  a substring to locate
    * @return      the offset of where the substring starts or -1 if not found
-   * @return      the offset of where the substring starts or -1 if not found
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
@@ -2212,7 +2211,6 @@ public final class Language {
    *
    * @param value a strings
    * @param find  a substring to locate
-   * @return      the offset of where the substring starts or -1 if not found
    * @return      the offset of where the substring starts or -1 if not found
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
@@ -3770,8 +3768,6 @@ public final class Language {
    * @return      the string with leading and trailing whitespace removed
    * Trim function returns
    *
-   * @param value a strings
-   * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
