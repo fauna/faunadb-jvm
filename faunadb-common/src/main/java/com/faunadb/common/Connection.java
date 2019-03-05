@@ -137,7 +137,7 @@ public final class Connection implements AutoCloseable {
     /**
      * Sets the last seen transaction time for the connection.
      *
-     * @param lastSeenTxn the last seen transaction time in microseconds.
+     * @param txnTime the last seen transaction time in microseconds.
      * @return this {@link Builder} object
      */
     public Builder withLastSeenTxn(long txnTime) {
@@ -342,7 +342,7 @@ public final class Connection implements AutoCloseable {
 
   private CompletableFuture<Response> performRequest(final Request request) {
     final Timer.Context ctx = registry.timer("fauna-request").time();
-    final CompletableFuture<Response> rv = new CompletableFuture();
+    final CompletableFuture<Response> rv = new CompletableFuture<>();
 
     BoundRequestBuilder req = client.prepareRequest(request)
       .addHeader("Authorization", authHeader)

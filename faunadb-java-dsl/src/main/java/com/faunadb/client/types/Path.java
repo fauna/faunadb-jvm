@@ -24,8 +24,7 @@ final class Path {
 
     @Override
     public boolean equals(Object other) {
-      return other != null &&
-        other instanceof Segment &&
+      return other instanceof Segment &&
         this.segment.equals(((Segment) other).segment);
     }
 
@@ -47,15 +46,12 @@ final class Path {
 
     @Override
     public Result<Value> get(Value root) {
-      return root.to(OBJECT).flatMap(new Function<Map<String, Value>, Result<Value>>() {
-        @Override
-        public Result<Value> apply(Map<String, Value> obj) {
-          Value value = obj.get(segment);
-          if (value != null)
-            return Result.success(value);
+      return root.to(OBJECT).flatMap(obj -> {
+        Value value = obj.get(segment);
+        if (value != null)
+          return Result.success(value);
 
-          return Result.fail(format("Object key \"%s\" not found", segment));
-        }
+        return Result.fail(format("Object key \"%s\" not found", segment));
       });
     }
 
@@ -68,14 +64,11 @@ final class Path {
 
     @Override
     public Result<Value> get(Value root) {
-      return root.to(ARRAY).flatMap(new Function<List<Value>, Result<Value>>() {
-        @Override
-        public Result<Value> apply(List<Value> array) {
-          try {
-            return Result.success(array.get(segment));
-          } catch (IndexOutOfBoundsException ign) {
-            return Result.fail(format("Array index \"%s\" not found", segment));
-          }
+      return root.to(ARRAY).flatMap(array -> {
+        try {
+          return Result.success(array.get(segment));
+        } catch (IndexOutOfBoundsException ign) {
+          return Result.fail(format("Array index \"%s\" not found", segment));
         }
       });
     }
@@ -83,11 +76,11 @@ final class Path {
   }
 
   static Path empty() {
-    return new Path(Collections.<Segment>emptyList());
+    return new Path(Collections.emptyList());
   }
 
   static Path from(String... keys) {
-    List<Segment> segments = new ArrayList<>();
+    List<Segment> segments = new ArrayList<>(keys.length);
 
     for (String key : keys)
       segments.add(new ObjectKey(key));
@@ -96,7 +89,7 @@ final class Path {
   }
 
   static Path from(int... indexes) {
-    List<Segment> segments = new ArrayList<>();
+    List<Segment> segments = new ArrayList<>(indexes.length);
 
     for (Integer index : indexes)
       segments.add(new ArrayIndex(index));
@@ -111,7 +104,7 @@ final class Path {
   }
 
   Path subPath(Path other) {
-    List<Segment> newSegments = new ArrayList<>();
+    List<Segment> newSegments = new ArrayList<>(segments.size() + other.segments.size());
     newSegments.addAll(segments);
     newSegments.addAll(other.segments);
 
@@ -133,8 +126,7 @@ final class Path {
 
   @Override
   public boolean equals(Object other) {
-    return other != null &&
-      other instanceof Path &&
+    return other instanceof Path &&
       this.segments.equals(((Path) other).segments);
   }
 

@@ -56,7 +56,7 @@ public final class Encoder {
     if (obj == null)
       return Value.NullV.NULL;
 
-    if (Value.class.isInstance(obj))
+    if (obj instanceof Value)
       return (Value) obj;
 
     if (contains(obj))

@@ -292,7 +292,7 @@ public abstract class Value extends Expr {
 
     @Override
     public boolean equals(Object other) {
-      return other != null && other instanceof ScalarValue &&
+      return other instanceof ScalarValue &&
         this.value.equals(((ScalarValue) other).value);
     }
 
@@ -323,21 +323,18 @@ public abstract class Value extends Expr {
     final Map<String, Value> values;
 
     public ObjectV(Map<String, ? extends Value> values) {
-      Objects.requireNonNull(values);
       this.values = Collections.unmodifiableMap(values);
     }
 
     @Override
     @JsonValue
     protected Map<String, Map<String, Value>> toJson() {
-        Map<String, Map<String, Value>> kvs = new HashMap<>();
-        kvs.put("object", values);
-        return Collections.unmodifiableMap(kvs);
+        return Collections.singletonMap("object", values);
     }
 
     @Override
     public boolean equals(Object other) {
-      return other != null && other instanceof ObjectV &&
+      return other instanceof ObjectV &&
         this.values.equals(((ObjectV) other).values);
     }
 
@@ -370,7 +367,6 @@ public abstract class Value extends Expr {
     final List<Value> values;
 
     public ArrayV(List<? extends Value> values) {
-      Objects.requireNonNull(values);
       this.values = Collections.unmodifiableList(values);
     }
 
@@ -382,8 +378,7 @@ public abstract class Value extends Expr {
 
     @Override
     public boolean equals(Object other) {
-      return other != null
-        && other instanceof ArrayV &&
+      return other instanceof ArrayV &&
         this.values.equals(((ArrayV) other).values);
     }
 
@@ -525,8 +520,7 @@ public abstract class Value extends Expr {
 
     @Override
     public boolean equals(Object other) {
-      return other != null
-        && other instanceof NullV;
+      return other instanceof NullV;
     }
 
     @Override
@@ -661,7 +655,7 @@ public abstract class Value extends Expr {
 
     @Override
     public boolean equals(Object obj) {
-      if (obj == null || !(obj instanceof RefID))
+      if (!(obj instanceof RefID))
         return false;
 
       RefID other = (RefID) obj;
@@ -721,7 +715,7 @@ public abstract class Value extends Expr {
 
     @Override
     public boolean equals(Object obj) {
-      if (obj == null || !(obj instanceof RefV))
+      if (!(obj instanceof RefV))
         return false;
 
       RefV other = (RefV) obj;
@@ -799,13 +793,13 @@ public abstract class Value extends Expr {
 
     @Override
     public boolean equals(Object other) {
-      return other != null && other instanceof BytesV &&
+      return other instanceof BytesV &&
         Arrays.equals(this.value, ((BytesV) other).value);
     }
 
     @Override
     public int hashCode() {
-      return value.hashCode();
+      return Arrays.hashCode(value);
     }
 
     @Override
@@ -841,7 +835,7 @@ public abstract class Value extends Expr {
 
     @Override
     public boolean equals(Object obj) {
-      return obj != null && obj instanceof QueryV && lambda.equals(((QueryV)obj).lambda);
+      return obj instanceof QueryV && lambda.equals(((QueryV)obj).lambda);
     }
 
     @Override

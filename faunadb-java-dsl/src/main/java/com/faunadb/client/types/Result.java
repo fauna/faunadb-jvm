@@ -55,8 +55,7 @@ public abstract class Result<T> {
 
     @Override
     public boolean equals(Object other) {
-      return other != null &&
-        other instanceof Success &&
+      return other instanceof Success &&
         this.value.equals(((Success) other).value);
     }
 
@@ -118,8 +117,7 @@ public abstract class Result<T> {
 
     @Override
     public boolean equals(Object other) {
-      return other != null &&
-        other instanceof Failure &&
+      return other instanceof Failure &&
         this.error.equals(((Failure) other).error);
     }
 

@@ -61,13 +61,17 @@ public final class Pagination extends Expr {
     Map<String, Expr> res = new LinkedHashMap<>();
     res.put("paginate", resource);
 
-    if (cursor.isPresent()) res.put(cursor.get().name, cursor.get().ref);
-    if (events.isPresent()) res.put("events", events.get());
-    if (sources.isPresent()) res.put("sources", sources.get());
-    if (ts.isPresent()) res.put("ts", ts.get());
-    if (size.isPresent()) res.put("size", size.get());
+    cursor.ifPresent(cur -> res.put(cur.name, cur.ref));
+    putIfPresent(events, res, "events");
+    putIfPresent(sources, res, "sources");
+    putIfPresent(ts, res, "ts");
+    putIfPresent(size, res, "size");
 
     return Collections.unmodifiableMap(res);
+  }
+
+  private static void putIfPresent(Optional<Expr> optExpr, Map<String, Expr> res, String name) {
+    optExpr.ifPresent(expr -> res.put(name, expr));
   }
 
   /**
@@ -77,7 +81,7 @@ public final class Pagination extends Expr {
    * @return this {@link Pagination} instance
    */
   public Pagination before(Expr cursor) {
-    this.cursor = Optional.<Cursor>of(new Before(cursor));
+    this.cursor = Optional.of(new Before(cursor));
     return this;
   }
 
@@ -88,7 +92,7 @@ public final class Pagination extends Expr {
    * @return this {@link Pagination} instance
    */
   public Pagination after(Expr cursor) {
-    this.cursor = Optional.<Cursor>of(new After(cursor));
+    this.cursor = Optional.of(new After(cursor));
     return this;
   }
 
