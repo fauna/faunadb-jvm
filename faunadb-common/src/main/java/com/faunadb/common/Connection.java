@@ -211,7 +211,7 @@ public final class Connection implements AutoCloseable {
    */
   public Connection newSessionConnection(String authToken) {
     if (client.retain())
-      return new Connection(faunaRoot, authToken, client, registry, txnTime.get());
+      return new Connection(faunaRoot, authToken, client, registry, getLastTxnTime());
     else
       throw new IllegalStateException("Can not create a session connection from a closed http connection");
   }
@@ -228,7 +228,7 @@ public final class Connection implements AutoCloseable {
   /**
    * Get the freshest timestamp reported to this client.
    */
-  public Long getLastTxnTime() {
+  public long getLastTxnTime() {
     return txnTime.get();
   }
 
@@ -240,10 +240,10 @@ public final class Connection implements AutoCloseable {
    *          multiple clients. Moving the timestamp arbitrarily forward into
    *          the future will cause transactions to stall.
    */
-  public void syncLastTxnTime(Long newTxnTime) {
+  public void syncLastTxnTime(long newTxnTime) {
     boolean cas;
     do {
-      long oldTxnTime = txnTime.get();
+      long oldTxnTime = getLastTxnTime();
 
       if (oldTxnTime < newTxnTime) {
         cas = txnTime.compareAndSet(oldTxnTime, newTxnTime);
@@ -348,33 +348,33 @@ public final class Connection implements AutoCloseable {
       .addHeader("Authorization", authHeader)
       .setHeader("X-FaunaDB-API-Version", "2.1");
 
-    long time = txnTime.get();
+    long time = getLastTxnTime();
     if (time > 0) {
       req = req.setHeader("X-Last-Seen-Txn", Long.toString(time));
     }
 
     req.execute(new AsyncCompletionHandler<Response>() {
-        @Override
-        public void onThrowable(Throwable t) {
-          ctx.stop();
-          rv.completeExceptionally(t);
-          logFailure(request, t);
+      @Override
+      public void onThrowable(Throwable t) {
+        ctx.stop();
+        rv.completeExceptionally(t);
+        logFailure(request, t);
+      }
+
+      @Override
+      public Response onCompleted(Response response) throws Exception {
+        ctx.stop();
+
+        String txnTimeHeader = response.getHeader("X-Txn-Time");
+        if (txnTimeHeader != null) {
+          syncLastTxnTime(Long.parseLong(txnTimeHeader));
         }
 
-        @Override
-        public Response onCompleted(Response response) throws Exception {
-          ctx.stop();
-
-          String txnTimeHeader = response.getHeader("X-Txn-Time");
-          if (txnTimeHeader != null) {
-            syncLastTxnTime(Long.valueOf(txnTimeHeader));
-          }
-
-          logSuccess(request, response);
-          rv.complete(response);
-          return response;
-        }
-      });
+        logSuccess(request, response);
+        rv.complete(response);
+        return response;
+      }
+    });
 
     return rv;
   }
