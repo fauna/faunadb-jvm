@@ -216,17 +216,13 @@ public final class Connection implements AutoCloseable {
    *          the future will cause transactions to stall.
    */
   public void syncLastTxnTime(long newTxnTime) {
-    boolean cas;
-    do {
+    for(;;) {
       long oldTxnTime = getLastTxnTime();
 
-      if (oldTxnTime < newTxnTime) {
-        cas = txnTime.compareAndSet(oldTxnTime, newTxnTime);
-      } else {
-        // Another query advanced the txnTime past this one.
-        break;
+      if (oldTxnTime >= newTxnTime || txnTime.compareAndSet(oldTxnTime, newTxnTime)) {
+        return;
       }
-    } while (!cas);
+    }
   }
 
   /**
