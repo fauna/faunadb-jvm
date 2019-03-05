@@ -95,8 +95,8 @@ public interface Codec<T> {
   /**
    * Converts a {@link Value} to a {@link RefV}
    */
-
   Codec<RefV> REF = Transformations.mapTo(RefV.class, Function.identity(), Transformations.upCast());
+
   /**
    * Converts a {@link Value} to a {@link SetRefV}
    */

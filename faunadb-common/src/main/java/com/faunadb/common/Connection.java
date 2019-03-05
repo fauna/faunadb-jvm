@@ -216,7 +216,7 @@ public final class Connection implements AutoCloseable {
    *          the future will cause transactions to stall.
    */
   public void syncLastTxnTime(long newTxnTime) {
-    for(;;) {
+    for (;;) {
       long oldTxnTime = getLastTxnTime();
 
       if (oldTxnTime >= newTxnTime || txnTime.compareAndSet(oldTxnTime, newTxnTime)) {
