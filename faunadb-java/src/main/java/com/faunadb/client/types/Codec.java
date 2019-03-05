@@ -95,17 +95,17 @@ public interface Codec<T> {
   /**
    * Converts a {@link Value} to a {@link RefV}
    */
-  Codec<RefV> REF = Transformations.mapTo(RefV.class, Function.<RefV>identity(), Transformations.<RefV, Value>upCast());
 
+  Codec<RefV> REF = Transformations.mapTo(RefV.class, Function.identity(), Transformations.upCast());
   /**
    * Converts a {@link Value} to a {@link SetRefV}
    */
-  Codec<SetRefV> SET_REF = Transformations.mapTo(SetRefV.class, Function.<SetRefV>identity(), Transformations.<SetRefV, Value>upCast());
+  Codec<SetRefV> SET_REF = Transformations.mapTo(SetRefV.class, Function.identity(), Transformations.upCast());
 
   /**
    * Converts a {@link Value} to a {@link Long}
    */
-  Codec<Long> LONG = Transformations.mapTo(LongV.class, Transformations.<LongV, Long>scalarValue(), Transformations.LONG_TO_VALUE);
+  Codec<Long> LONG = Transformations.mapTo(LongV.class, Transformations.scalarValue(), Transformations.LONG_TO_VALUE);
 
   /**
    * Converts a {@link Value} to a {@link Integer}
@@ -135,12 +135,12 @@ public interface Codec<T> {
   /**
    * Converts a {@link Value} to a {@link String}
    */
-  Codec<String> STRING = Transformations.mapTo(StringV.class, Transformations.<StringV, String>scalarValue(), Transformations.STRING_TO_VALUE);
+  Codec<String> STRING = Transformations.mapTo(StringV.class, Transformations.scalarValue(), Transformations.STRING_TO_VALUE);
 
   /**
    * Converts a {@link Value} to a {@link Double}
    */
-  Codec<Double> DOUBLE = Transformations.mapTo(DoubleV.class, Transformations.<DoubleV, Double>scalarValue(), Transformations.DOUBLE_TO_VALUE);
+  Codec<Double> DOUBLE = Transformations.mapTo(DoubleV.class, Transformations.scalarValue(), Transformations.DOUBLE_TO_VALUE);
 
   /**
    * Converts a {@link Value} to a {@link Float}
@@ -150,12 +150,12 @@ public interface Codec<T> {
   /**
    * Converts a {@link Value} to a {@link Boolean}
    */
-  Codec<Boolean> BOOLEAN = Transformations.mapTo(BooleanV.class, Transformations.<BooleanV, Boolean>scalarValue(), Transformations.BOOLEAN_TO_VALUE);
+  Codec<Boolean> BOOLEAN = Transformations.mapTo(BooleanV.class, Transformations.scalarValue(), Transformations.BOOLEAN_TO_VALUE);
 
   /**
    * Converts a {@link Value} to a {@link LocalDate}
    */
-  Codec<LocalDate> DATE = Transformations.mapTo(DateV.class, Transformations.<DateV, LocalDate>scalarValue(), Transformations.LOCAL_DATE_TO_VALUE);
+  Codec<LocalDate> DATE = Transformations.mapTo(DateV.class, Transformations.scalarValue(), Transformations.LOCAL_DATE_TO_VALUE);
 
   /**
    * Converts a {@link Value} to an {@link List} of {@link Value}
@@ -170,7 +170,7 @@ public interface Codec<T> {
   /**
    * Converts a {@link Value} to an array of bytes
    */
-  Codec<byte[]> BYTES = Transformations.mapTo(BytesV.class, Transformations.<BytesV, byte[]>scalarValue(), Transformations.BYTES_TO_VALUE);
+  Codec<byte[]> BYTES = Transformations.mapTo(BytesV.class, Transformations.scalarValue(), Transformations.BYTES_TO_VALUE);
 }
 
 final class Transformations {
@@ -228,12 +228,7 @@ final class Transformations {
   }
 
   static <T extends ScalarValue<R>, R> Function<T, R> scalarValue() {
-    return new Function<T, R>() {
-      @Override
-      public R apply(T input) {
-        return input.value;
-      }
-    };
+    return input -> input.value;
   }
 
   @SuppressWarnings("unchecked")
@@ -243,161 +238,51 @@ final class Transformations {
 
   /// Cast functions
 
-  final static Function<Long, Integer> LONG_TO_INTEGER = new Function<Long, Integer>() {
-    @Override
-    public Integer apply(Long input) {
-      return input.intValue();
-    }
-  };
+  final static Function<Long, Integer> LONG_TO_INTEGER = Long::intValue;
 
-  final static Function<Integer, Long> INTEGER_TO_LONG = new Function<Integer, Long>() {
-    @Override
-    public Long apply(Integer input) {
-      return Long.valueOf(input);
-    }
-  };
+  final static Function<Integer, Long> INTEGER_TO_LONG = Integer::longValue;
 
-  final static Function<Long, Short> LONG_TO_SHORT = new Function<Long, Short>() {
-    @Override
-    public Short apply(Long input) {
-      return input.shortValue();
-    }
-  };
+  final static Function<Long, Short> LONG_TO_SHORT = Long::shortValue;
 
-  final static Function<Short, Long> SHORT_TO_LONG = new Function<Short, Long>() {
-    @Override
-    public Long apply(Short input) {
-      return Long.valueOf(input);
-    }
-  };
+  final static Function<Short, Long> SHORT_TO_LONG = Short::longValue;
 
-  final static Function<Long, Byte> LONG_TO_BYTE = new Function<Long, Byte>() {
-    @Override
-    public Byte apply(Long input) {
-      return input.byteValue();
-    }
-  };
+  final static Function<Long, Byte> LONG_TO_BYTE = Long::byteValue;
 
-  final static Function<Byte, Long> BYTE_TO_LONG = new Function<Byte, Long>() {
-    @Override
-    public Long apply(Byte input) {
-      return Long.valueOf(input);
-    }
-  };
+  final static Function<Byte, Long> BYTE_TO_LONG = Byte::longValue;
 
-  final static Function<Long, Character> LONG_TO_CHAR = new Function<Long, Character>() {
-    @Override
-    public Character apply(Long input) {
-      return (char) input.longValue();
-    }
-  };
+  final static Function<Long, Character> LONG_TO_CHAR = input -> (char) input.longValue();
 
-  final static Function<Character, Long> CHAR_TO_LONG = new Function<Character, Long>() {
-    @Override
-    public Long apply(Character input) {
-      return Long.valueOf(input);
-    }
-  };
+  final static Function<Character, Long> CHAR_TO_LONG = Long::valueOf;
 
-  final static Function<Double, Float> DOUBLE_TO_FLOAT = new Function<Double, Float>() {
-    @Override
-    public Float apply(Double input) {
-      return input.floatValue();
-    }
-  };
+  final static Function<Double, Float> DOUBLE_TO_FLOAT = Double::floatValue;
 
-  final static Function<Float, Double> FLOAT_TO_DOUBLE = new Function<Float, Double>() {
-    @Override
-    public Double apply(Float input) {
-      return Double.valueOf(input);
-    }
-  };
+  final static Function<Float, Double> FLOAT_TO_DOUBLE = Float::doubleValue;
 
   /// Wrap functions
 
-  final static Function<Long, Value> LONG_TO_VALUE = new Function<Long, Value>() {
-    @Override
-    public Value apply(Long input) {
-      return new LongV(input);
-    }
-  };
+  final static Function<Long, Value> LONG_TO_VALUE = LongV::new;
 
-  final static Function<Double, Value> DOUBLE_TO_VALUE = new Function<Double, Value>() {
-    @Override
-    public Value apply(Double input) {
-      return new DoubleV(input);
-    }
-  };
+  final static Function<Double, Value> DOUBLE_TO_VALUE = DoubleV::new;
 
-  final static Function<String, Value> STRING_TO_VALUE = new Function<String, Value>() {
-    @Override
-    public Value apply(String input) {
-      return new StringV(input);
-    }
-  };
+  final static Function<String, Value> STRING_TO_VALUE = StringV::new;
 
-  final static Function<Boolean, Value> BOOLEAN_TO_VALUE = new Function<Boolean, Value>() {
-    @Override
-    public Value apply(Boolean input) {
-      return BooleanV.valueOf(input);
-    }
-  };
+  final static Function<Boolean, Value> BOOLEAN_TO_VALUE = BooleanV::valueOf;
 
-  final static Function<Instant, Value> INSTANT_TO_VALUE = new Function<Instant, Value>() {
-    @Override
-    public Value apply(Instant input) {
-      return new TimeV(input);
-    }
-  };
+  final static Function<Instant, Value> INSTANT_TO_VALUE = TimeV::new;
 
-  final static Function<LocalDate, Value> LOCAL_DATE_TO_VALUE = new Function<LocalDate, Value>() {
-    @Override
-    public Value apply(LocalDate input) {
-      return new DateV(input);
-    }
-  };
+  final static Function<LocalDate, Value> LOCAL_DATE_TO_VALUE = DateV::new;
 
-  final static Function<Map<String, Value>, Value> MAP_TO_VALUE = new Function<Map<String, Value>, Value>() {
-    @Override
-    public Value apply(Map<String, Value> input) {
-      return new ObjectV(input);
-    }
-  };
+  final static Function<Map<String, Value>, Value> MAP_TO_VALUE = ObjectV::new;
 
-  final static Function<List<Value>, Value> LIST_TO_VALUE = new Function<List<Value>, Value>() {
-    @Override
-    public Value apply(List<Value> input) {
-        return new ArrayV(Collections.unmodifiableList(input));
-    }
-  };
+  final static Function<List<Value>, Value> LIST_TO_VALUE = ArrayV::new;
 
-  final static Function<byte[], Value> BYTES_TO_VALUE = new Function<byte[], Value>() {
-    @Override
-    public Value apply(byte[] input) {
-      return new BytesV(input);
-    }
-  };
+  final static Function<byte[], Value> BYTES_TO_VALUE = BytesV::new;
 
   /// Unwrap functions
 
-  final static Function<TimeV, Instant> VALUE_TO_INSTANT = new Function<TimeV, Instant>() {
-    @Override
-    public Instant apply(TimeV time) {
-      return time.truncated();
-    }
-  };
+  final static Function<TimeV, Instant> VALUE_TO_INSTANT = TimeV::truncated;
 
-  final static Function<ArrayV, List<Value>> VALUE_TO_LIST = new Function<ArrayV, List<Value>>() {
-    @Override
-    public List<Value> apply(ArrayV input) {
-      return input.values;
-    }
-  };
+  final static Function<ArrayV, List<Value>> VALUE_TO_LIST = input -> input.values;
 
-  final static Function<ObjectV, Map<String, Value>> VALUE_TO_MAP = new Function<ObjectV, Map<String, Value>>() {
-    @Override
-    public Map<String, Value> apply(ObjectV input) {
-      return input.values;
-    }
-  };
+  final static Function<ObjectV, Map<String, Value>> VALUE_TO_MAP = input -> input.values;
 }

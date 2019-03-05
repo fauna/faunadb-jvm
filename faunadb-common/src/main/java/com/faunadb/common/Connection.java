@@ -122,7 +122,7 @@ public final class Connection implements AutoCloseable {
     /**
      * Sets the last seen transaction time for the connection.
      *
-     * @param lastSeenTxn the last seen transaction time in microseconds.
+     * @param txnTime the last seen transaction time in microseconds.
      * @return this {@link Builder} object
      */
     public Builder withLastSeenTxn(long txnTime) {
@@ -324,7 +324,7 @@ public final class Connection implements AutoCloseable {
 
   private CompletableFuture<FullHttpResponse> performRequest(final FullHttpRequest request) {
     final Timer.Context ctx = registry.timer("fauna-request").time();
-    final CompletableFuture<FullHttpResponse> rv = new CompletableFuture();
+    final CompletableFuture<FullHttpResponse> rv = new CompletableFuture<>();
 
     request.headers().add("Authorization", authHeader);
     request.headers().set("X-FaunaDB-API-Version", "2.1");
