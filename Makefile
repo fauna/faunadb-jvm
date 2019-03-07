@@ -22,11 +22,10 @@ DOCKER_RUN_FLAGS += -e FAUNA_TIMEOUT=$(FAUNA_TIMEOUT)
 endif
 
 test:
-	sbt android:package test
+	sbt test
 
 jenkins-test:
 	sbt clean; \
-	sbt android:package; \
 	sbt test; \
 	result=$$?; \
 	cp */target/test-reports/*.xml results/; \
