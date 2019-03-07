@@ -9,6 +9,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.base64.Base64;
 import io.netty.handler.codec.http.*;
+import io.netty.util.IllegalReferenceCountException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,7 @@ public final class Connection implements AutoCloseable {
     private String authToken;
     private MetricRegistry metricRegistry;
     private long lastSeenTxn;
+    private HttpClient client;
 
     private Builder() {
     }
@@ -131,6 +133,20 @@ public final class Connection implements AutoCloseable {
     }
 
     /**
+     * Sets the client to use for the connection.
+     *
+     * @param client the {@link HttpClient} to use for this connection.
+     * @return this {@link Builder} object
+     */
+    public Builder withHttpClient(HttpClient client) {
+      if (client.isClosed())
+        throw new IllegalStateException("Can not use a closed client connection.");
+
+      this.client = client;
+      return this;
+    }
+
+    /**
      * @return a newly constructed {@link Connection} with its configuration based on
      * the settings of the {@link Builder} instance.
      */
@@ -149,9 +165,15 @@ public final class Connection implements AutoCloseable {
         root = faunaRoot;
       }
 
-      HttpClient http = new HttpClient(root, DEFAULT_CONNECTION_TIMEOUT_MS, DEFAULT_REQUEST_TIMEOUT_MS);
+      HttpClient http;
+      if (client == null) {
+        http = new HttpClient(root, DEFAULT_CONNECTION_TIMEOUT_MS, DEFAULT_REQUEST_TIMEOUT_MS);
+      } else {
+        client.retain();
+        http = client;
+      }
 
-      return new Connection(root, authToken, new RefAwareHttpClient(http), registry, lastSeenTxn);
+      return new Connection(root, authToken, http, registry, lastSeenTxn);
     }
   }
 
@@ -160,7 +182,7 @@ public final class Connection implements AutoCloseable {
 
   private final URL faunaRoot;
   private final String authHeader;
-  private final RefAwareHttpClient client;
+  private final HttpClient client;
   private final MetricRegistry registry;
 
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -168,7 +190,7 @@ public final class Connection implements AutoCloseable {
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final AtomicLong txnTime = new AtomicLong(0L);
 
-  private Connection(URL faunaRoot, String authToken, RefAwareHttpClient client, MetricRegistry registry, long lastSeenTxn) {
+  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, long lastSeenTxn) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
     this.client = client;
@@ -185,10 +207,12 @@ public final class Connection implements AutoCloseable {
    * @return a new {@link Connection}
    */
   public Connection newSessionConnection(String authToken) {
-    if (client.retain())
+    try {
+      client.retain();
       return new Connection(faunaRoot, authToken, client, registry, getLastTxnTime());
-    else
+    } catch (IllegalReferenceCountException e) {
       throw new IllegalStateException("Can not create a session connection from a closed http connection");
+    }
   }
 
   /**
@@ -196,8 +220,9 @@ public final class Connection implements AutoCloseable {
    */
   @Override
   public void close() {
-    if (closed.compareAndSet(false, true))
+    if (closed.compareAndSet(false, true)) {
       client.close();
+    }
   }
 
   /**

@@ -11,6 +11,8 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.ssl.SslProvider;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import io.netty.util.AbstractReferenceCounted;
+import io.netty.util.ReferenceCounted;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.internal.SocketUtils;
 
@@ -33,7 +35,7 @@ import static io.netty.handler.codec.http.HttpMethod.PUT;
  * HTTP client built on top of <a href="https://netty.io/4.1/api/index.html">Netty</a>.
  *
  */
-public class HttpClient implements AutoCloseable {
+public class HttpClient extends AbstractReferenceCounted implements AutoCloseable {
 
   private static final int WORKER_QUIET_PERIOD = 2_000;
   private static final int WORKER_TIMEOUT = 15_000;
@@ -110,16 +112,35 @@ public class HttpClient implements AutoCloseable {
   }
 
   /**
+   * Implemented for {@link AutoCloseable}. Releases the client.
+   */
+  @Override
+  public void close() {
+    release();
+  }
+
+  /**
+   * Implemented for {@link AbstractReferenceCounted}.
+   *
+   * @returns ReferenceCounted
+   */
+  @Override
+  public ReferenceCounted touch(Object hint) {
+    return this;
+  }
+
+  /**
    * Frees any resources held by the client. Also closes the underlying worker
    *
    * @throws IOException
    */
   @Override
-  public void close() throws IOException {
-    if (worker != null) {
-      worker.shutdownGracefully(WORKER_QUIET_PERIOD, WORKER_TIMEOUT, TimeUnit.MILLISECONDS);
+  protected void deallocate() {
+    if (!isClosed()) {
+      if (worker != null) {
+        worker.shutdownGracefully(WORKER_QUIET_PERIOD, WORKER_TIMEOUT, TimeUnit.MILLISECONDS);
+      }
     }
-
     silentlyClose();
   }
 
