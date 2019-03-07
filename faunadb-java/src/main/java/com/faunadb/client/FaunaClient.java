@@ -214,6 +214,26 @@ public class FaunaClient implements AutoCloseable {
       return performRequest(json.valueToTree(exprs)).thenApply(result -> result.collect(Field.as(VALUE)));
   }
 
+  /**
+   * Sync the freshest timestamp seen by this client.
+   * <p>
+   * This has no effect if staler than currently stored timestamp.
+   * <p>
+   * WARNING: This should be used only when coordinating timestamps across
+   *          multiple clients. Moving the timestamp arbitrarily forward into
+   *          the future will cause transactions to stall.
+   */
+  public void syncLastTxnTime(long timestamp) {
+    connection.syncLastTxnTime(timestamp);
+  }
+
+  /**
+   * Get the freshest timestamp reported to this client.
+   */
+  public long getLastTxnTime() {
+    return connection.getLastTxnTime();
+  }
+
   private Value handleResponse(Response response) {
     try {
       handleQueryErrors(response);
