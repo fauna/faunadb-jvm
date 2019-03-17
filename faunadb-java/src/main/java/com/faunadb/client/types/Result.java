@@ -2,6 +2,7 @@ package com.faunadb.client.types;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Represents the result of an operation. Usually a conversion operation.
@@ -39,7 +40,7 @@ public abstract class Result<T> {
     }
 
     @Override
-    public A getOrElse(A defaultValue) {
+    public A getOrElse(Supplier<A> defaultValue) {
       return value;
     }
 
@@ -101,8 +102,8 @@ public abstract class Result<T> {
     }
 
     @Override
-    public A getOrElse(A defaultValue) {
-      return defaultValue;
+    public A getOrElse(Supplier<A> defaultValue) {
+      return defaultValue.get();
     }
 
     @Override
@@ -200,7 +201,17 @@ public abstract class Result<T> {
    * @param defaultValue default value to return case this represents a failure
    * @return the result value of the default value
    */
-  public abstract T getOrElse(T defaultValue);
+  public abstract T getOrElse(Supplier<T> defaultValue);
+
+  /**
+   * Gets the result value or return the a default value if the operation has failed
+   *
+   * @param defaultValue default value to return case this represents a failure
+   * @return the result value of the default value
+   */
+  public T orElseGet(Supplier<T> defaultValue) {
+    return getOrElse(defaultValue);
+  }
 
   /**
    * Apply the function passed on the result value.

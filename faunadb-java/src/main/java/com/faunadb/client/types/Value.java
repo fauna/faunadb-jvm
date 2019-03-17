@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -70,6 +71,7 @@ import static java.lang.String.format;
  */
 @JsonDeserialize(using = Deserializer.ValueDeserializer.class)
 public abstract class Value extends Expr {
+  private static Supplier<Value> NULL_SUPPLIER = () -> NullV.NULL;
 
   private Value() {
   }
@@ -253,7 +255,7 @@ public abstract class Value extends Expr {
    * @return the {@link Value} under the path provided
    */
   public final Value at(String... keys) {
-    return Field.at(keys).get(this).getOrElse(NullV.NULL);
+    return Field.at(keys).get(this).getOrElse(NULL_SUPPLIER);
   }
 
   /**
@@ -270,7 +272,7 @@ public abstract class Value extends Expr {
    * @return the {@link Value} under the path provided
    */
   public final Value at(int... indexes) {
-    return Field.at(indexes).get(this).getOrElse(NullV.NULL);
+    return Field.at(indexes).get(this).getOrElse(NULL_SUPPLIER);
   }
 
   /**
