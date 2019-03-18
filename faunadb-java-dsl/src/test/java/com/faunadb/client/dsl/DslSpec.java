@@ -85,29 +85,34 @@ public abstract class DslSpec {
     query(Arrays.asList(
       CreateIndex(Obj(
         "name", Value("all_spells"),
+        "active", Value(true),
         "source", Class("spells")
       )),
 
       CreateIndex(Obj(
         "name", Value("spells_by_element"),
+        "active", Value(true),
         "source", Class("spells"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("element"))))
       )),
 
       CreateIndex(Obj(
         "name", Value("elements_of_spells"),
+        "active", Value(true),
         "source", Class("spells"),
         "values", Arr(Obj("field", Arr(Value("data"), Value("element"))))
       )),
 
       CreateIndex(Obj(
         "name", Value("spellbooks_by_owner"),
+        "active", Value(true),
         "source", Class("spellbooks"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("owner"))))
       )),
 
       CreateIndex(Obj(
         "name", Value("spells_by_spellbook"),
+        "active", Value(true),
         "source", Class("spells"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("spellbook"))))
       ))
@@ -424,6 +429,7 @@ public abstract class DslSpec {
       CreateIndex(
         Obj(
           "name", Value(randomStartingWith("class_index_")),
+          "active", Value(true),
           "source", classRef,
           "terms", Arr(Obj("field", Arr(Value("data"), Value("uniqueField")))),
           "unique", Value(true)
