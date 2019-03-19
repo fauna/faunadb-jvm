@@ -684,6 +684,10 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val numF = client.query(ToNumber("100"))
     val numR = await(numF).to[Long].get
     numR should equal (100L)
+  }
+
+  it should "test time functions" in {
+    import java.util.Calendar._
 
     val timeF = client.query(ToTime("1970-01-01T00:00:00Z"))
     val timeR = await(timeF).to[TimeV].get.toInstant
@@ -692,6 +696,53 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val dateF = client.query(ToDate("1970-01-01"))
     val dateR = await(dateF).to[DateV].get.localDate
     dateR should equal (LocalDate.ofEpochDay(0))
+
+    val cal = java.util.Calendar.getInstance()
+    val nowStr = Time(cal.toInstant.toString)
+
+    val toSecondsF = client.query(ToSeconds(Epoch(0, TimeUnit.Second)))
+    val secondsR = await(toSecondsF).to[Long].get
+    secondsR should equal (0)
+
+    val toMillisF = client.query(ToMillis(nowStr))
+    val toMillisR = await(toMillisF).to[Long].get
+    toMillisR should equal (cal.getTimeInMillis)
+
+    val toMicrosF = client.query(ToMicros(Epoch(1552733214259L, TimeUnit.Second)))
+    val toMicrosR = await(toMicrosF).to[Long].get
+    toMicrosR should equal (1552733214259000000L)
+
+    val dayOfYearF = client.query(DayOfYear(nowStr))
+    val dayOfYearR = await(dayOfYearF).to[Long].get
+    dayOfYearR should equal (cal.get(DAY_OF_YEAR))
+
+    val dayOfMonthF = client.query(DayOfMonth(nowStr))
+    val dayOfMonthR = await(dayOfMonthF).to[Long].get
+    dayOfMonthR should equal (cal.get(DAY_OF_MONTH))
+
+    val dayOfWeekF = client.query(DayOfWeek(nowStr))
+    val dayOfWeekR = await(dayOfWeekF).to[Long].get
+    dayOfWeekR should equal (cal.get(DAY_OF_WEEK)-1)
+
+    val yearF = client.query(Year(nowStr))
+    val yearR = await(yearF).to[Long].get
+    yearR should equal (cal.get(YEAR))
+
+    val monthF = client.query(Month(nowStr))
+    val monthR = await(monthF).to[Long].get
+    monthR should equal (cal.get(MONTH)+1)
+
+    val hourF = client.query(Hour(Epoch(0, TimeUnit.Second)))
+    val hourR = await(hourF).to[Long].get
+    hourR should equal (0)
+
+    val minuteF = client.query(Minute(nowStr))
+    val minuteR = await(minuteF).to[Long].get
+    minuteR should equal (cal.get(MINUTE))
+
+    val secondF = client.query(query.Second(nowStr))
+    val secondR = await(secondF).to[Long].get
+    secondR should equal (cal.get(SECOND))
   }
 
   it should "test date and time functions" in {
@@ -701,7 +752,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     timeR.to[Instant].get shouldBe Instant.ofEpochMilli(0).plus(4, ChronoUnit.HOURS)
 
     val epochR = await(client.query(Arr(
-      Epoch(30, Second),
+      Epoch(30, TimeUnit.Second),
       Epoch(10, Millisecond),
       Epoch(42, Nanosecond),
       Epoch(40, Microsecond)
