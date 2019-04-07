@@ -9,13 +9,13 @@ import scala.language.implicitConversions
 /**
   * Functions modeling the FaunaDB Query language.
   *
-  * Instances of these classes can be composed to model a query expression, which can then be passed to
+  * Documents of these Collections can be composed to model a query expression, which can then be passed to
   * [[FaunaClient!.query(expr:faunadb\.query\.Expr)*]] in order to execute the query.
   *
   * ===Examples===
   *
   * {{{
-  * val query = Create(Class("spells"), Obj("data" -> Obj("name" -> "Magic Missile")))
+  * val query = Create(Collection("spells"), Obj("data" -> Obj("name" -> "Magic Missile")))
   * }}}
   *
   * {{{
@@ -112,7 +112,7 @@ package object query {
   // Values
 
   /**
-    * Creates a RefV value. The string "classes/widget/123" will be equivalent to:
+    * Creates a RefV value. The string "collections/widget/123" will be equivalent to:
     * {{{
     * RefV("123", RefV("widget", Native.Classes))
     * }}}
@@ -122,12 +122,16 @@ package object query {
   def Ref(value: String): Expr =
     Expr(ObjectV("@ref" -> StringV(value)))
 
-  def Ref(classRef: Expr, id: Expr): Expr =
-    Expr(ObjectV("ref" -> classRef.value, "id" -> id.value))
+  def Ref(collectionRef: Expr, id: Expr): Expr =
+    Expr(ObjectV("ref" -> collectionRef.value, "id" -> id.value))
 
   /** Native reference to all classes */
   def Classes(scope: Expr = NullV): Expr =
     Expr(ObjectV("classes" -> scope.value))
+  
+    /** Native reference to all classes */
+  def Collections(scope: Expr = NullV): Expr =
+    Expr(ObjectV("collections" -> scope.value))
 
   /** Native reference to all databases */
   def Databases(scope: Expr = NullV): Expr =
@@ -479,8 +483,17 @@ package object query {
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
     */
+  @deprecated("use CreateCollection instead")  
   def CreateClass(params: Expr): Expr =
     Expr(ObjectV("create_class" -> params.value))
+
+  /**
+    * A Create Collection expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
+    */
+  def CreateCollection(params: Expr): Expr =
+    Expr(ObjectV("create_collection" -> params.value))
 
   /**
     * A Create Database expression.
@@ -879,6 +892,7 @@ package object query {
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
+  @deprecated("use Collection instead")  
   def Class(name: Expr): Expr =
     Expr(ObjectV("class" -> name.value))
 
@@ -889,6 +903,22 @@ package object query {
     */
   def Class(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("class" -> name.value, "scope" -> scope.value))
+  
+  /**
+    * A Collection expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
+    */
+  def Collection(name: Expr): Expr =
+    Expr(ObjectV("collection" -> name.value))
+
+  /**
+    * A Collection expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
+    */
+  def Collection(name: Expr, scope: Expr): Expr =
+    Expr(ObjectV("collection" -> name.value, "scope" -> scope.value))  
 
   /**
     * A Database expression.

@@ -56,46 +56,46 @@ After the database is created, a new key specific to that database can be used t
     val client = adminClient.sessionClient(key)
 ```
 
-### How to create a class and index
+### How to create a collection and index
 
 ```scala
-    val SPELLS_CLASS = "spells"
+    val SPELLS_COLLECTION = "spells"
     val INDEX_NAME = "spells_index"
 
-    val classResults: Value = await(client.query(CreateClass(Obj("name" -> SPELLS_CLASS))))
-    println(s"Create Class for $DB_NAME:\n $classResults\n")
+    val collectionResults: Value = await(client.query(CreateCollection(Obj("name" -> SPELLS_COLLECTION))))
+    println(s"Create Collection for $DB_NAME:\n $collectionResults\n")
 
     val indexResults: Value = await(client.query(
       CreateIndex(
         Obj("name" -> INDEX_NAME,
-          "source" -> Class(SPELLS_CLASS)
+          "source" -> Collection(SPELLS_COLLECTION)
         )
       )
     ))
     println(s"Create Index for $DB_NAME:\n $indexResults\n")
 ```
 
-### How to add entries to a class
+### How to add entries to a collection
 
 ```scala
     val addFireResults = await(client.query(
-      Create(Class(Value(SPELLS_CLASS)),
+      Create(Collection(Value(SPELLS_COLLECTION)),
         Obj("data" ->
           Obj("name" -> "Fire Beak", "element" -> "water", "cost" -> 15)))
     ))
-    println(s"Added spell to class $SPELLS_CLASS: \n $addFireResults \n")
+    println(s"Added spell to collection $SPELLS_COLLECTION: \n $addFireResults \n")
 
     val addHippoResults = await(client.query(
-      Create(Class(Value(SPELLS_CLASS)),
+      Create(Collection(Value(SPELLS_COLLECTION)),
         Obj("data" ->
           Obj("name" -> "Hippo's Wallow", "element" -> "water", "cost" -> 35)))
     ))
-    println(s"Added spell to class $SPELLS_CLASS:\n $addHippoResults \n")
+    println(s"Added spell to collection $SPELLS_COLLECTION:\n $addHippoResults \n")
 ```
 
 ### How to access objects fields and convert to primitive values
 
-Adding data to a class returns a reference to the resource with the reference, a timestamp and the corresponding object in a json structure like:
+Adding data to a collection returns a reference to the resource with the reference, a timestamp and the corresponding object in a json structure like:
 
 ```json
  {
@@ -114,7 +114,7 @@ Adding data to a class returns a reference to the resource with the reference, a
 Objects fields are accessed through the default method of `Value` class. It's possible to access fields by names if the value represents an object or by index if it represents an array. For example to retrieve the resource reference of the returned Value use the following to get the `ref` field:
 
 ```scala
-    //The results at 'ref' are a pointer to the instance of the class that was just created.
+    //The results at 'ref' are a pointer to the document of the collection that was just created.
     val hippoRef = addHippoResults("ref")
     println(s"hippoRef = $hippoRef \n")
 ```
@@ -203,14 +203,14 @@ Option is used to mark a field that is optional and might not have a value
 
 ### Encoding and decoding user defined classes
 
-To persist an instance of `Spell` in FaunaDB:
+To persist a document of `Spell` in FaunaDB:
 
 
 ```scala
     val newSpell = Spell("Water Dragon's Claw", "water", Option(25))
     val storeSpellResult = await(client.query(
       Create(
-        Class(SPELLS_CLASS),
+        Collection(SPELLS_COLLECTION),
         Obj("data" -> newSpell))
     ))
     println(s"Stored spell:\n $storeSpellResult \n")
@@ -246,7 +246,7 @@ Read the spell we just created and convert from a `Value` type back to the `Spel
     }
 ```
 
-### Encoding and decoding lists of user defined classes
+### Encoding and decoding lists of user defined collections
 
 To persist a Scala sequence of `Spell` to FaunaDB because a codec is defined for the list it can be directly passed to the query Foreach.  This will convert it into a `Value` type:
 
@@ -263,7 +263,7 @@ To persist a Scala sequence of `Spell` to FaunaDB because a codec is defined for
       Foreach(spellList,
         Lambda { nextSpell =>
           Create(
-            Class(Value(SPELLS_CLASS)),
+            Collection(Value(SPELLS_COLLECTION)),
             Obj("data" -> nextSpell))
         })
     ))
