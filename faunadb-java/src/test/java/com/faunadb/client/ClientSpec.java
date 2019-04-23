@@ -269,6 +269,32 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldParseComplexIndex() throws Exception {
+    query(CreateClass(Obj("name", Value("reservations")))).get();
+
+    CompletableFuture<Value> indexF = query(CreateIndex(Obj(
+      "name", Value("reservations_by_lastName"),
+      "source", Obj(
+        "class", Class("reservations"),
+        "fields", Obj(
+          "cfLastName", Query(Lambda("x", Casefold(Select(Path("data", "guestInfo", "lastName"), Var("x"))))),
+          "fActive", Query(Lambda("x", Select(Path("data", "active"), Var("x"))))
+        )
+      ),
+      "terms", Arr(Obj("binding", Value("cfLastName")), Obj("binding", Value("fActive"))),
+      "values", Arr(
+        Obj("field", Arr(Value("data"), Value("checkIn"))),
+        Obj("field", Arr(Value("data"), Value("checkOut"))),
+        Obj("field", Arr(Value("ref")))
+      ),
+      "active", Value(true)
+    )));
+
+    Value index = indexF.get();
+    assertThat(index.at("name").to(String.class).get(), equalTo("reservations_by_lastName"));
+  }
+
+  @Test
   public void shouldBeAbleToGetAnInstance() throws Exception {
     Value instance = query(Get(magicMissile)).get();
     assertThat(instance.get(NAME_FIELD), equalTo("Magic Missile"));

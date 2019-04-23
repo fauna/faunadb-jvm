@@ -883,6 +883,31 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(client.query(Do(Arr(1, 2)))).to[Array[Long]].get shouldBe Array(1L, 2L)
   }
 
+  it should "parse complex index" in {
+    await(client.query(CreateClass(Obj("name" -> "reservations"))))
+
+    val indexF = client.query(CreateIndex(Obj(
+      "name" -> "reservations_by_lastName",
+      "source" -> Obj(
+        "class" -> Class("reservations"),
+        "fields" -> Obj(
+          "cfLastName" -> Query(Lambda(x => Casefold(Select(Path("data", "guestInfo", "lastName"), x)))),
+          "fActive" -> Query(Lambda(x => Select(Path("data", "active"), x)))
+        )
+      ),
+      "terms" -> Arr(Obj("binding" -> "cfLastName"), Obj("binding" -> "fActive")),
+      "values" -> Arr(
+        Obj("field" -> Arr("data", "checkIn")),
+        Obj("field" -> Arr("data", "checkOut")),
+        Obj("field" -> Arr("ref"))
+      ),
+      "active" -> true
+    )))
+
+    val index = await(indexF)
+    index("name").get shouldBe StringV("reservations_by_lastName")
+  }
+
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
     await(client.query(CreateDatabase(Obj("name" -> name))))
     val key = await(client.query(CreateKey(Obj("database" -> Database(name), "role" -> "admin"))))
