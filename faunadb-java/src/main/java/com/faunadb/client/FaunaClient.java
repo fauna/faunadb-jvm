@@ -47,7 +47,7 @@ import static com.faunadb.client.types.Codec.VALUE;
  *
  * client.query(
  *   Get(
- *     Ref(Class("some_class"), "123")
+ *     Ref(Collection("some_collection"), "123")
  *   )
  * );
  * }

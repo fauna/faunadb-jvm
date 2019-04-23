@@ -134,7 +134,7 @@ public class SerializationSpec {
 
   @Test
   public void shouldSerializeClass() throws Exception {
-    assertJson(Class(Value("spells")), "{\"class\":\"spells\"}");
+    assertJson(Collection(Value("spells")), "{\"collection\":\"spells\"}");
   }
 
   @Test

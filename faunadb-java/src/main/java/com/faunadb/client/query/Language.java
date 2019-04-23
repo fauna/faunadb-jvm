@@ -29,8 +29,8 @@ import static com.faunadb.client.util.SymbolGenerator.genSym;
  * <b>Example:</b>
  * <pre>{@code
  *   // Creates a new expression that, once executed, it will create a new instance
- *   // of the user class with an username and password fields.
- *   Expr createUserExpr = Create(Class("user"), Obj("data", Obj(
+ *   // of the user collection with an username and password fields.
+ *   Expr createUserExpr = Create(Collection("user"), Obj("data", Obj(
  *     "username", Value("bob"),
  *     "password", Value("abc123"),
  *   )));
@@ -197,7 +197,7 @@ public final class Language {
 
   /**
    * Creates a new reference.
-   * For example {@code Ref("classes/users/123")}.
+   * For example {@code Ref(Collection("users"), "123")}.
    *
    * <p>
    * The usage of this method is discouraged.
@@ -215,36 +215,36 @@ public final class Language {
 
   /**
    * Creates a new scoped reference.
-   * For example {@code Ref(Class("users"), "123")}.
+   * For example {@code Ref(Collection("users"), "123")}.
    *
-   * @param classRef the scope reference. Type: Reference
+   * @param collectionRef the scope reference. Type: Reference
    * @param id the reference id. Type: String
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
-   * @see #Class(String)
+   * @see #Collection(String)
    * @see #Database(String)
    * @see #Index(String)
    * @see #Function(String)
    */
-  public static Expr Ref(Expr classRef, Expr id) {
-    return Fn.apply("ref", classRef, "id", id);
+  public static Expr Ref(Expr collectionRef, Expr id) {
+    return Fn.apply("ref", collectionRef, "id", id);
   }
 
   /**
    * Creates a new scoped reference.
-   * For example {@code Ref(Class("users"), "123")}.
+   * For example {@code Ref(Collection("users"), "123")}.
    *
-   * @param classRef the scope reference. Type: Reference
+   * @param collectionRef the scope reference. Type: Reference
    * @param id the reference id
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
-   * @see #Class(String)
+   * @see #Collection(String)
    * @see #Database(String)
    * @see #Index(String)
    * @see #Function(String)
    */
-  public static Expr Ref(Expr classRef, String id) {
-    return Ref(classRef, Value(id));
+  public static Expr Ref(Expr collectionRef, String id) {
+    return Ref(collectionRef, Value(id));
   }
 
   /**
@@ -253,9 +253,23 @@ public final class Language {
    *
    * @return a new {@link Expr} instance
    * @see #Paginate(Expr)
+   * 
+   * @deprecated use Collections instead
    */
+  @Deprecated
   public static Expr Classes() {
     return Classes(Null());
+  }
+
+  /**
+   * Returns a reference to a set of all collections in the database.
+   * A reference set must be paginated in order to retrieve its values.
+   *
+   * @return a new {@link Expr} instance
+   * @see #Paginate(Expr)
+   */
+  public static Expr Collections() {
+    return Collections(Null());
   }
 
   /**
@@ -266,9 +280,25 @@ public final class Language {
    * @return a new {@link Expr} instance
    * @see #Database(String)
    * @see #Paginate(Expr)
+   * 
+   * @deprecated use Collection instead
    */
+  @Deprecated
   public static Expr Classes(Expr scope) {
     return Fn.apply("classes", scope);
+  }
+
+  /**
+   * Returns a reference to a set of all collections in the specified database.
+   * A reference set must be paginated in order to retrieve its values.
+   *
+   * @param scope a reference to a database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see #Database(String)
+   * @see #Paginate(Expr)
+   */
+  public static Expr Collections(Expr scope) {
+    return Fn.apply("collections", scope);
   }
 
   /**
@@ -797,7 +827,7 @@ public final class Language {
    *
    * client.query(
    *   Let(bindings).in(
-   *     Create(Class("users"), Obj("data", Obj(
+   *     Create(Collection("users"), Obj("data", Obj(
    *       "name", Var("name"),
    *       "age", Var("age"),
    *     )))
@@ -1212,7 +1242,7 @@ public final class Language {
    * <pre>{@code
    * client.query(
    *   Map(userNames, Lambda(Value("name"),
-   *     Create(Class("user"), Obj("data", Obj(
+   *     Create(Collection("user"), Obj("data", Obj(
    *       "name", Var("name")
    *     )))
    *   ))
@@ -1233,7 +1263,7 @@ public final class Language {
    *         Value("name"),
    *         Value("surname")
    *       ),
-   *       Create(Class("user"), Obj("data", Obj(
+   *       Create(Collection("user"), Obj("data", Obj(
    *         "fullName", Concat(
    *           Var("name"),
    *           Var("surname")
@@ -1470,7 +1500,7 @@ public final class Language {
   }
 
   /**
-   * Retrieves the instance identified by the given reference.
+   * Retrieves the document identified by the given reference.
    *
    * @param ref the reference to be retrieved. Type: Reference
    * @return a new {@link Expr} instance
@@ -1482,7 +1512,7 @@ public final class Language {
   }
 
   /**
-   * Retrieves the instance identified by the given reference at a specific point in time.
+   * Retrieves the document identified by the given reference at a specific point in time.
    *
    * @param ref the reference to be retrieved. Type: Reference
    * @param timestamp the timestamp from which the reference's data will be retrieved. Type: Timestamp
@@ -1498,7 +1528,7 @@ public final class Language {
   }
 
   /**
-   * Retrieves the instance identified by the given reference at a specific point in time.
+   * Retrieves the document identified by the given reference at a specific point in time.
    *
    * @param ref the reference to be retrieved. Type: Reference
    * @param timestamp the timestamp from which the reference's data will be retrieved.
@@ -1616,10 +1646,10 @@ public final class Language {
   }
 
   /**
-   * Creates a new instance of the given class with the parameters provided.
+   * Creates a new document of the given collection with the parameters provided.
    *
-   * @param ref the class reference for which a new instance will be created. Type: Reference
-   * @param params the parameters used to create the new instance. Type: Object
+   * @param ref the collection reference for which a new document will be created. Type: Reference
+   * @param params the parameters used to create the new document. Type: Object
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
    * @see #Class(Expr)
@@ -1635,7 +1665,7 @@ public final class Language {
    * Scalar values or arrays are replaced by new versions, objects are merged, and null removes a value.
    *
    * @param ref the resource reference to update. Type: Reference
-   * @param params the parameters used to update the new instance. Type: Object
+   * @param params the parameters used to update the new document. Type: Object
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
    * @see #Ref(Expr, String)
@@ -1672,11 +1702,11 @@ public final class Language {
   }
 
   /**
-   * Inserts a new event in the instance's history.
+   * Inserts a new event in the document's history.
    *
    * @param ref the target resource. Type: Reference
    * @param timestamp the timestamp in which the event will be inserted in the
-   *                  instance's history. Type: Timestamp
+   *                  document's history. Type: Timestamp
    * @param action the event action. Type: action
    * @param params the event's parameters. Type: Object
    * @return a new {@link Expr} instance
@@ -1692,11 +1722,11 @@ public final class Language {
   }
 
   /**
-   * Inserts a new event in the instance's history.
+   * Inserts a new event in the document's history.
    *
    * @param ref the target resource. Type: Reference
    * @param timestamp the timestamp in which the event will be inserted in the
-   *                  instance's history. Type: Timestamp
+   *                  document's history. Type: Timestamp
    * @param action the event action
    * @param params the event's parameters. Type: Object
    * @return a new {@link Expr} instance
@@ -1711,7 +1741,7 @@ public final class Language {
   }
 
   /**
-   * Removes an event from an instance's history.
+   * Removes an event from an document's history.
    *
    * @param ref the target resource. Type: Reference
    * @param timestamp the timestamp in which the event happened. Type: Timestamp
@@ -1729,7 +1759,7 @@ public final class Language {
   }
 
   /**
-   * Removes an event from an instance's history.
+   * Removes an event from an document's history.
    *
    * @param ref the target resource. Type: Reference
    * @param timestamp the timestamp in which the event happened. Type: Timestamp
@@ -1752,9 +1782,24 @@ public final class Language {
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
    * @see #Obj(Map)
+   * 
+   * @deprecated use CreateCollection instead.
    */
+  @Deprecated
   public static Expr CreateClass(Expr params) {
     return Fn.apply("create_class", params);
+  }
+
+  /**
+   * Creates a new collection in the current database.
+   *
+   * @param params the collection's configuration parameters. Type: Object
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see #Obj(Map)
+   */
+  public static Expr CreateCollection(Expr params) {
+    return Fn.apply("create_collection", params);
   }
 
   /**
@@ -1829,7 +1874,7 @@ public final class Language {
   /**
    * Returns the history of an instance's presence for the given reference.
    *
-   * @param ref the instance's reference to retrieve the singleton history. Type: Reference
+   * @param ref the document's reference to retrieve the singleton history. Type: Reference
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#sets">FaunaDB Set Functions</a>
    * @see #Ref(Expr, String)
@@ -1839,7 +1884,7 @@ public final class Language {
   }
 
   /**
-   * Returns the history of an instance's data for the given reference.
+   * Returns the history of an document's data for the given reference.
    *
    * @param refSet the resource to retrieve events for. Type: Reference or set reference.
    * @return a new {@link Expr} instance
@@ -1965,7 +2010,7 @@ public final class Language {
   }
 
   /**
-   * Derives a set of resources from applying each instance of the source set to the target parameter.
+   * Derives a set of resources from applying each document of the source set to the target parameter.
    * The target parameter can assume two forms: a index reference, and a lambda function.
    * When the target is an index reference, Join will match each result of the source set with the target index's terms.
    * When target is a lambda function, each result from the source set will be passed as the lambda's arguments.
@@ -1982,8 +2027,8 @@ public final class Language {
   }
 
   /**
-   * Derives a set of resources from applying each instance of the
-   * source set to the target parameter.  Each instance from the
+   * Derives a set of resources from applying each document of the
+   * source set to the target parameter.  Each document from the
    * source set will be passed as the lambda argument.
    *
    * @param source the source set. Type: Array or Set.
@@ -4010,7 +4055,10 @@ public final class Language {
    * @param name the class name. Type: String
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * 
+   * @deprecated use Collection instead
    */
+  @Deprecated
   public static Expr Class(Expr name) {
     return Fn.apply("class", name);
   }
@@ -4021,7 +4069,10 @@ public final class Language {
    * @param name the class name
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * 
+   * @deprecated use Collection instead
    */
+  @Deprecated
   public static Expr Class(String name) {
     return Class(Value(name));
   }
@@ -4034,9 +4085,47 @@ public final class Language {
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    * @see #Database(String)
+   * 
+   * @deprecated use Collection instead
    */
+  @Deprecated
   public static Expr Class(Expr name, Expr database) {
     return Fn.apply("class", name, "scope", database);
+  }
+
+  /**
+   * Creates a new reference for the given collection name.
+   *
+   * @param name the collection name. Type: String
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Collection(Expr name) {
+    return Fn.apply("collection", name);
+  }
+
+  /**
+   * Creates a new reference for the given collection name.
+   *
+   * @param name the collection name
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr Collection(String name) {
+    return Collection(Value(name));
+  }
+
+  /**
+   * Creates a reference for the given collection name, scoped to the database provided.
+   *
+   * @param name the collection name. Type: String
+   * @param database the scope database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see #Database(String)
+   */
+  public static Expr Collection(Expr name, Expr database) {
+    return Fn.apply("collection", name, "scope", database);
   }
 
   /**
@@ -4047,9 +4136,25 @@ public final class Language {
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    * @see #Database(String)
+   * 
+   * @deprecated use Collection instead
    */
+  @Deprecated
   public static Expr Class(String name, Expr database) {
     return Class(Value(name), database);
+  }
+
+  /**
+   * Creates a reference for the given collection name, scoped to the database provided.
+   *
+   * @param name the collection name
+   * @param database the scope database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see #Database(String)
+   */
+  public static Expr Collection(String name, Expr database) {
+    return Collection(Value(name), database);
   }
 
   /**

@@ -84,7 +84,7 @@ public class SpellExample {
         String INDEX_NAME = "spells_index";
 
         Value classResults = client.query(
-            CreateClass(
+            CreateCollection(
                 Obj("name", Value(SPELLS_CLASS))
             )
         ).get();
@@ -92,7 +92,7 @@ public class SpellExample {
 
         Value indexResults = client.query(
             CreateIndex(
-                Obj("name", Value(INDEX_NAME), "source", Class(Value(SPELLS_CLASS)))
+                Obj("name", Value(INDEX_NAME), "source", Collection(Value(SPELLS_CLASS)))
             )
         ).get();
         System.out.println("Create Index for " + DB_NAME + ":\n " + indexResults + "\n");
@@ -103,7 +103,7 @@ public class SpellExample {
 
         Value addFireResults = client.query(
             Create(
-                Class(Value(SPELLS_CLASS)),
+                Collection(Value(SPELLS_CLASS)),
                 Obj("data",
                     Obj("name", Value("Fire Beak"), "element", Value("water"), "cost", Value(15))
                 )
@@ -114,7 +114,7 @@ public class SpellExample {
 
         Value addDragonResults = client.query(
             Create(
-                Class(Value(SPELLS_CLASS)),
+                Collection(Value(SPELLS_CLASS)),
                 Obj("data",
                     Obj("name", Value("Water Dragon's Claw"), "element", Value("water"), "cost", Value(25))
                 )
@@ -124,7 +124,7 @@ public class SpellExample {
 
         Value addHippoResults = client.query(
             Create(
-                Class(Value(SPELLS_CLASS)),
+                Collection(Value(SPELLS_CLASS)),
                 Obj("data",
                     Obj("name", Value("Hippo's Wallow"), "element", Value("water"), "cost", Value(35))
                 )
@@ -182,7 +182,7 @@ public class SpellExample {
         Spell newSpell = new Spell("Water Dragon's Claw", "water", 25);
         Value storeSpellResult = client.query(
             Create(
-                Class(Value(SPELLS_CLASS)),
+                Collection(Value(SPELLS_CLASS)),
                 Obj("data", Value(newSpell))
             )
         ).get();
@@ -223,7 +223,7 @@ public class SpellExample {
                 encodedSpellsList,
                 Lambda(Value(NXT_SPELL),
                     Create(
-                        Class(Value(SPELLS_CLASS)),
+                        Collection(Value(SPELLS_CLASS)),
                         Obj("data", Var(NXT_SPELL))
                     )
                 )
