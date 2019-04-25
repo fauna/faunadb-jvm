@@ -69,55 +69,55 @@ After the database is created, a new key specific to that database can be used t
     System.out.println("Connected to Fauna database " + DB_NAME + " with server role\n");
 ```
 
-### How to create a class and index
+### How to create a collection and index
 
 ```java
-    String SPELLS_CLASS = "spells";
+    String SPELLS_COLLECTION = "spells";
     String INDEX_NAME = "spells_index";
 
-    Value classResults = client.query(
-        CreateClass(
-            Obj("name", Value(SPELLS_CLASS))
+    Value collectionResults = client.query(
+        CreateCollection(
+            Obj("name", Value(SPELLS_COLLECTION))
         )
     ).get();
-    System.out.println("Create Class for " + DB_NAME + ":\n " + classResults + "\n");
+    System.out.println("Create Collection for " + DB_NAME + ":\n " + collectionResults + "\n");
 
     Value indexResults = client.query(
         CreateIndex(
-            Obj("name", Value(INDEX_NAME), "source", Class(Value(SPELLS_CLASS)))
+            Obj("name", Value(INDEX_NAME), "source", Collection(Value(SPELLS_COLLECTION)))
         )
     ).get();
     System.out.println("Create Index for " + DB_NAME + ":\n " + indexResults + "\n");
 ```
 
-### How to add entries to a class
+### How to add entries to a collection
 
 ```java
     Value addFireResults = client.query(
         Create(
-            Class(Value(SPELLS_CLASS)),
+            Collection(Value(SPELLS_COLLECTION)),
             Obj("data",
                 Obj("name", Value("Fire Beak"), "element", Value("water"), "cost", Value(15))
             )
         )
     ).get();
-    System.out.println("Added spell to class " + SPELLS_CLASS + ":\n " + addFireResults + "\n");
+    System.out.println("Added spell to collection " + SPELLS_COLLECTION + ":\n " + addFireResults + "\n");
 
     Value addHippoResults = client.query(
         Create(
-            Class(Value(SPELLS_CLASS)),
+            Collection(Value(SPELLS_COLLECTION)),
             Obj("data",
                 Obj("name", Value("Hippo's Wallow"), "element", Value("water"), "cost", Value(35))
             )
         )
     ).get();
-    System.out.println("Added spell to class " + SPELLS_CLASS + ":\n " + addHippoResults + "\n");
+    System.out.println("Added spell to collection " + SPELLS_COLLECTION + ":\n " + addHippoResults + "\n");
 
 ```
 
 ### How to access objects fields and convert to primitive values
 
-Adding data to a class returns a reference to the resource with the reference, a timestamp and the corresponding object in a json structure like:
+Adding data to a collection returns a reference to the resource with the reference, a timestamp and the corresponding object in a json structure like:
 
 ```json
  {
@@ -135,7 +135,7 @@ Adding data to a class returns a reference to the resource with the reference, a
 Objects fields are accessed through `at` methods of `Value` class. It's possible to access fields by names if the value represents an object or by index if it represents an array.  For example to retrieve the resource reference of the returned Value use the following to get the `ref` field:
 
 ```java
-    //The results at 'ref' are a resource pointer to the class that was just created.
+    //The results at 'ref' are a resource pointer to the collection that was just created.
     Value hippoRef = addHippoResults.at("ref");
     System.out.println("hippoRef = " + hippoRef);
 ```
@@ -209,9 +209,9 @@ That query returns a list of resource references to all the spells in the index.
 
 ### How to work with user defined classes
 
-Instead of manually creating your objects via the DSL (e.g. the Obj()), you can use annotations to automatically encode and decode the class to user-defined types.  These transform the types into the equivalent `Value` types.
+Instead of manually creating your objects via the DSL (e.g. the Obj()), you can use annotations to automatically encode and decode the collection to user-defined types.  These transform the types into the equivalent `Value` types.
 
-For example a Spell class could be used that defines the fields and constructor:
+For example a Spell collection could be used that defines the fields and constructor:
 
 ```java
     import com.faunadb.client.types.FaunaConstructor;
@@ -261,14 +261,14 @@ There are three attributes that can be used to change the behavior of the `Encod
 
 ### Encoding and decoding user defined classes
 
-To persist an instance of `Spell` in FaunaDB:
+To persist an document of `Spell` in FaunaDB:
 
 
 ```java
     Spell newSpell = new Spell("Water Dragon's Claw", "water", 25);
     Value storeSpellResult = client.query(
         Create(
-            Class(Value(SPELLS_CLASS)),
+            Collection(Value(SPELLS_COLLECTION)),
             Obj("data", Value(newSpell))
         )
     ).get();
@@ -312,7 +312,7 @@ To persist a Java list of `Spell` to FaunaDB encode the list into a `Value`:
             encodedSpellsList,
             Lambda(Value(NXT_SPELL),
                 Create(
-                    Class(Value(SPELLS_CLASS)),
+                    Collection(Value(SPELLS_COLLECTION)),
                     Obj("data", Var(NXT_SPELL))
                 )
             )

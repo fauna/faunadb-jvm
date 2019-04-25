@@ -115,49 +115,49 @@ public class ClientSpec {
     initialized = true;
 
     query(Arrays.asList(
-      CreateClass(Obj("name", Value("spells"))),
-      CreateClass(Obj("name", Value("characters"))),
-      CreateClass(Obj("name", Value("spellbooks")))
+      CreateCollection(Obj("name", Value("spells"))),
+      CreateCollection(Obj("name", Value("characters"))),
+      CreateCollection(Obj("name", Value("spellbooks")))
     )).get();
 
     query(Arrays.asList(
       CreateIndex(Obj(
         "name", Value("all_spells"),
         "active", Value(true),
-        "source", Class("spells")
+        "source", Collection("spells")
       )),
 
       CreateIndex(Obj(
         "name", Value("spells_by_element"),
         "active", Value(true),
-        "source", Class("spells"),
+        "source", Collection("spells"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("element"))))
       )),
 
       CreateIndex(Obj(
         "name", Value("elements_of_spells"),
         "active", Value(true),
-        "source", Class("spells"),
+        "source", Collection("spells"),
         "values", Arr(Obj("field", Arr(Value("data"), Value("element"))))
       )),
 
       CreateIndex(Obj(
         "name", Value("spellbooks_by_owner"),
         "active", Value(true),
-        "source", Class("spellbooks"),
+        "source", Collection("spellbooks"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("owner"))))
       )),
 
       CreateIndex(Obj(
         "name", Value("spells_by_spellbook"),
         "active", Value(true),
-        "source", Class("spells"),
+        "source", Collection("spells"),
         "terms", Arr(Obj("field", Arr(Value("data"), Value("spellbook"))))
       ))
     )).get();
 
     magicMissile = query(
-      Create(Class("spells"),
+      Create(Collection("spells"),
         Obj("data",
           Obj(
             "name", Value("Magic Missile"),
@@ -166,7 +166,7 @@ public class ClientSpec {
     ).get().get(REF_FIELD);
 
     fireball = query(
-      Create(Class("spells"),
+      Create(Collection("spells"),
         Obj("data",
           Obj(
             "name", Value("Fireball"),
@@ -175,7 +175,7 @@ public class ClientSpec {
     ).get().get(REF_FIELD);
 
     faerieFire = query(
-      Create(Class("spells"),
+      Create(Collection("spells"),
         Obj("data",
           Obj(
             "name", Value("Faerie Fire"),
@@ -187,7 +187,7 @@ public class ClientSpec {
     ).get().get(REF_FIELD);
 
     summon = query(
-      Create(Class("spells"),
+      Create(Collection("spells"),
         Obj("data",
           Obj(
             "name", Value("Summon Animal Companion"),
@@ -196,24 +196,24 @@ public class ClientSpec {
     ).get().get(REF_FIELD);
 
     thor = query(
-      Create(Class("characters"),
+      Create(Collection("characters"),
         Obj("data", Obj("name", Value("Thor"))))
     ).get().get(REF_FIELD);
 
     RefV thorsSpellbook = query(
-      Create(Class("spellbooks"),
+      Create(Collection("spellbooks"),
         Obj("data",
           Obj("owner", thor)))
     ).get().get(REF_FIELD);
 
     thorSpell1 = query(
-      Create(Class("spells"),
+      Create(Collection("spells"),
         Obj("data",
           Obj("spellbook", thorsSpellbook)))
     ).get().get(REF_FIELD);
 
     thorSpell2 = query(
-      Create(Class("spells"),
+      Create(Collection("spells"),
         Obj("data",
           Obj("spellbook", thorsSpellbook)))
     ).get().get(REF_FIELD);
@@ -222,7 +222,7 @@ public class ClientSpec {
   @Test
   public void shouldThrowNotFoundWhenInstanceDoesntExists() throws Exception {
     thrown.expectCause(isA(NotFoundException.class));
-    query(Get(Ref(Class("spells"), "1234"))).get();
+    query(Get(Ref(Collection("spells"), "1234"))).get();
   }
 
   @Test
@@ -235,7 +235,7 @@ public class ClientSpec {
   @Test
   public void shouldCreateAComplexInstance() throws Exception {
     Value instance = query(
-      Create(onARandomClass(),
+      Create(onARandomCollection(),
         Obj("data",
           Obj("testField",
             Obj(
@@ -330,7 +330,7 @@ public class ClientSpec {
   @Test
   public void shouldBeAbleToUpdateAnInstancesData() throws Exception {
     Value createdInstance = query(
-      Create(onARandomClass(),
+      Create(onARandomCollection(),
         Obj("data",
           Obj(
             "name", Value("Magic Missile"),
@@ -355,7 +355,7 @@ public class ClientSpec {
   @Test
   public void shouldBeAbleToReplaceAnInstancesData() throws Exception {
     Value createdInstance = query(
-      Create(onARandomClass(),
+      Create(onARandomCollection(),
         Obj("data",
           Obj(
             "name", Value("Magic Missile"),
@@ -381,7 +381,7 @@ public class ClientSpec {
   @Test
   public void shouldBeAbleToDeleteAnInstance() throws Exception {
     Value createdInstance = query(
-      Create(onARandomClass(),
+      Create(onARandomCollection(),
         Obj("data", Obj("name", Value("Magic Missile"))))
     ).get();
 
@@ -398,7 +398,7 @@ public class ClientSpec {
   @Test
   public void shouldBeAbleToInsertAndRemoveEvents() throws Exception {
     Value createdInstance = query(
-      Create(onARandomClass(),
+      Create(onARandomCollection(),
         Obj("data", Obj("name", Value("Magic Missile"))))
     ).get();
 
@@ -427,7 +427,7 @@ public class ClientSpec {
   @Test
   public void shouldTestEvents() throws Exception {
     RefV ref = query(
-      Create(onARandomClass(), Obj("data", Obj("x", Value(1))))
+      Create(onARandomCollection(), Obj("data", Obj("x", Value(1))))
     ).get().get(REF_FIELD);
 
     query(
@@ -459,7 +459,7 @@ public class ClientSpec {
   @Test
   public void shouldTestSingleton() throws Exception {
     RefV ref = query(
-      Create(onARandomClass(), Obj("data", Obj("x", Value(1))))
+      Create(onARandomCollection(), Obj("data", Obj("x", Value(1))))
     ).get().get(REF_FIELD);
 
     query(
@@ -487,27 +487,27 @@ public class ClientSpec {
 
   @Test
   public void shouldHandleConstraintViolations() throws Exception {
-    RefV classRef = onARandomClass();
+    RefV collectionRef = onARandomCollection();
 
     query(
       CreateIndex(
         Obj(
-          "name", Value(randomStartingWith("class_index_")),
+          "name", Value(randomStartingWith("collection_index_")),
           "active", Value(true),
-          "source", classRef,
+          "source", collectionRef,
           "terms", Arr(Obj("field", Arr(Value("data"), Value("uniqueField")))),
           "unique", Value(true)
         ))
     ).get();
 
     query(
-      Create(classRef,
+      Create(collectionRef,
         Obj("data", Obj("uniqueField", Value("same value"))))
     ).get();
 
     thrown.expectCause(isA(BadRequestException.class));
     query(
-      Create(classRef,
+      Create(collectionRef,
         Obj("data", Obj("uniqueField", Value("same value"))))
     ).get();
   }
@@ -522,7 +522,7 @@ public class ClientSpec {
   }
 
   @Test
-  public void shouldListAllItensOnAClassIndex() throws Exception {
+  public void shouldListAllItensOnACollectionIndex() throws Exception {
     Value allInstances = query(
       Paginate(Match(Index("all_spells")))
     ).get();
@@ -595,7 +595,7 @@ public class ClientSpec {
 
   @Test
   public void shouldEvalDoExpression() throws Exception {
-    RefV ref = new RefV(randomStartingWith(), onARandomClass());
+    RefV ref = new RefV(randomStartingWith(), onARandomCollection());
 
     Value res = query(
       Do(
@@ -653,7 +653,7 @@ public class ClientSpec {
           Value("Fireball Level 1"),
           Value("Fireball Level 2")),
         Lambda(Value("spell"),
-          Create(onARandomClass(),
+          Create(onARandomCollection(),
             Obj("data", Obj("name", Var("spell")))))
       )
     ).get();
@@ -664,7 +664,7 @@ public class ClientSpec {
 
   @Test
   public void shouldForeachWithLambda() throws Exception {
-    Value cls = onARandomClass();
+    Value cls = onARandomCollection();
     Value res = query(
       Foreach(
         Arr(
@@ -767,7 +767,7 @@ public class ClientSpec {
   @Test
   public void shouldTestCollectionPredicatesForPages() throws Exception {
     String randomElement = randomStartingWith("element-");
-    Value created = query(Create(Class("spells"), Obj("data", Obj("name", Value("predicate test"), "element", Value(randomElement))))).get();
+    Value created = query(Create(Collection("spells"), Obj("data", Obj("name", Value("predicate test"), "element", Value(randomElement))))).get();
 
     assertThat(
       query(IsEmpty(Paginate(Match(Index("spells_by_element"), Value("invalid element"))))).get().to(BOOLEAN).get(),
@@ -1512,7 +1512,7 @@ public class ClientSpec {
   @Test
   public void shouldCreateASpellUsingEncoderDecoder() throws Exception {
     RefV ref = query(
-      Create(Class("spells"),
+      Create(Collection("spells"),
         Obj("data", Value(new Spell("Blah", "blah", 10)))
       )).get().get(REF_FIELD);
 
@@ -1534,7 +1534,7 @@ public class ClientSpec {
     );
 
     assertThat(
-      query(Class("spells")).get(),
+      query(Collection("spells")).get(),
       equalTo(new RefV("spells", Native.CLASSES))
     );
 
@@ -1559,12 +1559,12 @@ public class ClientSpec {
     );
 
     assertThat(
-      query(Ref(Class("spells"), Value("1234567890"))).get(),
+      query(Ref(Collection("spells"), Value("1234567890"))).get(),
       equalTo(new RefV("1234567890", new RefV("spells", Native.CLASSES)))
     );
 
     assertThat(
-      query(Ref(Class("spells"), "1234567890")).get(),
+      query(Ref(Collection("spells"), "1234567890")).get(),
       equalTo(new RefV("1234567890", new RefV("spells", Native.CLASSES)))
     );
   }
@@ -1572,7 +1572,7 @@ public class ClientSpec {
   @Test
   public void shouldCreateNestedRefFromString() throws Exception {
     assertThat(
-      query(Ref("classes/widget/123")).get(),
+      query(Ref("collections/widget/123")).get(),
       equalTo(new RefV("123", new RefV("widget", Native.CLASSES)))
     );
   }
@@ -1596,7 +1596,7 @@ public class ClientSpec {
     thrown.expectCause(isA(UnauthorizedException.class));
 
     createFaunaClient("invalid-secret")
-            .query(Get(Ref(Class("spells"), "1234")))
+            .query(Get(Ref(Collection("spells"), "1234")))
             .get();
   }
 
@@ -1614,7 +1614,7 @@ public class ClientSpec {
   @Test
   public void shouldAuthenticateSession() throws Exception {
     Value createdInstance = serverClient.query(
-            Create(onARandomClass(),
+            Create(onARandomCollection(),
                     Obj("credentials",
                             Obj("password", Value("abcdefg"))))
     ).get();
@@ -1645,7 +1645,7 @@ public class ClientSpec {
   @Test
   public void shouldTestHasIdentity() throws Exception {
     Value createdInstance = serverClient.query(
-            Create(onARandomClass(),
+            Create(onARandomCollection(),
                     Obj("credentials",
                             Obj("password", Value("sekret"))))
     ).get();
@@ -1669,7 +1669,7 @@ public class ClientSpec {
   @Test
   public void shouldTestIdentity() throws Exception {
     Value createdInstance = serverClient.query(
-            Create(onARandomClass(),
+            Create(onARandomCollection(),
                     Obj("credentials",
                             Obj("password", Value("sekret"))))
     ).get();
@@ -1708,8 +1708,8 @@ public class ClientSpec {
     FaunaClient childClient = createNewDatabase(parentClient, "child-database");
 
     childClient.query(
-      CreateClass(Obj(
-        "name", Value("a_class")
+      CreateCollection(Obj(
+        "name", Value("a_collection")
       ))
     ).get();
 
@@ -1724,10 +1724,10 @@ public class ClientSpec {
     ).get();
 
     Expr nestedDatabase = Database("child-database", Database("parent-database"));
-    Expr nestedClassRef = Class("a_class", nestedDatabase);
+    Expr nestedCollectionRef = Collection("a_collection", nestedDatabase);
     Expr nestedRoleRef = Role("a_role", nestedDatabase);
 
-    assertThat(adminClient.query(Exists(nestedClassRef)).get(), equalTo(BooleanV.TRUE));
+    assertThat(adminClient.query(Exists(nestedCollectionRef)).get(), equalTo(BooleanV.TRUE));
     assertThat(adminClient.query(Exists(nestedRoleRef)).get(), equalTo(BooleanV.TRUE));
 
     RefV childDBRef =
@@ -1736,14 +1736,14 @@ public class ClientSpec {
 
     List<RefV> refs = adminClient.query(
       Paginate(Union(
-        Classes(nestedDatabase),
+        Collections(nestedDatabase),
         Roles(nestedDatabase)
       ))
     ).get().get(REF_LIST);
 
     assertThat(refs, hasSize(2));
     assertThat(refs, containsInAnyOrder(
-      new RefV("a_class", Native.CLASSES, childDBRef),
+      new RefV("a_collection", Native.CLASSES, childDBRef),
       new RefV("a_role", Native.ROLES, childDBRef)
     ));
   }
@@ -1787,7 +1787,7 @@ public class ClientSpec {
 
     try {
       scopedClient.query(
-        CreateClass(Obj(
+        CreateCollection(Obj(
           "name", Value("foo")
         ))
       ).get();
@@ -1795,21 +1795,21 @@ public class ClientSpec {
       scopedClient.close();
     }
 
-    Value classesPage =
+    Value collectionsPage =
       adminClient.query(
         Paginate(
-          Classes(
+          Collections(
             Database("child-database2",
               Database("child-database1",
                 Database("scoped-database")))))
       ).get();
 
-    Collection<Value> classes =
-      classesPage
+    Collection<Value> collections =
+      collectionsPage
         .at("data")
         .collect(Value.class);
 
-    assertThat(classes, hasSize(1));
+    assertThat(collections, hasSize(1));
   }
 
   private CompletableFuture<Value> query(Expr expr) {
@@ -1826,11 +1826,11 @@ public class ClientSpec {
     return client.newSessionClient(key.get(SECRET_FIELD));
   }
 
-  private RefV onARandomClass() throws Exception {
+  private RefV onARandomCollection() throws Exception {
 
     Value clazz = query(
-      CreateClass(
-        Obj("name", Value(randomStartingWith("some_class_"))))
+      CreateCollection(
+        Obj("name", Value(randomStartingWith("some_collection_"))))
     ).get();
 
     return clazz.get(REF_FIELD);

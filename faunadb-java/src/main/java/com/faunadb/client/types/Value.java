@@ -749,6 +749,7 @@ public abstract class Value extends Expr {
     private Native() {}
 
     public static final RefV CLASSES = new RefV("classes", null, null);
+    public static final RefV COLLECTIONS = new RefV("collections", null, null);
     public static final RefV INDEXES = new RefV("indexes", null, null);
     public static final RefV DATABASES = new RefV("databases", null, null);
     public static final RefV KEYS = new RefV("keys", null, null);
