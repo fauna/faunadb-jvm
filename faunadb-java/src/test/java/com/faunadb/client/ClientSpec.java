@@ -16,6 +16,8 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.Calendar;
+import java.util.Calendar.*;
 
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
@@ -74,6 +76,9 @@ public class ClientSpec {
   private static RefV thorSpell2;
 
   private static boolean initialized = false;
+
+  private static Calendar cal = Calendar.getInstance();
+  private static Expr nowStr = Time(cal.toInstant().toString());
 
   private static Value handleBadRequest(Value v, Throwable ex) {
     if (ex instanceof BadRequestException) {
@@ -1395,6 +1400,80 @@ public class ClientSpec {
   public void shouldEvalToTimeExpression() throws Exception {
     Value res = query(ToTime(Value("1970-01-01T00:00:00Z"))).get();
     assertThat(res.to(TIME).get(), equalTo(Instant.ofEpochMilli(0)));
+  }
+
+  @Test
+  public void shouldEvalToSecondsExpression() throws Exception {
+    Value res = query(ToSeconds(ToTime(Value("1970-01-01T00:00:00Z")))).get();
+    assertThat(res.to(LONG).get(), equalTo(0L));
+  }
+
+  @Test
+  public void shouldEvalToMillisExpression() throws Exception {
+    Value res = query(ToMillis(nowStr)).get();
+    long expected = cal.getTimeInMillis();
+    assertThat(res.to(LONG).get(), equalTo(expected));
+  }
+
+  @Test
+  public void shouldEvalToMicrosExpression() throws Exception {
+    Value res = query(ToMicros(Epoch(1552733214259L, SECOND))).get();
+    assertThat(res.to(LONG).get(), equalTo(1552733214259000000L));
+  }
+
+  @Test
+  public void shouldEvalDayOfYearExpression() throws Exception {
+    Value res = query(DayOfYear(nowStr)).get();
+    long expected = cal.get(Calendar.DAY_OF_YEAR);
+    assertThat(res.to(LONG).get(), equalTo(expected));
+  }
+
+  @Test
+  public void shouldEvalDayOfMonthExpression() throws Exception {
+    Value res = query(DayOfMonth(nowStr)).get();
+    long expected = cal.get(Calendar.DAY_OF_MONTH);
+    assertThat(res.to(LONG).get(), equalTo(expected));
+  }
+
+  @Test
+  public void shouldEvalDayOfWeekExpression() throws Exception {
+    Value res = query(DayOfWeek(nowStr)).get();
+    long expected = cal.get(Calendar.DAY_OF_WEEK) - 1;
+    assertThat(res.to(LONG).get(), equalTo(expected));
+  }
+
+  @Test
+  public void shouldEvalYearExpression() throws Exception {
+    Value res = query(Year(nowStr)).get();
+    long expected = cal.get(Calendar.YEAR);
+    assertThat(res.to(LONG).get(), equalTo(expected));
+  }
+
+  @Test
+  public void shouldEvalMonthExpression() throws Exception {
+    Value res = query(Month(nowStr)).get();
+    long expected = cal.get(Calendar.MONTH) + 1;
+    assertThat(res.to(LONG).get(), equalTo(expected));
+  }
+
+  @Test
+  public void shouldEvalHourExpression() throws Exception {
+    Value res = query(Hour(Epoch(0, SECOND))).get();
+    assertThat(res.to(LONG).get(), equalTo(0L));
+  }
+
+  @Test
+  public void shouldEvalMinuteExpression() throws Exception {
+    Value res = query(Minute(nowStr)).get();
+    long expected = cal.get(Calendar.MINUTE);
+    assertThat(res.to(LONG).get(), equalTo(expected));
+  }
+
+  @Test
+  public void shouldEvalSecondExpression() throws Exception {
+    Value res = query(Second(nowStr)).get();
+    long expected = cal.get(Calendar.SECOND);
+    assertThat(res.to(LONG).get(), equalTo(expected));
   }
 
   @Test

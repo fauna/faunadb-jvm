@@ -1363,12 +1363,104 @@ package object query {
 
   /**
     * Casts an expression to a time value, if possible.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-functions]]
     */
   def ToTime(term: Expr): Expr =
     Expr(ObjectV("to_time" -> term.value))
 
   /**
+   * Converts a time expression to seconds since the UNIX epoch.
+   *
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-functions]]
+   */ 
+  def ToSeconds(term: Expr): Expr =
+    Expr(ObjectV("to_seconds" -> term.value))
+
+  /**
+   * Converts a time expression to milliseconds since the UNIX epoch.
+   *
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-functions]]
+   */
+  def ToMillis(term: Expr): Expr =
+    Expr(ObjectV("to_millis" -> term.value))
+
+  /**
+   * Converts a time expression to microseconds since the UNIX epoch.
+   *
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-functions]]
+   */ 
+  def ToMicros(term: Expr): Expr =
+    Expr(ObjectV("to_micros" -> term.value))
+
+  /**
+   * Returns a time expression's day of the month, from 1 to 31.
+   *
+   * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-functions]]
+   */ 
+  def DayOfMonth(term: Expr): Expr =
+    Expr(ObjectV("day_of_month" -> term.value))
+
+  /**
+    * Returns a time expression's day of the week following ISO-8601 convention, from 1 (Monday) to 7 (Sunday).
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-functions]]
+    */ 
+  def DayOfWeek(term: Expr): Expr =
+    Expr(ObjectV("day_of_week" -> term.value))
+
+  /**
+    * Returns a time expression's day of the year, from 1 to 365, or 366 in a leap year.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-functions]]
+    */
+  def DayOfYear(term: Expr): Expr =
+    Expr(ObjectV("day_of_year" -> term.value))
+
+  /**
+    * Returns the time expression's year, following the ISO-8601 standard.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-functions]]
+    */ 
+  def Year(term: Expr): Expr =
+    Expr(ObjectV("year" -> term.value))
+
+  /**
+    * Returns a time expression's month of the year, from 1 to 12.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-functions]]
+    */ 
+  def Month(term: Expr): Expr =
+    Expr(ObjectV("month" -> term.value))
+  
+  /**
+    * Returns a time expression's hour of the day, from 0 to 23.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-functions]]
+    */   
+  def Hour(term: Expr): Expr =
+    Expr(ObjectV("hour" -> term.value))
+
+  /**
+    * Returns a time expression's minute of the hour, from 0 to 59.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-functions]]
+    */   
+  def Minute(term: Expr): Expr =
+    Expr(ObjectV("minute" -> term.value))
+
+  /**
+    * Returns a time expression's second of the minute, from 0 to 59.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-functions]]
+    */ 
+  def Second(term: Expr): Expr =
+    Expr(ObjectV("second" -> term.value))
+
+  /**
     * Casts an expression to a data value, if possible.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-functions]]
     */
   def ToDate(term: Expr): Expr =
     Expr(ObjectV("to_date" -> term.value))
