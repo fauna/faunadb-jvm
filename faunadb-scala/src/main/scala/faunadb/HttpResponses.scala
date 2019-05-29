@@ -6,7 +6,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 object QueryError {
   case class ValidationFailure(field: Seq[String], code: String, description: String)
 }
-case class QueryError(position: Seq[String], code: String, description: String, failures: IndexedSeq[QueryError.ValidationFailure])
+
+case class QueryError(position: Seq[String],
+                      code: String,
+                      description: String,
+                      failures: IndexedSeq[QueryError.ValidationFailure],
+                      cause: IndexedSeq[QueryError])
 
 sealed abstract class FaunaResponse
 
