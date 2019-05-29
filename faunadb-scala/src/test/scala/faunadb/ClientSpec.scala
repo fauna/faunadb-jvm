@@ -839,6 +839,25 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(client.query(Call(Function("concat_with_slash"), "a", "b"))).to[String].get shouldBe "a/b"
   }
 
+  it should "parse function errors" in {
+    val err = the[BadRequestException] thrownBy {
+      await(client.query(
+        CreateFunction(Obj(
+          "name" -> "function_with_abort",
+          "body" -> Query(Lambda("_", Abort("this function failed")))
+        ))
+      ))
+      await(client.query(Call(Function("function_with_abort"))))
+    }
+
+    err.getMessage should include(
+      "call error: Calling the function resulted in an error.")
+
+    val cause = err.errors.head.cause.head
+    cause.code shouldEqual "transaction aborted"
+    cause.description shouldEqual "this function failed"
+  }
+
   it should "create a role" in {
     val name = s"a_role_${Random.alphanumeric.take(8).mkString}"
 
