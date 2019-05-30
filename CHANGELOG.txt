@@ -1,3 +1,8 @@
+2.6.2
+* Make last seen transaction time public
+* Make Result::getOrElse lazy
+* Fixed a bug when parsing errors duing UDF calls
+
 2.6.1
 * Fixed a bug that prevented the usage of large keys
 
