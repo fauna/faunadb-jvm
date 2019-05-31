@@ -1,6 +1,6 @@
 val driverVersion = "2.6.3-SNAPSHOT"
 val nettyVersion = "4.1.36.Final"
-val jacksonVersion = "2.8.8"
+val jacksonVersion = "2.8.11"
 val jacksonDocVersion = "2.8"
 val metricsVersion = "4.1.0"
 val scalaDefaultVersion = "2.12.8"
