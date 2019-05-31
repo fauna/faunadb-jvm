@@ -24,13 +24,13 @@ public class HttpResponses {
         JsonNode tree = json.readTree(jsonParser);
 
         if (!tree.has("field")) {
-          throw new JsonParseException("Cannot deserialize ValidationFailure: no 'field' field.", jsonParser.getTokenLocation());
+          throw new JsonParseException(jsonParser, "Cannot deserialize ValidationFailure: no 'field' field.", jsonParser.getTokenLocation());
         }
 
         List<String> field = json.convertValue(tree.get("field"), tf.constructCollectionType(ArrayList.class, String.class));
 
         if (!tree.has("code")) {
-          throw new JsonParseException("Cannot deserialize ValidationFailure: no 'code' field.", jsonParser.getTokenLocation());
+          throw new JsonParseException(jsonParser, "Cannot deserialize ValidationFailure: no 'code' field.", jsonParser.getTokenLocation());
         }
 
         String code = tree.get("code").asText();
@@ -41,7 +41,7 @@ public class HttpResponses {
         } else if (tree.has("reason")) {
           description = tree.get("reason").asText();
         } else {
-          throw new JsonParseException("Cannot deserialize ValidationFailure: no 'description' field.", jsonParser.getTokenLocation());
+          throw new JsonParseException(jsonParser, "Cannot deserialize ValidationFailure: no 'description' field.", jsonParser.getTokenLocation());
         }
 
         return new ValidationFailure(field, code, description);
@@ -64,7 +64,7 @@ public class HttpResponses {
         }
 
         if (!tree.has("code")) {
-          throw new JsonParseException("Cannot deserialize QueryError: no 'code' field.", jsonParser.getTokenLocation());
+          throw new JsonParseException(jsonParser, "Cannot deserialize QueryError: no 'code' field.", jsonParser.getTokenLocation());
         }
 
         String code = tree.get("code").asText();
@@ -73,7 +73,7 @@ public class HttpResponses {
         if (tree.has("description")) {
           description = tree.get("description").asText();
         } else {
-          throw new JsonParseException("Cannot deserialize QueryError: no 'description' field.", jsonParser.getTokenLocation());
+          throw new JsonParseException(jsonParser, "Cannot deserialize QueryError: no 'description' field.", jsonParser.getTokenLocation());
         }
 
         List<ValidationFailure> failures;

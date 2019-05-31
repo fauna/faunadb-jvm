@@ -28,16 +28,16 @@ class Deserializer {
       ObjectMapper json = (ObjectMapper) jsonParser.getCodec();
       JsonNode tree = json.readTree(jsonParser);
 
-      return deserializeTree(tree, json, location);
+      return deserializeTree(jsonParser, tree, json, location);
     }
 
     abstract T deserializeTree(
-      JsonNode tree, ObjectMapper json, JsonLocation loc) throws JsonParseException;
+      JsonParser jsonParser, JsonNode tree, ObjectMapper json, JsonLocation loc) throws JsonParseException;
   }
 
   static class ValueDeserializer extends TreeDeserializer<Value> {
     @Override
-    Value deserializeTree(JsonNode tree, ObjectMapper json, JsonLocation loc)
+    Value deserializeTree(JsonParser jsonParser, JsonNode tree, ObjectMapper json, JsonLocation loc)
       throws JsonParseException {
 
       switch (tree.getNodeType()) {
@@ -56,7 +56,7 @@ class Deserializer {
         case NULL:
           return NullV.NULL;
         default:
-          throw new JsonParseException("Cannot deserialize as a Value", loc);
+          throw new JsonParseException(jsonParser, "Cannot deserialize as a Value", loc);
       }
     }
 
@@ -114,7 +114,7 @@ class Deserializer {
 
   static class ArrayDeserializer extends TreeDeserializer<ArrayV> {
     @Override
-    ArrayV deserializeTree(JsonNode tree, final ObjectMapper json, JsonLocation loc) {
+    ArrayV deserializeTree(JsonParser jsonParser, JsonNode tree, final ObjectMapper json, JsonLocation loc) {
 
       List<Value> values = new ArrayList<>();
 
@@ -129,7 +129,7 @@ class Deserializer {
 
   static class ObjectDeserializer extends TreeDeserializer<ObjectV> {
     @Override
-    ObjectV deserializeTree(final JsonNode tree, final ObjectMapper json, JsonLocation loc) {
+    ObjectV deserializeTree(JsonParser jsonParser, final JsonNode tree, final ObjectMapper json, JsonLocation loc) {
 
       Map<String, Value> values = new LinkedHashMap<>();
 
