@@ -1,10 +1,10 @@
 val driverVersion = "2.6.3-SNAPSHOT"
-val nettyVersion = "4.1.31.Final"
+val nettyVersion = "4.1.36.Final"
 val jacksonVersion = "2.8.8"
 val jacksonDocVersion = "2.8"
-val metricsVersion = "3.1.0"
-val scalaDefaultVersion = "2.12.2"
-val scalaVersions = Seq("2.11.8", scalaDefaultVersion)
+val metricsVersion = "4.1.0"
+val scalaDefaultVersion = "2.12.8"
+val scalaVersions = Seq("2.12.8", scalaDefaultVersion)
 
 val javaDocUrl = "http://docs.oracle.com/javase/7/docs/api/"
 val nettyClientDocUrl = "https://netty.io/4.1/api/index.html"
@@ -87,7 +87,7 @@ lazy val common = project.in(file("faunadb-common"))
       "io.netty" % "netty-codec-http" % nettyVersion,
       "io.netty" % "netty-handler" % nettyVersion,
       "io.dropwizard.metrics" % "metrics-core" % metricsVersion,
-      "org.slf4j" % "slf4j-api" % "1.7.7",
+      "org.slf4j" % "slf4j-api" % "1.7.26",
       "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
       "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion
     )
@@ -105,9 +105,9 @@ lazy val scala = project.in(file("faunadb-scala"))
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
-      "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
+      "ch.qos.logback" % "logback-classic" % "1.2.3" % "test",
       "org.scala-lang.modules" % "scala-java8-compat_2.12" % "0.9.0",
-      "org.scalatest" %% "scalatest" % "3.0.3" % "test"
+      "org.scalatest" %% "scalatest" % "3.0.7" % "test"
     ),
 
     coverageEnabled := true,
@@ -155,9 +155,9 @@ lazy val java = project.in(file("faunadb-java"))
     coverageEnabled := true,
 
     libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
-      "org.yaml" % "snakeyaml" % "1.14" % "test",
+      "ch.qos.logback" % "logback-classic" % "1.2.3" % "test",
+      "org.yaml" % "snakeyaml" % "1.24" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test",
-      "org.hamcrest" % "hamcrest-library" % "1.3" % "test",
+      "org.hamcrest" % "hamcrest-library" % "2.1" % "test",
       "junit" % "junit" % "4.12" % "test"
     ))
