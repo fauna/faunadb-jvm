@@ -4,7 +4,7 @@ val jacksonVersion = "2.8.11"
 val jacksonDocVersion = "2.8"
 val metricsVersion = "4.1.0"
 val scalaDefaultVersion = "2.12.8"
-val scalaVersions = Seq("2.12.8", scalaDefaultVersion)
+val scalaVersions = Seq("2.11.12", scalaDefaultVersion)
 
 val javaDocUrl = "http://docs.oracle.com/javase/7/docs/api/"
 val nettyClientDocUrl = "https://netty.io/4.1/api/index.html"
