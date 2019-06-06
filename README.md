@@ -19,10 +19,10 @@ This repository contains the FaunaDB drivers for the JVM languages. Currently, J
 
 Javadocs and Scaladocs are hosted on GitHub:
 
-* [faunadb-java](http://fauna.github.io/faunadb-jvm/1.2.6/faunadb-java/api/)
-* [faunadb-java-dsl](http://fauna.github.io/faunadb-jvm/1.2.6/faunadb-java-dsl/api/)
-* [faunadb-android](http://fauna.github.io/faunadb-jvm/1.2.6/faunadb-android/api/)
-* [faunadb-scala](http://fauna.github.io/faunadb-jvm/1.2.6/faunadb-scala/api/)
+* [faunadb-java](http://fauna.github.io/faunadb-jvm/1.2.7/faunadb-java/api/)
+* [faunadb-java-dsl](http://fauna.github.io/faunadb-jvm/1.2.7/faunadb-java-dsl/api/)
+* [faunadb-android](http://fauna.github.io/faunadb-jvm/1.2.7/faunadb-android/api/)
+* [faunadb-scala](http://fauna.github.io/faunadb-jvm/1.2.7/faunadb-scala/api/)
 
 ## Dependencies
 
@@ -63,7 +63,7 @@ Download from the Maven central repository:
   <dependency>
     <groupId>com.faunadb</groupId>
     <artifactId>faunadb-java</artifactId>
-    <version>1.2.6</version>
+    <version>1.2.7</version>
     <scope>compile</scope>
   </dependency>
   ...
@@ -78,7 +78,7 @@ Download from the Maven central repository:
   <dependency>
     <groupId>com.faunadb</groupId>
     <artifactId>faunadb-android</artifactId>
-    <version>1.2.6</version>
+    <version>1.2.7</version>
     <scope>compile</scope>
   </dependency>
   ...
@@ -117,7 +117,7 @@ public class Main {
 ##### faunadb-scala/sbt
 
 ```scala
-libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "1.2.6")
+libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "1.2.7")
 ```
 
 ##### Basic Usage
