@@ -8,7 +8,7 @@ This repository contains the FaunaDB drivers for the JVM languages. Currently, J
 
 ### Features
 
-* All drivers fully support the current version of the [FaunaDB API](https://faunadb.com/documentation).
+* All drivers fully support the current version of the [FaunaDB API](https://docs.fauna.com/fauna/current/reference/queryapi/).
 * Java and Scala clients share the same underlying library [faunadb-common](./faunadb-common).
 * Java and Android clients share the same dsl library [faunadb-java-dsl](./faunadb-java-dsl).
 * Supports [Dropwizard Metrics](https://dropwizard.github.io/metrics/3.1.0/) hooks for stats reporting (except Android).
