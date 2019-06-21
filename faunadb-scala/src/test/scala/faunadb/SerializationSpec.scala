@@ -337,6 +337,14 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(not) shouldBe "{\"not\":false}"
   }
 
+  it should "serialize objects functions" in {
+    val merge0 = Merge(Obj("x" -> 10), Obj("y" -> 20))
+    json.writeValueAsString(merge0) shouldBe "{\"merge\":{\"object\":{\"x\":10}},\"with\":{\"object\":{\"y\":20}}}"
+
+    val merge1 = Merge(Obj("x" -> 10), Obj("y" -> 20), Lambda(x => x))
+    json.writeValueAsString(merge1) shouldBe "{\"merge\":{\"object\":{\"x\":10}},\"with\":{\"object\":{\"y\":20}},\"lambda\":{\"lambda\":\"x\",\"expr\":{\"var\":\"x\"}}}"
+  }
+
   it should "print usefully" in {
     ArrayV(1, "test").toString shouldBe "[1, \"test\"]"
     RefV("42", RefV("people", Native.Classes), RefV("db", Native.Databases)).toString shouldBe

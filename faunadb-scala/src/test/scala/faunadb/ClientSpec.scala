@@ -978,6 +978,79 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     index("name").get shouldBe StringV("reservations_by_lastName")
   }
 
+  it should "merge objects" in {
+    //empty object
+    await(client.query(
+      Merge(
+        Obj(),
+        Obj("x" -> 10, "y" -> 20)
+      )
+    )) shouldBe ObjectV("x" -> 10, "y" -> 20)
+
+    //adds field
+    await(client.query(
+      Merge(
+        Obj("x" -> 10, "y" -> 20),
+        Obj("z" -> 30)
+      )
+    )) shouldBe ObjectV("x" -> 10, "y" -> 20, "z" -> 30)
+
+    //replace field
+    await(client.query(
+      Merge(
+        Obj("x" -> 10, "y" -> 20, "z" -> -1),
+        Obj("z" -> 30)
+      )
+    )) shouldBe ObjectV("x" -> 10, "y" -> 20, "z" -> 30)
+
+    //remove field
+    await(client.query(
+      Merge(
+        Obj("x" -> 10, "y" -> 20, "z" -> -1),
+        Obj("z" -> Null())
+      )
+    )) shouldBe ObjectV("x" -> 10, "y" -> 20)
+
+    //merge multiple objects
+    await(client.query(
+      Merge(
+        Obj(),
+        Arr(
+          Obj("x" -> 10),
+          Obj("y" -> 20),
+          Obj("z" -> 30)
+        )
+      )
+    )) shouldBe ObjectV("x" -> 10, "y" -> 20, "z" -> 30)
+
+    //ignore left value
+    await(client.query(
+      Merge(
+        Obj("x" -> 10, "y" -> 20),
+        Obj("x" -> 100, "y" -> 200),
+        Lambda((key, left, right) => right)
+      )
+    )) shouldBe ObjectV("x" -> 100, "y" -> 200)
+
+    //ignore right value
+    await(client.query(
+      Merge(
+        Obj("x" -> 10, "y" -> 20),
+        Obj("x" -> 100, "y" -> 200),
+        Lambda((key, left, right) => left)
+      )
+    )) shouldBe ObjectV("x" -> 10, "y" -> 20)
+
+    //lambda 1-arity -> return [key, leftValue, rightValue]
+    await(client.query(
+      Merge(
+        Obj("x" -> 10, "y" -> 20),
+        Obj("x" -> 100, "y" -> 200),
+        Lambda(value => value)
+      )
+    )) shouldBe ObjectV("x" -> ArrayV("x", 10, 100), "y" -> ArrayV("y", 20, 200))
+  }
+
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
     await(client.query(CreateDatabase(Obj("name" -> name))))
     val key = await(client.query(CreateKey(Obj("database" -> Database(name), "role" -> "admin"))))

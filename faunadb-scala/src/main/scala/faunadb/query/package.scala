@@ -1464,4 +1464,20 @@ package object query {
     */
   def ToDate(term: Expr): Expr =
     Expr(ObjectV("to_date" -> term.value))
+
+  /**
+    * Merge two or more objects into a single one.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#object-functions]]
+    */
+  def Merge(merge: Expr, `with`: Expr): Expr =
+    Expr(ObjectV("merge" -> merge.value, "with" -> `with`.value))
+
+  /**
+    * Merge two or more objects into a single one. A lambda can be specified to resolve conflicts.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#object-functions]]
+    */
+  def Merge(merge: Expr, `with`: Expr, lambda: Expr): Expr =
+    Expr(ObjectV("merge" -> merge.value, "with" -> `with`.value, "lambda" -> lambda.value))
 }
