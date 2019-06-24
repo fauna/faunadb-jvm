@@ -1369,6 +1369,14 @@ public class SerializationSpec {
     assertJson(ToDate(Value("1970-01-01")), "{\"to_date\":\"1970-01-01\"}");
   }
 
+  @Test
+  public void shouldSerializeMerge() throws Exception {
+    assertJson(Merge(Obj("x", Value(10)), Obj("y", Value(20))),
+      "{\"merge\":{\"object\":{\"x\":10}},\"with\":{\"object\":{\"y\":20}}}");
+    assertJson(Merge(Obj("x", Value(10)), Obj("y", Value(20)), Lambda("x", Var("x"))),
+      "{\"merge\":{\"object\":{\"x\":10}},\"with\":{\"object\":{\"y\":20}},\"lambda\":{\"lambda\":\"x\",\"expr\":{\"var\":\"x\"}}}");
+  }
+
   private void assertJson(Expr expr, String jsonString) throws JsonProcessingException {
     assertThat(json.writeValueAsString(expr),
       equalTo(jsonString));

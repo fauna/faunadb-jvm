@@ -8,6 +8,7 @@ import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
 import io.netty.util.ResourceLeakDetector;
+import org.hamcrest.collection.IsMapWithSize;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
@@ -17,7 +18,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.Calendar;
-import java.util.Calendar.*;
 
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
@@ -28,9 +28,11 @@ import static com.faunadb.client.types.Codec.*;
 import static com.faunadb.client.types.Value.NullV.NULL;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
 import static org.junit.Assert.assertThat;
@@ -1889,6 +1891,108 @@ public class ClientSpec {
         .collect(Value.class);
 
     assertThat(collections, hasSize(1));
+  }
+
+  @Test
+  public void shouldTestMerge() throws Exception {
+    //empty object
+    assertThat(
+      query(
+        Merge(
+          Obj(),
+          Obj("x", Value(10), "y", Value(20))
+        )
+      ).get().asMapOf(int.class).get(),
+      allOf(aMapWithSize(2), hasEntry("x", 10), hasEntry("y", 20))
+    );
+
+    //adds field
+    assertThat(
+      query(
+        Merge(
+          Obj("x", Value(10), "y", Value(20)),
+          Obj("z", Value(30))
+        )
+      ).get().asMapOf(int.class).get(),
+      allOf(aMapWithSize(3), hasEntry("x", 10), hasEntry("y", 20), hasEntry("z", 30))
+    );
+
+    //replace field
+    assertThat(
+      query(
+        Merge(
+          Obj("x", Value(10), "y", Value(20), "z", Value(-1)),
+          Obj("z", Value(30))
+        )
+      ).get().asMapOf(int.class).get(),
+      allOf(aMapWithSize(3), hasEntry("x", 10), hasEntry("y", 20), hasEntry("z", 30))
+    );
+
+    //remove field
+    assertThat(
+      query(
+        Merge(
+          Obj("x", Value(10), "y", Value(20), "z", Value(-1)),
+          Obj("z", Null())
+        )
+      ).get().asMapOf(int.class).get(),
+      allOf(aMapWithSize(2), hasEntry("x", 10), hasEntry("y", 20))
+    );
+
+    //merge multiple objects
+    assertThat(
+      query(
+        Merge(
+          Obj(),
+          Arr(
+            Obj("x", Value(10)),
+            Obj("y", Value(20)),
+            Obj("z", Value(30))
+          )
+        )
+      ).get().asMapOf(int.class).get(),
+      allOf(aMapWithSize(3), hasEntry("x", 10), hasEntry("y", 20), hasEntry("z", 30))
+    );
+
+    //ignore left value
+    assertThat(
+      query(
+        Merge(
+          Obj("x", Value(10), "y", Value(20)),
+          Obj("x", Value(100), "y", Value(200)),
+          Lambda(Arr(Value("key"), Value("left"), Value("right")), Var("right"))
+        )
+      ).get().asMapOf(int.class).get(),
+      allOf(aMapWithSize(2), hasEntry("x", 100), hasEntry("y", 200))
+    );
+
+    //ignore right value
+    assertThat(
+      query(
+        Merge(
+          Obj("x", Value(10), "y", Value(20)),
+          Obj("x", Value(100), "y", Value(200)),
+          Lambda(Arr(Value("key"), Value("left"), Value("right")), Var("left"))
+        )
+      ).get().asMapOf(int.class).get(),
+      allOf(aMapWithSize(2), hasEntry("x", 10), hasEntry("y", 20))
+    );
+
+    //lambda 1-arity -> return [key, leftValue, rightValue]
+    assertThat(
+      query(
+        Merge(
+          Obj("x", Value(10), "y", Value(20)),
+          Obj("x", Value(100), "y", Value(200)),
+          Lambda("value", Var("value"))
+        )
+      ).get().asMapOf(ArrayList.class).get(),
+      allOf(
+        aMapWithSize(2),
+        hasEntry("x", Arrays.<Value>asList(new StringV("x"), new LongV(10), new LongV(100))),
+        hasEntry("y", Arrays.<Value>asList(new StringV("y"), new LongV(20), new LongV(200)))
+      )
+    );
   }
 
   private CompletableFuture<Value> query(Expr expr) {

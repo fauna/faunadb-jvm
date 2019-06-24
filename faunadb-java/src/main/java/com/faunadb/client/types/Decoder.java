@@ -118,6 +118,9 @@ public final class Decoder {
     if (dstType.getClass() == MapType.class)
       return toMap(value, (MapType) dstType);
 
+    if (rawType == Object.class)
+      return value;
+
     return Codecs.getDecoder(rawType).decode(value).get();
   }
 

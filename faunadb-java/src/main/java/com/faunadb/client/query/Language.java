@@ -5898,4 +5898,27 @@ public final class Language {
   public static Expr ToDate(Expr value) {
     return Fn.apply("to_date", value);
   }
+
+  /**
+   * Merge two or more objects.
+   *
+   * @param merge the first object. Type: Object
+   * @param with the second object or a list of objects: Type: Object or Array of Objects
+   * @return a new {@link Expr}
+   */
+  public static Expr Merge(Expr merge, Expr with) {
+    return Fn.apply("merge", merge, "with", with);
+  }
+
+  /**
+   * Merge two or more objects.
+   *
+   * @param merge the first object. Type: Object
+   * @param with the second object or a list of objects: Type: Object or Array of Objects
+   * @param lambda a lambda to resolve possible conflicts: Type: A lambda function
+   * @return a new {@link Expr}
+   */
+  public static Expr Merge(Expr merge, Expr with, Expr lambda) {
+    return Fn.apply("merge", merge, "with", with, "lambda", lambda);
+  }
 }
