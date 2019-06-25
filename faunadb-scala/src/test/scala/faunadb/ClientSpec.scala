@@ -484,6 +484,8 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     await(client.query(NGram(Arr("john", "doe")))).to[Seq[String]].get shouldBe Seq("j", "jo", "o", "oh", "h", "hn", "n", "d", "do", "o", "oe", "e")
     await(client.query(NGram(Arr("john", "doe"), 3, 4))).to[Seq[String]].get shouldBe Seq("joh", "john", "ohn", "doe")
+
+    await(client.query(Format("%3$s%1$s %2$s", "DB", "rocks", "Fauna"))).to[String].get shouldBe "FaunaDB rocks"
   }
 
   it should "test math functions" in {

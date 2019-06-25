@@ -294,6 +294,8 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(Casefold("Hen Wen")) shouldBe "{\"casefold\":\"Hen Wen\"}"
     json.writeValueAsString(Casefold("Hen Wen", "NFC")) shouldBe "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFC\"}"
     json.writeValueAsString(Casefold("Hen Wen", Normalizer.NFC)) shouldBe "{\"casefold\":\"Hen Wen\",\"normalizer\":\"NFC\"}"
+
+    json.writeValueAsString(Format("%f %d", 3.14, 10)) shouldBe "{\"format\":\"%f %d\",\"values\":[3.14,10]}"
   }
 
   it should "serialize misc and mathematical functions" in {

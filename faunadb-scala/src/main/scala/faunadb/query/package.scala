@@ -826,6 +826,14 @@ package object query {
   def UpperCase(term: Expr): Expr =
     Expr(ObjectV("uppercase" -> term.value ))
 
+  /**
+    * A Format expression
+    *
+    *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+    */
+  def Format(format: Expr, values: Expr*): Expr =
+    Expr(ObjectV("format" -> format.value, "values" -> varargs(values)))
+
   // Time Functions
 
   /**
