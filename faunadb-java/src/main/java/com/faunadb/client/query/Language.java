@@ -3892,6 +3892,31 @@ public final class Language {
   }
 
   /**
+   * Format values into a string.
+   *
+   * @param format a string with format specifiers
+   * @param values a list of values to format
+   * @return      a string
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see #Value(String)
+   */
+  public static Expr Format(Expr format, Expr ...values) {
+    return Fn.apply("format", format, "values", varargs(Arrays.asList(values)));
+  }
+
+  /**
+   * Format values into a string.
+   *
+   * @param format a string with format specifiers
+   * @param values a list of values to format
+   * @return      a string
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   */
+  public static Expr Format(String format, Expr ...values) {
+    return Format(new StringV(format), values);
+  }
+
+  /**
    * Creates a new timestamp from an ISO-8601 offset date/time string. A special string "now" can be used to get the
    * current transaction time. Multiple references to "now" within the same query will be equal.
    *
