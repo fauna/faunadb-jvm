@@ -1082,6 +1082,14 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldEvalFormatExpression() throws Exception {
+    assertThat(
+      query(Format("%3$s%1$s %2$s", Value("DB"), Value("rocks"), Value("Fauna"))).get().to(String.class).get(),
+      equalTo("FaunaDB rocks")
+    );
+  }
+
+  @Test
   public void shouldEvalContainsExpression() throws Exception {
     Value contains = query(
       Contains(

@@ -934,6 +934,12 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeFormat() throws Exception {
+    assertJson(Format(Value("%f %d"), Value(3.14), Value(10)), "{\"format\":\"%f %d\",\"values\":[3.14,10]}");
+    assertJson(Format("%f %d", Value(3.14), Value(10)), "{\"format\":\"%f %d\",\"values\":[3.14,10]}");
+  }
+
+  @Test
   public void shouldSerializeTime() throws Exception {
     assertJson(
       Time(Value("1970-01-01T00:00:00+00:00")),
