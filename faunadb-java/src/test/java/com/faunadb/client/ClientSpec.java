@@ -17,7 +17,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.Calendar;
-import java.util.Calendar.*;
 
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
@@ -58,7 +57,7 @@ public class ClientSpec {
   private static final Field<Spell> SPELL_FIELD = DATA.to(Spell.class);
   private static final Field<Long> TS_FIELD = Field.at("ts").to(LONG);
   private static final Field<RefV> REF_FIELD = Field.at("ref").to(REF);
-  private static final Field<RefV> INSTANCE_FIELD = Field.at("instance").to(REF);
+  private static final Field<RefV> DOCUMENT_FIELD = Field.at("document").to(REF);
   private static final Field<List<RefV>> REF_LIST = DATA.collect(Field.as(REF));
 
   private static final Field<String> NAME_FIELD = DATA.at(Field.at("name")).to(STRING);
@@ -413,7 +412,7 @@ public class ClientSpec {
           Obj("cooldown", Value(5L))))
     ).get();
 
-    assertThat(insertedEvent.get(INSTANCE_FIELD), equalTo(createdInstance.get(REF_FIELD)));
+    assertThat(insertedEvent.get(DOCUMENT_FIELD), equalTo(createdInstance.get(REF_FIELD)));
 
     Value removedEvent = query(
       Remove(createdInstance.get(REF_FIELD), Value(2L), DELETE)
@@ -426,7 +425,7 @@ public class ClientSpec {
     @FaunaField
     public String action;
     @FaunaField
-    public RefV instance;
+    public RefV document;
   }
 
   @Test
@@ -452,13 +451,13 @@ public class ClientSpec {
     assertThat(events, hasSize(3));
 
     assertThat(events.get(0).action, equalTo("create"));
-    assertThat(events.get(0).instance, equalTo(ref));
+    assertThat(events.get(0).document, equalTo(ref));
 
     assertThat(events.get(1).action, equalTo("update"));
-    assertThat(events.get(1).instance, equalTo(ref));
+    assertThat(events.get(1).document, equalTo(ref));
 
     assertThat(events.get(2).action, equalTo("delete"));
-    assertThat(events.get(2).instance, equalTo(ref));
+    assertThat(events.get(2).document, equalTo(ref));
   }
 
   @Test
@@ -484,10 +483,10 @@ public class ClientSpec {
     assertThat(events, hasSize(2));
 
     assertThat(events.get(0).action, equalTo("add"));
-    assertThat(events.get(0).instance, equalTo(ref));
+    assertThat(events.get(0).document, equalTo(ref));
 
     assertThat(events.get(1).action, equalTo("remove"));
-    assertThat(events.get(1).instance, equalTo(ref));
+    assertThat(events.get(1).document, equalTo(ref));
   }
 
   @Test
@@ -804,7 +803,7 @@ public class ClientSpec {
         .events(true)
     ).get();
 
-    assertThat(events.get(DATA).collect(INSTANCE_FIELD),
+    assertThat(events.get(DATA).collect(DOCUMENT_FIELD),
       contains(magicMissile, faerieFire));
   }
 
@@ -1614,7 +1613,7 @@ public class ClientSpec {
 
     assertThat(
       query(Collection("spells")).get(),
-      equalTo(new RefV("spells", Native.CLASSES))
+      equalTo(new RefV("spells", Native.COLLECTIONS))
     );
 
     assertThat(
@@ -1639,12 +1638,12 @@ public class ClientSpec {
 
     assertThat(
       query(Ref(Collection("spells"), Value("1234567890"))).get(),
-      equalTo(new RefV("1234567890", new RefV("spells", Native.CLASSES)))
+      equalTo(new RefV("1234567890", new RefV("spells", Native.COLLECTIONS)))
     );
 
     assertThat(
       query(Ref(Collection("spells"), "1234567890")).get(),
-      equalTo(new RefV("1234567890", new RefV("spells", Native.CLASSES)))
+      equalTo(new RefV("1234567890", new RefV("spells", Native.COLLECTIONS)))
     );
   }
 
@@ -1652,7 +1651,7 @@ public class ClientSpec {
   public void shouldCreateNestedRefFromString() throws Exception {
     assertThat(
       query(Ref("collections/widget/123")).get(),
-      equalTo(new RefV("123", new RefV("widget", Native.CLASSES)))
+      equalTo(new RefV("123", new RefV("widget", Native.COLLECTIONS)))
     );
   }
 
@@ -1822,7 +1821,7 @@ public class ClientSpec {
 
     assertThat(refs, hasSize(2));
     assertThat(refs, containsInAnyOrder(
-      new RefV("a_collection", Native.CLASSES, childDBRef),
+      new RefV("a_collection", Native.COLLECTIONS, childDBRef),
       new RefV("a_role", Native.ROLES, childDBRef)
     ));
   }

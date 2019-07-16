@@ -59,8 +59,8 @@ public class DeserializationSpec {
 
   @Test
   public void shouldDeserializeRef() throws Exception {
-    assertThat(parsed("{ \"@ref\": {\"id\": \"1\", \"class\": {\"@ref\": {\"id\": \"people\", \"class\": { \"@ref\": {\"id\": \"classes\"} } } } } }").to(REF).get(),
-      equalTo(new RefV("1", new RefV("people", Native.CLASSES))));
+    assertThat(parsed("{ \"@ref\": {\"id\": \"1\", \"collection\": {\"@ref\": {\"id\": \"people\", \"collection\": { \"@ref\": {\"id\": \"collections\"} } } } } }").to(REF).get(),
+      equalTo(new RefV("1", new RefV("people", Native.COLLECTIONS))));
   }
 
   @Test
@@ -95,27 +95,27 @@ public class DeserializationSpec {
   public void shouldDeserializeObject() throws Exception {
     Value parsed = parsed("{" +
       "  \"ref\": {" +
-      "    \"@ref\": { \"id\": \"93044099947429888\", \"class\": { \"@ref\": { \"id\": \"spells\", \"class\": { \"@ref\": { \"id\": \"classes\" } } } } }" +
+      "    \"@ref\": { \"id\": \"93044099947429888\", \"collection\": { \"@ref\": { \"id\": \"spells\", \"collection\": { \"@ref\": { \"id\": \"collections\" } } } } }" +
       "  }," +
-      "  \"class\": {" +
-      "   \"@ref\": { \"id\": \"spells\", \"class\": { \"@ref\": {\"id\": \"classes\"} } }" +
+      "  \"collection\": {" +
+      "   \"@ref\": { \"id\": \"spells\", \"collection\": { \"@ref\": {\"id\": \"collections\"} } }" +
       "  }," +
       "  \"ts\": 1424992618413105," +
       "  \"data\": {" +
       "   \"name\": \"fireball\"," +
       "   \"refField\": {" +
-      "    \"@ref\": { \"id\": \"93044099909681152\", \"class\": { \"@ref\": { \"id\": \"spells\", \"class\": { \"@ref\": { \"id\": \"classes\" } } } } }" +
+      "    \"@ref\": { \"id\": \"93044099909681152\", \"collection\": { \"@ref\": { \"id\": \"spells\", \"collection\": { \"@ref\": { \"id\": \"collections\" } } } } }" +
       "   }," +
       "   \"elements\": [\"fire\", \"air\"]" +
       "  }" +
       " }"
     );
 
-    assertThat(parsed.at("ref").to(REF).get(), equalTo(new RefV("93044099947429888", new RefV("spells", Native.CLASSES))));
-    assertThat(parsed.at("class").to(REF).get(), equalTo(new RefV("spells", Native.CLASSES)));
+    assertThat(parsed.at("ref").to(REF).get(), equalTo(new RefV("93044099947429888", new RefV("spells", Native.COLLECTIONS))));
+    assertThat(parsed.at("collection").to(REF).get(), equalTo(new RefV("spells", Native.COLLECTIONS)));
     assertThat(parsed.at("ts").to(LONG).get(), equalTo(1424992618413105L));
     assertThat(parsed.at("data", "name").to(STRING).get(), equalTo("fireball"));
-    assertThat(parsed.at("data", "refField").to(REF).get(), equalTo(new RefV("93044099909681152", new RefV("spells", Native.CLASSES))));
+    assertThat(parsed.at("data", "refField").to(REF).get(), equalTo(new RefV("93044099909681152", new RefV("spells", Native.COLLECTIONS))));
     assertThat(parsed.at("data", "elements").at(0).to(STRING).get(), equalTo("fire"));
     assertThat(parsed.at("data", "elements").at(1).to(STRING).get(), equalTo("air"));
   }
@@ -147,7 +147,7 @@ public class DeserializationSpec {
     Value parsed = parsed(
       "{" +
         "  \"@set\": {" +
-        "    \"match\": { \"@ref\": {\"id\": \"spells_by_element\", \"class\": { \"@ref\": {\"id\": \"indexes\"} } } }," +
+        "    \"match\": { \"@ref\": {\"id\": \"spells_by_element\", \"collection\": { \"@ref\": {\"id\": \"indexes\"} } } }," +
         "    \"terms\": \"fire\"" +
         "  }" +
         "}"

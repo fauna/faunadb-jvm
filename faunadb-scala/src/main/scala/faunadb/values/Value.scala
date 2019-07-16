@@ -136,14 +136,18 @@ object BooleanV {
 
 /** A Ref. */
 case class RefV(@(JsonIgnore @getter) id: String,
-                @(JsonIgnore @getter) clazz: Option[RefV] = None,
+                @(JsonIgnore @getter) collection: Option[RefV] = None,
                 @(JsonIgnore @getter) database: Option[RefV] = None) extends ScalarValue("Ref") {
 
+  @JsonIgnore
+  @deprecated("use collection instead")
+  val clazz: Option[RefV] = collection
+
   @JsonProperty("@ref")
-  lazy val refValue: Any = RefID(id, clazz, database)
+  lazy val refValue: Any = RefID(id, collection, database)
 
   override def toString = {
-    val cls = clazz map { ", class = " + _ } getOrElse ""
+    val cls = collection map { ", collection = " + _ } getOrElse ""
     val db = database map { ", database = " + _ } getOrElse ""
     s"""ref(id = "$id"$cls$db)"""
   }
@@ -151,7 +155,7 @@ case class RefV(@(JsonIgnore @getter) id: String,
   @JsonInclude(JsonInclude.Include.NON_ABSENT)
   private case class RefID(
      @(JsonProperty @getter)("id") id: String,
-     @(JsonProperty @getter)("class") clazz: Option[RefV],
+     @(JsonProperty @getter)("collection") collection: Option[RefV],
      @(JsonProperty @getter)("database") database: Option[RefV])
 }
 
@@ -161,12 +165,22 @@ object RefV {
 }
 
 object Native {
-  val Classes: RefV = RefV("classes", None, None)
+  val Collections: RefV = RefV("collections", None, None)
   val Indexes: RefV = RefV("indexes", None, None)
   val Databases: RefV = RefV("databases", None, None)
   val Functions: RefV = RefV("functions", None, None)
   val Keys: RefV = RefV("keys", None, None)
   val Roles: RefV = RefV("roles", None, None)
+
+  def fromName(id: String) = id match {
+    case "collections" => Collections
+    case "indexes"     => Indexes
+    case "databases"   => Databases
+    case "functions"   => Functions
+    case "keys"        => Keys
+    case "roles"       => Roles
+    case _             => RefV(id, None, None)
+  }
 }
 
 /** A Set Ref. */

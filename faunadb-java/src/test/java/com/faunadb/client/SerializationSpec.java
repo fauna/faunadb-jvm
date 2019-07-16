@@ -128,8 +128,8 @@ public class SerializationSpec {
 
   @Test
   public void shouldSerializeRef() throws Exception {
-    assertJson(Native.CLASSES, "{\"@ref\":{\"id\":\"classes\"}}");
-    assertJson(new RefV("id1", new RefV("people", Native.CLASSES)), "{\"@ref\":{\"id\":\"id1\",\"class\":{\"@ref\":{\"id\":\"people\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}");
+    assertJson(Native.COLLECTIONS, "{\"@ref\":{\"id\":\"collections\"}}");
+    assertJson(new RefV("id1", new RefV("people", Native.COLLECTIONS)), "{\"@ref\":{\"id\":\"id1\",\"collection\":{\"@ref\":{\"id\":\"people\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}}");
   }
 
   @Test
@@ -406,18 +406,18 @@ public class SerializationSpec {
   @Test
   public void shouldSerializeGet() throws Exception {
     assertJson(
-      Get(new RefV("104979509692858368", new RefV("spells", Native.CLASSES))),
-      "{\"get\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}}"
+      Get(new RefV("104979509692858368", new RefV("spells", Native.COLLECTIONS))),
+      "{\"get\":{\"@ref\":{\"id\":\"104979509692858368\",\"collection\":{\"@ref\":{\"id\":\"spells\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}}}"
     );
 
     assertJson(
-      Get(new RefV("104979509692858368", new RefV("spells", Native.CLASSES)), Value(Instant.ofEpochMilli(0))),
-      "{\"get\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}}"
+      Get(new RefV("104979509692858368", new RefV("spells", Native.COLLECTIONS)), Value(Instant.ofEpochMilli(0))),
+      "{\"get\":{\"@ref\":{\"id\":\"104979509692858368\",\"collection\":{\"@ref\":{\"id\":\"spells\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}}"
     );
 
     assertJson(
-      Get(new RefV("104979509692858368", new RefV("spells", Native.CLASSES)), Instant.ofEpochMilli(0)),
-      "{\"get\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}}"
+      Get(new RefV("104979509692858368", new RefV("spells", Native.COLLECTIONS)), Instant.ofEpochMilli(0)),
+      "{\"get\":{\"@ref\":{\"id\":\"104979509692858368\",\"collection\":{\"@ref\":{\"id\":\"spells\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}}"
     );
   }
 
@@ -441,7 +441,7 @@ public class SerializationSpec {
         .sources(true)
         .ts(10L)
         .size(2),
-      "{\"paginate\":{\"@ref\":{\"id\":\"databases\"}},\"after\":{\"@ref\":{\"id\":\"test\",\"class\":{\"@ref\":{\"id\":\"databases\"}}}}," +
+      "{\"paginate\":{\"@ref\":{\"id\":\"databases\"}},\"after\":{\"@ref\":{\"id\":\"test\",\"collection\":{\"@ref\":{\"id\":\"databases\"}}}}," +
         "\"events\":true,\"sources\":true,\"ts\":10,\"size\":2}"
     );
 
@@ -452,7 +452,7 @@ public class SerializationSpec {
         .sources(Value(true))
         .ts(Value(10L))
         .size(Value(2)),
-      "{\"paginate\":{\"@ref\":{\"id\":\"databases\"}},\"after\":{\"@ref\":{\"id\":\"test\",\"class\":{\"@ref\":{\"id\":\"databases\"}}}}," +
+      "{\"paginate\":{\"@ref\":{\"id\":\"databases\"}},\"after\":{\"@ref\":{\"id\":\"test\",\"collection\":{\"@ref\":{\"id\":\"databases\"}}}}," +
         "\"events\":true,\"sources\":true,\"ts\":10,\"size\":2}"
     );
 
@@ -463,7 +463,7 @@ public class SerializationSpec {
         .sources(false)
         .ts(10L)
         .size(2),
-      "{\"paginate\":{\"@ref\":{\"id\":\"databases\"}},\"before\":{\"@ref\":{\"id\":\"test\",\"class\":{\"@ref\":{\"id\":\"databases\"}}}}," +
+      "{\"paginate\":{\"@ref\":{\"id\":\"databases\"}},\"before\":{\"@ref\":{\"id\":\"test\",\"collection\":{\"@ref\":{\"id\":\"databases\"}}}}," +
         "\"ts\":10,\"size\":2}"
     );
   }
@@ -471,13 +471,13 @@ public class SerializationSpec {
   @Test
   public void shouldSerializeExists() throws Exception {
     assertJson(
-      Exists(new RefV("104979509692858368", new RefV("spells", Native.CLASSES))),
-      "{\"exists\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}}"
+      Exists(new RefV("104979509692858368", new RefV("spells", Native.COLLECTIONS))),
+      "{\"exists\":{\"@ref\":{\"id\":\"104979509692858368\",\"collection\":{\"@ref\":{\"id\":\"spells\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}}}"
     );
 
     assertJson(
-      Exists(new RefV("104979509692858368", new RefV("spells", Native.CLASSES)), Value(Instant.ofEpochMilli(0))),
-      "{\"exists\":{\"@ref\":{\"id\":\"104979509692858368\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}}"
+      Exists(new RefV("104979509692858368", new RefV("spells", Native.COLLECTIONS)), Value(Instant.ofEpochMilli(0))),
+      "{\"exists\":{\"@ref\":{\"id\":\"104979509692858368\",\"collection\":{\"@ref\":{\"id\":\"spells\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}}"
     );
   }
 
@@ -497,7 +497,7 @@ public class SerializationSpec {
       Update(
         new RefV("annuvin", Native.DATABASES),
         Obj("name", Value("llyr"))
-      ), "{\"update\":{\"@ref\":{\"id\":\"annuvin\",\"class\":{\"@ref\":{\"id\":\"databases\"}}}},\"params\":{\"object\":{\"name\":\"llyr\"}}}");
+      ), "{\"update\":{\"@ref\":{\"id\":\"annuvin\",\"collection\":{\"@ref\":{\"id\":\"databases\"}}}},\"params\":{\"object\":{\"name\":\"llyr\"}}}");
 
   }
 
@@ -505,18 +505,18 @@ public class SerializationSpec {
   public void shouldSerializeReplace() throws Exception {
     assertJson(
       Replace(
-        new RefV("104979509696660483", new RefV("spells", Native.CLASSES)),
+        new RefV("104979509696660483", new RefV("spells", Native.COLLECTIONS)),
         Obj("data",
           Obj("name", Value("Mountain's Thunder")))
-      ), "{\"replace\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}," +
+      ), "{\"replace\":{\"@ref\":{\"id\":\"104979509696660483\",\"collection\":{\"@ref\":{\"id\":\"spells\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}}," +
         "\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Mountain's Thunder\"}}}}}");
   }
 
   @Test
   public void shouldSerializeDelete() throws Exception {
     assertJson(
-      Delete(new RefV("104979509696660483", new RefV("spells", Native.CLASSES))),
-      "{\"delete\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}}"
+      Delete(new RefV("104979509696660483", new RefV("spells", Native.COLLECTIONS))),
+      "{\"delete\":{\"@ref\":{\"id\":\"104979509696660483\",\"collection\":{\"@ref\":{\"id\":\"spells\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}}}"
     );
   }
 
@@ -524,23 +524,23 @@ public class SerializationSpec {
   public void shouldSerializeInsert() throws Exception {
     assertJson(
       Insert(
-        new RefV("104979509696660483", new RefV("spells", Native.CLASSES)),
+        new RefV("104979509696660483", new RefV("spells", Native.COLLECTIONS)),
         Value(Instant.ofEpochMilli(0)),
         Action.CREATE,
         Obj("data", Obj("name", Value("test")))
       ),
-      "{\"insert\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}," +
+      "{\"insert\":{\"@ref\":{\"id\":\"104979509696660483\",\"collection\":{\"@ref\":{\"id\":\"spells\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}," +
         "\"action\":\"create\",\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"test\"}}}}}"
     );
 
     assertJson(
       Insert(
-        new RefV("104979509696660483", new RefV("spells", Native.CLASSES)),
+        new RefV("104979509696660483", new RefV("spells", Native.COLLECTIONS)),
         Value(Instant.ofEpochMilli(0)),
         Value("create"),
         Obj("data", Obj("name", Value("test")))
       ),
-      "{\"insert\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}," +
+      "{\"insert\":{\"@ref\":{\"id\":\"104979509696660483\",\"collection\":{\"@ref\":{\"id\":\"spells\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}},\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"}," +
         "\"action\":\"create\",\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"test\"}}}}}"
     );
   }
@@ -549,21 +549,21 @@ public class SerializationSpec {
   public void shouldSerializeRemove() throws Exception {
     assertJson(
       Remove(
-        new RefV("104979509696660483", new RefV("spells", Native.CLASSES)),
+        new RefV("104979509696660483", new RefV("spells", Native.COLLECTIONS)),
         Value(Instant.ofEpochMilli(0)),
         Action.DELETE
       ),
-      "{\"remove\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}," +
+      "{\"remove\":{\"@ref\":{\"id\":\"104979509696660483\",\"collection\":{\"@ref\":{\"id\":\"spells\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}}," +
         "\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"},\"action\":\"delete\"}"
     );
 
     assertJson(
       Remove(
-        new RefV("104979509696660483", new RefV("spells", Native.CLASSES)),
+        new RefV("104979509696660483", new RefV("spells", Native.COLLECTIONS)),
         Value(Instant.ofEpochMilli(0)),
         Value("delete")
       ),
-      "{\"remove\":{\"@ref\":{\"id\":\"104979509696660483\",\"class\":{\"@ref\":{\"id\":\"spells\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}," +
+      "{\"remove\":{\"@ref\":{\"id\":\"104979509696660483\",\"collection\":{\"@ref\":{\"id\":\"spells\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}}," +
         "\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"},\"action\":\"delete\"}"
     );
   }
@@ -604,9 +604,9 @@ public class SerializationSpec {
     assertJson(
       CreateIndex(Obj(
         "name", Value("all_spells"),
-        "source", Class(Value("spells"))
+        "source", Collection("spells")
       )),
-      "{\"create_index\":{\"object\":{\"name\":\"all_spells\",\"source\":{\"class\":\"spells\"}}}}"
+      "{\"create_index\":{\"object\":{\"name\":\"all_spells\",\"source\":{\"collection\":\"spells\"}}}}"
     );
   }
 
@@ -657,12 +657,12 @@ public class SerializationSpec {
   public void shouldSerializeMatchFunction() throws Exception {
     assertJson(
       Match(new RefV("all_users", Native.INDEXES)),
-      "{\"match\":{\"@ref\":{\"id\":\"all_users\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}"
+      "{\"match\":{\"@ref\":{\"id\":\"all_users\",\"collection\":{\"@ref\":{\"id\":\"indexes\"}}}}}"
     );
 
     assertJson(
       Match(new RefV("spells_by_element", Native.INDEXES), Value("fire")),
-      "{\"match\":{\"@ref\":{\"id\":\"spells_by_element\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}},\"terms\":\"fire\"}"
+      "{\"match\":{\"@ref\":{\"id\":\"spells_by_element\",\"collection\":{\"@ref\":{\"id\":\"indexes\"}}}},\"terms\":\"fire\"}"
     );
   }
 
@@ -724,7 +724,7 @@ public class SerializationSpec {
   public void shouldSerializeDistinct() throws Exception {
     assertJson(
       Distinct(Match(new RefV("some_set", Native.INDEXES))),
-      "{\"distinct\":{\"match\":{\"@ref\":{\"id\":\"some_set\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}}"
+      "{\"distinct\":{\"match\":{\"@ref\":{\"id\":\"some_set\",\"collection\":{\"@ref\":{\"id\":\"indexes\"}}}}}}"
     );
   }
 
@@ -732,12 +732,12 @@ public class SerializationSpec {
   public void shouldSerializeJoin() throws Exception {
     assertJson(
       Join(
-        Match(new RefV("spellbooks_by_owner", Native.INDEXES), new RefV("104979509695139637", new RefV("characters", Native.CLASSES))),
+        Match(new RefV("spellbooks_by_owner", Native.INDEXES), new RefV("104979509695139637", new RefV("characters", Native.COLLECTIONS))),
         new RefV("spells_by_spellbook", Native.INDEXES)
       ),
-      "{\"join\":{\"match\":{\"@ref\":{\"id\":\"spellbooks_by_owner\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}," +
-        "\"terms\":{\"@ref\":{\"id\":\"104979509695139637\",\"class\":{\"@ref\":{\"id\":\"characters\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}}," +
-        "\"with\":{\"@ref\":{\"id\":\"spells_by_spellbook\",\"class\":{\"@ref\":{\"id\":\"indexes\"}}}}}"
+      "{\"join\":{\"match\":{\"@ref\":{\"id\":\"spellbooks_by_owner\",\"collection\":{\"@ref\":{\"id\":\"indexes\"}}}}," +
+        "\"terms\":{\"@ref\":{\"id\":\"104979509695139637\",\"collection\":{\"@ref\":{\"id\":\"characters\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}}}," +
+        "\"with\":{\"@ref\":{\"id\":\"spells_by_spellbook\",\"collection\":{\"@ref\":{\"id\":\"indexes\"}}}}}"
     );
   }
 
@@ -745,10 +745,10 @@ public class SerializationSpec {
   public void shouldSerializeLogin() throws Exception {
     assertJson(
       Login(
-        new RefV("104979509695139637", new RefV("characters", Native.CLASSES)),
+        new RefV("104979509695139637", new RefV("characters", Native.COLLECTIONS)),
         Obj("password", Value("abracadabra"))
       ),
-      "{\"login\":{\"@ref\":{\"id\":\"104979509695139637\",\"class\":{\"@ref\":{\"id\":\"characters\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}}," +
+      "{\"login\":{\"@ref\":{\"id\":\"104979509695139637\",\"collection\":{\"@ref\":{\"id\":\"characters\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}}," +
         "\"params\":{\"object\":{\"password\":\"abracadabra\"}}}"
     );
   }
@@ -762,13 +762,13 @@ public class SerializationSpec {
   @Test
   public void shouldSerializeIdentify() throws Exception {
     assertJson(
-      Identify(new RefV("104979509695139637", new RefV("characters", Native.CLASSES)), Value("abracadabra")),
-      "{\"identify\":{\"@ref\":{\"id\":\"104979509695139637\",\"class\":{\"@ref\":{\"id\":\"characters\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"password\":\"abracadabra\"}"
+      Identify(new RefV("104979509695139637", new RefV("characters", Native.COLLECTIONS)), Value("abracadabra")),
+      "{\"identify\":{\"@ref\":{\"id\":\"104979509695139637\",\"collection\":{\"@ref\":{\"id\":\"characters\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}},\"password\":\"abracadabra\"}"
     );
 
     assertJson(
-      Identify(new RefV("104979509695139637", new RefV("characters", Native.CLASSES)), "abracadabra"),
-      "{\"identify\":{\"@ref\":{\"id\":\"104979509695139637\",\"class\":{\"@ref\":{\"id\":\"characters\",\"class\":{\"@ref\":{\"id\":\"classes\"}}}}}},\"password\":\"abracadabra\"}"
+      Identify(new RefV("104979509695139637", new RefV("characters", Native.COLLECTIONS)), "abracadabra"),
+      "{\"identify\":{\"@ref\":{\"id\":\"104979509695139637\",\"collection\":{\"@ref\":{\"id\":\"characters\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}},\"password\":\"abracadabra\"}"
     );
   }
 
@@ -1342,11 +1342,11 @@ public class SerializationSpec {
 
   @Test
   public void shouldSerializeAt() throws Exception {
-    assertJson(At(Value(1L), Get(Native.CLASSES)), "{\"at\":1,\"expr\":{\"get\":{\"@ref\":{\"id\":\"classes\"}}}}");
-    assertJson(At(Time(Value("1970-01-01T00:00:00+00:00")), Get(Native.CLASSES)),
-      "{\"at\":{\"time\":\"1970-01-01T00:00:00+00:00\"},\"expr\":{\"get\":{\"@ref\":{\"id\":\"classes\"}}}}");
-    assertJson(At(Instant.ofEpochMilli(0), Get(Native.CLASSES)),
-      "{\"at\":{\"@ts\":\"1970-01-01T00:00:00Z\"},\"expr\":{\"get\":{\"@ref\":{\"id\":\"classes\"}}}}");
+    assertJson(At(Value(1L), Get(Native.COLLECTIONS)), "{\"at\":1,\"expr\":{\"get\":{\"@ref\":{\"id\":\"collections\"}}}}");
+    assertJson(At(Time(Value("1970-01-01T00:00:00+00:00")), Get(Native.COLLECTIONS)),
+      "{\"at\":{\"time\":\"1970-01-01T00:00:00+00:00\"},\"expr\":{\"get\":{\"@ref\":{\"id\":\"collections\"}}}}");
+    assertJson(At(Instant.ofEpochMilli(0), Get(Native.COLLECTIONS)),
+      "{\"at\":{\"@ts\":\"1970-01-01T00:00:00Z\"},\"expr\":{\"get\":{\"@ref\":{\"id\":\"collections\"}}}}");
   }
 
   @Test
@@ -1392,10 +1392,10 @@ public class SerializationSpec {
     assertThat(new DateV(LocalDate.ofEpochDay(0)).toString(), equalTo("1970-01-01"));
     assertThat(new BytesV("DEADBEEF").toString(), equalTo("[0x0c 0x40 0x03 0x04 0x41 0x05]"));
     assertThat(new SetRefV(k1).toString(), equalTo("{@set = {k1: \"v1\"}}"));
-    assertThat(Native.CLASSES.toString(), equalTo("ref(id = \"classes\")"));
+    assertThat(Native.COLLECTIONS.toString(), equalTo("ref(id = \"collections\")"));
     assertThat(new RefV("42",
-                        new RefV("people", Native.CLASSES),
+                        new RefV("people", Native.COLLECTIONS),
                         new RefV("db", Native.DATABASES)).toString(),
-               equalTo("ref(id = \"42\", class = ref(id = \"people\", class = ref(id = \"classes\")), database = ref(id = \"db\", class = ref(id = \"databases\")))"));
+               equalTo("ref(id = \"42\", collection = ref(id = \"people\", collection = ref(id = \"collections\")), database = ref(id = \"db\", collection = ref(id = \"databases\")))"));
   }
 }

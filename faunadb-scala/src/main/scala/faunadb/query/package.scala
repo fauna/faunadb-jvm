@@ -114,7 +114,7 @@ package object query {
   /**
     * Creates a RefV value. The string "collections/widget/123" will be equivalent to:
     * {{{
-    * RefV("123", RefV("widget", Native.Classes))
+    * RefV("123", RefV("widget", Native.Collections))
     * }}}
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#simple-type]]
@@ -126,6 +126,7 @@ package object query {
     Expr(ObjectV("ref" -> collectionRef.value, "id" -> id.value))
 
   /** Native reference to all classes */
+  @deprecated("use Collections instead")
   def Classes(scope: Expr = NullV): Expr =
     Expr(ObjectV("classes" -> scope.value))
   
@@ -892,7 +893,7 @@ package object query {
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
-  @deprecated("use Collection instead")  
+  @deprecated("use Collection instead")
   def Class(name: Expr): Expr =
     Expr(ObjectV("class" -> name.value))
 
@@ -901,6 +902,7 @@ package object query {
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
+  @deprecated("use Collection instead")
   def Class(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("class" -> name.value, "scope" -> scope.value))
   

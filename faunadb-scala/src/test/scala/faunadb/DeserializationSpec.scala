@@ -12,49 +12,49 @@ class DeserializationSpec extends FlatSpec with Matchers {
 
   "Query AST deserialization" should "deserialize a query response with refs" in {
     val toDeserialize = """{
-      "ref":{"@ref":{"id":"93044099947429888","class":{"@ref":{"id":"spells","class":{"@ref":{"id":"classes"}}}}}},
-      "class":{"@ref":{"id":"spells","class":{"@ref":{"id":"classes"}}}},
+      "ref":{"@ref":{"id":"93044099947429888","collection":{"@ref":{"id":"spells","collection":{"@ref":{"id":"collections"}}}}}},
+      "collection":{"@ref":{"id":"spells","collection":{"@ref":{"id":"collections"}}}},
       "ts":1424992618413105,
-      "data":{"refField":{"@ref":{"id":"93044099909681152","class":{"@ref":{"id":"spells","class":{"@ref":{"id":"classes"}}}}}}}
+      "data":{"refField":{"@ref":{"id":"93044099909681152","collection":{"@ref":{"id":"spells","collection":{"@ref":{"id":"collections"}}}}}}}
     }"""
 
     val parsed = json.readValue[Value](toDeserialize, classOf[Value])
 
     parsed should equal (ObjectV(
-      "ref" -> RefV("93044099947429888", RefV("spells", Native.Classes)),
-      "class" -> RefV("spells", Native.Classes),
+      "ref" -> RefV("93044099947429888", RefV("spells", Native.Collections)),
+      "collection" -> RefV("spells", Native.Collections),
       "ts" -> LongV(1424992618413105L),
-      "data" -> ObjectV("refField" -> RefV("93044099909681152", RefV("spells", Native.Classes)))))
+      "data" -> ObjectV("refField" -> RefV("93044099909681152", RefV("spells", Native.Collections)))))
   }
 
   it should "deserialize a query response" in {
     val toDeserialize = """{
-      "class":{"@ref":{"id":"derp","class":{"@ref":{"id":"classes"}}}},
+      "collection":{"@ref":{"id":"derp","collection":{"@ref":{"id":"collections"}}}},
       "data":{"test":1},
-      "ref":{"@ref":{"id":"101192216816386048","class":{"@ref":{"id":"derp","class":{"@ref":{"id":"classes"}}}}}},
+      "ref":{"@ref":{"id":"101192216816386048","collection":{"@ref":{"id":"derp","collection":{"@ref":{"id":"collections"}}}}}},
       "ts":1432763268186882
     }"""
     val parsed = json.readValue(toDeserialize, classOf[Value])
 
     parsed should equal (ObjectV(
-      "ref" -> RefV("101192216816386048", RefV("derp", Native.Classes)),
-      "class" -> RefV("derp", Native.Classes),
+      "ref" -> RefV("101192216816386048", RefV("derp", Native.Collections)),
+      "collection" -> RefV("derp", Native.Collections),
       "ts" -> LongV(1432763268186882L),
       "data" -> ObjectV("test" -> LongV(1))))
   }
 
   it should "deserialize a query response with a literal object" in {
     val toDeserialize = """{
-      "class":{"@ref":{"id":"derp","class":{"@ref":{"id":"classes"}}}},
+      "collection":{"@ref":{"id":"derp","collection":{"@ref":{"id":"collections"}}}},
       "data":{"test":{"field1":{"@obj":{"@name":"Test"}}}},
-      "ref":{"@ref":{"id":"101727203651223552","class":{"@ref":{"id":"derp","class":{"@ref":{"id":"classes"}}}}}},
+      "ref":{"@ref":{"id":"101727203651223552","collection":{"@ref":{"id":"derp","collection":{"@ref":{"id":"collections"}}}}}},
       "ts":1433273471399755
     }"""
     val parsed = json.readValue(toDeserialize, classOf[Value])
 
     parsed should equal (ObjectV(
-      "ref" -> RefV("101727203651223552", RefV("derp", Native.Classes)),
-      "class" -> RefV("derp", Native.Classes),
+      "ref" -> RefV("101727203651223552", RefV("derp", Native.Collections)),
+      "collection" -> RefV("derp", Native.Collections),
       "ts" -> LongV(1433273471399755L),
       "data" -> ObjectV("test" -> ObjectV("field1" -> ObjectV("@name" -> StringV("Test"))))))
   }
@@ -64,7 +64,7 @@ class DeserializationSpec extends FlatSpec with Matchers {
       val toDeserialize = """{
         "@ref":{
           "id": "1234567890",
-          "class": "it was expected another ref here"
+          "collection": "it was expected another ref here"
         }
       }"""
 

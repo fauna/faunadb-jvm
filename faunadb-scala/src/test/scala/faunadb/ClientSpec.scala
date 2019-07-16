@@ -34,7 +34,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   val RefField = Field("ref").to[RefV]
   val TsField = Field("ts").to[Long]
-  val CollectionField = Field("class").to[RefV]
   val SecretField = Field("secret").to[String]
   val DataField = Field("data")
 
@@ -42,7 +41,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   case class Ev(ref: RefV, ts: Long, action: String)
 
   val EventField = Field.zip(
-    Field("instance").to[RefV],
+    Field("document").to[RefV],
     Field("ts").to[Long],
     Field("action").to[String]
   ) map { case (r, ts, a) => Ev(r, ts, a) }
@@ -83,7 +82,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   "Fauna Client" should "should not find an instance" in {
-    a[NotFoundException] should be thrownBy await(client.query(Get(RefV("1234", RefV("spells", Native.Classes)))))
+    a[NotFoundException] should be thrownBy await(client.query(Get(RefV("1234", RefV("spells", Native.Collections)))))
   }
 
   it should "abort the execution" in {
@@ -104,7 +103,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   it should "fail with unauthorized" in {
     val badClient = FaunaClient(endpoint = config("root_url"), secret = "notavalidsecret")
-    an[UnauthorizedException] should be thrownBy await(badClient.query(Get(RefV("12345", RefV("spells", Native.Classes)))))
+    an[UnauthorizedException] should be thrownBy await(badClient.query(Get(RefV("12345", RefV("spells", Native.Collections)))))
   }
 
   it should "create a new instance" in {
@@ -112,7 +111,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       Create(Collection("spells"),
         Obj("data" -> Obj("testField" -> "testValue")))))
 
-    inst(RefField).get.clazz should equal (Some(RefV("spells", Native.Classes)))
+    inst(RefField).get.collection should equal (Some(RefV("spells", Native.Collections)))
     inst(RefField).get.database should be (None)
     inst("data", "testField").to[String].get should equal ("testValue")
 
@@ -271,7 +270,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     ifR.to[String].get shouldBe "was true"
 
     val randomNum = Math.abs(Random.nextLong() % 250000L) + 250000L
-    val randomRef = RefV(randomNum.toString, RefV("spells", Native.Classes))
+    val randomRef = RefV(randomNum.toString, RefV("spells", Native.Collections))
     val doF = client.query(Do(
       Create(randomRef, Obj("data" -> Obj("name" -> "Magic Missile"))),
       Get(randomRef)
@@ -329,7 +328,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "test resource modification" in {
     val createF = client.query(Create(Collection("spells"), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L))))
     val createR = await(createF)
-    createR(RefField).get.clazz shouldBe Some(RefV("spells", Native.Classes))
+    createR(RefField).get.collection shouldBe Some(RefV("spells", Native.Collections))
     createR(RefField).get.database shouldBe None
     createR("data", "name").to[String].get shouldBe "Magic Missile"
     createR("data", "element").to[String].get shouldBe "arcane"
@@ -351,7 +350,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val insertF = client.query(Insert(createR("ref"), 1L, Action.Create, Obj("data" -> Obj("cooldown" -> 5L))))
     val insertR = await(insertF)
-    insertR("instance").get shouldBe createR("ref").get
+    insertR("document").get shouldBe createR("ref").get
 
     val removeF = client.query(Remove(createR("ref"), 2L, Action.Delete))
     val removeR = await(removeF)
@@ -426,32 +425,32 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(client.query(Update(dataRef, Obj("data" -> Obj("x" -> 2)))))
     await(client.query(Delete(dataRef)))
 
-    case class Event(action: String, instance: RefV)
+    case class Event(action: String, document: RefV)
 
-    implicit val eventCodec = Codec.caseClass[Event]
+    implicit val eventCodec = Codec.Record[Event]
 
     // Events
     val events = await(client.query(Paginate(Events(dataRef))))(DataField.to[List[Event]]).get
 
     events.length shouldBe 3
     events(0).action shouldBe "create"
-    events(0).instance shouldBe dataRef
+    events(0).document shouldBe dataRef
 
     events(1).action shouldBe "update"
-    events(1).instance shouldBe dataRef
+    events(1).document shouldBe dataRef
 
     events(2).action shouldBe "delete"
-    events(2).instance shouldBe dataRef
+    events(2).document shouldBe dataRef
 
     // Singleton
     val singletons = await(client.query(Paginate(Events(Singleton(dataRef)))))(DataField.to[List[Event]]).get
 
     singletons.length shouldBe 2
     singletons(0).action shouldBe "add"
-    singletons(0).instance shouldBe dataRef
+    singletons(0).document shouldBe dataRef
 
     singletons(1).action shouldBe "remove"
-    singletons(1).instance shouldBe dataRef
+    singletons(1).document shouldBe dataRef
   }
 
   it should "test string functions" in {
@@ -924,7 +923,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(client.query(Exists(Collection("a_collection", nestedDatabase)))).to[Boolean].get shouldBe true
 
     val allCollections = await(client.query(Paginate(Collections(nestedDatabase))))("data")
-    allCollections.to[List[RefV]].get shouldBe List(RefV("a_collection", Native.Classes, RefV("child-database", Native.Databases, RefV("parent-database", Native.Databases))))
+    allCollections.to[List[RefV]].get shouldBe List(RefV("a_collection", Native.Collections, RefV("child-database", Native.Databases, RefV("parent-database", Native.Databases))))
   }
 
   it should "test for keys in nested database" in {
@@ -944,7 +943,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "create recursive refs from string" in {
-    await(client.query(Ref("collections/widget/123"))) shouldBe RefV("123", RefV("widget", Native.Classes))
+    await(client.query(Ref("collections/widget/123"))) shouldBe RefV("123", RefV("widget", Native.Collections))
   }
 
   it should "not break do with one element" in {
