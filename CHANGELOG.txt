@@ -1,3 +1,10 @@
+2.7.0
+* Add stdlib time functions ToSeconds(), ToMillis(), ToMicros(), DayOfWeek(), DayOfMonth(), DayOfYear(), Month(), Hour(), Minute(), Second()
+* Support new schema names: Class -> Collection; Instance -> Document
+* Deprecate CreateClass(), Class(), and Classes() in favor of CreateCollection(), Collection(), Collections()
+* Add functions for RBAC: CreateRole(), Role(), Roles()
+* Add functions Format(), Merge()
+
 2.6.2
 * Make last seen transaction time public
 * Make Result::getOrElse lazy
