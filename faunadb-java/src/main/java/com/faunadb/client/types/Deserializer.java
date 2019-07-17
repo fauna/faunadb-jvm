@@ -100,15 +100,15 @@ class Deserializer {
 
     private RefV makeRef(JsonNode node) {
       JsonNode id = node.get("id");
-      RefV clazz = deserializeRefs(node.get("class"));
+      RefV collection = deserializeRefs(node.get("collection"));
       RefV database = deserializeRefs(node.get("database"));
 
       String idE = id.textValue();
 
-      if (clazz == null && database == null)
+      if (collection == null && database == null)
         return Native.fromName(idE);
 
-      return new RefV(idE, clazz, database);
+      return new RefV(idE, collection, database);
     }
   }
 

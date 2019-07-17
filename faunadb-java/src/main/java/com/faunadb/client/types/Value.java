@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -645,13 +644,13 @@ public abstract class Value extends Expr {
    */
   @JsonInclude(JsonInclude.Include.NON_ABSENT)
   public static class RefID {
-    @JsonProperty("id")       private final String id;
-    @JsonProperty("class")    private final RefV clazz;
-    @JsonProperty("database") private final RefV database;
+    @JsonProperty("id")         private final String id;
+    @JsonProperty("collection") private final RefV collection;
+    @JsonProperty("database")   private final RefV database;
 
-    private RefID(String id, RefV clazz, RefV database) {
+    private RefID(String id, RefV collection, RefV database) {
       this.id = id;
-      this.clazz = clazz;
+      this.collection = collection;
       this.database = database;
     }
 
@@ -663,13 +662,13 @@ public abstract class Value extends Expr {
       RefID other = (RefID) obj;
 
       return Objects.equals(id, other.id) &&
-        Objects.equals(clazz, other.clazz) &&
+        Objects.equals(collection, other.collection) &&
         Objects.equals(database, other.database);
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(id, clazz, database);
+      return Objects.hash(id, collection, database);
     }
   }
 
@@ -686,12 +685,12 @@ public abstract class Value extends Expr {
    */
   public static final class RefV extends Value.ScalarValue<RefID> {
 
-    public RefV(String id, RefV clazz, RefV database) {
-      super(new RefID(id, clazz, database));
+    public RefV(String id, RefV collection, RefV database) {
+      super(new RefID(id, collection, database));
     }
 
-    public RefV(String id, RefV clazz) {
-      this(id, clazz, null);
+    public RefV(String id, RefV collection) {
+      this(id, collection, null);
     }
 
     @JsonIgnore
@@ -700,8 +699,14 @@ public abstract class Value extends Expr {
     }
 
     @JsonIgnore
+    @Deprecated
     public Optional<RefV> getClazz() {
-      return Optional.ofNullable(value.clazz);
+      return getCollection();
+    }
+
+    @JsonIgnore
+    public Optional<RefV> getCollection() {
+      return Optional.ofNullable(value.collection);
     }
 
     @JsonIgnore
@@ -732,7 +737,7 @@ public abstract class Value extends Expr {
 
     @Override
     public String toString() {
-      String cls = value.clazz != null ? format(", class = %s", value.clazz) : "";
+      String cls = value.collection != null ? format(", collection = %s", value.collection) : "";
       String db = value.database != null ? format(", database = %s", value.database) : "";
       return format("ref(id = \"%s\"%s%s)", value.id, cls, db);
     }
@@ -748,7 +753,6 @@ public abstract class Value extends Expr {
   public static final class Native {
     private Native() {}
 
-    public static final RefV CLASSES = new RefV("classes", null, null);
     public static final RefV COLLECTIONS = new RefV("collections", null, null);
     public static final RefV INDEXES = new RefV("indexes", null, null);
     public static final RefV DATABASES = new RefV("databases", null, null);
@@ -758,7 +762,7 @@ public abstract class Value extends Expr {
 
     public static RefV fromName(String name) {
       switch (name) {
-        case "classes": return CLASSES;
+        case "collections": return COLLECTIONS;
         case "indexes": return INDEXES;
         case "databases": return DATABASES;
         case "keys": return KEYS;

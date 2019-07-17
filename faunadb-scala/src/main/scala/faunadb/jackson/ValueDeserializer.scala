@@ -91,7 +91,7 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
               in.nextToken()
               id = Some(in.getText)
               in.nextToken()
-            case "class" =>
+            case "collection" =>
               in.nextToken()
               cls = deserialize(in, ctx) match {
                 case r: RefV => Some(r)
@@ -109,8 +109,10 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
       }
     }
 
-    id map (RefV(_, cls, db)) getOrElse {
-      throw new JsonMappingException(s"Malformed reference type")
+    (id, cls, db) match {
+      case (Some(id), None, None) => Native.fromName(id)
+      case (Some(id), _, _)       => RefV(id, cls, db)
+      case (None, _, _)           => throw new JsonMappingException(s"Malformed reference type")
     }
   }
 

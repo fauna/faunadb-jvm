@@ -1,3 +1,5 @@
+.metals/
+.bloop/
 .idea/
 target/
 target-android/

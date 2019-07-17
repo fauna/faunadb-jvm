@@ -34,7 +34,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   val RefField = Field("ref").to[RefV]
   val TsField = Field("ts").to[Long]
-  val ClassField = Field("class").to[RefV]
   val SecretField = Field("secret").to[String]
   val DataField = Field("data")
 
@@ -42,7 +41,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   case class Ev(ref: RefV, ts: Long, action: String)
 
   val EventField = Field.zip(
-    Field("instance").to[RefV],
+    Field("document").to[RefV],
     Field("ts").to[Long],
     Field("action").to[String]
   ) map { case (r, ts, a) => Ev(r, ts, a) }
@@ -67,11 +66,11 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     client = FaunaClient(endpoint = config("root_url"), secret = key(SecretField).get)
 
-    await(client.query(CreateClass(Obj("name" -> "spells"))))
+    await(client.query(CreateCollection(Obj("name" -> "spells"))))
 
     await(client.query(CreateIndex(Obj(
       "name" -> "spells_by_element",
-      "source" -> Class("spells"),
+      "source" -> Collection("spells"),
       "terms" -> Arr(Obj("field" -> Arr("data", "element"))),
       "active" -> true))))
   }
@@ -83,7 +82,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   "Fauna Client" should "should not find an instance" in {
-    a[NotFoundException] should be thrownBy await(client.query(Get(RefV("1234", RefV("spells", Native.Classes)))))
+    a[NotFoundException] should be thrownBy await(client.query(Get(RefV("1234", RefV("spells", Native.Collections)))))
   }
 
   it should "abort the execution" in {
@@ -104,21 +103,21 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   it should "fail with unauthorized" in {
     val badClient = FaunaClient(endpoint = config("root_url"), secret = "notavalidsecret")
-    an[UnauthorizedException] should be thrownBy await(badClient.query(Get(RefV("12345", RefV("spells", Native.Classes)))))
+    an[UnauthorizedException] should be thrownBy await(badClient.query(Get(RefV("12345", RefV("spells", Native.Collections)))))
   }
 
   it should "create a new instance" in {
     val inst = await(client.query(
-      Create(Class("spells"),
+      Create(Collection("spells"),
         Obj("data" -> Obj("testField" -> "testValue")))))
 
-    inst(RefField).get.clazz should equal (Some(RefV("spells", Native.Classes)))
+    inst(RefField).get.collection should equal (Some(RefV("spells", Native.Collections)))
     inst(RefField).get.database should be (None)
     inst("data", "testField").to[String].get should equal ("testValue")
 
     await(client.query(Exists(inst(RefField)))) should equal (TrueV)
 
-    val inst2 = await(client.query(Create(Class("spells"),
+    val inst2 = await(client.query(Create(Collection("spells"),
       Obj("data" -> Obj(
         "testData" -> Obj(
           "array" -> Arr(1, "2", 3.4),
@@ -141,9 +140,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "issue a batched query" in {
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
-    val classRef = Class("spells")
-    val expr1 = Create(classRef, Obj("data" -> Obj("queryTest1" -> randomText1)))
-    val expr2 = Create(classRef, Obj("data" -> Obj("queryTest1" -> randomText2)))
+    val collectionRef = Collection("spells")
+    val expr1 = Create(collectionRef, Obj("data" -> Obj("queryTest1" -> randomText1)))
+    val expr2 = Create(collectionRef, Obj("data" -> Obj("queryTest1" -> randomText2)))
 
     val results = await(client.query(Seq(expr1, expr2)))
 
@@ -153,10 +152,10 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "get at timestamp" in {
-    val randomClassName = Random.alphanumeric.take(8).mkString
-    val randomClass = await(client.query(CreateClass(Obj("name" -> randomClassName))))
+    val randomCollectionName = Random.alphanumeric.take(8).mkString
+    val randomCollection = await(client.query(CreateCollection(Obj("name" -> randomCollectionName))))
 
-    val data = await(client.query(Create(randomClass(RefField).get, Obj("data" -> Obj("x" -> 1)))))
+    val data = await(client.query(Create(randomCollection(RefField).get, Obj("data" -> Obj("x" -> 1)))))
     val dataRef = data(RefField).get
 
     val ts1 = data(TsField).get
@@ -171,35 +170,35 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "issue a paginated query" in {
-    val randomClassName = Random.alphanumeric.take(8).mkString
-    val randomClassF = client.query(CreateClass(Obj("name" -> randomClassName)))
-    val classRef = await(randomClassF)(RefField).get
+    val randomCollectionName = Random.alphanumeric.take(8).mkString
+    val randomCollectionF = client.query(CreateCollection(Obj("name" -> randomCollectionName)))
+    val collectionRef = await(randomCollectionF)(RefField).get
 
-    val randomClassIndexF = client.query(CreateIndex(Obj(
-      "name" -> (randomClassName + "_class_index"),
-      "source" -> classRef,
+    val randomCollectionIndexF = client.query(CreateIndex(Obj(
+      "name" -> (randomCollectionName + "_collection_index"),
+      "source" -> collectionRef,
       "active" -> true,
       "unique" -> false
     )))
 
     val indexCreateF = client.query(CreateIndex(Obj(
-      "name" -> (randomClassName + "_test_index"),
-      "source" -> classRef,
+      "name" -> (randomCollectionName + "_test_index"),
+      "source" -> collectionRef,
       "terms" -> Arr(Obj("field" -> Arr("data", "queryTest1"))),
       "active" -> true,
       "unique" -> false
     )))
 
-    val randomClassIndex = await(randomClassIndexF)(RefField).get
+    val randomCollectionIndex = await(randomCollectionIndexF)(RefField).get
     val testIndex = await(indexCreateF)(RefField).get
 
     val randomText1 = Random.alphanumeric.take(8).mkString
     val randomText2 = Random.alphanumeric.take(8).mkString
     val randomText3 = Random.alphanumeric.take(8).mkString
 
-    val createFuture = client.query(Create(classRef, Obj("data" -> Obj("queryTest1" -> randomText1))))
-    val createFuture2 = client.query(Create(classRef, Obj("data" -> Obj("queryTest1" -> randomText2))))
-    val createFuture3 = client.query(Create(classRef, Obj("data" -> Obj("queryTest1" -> randomText3))))
+    val createFuture = client.query(Create(collectionRef, Obj("data" -> Obj("queryTest1" -> randomText1))))
+    val createFuture2 = client.query(Create(collectionRef, Obj("data" -> Obj("queryTest1" -> randomText2))))
+    val createFuture3 = client.query(Create(collectionRef, Obj("data" -> Obj("queryTest1" -> randomText3))))
 
     val create1 = await(createFuture)
     val create2 = await(createFuture2)
@@ -210,14 +209,14 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     queryMatchR(PageRefs).get shouldBe Seq(create1(RefField).get)
 
-    val queryF = client.query(Paginate(Match(randomClassIndex), size = 1))
+    val queryF = client.query(Paginate(Match(randomCollectionIndex), size = 1))
     val resp = await(queryF)
 
     resp("data").to[ArrayV].get.elems.size shouldBe 1
     resp("after").isDefined should equal (true)
     resp("before").isDefined should equal (false)
 
-    val query2F = client.query(Paginate(Match(randomClassIndex), After(resp("after")), size = 1))
+    val query2F = client.query(Paginate(Match(randomCollectionIndex), After(resp("after")), size = 1))
     val resp2 = await(query2F)
 
     resp2("data").to[Seq[Value]].get.size shouldBe 1
@@ -226,24 +225,24 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "handle a constraint violation" in {
-    val randomClassName = Random.alphanumeric.take(8).mkString
-    val randomClassF = client.query(CreateClass(Obj("name" -> randomClassName)))
-    val classRef = await(randomClassF)(RefField).get
+    val randomCollectionName = Random.alphanumeric.take(8).mkString
+    val randomCollectionF = client.query(CreateCollection(Obj("name" -> randomCollectionName)))
+    val collectionRef = await(randomCollectionF)(RefField).get
 
     val uniqueIndexFuture = client.query(CreateIndex(Obj(
-      "name" -> (randomClassName+"_by_unique_test"),
-      "source" -> classRef,
+      "name" -> (randomCollectionName+"_by_unique_test"),
+      "source" -> collectionRef,
       "terms" -> Arr(Obj("field" -> Arr("data", "uniqueTest1"))),
       "unique" -> true, "active" -> true)))
 
     await(uniqueIndexFuture)
 
     val randomText = Random.alphanumeric.take(8).mkString
-    val createFuture = client.query(Create(classRef, Obj("data" -> Obj("uniqueTest1" -> randomText))))
+    val createFuture = client.query(Create(collectionRef, Obj("data" -> Obj("uniqueTest1" -> randomText))))
 
     await(createFuture)
 
-    val createFuture2 = client.query(Create(classRef, Obj("data" -> Obj("uniqueTest1" -> randomText))))
+    val createFuture2 = client.query(Create(collectionRef, Obj("data" -> Obj("uniqueTest1" -> randomText))))
 
     val exception = intercept[BadRequestException] {
       await(createFuture2)
@@ -271,7 +270,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     ifR.to[String].get shouldBe "was true"
 
     val randomNum = Math.abs(Random.nextLong() % 250000L) + 250000L
-    val randomRef = RefV(randomNum.toString, RefV("spells", Native.Classes))
+    val randomRef = RefV(randomNum.toString, RefV("spells", Native.Collections))
     val doF = client.query(Do(
       Create(randomRef, Obj("data" -> Obj("name" -> "Magic Missile"))),
       Get(randomRef)
@@ -290,7 +289,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val mapR = await(client.query(Map(Arr(1L, 2L, 3L), Lambda(i => Add(i, 1L)))))
     mapR.to[Seq[Long]].get shouldBe Seq(2, 3, 4)
 
-    val foreachR = await(client.query(Foreach(Arr("Fireball Level 1", "Fireball Level 2"), Lambda(spell => Create(Class("spells"), Obj("data" -> Obj("name" -> spell)))))))
+    val foreachR = await(client.query(Foreach(Arr("Fireball Level 1", "Fireball Level 2"), Lambda(spell => Create(Collection("spells"), Obj("data" -> Obj("name" -> spell)))))))
     foreachR.to[Seq[String]].get shouldBe Seq("Fireball Level 1", "Fireball Level 2")
 
     val filterR = await(client.query(Filter(Arr(1, 2, 3, 4), Lambda(i => If(Equals(Modulo(i, 2), 0), true, false)))))
@@ -309,7 +308,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     appendR.to[Seq[Long]].get shouldBe Seq(4, 5, 6, 1, 2, 3)
 
     val randomElement = Random.alphanumeric.take(8).mkString
-    await(client.query(Create(Class("spells"), Obj("data" -> Obj("name" -> "predicate test", "element" -> randomElement)))))
+    await(client.query(Create(Collection("spells"), Obj("data" -> Obj("name" -> "predicate test", "element" -> randomElement)))))
 
     //arrays
     await(client.query(IsEmpty(Arr(1, 2, 3)))).to[Boolean].get shouldBe false
@@ -327,9 +326,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test resource modification" in {
-    val createF = client.query(Create(Class("spells"), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L))))
+    val createF = client.query(Create(Collection("spells"), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L))))
     val createR = await(createF)
-    createR(RefField).get.clazz shouldBe Some(RefV("spells", Native.Classes))
+    createR(RefField).get.collection shouldBe Some(RefV("spells", Native.Collections))
     createR(RefField).get.database shouldBe None
     createR("data", "name").to[String].get shouldBe "Magic Missile"
     createR("data", "element").to[String].get shouldBe "arcane"
@@ -351,7 +350,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val insertF = client.query(Insert(createR("ref"), 1L, Action.Create, Obj("data" -> Obj("cooldown" -> 5L))))
     val insertR = await(insertF)
-    insertR("instance").get shouldBe createR("ref").get
+    insertR("document").get shouldBe createR("ref").get
 
     val removeF = client.query(Remove(createR("ref"), 2L, Action.Delete))
     val removeR = await(removeF)
@@ -366,13 +365,13 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test sets" in {
-    val create1F = client.query(Create(Class("spells"),
+    val create1F = client.query(Create(Collection("spells"),
       Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L))))
-    val create2F = client.query(Create(Class("spells"),
+    val create2F = client.query(Create(Collection("spells"),
       Obj("data" -> Obj("name" -> "Fireball", "element" -> "fire", "cost" -> 10L))))
-    val create3F = client.query(Create(Class("spells"),
+    val create3F = client.query(Create(Collection("spells"),
       Obj("data" -> Obj("name" -> "Faerie Fire", "element" -> Arr("arcane", "nature"), "cost" -> 10L))))
-    val create4F = client.query(Create(Class("spells"),
+    val create4F = client.query(Create(Collection("spells"),
       Obj("data" -> Obj("name" -> "Summon Animal Companion", "element" -> "nature", "cost" -> 10L))))
 
     val create1R = await(create1F)
@@ -417,41 +416,41 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test events api" in {
-    val randomClassName = Random.alphanumeric.take(8).mkString
-    val randomClass = await(client.query(CreateClass(Obj("name" -> randomClassName))))
+    val randomCollectionName = Random.alphanumeric.take(8).mkString
+    val randomCollection = await(client.query(CreateCollection(Obj("name" -> randomCollectionName))))
 
-    val data = await(client.query(Create(randomClass(RefField).get, Obj("data" -> Obj("x" -> 1)))))
+    val data = await(client.query(Create(randomCollection(RefField).get, Obj("data" -> Obj("x" -> 1)))))
     val dataRef = data(RefField).get
 
     await(client.query(Update(dataRef, Obj("data" -> Obj("x" -> 2)))))
     await(client.query(Delete(dataRef)))
 
-    case class Event(action: String, instance: RefV)
+    case class Event(action: String, document: RefV)
 
-    implicit val eventCodec = Codec.caseClass[Event]
+    implicit val eventCodec = Codec.Record[Event]
 
     // Events
     val events = await(client.query(Paginate(Events(dataRef))))(DataField.to[List[Event]]).get
 
     events.length shouldBe 3
     events(0).action shouldBe "create"
-    events(0).instance shouldBe dataRef
+    events(0).document shouldBe dataRef
 
     events(1).action shouldBe "update"
-    events(1).instance shouldBe dataRef
+    events(1).document shouldBe dataRef
 
     events(2).action shouldBe "delete"
-    events(2).instance shouldBe dataRef
+    events(2).document shouldBe dataRef
 
     // Singleton
     val singletons = await(client.query(Paginate(Events(Singleton(dataRef)))))(DataField.to[List[Event]]).get
 
     singletons.length shouldBe 2
     singletons(0).action shouldBe "add"
-    singletons(0).instance shouldBe dataRef
+    singletons(0).document shouldBe dataRef
 
     singletons(1).action shouldBe "remove"
-    singletons(1).instance shouldBe dataRef
+    singletons(1).document shouldBe dataRef
   }
 
   it should "test string functions" in {
@@ -777,7 +776,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
    it should "test authentication functions" in {
-      val createF = client.query(Create(Class("spells"), Obj("credentials" -> Obj("password" -> "abcdefg"))))
+      val createF = client.query(Create(Collection("spells"), Obj("credentials" -> Obj("password" -> "abcdefg"))))
       val createR = await(createF)
 
       // Login
@@ -866,7 +865,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(rootClient.query(CreateRole(Obj(
       "name" -> name,
       "privileges" -> Obj(
-        "resource" -> Classes(),
+        "resource" -> Collections(),
         "actions" -> Obj("read" -> true)
       )
     ))))
@@ -882,7 +881,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(childCli.query(CreateRole(Obj(
       "name" -> "a_role",
       "privileges" -> Obj(
-        "resource" -> Classes(),
+        "resource" -> Collections(),
         "actions" -> Obj("read" -> true)
       )
     ))))
@@ -901,14 +900,14 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val magicMissile = Spell("Magic Missile", Left("arcane"), Some(10))
     val faerieFire = Spell("Faerie Fire", Right(Seq("arcane", "nature")), Some(10))
 
-    val masterSummonCreated = await(client.query(Create(Class("spells"), Obj("data" -> masterSummon))))
+    val masterSummonCreated = await(client.query(Create(Collection("spells"), Obj("data" -> masterSummon))))
     masterSummonCreated("data").to[Spell].get shouldBe masterSummon
 
     val spells = await(client.query(Map(Paginate(Match(Index("spells_by_element"), "arcane")), Lambda(x => Select("data", Get(x))))))("data").get
     spells.to[Set[Spell]].get shouldBe Set(magicMissile, faerieFire)
   }
 
-  it should "create class in a nested database" in {
+  it should "create collection in a nested database" in {
     val adminKey = await(rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "admin"))))
     val adminClient = FaunaClient(secret = adminKey(SecretField).get, endpoint = config("root_url"))
 
@@ -919,14 +918,14 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val client2 = FaunaClient(secret = key(SecretField).get, endpoint = config("root_url"))
 
-    await(client2.query(CreateClass(Obj("name" -> "a_class"))))
+    await(client2.query(CreateCollection(Obj("name" -> "a_collection"))))
 
     val nestedDatabase = Database("child-database", Database("parent-database"))
 
-    await(client.query(Exists(Class("a_class", nestedDatabase)))).to[Boolean].get shouldBe true
+    await(client.query(Exists(Collection("a_collection", nestedDatabase)))).to[Boolean].get shouldBe true
 
-    val allClasses = await(client.query(Paginate(Classes(nestedDatabase))))("data")
-    allClasses.to[List[RefV]].get shouldBe List(RefV("a_class", Native.Classes, RefV("child-database", Native.Databases, RefV("parent-database", Native.Databases))))
+    val allCollections = await(client.query(Paginate(Collections(nestedDatabase))))("data")
+    allCollections.to[List[RefV]].get shouldBe List(RefV("a_collection", Native.Collections, RefV("child-database", Native.Databases, RefV("parent-database", Native.Databases))))
   }
 
   it should "test for keys in nested database" in {
@@ -946,7 +945,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "create recursive refs from string" in {
-    await(client.query(Ref("classes/widget/123"))) shouldBe RefV("123", RefV("widget", Native.Classes))
+    await(client.query(Ref("collections/widget/123"))) shouldBe RefV("123", RefV("widget", Native.Collections))
   }
 
   it should "not break do with one element" in {

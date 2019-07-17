@@ -76,7 +76,7 @@ public class EncoderSpec {
         assertEquals(new DateV(LocalDate.parse("1970-01-01")), encode(new DateV(LocalDate.parse("1970-01-01"))).get());
         assertEquals(new TimeV(parseInstant("1970-01-01T00:05:02.010000000Z")), encode(new TimeV(parseInstant("1970-01-01T00:05:02.010000000Z"))).get());
         assertEquals(new BytesV(new byte[] {1, 2, 3, 4}), encode(new BytesV(new byte[] {1, 2, 3, 4})).get());
-        assertEquals(new RefV("123", new RefV("widgets", Native.CLASSES)), encode(new RefV("123", new RefV("widgets", Native.CLASSES))).get());
+        assertEquals(new RefV("123", new RefV("widgets", Native.COLLECTIONS)), encode(new RefV("123", new RefV("widgets", Native.COLLECTIONS))).get());
         assertEquals(new SetRefV(Collections.<String, Value>emptyMap()), encode(new SetRefV(Collections.<String, Value>emptyMap())).get());
         assertEquals(new ArrayV(asList(new LongV(1))), encode(new ArrayV(asList(new LongV(1)))).get());
 

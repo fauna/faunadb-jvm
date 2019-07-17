@@ -81,51 +81,51 @@ object SpellExample  {
   private def runSpellExamples(DB_NAME: String, client: FaunaClient): Unit = {
 
     /*
-    * Create the spell class and index
+    * Create the spell collection and index
     */
-    val SPELLS_CLASS = "spells"
+    val SPELLS_COLLECTION = "spells"
     val INDEX_NAME = "spells_index"
 
-    val classResults: Value = await(client.query(CreateClass(Obj("name" -> SPELLS_CLASS))))
-    println(s"Create Class for $DB_NAME:\n $classResults\n")
+    val collectionResults: Value = await(client.query(CreateCollection(Obj("name" -> SPELLS_COLLECTION))))
+    println(s"Create Collection for $DB_NAME:\n $collectionResults\n")
 
     val indexResults: Value = await(client.query(
       CreateIndex(
         Obj("name" -> INDEX_NAME,
-          "source" -> Class(SPELLS_CLASS)
+          "source" -> Collection(SPELLS_COLLECTION)
         )
       )
     ))
     println(s"Create Index for $DB_NAME:\n $indexResults\n")
 
     /*
-    * Add some entries to the spells class
+    * Add some entries to the spells collection
     */
     val addFireResults = await(client.query(
-      Create(Class(Value(SPELLS_CLASS)),
+      Create(Collection(Value(SPELLS_COLLECTION)),
         Obj("data" ->
           Obj("name" -> "Fire Beak", "element" -> "water", "cost" -> 15)))
     ))
 
-    println(s"Added spell to class $SPELLS_CLASS: \n $addFireResults \n")
+    println(s"Added spell to collection $SPELLS_COLLECTION: \n $addFireResults \n")
 
     val addDragonResults = await(client.query(
-      Create(Class(Value(SPELLS_CLASS)),
+      Create(Collection(Value(SPELLS_COLLECTION)),
         Obj("data" ->
           Obj("name" -> "Water Dragon's Claw", "element" -> "water")
         )
       )
     ))
-    println(s"Added spell to class $SPELLS_CLASS \n $addDragonResults \n")
+    println(s"Added spell to collection $SPELLS_COLLECTION \n $addDragonResults \n")
 
     val addHippoResults = await(client.query(
-      Create(Class(Value(SPELLS_CLASS)),
+      Create(Collection(Value(SPELLS_COLLECTION)),
         Obj("data" ->
           Obj("name" -> "Hippo's Wallow", "element" -> "water", "cost" -> 35)))
     ))
-    println(s"Added spell to class $SPELLS_CLASS:\n $addHippoResults \n")
+    println(s"Added spell to collection $SPELLS_COLLECTION:\n $addHippoResults \n")
 
-    //The results at 'ref' are a pointer to the instance of the class that was just created.
+    //The results at 'ref' are a pointer to the document of the collection that was just created.
     val hippoRef = addHippoResults("ref")
     println(s"hippoRef = $hippoRef \n")
 
@@ -170,7 +170,7 @@ object SpellExample  {
     val newSpell = Spell("Water Dragon's Claw", "water", Option(25))
     val storeSpellResult = await(client.query(
       Create(
-        Class(SPELLS_CLASS),
+        Collection(SPELLS_COLLECTION),
         Obj("data" -> newSpell))
     ))
     println(s"Stored spell:\n $storeSpellResult \n")
@@ -218,7 +218,7 @@ object SpellExample  {
       Foreach(spellList,
         Lambda { nextSpell =>
           Create(
-            Class(Value(SPELLS_CLASS)),
+            Collection(Value(SPELLS_COLLECTION)),
             Obj("data" -> nextSpell))
         })
     ))

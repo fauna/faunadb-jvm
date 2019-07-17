@@ -39,6 +39,7 @@ import static java.lang.String.format;
  */
 public final class Connection implements AutoCloseable {
 
+  private static final String API_VERSION = "2.7";
   private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
   private static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
   private static final URL FAUNA_ROOT;
@@ -348,7 +349,7 @@ public final class Connection implements AutoCloseable {
     final CompletableFuture<FullHttpResponse> rv = new CompletableFuture<>();
 
     request.headers().add("Authorization", authHeader);
-    request.headers().set("X-FaunaDB-API-Version", "2.1");
+    request.headers().set("X-FaunaDB-API-Version", API_VERSION);
 
     long time = getLastTxnTime();
     if (time > 0) {
