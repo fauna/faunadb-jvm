@@ -54,9 +54,10 @@ public class HttpClientTimeoutHandler extends ChannelDuplexHandler {
     if (e instanceof IdleStateEvent) {
       IdleStateEvent event = (IdleStateEvent) e;
 
-      if (event.state() == IdleState.READER_IDLE && waiting)
-        throw ReadTimeoutException.INSTANCE;
+      if (event.state() == IdleState.READER_IDLE && waiting) {
+        ctx.fireExceptionCaught(ReadTimeoutException.INSTANCE);
+        ctx.close();
+      }
     }
   }
-
 }

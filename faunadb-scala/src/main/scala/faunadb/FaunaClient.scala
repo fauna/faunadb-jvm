@@ -95,9 +95,13 @@ class FaunaClient(connection: Connection) {
     */
   def query(expr: Expr)(implicit ec: ExecutionContext): Future[Value] =
     connection.post("", json.valueToTree(expr)).toScala.map { resp =>
-      handleQueryErrors(resp)
-      val rv = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
-      if (rv eq null) NullV else rv
+      try {
+        handleQueryErrors(resp)
+        val rv = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
+        if (rv eq null) NullV else rv
+      } finally {
+        resp.release()
+      }
     }.recover(handleNetworkExceptions)
 
   /**
@@ -112,9 +116,13 @@ class FaunaClient(connection: Connection) {
     */
   def query(exprs: Iterable[Expr])(implicit ec: ExecutionContext): Future[IndexedSeq[Value]] =
     connection.post("", json.valueToTree(exprs)).toScala.map { resp =>
-      handleQueryErrors(resp)
-      val arr = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
-      arr.asInstanceOf[ArrayV].elems
+      try {
+        handleQueryErrors(resp)
+        val arr = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
+        arr.asInstanceOf[ArrayV].elems
+      } finally {
+        resp.release()
+      }
     }.recover(handleNetworkExceptions)
 
   /**
