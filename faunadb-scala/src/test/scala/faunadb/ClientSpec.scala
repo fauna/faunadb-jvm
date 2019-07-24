@@ -29,6 +29,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   val testDbName = "faunadb-scala-test"
   var client: FaunaClient = null
+  var adminClient: FaunaClient = null
 
   // Helper fields
 
@@ -62,9 +63,11 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val db = await(rootClient.query(CreateDatabase(Obj("name" -> testDbName))))
     val dbRef = db(RefField).get
-    val key = await(rootClient.query(CreateKey(Obj("database" -> dbRef, "role" -> "server"))))
+    val serverKey = await(rootClient.query(CreateKey(Obj("database" -> dbRef, "role" -> "server"))))
+    val adminKey = await(rootClient.query(CreateKey(Obj("database" -> dbRef, "role" -> "admin"))))
 
-    client = FaunaClient(endpoint = config("root_url"), secret = key(SecretField).get)
+    client = FaunaClient(endpoint = config("root_url"), secret = serverKey(SecretField).get)
+    adminClient = FaunaClient(endpoint = config("root_url"), secret = adminKey(SecretField).get)
 
     await(client.query(CreateCollection(Obj("name" -> "spells"))))
 
@@ -78,6 +81,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   override protected def afterAll(): Unit = {
     dropDB()
     client.close()
+    adminClient.close()
     rootClient.close()
   }
 
@@ -908,9 +912,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "read a role from a nested database" in {
-    val key = await(rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "admin"))))
-    val parentCli = rootClient.sessionClient(key(SecretField).get)
-    val childCli = createNewDatabase(parentCli, "db-for-roles")
+    val childCli = createNewDatabase(adminClient, "db-for-roles")
 
     await(childCli.query(CreateRole(Obj(
       "name" -> "a_role",
@@ -921,8 +923,25 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     ))))
 
     await(childCli.query(Paginate(Roles())))(PageRefs).get shouldBe Seq(RefV("a_role", Native.Roles))
-    await(parentCli.query(Paginate(Roles(Database("db-for-roles")))))(PageRefs).get shouldBe
+    await(adminClient.query(Paginate(Roles(Database("db-for-roles")))))(PageRefs).get shouldBe
       Seq(RefV("a_role", Native.Roles, RefV("db-for-roles", Native.Databases)))
+  }
+
+  it should "move database" in {
+    val db1Name = Random.alphanumeric.take(10).mkString
+    val db2Name = Random.alphanumeric.take(10).mkString
+    val clsName = Random.alphanumeric.take(10).mkString
+
+    val db1 = createNewDatabase(adminClient, db1Name)
+    val db2 = createNewDatabase(adminClient, db2Name)
+    await(db2.query(CreateCollection(Obj("name" -> clsName))))
+
+    await(db1.query(Paginate(Databases())))(PageRefs).get shouldBe empty
+
+    await(adminClient.query(MoveDatabase(Database(db2Name), Database(db1Name))))
+
+    await(db1.query(Paginate(Databases())))(PageRefs).get shouldBe List(RefV(db2Name, Native.Databases))
+    await(db1.query(Paginate(Collections(Database(db2Name)))))(PageRefs).get shouldBe List(RefV(clsName, Native.Collections, RefV(db2Name, Native.Databases)))
   }
 
   case class Spell(name: String, element: Either[String, Seq[String]], cost: Option[Long])
@@ -942,9 +961,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "create collection in a nested database" in {
-    val adminKey = await(rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "admin"))))
-    val adminClient = FaunaClient(secret = adminKey(SecretField).get, endpoint = config("root_url"))
-
     val client1 = createNewDatabase(adminClient, "parent-database")
     createNewDatabase(client1, "child-database")
 
@@ -963,9 +979,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test for keys in nested database" in {
-    val key = await(rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "admin"))))
-    val adminClient = FaunaClient(secret = key(SecretField).get, endpoint = config("root_url"))
-
     val client = createNewDatabase(adminClient, "db-for-keys")
 
     await(client.query(CreateDatabase(Obj("name" -> "db-test"))))

@@ -548,6 +548,14 @@ package object query {
   def CreateRole(params: Expr): Expr =
     Expr(ObjectV("create_role" -> params.value))
 
+  /**
+    * A Move Database expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
+    */
+  def MoveDatabase(from: Expr, to: Expr): Expr =
+    Expr(ObjectV("move_database" -> from.value, "to" -> to.value))
+
   // Set Constructors
 
   /**
