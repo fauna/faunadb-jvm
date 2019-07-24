@@ -1892,6 +1892,18 @@ public final class Language {
   }
 
   /**
+   * Move database to a new hierarchy.
+   *
+   * @param from database reference to be moved.
+   * @param to new parent database reference.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   */
+  public static Expr MoveDatabase(Expr from, Expr to) {
+    return Fn.apply("move_database", from, "to", to);
+  }
+
+  /**
    * Returns the history of an instance's presence for the given reference.
    *
    * @param ref the document's reference to retrieve the singleton history. Type: Reference

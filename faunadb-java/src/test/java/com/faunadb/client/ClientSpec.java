@@ -2228,6 +2228,34 @@ public class ClientSpec {
     );
   }
 
+  @Test
+  public void testMoveDatabase() throws Exception {
+    String db1Name = randomStartingWith("db1_");
+    String db2Name = randomStartingWith("db2_");
+    String clsName = randomStartingWith("cls_");
+
+    FaunaClient db1 = createNewDatabase(adminClient, db1Name);
+    FaunaClient db2 = createNewDatabase(adminClient, db2Name);
+    db2.query(CreateCollection(Obj("name", Value(clsName)))).get();
+
+    assertThat(
+      db1.query(Paginate(Databases())).get().get(REF_LIST),
+      hasSize(0)
+    );
+
+    adminClient.query(MoveDatabase(Database(db2Name), Database(db1Name))).get();
+
+    assertThat(
+      db1.query(Paginate(Databases())).get().get(REF_LIST),
+      equalTo(Collections.singletonList(new RefV(db2Name, Native.DATABASES)))
+    );
+
+    assertThat(
+      db1.query(Paginate(Collections(Database(db2Name)))).get().get(REF_LIST),
+      equalTo(Collections.singletonList(new RefV(clsName, Native.COLLECTIONS, new RefV(db2Name, Native.DATABASES))))
+    );
+  }
+
   private CompletableFuture<Value> query(Expr expr) {
     return serverClient.query(expr);
   }
