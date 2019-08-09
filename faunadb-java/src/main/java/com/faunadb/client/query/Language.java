@@ -1573,6 +1573,19 @@ public final class Language {
   }
 
   /**
+   * Reduce the collection.
+   *
+   * @param lambda the accumulator lambda
+   * @param initial the initial value for the accumulator.
+   * @param collection the collection to be reduced.
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/reduce">Reduce Function</a>
+   * @return a new {@link Expr} instance
+   */
+  public static Expr Reduce(Expr lambda, Expr initial, Expr collection) {
+    return Fn.apply("reduce", lambda, "initial", initial, "collection", collection);
+  }
+
+  /**
    * Returns a Page object that groups a page of results and cursors for retrieving pages before or after
    * the current page. Pages are collections and can be passed directly to some functions such as
    * {@link #Map(Expr, Expr)}, {@link #Foreach(Expr, Expr)}, or {@link #Filter(Expr, Expr)}.

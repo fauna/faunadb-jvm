@@ -9,7 +9,6 @@ import com.faunadb.client.query.Language;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
 import io.netty.util.ResourceLeakDetector;
-import org.hamcrest.collection.IsMapWithSize;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
@@ -2166,6 +2165,66 @@ public class ClientSpec {
     assertThat(
       query.apply(Intersection(Range(m, Value(1), Value(20)), Range(m, Value(5), Value(15)))),
       equalTo(IntStream.rangeClosed(5, 15).boxed().collect(Collectors.toList()))
+    );
+  }
+
+  public void shouldTestReduce() throws Exception {
+    RefV coll = onARandomCollection();
+
+    String idxName = randomStartingWith("idx");
+    query(CreateIndex(Obj(
+      "name", Value(idxName),
+      "source", coll,
+      "active", Value(true),
+      "values", Arr(
+        Obj("field", Arr(Value("data"), Value("value"))),
+        Obj("field", Arr(Value("data"), Value("foo")))
+      )
+    ))).get();
+
+    List<Expr> values = IntStream.rangeClosed(1, 100).mapToObj(Language :: Value).collect(Collectors.toList());
+
+    query(
+      Foreach(
+        Arr(values),
+        Lambda("i", Create(coll, Obj("data", Obj("value", Var("i"), "foo", Value("bar")))))
+      )
+    ).get();
+
+    //arrays
+    assertThat(
+      query(
+        Reduce(
+          Lambda(Arr(Value("acc"), Value("i")), Add(Var("acc"), Var("i"))),
+          Value(10),
+          Arr(values)
+        )
+      ).get().to(Long.class).get(),
+      equalTo(5060L)
+    );
+
+    //pages
+    assertThat(
+      query(
+        Reduce(
+          Lambda(Arr(Value("acc"), Value("i")), Add(Var("acc"), Select(Value(0), Var("i")))),
+          Value(10),
+          Paginate(Match(Index(idxName))).size(100)
+        )
+      ).get().at("data").at(0).to(Long.class).get(),
+      equalTo(5060L)
+    );
+
+    //sets
+    assertThat(
+      query(
+        Reduce(
+          Lambda(Arr(Value("acc"), Value("i")), Add(Var("acc"), Select(Value(0), Var("i")))),
+          Value(10),
+          Match(Index(idxName))
+        )
+      ).get().to(Long.class).get(),
+      equalTo(5060L)
     );
   }
 
