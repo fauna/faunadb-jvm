@@ -1086,6 +1086,60 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     )) shouldBe ObjectV("x" -> ArrayV("x", 10, 100), "y" -> ArrayV("y", 20, 200))
   }
 
+  it should "reduce collections" in {
+    val collName = Random.alphanumeric.take(8).mkString
+    val indexName = Random.alphanumeric.take(8).mkString
+
+    val values = Arr((1 to 100).map(i => i: Expr): _*)
+
+    await(client.query(CreateCollection(Obj("name" -> collName))))
+    await(client.query(CreateIndex(Obj(
+      "name" -> indexName,
+      "source" -> Collection(collName),
+      "active" -> true,
+       "values" -> Arr(
+         Obj("field" -> Arr("data", "value")),
+         Obj("field" -> Arr("data", "foo"))
+       )
+    ))))
+
+    await(client.query(
+      Foreach(
+        values,
+        Lambda(i => Create(Collection(collName), Obj(
+          "data" -> Obj("value" -> i, "foo" -> "bar")
+        )))
+      )
+    ))
+
+    //array
+    await(client.query(
+      Reduce(
+        Lambda((acc, i) => Add(acc, i)),
+        10,
+        values
+      )
+    )).to[Long].get shouldBe 5060L
+
+    //page
+    await(client.query(
+      Reduce(
+        Lambda((acc, i) => Add(acc, Select(0, i))),
+        10,
+        Paginate(Match(Index(indexName)), size = 100)
+      )
+    ))("data").to[Seq[Long]].get shouldBe Seq(5060L)
+
+    //set
+    await(client.query(
+      Reduce(
+        Lambda((acc, i) => Add(acc, Select(0, i))),
+        10,
+        Match(Index(indexName))
+      )
+    )).to[Long].get shouldBe 5060L
+  }
+
   it should "count/sum/mean collections" in {
     val collName = Random.alphanumeric.take(8).mkString
     val indexName = Random.alphanumeric.take(8).mkString

@@ -385,6 +385,14 @@ package object query {
     Expr(ObjectV("key_from_secret" -> secret.value))
 
   /**
+    * A Reduce expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/reduce]]
+    */
+  def Reduce(lambda: Expr, initial: Expr, collection: Expr): Expr =
+    Expr(ObjectV("reduce" -> lambda.value, "initial" -> initial.value, "collection" -> collection.value))
+
+  /**
    * A Paginate expression.
    *
    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#read-functions]]
