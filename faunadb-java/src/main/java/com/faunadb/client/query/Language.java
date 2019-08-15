@@ -2049,6 +2049,19 @@ public final class Language {
   }
 
   /**
+   * Filter the set based on the lower/upper bounds (inclusive).
+   *
+   * @param set set to be filtered
+   * @param from lower bound
+   * @param to upper bound
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/range">Range Function</a>
+   */
+  public static Expr Range(Expr set, Expr from, Expr to) {
+    return Fn.apply("range", set, "from", from, "to", to);
+  }
+
+  /**
    * Creates a new authentication token for the provided reference.
    *
    * @param ref the token's owner reference. Type: Reference

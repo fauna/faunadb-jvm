@@ -19,6 +19,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.Calendar;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -2107,6 +2109,63 @@ public class ClientSpec {
         )
       ).get(),
       equalTo(new ArrayV(Arrays.<Value>asList(new LongV(5050), new LongV(100), new DoubleV(50.5))))
+    );
+  }
+
+  @Test
+  public void shouldTestRange() throws Exception {
+    RefV col = onARandomCollection();
+
+    Value index = query(CreateIndex(Obj(
+      "name", Value(randomStartingWith("index_")),
+      "source", col,
+      "values", Arr(
+        Obj("field", Arr(Value("data"), Value("value"))),
+        Obj("field", Value("ref"))
+      ),
+      "active", Value(true)
+    ))).get().at("ref");
+
+    query(Foreach(
+      Arr(IntStream.rangeClosed(1, 20).mapToObj(Language:: Value).collect(Collectors.toList())),
+      Lambda("i",
+        Create(
+          col,
+          Obj("data", Obj("value", Var("i")))
+        )
+      )
+    )).get();
+
+    Function<Expr, Collection<Integer>> query = set -> {
+      try {
+        return query(Select(Value("data"),
+          Map(Paginate(set), Lambda(Arr(Value("value"), Value("ref")), Var("value")))
+        )).get().asCollectionOf(Integer.class).get();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    };
+
+    Expr m = Match(index);
+
+    assertThat(
+      query.apply(Range(m, Value(3), Value(7))),
+      equalTo(IntStream.rangeClosed(3, 7).boxed().collect(Collectors.toList()))
+    );
+
+    assertThat(
+      query.apply(Union(Range(m, Value(1), Value(10)), Range(m, Value(11), Value(20)))),
+      equalTo(IntStream.rangeClosed(1, 20).boxed().collect(Collectors.toList()))
+    );
+
+    assertThat(
+      query.apply(Difference(Range(m, Value(1), Value(20)), Range(m, Value(11), Value(20)))),
+      equalTo(IntStream.rangeClosed(1, 10).boxed().collect(Collectors.toList()))
+    );
+
+    assertThat(
+      query.apply(Intersection(Range(m, Value(1), Value(20)), Range(m, Value(5), Value(15)))),
+      equalTo(IntStream.rangeClosed(5, 15).boxed().collect(Collectors.toList()))
     );
   }
 
