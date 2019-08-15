@@ -1538,6 +1538,17 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldEvalTimeDiffExpression() throws Exception {
+    List<Value> res = query(Arrays.asList(
+      TimeDiff(Epoch(Value(0), SECOND), Epoch(Value(1), SECOND), SECOND),
+      TimeDiff(Date(Value("1970-01-01")), Date(Value("1970-01-02")), DAY)
+      )).get();
+
+    assertThat(res.get(0).to(LONG).get(), equalTo(1L));
+    assertThat(res.get(1).to(LONG).get(), equalTo(1L));
+  }
+
+  @Test
   public void shouldEvalDateExpression() throws Exception {
     Value res = query(Date(Value("1970-01-02"))).get();
     assertThat(res.to(DATE).get(), equalTo(LocalDate.ofEpochDay(1)));

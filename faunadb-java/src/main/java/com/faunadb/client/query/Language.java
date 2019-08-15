@@ -61,6 +61,7 @@ public final class Language {
    * @see #Epoch(Expr, TimeUnit)
    * @see #TimeAdd(Expr, Expr, TimeUnit)
    * @see #TimeSubtract(Expr, Expr, TimeUnit)
+   * @see #TimeDiff(Expr, Expr, TimeUnit)
    */
   public enum TimeUnit {
     DAY("day"),
@@ -4348,6 +4349,138 @@ public final class Language {
    */
   public static Expr TimeSubtract(LocalDate base, long offset, TimeUnit unit) {
     return TimeSubtract(new DateV(base), new LongV(offset), unit.value);
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two times or dates. Both start and finish must be of the same
+   * type.
+   *
+   * @param start the starting time or date, inclusive. Type: Time or Date
+   * @param finish the ending time or date, exclusive. Type: Time or Date
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(Expr start, Expr finish, Expr unit) {
+    return Fn.apply("time_diff", start, "other", finish, "unit", unit);
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two times or dates. Both start and finish must be of the same
+   * type.
+   *
+   * @param start the starting time or date, inclusive. Type: Time or Date
+   * @param finish the ending time or date, exclusive. Type: Time or Date
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(Expr start, Expr finish, TimeUnit unit) {
+    return TimeDiff(start, finish, unit.value);
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two times.
+   *
+   * @param start the starting time, inclusive.
+   * @param finish the ending time, exclusive. Type: Time
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(Instant start, Expr finish, Expr unit) {
+    return TimeDiff(new TimeV(start), finish, unit);
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two times.
+   *
+   * @param start the starting time, inclusive.
+   * @param finish the ending time, exclusive.
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(Instant start, Instant finish, Expr unit) {
+    return TimeDiff(new TimeV(start), new TimeV(finish), unit);
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two times.
+   *
+   * @param start the starting time, inclusive.
+   * @param finish the ending time, exclusive. Type: Time
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(Instant start, Expr finish, TimeUnit unit) {
+    return TimeDiff(new TimeV(start), finish, unit.value);
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two times.
+   *
+   * @param start the starting time, inclusive.
+   * @param finish the ending time, exclusive.
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(Instant start, Instant finish, TimeUnit unit) {
+    return TimeDiff(new TimeV(start), new TimeV(finish), unit.value);
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two dates.
+   *
+   * @param start the starting date, inclusive.
+   * @param finish the ending date, exclusive. Type: Date
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(LocalDate start, Expr finish, Expr unit) {
+    return TimeDiff(new DateV(start), finish, unit);
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two dates.
+   *
+   * @param start the starting date, inclusive.
+   * @param finish the ending date, exclusive.
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(LocalDate start, LocalDate finish, Expr unit) {
+    return TimeDiff(new DateV(start), new DateV(finish), unit);
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two dates.
+   *
+   * @param start the starting date, inclusive.
+   * @param finish the ending date, exclusive. Type: Date
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(LocalDate start, Expr finish, TimeUnit unit) {
+    return TimeDiff(new DateV(start), finish, unit.value);
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two dates.
+   *
+   * @param start the starting date, inclusive.
+   * @param finish the ending date, exclusive.
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(LocalDate start, LocalDate finish, TimeUnit unit) {
+    return TimeDiff(new DateV(start), new DateV(finish), unit.value);
   }
 
   /**

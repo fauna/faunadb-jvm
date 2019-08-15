@@ -896,6 +896,17 @@ package object query {
     TimeSubtract(base, offset, unit.expr)
 
   /**
+    * A TimeDiff expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-and-date]]
+    */
+  def TimeDiff(start: Expr, finish: Expr, unit: Expr): Expr =
+    Expr(ObjectV("time_diff" -> start.value, "other" -> finish.value, "unit" -> unit.value))
+
+  def TimeDiff(start: Expr, finish: Expr, unit: TimeUnit): Expr =
+    TimeDiff(start, finish, unit.expr)
+
+  /**
     * A Date expression.
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-and-date]]
