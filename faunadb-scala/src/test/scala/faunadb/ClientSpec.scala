@@ -1139,6 +1139,41 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     )) shouldBe ArrayV(5050L, 100L, 50.5d)
   }
 
+  it should "range" in {
+    val col = await(client.query(CreateCollection(Obj("name" -> Random.alphanumeric.take(10).mkString))))
+
+    val index = await(client.query(CreateIndex(Obj(
+      "name" -> Random.alphanumeric.take(10).mkString,
+      "source" -> col("ref").get,
+      "values" -> Arr(
+        Obj("field" -> Arr("data", "value")),
+        Obj("field" -> "ref"),
+      ),
+      "active" -> true
+    ))))
+
+    await(client.query(Foreach(
+      (1 to 20).toList,
+      Lambda(i =>
+        Create(
+          col("ref").get,
+          Obj("data" -> Obj("value" -> i))
+        )
+      )
+    )))
+
+    def query(set: Expr) =
+      await(client.query(Select("data",
+        Map(Paginate(set), Lambda((value, ref) => value))
+      ))).to[List[Int]].get
+
+    val m = Match(index("ref").get)
+    query(Range(m, 3, 7)) shouldBe (3 to 7).toList
+    query(Union(Range(m, 1, 10), Range(m, 11, 20))) shouldBe (1 to 20).toList
+    query(Difference(Range(m, 1, 20), Range(m, 11, 20))) shouldBe (1 to 10).toList
+    query(Intersection(Range(m, 1, 20), Range(m, 5, 15))) shouldBe (5 to 15).toList
+  }
+
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
     await(client.query(CreateDatabase(Obj("name" -> name))))
     val key = await(client.query(CreateKey(Obj("database" -> Database(name), "role" -> "admin"))))

@@ -606,6 +606,18 @@ package object query {
   def Join(source: Expr, `with`: Expr): Expr =
     Expr(ObjectV("join" -> source.value, "with" -> `with`.value))
 
+  /**
+   * Filter the set based on the lower/upper bounds (inclusive).
+   *
+   * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/range]]
+   *
+   * @param set set to be filtered
+   * @param from lower bound
+   * @param to upper bound
+   */
+  def Range(set: Expr, from: Expr, to: Expr): Expr =
+    Expr(ObjectV("range" -> set.value, "from" -> from.value, "to" -> to.value))
+
   // Authentication Functions
 
   /**
