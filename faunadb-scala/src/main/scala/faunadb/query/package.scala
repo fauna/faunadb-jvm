@@ -874,6 +874,17 @@ package object query {
     Expr(ObjectV("epoch" -> num.value, "unit" -> unit.value))
 
   /**
+    * A TimeAdd expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-and-date]]
+    */
+  def TimeAdd(base: Expr, offset: Expr, unit: Expr): Expr =
+    Expr(ObjectV("time_add" -> base.value, "offset" -> offset.value, "unit" -> unit.value))
+
+  def TimeAdd(base: Expr, offset: Expr, unit: TimeUnit): Expr =
+    TimeAdd(base, offset, unit.expr)
+
+  /**
     * A Date expression.
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-and-date]]
