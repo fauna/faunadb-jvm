@@ -61,6 +61,10 @@ public final class Language {
    * @see #Epoch(Expr, TimeUnit)
    */
   public enum TimeUnit {
+    DAY("day"),
+    HALF_DAY("half day"),
+    HOUR("hour"),
+    MINUTE("minute"),
     SECOND("second"),
     MILLISECOND("millisecond"),
     MICROSECOND("microsecond"),
@@ -3972,6 +3976,10 @@ public final class Language {
    * Constructs a timestamp relative to the epoch "1970-01-01T00:00:00Z" given a unit type and a number of units.
    * Possible unit types are:
    * <ul>
+   *   <li>day</li>
+   *   <li>half day</li>
+   *   <li>hour</li>
+   *   <li>minute</li>
    *   <li>second</li>
    *   <li>millisecond</li>
    *   <li>microsecond</li>

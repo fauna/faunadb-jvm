@@ -1495,16 +1495,24 @@ public class ClientSpec {
   @Test
   public void shouldEvalEpochExpression() throws Exception {
     List<Value> res = query(Arrays.asList(
+      Epoch(Value(30), DAY),
+      Epoch(Value(30), HALF_DAY),
+      Epoch(Value(30), HOUR),
+      Epoch(Value(30), MINUTE),
       Epoch(Value(30), SECOND),
       Epoch(Value(30), MILLISECOND),
       Epoch(Value(30), MICROSECOND),
       Epoch(Value(30), NANOSECOND)
     )).get();
 
-    assertThat(res.get(0).to(TIME).get(), equalTo(Instant.ofEpochMilli(0).plus(30, ChronoUnit.SECONDS)));
-    assertThat(res.get(1).to(TIME).get(), equalTo(Instant.ofEpochMilli(30)));
-    assertThat(res.get(2).to(TIME).get(), equalTo(Instant.ofEpochMilli(0).plus(30, ChronoUnit.MICROS)));
-    assertThat(res.get(3).to(TIME).get(), equalTo(Instant.ofEpochMilli(0).plus(30, ChronoUnit.NANOS)));
+    assertThat(res.get(0).to(TIME).get(), equalTo(Instant.ofEpochMilli(0).plus(30, ChronoUnit.DAYS)));
+    assertThat(res.get(1).to(TIME).get(), equalTo(Instant.ofEpochMilli(0).plus(30, ChronoUnit.HALF_DAYS)));
+    assertThat(res.get(2).to(TIME).get(), equalTo(Instant.ofEpochMilli(0).plus(30, ChronoUnit.HOURS)));
+    assertThat(res.get(3).to(TIME).get(), equalTo(Instant.ofEpochMilli(0).plus(30, ChronoUnit.MINUTES)));
+    assertThat(res.get(4).to(TIME).get(), equalTo(Instant.ofEpochMilli(0).plus(30, ChronoUnit.SECONDS)));
+    assertThat(res.get(5).to(TIME).get(), equalTo(Instant.ofEpochMilli(30)));
+    assertThat(res.get(6).to(TIME).get(), equalTo(Instant.ofEpochMilli(0).plus(30, ChronoUnit.MICROS)));
+    assertThat(res.get(7).to(TIME).get(), equalTo(Instant.ofEpochMilli(0).plus(30, ChronoUnit.NANOS)));
   }
 
   @Test

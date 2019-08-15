@@ -44,6 +44,10 @@ package query {
     */
   sealed abstract class TimeUnit(val expr: Expr)
   object TimeUnit {
+    case object Day extends TimeUnit("day")
+    case object HalfDay extends TimeUnit("half day")
+    case object Hour extends TimeUnit("hour")
+    case object Minute extends TimeUnit("minute")
     case object Second extends TimeUnit("second")
     case object Millisecond extends TimeUnit("millisecond")
     case object Microsecond extends TimeUnit("microsecond")

@@ -1,7 +1,7 @@
 package faunadb
 
 import faunadb.errors.{ BadRequestException, NotFoundException, PermissionDeniedException, UnauthorizedException }
-import faunadb.query.TimeUnit._
+import faunadb.query.TimeUnit
 import faunadb.query._
 import faunadb.values._
 import java.time.{ Instant, LocalDate }
@@ -753,21 +753,29 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     timeR.to[Instant].get shouldBe Instant.ofEpochMilli(0).plus(4, ChronoUnit.HOURS)
 
     val epochR = await(client.query(Arr(
+      Epoch(2, TimeUnit.Day),
+      Epoch(1, TimeUnit.HalfDay),
+      Epoch(12, TimeUnit.Hour),
+      Epoch(30, TimeUnit.Minute),
       Epoch(30, TimeUnit.Second),
-      Epoch(10, Millisecond),
-      Epoch(42, Nanosecond),
-      Epoch(40, Microsecond)
+      Epoch(10, TimeUnit.Millisecond),
+      Epoch(42, TimeUnit.Nanosecond),
+      Epoch(40, TimeUnit.Microsecond)
     )))
 
     epochR.collect(Field.to[Instant]).get.sorted shouldBe Seq(
       Instant.ofEpochMilli(0).plus(42, ChronoUnit.NANOS),
       Instant.ofEpochMilli(0).plus(40, ChronoUnit.MICROS),
-      Instant.ofEpochMilli(10),
-      Instant.ofEpochMilli(30000)
+      Instant.ofEpochMilli(0).plus(10, ChronoUnit.MILLIS),
+      Instant.ofEpochMilli(0).plus(30, ChronoUnit.SECONDS),
+      Instant.ofEpochMilli(0).plus(30, ChronoUnit.MINUTES),
+      Instant.ofEpochMilli(0).plus(12, ChronoUnit.HOURS),
+      Instant.ofEpochMilli(0).plus(1, ChronoUnit.HALF_DAYS),
+      Instant.ofEpochMilli(0).plus(2, ChronoUnit.DAYS)
     )
 
-    epochR(0).to[TimeV].get.toInstant shouldBe Instant.ofEpochMilli(0).plus(30, ChronoUnit.SECONDS)
-    epochR(0).to[Instant].get shouldBe Instant.ofEpochMilli(0).plus(30, ChronoUnit.SECONDS)
+    epochR(0).to[TimeV].get.toInstant shouldBe Instant.ofEpochMilli(0).plus(2, ChronoUnit.DAYS)
+    epochR(0).to[Instant].get shouldBe Instant.ofEpochMilli(0).plus(2, ChronoUnit.DAYS)
 
     val dateF = client.query(query.Date("1970-01-02"))
     val dateR = await(dateF)
