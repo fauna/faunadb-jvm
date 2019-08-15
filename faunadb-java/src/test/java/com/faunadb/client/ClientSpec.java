@@ -1527,6 +1527,17 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldEvalTimeSubtractExpression() throws Exception {
+    List<Value> res = query(Arrays.asList(
+      TimeSubtract(Epoch(Value(0), SECOND), 1, HOUR),
+      TimeSubtract(Date(Value("1970-01-01")), 1, DAY)
+    )).get();
+
+    assertThat(res.get(0).to(TIME).get(), equalTo(Instant.ofEpochMilli(0).minus(1, ChronoUnit.HOURS)));
+    assertThat(res.get(1).to(DATE).get(), equalTo(LocalDate.ofEpochDay(-1)));
+  }
+
+  @Test
   public void shouldEvalDateExpression() throws Exception {
     Value res = query(Date(Value("1970-01-02"))).get();
     assertThat(res.to(DATE).get(), equalTo(LocalDate.ofEpochDay(1)));

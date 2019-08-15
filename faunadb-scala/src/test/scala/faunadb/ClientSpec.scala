@@ -791,6 +791,14 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val addDateF = client.query(TimeAdd(Date("1970-01-01"), 1, TimeUnit.Day))
     val addDateR = await(addDateF)
     addDateR.to[LocalDate].get shouldBe LocalDate.ofEpochDay(1)
+
+    val subTimeF = client.query(TimeSubtract(Epoch(0, TimeUnit.Second), 1, TimeUnit.Day))
+    val subTimeR = await(subTimeF)
+    subTimeR.to[Instant].get shouldBe Instant.ofEpochMilli(0).minus(1, ChronoUnit.DAYS)
+
+    val subDateF = client.query(TimeSubtract(Date("1970-01-01"), 1, TimeUnit.Day))
+    val subDateR = await(subDateF)
+    subDateR.to[LocalDate].get shouldBe LocalDate.ofEpochDay(-1)
   }
 
    it should "test authentication functions" in {

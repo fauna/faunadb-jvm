@@ -60,6 +60,7 @@ public final class Language {
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#time-and-date">FaunaDB Time Functions</a>
    * @see #Epoch(Expr, TimeUnit)
    * @see #TimeAdd(Expr, Expr, TimeUnit)
+   * @see #TimeSubtract(Expr, Expr, TimeUnit)
    */
   public enum TimeUnit {
     DAY("day"),
@@ -4190,6 +4191,163 @@ public final class Language {
    */
   public static Expr TimeAdd(LocalDate base, long offset, TimeUnit unit) {
     return TimeAdd(new DateV(base), new LongV(offset), unit.value);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data. Type: Time or Date
+   * @param offset the number of units. Type: Number
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(Expr base, Expr offset, Expr unit) {
+    return Fn.apply("time_subtract", base, "offset", offset, "unit", unit);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data. Type: Time or Date
+   * @param offset the number of units. Type: Number
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(Expr base, Expr offset, TimeUnit unit) {
+    return TimeSubtract(base, offset, unit.value);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data. Type: Time or Date
+   * @param offset the number of units.
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(Expr base, long offset, Expr unit) {
+    return TimeSubtract(base, new LongV(offset), unit);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data. Type: Time or Date
+   * @param offset the number of units.
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(Expr base, long offset, TimeUnit unit) {
+    return TimeSubtract(base, new LongV(offset), unit.value);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units. Type: Number
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(Instant base, Expr offset, Expr unit) {
+    return TimeSubtract(new TimeV(base), offset, unit);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units.
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(Instant base, long offset, Expr unit) {
+    return TimeSubtract(new TimeV(base), new LongV(offset), unit);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units. Type: Number
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(Instant base, Expr offset, TimeUnit unit) {
+    return TimeSubtract(new TimeV(base), offset, unit.value);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units.
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(Instant base, long offset, TimeUnit unit) {
+    return TimeSubtract(new TimeV(base), new LongV(offset), unit.value);
+  }
+
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units. Type: Number
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(LocalDate base, Expr offset, Expr unit) {
+    return TimeSubtract(new DateV(base), offset, unit);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units.
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(LocalDate base, long offset, Expr unit) {
+     return TimeSubtract(new DateV(base), new LongV(offset), unit);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units. Type: Number
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(LocalDate base, Expr offset, TimeUnit unit) {
+    return TimeSubtract(new DateV(base), offset, unit.value);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units.
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(LocalDate base, long offset, TimeUnit unit) {
+    return TimeSubtract(new DateV(base), new LongV(offset), unit.value);
   }
 
   /**
