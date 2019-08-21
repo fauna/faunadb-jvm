@@ -1371,6 +1371,30 @@ package object query {
     Expr(ObjectV("trunc" -> num.value, "precision" -> precision.value))
 
   /**
+    * Count the number of elements in the collection.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/count]]
+    */
+  def Count(collection: Expr): Expr =
+    Expr(ObjectV("count" -> collection.value))
+
+  /**
+    * Sum the elements in the collection.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/sum]]
+    */
+  def Sum(collection: Expr): Expr =
+    Expr(ObjectV("sum" -> collection.value))
+
+  /**
+    * Returns the mean of all elements in the collection.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/mean]]
+    */
+  def Mean(collection: Expr): Expr =
+    Expr(ObjectV("mean" -> collection.value))
+
+  /**
     * A LT expression.
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#logical-functions]]

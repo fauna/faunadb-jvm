@@ -1086,6 +1086,59 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     )) shouldBe ObjectV("x" -> ArrayV("x", 10, 100), "y" -> ArrayV("y", 20, 200))
   }
 
+  it should "count/sum/mean collections" in {
+    val collName = Random.alphanumeric.take(8).mkString
+    val indexName = Random.alphanumeric.take(8).mkString
+
+    val values = Arr((1 to 100).map(i => i: Expr): _*)
+
+    await(client.query(CreateCollection(Obj("name" -> collName))))
+    await(client.query(CreateIndex(Obj(
+      "name" -> indexName,
+      "source" -> Collection(collName),
+      "active" -> true,
+      "values" -> Arr(
+        Obj("field" -> Arr("data", "value"))
+      )
+    ))))
+
+    await(client.query(
+      Foreach(
+        values,
+        Lambda(i => Create(Collection(collName), Obj(
+          "data" -> Obj("value" -> i)
+        )))
+      )
+    ))
+
+    //array
+    await(client.query(
+      Arr(
+        Sum(values),
+        Count(values),
+        Mean(values)
+      )
+    )) shouldBe ArrayV(5050L, 100L, 50.5d)
+
+    //sets
+    await(client.query(
+      Arr(
+        Sum(Match(Index(indexName))),
+        Count(Match(Index(indexName))),
+        Mean(Match(Index(indexName)))
+      )
+    )) shouldBe ArrayV(5050L, 100L, 50.5d)
+
+    //pages
+    await(client.query(
+      Arr(
+        Select(Path("data", 0), Sum(Paginate(Match(Index(indexName)), size = 100))),
+        Select(Path("data", 0), Count(Paginate(Match(Index(indexName)), size = 100))),
+        Select(Path("data", 0), Mean(Paginate(Match(Index(indexName)), size = 100)))
+      )
+    )) shouldBe ArrayV(5050L, 100L, 50.5d)
+  }
+
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
     await(client.query(CreateDatabase(Obj("name" -> name))))
     val key = await(client.query(CreateKey(Obj("database" -> Database(name), "role" -> "admin"))))
