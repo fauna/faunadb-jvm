@@ -6083,6 +6083,42 @@ public final class Language {
   }
 
   /**
+   *
+   * Count the number of elements in the collection.
+   *
+   * @param collection the collection
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/count">Count function</a>
+   */
+  public static Expr Count(Expr collection) {
+    return Fn.apply("count", collection);
+  }
+
+  /**
+   *
+   * Sum the elements in the collection.
+   *
+   * @param collection the collection
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/sum">Sum function</a>
+   */
+  public static Expr Sum(Expr collection) {
+    return Fn.apply("sum", collection);
+  }
+
+  /**
+   *
+   * Returns the mean of all elements in the collection.
+   *
+   * @param collection the collection
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/mean">Mean function</a>
+   */
+  public static Expr Mean(Expr collection) {
+    return Fn.apply("mean", collection);
+  }
+
+  /**
    * Returns true if the first element of the given collection is less than the ones following, and false otherwise.
    *
    * @param values the list of numbers to compare. Type: Array

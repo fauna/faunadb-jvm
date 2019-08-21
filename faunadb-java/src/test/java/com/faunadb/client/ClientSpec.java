@@ -5,6 +5,7 @@ import com.faunadb.client.errors.NotFoundException;
 import com.faunadb.client.errors.PermissionDeniedException;
 import com.faunadb.client.errors.UnauthorizedException;
 import com.faunadb.client.query.Expr;
+import com.faunadb.client.query.Language;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
 import io.netty.util.ResourceLeakDetector;
@@ -18,6 +19,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.Calendar;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
@@ -2041,6 +2044,69 @@ public class ClientSpec {
         hasEntry("x", Arrays.<Value>asList(new StringV("x"), new LongV(10), new LongV(100))),
         hasEntry("y", Arrays.<Value>asList(new StringV("y"), new LongV(20), new LongV(200)))
       )
+    );
+  }
+
+  @Test
+  public void shouldTestCountSumMean() throws Exception {
+    String collName = randomStartingWith("collection_");
+    String indexName = randomStartingWith("index_");
+
+    Expr values = Arr(IntStream.rangeClosed(1, 100).mapToObj(Language:: Value).collect(Collectors.toList()));
+
+    query(CreateCollection(Obj("name", Value(collName)))).get();
+    query(CreateIndex(Obj(
+      "name", Value(indexName),
+      "source", Collection(collName),
+      "active", Value(true),
+      "values", Arr(
+        Obj("field", Arr(Value("data"), Value("value")))
+      )
+    ))).get();
+
+    query(
+      Foreach(
+        values,
+        Lambda("i", Create(Collection(collName), Obj(
+          "data", Obj("value", Var("i"))
+        )))
+      )
+    ).get();
+
+    //array
+    assertThat(
+      query(
+        Arr(
+          Sum(values),
+          Count(values),
+          Mean(values)
+        )
+      ).get(),
+      equalTo(new ArrayV(Arrays.<Value>asList(new LongV(5050), new LongV(100), new DoubleV(50.5))))
+    );
+
+    //sets
+    assertThat(
+      query(
+        Arr(
+          Sum(Match(Index(indexName))),
+          Count(Match(Index(indexName))),
+          Mean(Match(Index(indexName)))
+        )
+      ).get(),
+      equalTo(new ArrayV(Arrays.<Value>asList(new LongV(5050), new LongV(100), new DoubleV(50.5))))
+    );
+
+    //pages
+    assertThat(
+      query(
+        Arr(
+          Select(Path("data").at(0), Sum(Paginate(Match(Index(indexName))).size(100))),
+          Select(Path("data").at(0), Count(Paginate(Match(Index(indexName))).size(100))),
+          Select(Path("data").at(0), Mean(Paginate(Match(Index(indexName))).size(100)))
+        )
+      ).get(),
+      equalTo(new ArrayV(Arrays.<Value>asList(new LongV(5050), new LongV(100), new DoubleV(50.5))))
     );
   }
 
