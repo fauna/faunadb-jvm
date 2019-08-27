@@ -1,3 +1,9 @@
+2.8.0
+* Add stdlib functions: MoveDatabase(), Reduce(), Range(), Count(), Sum(),
+  Mean(), TimeDiff(), TimeSubtract(), TimeAdd()
+* Expand time units to include DAY, HALF_DAY, HOUR, and MINUTE
+* Fixed a bug to ensure buffers are released after an exception.
+
 2.7.0
 * Add stdlib time functions ToSeconds(), ToMillis(), ToMicros(), DayOfWeek(), DayOfMonth(), DayOfYear(), Month(), Hour(), Minute(), Second()
 * Support new schema names: Class -> Collection; Instance -> Document
