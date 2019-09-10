@@ -91,7 +91,7 @@ public class HttpClient extends AbstractReferenceCounted implements AutoCloseabl
   }
 
   private NioEventLoopGroup initWorker() {
-    DefaultThreadFactory defaultThreadFactory = new DefaultThreadFactory("fauna-http-client");
+    DefaultThreadFactory defaultThreadFactory = new DefaultThreadFactory("fauna-http-client", true);
     return new NioEventLoopGroup(0, defaultThreadFactory);
   }
 
