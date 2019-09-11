@@ -1559,6 +1559,15 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldEvalNowExpression() throws Exception {
+    assertThat(query(Equals(Now(), Time("now"))).get(), equalTo(BooleanV.TRUE));
+
+    Value t1 = query(Now()).get();
+    Value t2 = query(Now()).get();
+    assertThat(query(LTE(t1, t2, Now())).get(), equalTo(BooleanV.TRUE));
+  }
+
+  @Test
   public void shouldGetNewId() throws Exception {
     Value res = query(NewId()).get();
     assertThat(res.to(STRING).get(), notNullValue());
