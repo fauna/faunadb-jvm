@@ -1,4 +1,4 @@
-val driverVersion = "2.8.0"
+val driverVersion = "2.8.1"
 val nettyVersion = "4.1.36.Final"
 val jacksonVersion = "2.8.11"
 val jacksonDocVersion = "2.8"
@@ -93,7 +93,6 @@ lazy val common = project.in(file("faunadb-common"))
     )
   )
 
-crossScalaVersions := scalaVersions
 
 lazy val scala = project.in(file("faunadb-scala"))
   .dependsOn(common)
@@ -101,6 +100,7 @@ lazy val scala = project.in(file("faunadb-scala"))
   .settings(
     name := "faunadb-scala",
     scalaVersion := scalaDefaultVersion,
+    crossScalaVersions := scalaVersions,
 
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
@@ -110,7 +110,7 @@ lazy val scala = project.in(file("faunadb-scala"))
       "org.scalatest" %% "scalatest" % "3.0.7" % "test"
     ),
 
-    coverageEnabled := true,
+    coverageEnabled := !scalaVersion.value.startsWith("2.11"),
 
     autoAPIMappings := true,
     apiURL := Some(url(scalaApiUrl)),
