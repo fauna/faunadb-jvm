@@ -1,3 +1,6 @@
+2.8.1
+* Disable scoverage for scala 2.11
+
 2.8.0
 * Add stdlib functions: MoveDatabase(), Reduce(), Range(), Count(), Sum(),
   Mean(), TimeDiff(), TimeSubtract(), TimeAdd()
