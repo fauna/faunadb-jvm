@@ -109,7 +109,7 @@ lazy val scala = project.in(file("faunadb-scala"))
       "org.scalatest" %% "scalatest" % "3.0.7" % "test"
     ),
 
-    coverageEnabled := true,
+    coverageEnabled := !scalaVersion.value.startsWith("2.11"),
 
     autoAPIMappings := true,
     apiURL := Some(url(scalaApiUrl)),
