@@ -93,14 +93,13 @@ lazy val common = project.in(file("faunadb-common"))
     )
   )
 
-crossScalaVersions := scalaVersions
-
 lazy val scala = project.in(file("faunadb-scala"))
   .dependsOn(common)
   .settings(publishSettings : _*)
   .settings(
     name := "faunadb-scala",
     scalaVersion := scalaDefaultVersion,
+    crossScalaVersions := scalaVersions,
 
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
