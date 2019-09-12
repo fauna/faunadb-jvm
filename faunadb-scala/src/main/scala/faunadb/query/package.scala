@@ -704,6 +704,30 @@ package object query {
     Expr(ObjectV("casefold" -> term.value, "normalizer" -> normalizer.value))
 
   /**
+    * A ContainsStr expression
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/containsstr]]
+    */
+  def ContainsStr(value: Expr, search: Expr): Expr =
+    Expr(ObjectV("containsstr" -> value.value, "search" -> search.value))
+
+  /**
+    * A ContainsStrRegex expression
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/containsstrregex]]
+    */
+  def ContainsStrRegex(value: Expr, pattern: Expr): Expr =
+    Expr(ObjectV("containsstrregex" -> value.value, "pattern" -> pattern.value))
+
+  /**
+    * An EndsWith expression
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/endswith]]
+    */
+  def EndsWith(value: Expr, search: Expr): Expr =
+    Expr(ObjectV("endswith" -> value.value, "search" -> search.value))
+
+  /**
    * A FindStr expression
    *
    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
@@ -769,6 +793,14 @@ package object query {
   }
 
   /**
+    * A RegexEscape expression
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/regexescape]]
+    */
+  def RegexEscape(value: Expr): Expr =
+    Expr(ObjectV("regexescape" -> value.value))
+
+  /**
    * A Repeat expression
    *
    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
@@ -823,6 +855,14 @@ package object query {
    */
   def Space(value: Expr): Expr =
     Expr(ObjectV("space" -> value.value ))
+
+  /**
+    * A StartsWith expression
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/startswith]]
+    */
+  def StartsWith(value: Expr, search: Expr): Expr =
+    Expr(ObjectV("startswith" -> value.value, "search" -> search.value))
 
   /**
     * A SubString expression
