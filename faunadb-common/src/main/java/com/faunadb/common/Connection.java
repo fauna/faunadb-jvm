@@ -204,7 +204,7 @@ public final class Connection implements AutoCloseable {
 
   private static final String X_FAUNADB_HOST = "X-FaunaDB-Host";
   private static final String X_FAUNADB_BUILD = "X-FaunaDB-Build";
-  private static final String X_FAUNA_DRIVER_HEADER_NAME = "X-Fauna-Driver";
+  private static final String X_FAUNA_DRIVER = "X-Fauna-Driver";
 
   private final URL faunaRoot;
   private final String authHeader;
@@ -377,7 +377,7 @@ public final class Connection implements AutoCloseable {
 
     request.headers().add("Authorization", authHeader);
     request.headers().set("X-FaunaDB-API-Version", API_VERSION);
-    request.headers().set(X_FAUNA_DRIVER_HEADER_NAME, getFaunaDriverHeaderValue());
+    request.headers().set(X_FAUNA_DRIVER, getFaunaDriverHeaderValue());
 
     long time = getLastTxnTime();
     if (time > 0) {
