@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.common.Connection
-import com.faunadb.common.Connection.FaunaDriver
+import com.faunadb.common.Connection.JvmDriver
 import faunadb.errors._
 import faunadb.query.Expr
 import faunadb.values.{ ArrayV, NullV, Value }
@@ -43,7 +43,7 @@ object FaunaClient {
     if (endpoint ne null) b.withFaunaRoot(endpoint)
     if (secret ne null) b.withAuthToken(secret)
     if (metrics ne null) b.withMetrics(metrics)
-    b.withFaunaDriver(FaunaDriver.SCALA)
+    b.withJvmDriver(JvmDriver.SCALA)
 
     new FaunaClient(b.build)
   }
