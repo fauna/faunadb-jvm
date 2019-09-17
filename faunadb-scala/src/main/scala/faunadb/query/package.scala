@@ -88,8 +88,13 @@ package query {
     * Helper for pagination cursors
     */
   sealed trait Cursor
+  object Cursor {
+    implicit def exprToCursor(expr: Expr): Cursor =
+      RawCursor(expr)
+  }
   case class Before(expr: Expr) extends Cursor
   case class After(expr: Expr) extends Cursor
+  case class RawCursor(expr: Expr) extends Cursor
   case object NoCursor extends Cursor
 }
 
@@ -411,9 +416,10 @@ package object query {
     call += "paginate" -> resource.value
 
     cursor match {
-      case b: Before => call += "before" -> b.expr.value
-      case a: After => call += "after" -> a.expr.value
-      case _ => ()
+      case b: Before    => call += "before" -> b.expr.value
+      case a: After     => call += "after" -> a.expr.value
+      case r: RawCursor => call += "cursor" -> r.expr.value
+      case NoCursor     => ()
     }
 
     val nullExpr = Expr(NullV)

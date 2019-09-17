@@ -230,6 +230,47 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     resp2("before").isDefined should equal (true)
   }
 
+  it should "paginate with cursor object" in {
+    val collection =
+      await(
+        client.query(
+          CreateCollection(Obj(
+            "name" -> aRandomString
+          ))))
+
+    val index =
+      await(client.query(
+        CreateIndex(Obj(
+          "name" -> Concat(collection("name"), "_collection_index"),
+          "source" -> collection("ref"),
+          "active" -> true
+        ))))
+
+    await(client.query(
+      Arr(0 until 10 map { _ =>
+        Create(collection("ref"), Obj(
+          "name" -> aRandomString
+        ))
+      }: _*)
+    ))
+
+    def page(cursor: Expr): Value =
+      await(client.query(
+        Paginate(
+          Match(index("ref")),
+          cursor = cursor,
+          size = 4,
+        )))
+
+    val first = page(Null())
+    val second = page(Obj("after" -> first("after")))
+    val third = page(Obj("before" -> second("before")))
+
+    first("data").to[Seq[Value]].get should have size 4
+    first("data") shouldNot equal(second("data"))
+    first("data") shouldBe third("data")
+  }
+
   it should "handle a constraint violation" in {
     val randomCollectionName = aRandomString
     val randomCollectionF = client.query(CreateCollection(Obj("name" -> randomCollectionName)))
