@@ -5,7 +5,6 @@ import faunadb.query.TimeUnit
 import faunadb.query._
 import faunadb.values._
 import java.time.{ Instant, LocalDate }
-import java.time.ZoneOffset.UTC
 import java.time.temporal.ChronoUnit
 import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -52,6 +51,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   def await[T](f: Future[T]) = Await.result(f, 5.second)
   def ready[T](f: Future[T]) = Await.ready(f, 5.second)
+
+  def aRandomString: String = aRandomString(size = 8)
+  def aRandomString(size: Int): String = Random.alphanumeric.take(size).mkString
 
   def dropDB(): Unit =
     ready(rootClient.query(Delete(Database(testDbName))))
@@ -142,8 +144,8 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "issue a batched query" in {
-    val randomText1 = Random.alphanumeric.take(8).mkString
-    val randomText2 = Random.alphanumeric.take(8).mkString
+    val randomText1 = aRandomString
+    val randomText2 = aRandomString
     val collectionRef = Collection("spells")
     val expr1 = Create(collectionRef, Obj("data" -> Obj("queryTest1" -> randomText1)))
     val expr2 = Create(collectionRef, Obj("data" -> Obj("queryTest1" -> randomText2)))
@@ -156,7 +158,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "get at timestamp" in {
-    val randomCollectionName = Random.alphanumeric.take(8).mkString
+    val randomCollectionName = aRandomString
     val randomCollection = await(client.query(CreateCollection(Obj("name" -> randomCollectionName))))
 
     val data = await(client.query(Create(randomCollection(RefField).get, Obj("data" -> Obj("x" -> 1)))))
@@ -174,7 +176,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "issue a paginated query" in {
-    val randomCollectionName = Random.alphanumeric.take(8).mkString
+    val randomCollectionName = aRandomString
     val randomCollectionF = client.query(CreateCollection(Obj("name" -> randomCollectionName)))
     val collectionRef = await(randomCollectionF)(RefField).get
 
@@ -196,9 +198,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val randomCollectionIndex = await(randomCollectionIndexF)(RefField).get
     val testIndex = await(indexCreateF)(RefField).get
 
-    val randomText1 = Random.alphanumeric.take(8).mkString
-    val randomText2 = Random.alphanumeric.take(8).mkString
-    val randomText3 = Random.alphanumeric.take(8).mkString
+    val randomText1 = aRandomString
+    val randomText2 = aRandomString
+    val randomText3 = aRandomString
 
     val createFuture = client.query(Create(collectionRef, Obj("data" -> Obj("queryTest1" -> randomText1))))
     val createFuture2 = client.query(Create(collectionRef, Obj("data" -> Obj("queryTest1" -> randomText2))))
@@ -229,7 +231,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "handle a constraint violation" in {
-    val randomCollectionName = Random.alphanumeric.take(8).mkString
+    val randomCollectionName = aRandomString
     val randomCollectionF = client.query(CreateCollection(Obj("name" -> randomCollectionName)))
     val collectionRef = await(randomCollectionF)(RefField).get
 
@@ -241,7 +243,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     await(uniqueIndexFuture)
 
-    val randomText = Random.alphanumeric.take(8).mkString
+    val randomText = aRandomString
     val createFuture = client.query(Create(collectionRef, Obj("data" -> Obj("uniqueTest1" -> randomText))))
 
     await(createFuture)
@@ -311,7 +313,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val appendR = await(client.query(Append(Arr(1, 2, 3), Arr(4, 5, 6))))
     appendR.to[Seq[Long]].get shouldBe Seq(4, 5, 6, 1, 2, 3)
 
-    val randomElement = Random.alphanumeric.take(8).mkString
+    val randomElement = aRandomString
     await(client.query(Create(Collection("spells"), Obj("data" -> Obj("name" -> "predicate test", "element" -> randomElement)))))
 
     //arrays
@@ -420,7 +422,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "test events api" in {
-    val randomCollectionName = Random.alphanumeric.take(8).mkString
+    val randomCollectionName = aRandomString
     val randomCollection = await(client.query(CreateCollection(Obj("name" -> randomCollectionName))))
 
     val data = await(client.query(Create(randomCollection(RefField).get, Obj("data" -> Obj("x" -> 1)))))
@@ -898,7 +900,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "create a role" in {
-    val name = s"a_role_${Random.alphanumeric.take(8).mkString}"
+    val name = s"a_role_${aRandomString}"
 
     await(rootClient.query(CreateRole(Obj(
       "name" -> name,
@@ -928,9 +930,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "move database" in {
-    val db1Name = Random.alphanumeric.take(10).mkString
-    val db2Name = Random.alphanumeric.take(10).mkString
-    val clsName = Random.alphanumeric.take(10).mkString
+    val db1Name = aRandomString(size = 10)
+    val db2Name = aRandomString(size = 10)
+    val clsName = aRandomString(size = 10)
 
     val db1 = createNewDatabase(adminClient, db1Name)
     val db2 = createNewDatabase(adminClient, db2Name)
@@ -1100,8 +1102,8 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "reduce collections" in {
-    val collName = Random.alphanumeric.take(8).mkString
-    val indexName = Random.alphanumeric.take(8).mkString
+    val collName = aRandomString
+    val indexName = aRandomString
 
     val values = Arr((1 to 100).map(i => i: Expr): _*)
 
@@ -1154,8 +1156,8 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "count/sum/mean collections" in {
-    val collName = Random.alphanumeric.take(8).mkString
-    val indexName = Random.alphanumeric.take(8).mkString
+    val collName = aRandomString
+    val indexName = aRandomString
 
     val values = Arr((1 to 100).map(i => i: Expr): _*)
 
@@ -1207,10 +1209,10 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "range" in {
-    val col = await(client.query(CreateCollection(Obj("name" -> Random.alphanumeric.take(10).mkString))))
+    val col = await(client.query(CreateCollection(Obj("name" -> aRandomString(size = 10)))))
 
     val index = await(client.query(CreateIndex(Obj(
-      "name" -> Random.alphanumeric.take(10).mkString,
+      "name" -> aRandomString(size = 10),
       "source" -> col("ref").get,
       "values" -> Arr(
         Obj("field" -> Arr("data", "value")),
