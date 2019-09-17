@@ -18,7 +18,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.Calendar;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -563,6 +562,31 @@ public class ClientSpec {
     assertThat(page2.get(DATA), not(page1.at("data")));
     assertThat(page2.at("before"), notNullValue());
     assertThat(page2.at("after").to(VALUE).getOptional(), is(Optional.<Value>empty()));
+  }
+
+  @Test
+  public void shouldPaginateWithCursorObject() throws Exception {
+    Value first = query(
+      Paginate(Match(Index("all_spells")))
+        .cursor(Null())
+        .size(3)
+    ).get();
+
+    Value second = query(
+      Paginate(Match(Index("all_spells")))
+        .cursor(Obj("after", first.at("after")))
+        .size(3)
+    ).get();
+
+    Value third = query(
+      Paginate(Match(Index("all_spells")))
+        .cursor(Obj("before", second.at("before")))
+        .size(3)
+    ).get();
+
+    assertThat(first.get(DATA).to(ARRAY).get(), hasSize(3));
+    assertThat(first.get(DATA), not(second.get(DATA)));
+    assertThat(first.get(DATA), is(third.get(DATA)));
   }
 
   @Test

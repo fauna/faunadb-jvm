@@ -44,6 +44,12 @@ public final class Pagination extends Expr {
     }
   }
 
+  private static final class RawCursor extends Cursor {
+    private RawCursor(Expr obj) {
+      super("cursor", obj);
+    }
+  }
+
   private final Expr resource;
   private Optional<Cursor> cursor = Optional.empty();
   private Optional<Expr> ts = Optional.empty();
@@ -72,6 +78,17 @@ public final class Pagination extends Expr {
 
   private static void putIfPresent(Optional<Expr> optExpr, Map<String, Expr> res, String name) {
     optExpr.ifPresent(expr -> res.put(name, expr));
+  }
+
+  /**
+   * Sets the cursor object of the pagination.
+   *
+   * @param cursor the cursor object
+   * @return this {@link Pagination} instance
+   */
+  public Pagination cursor(Expr cursor) {
+    this.cursor = Optional.of(new RawCursor(cursor));
+    return this;
   }
 
   /**
