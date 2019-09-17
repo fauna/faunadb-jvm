@@ -951,6 +951,30 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldEvalContainsStrExpression() throws Exception {
+    Value res1 = query(ContainsStr("ABCDEF", "CDE")).get();
+    assertThat(res1.to(BOOLEAN).get(), is(true));
+    Value res2 = query(ContainsStr("ABCDEF", "GHI")).get();
+    assertThat(res2.to(BOOLEAN).get(), is(false));
+  }
+
+  @Test
+  public void shouldEvalContainsStrRegexExpression() throws Exception {
+    Value res1 = query(ContainsStrRegex("ABCDEF", "[A-Z]")).get();
+    assertThat(res1.to(BOOLEAN).get(), is(true));
+    Value res2 = query(ContainsStrRegex("123456", "[A-Z]")).get();
+    assertThat(res2.to(BOOLEAN).get(), is(false));
+  }
+
+  @Test
+  public void shouldEvalEndsWithExpression() throws Exception {
+    Value res1 = query(EndsWith("ABCDEF", "DEF")).get();
+    assertThat(res1.to(BOOLEAN).get(), is(true));
+    Value res2 = query(EndsWith("ABCDEF", "ABC")).get();
+    assertThat(res2.to(BOOLEAN).get(), is(false));
+  }
+
+  @Test
   public void shouldEvalFindStrExpression() throws Exception {
     Value res = query(FindStr(Value("fire and  Ice"), Value("fire"))).get();
     assertThat(res.to(LONG).get(), equalTo(0L));
@@ -1010,6 +1034,12 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldEvalRegexEscape() throws Exception {
+    Value res = query(RegexEscape("ABCDEF")).get();
+    assertThat(res.to(STRING).get(), equalTo("\\QABCDEF\\E"));
+  }
+
+  @Test
   public void shouldEvalRepeatExpression() throws Exception {
     Value res = query(Repeat("f")).get();
     assertThat(res.to(STRING).get(), equalTo("ff"));
@@ -1047,6 +1077,14 @@ public class ClientSpec {
     assertThat(res.to(STRING).get(), equalTo(" "));
     Value res1 = query(Space(4)).get();
     assertThat(res1.to(STRING).get(), equalTo("    "));
+  }
+
+  @Test
+  public void shouldEvalStartsWithExpression() throws Exception {
+    Value res1 = query(StartsWith("ABCDEF", "ABC")).get();
+    assertThat(res1.to(BOOLEAN).get(), is(true));
+    Value res2 = query(StartsWith("ABCDEF", "DEF")).get();
+    assertThat(res2.to(BOOLEAN).get(), is(false));
   }
 
   @Test

@@ -2293,6 +2293,162 @@ public final class Language {
   }
 
   /**
+   * Returns true if the string contains the given substring, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param search  the substring to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstr">FaunaDB ContainsStr Function</a>
+   * @see #Value(String)
+   */
+  public static Expr ContainsStr(Expr value, Expr search) {
+    return Fn.apply("containsstr", value, "search", search);
+  }
+
+  /**
+   * Returns true if the string contains the given substring, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param search  the substring to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstr">FaunaDB ContainsStr Function</a>
+   * @see #Value(String)
+   */
+  public static Expr ContainsStr(String value, Expr search) {
+    return ContainsStr(new StringV(value), search);
+  }
+
+  /**
+   * Returns true if the string contains the given substring, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param search  the substring to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstr">FaunaDB ContainsStr Function</a>
+   * @see #Value(String)
+   */
+  public static Expr ContainsStr(Expr value, String search) {
+    return ContainsStr(value, new StringV(search));
+  }
+
+  /**
+   * Returns true if the string contains the given substring, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param search  the substring to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstr">FaunaDB ContainsStr Function</a>
+   * @see #Value(String)
+   */
+  public static Expr ContainsStr(String value, String search) {
+    return ContainsStr(new StringV(value), new StringV(search));
+  }
+
+  /**
+   * Returns true if the string contains the given pattern, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param pattern the pattern to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstrregex">FaunaDB ContainsStrRegex Function</a>
+   * @see #Value(String)
+   */
+  public static Expr ContainsStrRegex(Expr value, Expr pattern) {
+    return Fn.apply("containsstrregex", value, "pattern", pattern);
+  }
+
+  /**
+   * Returns true if the string contains the given pattern, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param pattern the pattern to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstrregex">FaunaDB ContainsStrRegex Function</a>
+   * @see #Value(String)
+   */
+  public static Expr ContainsStrRegex(String value, Expr pattern) {
+    return ContainsStrRegex(new StringV(value), pattern);
+  }
+
+  /**
+   * Returns true if the string contains the given pattern, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param pattern the pattern to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstrregex">FaunaDB ContainsStrRegex Function</a>
+   * @see #Value(String)
+   */
+  public static Expr ContainsStrRegex(Expr value, String pattern) {
+    return ContainsStrRegex(value, new StringV(pattern));
+  }
+
+  /**
+   * Returns true if the string contains the given pattern, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param pattern the pattern to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstrregex">FaunaDB ContainsStrRegex Function</a>
+   * @see #Value(String)
+   */
+  public static Expr ContainsStrRegex(String value, String pattern) {
+    return ContainsStrRegex(new StringV(value), new StringV(pattern));
+  }
+
+  /**
+   * Returns true if the string ends with the given suffix value, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param search  the suffix to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/endswith">FaunaDB EndsWith Function</a>
+   * @see #Value(String)
+   */
+  public static Expr EndsWith(Expr value, Expr search) {
+    return Fn.apply("endswith", value, "search", search);
+  }
+
+  /**
+   * Returns true if the string ends with the given suffix value, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param search  the suffix to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/endswith">FaunaDB EndsWith Function</a>
+   * @see #Value(String)
+   */
+  public static Expr EndsWith(String value, Expr search) {
+    return EndsWith(new StringV(value), search);
+  }
+
+  /**
+   * Returns true if the string ends with the given suffix value, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param search  the suffix to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/endswith">FaunaDB EndsWith Function</a>
+   * @see #Value(String)
+   */
+  public static Expr EndsWith(Expr value, String search) {
+    return EndsWith(value, new StringV(search));
+  }
+
+  /**
+   * Returns true if the string ends with the given suffix value, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param search  the suffix to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/endswith">FaunaDB EndsWith Function</a>
+   * @see #Value(String)
+   */
+  public static Expr EndsWith(String value, String search) {
+    return EndsWith(new StringV(value), new StringV(search));
+  }
+
+  /**
    * FindStr function searches a string for a substring and locates the location of the substring in the string
    *
    * @param value a strings
@@ -3073,6 +3229,29 @@ public final class Language {
     return NGram(new StringV(term));
   }
 
+  /**
+   * It takes a string and returns a regex which matches the input string verbatim.
+   *
+   * @param value the string to analyze
+   * @return      a regex which matches the input string verbatim
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/regexescape">FaunaDB RegexEscape Function</a>
+   * @see #Value(String)
+   */
+  public static Expr RegexEscape(Expr value) {
+    return Fn.apply("regexescape", value);
+  }
+
+  /**
+   * It takes a string and returns a regex which matches the input string verbatim.
+   *
+   * @param value the string to analyze
+   * @return      a regex which matches the input string verbatim
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/regexescape">FaunaDB RegexEscape Function</a>
+   * @see #Value(String)
+   */
+  public static Expr RegexEscape(String value) {
+    return RegexEscape(new StringV(value));
+  }
 
   /**
    * Repeat function returns a string the specified number of times
@@ -3959,6 +4138,58 @@ public final class Language {
    */
   public static Expr Format(String format, Expr ...values) {
     return Format(new StringV(format), values);
+  }
+
+  /**
+   * Returns true if the string starts with the given prefix value, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param search  the prefix to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/startswith">FaunaDB StartsWith Function</a>
+   * @see #Value(String)
+   */
+  public static Expr StartsWith(Expr value, Expr search) {
+    return Fn.apply("startswith", value, "search", search);
+  }
+
+  /**
+   * Returns true if the string starts with the given prefix value, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param search  the prefix to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/startswith">FaunaDB StartsWith Function</a>
+   * @see #Value(String)
+   */
+  public static Expr StartsWith(String value, Expr search) {
+    return StartsWith(new StringV(value), search);
+  }
+
+  /**
+   * Returns true if the string starts with the given prefix value, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param search  the prefix to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/startswith">FaunaDB StartsWith Function</a>
+   * @see #Value(String)
+   */
+  public static Expr StartsWith(Expr value, String search) {
+    return StartsWith(value, new StringV(search));
+  }
+
+  /**
+   * Returns true if the string starts with the given prefix value, or false if otherwise
+   *
+   * @param value   the string to evaluate
+   * @param search  the prefix to search for
+   * @return        a {@link Expr} instance with the evaluation result
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/startswith">FaunaDB StartsWith Function</a>
+   * @see #Value(String)
+   */
+  public static Expr StartsWith(String value, String search) {
+    return StartsWith(new StringV(value), new StringV(search));
   }
 
   /**

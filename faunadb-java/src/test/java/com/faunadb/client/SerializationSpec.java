@@ -816,6 +816,30 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeContainsStr() throws Exception {
+    assertJson(ContainsStr("ABCDEF", "CDE"), "{\"containsstr\":\"ABCDEF\",\"search\":\"CDE\"}");
+    assertJson(ContainsStr(Value("ABCDEF"), "CDE"), "{\"containsstr\":\"ABCDEF\",\"search\":\"CDE\"}");
+    assertJson(ContainsStr("ABCDEF", Value("CDE")), "{\"containsstr\":\"ABCDEF\",\"search\":\"CDE\"}");
+    assertJson(ContainsStr(Value("ABCDEF"), Value("CDE")), "{\"containsstr\":\"ABCDEF\",\"search\":\"CDE\"}");
+  }
+
+  @Test
+  public void shouldSerializeContainsStrRegex() throws Exception {
+    assertJson(ContainsStrRegex("ABCDEF", "BCD"), "{\"containsstrregex\":\"ABCDEF\",\"pattern\":\"BCD\"}");
+    assertJson(ContainsStrRegex(Value("ABCDEF"), "BCD"), "{\"containsstrregex\":\"ABCDEF\",\"pattern\":\"BCD\"}");
+    assertJson(ContainsStrRegex("ABCDEF", Value("BCD")), "{\"containsstrregex\":\"ABCDEF\",\"pattern\":\"BCD\"}");
+    assertJson(ContainsStrRegex(Value("ABCDEF"), Value("BCD")), "{\"containsstrregex\":\"ABCDEF\",\"pattern\":\"BCD\"}");
+  }
+
+  @Test
+  public void shouldSerializeEndsWith() throws Exception {
+    assertJson(EndsWith("ABCDEF", "DEF"), "{\"endswith\":\"ABCDEF\",\"search\":\"DEF\"}");
+    assertJson(EndsWith(Value("ABCDEF"), "DEF"), "{\"endswith\":\"ABCDEF\",\"search\":\"DEF\"}");
+    assertJson(EndsWith("ABCDEF", Value("DEF")), "{\"endswith\":\"ABCDEF\",\"search\":\"DEF\"}");
+    assertJson(EndsWith(Value("ABCDEF"), Value("DEF")), "{\"endswith\":\"ABCDEF\",\"search\":\"DEF\"}");
+  }
+
+  @Test
   public void shouldSerializeFindStr() throws Exception {
     assertJson(FindStr("ABCDEF", "ABC"), "{\"findstr\":\"ABCDEF\",\"find\":\"ABC\"}");
     assertJson(FindStr(Value("AABCDEFF"), Value("AABC")), "{\"findstr\":\"AABCDEFF\",\"find\":\"AABC\"}");
@@ -871,6 +895,12 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeRegexEscape() throws Exception {
+    assertJson(RegexEscape("ABC"), "{\"regexescape\":\"ABC\"}");
+    assertJson(RegexEscape(Value("ABC")), "{\"regexescape\":\"ABC\"}");
+  }
+
+  @Test
   public void shouldSerializeRepeat() throws Exception {
     assertJson(Repeat("ABC"), "{\"repeat\":\"ABC\"}");
     assertJson(Repeat(Value("abc")), "{\"repeat\":\"abc\"}");
@@ -903,6 +933,14 @@ public class SerializationSpec {
     assertJson(Space(2), "{\"space\":2}");
     assertJson(Space(2L), "{\"space\":2}");
     assertJson(Space(Value(2)), "{\"space\":2}");
+  }
+
+  @Test
+  public void shouldSerializeStartsWith() throws Exception {
+    assertJson(StartsWith("ABCDEF", "ABC"), "{\"startswith\":\"ABCDEF\",\"search\":\"ABC\"}");
+    assertJson(StartsWith(Value("ABCDEF"), "ABC"), "{\"startswith\":\"ABCDEF\",\"search\":\"ABC\"}");
+    assertJson(StartsWith("ABCDEF", Value("ABC")), "{\"startswith\":\"ABCDEF\",\"search\":\"ABC\"}");
+    assertJson(StartsWith(Value("ABCDEF"), Value("ABC")), "{\"startswith\":\"ABCDEF\",\"search\":\"ABC\"}");
   }
 
   @Test
