@@ -191,13 +191,6 @@ public final class Connection implements AutoCloseable {
         http = client;
       }
 
-      JvmDriver jvmDriver;
-      if(this.jvmDriver == null) {
-        jvmDriver = JvmDriver.JAVA;
-      } else {
-        jvmDriver = this.jvmDriver;
-      }
-
       return new Connection(root, authToken, http, registry, jvmDriver, lastSeenTxn);
     }
   }
@@ -377,7 +370,13 @@ public final class Connection implements AutoCloseable {
 
     request.headers().add("Authorization", authHeader);
     request.headers().set("X-FaunaDB-API-Version", API_VERSION);
-    request.headers().set(X_FAUNA_DRIVER, getFaunaDriverHeaderValue());
+
+    // Set X-Fauna-Driver header
+    if(jvmDriver == JvmDriver.JAVA) {
+      request.headers().set(X_FAUNA_DRIVER, "Java");
+    } else if(jvmDriver == JvmDriver.SCALA) {
+      request.headers().set(X_FAUNA_DRIVER, "Scala");
+    }
 
     long time = getLastTxnTime();
     if (time > 0) {
@@ -442,11 +441,6 @@ public final class Connection implements AutoCloseable {
     String hdr = "Basic " + enc.toString(US_ASCII);
     enc.release();
     return hdr;
-  }
-
-  private String getFaunaDriverHeaderValue() {
-    if(jvmDriver == JvmDriver.SCALA) return "Scala";
-    else return "Java";
   }
 
 }
