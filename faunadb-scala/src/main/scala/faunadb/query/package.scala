@@ -1096,6 +1096,14 @@ package object query {
   def SelectAll(path: Expr, from: Expr): Expr =
     Expr(ObjectV("select_all" -> path.value, "from" -> from.value))
 
+    /**
+    * A SelectAsIndex expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/selectasindex]]
+    */
+  def SelectAsIndex(path: Expr, from: Expr): Expr =
+    Expr(ObjectV("select_as_index" -> path.value, "from" -> from.value))
+
   /**
    * An Abs expression.
    *

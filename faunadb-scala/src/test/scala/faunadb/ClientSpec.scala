@@ -668,6 +668,10 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(client.query(SelectAll("foo" / "bar", Arr(Obj("foo" -> Obj("bar" -> 1)), Obj("foo" -> Obj("bar" -> 2)))))) shouldBe ArrayV(1, 2)
     await(client.query(SelectAll("foo" / 0, Arr(Obj("foo" -> Arr(0, 1)), Obj("foo" -> Arr(2, 3)))))) shouldBe ArrayV(0, 2)
 
+    await(client.query(SelectAsIndex("foo", Arr(Obj("foo" -> "bar"), Obj("foo" -> "baz"), Obj("a" -> "b"))))) shouldBe ArrayV("bar", "baz")
+    await(client.query(SelectAsIndex("foo" / "bar", Arr(Obj("foo" -> Obj("bar" -> 1)), Obj("foo" -> Obj("bar" -> 2)))))) shouldBe ArrayV(1, 2)
+    await(client.query(SelectAsIndex("foo" / 0, Arr(Obj("foo" -> Arr(0, 1)), Obj("foo" -> Arr(2, 3)))))) shouldBe ArrayV(0, 2)
+
     val andF = client.query(And(true, false))
     val andR = await(andF).to[Boolean].get
     andR shouldBe false
