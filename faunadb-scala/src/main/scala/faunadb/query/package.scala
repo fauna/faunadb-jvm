@@ -1093,6 +1093,7 @@ package object query {
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#read-functions]]
     */
+  @deprecated("use SelectAsIndex instead")
   def SelectAll(path: Expr, from: Expr): Expr =
     Expr(ObjectV("select_all" -> path.value, "from" -> from.value))
 

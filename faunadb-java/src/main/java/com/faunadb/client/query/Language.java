@@ -5015,7 +5015,10 @@ public final class Language {
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
    * @see #Select(Path, Expr)
+   *
+   * @deprecated use SelectAsIndex instead
    */
+  @Deprecated
   public static Expr SelectAll(Expr path, Expr from) {
     return Fn.apply("select_all", path, "from", from);
   }
@@ -5027,7 +5030,10 @@ public final class Language {
    * @param from the collection to traverse. Type: Array
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   *
+   * @deprecated use SelectAsIndex instead
    */
+  @Deprecated
   public static Expr SelectAll(Path path, Expr from) {
     return SelectAll(Arr(path.segments), from);
   }
