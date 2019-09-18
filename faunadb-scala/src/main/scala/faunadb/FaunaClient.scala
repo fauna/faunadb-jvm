@@ -80,7 +80,7 @@ object FaunaClient {
   *
   * @constructor create a new client with a configured [[com.faunadb.common.Connection]].
   */
-class FaunaClient(connection: Connection) {
+class FaunaClient private (connection: Connection) {
 
   private[this] val json = new ObjectMapper
   json.registerModule(new DefaultScalaModule)
