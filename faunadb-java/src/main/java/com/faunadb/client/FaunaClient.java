@@ -9,6 +9,7 @@ import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
+import com.faunadb.common.Connection.JvmDriver;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.handler.codec.http.FullHttpResponse;
 
@@ -119,7 +120,8 @@ public class FaunaClient implements AutoCloseable {
     public FaunaClient build() {
       Connection.Builder builder = Connection.builder()
         .withAuthToken(secret)
-        .withFaunaRoot(endpoint);
+        .withFaunaRoot(endpoint)
+        .withJvmDriver(JvmDriver.JAVA);
 
       if (registry != null) builder.withMetrics(registry);
 

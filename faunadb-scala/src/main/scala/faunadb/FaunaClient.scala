@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.common.Connection
+import com.faunadb.common.Connection.JvmDriver
 import faunadb.errors._
 import faunadb.query.Expr
 import faunadb.values.{ ArrayV, NullV, Value }
@@ -42,6 +43,7 @@ object FaunaClient {
     if (endpoint ne null) b.withFaunaRoot(endpoint)
     if (secret ne null) b.withAuthToken(secret)
     if (metrics ne null) b.withMetrics(metrics)
+    b.withJvmDriver(JvmDriver.SCALA)
 
     new FaunaClient(b.build)
   }
@@ -78,7 +80,7 @@ object FaunaClient {
   *
   * @constructor create a new client with a configured [[com.faunadb.common.Connection]].
   */
-class FaunaClient(connection: Connection) {
+class FaunaClient private (connection: Connection) {
 
   private[this] val json = new ObjectMapper
   json.registerModule(new DefaultScalaModule)

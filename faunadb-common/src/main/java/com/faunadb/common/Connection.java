@@ -52,6 +52,21 @@ public final class Connection implements AutoCloseable {
     }
   }
 
+  public enum JvmDriver {
+    JAVA("Java"),
+    SCALA("Scala");
+
+    private String stringValue;
+
+    JvmDriver(String stringValue) {
+      this.stringValue = stringValue;
+    }
+
+    @Override public String toString() {
+      return this.stringValue;
+    }
+  }
+
   /**
    * Returns a new {@link Builder} instance.
    *
@@ -72,6 +87,7 @@ public final class Connection implements AutoCloseable {
     private MetricRegistry metricRegistry;
     private long lastSeenTxn;
     private HttpClient client;
+    private JvmDriver jvmDriver;
 
     private Builder() {
     }
@@ -119,6 +135,17 @@ public final class Connection implements AutoCloseable {
      */
     public Builder withMetrics(MetricRegistry registry) {
       this.metricRegistry = registry;
+      return this;
+    }
+
+    /**
+     * Sets the Fauna driver to use for the connection.
+     *
+     * @param jvmDriver the {@link JvmDriver} to use for this connection.
+     * @return this {@link Builder} object
+     */
+    public Builder withJvmDriver(JvmDriver jvmDriver) {
+      this.jvmDriver = jvmDriver;
       return this;
     }
 
@@ -174,15 +201,17 @@ public final class Connection implements AutoCloseable {
         http = client;
       }
 
-      return new Connection(root, authToken, http, registry, lastSeenTxn);
+      return new Connection(root, authToken, http, registry, jvmDriver, lastSeenTxn);
     }
   }
 
   private static final String X_FAUNADB_HOST = "X-FaunaDB-Host";
   private static final String X_FAUNADB_BUILD = "X-FaunaDB-Build";
+  private static final String X_FAUNA_DRIVER = "X-Fauna-Driver";
 
   private final URL faunaRoot;
   private final String authHeader;
+  private final JvmDriver jvmDriver;
   private final HttpClient client;
   private final MetricRegistry registry;
 
@@ -191,11 +220,12 @@ public final class Connection implements AutoCloseable {
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final AtomicLong txnTime = new AtomicLong(0L);
 
-  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, long lastSeenTxn) {
+  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
     this.client = client;
     this.registry = registry;
+    this.jvmDriver = jvmDriver;
     txnTime.set(lastSeenTxn);
   }
 
@@ -210,7 +240,7 @@ public final class Connection implements AutoCloseable {
   public Connection newSessionConnection(String authToken) {
     try {
       client.retain();
-      return new Connection(faunaRoot, authToken, client, registry, getLastTxnTime());
+      return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime());
     } catch (IllegalReferenceCountException e) {
       throw new IllegalStateException("Can not create a session connection from a closed http connection");
     }
@@ -351,6 +381,10 @@ public final class Connection implements AutoCloseable {
     request.headers().add("Authorization", authHeader);
     request.headers().set("X-FaunaDB-API-Version", API_VERSION);
 
+    if(jvmDriver != null) {
+      request.headers().set(X_FAUNA_DRIVER, jvmDriver.toString());
+    }
+
     long time = getLastTxnTime();
     if (time > 0) {
       request.headers().set("X-Last-Seen-Txn", Long.toString(time));
@@ -415,4 +449,5 @@ public final class Connection implements AutoCloseable {
     enc.release();
     return hdr;
   }
+
 }
