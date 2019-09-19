@@ -1,0 +1,78 @@
+version: 2.1
+description: FaunaDB JVM Driver Tests
+
+executors:
+  core:
+    parameters:
+      version:
+        type: enum
+        enum: ["release", "nightly"]
+    resource_class: large
+    docker:
+      - image: circleci/openjdk:8-jdk
+
+      - image: gcr.io/faunadb-cloud/faunadb/enterprise/<<parameters.version>>:latest
+        name: core
+        auth:
+          username: _json_key
+          password: $GCR_KEY
+    environment:
+      FAUNA_ROOT_KEY: secret
+      FAUNA_DOMAIN: core
+      FAUNA_SCHEME: http
+      FAUNA_PORT: 8443
+      FAUNA_TIMEOUT: 60s
+
+commands:
+  build_and_test:
+    description: "Run JVM tests"
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-deps-{{ checksum "build.sbt" }}
+
+      - run:
+          name: Compile
+          command: sbt test:compile
+
+      - save_cache:
+          paths:
+          - ~/.ivy2
+          key: v1-deps-{{ checksum "build.sbt" }}
+
+      - run:
+          name: Run Tests
+          command: sbt test
+
+      - run:
+          when: always
+          name: Gather results
+          command: |
+            mkdir results
+            cp **/target/test-reports/*.xml results/
+
+      - store_test_results:
+          path: results/
+
+jobs:
+  core-stable:
+    executor:
+      name: core
+      version: release
+    steps:
+      - build_and_test
+
+  core-nightly:
+    executor:
+      name: core
+      version: nightly
+    steps:
+      - build_and_test
+
+workflows:
+  build_and_test:
+    jobs:
+      - core-stable
+      - core-nightly
