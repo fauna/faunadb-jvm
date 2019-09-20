@@ -1147,6 +1147,36 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeSelectAsIndexFunction() throws Exception {
+    assertJson(
+      SelectAsIndex(
+        Path("foo").at(1),
+        Arr(
+          Obj("foo", Arr(Value(0), Value(1))),
+          Obj("foo", Arr(Value(2), Value(3)))
+        )
+      ),
+      "{\"select_as_index\":[\"foo\",1],\"from\":[{\"object\":{\"foo\":[0,1]}},{\"object\":{\"foo\":[2,3]}}]}"
+    );
+
+    assertJson(
+      SelectAsIndex(
+        Path(0).at("name"),
+        Arr(Obj("name", Value("someone")))
+      ),
+      "{\"select_as_index\":[0,\"name\"],\"from\":[{\"object\":{\"name\":\"someone\"}}]}"
+    );
+
+    assertJson(
+      SelectAsIndex(
+        Arr(Value("foo"), Value("bar")),
+        Obj("foo", Obj("bar", Arr(Value(1), Value(2))))
+      ),
+      "{\"select_as_index\":[\"foo\",\"bar\"],\"from\":{\"object\":{\"foo\":{\"object\":{\"bar\":[1,2]}}}}}");
+  }
+
+
+  @Test
   public void shouldSerializeAbs() throws Exception {
     assertJson(Abs(Value(-100)), "{\"abs\":-100}");
     assertJson(Abs(-100L), "{\"abs\":-100}");

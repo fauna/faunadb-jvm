@@ -5246,7 +5246,10 @@ public final class Language {
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
    * @see #Select(Path, Expr)
+   *
+   * @deprecated use SelectAsIndex instead
    */
+  @Deprecated
   public static Expr SelectAll(Expr path, Expr from) {
     return Fn.apply("select_all", path, "from", from);
   }
@@ -5258,9 +5261,41 @@ public final class Language {
    * @param from the collection to traverse. Type: Array
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   *
+   * @deprecated use SelectAsIndex instead
    */
+  @Deprecated
   public static Expr SelectAll(Path path, Expr from) {
     return SelectAll(Arr(path.segments), from);
+  }
+
+  /**
+   * Selects the desired path for each element in the given array. The path must be an array in which each element
+   * can be either a string, or a number. If a string, the path segment refers to an object key. If a number, the
+   * path segment refers to an array index.
+   *
+   * For convenience, a path builder is available at the {@link #SelectAsIndex(Path, Expr)} function.
+   *
+   * @param path the path to the desired value. Type: Array
+   * @param from the collection to traverse. Type: Array
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/selectasindex">FaunaDB SelectAsIndex Function</a>
+   * @see #Select(Path, Expr)
+   */
+  public static Expr SelectAsIndex(Expr path, Expr from) {
+    return Fn.apply("select_as_index", path, "from", from);
+  }
+
+  /**
+   * Selects the desired path for each element in the given array.
+   *
+   * @param path the path to the desired value
+   * @param from the collection to traverse. Type: Array
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/selectasindex">FaunaDB SelectAsIndex Function</a>
+   */
+  public static Expr SelectAsIndex(Path path, Expr from) {
+    return SelectAsIndex(Arr(path.segments), from);
   }
 
   /**
