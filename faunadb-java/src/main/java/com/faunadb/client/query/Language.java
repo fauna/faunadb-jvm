@@ -4776,6 +4776,16 @@ public final class Language {
   }
 
   /**
+   * Returns the current snapshot time.
+   *
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/now">Now function</a>
+   */
+  public static Expr Now() {
+    return Fn.apply("now", Null());
+  }
+
+  /**
    * Returns a new string identifier suitable for use when constructing references.
    *
    * @deprecated Use NewId() instead.

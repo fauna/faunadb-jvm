@@ -990,6 +990,14 @@ package object query {
   def Date(str: Expr): Expr =
     Expr(ObjectV("date" -> str.value))
 
+  /**
+    * Returns the current snapshot time.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/now]]
+   */
+  def Now(): Expr =
+    Expr(ObjectV("now" -> NullV))
+
   // Misc Functions
 
   /**

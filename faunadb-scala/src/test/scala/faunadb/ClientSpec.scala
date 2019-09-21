@@ -874,6 +874,14 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     diffDateR.to[Long].get should equal (1)
   }
 
+  it should "test now function" in {
+    await(client.query(Equals(Now(), Time("now")))) shouldBe TrueV
+
+    val t1 = await(client.query(Now()))
+    val t2 = await(client.query(Now()))
+    await(client.query(LTE(t1, t2, Now()))) shouldBe TrueV
+  }
+
    it should "test authentication functions" in {
       val createF = client.query(Create(Collection("spells"), Obj("credentials" -> Obj("password" -> "abcdefg"))))
       val createR = await(createF)
