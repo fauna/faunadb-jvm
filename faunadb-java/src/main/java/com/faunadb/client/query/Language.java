@@ -6600,6 +6600,86 @@ public final class Language {
   }
 
   /**
+   * Casts an expression to a double value, if possible.
+   *
+   * @param value an expression. Type: Any
+   * @return a new {@link Expr}
+   */
+  public static Expr ToDouble(Expr value) {
+    return Fn.apply("to_double", value);
+  }
+
+  /**
+   * Casts an expression to a double value, if possible.
+   *
+   * @param value a string
+   * @return a new {@link Expr}
+   */
+  public static Expr ToDouble(String value) {
+    return ToDouble(Value(value));
+  }
+
+  /**
+   * Casts an expression to a double value, if possible.
+   *
+   * @param value a double value.
+   * @return a new {@link Expr}
+   */
+  public static Expr ToDouble(double value) {
+    return ToDouble(Value(value));
+  }
+
+  /**
+   * Casts an expression to a double value, if possible.
+   *
+   * @param value a long value
+   * @return a new {@link Expr}
+   */
+  public static Expr ToDouble(long value) {
+    return ToDouble(Value(value));
+  }
+
+  /**
+   * Casts an expression to an integer value, if possible.
+   *
+   * @param value an expression. Type: Any
+   * @return a new {@link Expr}
+   */
+  public static Expr ToInteger(Expr value) {
+    return Fn.apply("to_integer", value);
+  }
+
+  /**
+   * Casts an expression to an integer value, if possible.
+   *
+   * @param value a string.
+   * @return a new {@link Expr}
+   */
+  public static Expr ToInteger(String value) {
+    return ToInteger(Value(value));
+  }
+
+  /**
+   * Casts an expression to an integer value, if possible.
+   *
+   * @param value a double value
+   * @return a new {@link Expr}
+   */
+  public static Expr ToInteger(double value) {
+    return ToInteger(Value(value));
+  }
+
+  /**
+   * Casts an expression to an integer value, if possible.
+   *
+   * @param value a long value
+   * @return a new {@link Expr}
+   */
+  public static Expr ToInteger(long value) {
+    return ToInteger(Value(value));
+  }
+
+  /**
    * Casts an expression to a time value, if possible.
    *
    * @param value an expression. Type: Any

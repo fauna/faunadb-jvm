@@ -1512,6 +1512,46 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldEvalToDoubleExpression() throws Exception {
+    Value res1 = query(ToDouble(10L)).get();
+    assertThat(res1.to(DOUBLE).get(), equalTo(10.0));
+
+    Value res2 = query(ToDouble(3.14)).get();
+    assertThat(res2.to(DOUBLE).get(), equalTo(3.14));
+
+    Value res3 = query(ToDouble("3.14")).get();
+    assertThat(res3.to(DOUBLE).get(), equalTo(3.14));
+  }
+
+  @Test
+  public void shouldThrowBadRequestOnToDouble() throws Exception {
+    thrown.expectCause(isA(BadRequestException.class));
+    thrown.expectMessage("com.faunadb.client.errors.BadRequestException: invalid argument: Cannot cast Time to Double.");
+
+    query(ToDouble(Now())).get();
+  }
+
+  @Test
+  public void shouldEvalToIntegerExpression() throws Exception {
+    Value res1 = query(ToInteger(10L)).get();
+    assertThat(res1.to(LONG).get(), equalTo(10L));
+
+    Value res2 = query(ToInteger(10.0)).get();
+    assertThat(res2.to(LONG).get(), equalTo(10L));
+
+    Value res3 = query(ToInteger("10")).get();
+    assertThat(res3.to(LONG).get(), equalTo(10L));
+  }
+
+  @Test
+  public void shouldThrowBadRequestOnToInteger() throws Exception {
+    thrown.expectCause(isA(BadRequestException.class));
+    thrown.expectMessage("com.faunadb.client.errors.BadRequestException: invalid argument: Cannot cast Time to Integer.");
+
+    query(ToInteger(Now())).get();
+  }
+
+  @Test
   public void shouldEvalToTimeExpression() throws Exception {
     Value res = query(ToTime(Value("1970-01-01T00:00:00Z"))).get();
     assertThat(res.to(TIME).get(), equalTo(Instant.ofEpochMilli(0)));
@@ -2278,6 +2318,7 @@ public class ClientSpec {
     );
   }
 
+  @Test
   public void shouldTestReduce() throws Exception {
     RefV coll = onARandomCollection();
 
