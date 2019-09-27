@@ -750,6 +750,26 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val numF = client.query(ToNumber("100"))
     val numR = await(numF).to[Long].get
     numR should equal (100L)
+
+    await(client.query(
+      Arr(ToDouble(3.14d), ToDouble(10L), ToDouble("3.14"))
+    )).to[List[Double]].get shouldBe List(3.14D, 10D, 3.14D)
+
+    val doubleErr = the[BadRequestException] thrownBy {
+      await(client.query(ToDouble(Now())))
+    }
+
+    doubleErr.getMessage shouldBe "invalid argument: Cannot cast Time to Double."
+
+    await(client.query(
+      Arr(ToInteger(10D), ToInteger(10L), ToInteger("10"))
+    )).to[List[Long]].get shouldBe List(10L, 10L, 10L)
+
+    val integerErr = the[BadRequestException] thrownBy {
+      await(client.query(ToInteger(Now())))
+    }
+
+    integerErr.getMessage shouldBe "invalid argument: Cannot cast Time to Integer."
   }
 
   it should "test time functions" in {
