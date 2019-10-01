@@ -22,9 +22,13 @@ object Result {
         case VSuccess(v, pre) =>
           field.get(v) match {
             case VSuccess(t, path) => VSuccess(t, pre ++ path)
-            case VFail(errs) => VFail(errs map (_ prefixed pre))
+            case VFail(errs)       => VFail(errs map (_ prefixed pre))
           }
-        case VFail(errs) => VFail(errs)
+        case f @ VFail(_) =>
+          field.get(NullV) match {
+            case VSuccess(t, path) => VSuccess(t, path)
+            case VFail(_)          => f
+          }
       }
 
     def apply(p: FieldPath, ps: FieldPath*): Result[Value] = apply(Field(p, ps: _*))

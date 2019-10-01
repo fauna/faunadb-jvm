@@ -356,6 +356,66 @@ class CodecSpec extends FlatSpec with Matchers {
     ((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11): Value) shouldBe ArrayV(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
   }
 
+  it should "works with for-comprehensions" in {
+    {
+      val obj = ObjectV("x" -> LongV(10), "y" -> LongV(20))
+
+      val xy = for {
+        x <- obj("x").to[Long]
+        y <- obj("y").to[Long]
+      } yield {
+        (x, y)
+      }
+
+      xy.isSuccess shouldBe true
+      xy.get shouldBe (10L, 20L)
+    }
+
+    {
+      val obj = ObjectV("y" -> LongV(20))
+
+      val xy = for {
+        x <- obj("x").to[Long]
+        y <- obj("y").to[Long]
+      } yield {
+        (x, y)
+      }
+
+      xy.isFailure shouldBe true
+      the [ValueReadException] thrownBy {
+        xy.get
+      } should have message "Error at /x: Value not found"
+    }
+
+    {
+      val obj = ObjectV("x" -> LongV(10))
+
+      val xy = for {
+        x <- obj("x").to[Long]
+        y <- obj("y").to[Option[Long]]
+      } yield {
+        (x, y)
+      }
+
+      xy.isSuccess shouldBe true
+      xy.get shouldBe (10L, Option.empty[Long])
+    }
+
+    {
+      val obj = ObjectV("x" -> LongV(10), "y" -> ObjectV())
+
+      val xy = for {
+        x <- obj("x").to[Long]
+        y <- obj("y", "z").to[Option[Long]]
+      } yield {
+        (x, y)
+      }
+
+      xy.isSuccess shouldBe true
+      xy.get shouldBe (10L, Option.empty[Long])
+    }
+  }
+
   // Errors
 
   it should "test for runtime errors" in {
