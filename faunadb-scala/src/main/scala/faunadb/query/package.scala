@@ -1556,6 +1556,18 @@ package object query {
     Expr(ObjectV("to_number" -> term.value))
 
   /**
+    * Casts an expression to a double value, if possible.
+    */
+  def ToDouble(term: Expr): Expr =
+    Expr(ObjectV("to_double" -> term.value))
+
+  /**
+    * Casts an expression to an integer value, if possible.
+    */
+  def ToInteger(term: Expr): Expr =
+    Expr(ObjectV("to_integer" -> term.value))
+
+  /**
     * Casts an expression to a time value, if possible.
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#time-functions]]
