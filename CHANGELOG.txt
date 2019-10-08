@@ -1,3 +1,12 @@
+2.9.0
+* Add String functions: StartsWith(), EndsWith(), ContainsStr(), ContainsStrRegex(), and RegexEscape()
+* Add Conversion functions: ToDouble() and ToInteger()
+* Add Time functions: Now()
+* Add Read functions: SelectAsIndex()
+* Add X-Fauna-Driver header to HTTP client
+* Add support for paginate with cursor object
+* Enhance Result monad on for-comprehensions
+
 2.8.1
 * Disable scoverage for scala 2.11
 
