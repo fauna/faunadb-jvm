@@ -30,15 +30,13 @@ package query {
   case class Expr private[query] (@(JsonValue @getter) value: Value) extends AnyVal
 
   object Expr {
-    implicit def encode[T: Encoder](obj: T): Expr = new Expr(wrapValue(obj))
+    implicit def encode[T: Encoder](obj: T): Expr = Expr(wrapValue(obj))
 
     private def wrapValue(value: Value): Value = value match {
       case ObjectV(fields) => ObjectV("object" -> ObjectV(fields.map { case (k, v) => (k, wrapValue(v)) }))
       case ArrayV(values) => ArrayV(values.map(wrapValue))
       case _ => value
     }
-
-    private[query] def apply(value: Value): Expr = new Expr(value)
   }
 
   /**
