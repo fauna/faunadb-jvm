@@ -1188,6 +1188,40 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     )) shouldBe ObjectV("x" -> ArrayV("x", 10, 100), "y" -> ArrayV("y", 20, 200))
   }
 
+  it should "to_object" in {
+    await(client.query(ToObject(Seq(("k0", 10), ("k1", 20))))) shouldBe ObjectV("k0" -> 10, "k1" -> 20)
+
+    val collName = aRandomString
+    val indexName = aRandomString
+    await(client.query(CreateCollection(Obj("name" -> collName))))
+    await(client.query(CreateIndex(Obj(
+      "name" -> indexName,
+      "source" -> Collection(collName),
+      "active" -> true,
+      "values" -> Arr(
+        Obj("field" -> Arr("data", "key")),
+        Obj("field" -> Arr("data", "value"))
+      )
+    ))))
+
+    await(client.query(Do(
+      Create(Collection(collName), Obj("data" -> Obj("key" -> "k0", "value" -> 10))),
+      Create(Collection(collName), Obj("data" -> Obj("key" -> "k1", "value" -> 20)))
+    )))
+
+    await(client.query(ToObject(Select("data", Paginate(Match(Index(indexName))))))) shouldBe ObjectV("k0" -> 10, "k1" -> 20)
+  }
+
+  it should "to_array" in {
+    await(client.query(ToArray(Obj("k0" -> 10, "k1" -> 20)))) shouldBe ArrayV(("k0", 10), ("k1", 20))
+  }
+
+  it should "to_object/to_array" in {
+    val obj = ObjectV("k0" -> 10, "k1" -> 20)
+
+    await(client.query(ToObject(ToArray(obj)))) shouldBe obj
+  }
+
   it should "reduce collections" in {
     val collName = aRandomString
     val indexName = aRandomString
