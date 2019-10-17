@@ -6833,4 +6833,24 @@ public final class Language {
   public static Expr Merge(Expr merge, Expr with, Expr lambda) {
     return Fn.apply("merge", merge, "with", with, "lambda", lambda);
   }
+
+  /**
+   * Try to convert an array of (field, value) into an object.
+   *
+   * @param fields an expr that result into an array of (field, value)
+   * @return a new {@link Expr}
+   */
+  public static Expr ToObject(Expr fields) {
+    return Fn.apply("to_object", fields);
+  }
+
+  /**
+   * Try to convert an object into an array of (field, value).
+   *
+   * @param object the object to convert.
+   * @return a new {@link Expr}
+   */
+  public static Expr ToArray(Expr object) {
+    return Fn.apply("to_array", object);
+  }
 }

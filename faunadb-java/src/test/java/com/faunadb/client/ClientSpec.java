@@ -2199,6 +2199,67 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldTestToObject() throws Exception {
+    Map<String, Value> keys = new HashMap<>();
+    keys.put("k0", new LongV(10));
+    keys.put("k1", new LongV(20));
+    ObjectV obj = new ObjectV(keys);
+
+    assertThat(
+      query(ToObject(Arr(Arr(Value("k0"), Value(10)), Arr(Value("k1"), Value(20))))).get(),
+      equalTo(obj)
+    );
+
+    String collName = randomStartingWith("collection_");
+    String indexName = randomStartingWith("index_");
+
+    query(CreateCollection(Obj("name", Value(collName)))).get();
+    query(CreateIndex(Obj(
+      "name", Value(indexName),
+      "source", Collection(collName),
+      "active", Value(true),
+      "values", Arr(
+        Obj("field", Arr(Value("data"), Value("key"))),
+        Obj("field", Arr(Value("data"), Value("value")))
+      )
+    ))).get();
+
+    query(Do(
+      Create(Collection(collName), Obj("data", Obj("key", Value("k0"), "value", Value(10)))),
+      Create(Collection(collName), Obj("data", Obj("key", Value("k1"), "value", Value(20))))
+    )).get();
+
+    assertThat(
+      query(ToObject(Select(Path("data"), Paginate(Match(Index(indexName)))))).get(),
+      equalTo(obj)
+    );
+  }
+
+  @Test
+  public void shouldTestToArray() throws Exception {
+    assertThat(
+      query(ToArray(Obj("k0", Value(10), "k1", Value(20)))).get(),
+      equalTo(new ArrayV(Arrays.asList(
+        new ArrayV(Arrays.<Value>asList(new StringV("k0"), new LongV(10))),
+        new ArrayV(Arrays.<Value>asList(new StringV("k1"), new LongV(20)))
+      )))
+    );
+  }
+
+  @Test
+  public void shouldTestToArrayAndToObject() throws Exception {
+    Map<String, Value> keys = new HashMap<>();
+    keys.put("k0", new LongV(10));
+    keys.put("k1", new LongV(20));
+    ObjectV obj = new ObjectV(keys);
+
+    assertThat(
+      query(ToObject(ToArray(obj))).get(),
+      equalTo(obj)
+    );
+  }
+
+  @Test
   public void shouldTestCountSumMean() throws Exception {
     String collName = randomStartingWith("collection_");
     String indexName = randomStartingWith("index_");

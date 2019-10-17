@@ -1684,4 +1684,16 @@ package object query {
     */
   def Merge(merge: Expr, `with`: Expr, lambda: Expr): Expr =
     Expr(ObjectV("merge" -> merge.value, "with" -> `with`.value, "lambda" -> lambda.value))
+
+  /**
+    * Try to convert an array of (field, value) into an object.
+    */
+  def ToObject(fields: Expr): Expr =
+    Expr(ObjectV("to_object" -> fields.value))
+
+  /**
+    * Try to convert an object into an array of (field, value).
+    */
+  def ToArray(obj: Expr): Expr =
+    Expr(ObjectV("to_array" -> obj.value))
 }
