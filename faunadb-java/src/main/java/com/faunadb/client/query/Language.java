@@ -4337,6 +4337,19 @@ public final class Language {
    * added.
    *
    * @param base the base time or data. Type: Time or Date
+   * @param offset the number of units. Type: Number
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeAdd(Expr base, Expr offset, String unit) {
+    return TimeAdd(base, offset, Value(unit));
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * added.
+   *
+   * @param base the base time or data. Type: Time or Date
    * @param offset the number of units.
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
@@ -4362,13 +4375,13 @@ public final class Language {
    * Returns a new time or date with the offset in terms of the unit
    * added.
    *
-   * @param base the base time or data.
-   * @param offset the number of units. Type: Number
-   * @param unit the unit type. Type: String
+   * @param base the base time or data. Type: Time or Date
+   * @param offset the number of units.
+   * @param unit the unit type.
    * @return a new {@link Expr} instance
    */
-  public static Expr TimeAdd(Instant base, Expr offset, Expr unit) {
-    return TimeAdd(new TimeV(base), offset, unit);
+  public static Expr TimeAdd(Expr base, long offset, String unit) {
+    return TimeAdd(base, new LongV(offset), Value(unit));
   }
 
   /**
@@ -4376,12 +4389,12 @@ public final class Language {
    * added.
    *
    * @param base the base time or data.
-   * @param offset the number of units.
+   * @param offset the number of units. Type: Number
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
    */
-  public static Expr TimeAdd(Instant base, long offset, Expr unit) {
-    return TimeAdd(new TimeV(base), new LongV(offset), unit);
+  public static Expr TimeAdd(Instant base, Expr offset, Expr unit) {
+    return TimeAdd(new TimeV(base), offset, unit);
   }
 
   /**
@@ -4402,6 +4415,32 @@ public final class Language {
    * added.
    *
    * @param base the base time or data.
+   * @param offset the number of units. Type: Number
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeAdd(Instant base, Expr offset, String unit) {
+    return TimeAdd(new TimeV(base), offset, Value(unit));
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * added.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units.
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeAdd(Instant base, long offset, Expr unit) {
+    return TimeAdd(new TimeV(base), new LongV(offset), unit);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * added.
+   *
+   * @param base the base time or data.
    * @param offset the number of units.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
@@ -4410,6 +4449,18 @@ public final class Language {
     return TimeAdd(new TimeV(base), new LongV(offset), unit.value);
   }
 
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * added.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units.
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeAdd(Instant base, long offset, String unit) {
+    return TimeAdd(new TimeV(base), new LongV(offset), Value(unit));
+  }
 
   /**
    * Returns a new time or date with the offset in terms of the unit
@@ -4442,6 +4493,32 @@ public final class Language {
    * added.
    *
    * @param base the base time or data.
+   * @param offset the number of units.
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeAdd(LocalDate base, long offset, TimeUnit unit) {
+    return TimeAdd(new DateV(base), new LongV(offset), unit.value);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * added.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units.
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeAdd(LocalDate base, long offset, String unit) {
+    return TimeAdd(new DateV(base), new LongV(offset), Value(unit));
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * added.
+   *
+   * @param base the base time or data.
    * @param offset the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
@@ -4455,12 +4532,12 @@ public final class Language {
    * added.
    *
    * @param base the base time or data.
-   * @param offset the number of units.
+   * @param offset the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
    */
-  public static Expr TimeAdd(LocalDate base, long offset, TimeUnit unit) {
-    return TimeAdd(new DateV(base), new LongV(offset), unit.value);
+  public static Expr TimeAdd(LocalDate base, Expr offset, String unit) {
+    return TimeAdd(new DateV(base), offset, Value(unit));
   }
 
   /**
@@ -4494,6 +4571,19 @@ public final class Language {
    * subtracted.
    *
    * @param base the base time or data. Type: Time or Date
+   * @param offset the number of units. Type: Number
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(Expr base, Expr offset, String unit) {
+    return TimeSubtract(base, offset, Value(unit));
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data. Type: Time or Date
    * @param offset the number of units.
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
@@ -4519,13 +4609,13 @@ public final class Language {
    * Returns a new time or date with the offset in terms of the unit
    * subtracted.
    *
-   * @param base the base time or data.
-   * @param offset the number of units. Type: Number
-   * @param unit the unit type. Type: String
+   * @param base the base time or data. Type: Time or Date
+   * @param offset the number of units.
+   * @param unit the unit type.
    * @return a new {@link Expr} instance
    */
-  public static Expr TimeSubtract(Instant base, Expr offset, Expr unit) {
-    return TimeSubtract(new TimeV(base), offset, unit);
+  public static Expr TimeSubtract(Expr base, long offset, String unit) {
+    return TimeSubtract(base, new LongV(offset), Value(unit));
   }
 
   /**
@@ -4533,12 +4623,12 @@ public final class Language {
    * subtracted.
    *
    * @param base the base time or data.
-   * @param offset the number of units.
+   * @param offset the number of units. Type: Number
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
    */
-  public static Expr TimeSubtract(Instant base, long offset, Expr unit) {
-    return TimeSubtract(new TimeV(base), new LongV(offset), unit);
+  public static Expr TimeSubtract(Instant base, Expr offset, Expr unit) {
+    return TimeSubtract(new TimeV(base), offset, unit);
   }
 
   /**
@@ -4559,6 +4649,32 @@ public final class Language {
    * subtracted.
    *
    * @param base the base time or data.
+   * @param offset the number of units. Type: Number
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(Instant base, Expr offset, String unit) {
+    return TimeSubtract(new TimeV(base), offset, Value(unit));
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units.
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(Instant base, long offset, Expr unit) {
+    return TimeSubtract(new TimeV(base), new LongV(offset), unit);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data.
    * @param offset the number of units.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
@@ -4567,6 +4683,18 @@ public final class Language {
     return TimeSubtract(new TimeV(base), new LongV(offset), unit.value);
   }
 
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units.
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(Instant base, long offset, String unit) {
+    return TimeSubtract(new TimeV(base), new LongV(offset), Value(unit));
+  }
 
   /**
    * Returns a new time or date with the offset in terms of the unit
@@ -4579,19 +4707,6 @@ public final class Language {
    */
   public static Expr TimeSubtract(LocalDate base, Expr offset, Expr unit) {
     return TimeSubtract(new DateV(base), offset, unit);
-  }
-
-  /**
-   * Returns a new time or date with the offset in terms of the unit
-   * subtracted.
-   *
-   * @param base the base time or data.
-   * @param offset the number of units.
-   * @param unit the unit type. Type: String
-   * @return a new {@link Expr} instance
-   */
-  public static Expr TimeSubtract(LocalDate base, long offset, Expr unit) {
-     return TimeSubtract(new DateV(base), new LongV(offset), unit);
   }
 
   /**
@@ -4612,12 +4727,51 @@ public final class Language {
    * subtracted.
    *
    * @param base the base time or data.
+   * @param offset the number of units. Type: Number
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(LocalDate base, Expr offset, String unit) {
+    return TimeSubtract(new DateV(base), offset, Value(unit));
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units.
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(LocalDate base, long offset, Expr unit) {
+     return TimeSubtract(new DateV(base), new LongV(offset), unit);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data.
    * @param offset the number of units.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
    */
   public static Expr TimeSubtract(LocalDate base, long offset, TimeUnit unit) {
     return TimeSubtract(new DateV(base), new LongV(offset), unit.value);
+  }
+
+  /**
+   * Returns a new time or date with the offset in terms of the unit
+   * subtracted.
+   *
+   * @param base the base time or data.
+   * @param offset the number of units.
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeSubtract(LocalDate base, long offset, String unit) {
+    return TimeSubtract(new DateV(base), new LongV(offset), Value(unit));
   }
 
   /**
@@ -4650,6 +4804,20 @@ public final class Language {
 
   /**
    * Returns the number of intervals in terms of the unit between
+   * two times or dates. Both start and finish must be of the same
+   * type.
+   *
+   * @param start the starting time or date, inclusive. Type: Time or Date
+   * @param finish the ending time or date, exclusive. Type: Time or Date
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(Expr start, Expr finish, String unit) {
+    return TimeDiff(start, finish, Value(unit));
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
    * two times.
    *
    * @param start the starting time, inclusive.
@@ -4659,19 +4827,6 @@ public final class Language {
    */
   public static Expr TimeDiff(Instant start, Expr finish, Expr unit) {
     return TimeDiff(new TimeV(start), finish, unit);
-  }
-
-  /**
-   * Returns the number of intervals in terms of the unit between
-   * two times.
-   *
-   * @param start the starting time, inclusive.
-   * @param finish the ending time, exclusive.
-   * @param unit the unit type. Type: String
-   * @return a new {@link Expr} instance
-   */
-  public static Expr TimeDiff(Instant start, Instant finish, Expr unit) {
-    return TimeDiff(new TimeV(start), new TimeV(finish), unit);
   }
 
   /**
@@ -4692,12 +4847,51 @@ public final class Language {
    * two times.
    *
    * @param start the starting time, inclusive.
+   * @param finish the ending time, exclusive. Type: Time
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(Instant start, Expr finish, String unit) {
+    return TimeDiff(new TimeV(start), finish, Value(unit));
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two times.
+   *
+   * @param start the starting time, inclusive.
+   * @param finish the ending time, exclusive.
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(Instant start, Instant finish, Expr unit) {
+    return TimeDiff(new TimeV(start), new TimeV(finish), unit);
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two times.
+   *
+   * @param start the starting time, inclusive.
    * @param finish the ending time, exclusive.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
    */
   public static Expr TimeDiff(Instant start, Instant finish, TimeUnit unit) {
     return TimeDiff(new TimeV(start), new TimeV(finish), unit.value);
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two times.
+   *
+   * @param start the starting time, inclusive.
+   * @param finish the ending time, exclusive.
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(Instant start, Instant finish, String unit) {
+    return TimeDiff(new TimeV(start), new TimeV(finish), Value(unit));
   }
 
   /**
@@ -4718,19 +4912,6 @@ public final class Language {
    * two dates.
    *
    * @param start the starting date, inclusive.
-   * @param finish the ending date, exclusive.
-   * @param unit the unit type. Type: String
-   * @return a new {@link Expr} instance
-   */
-  public static Expr TimeDiff(LocalDate start, LocalDate finish, Expr unit) {
-    return TimeDiff(new DateV(start), new DateV(finish), unit);
-  }
-
-  /**
-   * Returns the number of intervals in terms of the unit between
-   * two dates.
-   *
-   * @param start the starting date, inclusive.
    * @param finish the ending date, exclusive. Type: Date
    * @param unit the unit type.
    * @return a new {@link Expr} instance
@@ -4744,12 +4925,51 @@ public final class Language {
    * two dates.
    *
    * @param start the starting date, inclusive.
+   * @param finish the ending date, exclusive. Type: Date
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(LocalDate start, Expr finish, String unit) {
+    return TimeDiff(new DateV(start), finish, Value(unit));
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two dates.
+   *
+   * @param start the starting date, inclusive.
+   * @param finish the ending date, exclusive.
+   * @param unit the unit type. Type: String
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(LocalDate start, LocalDate finish, Expr unit) {
+    return TimeDiff(new DateV(start), new DateV(finish), unit);
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two dates.
+   *
+   * @param start the starting date, inclusive.
    * @param finish the ending date, exclusive.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
    */
   public static Expr TimeDiff(LocalDate start, LocalDate finish, TimeUnit unit) {
     return TimeDiff(new DateV(start), new DateV(finish), unit.value);
+  }
+
+  /**
+   * Returns the number of intervals in terms of the unit between
+   * two dates.
+   *
+   * @param start the starting date, inclusive.
+   * @param finish the ending date, exclusive.
+   * @param unit the unit type.
+   * @return a new {@link Expr} instance
+   */
+  public static Expr TimeDiff(LocalDate start, LocalDate finish, String unit) {
+    return TimeDiff(new DateV(start), new DateV(finish), Value(unit));
   }
 
   /**
