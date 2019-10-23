@@ -2474,6 +2474,117 @@ public class ClientSpec {
     );
   }
 
+  @Test
+  public void testTypeCheck() throws Exception {
+    Value coll = serverClient.query(CreateCollection(Obj("name", Value(randomStartingWith())))).get().at("ref");
+    Value index = serverClient.query(CreateIndex(Obj("name", Value(randomStartingWith()), "source", coll, "active", Value(true)))).get().at("ref");
+    Value doc = serverClient.query(Create(coll, Obj("credentials", Obj("password", Value("sekret"))))).get().at("ref");
+    Value db = adminClient.query(CreateDatabase(Obj("name", Value(randomStartingWith())))).get().at("ref");
+    Value fn = serverClient.query(CreateFunction(Obj("name", Value(randomStartingWith()), "body", Query(Lambda("x", Var("x")))))).get().at("ref");
+    Value key = adminClient.query(CreateKey(Obj("database", db, "role", Value("admin")))).get().at("ref");
+    Value tok = serverClient.query(Login(doc, Obj("password", Value("sekret")))).get();
+    Value role = adminClient.query(CreateRole(Obj("name", Value(randomStartingWith()), "membership", Arr(), "privileges", Arr()))).get().at("ref");
+    FaunaClient cli = serverClient.newSessionClient(tok.get(SECRET_FIELD));
+    Value cred = cli.query(Get(Ref("credentials/self"))).get().at("ref");
+    Value token = tok.at("ref");
+
+    cli.close();
+
+    List<Expr> trueExprs = Arrays.asList(
+      IsNumber(Value(3.14)),
+      IsNumber(Value(10L)),
+      IsDouble(Value(3.14)),
+      IsInteger(Value(10L)),
+      IsBoolean(Value(true)),
+      IsBoolean(Value(false)),
+      IsNull(Null()),
+      IsBytes(Value(new byte[] {0x1, 0x2, 0x3, 0x4})),
+      IsTimestamp(Now()),
+      IsTimestamp(Epoch(1, SECOND)),
+      IsTimestamp(Time("1970-01-01T00:00:00Z")),
+      IsDate(ToDate(Now())),
+      IsDate(Date("1970-01-01")),
+      IsString(Value("string")),
+      IsArray(Arr(Value(10))),
+      IsObject(Obj("x", Value(10))),
+      IsObject(Paginate(Collections())),
+      IsObject(Get(doc)),
+      IsRef(coll),
+      IsSet(Collections()),
+      IsSet(Match(index)),
+      IsSet(Union(Match(index))),
+      IsDoc(doc),
+      IsDoc(Get(doc)),
+      IsLambda(Query(Lambda("x", Var("x")))),
+      IsCollection(coll),
+      IsCollection(Get(coll)),
+      IsDatabase(db),
+      IsDatabase(Get(db)),
+      IsIndex(index),
+      IsIndex(Get(index)),
+      IsFunction(fn),
+      IsFunction(Get(fn)),
+      IsKey(key),
+      IsKey(Get(key)),
+      IsToken(token),
+      IsToken(Get(token)),
+      IsCredentials(cred),
+      IsCredentials(Get(cred)),
+      IsRole(role),
+      IsRole(Get(role))
+    );
+
+    assertThat(
+      adminClient.query(trueExprs).get(),
+      equalTo(Collections.nCopies(trueExprs.size(), BooleanV.TRUE))
+    );
+
+    List<Expr> falseExprs = Arrays.asList(
+      IsNumber(Value("string")),
+      IsNumber(Arr()),
+      IsDouble(Value(10L)),
+      IsInteger(Value(3.14)),
+      IsBoolean(Value("string")),
+      IsBoolean(Value(10)),
+      IsNull(Value("string")),
+      IsBytes(Arr(Value(0x1), Value(0x2), Value(0x3), Value(0x4))),
+      IsTimestamp(ToDate(Now())),
+      IsTimestamp(Value(10)),
+      IsDate(Now()),
+      IsString(Arr()),
+      IsString(Value(10)),
+      IsArray(Obj("x", Value(10))),
+      IsObject(Arr(Value(10))),
+      IsRef(Match(index)),
+      IsRef(Value(10)),
+      IsSet(Value("string")),
+      IsDoc(Obj()),
+      IsLambda(fn),
+      IsLambda(Get(fn)),
+      IsCollection(db),
+      IsCollection(Get(db)),
+      IsDatabase(coll),
+      IsDatabase(Get(coll)),
+      IsIndex(coll),
+      IsIndex(Get(db)),
+      IsFunction(index),
+      IsFunction(Get(coll)),
+      IsKey(db),
+      IsKey(Get(index)),
+      IsToken(index),
+      IsToken(Get(cred)),
+      IsCredentials(token),
+      IsCredentials(Get(role)),
+      IsRole(coll),
+      IsRole(Get(index))
+    );
+
+    assertThat(
+      adminClient.query(falseExprs).get(),
+      equalTo(Collections.nCopies(falseExprs.size(), BooleanV.FALSE))
+    );
+  }
+
   private CompletableFuture<Value> query(Expr expr) {
     return serverClient.query(expr);
   }
