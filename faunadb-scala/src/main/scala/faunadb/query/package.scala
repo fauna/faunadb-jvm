@@ -1696,4 +1696,188 @@ package object query {
     */
   def ToArray(obj: Expr): Expr =
     Expr(ObjectV("to_array" -> obj.value))
+
+  /**
+    * Check if the expression is a number.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isnumber]]
+    */
+  def IsNumber(expr: Expr): Expr =
+    Expr(ObjectV("is_number" -> expr.value))
+
+  /**
+    * Check if the expression is a double.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isdouble]]
+    */
+  def IsDouble(expr: Expr): Expr =
+    Expr(ObjectV("is_double" -> expr.value))
+
+  /**
+    * Check if the expression is an integer.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isinteger]]
+    */
+  def IsInteger(expr: Expr): Expr =
+    Expr(ObjectV("is_integer" -> expr.value))
+
+  /**
+    * Check if the expression is a boolean.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isboolean]]
+    */
+  def IsBoolean(expr: Expr): Expr =
+    Expr(ObjectV("is_boolean" -> expr.value))
+
+  /**
+    * Check if the expression is null.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isnull]]
+    */
+  def IsNull(expr: Expr): Expr =
+    Expr(ObjectV("is_null" -> expr.value))
+
+  /**
+    * Check if the expression is a byte array.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isbytes]]
+    */
+  def IsBytes(expr: Expr): Expr =
+    Expr(ObjectV("is_bytes" -> expr.value))
+
+  /**
+    * Check if the expression is a timestamp.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/istimestamp]]
+    */
+  def IsTimestamp(expr: Expr): Expr =
+    Expr(ObjectV("is_timestamp" -> expr.value))
+
+  /**
+    * Check if the expression is a date.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isdate]]
+    */
+  def IsDate(expr: Expr): Expr =
+    Expr(ObjectV("is_date" -> expr.value))
+
+  /**
+    * Check if the expression is a string.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isstring]]
+    */
+  def IsString(expr: Expr): Expr =
+    Expr(ObjectV("is_string" -> expr.value))
+
+  /**
+    * Check if the expression is an array.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isarray]]
+    */
+  def IsArray(expr: Expr): Expr =
+    Expr(ObjectV("is_array" -> expr.value))
+
+  /**
+    * Check if the expression is an object.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isobject]]
+    */
+  def IsObject(expr: Expr): Expr =
+    Expr(ObjectV("is_object" -> expr.value))
+
+  /**
+    * Check if the expression is a reference.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isref]]
+    */
+  def IsRef(expr: Expr): Expr =
+    Expr(ObjectV("is_ref" -> expr.value))
+
+  /**
+    * Check if the expression is a set.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isset]]
+    */
+  def IsSet(expr: Expr): Expr =
+    Expr(ObjectV("is_set" -> expr.value))
+
+  /**
+    * Check if the expression is a document (either a reference or an instance).
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isdoc]]
+    */
+  def IsDoc(expr: Expr): Expr =
+    Expr(ObjectV("is_doc" -> expr.value))
+
+  /**
+    * Check if the expression is a lambda.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/islambda]]
+    */
+  def IsLambda(expr: Expr): Expr =
+    Expr(ObjectV("is_lambda" -> expr.value))
+
+  /**
+    * Check if the expression is a collection.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/iscollection]]
+    */
+  def IsCollection(expr: Expr): Expr =
+    Expr(ObjectV("is_collection" -> expr.value))
+
+  /**
+    * Check if the expression is a database.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isdatabase]]
+    */
+  def IsDatabase(expr: Expr): Expr =
+    Expr(ObjectV("is_database" -> expr.value))
+
+  /**
+    * Check if the expression is an index.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isindex]]
+    */
+  def IsIndex(expr: Expr): Expr =
+    Expr(ObjectV("is_index" -> expr.value))
+
+  /**
+    * Check if the expression is a function.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isfunction]]
+    */
+  def IsFunction(expr: Expr): Expr =
+    Expr(ObjectV("is_function" -> expr.value))
+
+  /**
+    * Check if the expression is a key.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/iskey]]
+    */
+  def IsKey(expr: Expr): Expr =
+    Expr(ObjectV("is_key" -> expr.value))
+
+  /**
+    * Check if the expression is a token.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/istoken]]
+    */
+  def IsToken(expr: Expr): Expr =
+    Expr(ObjectV("is_token" -> expr.value))
+
+  /**
+    * Check if the expression is a credentials.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/iscredentials]]
+    */
+  def IsCredentials(expr: Expr): Expr =
+    Expr(ObjectV("is_credentials" -> expr.value))
+
+  /**
+    * Check if the expression is a role.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/isrole]]
+    */
+  def IsRole(expr: Expr): Expr =
+    Expr(ObjectV("is_role" -> expr.value))
 }
