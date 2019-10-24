@@ -2329,6 +2329,79 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldTestAllAny() throws Exception {
+    Value coll = serverClient.query(CreateCollection(Obj("name", Value(randomStartingWith())))).get();
+    Value index = serverClient.query(CreateIndex(Obj(
+      "name", Value(randomStartingWith()),
+      "source", coll.at("ref"),
+      "active", Value(true),
+      "terms", Arr(Obj("field", Arr(Value("data"), Value("foo")))),
+      "values", Arr(Obj("field", Arr(Value("data"), Value("value"))))
+    ))).get();
+
+    serverClient.query(Do(
+      Create(coll.at("ref"), Obj("data", Obj("foo", Value("true"), "value", Value(true)))),
+      Create(coll.at("ref"), Obj("data", Obj("foo", Value("true"), "value", Value(true)))),
+      Create(coll.at("ref"), Obj("data", Obj("foo", Value("true"), "value", Value(true)))),
+
+      Create(coll.at("ref"), Obj("data", Obj("foo", Value("false"), "value", Value(false)))),
+      Create(coll.at("ref"), Obj("data", Obj("foo", Value("false"), "value", Value(false)))),
+      Create(coll.at("ref"), Obj("data", Obj("foo", Value("false"), "value", Value(false)))),
+
+      Create(coll.at("ref"), Obj("data", Obj("foo", Value("mixed"), "value", Value(true)))),
+      Create(coll.at("ref"), Obj("data", Obj("foo", Value("mixed"), "value", Value(false)))),
+      Create(coll.at("ref"), Obj("data", Obj("foo", Value("mixed"), "value", Value(true)))),
+      Create(coll.at("ref"), Obj("data", Obj("foo", Value("mixed"), "value", Value(false))))
+    )).get();
+
+    //all: array
+    assertThat(serverClient.query(All(Arr(Value(true), Value(true), Value(true)))).get(), equalTo(BooleanV.TRUE));
+    assertThat(serverClient.query(All(Arr(Value(true), Value(false), Value(true)))).get(), equalTo(BooleanV.FALSE));
+
+    //all: page
+    assertThat(
+      serverClient.query(Select(Path("data").at(0), All(Paginate(Match(index.at("ref"), Value("true")))))).get(),
+      equalTo(BooleanV.TRUE)
+    );
+    assertThat(
+      serverClient.query(Select(Path("data").at(0), All(Paginate(Match(index.at("ref"), Value("false")))))).get(),
+      equalTo(BooleanV.FALSE)
+    );
+    assertThat(
+      serverClient.query(Select(Path("data").at(0), All(Paginate(Match(index.at("ref"), Value("mixed")))))).get(),
+      equalTo(BooleanV.FALSE)
+    );
+
+    //all: set
+    assertThat(serverClient.query(All(Match(index.at("ref"), Value("true")))).get(), equalTo(BooleanV.TRUE));
+    assertThat(serverClient.query(All(Match(index.at("ref"), Value("false")))).get(), equalTo(BooleanV.FALSE));
+    assertThat(serverClient.query(All(Match(index.at("ref"), Value("mixed")))).get(), equalTo(BooleanV.FALSE));
+
+    //any: array
+    assertThat(serverClient.query(Any(Arr(Value(false), Value(false), Value(false)))).get(), equalTo(BooleanV.FALSE));
+    assertThat(serverClient.query(Any(Arr(Value(true), Value(false), Value(true)))).get(), equalTo(BooleanV.TRUE));
+
+    //any: page
+    assertThat(
+      serverClient.query(Select(Path("data").at(0), Any(Paginate(Match(index.at("ref"), Value("true")))))).get(),
+      equalTo(BooleanV.TRUE)
+    );
+    assertThat(
+      serverClient.query(Select(Path("data").at(0), Any(Paginate(Match(index.at("ref"), Value("false")))))).get(),
+      equalTo(BooleanV.FALSE)
+    );
+    assertThat(
+      serverClient.query(Select(Path("data").at(0), Any(Paginate(Match(index.at("ref"), Value("mixed")))))).get(),
+      equalTo(BooleanV.TRUE)
+    );
+
+    //any: set
+    assertThat(serverClient.query(Any(Match(index.at("ref"), Value("true")))).get(), equalTo(BooleanV.TRUE));
+    assertThat(serverClient.query(Any(Match(index.at("ref"), Value("false")))).get(), equalTo(BooleanV.FALSE));
+    assertThat(serverClient.query(Any(Match(index.at("ref"), Value("mixed")))).get(), equalTo(BooleanV.TRUE));
+  }
+
+  @Test
   public void shouldTestRange() throws Exception {
     RefV col = onARandomCollection();
 
