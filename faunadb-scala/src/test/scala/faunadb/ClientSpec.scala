@@ -1329,6 +1329,60 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     )) shouldBe ArrayV(5050L, 100L, 50.5d)
   }
 
+  it should "all/any" in {
+    val coll = await(client.query(CreateCollection(Obj("name" -> aRandomString))))
+    val index = await(client.query(CreateIndex(Obj(
+      "name" -> aRandomString,
+      "source" -> coll("ref"),
+      "active" -> true,
+      "terms" -> Arr(Obj("field" -> Arr("data", "foo"))),
+      "values" -> Arr(Obj("field" -> Arr("data", "value")))
+    ))))
+
+    await(client.query(Do(
+      Create(coll("ref"), Obj("data" -> Obj("foo" -> "true", "value" -> true))),
+      Create(coll("ref"), Obj("data" -> Obj("foo" -> "true", "value" -> true))),
+      Create(coll("ref"), Obj("data" -> Obj("foo" -> "true", "value" -> true))),
+
+      Create(coll("ref"), Obj("data" -> Obj("foo" -> "false", "value" -> false))),
+      Create(coll("ref"), Obj("data" -> Obj("foo" -> "false", "value" -> false))),
+      Create(coll("ref"), Obj("data" -> Obj("foo" -> "false", "value" -> false))),
+
+      Create(coll("ref"), Obj("data" -> Obj("foo" -> "mixed", "value" -> true))),
+      Create(coll("ref"), Obj("data" -> Obj("foo" -> "mixed", "value" -> false))),
+      Create(coll("ref"), Obj("data" -> Obj("foo" -> "mixed", "value" -> true))),
+      Create(coll("ref"), Obj("data" -> Obj("foo" -> "mixed", "value" -> false)))
+    )))
+
+    //all: array
+    await(client.query(All(Arr(true, true, true)))) shouldBe TrueV
+    await(client.query(All(Arr(true, false, true)))) shouldBe FalseV
+
+    //all: page
+    await(client.query(All(Paginate(Match(index("ref"), "true"))))) shouldBe ObjectV("data" -> ArrayV(TrueV))
+    await(client.query(All(Paginate(Match(index("ref"), "false"))))) shouldBe ObjectV("data" -> ArrayV(FalseV))
+    await(client.query(All(Paginate(Match(index("ref"), "mixed"))))) shouldBe ObjectV("data" -> ArrayV(FalseV))
+
+    //all: set
+    await(client.query(All(Match(index("ref"), "true")))) shouldBe TrueV
+    await(client.query(All(Match(index("ref"), "false")))) shouldBe FalseV
+    await(client.query(All(Match(index("ref"), "mixed")))) shouldBe FalseV
+
+    //any: array
+    await(client.query(Any(Arr(false, false, false)))) shouldBe FalseV
+    await(client.query(Any(Arr(true, false, true)))) shouldBe TrueV
+
+    //any: page
+    await(client.query(Any(Paginate(Match(index("ref"), "true"))))) shouldBe ObjectV("data" -> ArrayV(TrueV))
+    await(client.query(Any(Paginate(Match(index("ref"), "false"))))) shouldBe ObjectV("data" -> ArrayV(FalseV))
+    await(client.query(Any(Paginate(Match(index("ref"), "mixed"))))) shouldBe ObjectV("data" -> ArrayV(TrueV))
+
+    //any: set
+    await(client.query(Any(Match(index("ref"), "true")))) shouldBe TrueV
+    await(client.query(Any(Match(index("ref"), "false")))) shouldBe FalseV
+    await(client.query(Any(Match(index("ref"), "mixed")))) shouldBe TrueV
+  }
+
   it should "range" in {
     val col = await(client.query(CreateCollection(Obj("name" -> aRandomString(size = 10)))))
 

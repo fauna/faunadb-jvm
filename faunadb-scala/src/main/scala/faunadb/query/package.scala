@@ -1486,6 +1486,22 @@ package object query {
     Expr(ObjectV("mean" -> collection.value))
 
   /**
+    * Evaluates to true if all elements of the collection is true.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/all]]
+    */
+  def All(collection: Expr): Expr =
+    Expr(ObjectV("all" -> collection.value))
+
+  /**
+    * Evaluates to true if any element of the collection is true.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/any]]
+    */
+  def Any(collection: Expr): Expr =
+    Expr(ObjectV("any" -> collection.value))
+
+  /**
     * A LT expression.
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#logical-functions]]

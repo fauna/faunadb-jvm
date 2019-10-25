@@ -6653,6 +6653,30 @@ public final class Language {
   }
 
   /**
+   *
+   * Evaluates to true if all elements of the collection is true.
+   *
+   * @param collection the collection
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/all">All function</a>
+   */
+  public static Expr All(Expr collection) {
+    return Fn.apply("all", collection);
+  }
+
+  /**
+   *
+   * Evaluates to true if any element of the collection is true.
+   *
+   * @param collection the collection
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/any">Any function</a>
+   */
+  public static Expr Any(Expr collection) {
+    return Fn.apply("any", collection);
+  }
+
+  /**
    * Returns true if the first element of the given collection is less than the ones following, and false otherwise.
    *
    * @param values the list of numbers to compare. Type: Array
