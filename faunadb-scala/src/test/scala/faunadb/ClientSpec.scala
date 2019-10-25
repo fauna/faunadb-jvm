@@ -1364,6 +1364,107 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     query(Intersection(Range(m, 1, 20), Range(m, 5, 15))) shouldBe (5 to 15).toList
   }
 
+  it should "type check" in {
+    val coll = await(client.query(CreateCollection(Obj("name" -> aRandomString))))("ref").get
+    val index = await(client.query(CreateIndex(Obj("name" -> aRandomString, "source" -> coll, "active" -> true))))("ref").get
+    val doc = await(client.query(Create(coll, Obj("credentials" -> Obj("password" -> "sekret")))))("ref").get
+    val db = await(adminClient.query(CreateDatabase(Obj("name" -> aRandomString))))("ref").get
+    val fn = await(client.query(CreateFunction(Obj("name" -> aRandomString, "body" -> Query(x => x)))))("ref").get
+    val key = await(adminClient.query(CreateKey(Obj("database" -> db, "role" -> "admin"))))("ref").get
+    val tok = await(client.query(Login(doc, Obj("password" -> "sekret"))))
+    val role = await(adminClient.query(CreateRole(Obj("name" -> aRandomString, "membership" -> Arr(), "privileges" -> Arr()))))("ref").get
+    val cred = await(client.sessionWith(tok(SecretField).get) { c => c.query(Get(Ref("credentials/self"))) })("ref").get
+    val token = tok("ref").get
+
+    val trueExprs = Seq(
+      IsNumber(3.14),
+      IsNumber(10L),
+      IsDouble(3.14),
+      IsInteger(10L),
+      IsBoolean(true),
+      IsBoolean(false),
+      IsNull(Null()),
+      IsBytes(BytesV(0x1, 0x2, 0x3, 0x4)),
+      IsTimestamp(Now()),
+      IsTimestamp(Epoch(1, TimeUnit.Second)),
+      IsTimestamp(Time("1970-01-01T00:00:00Z")),
+      IsDate(ToDate(Now())),
+      IsDate(Date("1970-01-01")),
+      IsString("string"),
+      IsArray(Seq(10)),
+      IsObject(Obj("x" -> 10)),
+      IsObject(Paginate(Collections())),
+      IsObject(Get(doc)),
+      IsRef(coll),
+      IsSet(Collections()),
+      IsSet(Match(index)),
+      IsSet(Union(Match(index))),
+      IsDoc(doc),
+      IsDoc(Get(doc)),
+      IsLambda(Query(x => x)),
+      IsCollection(coll),
+      IsCollection(Get(coll)),
+      IsDatabase(db),
+      IsDatabase(Get(db)),
+      IsIndex(index),
+      IsIndex(Get(index)),
+      IsFunction(fn),
+      IsFunction(Get(fn)),
+      IsKey(key),
+      IsKey(Get(key)),
+      IsToken(token),
+      IsToken(Get(token)),
+      IsCredentials(cred),
+      IsCredentials(Get(cred)),
+      IsRole(role),
+      IsRole(Get(role))
+    )
+
+    await(adminClient.query(trueExprs)) shouldBe Seq.fill(trueExprs.size)(TrueV)
+
+    val falseExprs = Seq(
+      IsNumber("string"),
+      IsNumber(Arr()),
+      IsDouble(10L),
+      IsInteger(3.14),
+      IsBoolean("string"),
+      IsBoolean(10),
+      IsNull("string"),
+      IsBytes(Arr(0x1, 0x2, 0x3, 0x4)),
+      IsTimestamp(ToDate(Now())),
+      IsTimestamp(10),
+      IsDate(Now()),
+      IsString(Arr()),
+      IsString(10),
+      IsArray(Obj("x" -> 10)),
+      IsObject(Arr(10)),
+      IsRef(Match(index)),
+      IsRef(10),
+      IsSet("string"),
+      IsDoc(Obj()),
+      IsLambda(fn),
+      IsLambda(Get(fn)),
+      IsCollection(db),
+      IsCollection(Get(db)),
+      IsDatabase(coll),
+      IsDatabase(Get(coll)),
+      IsIndex(coll),
+      IsIndex(Get(db)),
+      IsFunction(index),
+      IsFunction(Get(coll)),
+      IsKey(db),
+      IsKey(Get(index)),
+      IsToken(index),
+      IsToken(Get(cred)),
+      IsCredentials(token),
+      IsCredentials(Get(role)),
+      IsRole(coll),
+      IsRole(Get(index))
+    )
+
+    await(adminClient.query(falseExprs)) shouldBe Seq.fill(falseExprs.size)(FalseV)
+  }
+
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
     await(client.query(CreateDatabase(Obj("name" -> name))))
     val key = await(client.query(CreateKey(Obj("database" -> Database(name), "role" -> "admin"))))

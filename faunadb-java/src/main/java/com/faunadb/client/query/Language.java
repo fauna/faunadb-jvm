@@ -7073,4 +7073,257 @@ public final class Language {
   public static Expr ToArray(Expr object) {
     return Fn.apply("to_array", object);
   }
+
+  /**
+   * Check if the expression is a number.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isnumber">IsNumber</a>
+   */
+  public static Expr IsNumber(Expr expr) {
+    return Fn.apply("is_number", expr);
+  }
+
+  /**
+   * Check if the expression is a double.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isdouble">IsDouble</a>
+   */
+  public static Expr IsDouble(Expr expr) {
+    return Fn.apply("is_double", expr);
+  }
+
+  /**
+   * Check if the expression is an integer.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isinteger">IsInteger</a>
+   */
+  public static Expr IsInteger(Expr expr) {
+    return Fn.apply("is_integer", expr);
+  }
+
+  /**
+   * Check if the expression is a boolean.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isboolean">IsBoolean</a>
+   */
+  public static Expr IsBoolean(Expr expr) {
+    return Fn.apply("is_boolean", expr);
+  }
+
+  /**
+   * Check if the expression is null.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isnull">IsNull</a>
+   */
+  public static Expr IsNull(Expr expr) {
+    return Fn.apply("is_null", expr);
+  }
+
+  /**
+   * Check if the expression is a byte array.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isbytes">IsBytes</a>
+   */
+  public static Expr IsBytes(Expr expr) {
+    return Fn.apply("is_bytes", expr);
+  }
+
+  /**
+   * Check if the expression is a timestamp.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/istimestamp">IsTimestamp</a>
+   */
+  public static Expr IsTimestamp(Expr expr) {
+    return Fn.apply("is_timestamp", expr);
+  }
+
+  /**
+   * Check if the expression is a date.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isdate">IsDate</a>
+   */
+  public static Expr IsDate(Expr expr) {
+    return Fn.apply("is_date", expr);
+  }
+
+  /**
+   * Check if the expression is a string.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isstring">IsString</a>
+   */
+  public static Expr IsString(Expr expr) {
+    return Fn.apply("is_string", expr);
+  }
+
+  /**
+   * Check if the expression is an array.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isarray">IsArray</a>
+   */
+  public static Expr IsArray(Expr expr) {
+    return Fn.apply("is_array", expr);
+  }
+
+  /**
+   * Check if the expression is an object.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isobject">IsObject</a>
+   */
+  public static Expr IsObject(Expr expr) {
+    return Fn.apply("is_object", expr);
+  }
+
+  /**
+   * Check if the expression is a reference.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isref">IsRef</a>
+   */
+  public static Expr IsRef(Expr expr) {
+    return Fn.apply("is_ref", expr);
+  }
+
+  /**
+   * Check if the expression is a set.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isset">IsSet</a>
+   */
+  public static Expr IsSet(Expr expr) {
+    return Fn.apply("is_set", expr);
+  }
+
+  /**
+   * Check if the expression is a document (either a reference or an instance).
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isdoc">IsDoc</a>
+   */
+  public static Expr IsDoc(Expr expr) {
+    return Fn.apply("is_doc", expr);
+  }
+
+  /**
+   * Check if the expression is a lambda.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/islambda">IsLambda</a>
+   */
+  public static Expr IsLambda(Expr expr) {
+    return Fn.apply("is_lambda", expr);
+  }
+
+  /**
+   * Check if the expression is a collection.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/iscollection">IsCollection</a>
+   */
+  public static Expr IsCollection(Expr expr) {
+    return Fn.apply("is_collection", expr);
+  }
+
+  /**
+   * Check if the expression is a database.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isdatabase">IsDatabase</a>
+   */
+  public static Expr IsDatabase(Expr expr) {
+    return Fn.apply("is_database", expr);
+  }
+
+  /**
+   * Check if the expression is an index.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isindex">IsIndex</a>
+   */
+  public static Expr IsIndex(Expr expr) {
+    return Fn.apply("is_index", expr);
+  }
+
+  /**
+   * Check if the expression is a function.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isfunction">IsFunction</a>
+   */
+  public static Expr IsFunction(Expr expr) {
+    return Fn.apply("is_function", expr);
+  }
+
+  /**
+   * Check if the expression is a key.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/iskey">IsKey</a>
+   */
+  public static Expr IsKey(Expr expr) {
+    return Fn.apply("is_key", expr);
+  }
+
+  /**
+   * Check if the expression is a token.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/istoken">IsToken</a>
+   */
+  public static Expr IsToken(Expr expr) {
+    return Fn.apply("is_token", expr);
+  }
+
+  /**
+   * Check if the expression is a credentials.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/iscredentials">IsCredentials</a>
+   */
+  public static Expr IsCredentials(Expr expr) {
+    return Fn.apply("is_credentials", expr);
+  }
+
+  /**
+   * Check if the expression is a role.
+   *
+   * @param expr the expression to check
+   * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isrole">IsRole</a>
+   */
+  public static Expr IsRole(Expr expr) {
+    return Fn.apply("is_role", expr);
+  }
 }
