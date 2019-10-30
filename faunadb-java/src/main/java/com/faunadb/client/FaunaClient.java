@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.module.scala.DefaultScalaModule;
 
 import static com.faunadb.client.types.Codec.VALUE;
 
@@ -131,9 +130,7 @@ public class FaunaClient implements AutoCloseable {
     }
   }
 
-  private final ObjectMapper json = new ObjectMapper()
-      .registerModule(new Jdk8Module())
-      .registerModule(DefaultScalaModule);
+  private final ObjectMapper json = new ObjectMapper().registerModule(new Jdk8Module())
   private final Connection connection;
 
   private FaunaClient(Connection connection) {
