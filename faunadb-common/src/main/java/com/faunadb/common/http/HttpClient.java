@@ -201,7 +201,7 @@ public class HttpClient extends AbstractReferenceCounted implements AutoCloseabl
         responseFuture.whenComplete((a, b) -> pool.offer(channel));
 
         channel.pipeline().replace(HttpResponseHandler.class, "response-handler", handler);
-        ret = new CompletableFuture<>().completedFuture(new ChannelResponseTuple(channel, responseFuture));
+        ret = CompletableFuture.completedFuture(new ChannelResponseTuple(channel, responseFuture));
 
       } else if (channel == null) {
         CompletableFuture<FullHttpResponse> responseFuture = new CompletableFuture<>();

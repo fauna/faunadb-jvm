@@ -171,7 +171,7 @@ class FaunaClient private (connection: Connection) {
 
   private def handleNetworkExceptions[A]: PartialFunction[Throwable, A] = {
     case ex: ConnectException =>
-      throw new UnavailableException(ex.getMessage)
+      throw new UnavailableException(ex.getMessage, ex)
     case ex: TimeoutException =>
       throw new TimeoutException(ex.getMessage)
   }
@@ -181,10 +181,15 @@ class FaunaClient private (connection: Connection) {
       case x if x >= 300 =>
         try {
           val errors = parseResponseBody(response).get("errors").asInstanceOf[ArrayNode]
-          val parsedErrors = errors.iterator().asScala.map {
-            json.treeToValue(_, classOf[QueryError])
-          }.toIndexedSeq
-          val error = QueryErrorResponse(x, parsedErrors)
+          val parsedErrors = if (errors != null) {
+            errors.iterator().asScala.map {
+              json.treeToValue(_, classOf[QueryError])
+            }
+          } else {
+            Seq.empty[QueryError]
+          }
+
+          val error = QueryErrorResponse(x, parsedErrors.toIndexedSeq)
           x match {
             case 400 => throw new BadRequestException(error)
             case 401 => throw new UnauthorizedException(error)
@@ -196,9 +201,9 @@ class FaunaClient private (connection: Connection) {
           }
         } catch {
           case e: FaunaException => throw e
-          case NonFatal(_)       => response.status().code() match {
-            case 503   => throw new UnavailableException("Service Unavailable: Unparseable response.")
-            case s @ _ => throw new UnknownException(s"Unparseable service $s response.")
+          case NonFatal(ex)      => response.status().code() match {
+            case 503   => throw new UnavailableException("Service Unavailable: Unparseable response.", ex)
+            case s @ _ => throw new UnknownException(s"Unparseable service $s response.", ex)
           }
         }
       case _ =>

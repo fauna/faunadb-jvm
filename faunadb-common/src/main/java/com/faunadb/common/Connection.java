@@ -399,7 +399,8 @@ public final class Connection implements AutoCloseable {
       if (throwable != null) {
         logFailure(request, throwable);
         request.release();
-        response.release();
+        if (response != null)
+          response.release();
         rv.completeExceptionally(throwable);
         return;
       }
