@@ -244,18 +244,20 @@ public class FaunaClient implements AutoCloseable {
     }
   }
 
-  private void handleQueryErrors(FullHttpResponse response) throws FaunaException {
+  private void handleQueryErrors(FullHttpResponse response) {
     int status = response.status().code();
     if (status >= 300) {
       try {
-        ArrayNode errors = (ArrayNode) parseResponseBody(response).get("errors");
-        List<HttpResponses.QueryError> errorBuilder = new ArrayList<>();
+        List<HttpResponses.QueryError> parsedErrors = new ArrayList<>();
 
-        for (JsonNode errorNode : errors) {
-          errorBuilder.add(json.treeToValue(errorNode, HttpResponses.QueryError.class));
+        ArrayNode errors = (ArrayNode) parseResponseBody(response).get("errors");
+        if (errors != null) {
+          for (JsonNode errorNode : errors) {
+            parsedErrors.add(json.treeToValue(errorNode, HttpResponses.QueryError.class));
+          }
         }
 
-        HttpResponses.QueryErrorResponse errorResponse = HttpResponses.QueryErrorResponse.create(status, errorBuilder);
+        HttpResponses.QueryErrorResponse errorResponse = HttpResponses.QueryErrorResponse.create(status, parsedErrors);
 
         switch (status) {
           case 400:
@@ -273,12 +275,15 @@ public class FaunaClient implements AutoCloseable {
           default:
             throw new UnknownException(errorResponse);
         }
-      } catch (IOException ex) {
-        switch (status) {
-          case 503:
-            throw new UnavailableException("Service Unavailable: Unparseable response.");
-          default:
-            throw new UnknownException("Unparseable service " + status + "response.");
+      } catch (VirtualMachineError | ThreadDeath | LinkageError ex) { //like NonFatal(ex) on scala driver
+        throw ex;
+      } catch (FaunaException ex) {
+        throw ex;
+      } catch (Exception ex) {
+        if (status == 503) {
+          throw new UnavailableException("Service Unavailable: Unparseable response.", ex);
+        } else {
+          throw new UnknownException("Unparseable service " + status + " response.", ex);
         }
       }
     }
@@ -288,7 +293,7 @@ public class FaunaClient implements AutoCloseable {
       return f.whenComplete((v, ex) -> {
               if (ex instanceof ConnectException ||
                          ex instanceof TimeoutException) {
-                  throw new UnavailableException(ex.getMessage());
+                  throw new UnavailableException(ex.getMessage(), ex);
               }
           });
   }

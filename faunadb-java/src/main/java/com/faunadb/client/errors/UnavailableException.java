@@ -7,8 +7,8 @@ import com.faunadb.client.HttpResponses;
  * to the host, or if the host does not respond.
  */
 public class UnavailableException extends FaunaException {
-  public UnavailableException(String message) {
-    super("FaunaDB unavailable: "+message);
+  public UnavailableException(String message, Throwable cause) {
+    super("FaunaDB unavailable: " + message, cause);
   }
 
   public UnavailableException(HttpResponses.QueryErrorResponse response) {
