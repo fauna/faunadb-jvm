@@ -21,6 +21,7 @@ import static com.faunadb.client.types.Codec.STRING;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 public class ObjectCodecSpec {
 
@@ -61,7 +62,7 @@ public class ObjectCodecSpec {
 
   @Before
   public void setUp() throws Exception {
-    json = new ObjectMapper().findAndRegisterModules();
+    json = new ObjectMapper().registerModule(new Jdk8Module());
   }
 
   @Test

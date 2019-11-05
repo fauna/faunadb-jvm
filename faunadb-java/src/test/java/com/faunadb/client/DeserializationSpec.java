@@ -23,6 +23,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static java.time.ZoneOffset.UTC;
 import static org.junit.Assert.assertThat;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 public class DeserializationSpec {
 
@@ -30,7 +31,7 @@ public class DeserializationSpec {
 
   @Before
   public void setUp() throws Exception {
-    json = new ObjectMapper().findAndRegisterModules();
+    json = new ObjectMapper().registerModule(new Jdk8Module());
   }
 
   @Test
