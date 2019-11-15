@@ -36,7 +36,6 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
           case "@set" =>
             in.nextToken()
             val rv = SetRefV(deserialize(in, ctx))
-            in.nextToken()
             rv
           case "@ts" =>
             in.nextToken()

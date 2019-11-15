@@ -87,6 +87,27 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     rootClient.close()
   }
 
+  it should "parse nested sets" in {
+    val collName = aRandomString
+    val indexName = aRandomString
+    await(client.query(CreateCollection(Obj("name" -> collName))))
+    await(client.query(CreateIndex(Obj("name" -> indexName, "source" -> Collection(collName)))))
+
+    val result = await(client.query(
+      Map(
+        Arr(
+          Match(Index(indexName))
+        ),
+        Lambda(
+          "x",
+          Obj( "value" -> Var("x"), "IsSet" -> IsSet(Var("x")))
+        )
+      )
+    ))
+
+    result shouldBe ArrayV(ObjectV("value" -> SetRefV(ObjectV("match" -> RefV(indexName, Native.Indexes))), "IsSet" -> TrueV))
+  }
+
   "Fauna Client" should "should not find an instance" in {
     a[NotFoundException] should be thrownBy await(client.query(Get(RefV("1234", RefV("spells", Native.Collections)))))
   }
