@@ -100,6 +100,10 @@ lazy val scala = project.in(file("faunadb-scala"))
     name := "faunadb-scala",
     scalaVersion := scalaDefaultVersion,
     crossScalaVersions := scalaVersions,
+    
+    scalacOptions ++= Seq(
+      "-Xsource:2.12"
+    ),
 
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
