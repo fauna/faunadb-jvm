@@ -1,6 +1,0 @@
----
-coverage:
-  notify:
-    slack:
-      default:
-        url: secret:qADwIaa12WwAxZfwSeEQgt61YrcmX8FPUAhSqXucQ3sIV5JJ9h2MNPh8EH5vLS4/sL4vfikSvBi3t5PeVXt9RRyQfPizMoGfQPPzvhzWO05HW2D359C1FS/Iq9o4ykWZD8budv4eDvdhqPEfQEW4fc3gwy3s7owVjHoSiooVyYg=
