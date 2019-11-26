@@ -1,3 +1,13 @@
+2.10.0
+* Add Time functions: TimeAdd(), TimeSubtract(), and TimeDiff()
+* Add Conversion functions: ToObject(), ToArray(), ToDouble(), and ToInteger()
+* Add Logical functions: Any(), and All()
+* Add Type Check functions: IsNumber(), IsDouble(), IsInteger(), IsBoolean(), IsNull(),
+  IsBytes(), IsTimestamp(), IsDate(), IsString(), IsArray(), IsObject(), IsRef(), IsSet(),
+  IsDoc(), IsLambda(), IsCollection(), IsDatabase(), IsIndex(), IsFunction(), IsKey(),
+  IsToken(), IsCredentials(), and IsRole()
+* Make Expr constructor private
+
 2.9.0
 * Add String functions: StartsWith(), EndsWith(), ContainsStr(), ContainsStrRegex(), and RegexEscape()
 * Add Conversion functions: ToDouble() and ToInteger()
