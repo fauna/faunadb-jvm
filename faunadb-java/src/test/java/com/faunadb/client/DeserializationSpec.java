@@ -1,6 +1,7 @@
 package com.faunadb.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.Native;
 import com.faunadb.client.types.Value.ObjectV;
@@ -29,8 +30,8 @@ public class DeserializationSpec {
   private ObjectMapper json;
 
   @Before
-  public void setUp() throws Exception {
-    json = new ObjectMapper().findAndRegisterModules();
+  public void setUp() {
+    json = new ObjectMapper().registerModule(new Jdk8Module());
   }
 
   @Test
