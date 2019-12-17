@@ -91,7 +91,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val collName = aRandomString
     val indexName = aRandomString
     await(client.query(CreateCollection(Obj("name" -> collName))))
-    await(client.query(CreateIndex(Obj("name" -> indexName, "source" -> Collection(collName)))))
+    await(client.query(CreateIndex(Obj("name" -> indexName, "source" -> Collection(collName), "active" -> true))))
 
     val result = await(client.query(
       Map(
