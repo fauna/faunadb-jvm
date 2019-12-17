@@ -1,7 +1,7 @@
 val driverVersion = "2.10.0"
-val nettyVersion = "4.1.36.Final"
-val jacksonVersion = "2.8.11"
-val jacksonDocVersion = "2.8"
+val nettyVersion = "4.1.43.Final"
+val jacksonVersion = "2.10.1"
+val jacksonDocVersion = "2.10"
 val metricsVersion = "4.1.0"
 val scalaDefaultVersion = "2.12.8"
 val scalaVersions = Seq("2.11.12", scalaDefaultVersion)
@@ -110,6 +110,7 @@ lazy val scala = project.in(file("faunadb-scala"))
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
       "ch.qos.logback" % "logback-classic" % "1.2.3" % "test",
       "org.scala-lang.modules" % "scala-java8-compat_2.12" % "0.9.0",
+      "org.scala-lang" % "scala-reflect" % "2.12.10",
       "org.scalatest" %% "scalatest" % "3.0.7" % "test"
     ),
 
