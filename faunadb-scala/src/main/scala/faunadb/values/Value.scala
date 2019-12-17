@@ -140,7 +140,7 @@ case class RefV(@(JsonIgnore @getter) id: String,
                 @(JsonIgnore @getter) database: Option[RefV] = None) extends ScalarValue("Ref") {
 
   @JsonIgnore
-  @deprecated("use collection instead")
+  @deprecated("use collection instead", "2.7.0")
   val clazz: Option[RefV] = collection
 
   @JsonProperty("@ref")

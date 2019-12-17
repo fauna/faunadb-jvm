@@ -18,7 +18,7 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
       case VALUE_TRUE         => BooleanV(true)
       case VALUE_FALSE        => BooleanV(false)
       case VALUE_NULL         => NullV
-      case t                  => throw new JsonMappingException(s"Unexpected token $t")
+      case t                  => throw new JsonMappingException(in, s"Unexpected token $t")
     }
 
     in.nextToken()
@@ -62,7 +62,7 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
             readObjectBody(in, ctx)
         }
       case END_OBJECT => ObjectV.empty
-      case t => throw new JsonMappingException(s"Unexpected token $t")
+      case t => throw new JsonMappingException(in, s"Unexpected token $t")
     }
   }
 
@@ -73,7 +73,7 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
         val rv = readRefBody(in, ctx)
         in.nextToken()
         rv
-      case t => throw new JsonMappingException(s"Unexpected token $t")
+      case t => throw new JsonMappingException(in, s"Unexpected token $t")
     }
   }
 
@@ -94,24 +94,24 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
               in.nextToken()
               cls = deserialize(in, ctx) match {
                 case r: RefV => Some(r)
-                case t => throw new JsonMappingException(s"Unexpected value in class field of @ref: $t")
+                case t => throw new JsonMappingException(in, s"Unexpected value in class field of @ref: $t")
               }
             case "database" =>
               in.nextToken()
               db = deserialize(in, ctx) match {
                 case d: RefV => Some(d)
-                case t => throw new JsonMappingException(s"Unexpected value in database field of @ref: $t")
+                case t => throw new JsonMappingException(in, s"Unexpected value in database field of @ref: $t")
               }
-            case t => throw new JsonMappingException(s"Unexpected field in @ref: $t")
+            case t => throw new JsonMappingException(in, s"Unexpected field in @ref: $t")
           }
-        case t => throw new JsonMappingException(s"Unexpected token $t")
+        case t => throw new JsonMappingException(in, s"Unexpected token $t")
       }
     }
 
     (id, cls, db) match {
       case (Some(id), None, None) => Native.fromName(id)
       case (Some(id), _, _)       => RefV(id, cls, db)
-      case (None, _, _)           => throw new JsonMappingException(s"Malformed reference type")
+      case (None, _, _)           => throw new JsonMappingException(in, s"Malformed reference type")
     }
   }
 
@@ -122,7 +122,7 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
         val rv = readObjectBody(in, ctx)
         in.nextToken()
         rv
-      case t => throw new JsonMappingException(s"Unexpected token $t")
+      case t => throw new JsonMappingException(in, s"Unexpected token $t")
     }
   }
 
@@ -135,7 +135,7 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
           val name = in.getText
           in.nextToken()
           b += (name -> deserialize(in, ctx))
-        case t => throw new JsonMappingException(s"Unexpected token $t")
+        case t => throw new JsonMappingException(in, s"Unexpected token $t")
       }
     }
 

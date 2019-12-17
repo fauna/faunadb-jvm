@@ -75,8 +75,8 @@ class SerializationSpec extends FlatSpec with Matchers {
       Get(RefV("ref1", RefV("some", Native.Collections))))
     json.writeValueAsString(doForm) shouldBe "{\"do\":[{\"create\":{\"@ref\":{\"id\":\"ref1\",\"collection\":{\"@ref\":{\"id\":\"some\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}},\"params\":{\"object\":{\"data\":{\"object\":{\"name\":\"Hen Wen\"}}}}},{\"get\":{\"@ref\":{\"id\":\"ref1\",\"collection\":{\"@ref\":{\"id\":\"some\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}}}]}"
 
-    val doOneElement = Do(Ref(Class("cls"), 1))
-    json.writeValueAsString(doOneElement) shouldBe "{\"do\":[{\"ref\":{\"class\":\"cls\"},\"id\":1}]}"
+    val doOneElement = Do(Ref(Collection("cls"), 1))
+    json.writeValueAsString(doOneElement) shouldBe "{\"do\":[{\"ref\":{\"collection\":\"cls\"},\"id\":1}]}"
 
     val doTwoElement = Do(1, 2)
     json.writeValueAsString(doTwoElement) shouldBe "{\"do\":[1,2]}"
@@ -191,8 +191,8 @@ class SerializationSpec extends FlatSpec with Matchers {
     val remove = Remove(RefV("123456", RefV("spells", Native.Collections)), 1L, Action.Delete)
     json.writeValueAsString(remove) shouldBe "{\"remove\":{\"@ref\":{\"id\":\"123456\",\"collection\":{\"@ref\":{\"id\":\"spells\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}},\"ts\":1,\"action\":\"delete\"}"
 
-    val createClass = CreateClass(Obj("name" -> "spells"))
-    json.writeValueAsString(createClass) shouldBe "{\"create_class\":{\"object\":{\"name\":\"spells\"}}}"
+    val createClass = CreateCollection(Obj("name" -> "spells"))
+    json.writeValueAsString(createClass) shouldBe "{\"create_collection\":{\"object\":{\"name\":\"spells\"}}}"
 
     val createDatabase = CreateDatabase(Obj("name" -> "db-test"))
     json.writeValueAsString(createDatabase) shouldBe "{\"create_database\":{\"object\":{\"name\":\"db-test\"}}}"
@@ -205,11 +205,11 @@ class SerializationSpec extends FlatSpec with Matchers {
   }
 
   it should "serialize sets" in {
-    val singleton = Singleton(Ref("classes/widget/1"))
-    json.writeValueAsString(singleton) shouldBe "{\"singleton\":{\"@ref\":\"classes/widget/1\"}}"
+    val singleton = Singleton(Ref("collections/widget/1"))
+    json.writeValueAsString(singleton) shouldBe "{\"singleton\":{\"@ref\":\"collections/widget/1\"}}"
 
-    val events = Events(Ref("classes/widget/1"))
-    json.writeValueAsString(events) shouldBe "{\"events\":{\"@ref\":\"classes/widget/1\"}}"
+    val events = Events(Ref("collections/widget/1"))
+    json.writeValueAsString(events) shouldBe "{\"events\":{\"@ref\":\"collections/widget/1\"}}"
 
     val matchSet = Match(RefV("spells_by_elements", Native.Indexes), "fire")
     json.writeValueAsString(matchSet) shouldBe "{\"match\":\"fire\",\"index\":{\"@ref\":{\"id\":\"spells_by_elements\",\"collection\":{\"@ref\":{\"id\":\"indexes\"}}}}}"
@@ -304,8 +304,8 @@ class SerializationSpec extends FlatSpec with Matchers {
     val newId = NewId()
     json.writeValueAsString(newId) shouldBe "{\"new_id\":null}"
 
-    val clazz = Class("spells")
-    json.writeValueAsString(clazz) shouldBe "{\"class\":\"spells\"}"
+    val clazz = Collection("spells")
+    json.writeValueAsString(clazz) shouldBe "{\"collection\":\"spells\"}"
 
     val collection = Collection("spells")
     json.writeValueAsString(collection) shouldBe "{\"collection\":\"spells\"}"

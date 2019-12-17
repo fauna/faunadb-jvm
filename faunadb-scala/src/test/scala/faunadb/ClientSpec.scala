@@ -1112,7 +1112,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "parse complex index" in {
-    await(client.query(CreateClass(Obj("name" -> "reservations"))))
+    await(client.query(CreateCollection(Obj("name" -> "reservations"))))
 
     val indexF = client.query(CreateIndex(Obj(
       "name" -> "reservations_by_lastName",

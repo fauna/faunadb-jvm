@@ -60,7 +60,7 @@ class DeserializationSpec extends FlatSpec with Matchers {
   }
 
   it should "deserialize an invalid reference" in {
-    the [JsonMappingException] thrownBy {
+    (the [JsonMappingException] thrownBy {
       val toDeserialize = """{
         "@ref":{
           "id": "1234567890",
@@ -69,9 +69,9 @@ class DeserializationSpec extends FlatSpec with Matchers {
       }"""
 
       json.readValue(toDeserialize, classOf[Value])
-    } should have message "Unexpected value in class field of @ref: \"it was expected another ref here\""
+    }).getMessage should include("Unexpected value in class field of @ref: \"it was expected another ref here\"")
 
-    the [JsonMappingException] thrownBy {
+    (the [JsonMappingException] thrownBy {
       val toDeserialize = """{
         "@ref":{
           "id": "1234567890",
@@ -80,7 +80,7 @@ class DeserializationSpec extends FlatSpec with Matchers {
       }"""
 
       json.readValue(toDeserialize, classOf[Value])
-    } should have message "Unexpected value in database field of @ref: \"it was expected another ref here\""
+    }).getMessage should include("Unexpected value in database field of @ref: \"it was expected another ref here\"")
   }
 
   it should "deserialize empty object" in {

@@ -16,7 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static com.faunadb.client.query.Language.*;
-import static com.faunadb.client.query.Language.Class;
+import static com.faunadb.client.query.Language.Collection;
 import static com.faunadb.client.query.Language.TimeUnit.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -133,7 +133,7 @@ public class SerializationSpec {
   }
 
   @Test
-  public void shouldSerializeClass() throws Exception {
+  public void shouldSerializeCollection() throws Exception {
     assertJson(Collection(Value("spells")), "{\"collection\":\"spells\"}");
   }
 
@@ -571,10 +571,10 @@ public class SerializationSpec {
   @Test
   public void shouldSerializeCreateClass() throws Exception {
     assertJson(
-      CreateClass(Obj(
+      CreateCollection(Obj(
         "name", Value("spells")
       )),
-      "{\"create_class\":{\"object\":{\"name\":\"spells\"}}}"
+      "{\"create_collection\":{\"object\":{\"name\":\"spells\"}}}"
     );
   }
 
