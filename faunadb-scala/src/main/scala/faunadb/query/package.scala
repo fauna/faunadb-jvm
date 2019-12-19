@@ -140,7 +140,7 @@ package object query {
   @deprecated("use Collections instead")
   def Classes(scope: Expr = NullV): Expr =
     Expr(ObjectV("classes" -> scope.value))
-  
+
     /** Native reference to all classes */
   def Collections(scope: Expr = NullV): Expr =
     Expr(ObjectV("collections" -> scope.value))
@@ -172,6 +172,10 @@ package object query {
   /** Native reference to all credentials */
   def Credentials(scope: Expr = NullV): Expr =
     Expr(ObjectV("credentials" -> scope.value))
+
+  /** Returns a set of all documents in the given collection */
+  def Documents(collection: Expr): Expr =
+    Expr(ObjectV("documents" -> collection.value))
 
   /**
     * An Array value.
