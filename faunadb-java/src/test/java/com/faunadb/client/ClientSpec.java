@@ -25,7 +25,7 @@ import java.util.stream.IntStream;
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
 import static com.faunadb.client.query.Language.*;
-import static com.faunadb.client.query.Language.Class;
+import static com.faunadb.client.query.Language.Collection;
 import static com.faunadb.client.query.Language.TimeUnit.*;
 import static com.faunadb.client.types.Codec.*;
 import static com.faunadb.client.types.Value.NullV.NULL;
@@ -280,12 +280,12 @@ public class ClientSpec {
 
   @Test
   public void shouldParseComplexIndex() throws Exception {
-    query(CreateClass(Obj("name", Value("reservations")))).get();
+    query(CreateCollection(Obj("name", Value("reservations")))).get();
 
     CompletableFuture<Value> indexF = query(CreateIndex(Obj(
       "name", Value("reservations_by_lastName"),
       "source", Obj(
-        "class", Class("reservations"),
+        "class", Collection("reservations"),
         "fields", Obj(
           "cfLastName", Query(Lambda("x", Casefold(Select(Path("data", "guestInfo", "lastName"), Var("x"))))),
           "fActive", Query(Lambda("x", Select(Path("data", "active"), Var("x"))))

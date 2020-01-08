@@ -1672,7 +1672,7 @@ public final class Language {
    * @param params the parameters used to create the new document. Type: Object
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
-   * @see #Class(Expr)
+   * @see #Collection(Expr)
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
    */

@@ -137,7 +137,7 @@ package object query {
     Expr(ObjectV("ref" -> collectionRef.value, "id" -> id.value))
 
   /** Native reference to all classes */
-  @deprecated("use Collections instead")
+  @deprecated("use Collections instead", "2.7.0")
   def Classes(scope: Expr = NullV): Expr =
     Expr(ObjectV("classes" -> scope.value))
   
@@ -504,7 +504,7 @@ package object query {
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
     */
-  @deprecated("use CreateCollection instead")  
+  @deprecated("use CreateCollection instead", "2.7.0")
   def CreateClass(params: Expr): Expr =
     Expr(ObjectV("create_class" -> params.value))
 
@@ -1005,7 +1005,7 @@ package object query {
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
-  @deprecated("use NewId instead")
+  @deprecated("use NewId instead", "2.7.0")
   def NextId(): Expr =
     Expr(ObjectV("next_id" -> NullV))
 
@@ -1022,7 +1022,7 @@ package object query {
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
-  @deprecated("use Collection instead")
+  @deprecated("use Collection instead", "2.7.0")
   def Class(name: Expr): Expr =
     Expr(ObjectV("class" -> name.value))
 
@@ -1031,7 +1031,7 @@ package object query {
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
     */
-  @deprecated("use Collection instead")
+  @deprecated("use Collection instead", "2.7.0")
   def Class(name: Expr, scope: Expr): Expr =
     Expr(ObjectV("class" -> name.value, "scope" -> scope.value))
   
@@ -1147,7 +1147,7 @@ package object query {
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#read-functions]]
     */
-  @deprecated("use SelectAsIndex instead")
+  @deprecated("use SelectAsIndex instead", "2.10.0")
   def SelectAll(path: Expr, from: Expr): Expr =
     Expr(ObjectV("select_all" -> path.value, "from" -> from.value))
 
