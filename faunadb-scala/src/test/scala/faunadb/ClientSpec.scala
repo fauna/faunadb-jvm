@@ -1540,6 +1540,13 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(adminClient.query(falseExprs)) shouldBe Seq.fill(falseExprs.size)(FalseV)
   }
 
+  it should "retrieve documents from a collection" in {
+    val coll = await(client.query(CreateCollection(Obj("name" -> aRandomString))))("ref").get
+    for (i <- 1 to 10) await(client.query(Create(coll, Obj())))
+    val docs = await(client.query(Paginate(Documents(coll))))
+    docs("data").to[Seq[Value]].get should have size 10
+  }
+
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
     await(client.query(CreateDatabase(Obj("name" -> name))))
     val key = await(client.query(CreateKey(Obj("database" -> Database(name), "role" -> "admin"))))

@@ -1451,12 +1451,6 @@ public class SerializationSpec {
       "{\"merge\":{\"object\":{\"x\":10}},\"with\":{\"object\":{\"y\":20}},\"lambda\":{\"lambda\":\"x\",\"expr\":{\"var\":\"x\"}}}");
   }
 
-  private void assertJson(Expr expr, String jsonString) throws JsonProcessingException {
-    assertThat(json.writeValueAsString(expr),
-      equalTo(jsonString));
-  }
-
-
   @Test
   public void shouldPrintUsefully() throws Exception {
     Map<String, Value> k1 = new java.util.HashMap<>();
@@ -1479,5 +1473,15 @@ public class SerializationSpec {
                         new RefV("people", Native.COLLECTIONS),
                         new RefV("db", Native.DATABASES)).toString(),
                equalTo("ref(id = \"42\", collection = ref(id = \"people\", collection = ref(id = \"collections\")), database = ref(id = \"db\", collection = ref(id = \"databases\")))"));
+  }
+
+  @Test
+  public void shouldSerializeTheDocumentsFunction() throws Exception {
+    assertJson(Documents(Collection("foo")), "{\"documents\":{\"collection\":\"foo\"}}");
+  }
+
+  private void assertJson(Expr expr, String jsonString) throws JsonProcessingException {
+    assertThat(json.writeValueAsString(expr),
+      equalTo(jsonString));
   }
 }

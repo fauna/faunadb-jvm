@@ -364,4 +364,9 @@ class SerializationSpec extends FlatSpec with Matchers {
     BytesV("DEADBEEF").toString shouldBe "[0x0c 0x40 0x03 0x04 0x41 0x05]"
     QueryV(ObjectV("lambda" -> "_", "expr" -> true)).toString shouldBe "{lambda: \"_\", expr: true}"
   }
+
+  it should "serialize the documents function" in {
+    val docs = Documents(Collection("foo"))
+    json.writeValueAsString(docs) shouldBe "{\"documents\":{\"collection\":\"foo\"}}"
+  }
 }

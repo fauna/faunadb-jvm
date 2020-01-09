@@ -532,6 +532,16 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldListAllItensInACollection() throws Exception {
+    Value allInstances = query(
+      Paginate(Documents(Collection("spells")))
+    ).get();
+
+    assertThat(allInstances.get(REF_LIST),
+      contains(magicMissile, fireball, faerieFire, summon, thorSpell1, thorSpell2));
+  }
+
+  @Test
   public void shouldListAllItensOnACollectionIndex() throws Exception {
     Value allInstances = query(
       Paginate(Match(Index("all_spells")))

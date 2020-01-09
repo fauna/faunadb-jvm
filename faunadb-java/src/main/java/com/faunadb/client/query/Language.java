@@ -481,6 +481,18 @@ public final class Language {
   }
 
   /**
+   * Returns a set of all documents in the given collection.
+   * A set must be paginated in order to retrieve its values.
+   *
+   * @param collection a reference to the collection. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see #Paginate(Expr)
+   */
+  public static Expr Documents(Expr collection) {
+    return Fn.apply("documents", collection);
+  }
+
+  /**
    * Encodes the given object using the reflection {@link Encoder}.
    *
    * @param value the object to be encoded
