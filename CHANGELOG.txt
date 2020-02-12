@@ -1,3 +1,10 @@
+2.11.0
+* Add Documents() function
+* Upgrade dependencies versions
+* Register Jackson mapper module explicitly
+* Update calls to deprecated functions
+* Fix intermittently failing test
+
 2.10.0
 * Add Time functions: TimeAdd(), TimeSubtract(), and TimeDiff()
 * Add Conversion functions: ToObject(), ToArray(), ToDouble(), and ToInteger()
