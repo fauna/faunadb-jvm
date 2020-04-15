@@ -17,6 +17,7 @@ import java.io.IOError;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -88,6 +89,7 @@ public final class Connection implements AutoCloseable {
     private long lastSeenTxn;
     private HttpClient client;
     private JvmDriver jvmDriver;
+    private Duration queryTimeout;
 
     private Builder() {
     }
@@ -174,6 +176,12 @@ public final class Connection implements AutoCloseable {
       return this;
     }
 
+
+    public Builder withQueryTimeout(Duration timeout) {
+      this.queryTimeout = timeout;
+      return this;
+    }
+
     /**
      * @return a newly constructed {@link Connection} with its configuration based on
      * the settings of the {@link Builder} instance.
@@ -201,32 +209,35 @@ public final class Connection implements AutoCloseable {
         http = client;
       }
 
-      return new Connection(root, authToken, http, registry, jvmDriver, lastSeenTxn);
+      return new Connection(root, authToken, http, registry, jvmDriver, lastSeenTxn, queryTimeout);
     }
   }
 
   private static final String X_FAUNADB_HOST = "X-FaunaDB-Host";
   private static final String X_FAUNADB_BUILD = "X-FaunaDB-Build";
   private static final String X_FAUNA_DRIVER = "X-Fauna-Driver";
+  private static final String X_QUERY_TIMEOUT = "X-Query-Timeout";
 
   private final URL faunaRoot;
   private final String authHeader;
   private final JvmDriver jvmDriver;
   private final HttpClient client;
   private final MetricRegistry registry;
+  private final Duration queryTimeout;
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final ObjectMapper json = new ObjectMapper();
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final AtomicLong txnTime = new AtomicLong(0L);
 
-  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn) {
+  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Duration queryTimeout) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
     this.client = client;
     this.registry = registry;
     this.jvmDriver = jvmDriver;
     txnTime.set(lastSeenTxn);
+    this.queryTimeout = queryTimeout;
   }
 
   /**
@@ -240,7 +251,7 @@ public final class Connection implements AutoCloseable {
   public Connection newSessionConnection(String authToken) {
     try {
       client.retain();
-      return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime());
+      return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), queryTimeout);
     } catch (IllegalReferenceCountException e) {
       throw new IllegalStateException("Can not create a session connection from a closed http connection");
     }
@@ -383,6 +394,10 @@ public final class Connection implements AutoCloseable {
 
     if(jvmDriver != null) {
       request.headers().set(X_FAUNA_DRIVER, jvmDriver.toString());
+    }
+
+    if(queryTimeout != null) {
+      request.headers().set(X_QUERY_TIMEOUT, queryTimeout.toMillis());
     }
 
     long time = getLastTxnTime();

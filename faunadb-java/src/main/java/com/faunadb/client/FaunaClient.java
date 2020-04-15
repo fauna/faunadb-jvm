@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -75,6 +76,7 @@ public class FaunaClient implements AutoCloseable {
     private String secret;
     private URL endpoint;
     private MetricRegistry registry;
+    private Duration queryTimeout;
 
     private Builder() {
     }
@@ -114,6 +116,12 @@ public class FaunaClient implements AutoCloseable {
       return this;
     }
 
+
+    public Builder withQueryTimeout(Duration timeout) {
+      this.queryTimeout = timeout;
+      return this;
+    }
+
     /**
      * Returns a newly constructed {@link FaunaClient} with configuration based on the settings of this {@link Builder}.
      * @return {@link FaunaClient}
@@ -122,6 +130,7 @@ public class FaunaClient implements AutoCloseable {
       Connection.Builder builder = Connection.builder()
         .withAuthToken(secret)
         .withFaunaRoot(endpoint)
+        .withQueryTimeout(queryTimeout)
         .withJvmDriver(JvmDriver.JAVA);
 
       if (registry != null) builder.withMetrics(registry);
