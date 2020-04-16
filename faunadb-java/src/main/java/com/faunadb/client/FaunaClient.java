@@ -116,7 +116,12 @@ public class FaunaClient implements AutoCloseable {
       return this;
     }
 
-
+    /**
+     * Sets a global timeout for all the Queries issued by this client.
+     *
+     * @param timeout the query timeout value
+     * @return this {@link Builder} object
+     */
     public Builder withQueryTimeout(Duration timeout) {
       this.queryTimeout = timeout;
       return this;
@@ -180,6 +185,10 @@ public class FaunaClient implements AutoCloseable {
    * @see com.faunadb.client.query.Language
    */
   public CompletableFuture<Value> query(Expr expr) {
+    return performRequest(json.valueToTree(expr));
+  }
+
+  public CompletableFuture<Value> query(Expr expr, Duration timeout) {
     return performRequest(json.valueToTree(expr));
   }
 

@@ -176,7 +176,12 @@ public final class Connection implements AutoCloseable {
       return this;
     }
 
-
+    /**
+     * Sets the global query timeout for this connection.
+     *
+     * @param timeout the query timeout value
+     * @return this {@link Builder} object
+     */
     public Builder withQueryTimeout(Duration timeout) {
       this.queryTimeout = timeout;
       return this;
