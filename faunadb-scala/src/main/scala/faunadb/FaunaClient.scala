@@ -18,6 +18,7 @@ import io.netty.handler.codec.http.FullHttpResponse
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
+import scala.compat.java8.OptionConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.control.NonFatal
 
@@ -96,7 +97,7 @@ class FaunaClient private (connection: Connection) {
     *         future is returned.
     */
   def query(expr: Expr)(implicit ec: ExecutionContext): Future[Value] =
-    connection.post("", json.valueToTree(expr)).toScala.map { resp =>
+    connection.post("", json.valueToTree(expr), None.asJava).toScala.map { resp =>
       try {
         handleQueryErrors(resp)
         val rv = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
@@ -117,7 +118,7 @@ class FaunaClient private (connection: Connection) {
     *         query fails, a failed future is returned.
     */
   def query(exprs: Iterable[Expr])(implicit ec: ExecutionContext): Future[IndexedSeq[Value]] =
-    connection.post("", json.valueToTree(exprs)).toScala.map { resp =>
+    connection.post("", json.valueToTree(exprs), None.asJava).toScala.map { resp =>
       try {
         handleQueryErrors(resp)
         val arr = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])

@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -185,11 +186,45 @@ public class FaunaClient implements AutoCloseable {
    * @see com.faunadb.client.query.Language
    */
   public CompletableFuture<Value> query(Expr expr) {
-    return performRequest(json.valueToTree(expr));
+    return query(expr, Optional.empty());
   }
 
+  /**
+   * Issues a Query to FaunaDB.
+   * <p>
+   * Queries are constructed by the helper methods in the {@link com.faunadb.client.query.Language} class.
+   * <p>
+   * Responses are represented as structured tree where each node is a {@link Value} instance.
+   * {@link Value} instances can be converted to native types. See {@link Value} class for details.
+   *
+   * @param expr the query to be executed.
+   * @param timeout the timeout for the current query. If a query timeout has been set when creating
+   *                the {@link FaunaClient}, the one set here will be used for the scope of this query instead.
+   * @return a {@link CompletableFuture} containing the root node of the response tree.
+   * @see Value
+   * @see com.faunadb.client.query.Language
+   */
   public CompletableFuture<Value> query(Expr expr, Duration timeout) {
-    return performRequest(json.valueToTree(expr));
+    return query(expr, Optional.ofNullable(timeout));
+  }
+
+  /**
+   * Issues a Query to FaunaDB.
+   * <p>
+   * Queries are constructed by the helper methods in the {@link com.faunadb.client.query.Language} class.
+   * <p>
+   * Responses are represented as structured tree where each node is a {@link Value} instance.
+   * {@link Value} instances can be converted to native types. See {@link Value} class for details.
+   *
+   * @param expr the query to be executed.
+   * @param timeout the timeout for the current query. If a query timeout has been set when creating
+   *                the {@link FaunaClient}, the one set here will be used for the scope of this query instead.
+   * @return a {@link CompletableFuture} containing the root node of the response tree.
+   * @see Value
+   * @see com.faunadb.client.query.Language
+   */
+  public CompletableFuture<Value> query(Expr expr, Optional<Duration> timeout) {
+    return performRequest(json.valueToTree(expr), timeout);
   }
 
   /**
@@ -217,7 +252,39 @@ public class FaunaClient implements AutoCloseable {
    * @return a {@link CompletableFuture} containing an ordered list of the query's responses.
    */
   public CompletableFuture<List<Value>> query(List<? extends Expr> exprs) {
-      return performRequest(json.valueToTree(exprs)).thenApply(result -> result.collect(Field.as(VALUE)));
+    return query(exprs, Optional.empty());
+  }
+
+  /**
+   * Issues multiple queries to FaunaDB.
+   * <p>
+   * These queries are sent to FaunaDB in a single request. A list containing all responses is returned
+   * in the same order as the issued queries.
+   * <p>
+   *
+   * @param exprs the list of queries to be sent to FaunaDB.
+   * @param timeout the timeout for the current query. If a query timeout has been set when creating
+   *                the {@link FaunaClient}, the one set here will be used for the scope of this query instead.
+   * @return a {@link CompletableFuture} containing an ordered list of the query's responses.
+   */
+  public CompletableFuture<List<Value>> query(List<? extends Expr> exprs, Duration timeout) {
+    return query(exprs, Optional.ofNullable(timeout));
+  }
+
+  /**
+   * Issues multiple queries to FaunaDB.
+   * <p>
+   * These queries are sent to FaunaDB in a single request. A list containing all responses is returned
+   * in the same order as the issued queries.
+   * <p>
+   *
+   * @param exprs the list of queries to be sent to FaunaDB.
+   * @param timeout the timeout for the current query. If a query timeout has been set when creating
+   *                the {@link FaunaClient}, the one set here will be used for the scope of this query instead.
+   * @return a {@link CompletableFuture} containing an ordered list of the query's responses.
+   */
+  public CompletableFuture<List<Value>> query(List<? extends Expr> exprs, Optional<Duration> timeout) {
+    return performRequest(json.valueToTree(exprs), timeout).thenApply(result -> result.collect(Field.as(VALUE)));
   }
 
   /**
@@ -253,9 +320,9 @@ public class FaunaClient implements AutoCloseable {
     }
   }
 
-  private CompletableFuture<Value> performRequest(JsonNode body) {
+  private CompletableFuture<Value> performRequest(JsonNode body, Optional<Duration> queryTimeout) {
     try {
-        return handleNetworkExceptions(connection.post("", body).thenApply(this::handleResponse));
+        return handleNetworkExceptions(connection.post("", body, queryTimeout).thenApply(this::handleResponse));
     } catch (IOException ex) {
         CompletableFuture<Value> oops = new CompletableFuture<>();
         oops.completeExceptionally(ex);
