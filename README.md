@@ -51,7 +51,7 @@ Download from the Maven central repository:
 ##### faunadb-java/pom.xml:
 
 ```xml
-  <dependencies>
+<dependencies>
   ...
   <dependency>
     <groupId>com.faunadb</groupId>
