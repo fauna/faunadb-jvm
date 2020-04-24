@@ -8,7 +8,7 @@ import com.faunadb.common.Connection
 import com.faunadb.common.Connection.JvmDriver
 import faunadb.errors._
 import faunadb.query.Expr
-import faunadb.values.{ ArrayV, NullV, Value }
+import faunadb.values.{ ArrayV, Encoder, NullV, Value }
 import java.io.IOException
 import java.net.ConnectException
 import java.util.concurrent.TimeoutException
@@ -52,6 +52,108 @@ object FaunaClient {
 
     new FaunaClient(b.build)
   }
+
+  object QueryAPI {
+
+    sealed trait QueryMagnet {
+      type Result
+      type PerformRequest = (JsonNode, Option[FiniteDuration], ExecutionContext) => Future[Value]
+
+      def apply(json: ObjectMapper, performRequest: PerformRequest): Result
+    }
+
+    /**
+      * ''Magnet companion'' for the [[faunadb.FaunaClient#query FaunaClient.query]] method.
+      *
+      *  The ''magnet branches'' listed within it define all the different variants
+      *  the [[faunadb.FaunaClient#query FaunaClient.query]] method is overloaded.
+      *
+      *  @see [[http://spray.io/blog/2012-12-13-the-magnet-pattern/ Magnet Pattern]]
+      */
+    object QueryMagnet {
+
+      /**
+        * Implicitly converts from an [[faunadb.query.Expr Expr]] into
+        * a valid [[faunadb.FaunaClient.QueryAPI.QueryMagnet QueryMagnet]].
+        *
+        * The [[faunadb.FaunaClient#query FaunaClient.query]] method can be called with the signature of this method.
+        *
+        * @param expr    the query to run.
+        * @param ec      the `ExecutionContext` used to run the query asynchronously.
+        * @param timeout the timeout for the given query. It replaces the timeout value set for the current
+        *                [[faunadb.FaunaClient]] (if any) for the scope of this query. The timeout value has
+        *                milliseconds precision.
+        * @return        a [[faunadb.FaunaClient.QueryAPI.QueryMagnet QueryMagnet]]
+        *                with return type [[scala.concurrent.Future Future]] of [[faunadb.values.Value Value]].
+        */
+      implicit def fromExpr(expr: Expr)(implicit ec: ExecutionContext, timeout: FiniteDuration = null) =
+        new QueryMagnet {
+          type Result = Future[Value]
+
+          def apply(json: ObjectMapper, performRequest: PerformRequest): Result = {
+            performRequest(json.valueToTree(expr), Option(timeout), ec).map { result =>
+              if (result eq null) NullV else result
+            }
+          }
+        }
+
+      /**
+        * Implicitly converts from an [[scala.collection.Iterable Iterable]] implementation
+        * of [[faunadb.query.Expr Expr]] into a valid [[faunadb.FaunaClient.QueryAPI.QueryMagnet QueryMagnet]].
+        *
+        * The [[faunadb.FaunaClient#query FaunaClient.query]] method can be called with the signature of this method.
+        *
+        * @param exprs   the queries to run.
+        * @param ec      the `ExecutionContext` used to run the query asynchronously.
+        * @param timeout the timeout for the given query. It replaces the timeout value set for the current
+        *                [faunadb.FaunaClient]] (if any) for the scope of this query. The timeout value has
+        *                milliseconds precision.
+        * @returna       a [[faunadb.FaunaClient.QueryAPI.QueryMagnet QueryMagnet]]
+        *                with return type [[scala.concurrent.Future Future]]
+        *                of [[scala.collection.Iterable Iterable]]
+        *                of [[faunadb.values.Value Value]].
+        */
+      implicit def fromExprs(exprs: Iterable[Expr])(implicit ec: ExecutionContext, timeout: FiniteDuration = null) =
+        new QueryMagnet {
+          type Result = Future[IndexedSeq[Value]]
+
+          def apply(json: ObjectMapper, performRequest: PerformRequest): Result = {
+            performRequest(json.valueToTree(exprs), Option(timeout), ec).map { result =>
+              result.asInstanceOf[ArrayV].elems
+            }
+          }
+        }
+
+      /**
+        * Implicitly converts from an instance of type `A` into a valid [[faunadb.FaunaClient.QueryAPI.QueryMagnet QueryMagnet]].
+        *
+        * An implicit [[faunadb.values.Encoder Encoder]] of type `A` is required for converting the given value
+        * into a valid [[faunadb.query.Expr Expr]].
+        *
+        * The [[faunadb.FaunaClient#query FaunaClient.query]] method can be called with the signature of this method.
+        *
+        * @param value   the query to run
+        * @param ec      the `ExecutionContext` used to run the query asynchronously.
+        * @param timeout the timeout for the given query. It replaces the timeout value set for the current
+        *                [faunadb.FaunaClient]] (if any) for the scope of this query. The timeout value has
+        *                milliseconds precision.
+        * @return        a [[faunadb.FaunaClient.QueryAPI.QueryMagnet QueryMagnet]]
+        *                with return type [[scala.concurrent.Future Future]] of [[faunadb.values.Value Value]].
+        */
+      implicit def fromAny[A: Encoder](value: A)(implicit ec: ExecutionContext, timeout: FiniteDuration = null) =
+        new QueryMagnet {
+          type Result = Future[Value]
+
+          def apply(json: ObjectMapper, performRequest: PerformRequest): Result = {
+            val expr = Expr.encode(value)
+            performRequest(json.valueToTree(expr), Option(timeout), ec).map { result =>
+              if (result eq null) NullV else result
+            }
+          }
+        }
+    }
+  }
+
 }
 
 /**
@@ -86,6 +188,8 @@ object FaunaClient {
   * @constructor create a new client with a configured [[com.faunadb.common.Connection]].
   */
 class FaunaClient private (connection: Connection) {
+  import FaunaClient._
+  import QueryAPI._
 
   private[this] val json = new ObjectMapper
   json.registerModule(new DefaultScalaModule)
@@ -93,42 +197,133 @@ class FaunaClient private (connection: Connection) {
   /**
     * Issues a query.
     *
-    * @param expr the query to run, created using the query dsl helpers in [[faunadb.query]].
-    * @param ec the [[scala.concurrent.ExecutionContext]] what will be used to run this query
-    * @param timeout the timeout for the current query. It replaces the timeout value set for this
-    *                [[faunadb.FaunaClient]] if any for the scope of this query. The timeout value has
-    *                milliseconds precision.
-    * @return A [[scala.concurrent.Future]] containing the query result.
-    *         The result is an instance of [[faunadb.values.Result]],
-    *         which can be cast to a typed value using the
-    *         [[faunadb.values.Field]] API. If the query fails, failed
-    *         future is returned.
-    */
-  def query(expr: Expr)(implicit ec: ExecutionContext, timeout: FiniteDuration = null): Future[Value] =
-    performRequest(json.valueToTree(expr), Option(timeout)).map { result =>
-      if (result eq null) NullV else result
-    }
-
-  /**
-    * Issues multiple queries as a single transaction.
+    * The query method is implemented following the [[http://spray.io/blog/2012-12-13-the-magnet-pattern/ Magnet Pattern]].
+    * Refer to the ''magnet companion'' [[faunadb.FaunaClient.QueryAPI.QueryMagnet QueryMagnet]], for a definition of all
+    * the possible ''magnet branches''.
     *
-    * @param exprs the queries to run.
-    * @param ec the [[scala.concurrent.ExecutionContext]] what will be used to run this query
-    * @param timeout the timeout for the current query. It replaces the timeout value set for this
-    *                [[faunadb.FaunaClient]] if any, for the scope of this query. The timeout value
-    *                has milliseconds precision.
-    * @return A [[scala.concurrent.Future]] containing an IndexedSeq of
-    *         the results of each query. Each result is an instance of
-    *         [[faunadb.values.Value]], which can be cast to a typed
-    *         value using the [[faunadb.values.Field]] API. If *any*
-    *         query fails, a failed future is returned.
-    */
-  def query(exprs: Iterable[Expr])(implicit ec: ExecutionContext, timeout: FiniteDuration = null): Future[IndexedSeq[Value]] =
-    performRequest(json.valueToTree(exprs), Option(timeout)).map { result =>
-      result.asInstanceOf[ArrayV].elems
-    }
+    * =Issuing queries=
+    *
+    * The query method requires in all its variants an implicit [[scala.concurrent.ExecutionContext ExecutionContext]].
+    * The `ExecutionContext` is used for running the query against the FaunaDB server asynchronously.
+    *
+    * Make sure there is always an ''implicit'' `ExecutionContext` available in the scope, when calling this method.
+    *
+    * Example:
+    *
+    * {{{
+    * implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
+    * }}}
+    *
+    * ==Issue a single query==
+    *
+    * Pass an instance of [[faunadb.query.Expr Expr]] as parameter:
+    *
+    * Example:
+    *
+    * {{{
+    * import faunadb.values._
+    * import faunadb.query._
+    * import scala.concurrent.ExecutionContext.Implicits.global
+    *
+    * val result: Future[Value] =
+    *   client.query(
+    *     Get(Ref(Collection("users"), "263608813107544596"))
+    *   )
+    * }}}
+    *
+    * Alternatively, an instance of any class can be passed as parameter as long as there is
+    * an implicit [[faunadb.values.Encoder Encoder]] for it in scope.
+    *
+    * Example:
+    *
+    * {{{
+    * import faunadb.values._
+    * import scala.concurrent.ExecutionContext.Implicits.global
+    *
+    * val result: Future[Value] =
+    *   client.query(
+    *     "Hello, FaunaDB!"
+    *   )
+    * }}}
+    *
+    * ==Issue multiple queries as a single transaction==
+    *
+    * Pass an [[scala.collection.Iterable Iterable]] implementation of [[faunadb.query.Expr Expr]] as parameter.
+    *
+    * Example:
+    *
+    * {{{
+    * import faunadb.values._
+    * import faunadb.query._
+    * import scala.concurrent.ExecutionContext.Implicits.global
+    *
+    * val result: Future[IndexedSeq[Value]] =
+    *   client.query(
+    *     Seq(
+    *       Get(Ref(Collection("users"), "263608813107544596")),
+    *       Get(Ref(Collection("users"), "263608827286389268"))
+    *     )
+    *   )
+    * }}}
+    *
+    * Alternatively, an [[scala.collection.Iterable Iterable]] implementation of any class can be passed as parameter,
+    * as long as there is an implicit [[faunadb.values.Encoder Encoder]] for it in scope.
+    *
+    * Example:
+    *
+    * {{{
+    * import faunadb.values._
+    * import scala.concurrent.ExecutionContext.Implicits.global
+    *
+    * val result: Future[IndexedSeq[Value]] =
+    *   client.query(
+    *     Seq(
+    *       "Hello",
+    *      "FaunaDB!"
+    *     )
+    *   )
+    * }}}
+    *
+    * =Other options=
+    *
+    * ==Set query timeout==
+    *
+    * The query method also accepts an ''implicit'' timeout parameter
+    * of [[scala.concurrent.duration.FiniteDuration FiniteDuration]] type.
+    *
+    * Example:
+    *
+    * {{{
+    * import faunadb.query._
+    * import faunadb.values._
+    *
+    * import scala.concurrent.ExecutionContext.Implicits.global
+    * import scala.concurrent.duration._
+    *
+    * implicit val timeout: FiniteDuration = 500 millis
+    *
+    * val result: Future[Value] =
+    *   client.query(
+    *     Get(Ref(Collection("users"), "263608813107544596"))
+    *   )
+    * }}}
+    *
+    * The timeout value defines the maximum time a query will be allowed
+    * to run on the server. If the value is exceeded, the query is aborted.
+    *
+    * If a timeout value is provided when calling this method, it replaces
+    * the timeout value set for this [[faunadb.FaunaClient]] (if any) for
+    * the scope of this query.
+    *
+    * The timeout value has milliseconds precision.
+    *
+    * @see [[http://spray.io/blog/2012-12-13-the-magnet-pattern/ Magnet Pattern]]
+    * @see [[faunadb.FaunaClient.QueryAPI.QueryMagnet QueryMagnet]]
+    * */
+  def query(magnet: QueryMagnet): magnet.Result = magnet(json, performRequest _)
 
-  private def performRequest(body: JsonNode, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[Value] =
+  private def performRequest(body: JsonNode, timeout: Option[FiniteDuration], ec: ExecutionContext): Future[Value] = {
+    implicit val executor = ec
     connection.post("", body, timeout.map(_.toJava).asJava).toScala.map { resp =>
       try {
         handleQueryErrors(resp)
@@ -138,6 +333,7 @@ class FaunaClient private (connection: Connection) {
         resp.release()
       }
     }.recover(handleNetworkExceptions)
+  }
 
   /**
     * Creates a new scope to execute session queries. Queries submitted within the session scope will be
