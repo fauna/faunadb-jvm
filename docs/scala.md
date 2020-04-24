@@ -130,6 +130,18 @@ The `query` method takes an `Expr` object. `Expr` objects can be composed with o
     System.out.println("Hippo Spells:\n " + readHippoResults + "\n");
 ```
 
+The `query` method also accepts a `timeout` implicit parameter. The `timeout` value defines the maximum time a `query` will be allowed to run on the server. If the value is exceeded, the query is aborted. If no `timeout` is defined in scope, a default value is assigned on the server side.
+
+```scala
+import scala.concurrent.duration._
+
+implicit val timeout = 500 millis
+
+client.query(
+  Select(Value("data"), Get(hippoRef))
+)
+```
+
 ### How to retrieve the values from a query result
 
 That query returns the data in the form of a json object. It's possible to convert `Value` class to its primitive correspondent using `to` methods specifying a type.  For example the data can be extracted from the results by using:
