@@ -120,7 +120,7 @@ public class FaunaClient implements AutoCloseable {
     /**
      * Sets a global timeout for all the Queries issued by this client.
      *
-     * @param timeout the query timeout value
+     * @param timeout the query timeout value. The timeout value has milliseconds precision.
      * @return this {@link Builder} object
      */
     public Builder withQueryTimeout(Duration timeout) {
@@ -198,8 +198,9 @@ public class FaunaClient implements AutoCloseable {
    * {@link Value} instances can be converted to native types. See {@link Value} class for details.
    *
    * @param expr the query to be executed.
-   * @param timeout the timeout for the current query. If a query timeout has been set when creating
-   *                the {@link FaunaClient}, the one set here will be used for the scope of this query instead.
+   * @param timeout the timeout for the current query. It replaces the timeout value set for this
+   *                {@link FaunaClient} (if any), for the scope of this query. The timeout value
+   *                has milliseconds precision.
    * @return a {@link CompletableFuture} containing the root node of the response tree.
    * @see Value
    * @see com.faunadb.client.query.Language
@@ -217,8 +218,9 @@ public class FaunaClient implements AutoCloseable {
    * {@link Value} instances can be converted to native types. See {@link Value} class for details.
    *
    * @param expr the query to be executed.
-   * @param timeout the timeout for the current query. If a query timeout has been set when creating
-   *                the {@link FaunaClient}, the one set here will be used for the scope of this query instead.
+   * @param timeout the timeout for the current query. It replaces the timeout value set for this
+   *                {@link FaunaClient} (if any), for the scope of this query. The timeout value
+   *                has milliseconds precision.
    * @return a {@link CompletableFuture} containing the root node of the response tree.
    * @see Value
    * @see com.faunadb.client.query.Language
@@ -263,8 +265,9 @@ public class FaunaClient implements AutoCloseable {
    * <p>
    *
    * @param exprs the list of queries to be sent to FaunaDB.
-   * @param timeout the timeout for the current query. If a query timeout has been set when creating
-   *                the {@link FaunaClient}, the one set here will be used for the scope of this query instead.
+   * @param timeout the timeout for the current query. It replaces the timeout value set for this
+   *                {@link FaunaClient} (if any), for the scope of this query. The timeout value
+   *                has milliseconds precision.
    * @return a {@link CompletableFuture} containing an ordered list of the query's responses.
    */
   public CompletableFuture<List<Value>> query(List<? extends Expr> exprs, Duration timeout) {
@@ -279,8 +282,9 @@ public class FaunaClient implements AutoCloseable {
    * <p>
    *
    * @param exprs the list of queries to be sent to FaunaDB.
-   * @param timeout the timeout for the current query. If a query timeout has been set when creating
-   *                the {@link FaunaClient}, the one set here will be used for the scope of this query instead.
+   * @param timeout the timeout for the current query. It replaces the timeout value set for this
+   *                {@link FaunaClient} (if any), for the scope of this query. The timeout value
+   *                has milliseconds precision.
    * @return a {@link CompletableFuture} containing an ordered list of the query's responses.
    */
   public CompletableFuture<List<Value>> query(List<? extends Expr> exprs, Optional<Duration> timeout) {
