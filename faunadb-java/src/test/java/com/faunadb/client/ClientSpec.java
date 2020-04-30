@@ -236,6 +236,12 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldReturnNullValueWhenTheResultIsNull() throws Exception {
+    Value nullValue = query(Null()).get();
+    assertThat(nullValue, equalTo(Null()));
+  }
+
+  @Test
   public void shouldAbort() throws Exception {
     thrown.expectCause(isA(BadRequestException.class));
     thrown.expectMessage(containsString("transaction aborted: a message"));
@@ -424,7 +430,7 @@ public class ClientSpec {
       Remove(createdInstance.get(REF_FIELD), Value(2L), DELETE)
     ).get();
 
-    assertThat(removedEvent, nullValue());
+    assertThat(removedEvent, equalTo(Null()));
   }
 
   static class Event {
