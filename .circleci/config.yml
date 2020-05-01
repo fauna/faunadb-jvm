@@ -6,7 +6,7 @@ executors:
     parameters:
       version:
         type: enum
-        enum: ["release", "nightly"]
+        enum: ["stable", "nightly"]
     resource_class: large
     docker:
       - image: circleci/openjdk:8-jdk
@@ -44,14 +44,15 @@ commands:
 
       - run:
           name: Run Tests
-          command: sbt test
+          command: sbt coverage test coverageReport
 
       - run:
           when: always
           name: Gather results
           command: |
-            mkdir results
-            cp **/target/test-reports/*.xml results/
+            mkdir -p results/{tests,coverage}
+            cp **/target/test-reports/*.xml results/tests/
+            cp faunadb-scala/target/scala-2.12/*coverage-report/ results/coverage/
 
       - store_test_results:
           path: results/
@@ -60,7 +61,7 @@ jobs:
   core-stable:
     executor:
       name: core
-      version: release
+      version: stable
     steps:
       - build_and_test
 
