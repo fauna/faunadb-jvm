@@ -114,8 +114,6 @@ lazy val scala = project.in(file("faunadb-scala"))
       "org.scalatest" %% "scalatest" % "3.0.7" % "test"
     ),
 
-    coverageEnabled := !scalaVersion.value.startsWith("2.11"),
-
     autoAPIMappings := true,
     apiURL := Some(url(scalaApiUrl)),
     apiMappings ++= {
@@ -156,7 +154,6 @@ lazy val java = project.in(file("faunadb-java"))
     ),
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
-    coverageEnabled := true,
 
     libraryDependencies ++= Seq(
       "ch.qos.logback" % "logback-classic" % "1.2.3" % "test",
