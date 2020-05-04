@@ -4,12 +4,14 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
 import com.faunadb.common.Connection.JvmDriver;
+import com.faunadb.client.types.Value.NullV;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.handler.codec.http.FullHttpResponse;
 
@@ -17,9 +19,11 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -75,6 +79,7 @@ public class FaunaClient implements AutoCloseable {
     private String secret;
     private URL endpoint;
     private MetricRegistry registry;
+    private Duration queryTimeout;
 
     private Builder() {
     }
@@ -115,6 +120,17 @@ public class FaunaClient implements AutoCloseable {
     }
 
     /**
+     * Sets a global timeout for all the Queries issued by this client.
+     *
+     * @param timeout the query timeout value. The timeout value has milliseconds precision.
+     * @return this {@link Builder} object
+     */
+    public Builder withQueryTimeout(Duration timeout) {
+      this.queryTimeout = timeout;
+      return this;
+    }
+
+    /**
      * Returns a newly constructed {@link FaunaClient} with configuration based on the settings of this {@link Builder}.
      * @return {@link FaunaClient}
      */
@@ -122,6 +138,7 @@ public class FaunaClient implements AutoCloseable {
       Connection.Builder builder = Connection.builder()
         .withAuthToken(secret)
         .withFaunaRoot(endpoint)
+        .withQueryTimeout(queryTimeout)
         .withJvmDriver(JvmDriver.JAVA);
 
       if (registry != null) builder.withMetrics(registry);
@@ -171,7 +188,47 @@ public class FaunaClient implements AutoCloseable {
    * @see com.faunadb.client.query.Language
    */
   public CompletableFuture<Value> query(Expr expr) {
-    return performRequest(json.valueToTree(expr));
+    return query(expr, Optional.empty());
+  }
+
+  /**
+   * Issues a Query to FaunaDB.
+   * <p>
+   * Queries are constructed by the helper methods in the {@link com.faunadb.client.query.Language} class.
+   * <p>
+   * Responses are represented as structured tree where each node is a {@link Value} instance.
+   * {@link Value} instances can be converted to native types. See {@link Value} class for details.
+   *
+   * @param expr the query to be executed.
+   * @param timeout the timeout for the current query. It replaces the timeout value set for this
+   *                {@link FaunaClient} (if any), for the scope of this query. The timeout value
+   *                has milliseconds precision.
+   * @return a {@link CompletableFuture} containing the root node of the response tree.
+   * @see Value
+   * @see com.faunadb.client.query.Language
+   */
+  public CompletableFuture<Value> query(Expr expr, Duration timeout) {
+    return query(expr, Optional.ofNullable(timeout));
+  }
+
+  /**
+   * Issues a Query to FaunaDB.
+   * <p>
+   * Queries are constructed by the helper methods in the {@link com.faunadb.client.query.Language} class.
+   * <p>
+   * Responses are represented as structured tree where each node is a {@link Value} instance.
+   * {@link Value} instances can be converted to native types. See {@link Value} class for details.
+   *
+   * @param expr the query to be executed.
+   * @param timeout the timeout for the current query. It replaces the timeout value set for this
+   *                {@link FaunaClient} (if any), for the scope of this query. The timeout value
+   *                has milliseconds precision.
+   * @return a {@link CompletableFuture} containing the root node of the response tree.
+   * @see Value
+   * @see com.faunadb.client.query.Language
+   */
+  public CompletableFuture<Value> query(Expr expr, Optional<Duration> timeout) {
+    return performRequest(json.valueToTree(expr), timeout);
   }
 
   /**
@@ -199,7 +256,41 @@ public class FaunaClient implements AutoCloseable {
    * @return a {@link CompletableFuture} containing an ordered list of the query's responses.
    */
   public CompletableFuture<List<Value>> query(List<? extends Expr> exprs) {
-      return performRequest(json.valueToTree(exprs)).thenApply(result -> result.collect(Field.as(VALUE)));
+    return query(exprs, Optional.empty());
+  }
+
+  /**
+   * Issues multiple queries to FaunaDB.
+   * <p>
+   * These queries are sent to FaunaDB in a single request. A list containing all responses is returned
+   * in the same order as the issued queries.
+   * <p>
+   *
+   * @param exprs the list of queries to be sent to FaunaDB.
+   * @param timeout the timeout for the current query. It replaces the timeout value set for this
+   *                {@link FaunaClient} (if any), for the scope of this query. The timeout value
+   *                has milliseconds precision.
+   * @return a {@link CompletableFuture} containing an ordered list of the query's responses.
+   */
+  public CompletableFuture<List<Value>> query(List<? extends Expr> exprs, Duration timeout) {
+    return query(exprs, Optional.ofNullable(timeout));
+  }
+
+  /**
+   * Issues multiple queries to FaunaDB.
+   * <p>
+   * These queries are sent to FaunaDB in a single request. A list containing all responses is returned
+   * in the same order as the issued queries.
+   * <p>
+   *
+   * @param exprs the list of queries to be sent to FaunaDB.
+   * @param timeout the timeout for the current query. It replaces the timeout value set for this
+   *                {@link FaunaClient} (if any), for the scope of this query. The timeout value
+   *                has milliseconds precision.
+   * @return a {@link CompletableFuture} containing an ordered list of the query's responses.
+   */
+  public CompletableFuture<List<Value>> query(List<? extends Expr> exprs, Optional<Duration> timeout) {
+    return performRequest(json.valueToTree(exprs), timeout).thenApply(result -> result.collect(Field.as(VALUE)));
   }
 
   /**
@@ -227,6 +318,15 @@ public class FaunaClient implements AutoCloseable {
       handleQueryErrors(response);
       JsonNode responseBody = parseResponseBody(response);
       JsonNode resource = responseBody.get("resource");
+
+      if(resource == null) {
+        throw new IOException("Invalid JSON.");
+      }
+
+      if(resource instanceof NullNode) {
+        return NullV.NULL;
+      }
+
       return json.treeToValue(resource, Value.class);
     } catch (IOException ex) {
       throw new AssertionError(ex);
@@ -235,9 +335,9 @@ public class FaunaClient implements AutoCloseable {
     }
   }
 
-  private CompletableFuture<Value> performRequest(JsonNode body) {
+  private CompletableFuture<Value> performRequest(JsonNode body, Optional<Duration> queryTimeout) {
     try {
-        return handleNetworkExceptions(connection.post("", body).thenApply(this::handleResponse));
+        return handleNetworkExceptions(connection.post("", body, queryTimeout).thenApply(this::handleResponse));
     } catch (IOException ex) {
         CompletableFuture<Value> oops = new CompletableFuture<>();
         oops.completeExceptionally(ex);

@@ -1,6 +1,6 @@
 package faunadb
 
-import faunadb.errors.{ BadRequestException, NotFoundException, PermissionDeniedException, UnauthorizedException }
+import faunadb.errors.{ BadRequestException, NotFoundException, PermissionDeniedException, UnauthorizedException, UnavailableException }
 import faunadb.query.TimeUnit
 import faunadb.query._
 import faunadb.values._
@@ -119,6 +119,12 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "echo values" in {
     await(client.query(ObjectV("foo" -> StringV("bar")))) should equal (ObjectV("foo" -> StringV("bar")))
     await(client.query("qux")) should equal (StringV("qux"))
+  }
+
+  it should "fail with timeout error" in {
+    val timeout = Duration.Zero
+    val thrown = the [UnavailableException] thrownBy await(client.query("echo", timeout))
+    thrown.message should include ("time out: Read timed out.")
   }
 
   it should "fail with permission denied" in {

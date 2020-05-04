@@ -1,9 +1,6 @@
 package com.faunadb.client;
 
-import com.faunadb.client.errors.BadRequestException;
-import com.faunadb.client.errors.NotFoundException;
-import com.faunadb.client.errors.PermissionDeniedException;
-import com.faunadb.client.errors.UnauthorizedException;
+import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
 import com.faunadb.client.types.*;
@@ -12,6 +9,7 @@ import io.netty.util.ResourceLeakDetector;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -230,9 +228,23 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldThrowATimeoutErrorWhenQueryTimeoutIsZero() throws Exception {
+    thrown.expectCause(isA(UnavailableException.class));
+    thrown.expectMessage(containsString("time out: Read timed out."));
+    Duration timeout = Duration.ZERO;
+    query(Value("echo"), timeout).get();
+  }
+
+  @Test
   public void shouldThrowNotFoundWhenInstanceDoesntExists() throws Exception {
     thrown.expectCause(isA(NotFoundException.class));
     query(Get(Ref(Collection("spells"), "1234"))).get();
+  }
+
+  @Test
+  public void shouldReturnNullValueWhenTheResultIsNull() throws Exception {
+    Value nullValue = query(Null()).get();
+    assertThat(nullValue, equalTo(Null()));
   }
 
   @Test
@@ -424,7 +436,7 @@ public class ClientSpec {
       Remove(createdInstance.get(REF_FIELD), Value(2L), DELETE)
     ).get();
 
-    assertThat(removedEvent, nullValue());
+    assertThat(removedEvent, equalTo(Null()));
   }
 
   static class Event {
@@ -2670,6 +2682,10 @@ public class ClientSpec {
 
   private CompletableFuture<Value> query(Expr expr) {
     return serverClient.query(expr);
+  }
+
+  private CompletableFuture<Value> query(Expr expr, Duration timeout) {
+    return serverClient.query(expr, timeout);
   }
 
   private CompletableFuture<List<Value>> query(List<? extends Expr> exprs) {
