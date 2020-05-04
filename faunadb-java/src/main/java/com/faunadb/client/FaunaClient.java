@@ -4,12 +4,14 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
 import com.faunadb.common.Connection.JvmDriver;
+import com.faunadb.client.types.Value.NullV;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.handler.codec.http.FullHttpResponse;
 
@@ -227,6 +229,15 @@ public class FaunaClient implements AutoCloseable {
       handleQueryErrors(response);
       JsonNode responseBody = parseResponseBody(response);
       JsonNode resource = responseBody.get("resource");
+
+      if(resource == null) {
+        throw new IOException("Invalid JSON.");
+      }
+
+      if(resource instanceof NullNode) {
+        return NullV.NULL;
+      }
+
       return json.treeToValue(resource, Value.class);
     } catch (IOException ex) {
       throw new AssertionError(ex);
