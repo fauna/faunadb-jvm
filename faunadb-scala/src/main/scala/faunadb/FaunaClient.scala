@@ -1,7 +1,7 @@
 package faunadb
 
 import com.codahale.metrics.MetricRegistry
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.{ JsonNode, ObjectMapper }
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.common.Connection
@@ -17,7 +17,10 @@ import io.netty.buffer.ByteBufInputStream
 import io.netty.handler.codec.http.FullHttpResponse
 
 import scala.collection.JavaConverters._
+import scala.compat.java8.DurationConverters._
 import scala.compat.java8.FutureConverters._
+import scala.compat.java8.OptionConverters._
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.control.NonFatal
 
@@ -27,22 +30,24 @@ object FaunaClient {
   /**
     * Creates a new FaunaDB client.
     *
-    *
-    *
     * @param secret The secret material of the auth key used. See [[https://fauna.com/documentation#authentication-key_access]]
     * @param endpoint URL of the FaunaDB service to connect to. Defaults to https://db.fauna.com
     * @param metrics An optional [[com.codahale.metrics.MetricRegistry]] to record stats.
+    * @param queryTimeout An optional global timeout for all the queries issued by this client. The timeout value has
+    *                     milliseconds precision. If not provided, a default timeout value is set on the server side.
     * @return A configured FaunaClient instance.
     */
   def apply(
     secret: String = null,
     endpoint: String = null,
-    metrics: MetricRegistry = null): FaunaClient = {
+    metrics: MetricRegistry = null,
+    queryTimeout: FiniteDuration = null): FaunaClient = {
 
     val b = Connection.builder
     if (endpoint ne null) b.withFaunaRoot(endpoint)
     if (secret ne null) b.withAuthToken(secret)
     if (metrics ne null) b.withMetrics(metrics)
+    if (queryTimeout ne null) b.withQueryTimeout(queryTimeout.toJava)
     b.withJvmDriver(JvmDriver.SCALA)
 
     new FaunaClient(b.build)
@@ -89,27 +94,55 @@ class FaunaClient private (connection: Connection) {
     * Issues a query.
     *
     * @param expr the query to run, created using the query dsl helpers in [[faunadb.query]].
+    * @param ec the `ExecutionContext` used to run the query asynchronously.
     * @return A [[scala.concurrent.Future]] containing the query result.
     *         The result is an instance of [[faunadb.values.Result]],
     *         which can be cast to a typed value using the
     *         [[faunadb.values.Field]] API. If the query fails, failed
     *         future is returned.
     */
-  def query(expr: Expr)(implicit ec: ExecutionContext): Future[Value] =
-    connection.post("", json.valueToTree(expr)).toScala.map { resp =>
-      try {
-        handleQueryErrors(resp)
-        val rv = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
-        if (rv eq null) NullV else rv
-      } finally {
-        resp.release()
-      }
-    }.recover(handleNetworkExceptions)
+  def query(expr: Expr)(implicit ec: ExecutionContext): Future[Value] = query(expr, None)
+
+  /**
+    * Issues a query.
+    *
+    * @param expr the query to run, created using the query dsl helpers in [[faunadb.query]].
+    * @param ec the `ExecutionContext` used to run the query asynchronously.
+    * @param timeout the timeout for the current query. It replaces the timeout value set for this
+    *                [[faunadb.FaunaClient]] if any for the scope of this query. The timeout value has
+    *                milliseconds precision.
+    * @return A [[scala.concurrent.Future]] containing the query result.
+    *         The result is an instance of [[faunadb.values.Result]],
+    *         which can be cast to a typed value using the
+    *         [[faunadb.values.Field]] API. If the query fails, failed
+    *         future is returned.
+    */
+  def query(expr: Expr, timeout: FiniteDuration)(implicit ec: ExecutionContext): Future[Value] = query(expr, Some(timeout))
+
+  /**
+    * Issues a query.
+    *
+    * @param expr the query to run, created using the query dsl helpers in [[faunadb.query]].
+    * @param ec the `ExecutionContext` used to run the query asynchronously.
+    * @param timeout the timeout for the current query. It replaces the timeout value set for this
+    *                [[faunadb.FaunaClient]] if any for the scope of this query. The timeout value has
+    *                milliseconds precision.
+    * @return A [[scala.concurrent.Future]] containing the query result.
+    *         The result is an instance of [[faunadb.values.Result]],
+    *         which can be cast to a typed value using the
+    *         [[faunadb.values.Field]] API. If the query fails, failed
+    *         future is returned.
+    */
+  def query(expr: Expr, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[Value] =
+    performRequest(json.valueToTree(expr), timeout).map { result =>
+      if (result eq null) NullV else result
+    }
 
   /**
     * Issues multiple queries as a single transaction.
     *
     * @param exprs the queries to run.
+    * @param ec the `ExecutionContext` used to run the query asynchronously.
     * @return A [[scala.concurrent.Future]] containing an IndexedSeq of
     *         the results of each query. Each result is an instance of
     *         [[faunadb.values.Value]], which can be cast to a typed
@@ -117,11 +150,50 @@ class FaunaClient private (connection: Connection) {
     *         query fails, a failed future is returned.
     */
   def query(exprs: Iterable[Expr])(implicit ec: ExecutionContext): Future[IndexedSeq[Value]] =
-    connection.post("", json.valueToTree(exprs)).toScala.map { resp =>
+    query(exprs, None)
+
+  /**
+    * Issues multiple queries as a single transaction.
+    *
+    * @param exprs the queries to run.
+    * @param ec the `ExecutionContext` used to run the query asynchronously.
+    * @param timeout the timeout for the current query. It replaces the timeout value set for this
+    *                [[faunadb.FaunaClient]] if any, for the scope of this query. The timeout value
+    *                has milliseconds precision.
+    * @return A [[scala.concurrent.Future]] containing an IndexedSeq of
+    *         the results of each query. Each result is an instance of
+    *         [[faunadb.values.Value]], which can be cast to a typed
+    *         value using the [[faunadb.values.Field]] API. If *any*
+    *         query fails, a failed future is returned.
+    */
+  def query(exprs: Iterable[Expr], timeout: FiniteDuration)(implicit ec: ExecutionContext): Future[IndexedSeq[Value]] =
+    query(exprs, Some(timeout))
+
+  /**
+    * Issues multiple queries as a single transaction.
+    *
+    * @param exprs the queries to run.
+    * @param ec the `ExecutionContext` used to run the query asynchronously.
+    * @param timeout the timeout for the current query. It replaces the timeout value set for this
+    *                [[faunadb.FaunaClient]] if any, for the scope of this query. The timeout value
+    *                has milliseconds precision.
+    * @return A [[scala.concurrent.Future]] containing an IndexedSeq of
+    *         the results of each query. Each result is an instance of
+    *         [[faunadb.values.Value]], which can be cast to a typed
+    *         value using the [[faunadb.values.Field]] API. If *any*
+    *         query fails, a failed future is returned.
+    */
+  def query(exprs: Iterable[Expr], timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[IndexedSeq[Value]] =
+    performRequest(json.valueToTree(exprs), timeout).map { result =>
+      result.asInstanceOf[ArrayV].elems
+    }
+
+  private def performRequest(body: JsonNode, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[Value] =
+    connection.post("", body, timeout.map(_.toJava).asJava).toScala.map { resp =>
       try {
         handleQueryErrors(resp)
-        val arr = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
-        arr.asInstanceOf[ArrayV].elems
+        val result = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
+        result
       } finally {
         resp.release()
       }
