@@ -1,4 +1,4 @@
-val driverVersion = "2.11.0"
+val driverVersion = "2.11.1"
 val nettyVersion = "4.1.43.Final"
 val jacksonVersion = "2.10.1"
 val jacksonDocVersion = "2.10"
@@ -114,8 +114,6 @@ lazy val scala = project.in(file("faunadb-scala"))
       "org.scalatest" %% "scalatest" % "3.0.7" % "test"
     ),
 
-    coverageEnabled := !scalaVersion.value.startsWith("2.11"),
-
     autoAPIMappings := true,
     apiURL := Some(url(scalaApiUrl)),
     apiMappings ++= {
@@ -156,7 +154,6 @@ lazy val java = project.in(file("faunadb-java"))
     ),
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
-    coverageEnabled := true,
 
     libraryDependencies ++= Seq(
       "ch.qos.logback" % "logback-classic" % "1.2.3" % "test",

@@ -17,6 +17,7 @@ import java.io.IOError;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -88,6 +89,7 @@ public final class Connection implements AutoCloseable {
     private long lastSeenTxn;
     private HttpClient client;
     private JvmDriver jvmDriver;
+    private Optional<Duration> queryTimeout = Optional.empty();
 
     private Builder() {
     }
@@ -175,6 +177,17 @@ public final class Connection implements AutoCloseable {
     }
 
     /**
+     * Sets the global query timeout for this connection.
+     *
+     * @param timeout the query timeout value
+     * @return this {@link Builder} object
+     */
+    public Builder withQueryTimeout(Duration timeout) {
+      this.queryTimeout = Optional.ofNullable(timeout);
+      return this;
+    }
+
+    /**
      * @return a newly constructed {@link Connection} with its configuration based on
      * the settings of the {@link Builder} instance.
      */
@@ -201,32 +214,35 @@ public final class Connection implements AutoCloseable {
         http = client;
       }
 
-      return new Connection(root, authToken, http, registry, jvmDriver, lastSeenTxn);
+      return new Connection(root, authToken, http, registry, jvmDriver, lastSeenTxn, queryTimeout);
     }
   }
 
   private static final String X_FAUNADB_HOST = "X-FaunaDB-Host";
   private static final String X_FAUNADB_BUILD = "X-FaunaDB-Build";
   private static final String X_FAUNA_DRIVER = "X-Fauna-Driver";
+  private static final String X_QUERY_TIMEOUT = "X-Query-Timeout";
 
   private final URL faunaRoot;
   private final String authHeader;
   private final JvmDriver jvmDriver;
   private final HttpClient client;
   private final MetricRegistry registry;
+  private final Optional<Duration> queryTimeout;
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final ObjectMapper json = new ObjectMapper();
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final AtomicLong txnTime = new AtomicLong(0L);
 
-  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn) {
+  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> queryTimeout) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
     this.client = client;
     this.registry = registry;
     this.jvmDriver = jvmDriver;
     txnTime.set(lastSeenTxn);
+    this.queryTimeout = queryTimeout;
   }
 
   /**
@@ -240,7 +256,7 @@ public final class Connection implements AutoCloseable {
   public Connection newSessionConnection(String authToken) {
     try {
       client.retain();
-      return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime());
+      return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), queryTimeout);
     } catch (IllegalReferenceCountException e) {
       throw new IllegalStateException("Can not create a session connection from a closed http connection");
     }
@@ -285,12 +301,13 @@ public final class Connection implements AutoCloseable {
    * Issues a {@code GET} request with no parameters.
    *
    * @param path the relative path of the resource.
+   * @param queryTimeout the query timeout for the current request.
    * @return a {@link CompletableFuture} containing the HTTP Response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<FullHttpResponse> get(String path) throws IOException {
+  public CompletableFuture<FullHttpResponse> get(String path, Optional<Duration> queryTimeout) throws IOException {
     FullHttpRequest request = newRequest(HttpMethod.GET, path);
-    return performRequest(request);
+    return performRequest(request, queryTimeout);
   }
 
   /**
@@ -298,13 +315,14 @@ public final class Connection implements AutoCloseable {
    *
    * @param path   the relative path of the resource.
    * @param params a map containing the request parameters.
+   * @param queryTimeout the query timeout for the current request.
    * @return a {@code CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<FullHttpResponse> get(String path, Map<String, List<String>> params) throws IOException {
+  public CompletableFuture<FullHttpResponse> get(String path, Map<String, List<String>> params, Optional<Duration> queryTimeout) throws IOException {
     FullHttpRequest request = newRequest(HttpMethod.GET, path);
     fixRequestParameters(request, params);
-    return performRequest(request);
+    return performRequest(request, queryTimeout);
   }
 
   /**
@@ -312,12 +330,13 @@ public final class Connection implements AutoCloseable {
    *
    * @param path the relative path of the resource.
    * @param body the JSON tree that will be serialized into the request body.
+   * @param queryTimeout the query timeout for the current request.
    * @return a {@link CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<FullHttpResponse> post(String path, JsonNode body) throws IOException {
+  public CompletableFuture<FullHttpResponse> post(String path, JsonNode body, Optional<Duration> queryTimeout) throws IOException {
     FullHttpRequest request = newRequest(HttpMethod.POST, path, body);
-    return performRequest(request);
+    return performRequest(request, queryTimeout);
   }
 
   /**
@@ -325,12 +344,13 @@ public final class Connection implements AutoCloseable {
    *
    * @param path the relative path of the resource.
    * @param body the JSON tree that will be serialized into the request body.
+   * @param queryTimeout the query timeout for the current request.
    * @return a {@link CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<FullHttpResponse> put(String path, JsonNode body) throws IOException {
+  public CompletableFuture<FullHttpResponse> put(String path, JsonNode body, Optional<Duration> queryTimeout) throws IOException {
     FullHttpRequest request = newRequest(HttpMethod.PUT, path, body);
-    return performRequest(request);
+    return performRequest(request, queryTimeout);
   }
 
   /**
@@ -338,12 +358,13 @@ public final class Connection implements AutoCloseable {
    *
    * @param path the relative path of the resource.
    * @param body the JSON tree that will be serialized into the request body.
+   * @param queryTimeout the query timeout for the current request.
    * @return a {@link CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<FullHttpResponse> patch(String path, JsonNode body) throws IOException {
+  public CompletableFuture<FullHttpResponse> patch(String path, JsonNode body, Optional<Duration> queryTimeout) throws IOException {
     FullHttpRequest request = newRequest(HttpMethod.PATCH, path, body);
-    return performRequest(request);
+    return performRequest(request, queryTimeout);
   }
 
   private FullHttpRequest newRequest(HttpMethod method, String path) throws IOException {
@@ -374,7 +395,7 @@ public final class Connection implements AutoCloseable {
     return request;
   }
 
-  private CompletableFuture<FullHttpResponse> performRequest(final FullHttpRequest request) {
+  private CompletableFuture<FullHttpResponse> performRequest(final FullHttpRequest request, final Optional<Duration> requestQueryTimeout) {
     final Timer.Context ctx = registry.timer("fauna-request").time();
     final CompletableFuture<FullHttpResponse> rv = new CompletableFuture<>();
 
@@ -384,6 +405,17 @@ public final class Connection implements AutoCloseable {
     if(jvmDriver != null) {
       request.headers().set(X_FAUNA_DRIVER, jvmDriver.toString());
     }
+
+    // TODO: replace as follows when upgrade to Java 9 or higher:
+    // requestQueryTimeout.or(queryTimeout)
+    //   .ifPresent(timeout -> request.headers().set(X_QUERY_TIMEOUT, timeout.toMillis()));
+    queryTimeout
+      .ifPresent(timeout -> request.headers().set(X_QUERY_TIMEOUT, timeout.toMillis()));
+
+    // If a query timeout has been given for the current request,
+    // override the one from the Connection if any
+    requestQueryTimeout
+      .ifPresent(timeout -> request.headers().set(X_QUERY_TIMEOUT, timeout.toMillis()));
 
     long time = getLastTxnTime();
     if (time > 0) {
