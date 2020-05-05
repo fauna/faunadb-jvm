@@ -22,6 +22,7 @@ import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.{Success, Try}
 import scala.util.control.NonFatal
 
 /** Companion object to the FaunaClient class. */
@@ -276,9 +277,9 @@ class FaunaClient private (connection: Connection) {
     def parseErrors(): Future[QueryErrorResponse] = {
       val statusCode = response.status().code()
 
-      def getErrors(body: JsonNode): Future[Iterator[JsonNode]] = Option(body.get("errors")) match {
-        case Some(errors) => Future(errors.asInstanceOf[ArrayNode].iterator().asScala)
-        case None => Future.successful(Iterator.empty)
+      def getErrors(body: JsonNode): Try[Iterator[JsonNode]] = Option(body.get("errors")) match {
+        case Some(errors) => Try(errors.asInstanceOf[ArrayNode].iterator().asScala)
+        case None => Success(Iterator.empty)
       }
 
       def parseErrors(errors: Iterator[JsonNode]): Future[IndexedSeq[QueryError]] = Future {
@@ -288,7 +289,7 @@ class FaunaClient private (connection: Connection) {
       val result: Future[QueryErrorResponse] =
         for {
           body <- parseResponseBody(response)
-          errors <- getErrors(body)
+          errors <- Future.fromTry(getErrors(body))
           queryErrors <- parseErrors(errors)
         } yield QueryErrorResponse(statusCode, queryErrors)
 
