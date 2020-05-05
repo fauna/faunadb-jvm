@@ -277,9 +277,9 @@ class FaunaClient private (connection: Connection) {
     def parseErrors(): Future[QueryErrorResponse] = {
       val statusCode = response.status().code()
 
-      def getErrors(body: JsonNode): Try[Iterator[JsonNode]] = Option(body.get("errors")) match {
-        case Some(errors) => Try(errors.asInstanceOf[ArrayNode].iterator().asScala)
-        case None => Success(Iterator.empty)
+      def getErrors(body: JsonNode): Future[Iterator[JsonNode]] = Option(body.get("errors")) match {
+        case Some(errors: ArrayNode) => Future.successful(errors.iterator().asScala)
+        case _ => Future.successful(Iterator.empty)
       }
 
       def parseErrors(errors: Iterator[JsonNode]): Future[IndexedSeq[QueryError]] = Future {
@@ -289,7 +289,7 @@ class FaunaClient private (connection: Connection) {
       val result: Future[QueryErrorResponse] =
         for {
           body <- parseResponseBody(response)
-          errors <- Future.fromTry(getErrors(body))
+          errors <- getErrors(body)
           queryErrors <- parseErrors(errors)
         } yield QueryErrorResponse(statusCode, queryErrors)
 
