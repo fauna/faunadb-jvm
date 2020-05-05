@@ -188,16 +188,23 @@ class FaunaClient private (connection: Connection) {
       result.asInstanceOf[ArrayV].elems
     }
 
-  private def performRequest(body: JsonNode, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[Value] =
-    connection.post("", body, timeout.map(_.toJava).asJava).toScala.map { resp =>
-      try {
-        handleQueryErrors(resp)
-        val result = json.treeToValue[Value](parseResponseBody(resp).get("resource"), classOf[Value])
-        result
-      } finally {
-        resp.release()
+  private def performRequest(body: JsonNode, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[Value] = {
+    def handleSuccessResponse(response: FullHttpResponse): Future[Value] = Future {
+      json.treeToValue[Value](parseResponseBody(response).get("resource"), classOf[Value])
+    }.andThen {
+      case _ => response.release()
+    }
+
+    val javaTimeout = timeout.map(_.toJava).asJava
+    val response: Future[FullHttpResponse] = connection.post("", body, javaTimeout).toScala
+
+    response
+      .flatMap {
+        case successResponse if successResponse.status().code() < 300 => handleSuccessResponse(successResponse)
+        case errorResponse => handleErrorResponse(errorResponse)
       }
-    }.recover(handleNetworkExceptions)
+      .recoverWith(handleNetworkExceptions)
+  }
 
   /**
     * Creates a new scope to execute session queries. Queries submitted within the session scope will be
@@ -241,47 +248,45 @@ class FaunaClient private (connection: Connection) {
   def syncLastTxnTime(timestamp: Long): Unit =
     connection.syncLastTxnTime(timestamp)
 
-  private def handleNetworkExceptions[A]: PartialFunction[Throwable, A] = {
-    case ex: ConnectException =>
-      throw new UnavailableException(ex.getMessage, ex)
-    case ex: TimeoutException =>
-      throw new TimeoutException(ex.getMessage)
+  private def handleNetworkExceptions[A]: PartialFunction[Throwable, Future[A]] = {
+    case ex: ConnectException => Future.failed(new UnavailableException(ex.getMessage, ex))
+    case ex: TimeoutException => Future.failed(new TimeoutException(ex.getMessage))
   }
 
-  private def handleQueryErrors(response: FullHttpResponse) =
-    response.status().code() match {
-      case x if x >= 300 =>
-        try {
-          val errors = parseResponseBody(response).get("errors").asInstanceOf[ArrayNode]
-          val parsedErrors = if (errors != null) {
-            errors.iterator().asScala.map {
-              json.treeToValue(_, classOf[QueryError])
-            }
-          } else {
-            Seq.empty[QueryError]
-          }
-
-          val error = QueryErrorResponse(x, parsedErrors.toIndexedSeq)
-          x match {
-            case 400 => throw new BadRequestException(error)
-            case 401 => throw new UnauthorizedException(error)
-            case 403 => throw new PermissionDeniedException(error)
-            case 404 => throw new NotFoundException(error)
-            case 500 => throw new InternalException(error)
-            case 503 => throw new UnavailableException(error)
-            case _   => throw new UnknownException(error)
-          }
-        } catch {
-          case e: FaunaException => throw e
-          case NonFatal(ex)      => response.status().code() match {
-            case 503   => throw new UnavailableException("Service Unavailable: Unparseable response.", ex)
-            case s @ _ => throw new UnknownException(s"Unparseable service $s response.", ex)
-          }
-        }
-      case _ =>
+  private def handleErrorResponse(response: FullHttpResponse)(implicit ec: ExecutionContext): Future[Nothing] = {
+    def parseError(): Future[QueryErrorResponse] = Future {
+      val statusCode = response.status().code()
+      val errors = Option(parseResponseBody(response).get("errors").asInstanceOf[ArrayNode])
+      val parsedErrors = errors.map(_.iterator().asScala.map(json.treeToValue(_, classOf[QueryError])).toIndexedSeq).getOrElse(IndexedSeq.empty)
+      val error = QueryErrorResponse(statusCode, parsedErrors)
+      error
+    }.recoverWith {
+      case e: FaunaException => Future.failed(e)
+      case unavailable if response.status().code() == 503 => Future.failed(new UnavailableException("Service Unavailable: Unparseable response.", unavailable))
+      case unknown => Future.failed(new UnknownException(s"Unparseable service $unknown response.", unknown))
+    }.andThen {
+      case _ => response.release()
     }
 
-  private def parseResponseBody(response: FullHttpResponse) = {
+    def parseErrorAndFailWith(fun: QueryErrorResponse => FaunaException): Future[Nothing] = {
+      parseError().flatMap { errors =>
+        val exception = fun(errors)
+        Future.failed(exception)
+      }
+    }
+
+    response.status().code() match {
+      case 400 => parseErrorAndFailWith(new BadRequestException(_))
+      case 401 => parseErrorAndFailWith(new UnauthorizedException(_))
+      case 403 => parseErrorAndFailWith(new PermissionDeniedException(_))
+      case 404 => parseErrorAndFailWith(new NotFoundException(_))
+      case 500 => parseErrorAndFailWith(new InternalException(_))
+      case 503 => parseErrorAndFailWith(new UnavailableException(_))
+      case _   => parseErrorAndFailWith(new UnknownException(_))
+    }
+  }
+
+  private def parseResponseBody(response: FullHttpResponse): JsonNode = {
     val body = json.readTree(new ByteBufInputStream(response.content()))
     if (body eq null) {
       throw new IOException("Invalid JSON.")
