@@ -139,6 +139,10 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     an[UnauthorizedException] should be thrownBy await(badClient.query(Get(RefV("12345", RefV("spells", Native.Collections)))))
   }
 
+  it should "receive a Null value properly" in {
+    await(client.query(NullV)) shouldBe NullV
+  }
+
   it should "create a new instance" in {
     val inst = await(client.query(
       Create(Collection("spells"),
