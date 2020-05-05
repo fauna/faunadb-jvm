@@ -1,4 +1,4 @@
-val driverVersion = "2.11.1"
+val driverVersion = "2.12.0"
 val nettyVersion = "4.1.43.Final"
 val jacksonVersion = "2.10.1"
 val jacksonDocVersion = "2.10"
