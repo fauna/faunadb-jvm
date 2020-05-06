@@ -1,3 +1,7 @@
+2.12.0
+* Add client-specified query timeout
+* Handle Null value responses properly
+
 2.11.1
 * Disable scoverage while building the project
 
