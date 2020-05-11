@@ -290,7 +290,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
         Paginate(
           Match(index("ref")),
           cursor = cursor,
-          size = 4,
+          size = 4
         )))
 
     val first = page(Null())
@@ -1422,7 +1422,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       "source" -> col("ref").get,
       "values" -> Arr(
         Obj("field" -> Arr("data", "value")),
-        Obj("field" -> "ref"),
+        Obj("field" -> "ref")
       ),
       "active" -> true
     ))))
