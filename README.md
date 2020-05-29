@@ -89,7 +89,7 @@ public class Main {
             )
         ).get();
 
-        client.close();
+        adminClient.close();
     }
 }
 ```
