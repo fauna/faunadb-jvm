@@ -732,6 +732,7 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val concat2R = await(concat2F).to[String].get
     concat2R shouldBe "Magic Missile"
 
+    // Contains
     val containsF = client.query(Contains("favorites" / "foods", Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings")))))
     val containsR = await(containsF).to[Boolean].get
     containsR shouldBe true
@@ -739,12 +740,17 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(client.query(Contains("field", Obj("field" -> "value")))) shouldBe TrueV
     await(client.query(Contains(1, Arr("value0", "value1", "value2")))) shouldBe TrueV
 
+    await(client.query(Contains("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value"))))))) shouldBe TrueV
+
+    // ContainsPath
     val containsPathF = client.query(ContainsPath("favorites" / "foods", Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings")))))
     val containsPathR = await(containsF).to[Boolean].get
     containsPathR shouldBe true
 
     await(client.query(ContainsPath("field", Obj("field" -> "value")))) shouldBe TrueV
     await(client.query(ContainsPath(1, Arr("value0", "value1", "value2")))) shouldBe TrueV
+
+    await(client.query(ContainsPath("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value"))))))) shouldBe TrueV
 
     val selectF = client.query(Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings", "lunchings")))))
     val selectR = await(selectF).to[String].get
@@ -756,8 +762,6 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     await(client.query(Select(1, Arr("value0", "value1", "value2")))) shouldBe StringV("value1")
     await(client.query(Select(100, Arr("value0", "value1", "value2"), "a default value"))) shouldBe StringV("a default value")
 
-    await(client.query(Contains("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value"))))))) shouldBe TrueV
-    await(client.query(ContainsPath("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value"))))))) shouldBe TrueV
     await(client.query(Select("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value"))))))) shouldBe StringV("value")
 
     await(client.query(SelectAll("foo", Arr(Obj("foo" -> "bar"), Obj("foo" -> "baz"), Obj("a" -> "b"))))) shouldBe ArrayV("bar", "baz")
