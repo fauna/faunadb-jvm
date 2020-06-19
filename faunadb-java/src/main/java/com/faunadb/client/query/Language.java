@@ -5368,7 +5368,10 @@ public final class Language {
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    * @see #Contains(Path, Expr)
+   *
+   * @deprecated use {@code ContainsPath} instead
    */
+  @Deprecated
   public static Expr Contains(Expr path, Expr in) {
     return Fn.apply("contains", path, "in", in);
   }
@@ -5380,9 +5383,41 @@ public final class Language {
    * @param in the target value. Type: Object or Array
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   *
+   * @deprecated use {@code ContainsPath} instead
    */
+  @Deprecated
   public static Expr Contains(Path path, Expr in) {
     return Contains(Arr(path.segments), in);
+  }
+
+  /**
+   * Returns true if the target value contains the given path, and false otherwise.
+   * The path must be an array in which each element can be either a string, or a number.
+   * If a string, the path segment refers to an object key. If a number, the path segment refers to an array index.
+   *
+   * For convenience, a path builder is available at the {@link #ContainsPath(Path, Expr)} function.
+   *
+   * @param path the desired path to check for presence. Type: Array
+   * @param in the target value. Type: Object or Array
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see #ContainsPath(Path, Expr)
+   */
+  public static Expr ContainsPath(Expr path, Expr in) {
+    return Fn.apply("contains_path", path, "in", in);
+  }
+
+  /**
+   * Returns true if the target value contains the given path, and false otherwise.
+   *
+   * @param path the desired path to check for presence
+   * @param in the target value. Type: Object or Array
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr ContainsPath(Path path, Expr in) {
+    return ContainsPath(Arr(path.segments), in);
   }
 
   /**
