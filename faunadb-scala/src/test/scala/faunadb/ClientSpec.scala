@@ -740,10 +740,9 @@ class ClientSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val containsR = await(containsF).to[Boolean].get
     containsR shouldBe true
 
-    await(client.query(Contains("field", Obj("field" -> "value")))) shouldBe TrueV
-    await(client.query(Contains(1, Arr("value0", "value1", "value2")))) shouldBe TrueV
-
-    await(client.query(Contains("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value"))))))) shouldBe TrueV
+    // ContainsField
+    await(client.query(ContainsField("field", Obj("field" -> "value")))) shouldBe TrueV
+    await(client.query(ContainsField("field", Obj()))) shouldBe FalseV
 
     // ContainsPath
     val containsPathF = client.query(ContainsPath("favorites" / "foods", Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings")))))

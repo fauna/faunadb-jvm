@@ -1137,6 +1137,14 @@ package object query {
     Expr(ObjectV("contains" -> path.value, "in" -> in.value))
 
   /**
+   * A ContainsField expression.
+   *
+   * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/containsfield]]
+   */
+  def ContainsField(field: Expr, in: Expr): Expr =
+    Expr(ObjectV("contains_field" -> field.value, "in" -> in.value))
+
+  /**
    * A ContainsPath expression.
    *
    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/containspath]]
