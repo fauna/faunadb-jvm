@@ -676,8 +676,8 @@ class ClientSpec
     client.query(Contains("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value")))))).futureValue shouldBe TrueV
 
     // ContainsField
-    client.query(ContainsField("field", Obj("field" -> "value"))).futureValue shouldBe TrueV
-    client.query(ContainsField("field", Obj())).futureValue shouldBe FalseV
+    client.query(ContainsField("foo", Obj("foo" -> "bar"))).futureValue shouldBe TrueV
+    client.query(ContainsField("foo", Obj())).futureValue shouldBe FalseV
 
     // ContainsPath
     val containsPath = client.query(ContainsPath("favorites" / "foods", Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings"))))).futureValue
@@ -690,13 +690,27 @@ class ClientSpec
 
     // ContainsValue
     val collectionName = aRandomString
-    val collection = client.query(CreateCollection(Obj("name" -> collectionName))).futureValue
-    val document = client.query(Create(Collection(collectionName), Obj())).futureValue
+    client.query(CreateCollection(Obj("name" -> collectionName))).futureValue
 
+    val document = client.query(Create(Collection(collectionName), Obj())).futureValue
     val ref = document("ref").to[RefV].get
     client.query(ContainsValue(ref.id, ref)).futureValue shouldBe TrueV
 
-    client.query(ContainsValue(ref, document)).futureValue shouldBe TrueV
+    client.query(ContainsValue("1", Arr("1", "2", "3"))).futureValue shouldBe TrueV
+
+    client.query(ContainsValue("bar", Obj("foo" -> "bar"))).futureValue shouldBe TrueV
+
+    val indexName = aRandomString
+    client.query(
+      CreateIndex(Obj(
+        "name" -> indexName,
+          "source" -> Collection(collectionName),
+          "terms" -> Arr(Obj("field" -> Arr("data", "value"))),
+          "values" -> Arr(Obj("field" -> Arr("data", "value")))
+        ))).futureValue
+
+    client.query(Create(Collection(collectionName), Obj("data" -> Obj("value" -> "foo")))).futureValue
+    client.query(ContainsValue("foo", Match(Index(indexName), "foo"))).futureValue shouldBe TrueV
 
     // Select
     val selectR = client.query(Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings", "lunchings"))))).futureValue
