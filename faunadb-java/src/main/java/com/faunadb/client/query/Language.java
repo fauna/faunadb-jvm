@@ -5392,6 +5392,18 @@ public final class Language {
   }
 
   /**
+   * Returns true if the target Expr contains the given field, and false otherwise.
+   *
+   * @param field the desired value to field for presence.
+   * @param in the target value. Type: Object or Array
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr ContainsField(Expr field, Expr in) {
+    return Fn.apply("contains_field", field, "in", in);
+  }
+
+  /**
    * Returns true if the target value contains the given path, and false otherwise.
    * The path must be an array in which each element can be either a string, or a number.
    * If a string, the path segment refers to an object key. If a number, the path segment refers to an array index.

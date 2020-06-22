@@ -1067,6 +1067,16 @@ public class SerializationSpec {
       "{\"contains\":[\"favorites\",\"foods\"],\"in\":" +
         "{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}");
   }
+  @Test
+  public void shouldSerializeContainsField() throws Exception {
+    assertJson(
+      ContainsField(
+        Value("foo"),
+        Obj("foo", Value("bar"))
+      ),
+      "{\"contains_field\":\"foo\",\"in\":" +
+        "{\"object\":{\"foo\":\"bar\"}}}");
+  }
 
   @Test
   public void shouldSerializeContainsPath() throws Exception {
