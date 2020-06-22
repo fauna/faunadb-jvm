@@ -1100,6 +1100,17 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeContainsValue() throws Exception {
+    assertJson(
+      ContainsValue(
+        Value("bar"),
+        Obj("foo", Value("bar"))
+      ),
+      "{\"contains_value\":\"bar\",\"in\":" +
+        "{\"object\":{\"foo\":\"bar\"}}}");
+  }
+
+  @Test
   public void shouldSerializeSelect() throws Exception {
     assertJson(
       Select(

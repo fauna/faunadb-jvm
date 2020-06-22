@@ -5421,6 +5421,18 @@ public final class Language {
   }
 
   /**
+   * Returns true if the target Expr contains the given value, and false otherwise.
+   *
+   * @param value the desired value to check for presence.
+   * @param in the target value. Type: Ref, Object, Array or Set
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr ContainsValue(Expr value, Expr in) {
+    return Fn.apply("contains_value", value, "in", in);
+  }
+
+  /**
    * Constructs a path matching object keys.
    *
    * @param segments the object keys

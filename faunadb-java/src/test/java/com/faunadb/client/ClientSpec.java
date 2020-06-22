@@ -1204,6 +1204,61 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldEvalContainsValueExpression() throws Exception {
+    RefV collectionRef = onARandomCollection();
+    Value document = query(Create(collectionRef, Obj())).get();
+    RefV ref = document.get(REF_FIELD);
+
+    Value containsValue = query(
+      ContainsValue(
+        Value(ref.getId()),
+        ref
+      )
+    ).get();
+
+    assertThat(containsValue.to(BOOLEAN).get(), is(true));
+
+    Value containsValue2 = query(
+      ContainsValue(
+        Value("bar"),
+        Obj("foo", Value("bar"))
+      )
+    ).get();
+
+    assertThat(containsValue2.to(BOOLEAN).get(), is(true));
+
+    Value containsValue3 = query(
+      ContainsValue(
+        Value("1"),
+        Arr(Value("1"), Value("2"), Value("3"))
+      )
+    ).get();
+
+    assertThat(containsValue3.to(BOOLEAN).get(), is(true));
+
+    String indexName = randomStartingWith("index_");
+    Value index = query(
+      CreateIndex(Obj(
+    "name", Value(indexName),
+    "source", collectionRef,
+    "values", Arr(Obj("field", Arr(Value("data"), Value("value")))),
+    "terms", Arr(Obj("field", Arr(Value("data"), Value("value"))))
+      ))
+    ).get();
+
+    query(Create(collectionRef, Obj("data", Obj("value", Value("foo"))))).get();
+
+    Value containsValue4 = query(
+      ContainsValue(
+        Value("foo"),
+        Match(Index(indexName), Value("foo"))
+      )
+    ).get();
+
+    assertThat(containsValue4.to(BOOLEAN).get(), is(true));
+  }
+
+  @Test
   public void shouldEvalSelectExpression() throws Exception {
     Value selected = query(
       Select(
