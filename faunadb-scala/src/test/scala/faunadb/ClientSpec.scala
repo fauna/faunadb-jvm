@@ -1456,7 +1456,7 @@ class ClientSpec
   it should "create an access provider" in {
     val name = aRandomString
     val issuer = aRandomString
-    val jwksUri = "https://db.fauna.com"
+    val jwksUri = "https://xxxx.auth0.com/"
     val collection = client.query(CreateCollection(Obj("name" -> aRandomString))).futureValue
     val role =
       adminClient.query(
@@ -1499,7 +1499,7 @@ class ClientSpec
   it should "retrieve an existing access provider" in {
     val name = aRandomString
     val issuer = aRandomString
-    val jwksUri = "https://db.fauna.com"
+    val jwksUri = "https://xxxx.auth0.com/"
 
     adminClient.query(
       CreateAccessProvider(
@@ -1521,7 +1521,7 @@ class ClientSpec
   }
 
   it should "retrieve all existing access providers" in {
-    val jwksUri = "https://db.fauna.com"
+    val jwksUri = "https://xxxx.auth0.com/"
 
     val accessProvider1 =
       adminClient.query(
