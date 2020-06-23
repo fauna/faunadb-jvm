@@ -2685,6 +2685,7 @@ public class ClientSpec {
 
   @Test
   public void shouldCreateAnAccessProvider() throws Exception {
+    // Set up
     String name = randomStartingWith("name_");
     String issuer = randomStartingWith("issuer_");
     String jwksUri = "https://xxxx.auth0.com/";
@@ -2703,6 +2704,7 @@ public class ClientSpec {
     Value allowedCollections = new ArrayV(asList(collectionRef));
     Value allowedRoles = new ArrayV(asList(role.get(REF_FIELD)));
 
+    // Run
     Value accessProvider =
       adminClient.query(
         CreateAccessProvider(Obj(
@@ -2714,6 +2716,7 @@ public class ClientSpec {
         ))
       ).get();
 
+    // Verify
     assertThat(accessProvider.getOptional(REF_FIELD).isPresent(), equalTo(Boolean.TRUE));
     assertThat(accessProvider.getOptional(TS_FIELD).isPresent(), equalTo(Boolean.TRUE));
     assertThat(accessProvider.at("name").to(STRING).get(), equalTo(name));
@@ -2721,6 +2724,32 @@ public class ClientSpec {
     assertThat(accessProvider.at("jwks_uri").to(STRING).get(), equalTo(jwksUri));
     assertThat(accessProvider.at("allowed_collections"), equalTo(allowedCollections));
     assertThat(accessProvider.at("allowed_roles"), equalTo(allowedRoles));
+  }
+
+  @Test
+  public void shouldRetrieveAnExistingAccessProvider() throws Exception {
+    // Set up
+    String name = randomStartingWith("name_");
+    String issuer = randomStartingWith("issuer_");
+    String jwksUri = "https://xxxx.auth0.com/";
+
+    adminClient.query(
+      CreateAccessProvider(Obj(
+        "name", Value(name),
+        "issuer", Value(issuer),
+        "jwks_uri", Value(jwksUri)
+      ))
+    ).get();
+
+    // Run
+    Value accessProvider = adminClient.query(Get(AccessProvider(name))).get();
+
+    // Verify
+    assertThat(accessProvider.getOptional(REF_FIELD).isPresent(), equalTo(Boolean.TRUE));
+    assertThat(accessProvider.getOptional(TS_FIELD).isPresent(), equalTo(Boolean.TRUE));
+    assertThat(accessProvider.at("name").to(STRING).get(), equalTo(name));
+    assertThat(accessProvider.at("issuer").to(STRING).get(), equalTo(issuer));
+    assertThat(accessProvider.at("jwks_uri").to(STRING).get(), equalTo(jwksUri));
   }
 
   private CompletableFuture<Value> query(Expr expr) {

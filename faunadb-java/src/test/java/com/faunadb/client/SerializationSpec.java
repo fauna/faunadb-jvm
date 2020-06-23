@@ -133,6 +133,11 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeAccessProvider() throws Exception {
+    assertJson(AccessProvider(Value("access-provider")), "{\"access_provider\":\"access-provider\"}");
+  }
+
+  @Test
   public void shouldSerializeCollection() throws Exception {
     assertJson(Collection(Value("spells")), "{\"collection\":\"spells\"}");
   }

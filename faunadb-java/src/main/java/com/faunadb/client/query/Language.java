@@ -5055,6 +5055,54 @@ public final class Language {
   }
 
   /**
+   * Creates a reference for the access provider name.
+   *
+   * @param name the access provider name. Type: String
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr AccessProvider(Expr name) {
+    return Fn.apply("access_provider", name);
+  }
+
+  /**
+   * Creates a reference for the access provider name.
+   *
+   * @param name the access provider name
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr AccessProvider(String name) {
+    return AccessProvider(Value(name));
+  }
+
+  /**
+   * Creates a reference for the given access provider name, scoped to the database provided.
+   *
+   * @param name the access provider name. Type: String
+   * @param database the scope database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see #Database(String)
+   */
+  public static Expr AccessProvider(Expr name, Expr database) {
+    return Fn.apply("access_provider", name, "scope", database);
+  }
+
+  /**
+   * Creates a reference for the given access provider name, scoped to the database provided.
+   *
+   * @param name the access provider name
+   * @param database the scope database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see #Database(String)
+   */
+  public static Expr AccessProvider(String name, Expr database) {
+    return AccessProvider(Value(name), database);
+  }
+
+  /**
    * Creates a new reference for the given class name.
    *
    * @param name the class name. Type: String
@@ -5141,7 +5189,7 @@ public final class Language {
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    * @see #Database(String)
-   * 
+   *
    * @deprecated use Collection instead
    */
   @Deprecated
