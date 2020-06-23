@@ -255,6 +255,30 @@ public final class Language {
   }
 
   /**
+   * Returns a reference to a set of all access providers in the database.
+   * A reference set must be paginated in order to retrieve its values.
+   *
+   * @param scope a reference to a database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see #Database(String)
+   * @see #Paginate(Expr)
+   */
+  public static Expr AccessProviders(Expr scope) {
+    return Fn.apply("access_providers", scope);
+  }
+
+  /**
+   * Returns a reference to a set of all access providers in the database.
+   * A reference set must be paginated in order to retrieve its values.
+   *
+   * @return a new {@link Expr} instance
+   * @see #Paginate(Expr)
+   */
+  public static Expr AccessProviders() {
+    return AccessProviders(Null());
+  }
+
+  /**
    * Returns a reference to a set of all classes in the database.
    * A reference set must be paginated in order to retrieve its values.
    *

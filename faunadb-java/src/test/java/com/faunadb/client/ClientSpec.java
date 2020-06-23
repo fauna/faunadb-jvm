@@ -2752,6 +2752,38 @@ public class ClientSpec {
     assertThat(accessProvider.at("jwks_uri").to(STRING).get(), equalTo(jwksUri));
   }
 
+  @Test
+  public void shouldRetrieveAllExistingAccessProviders() throws Exception {
+    // Set up
+    String jwksUri = "https://xxxx.auth0.com/";
+
+    Value accessProvider1 =
+      adminClient.query(
+        CreateAccessProvider(Obj(
+          "name", Value(randomStartingWith("name_")),
+          "issuer", Value(randomStartingWith("issuer_")),
+          "jwks_uri", Value(jwksUri)
+        ))
+      ).get();
+
+    Value accessProvider2 =
+      adminClient.query(
+        CreateAccessProvider(Obj(
+          "name", Value(randomStartingWith("name_")),
+          "issuer", Value(randomStartingWith("issuer_")),
+          "jwks_uri", Value(jwksUri)
+        ))
+      ).get();
+
+    // Run
+    Value accessProviders = adminClient.query(Paginate(AccessProviders())).get();
+
+    // Verify
+    Value expectedAccessProvidersRefs = new ArrayV(asList(accessProvider1.get(REF_FIELD), accessProvider2.get(REF_FIELD)));
+    assertThat(accessProviders.at("data"), equalTo(expectedAccessProvidersRefs));
+
+  }
+
   private CompletableFuture<Value> query(Expr expr) {
     return serverClient.query(expr);
   }
