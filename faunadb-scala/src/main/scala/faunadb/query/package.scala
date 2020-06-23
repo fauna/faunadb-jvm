@@ -504,6 +504,14 @@ package object query {
     Expr(ObjectV("remove" -> ref.value, "ts" -> ts.value, "action" -> action.value))
 
   /**
+    * A Create Access Provider expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
+    */
+  def CreateAccessProvider(params: Expr): Expr =
+    Expr(ObjectV("create_access_provider" -> params.value))
+
+  /**
     * A Create Class expression.
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]

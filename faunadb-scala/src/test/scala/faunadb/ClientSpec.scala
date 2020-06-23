@@ -1453,6 +1453,49 @@ class ClientSpec
     docs("data").to[Seq[Value]].get should have size 10
   }
 
+  it should "create an access provider" in {
+    val name = aRandomString
+    val issuer = aRandomString
+    val jwksUri = "https://db.fauna.com"
+    val collection = client.query(CreateCollection(Obj("name" -> aRandomString))).futureValue
+    val role =
+      adminClient.query(
+        CreateRole(
+          Obj(
+            "name" -> aRandomString,
+            "privileges" -> Obj(
+              "resource" -> collection(RefField).get,
+              "actions" -> Obj("read" -> true)
+            )
+          )
+        )
+      ).futureValue
+
+    val allowedCollections = Arr(collection(RefField).get).value
+    val allowedRoles = Arr(role(RefField).get).value
+
+    val accessProvider =
+      adminClient.query(
+        CreateAccessProvider(
+          Obj(
+            "name" -> name,
+            "issuer" -> issuer,
+            "jwks_uri" -> jwksUri,
+            "allowed_collections" -> allowedCollections,
+            "allowed_roles" -> allowedRoles
+          )
+        )
+      ).futureValue
+
+    accessProvider("ref").toOpt shouldBe defined
+    accessProvider("ts").toOpt shouldBe defined
+    accessProvider("name").to[String].get shouldBe name
+    accessProvider("issuer").to[String].get shouldBe issuer
+    accessProvider("jwks_uri").to[String].get shouldBe jwksUri
+    accessProvider("allowed_collections").get shouldBe allowedCollections
+    accessProvider("allowed_roles").get shouldBe allowedRoles
+  }
+
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
     client.query(CreateDatabase(Obj("name" -> name))).futureValue
     val key = client.query(CreateKey(Obj("database" -> Database(name), "role" -> "admin"))).futureValue
