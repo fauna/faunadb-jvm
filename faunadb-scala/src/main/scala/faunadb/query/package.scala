@@ -1030,6 +1030,14 @@ package object query {
     Expr(ObjectV("new_id" -> NullV))
 
   /**
+    * An Access Provider expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider]]
+    */
+  def AccessProvider(name: Expr): Expr =
+    Expr(ObjectV("access_provider" -> name.value))
+
+  /**
     * A Class expression.
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
