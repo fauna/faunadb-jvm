@@ -136,6 +136,10 @@ package object query {
   def Ref(collectionRef: Expr, id: Expr): Expr =
     Expr(ObjectV("ref" -> collectionRef.value, "id" -> id.value))
 
+  /** Native reference to all access providers */
+  def AccessProviders(scope: Expr = NullV): Expr =
+    Expr(ObjectV("access_providers" -> scope.value))
+
   /** Native reference to all classes */
   @deprecated("use Collections instead", "2.7.0")
   def Classes(scope: Expr = NullV): Expr =

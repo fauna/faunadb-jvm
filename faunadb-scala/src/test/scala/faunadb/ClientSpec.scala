@@ -1520,6 +1520,37 @@ class ClientSpec
     accessProvider("jwks_uri").to[String].get shouldBe jwksUri
   }
 
+  it should "retrieve all existing access providers" in {
+    val jwksUri = "https://db.fauna.com"
+
+    val accessProvider1 =
+      adminClient.query(
+        CreateAccessProvider(
+          Obj(
+            "name" -> aRandomString,
+            "issuer" -> aRandomString,
+            "jwks_uri" -> jwksUri
+          )
+        )
+      ).futureValue
+
+    val accessProvider2 =
+      adminClient.query(
+        CreateAccessProvider(
+          Obj(
+            "name" -> aRandomString,
+            "issuer" -> aRandomString,
+            "jwks_uri" -> jwksUri
+          )
+        )
+      ).futureValue
+
+    val accessProviders = adminClient.query(Paginate(AccessProviders())).futureValue
+
+    val expectedAccessProvidersRefs = Seq(accessProvider1(RefField).get, accessProvider2(RefField).get)
+    accessProviders("data").to[ArrayV].get.elems should contain theSameElementsAs expectedAccessProvidersRefs
+  }
+
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
     client.query(CreateDatabase(Obj("name" -> name))).futureValue
     val key = client.query(CreateKey(Obj("database" -> Database(name), "role" -> "admin"))).futureValue
