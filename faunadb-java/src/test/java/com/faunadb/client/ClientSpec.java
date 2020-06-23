@@ -3,6 +3,7 @@ package com.faunadb.client;
 import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
+import com.faunadb.client.types.Value;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
 import io.netty.util.ResourceLeakDetector;
@@ -13,21 +14,23 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.Calendar;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
-import static com.faunadb.client.query.Language.*;
-import static com.faunadb.client.query.Language.Collection;
 import static com.faunadb.client.query.Language.TimeUnit.*;
 import static com.faunadb.client.types.Codec.*;
 import static com.faunadb.client.types.Value.NullV.NULL;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -2678,6 +2681,46 @@ public class ClientSpec {
       adminClient.query(falseExprs).get(),
       equalTo(Collections.nCopies(falseExprs.size(), BooleanV.FALSE))
     );
+  }
+
+  @Test
+  public void shouldCreateAnAccessProvider() throws Exception {
+    String name = randomStartingWith("name_");
+    String issuer = randomStartingWith("issuer_");
+    String jwksUri = "https://xxxx.auth0.com/";
+    RefV collectionRef = onARandomCollection();
+
+    Value role =
+      adminClient.query(
+        CreateRole(Obj(
+        "name", Value(randomStartingWith("role_")),
+        "privileges", Obj(
+          "resource", collectionRef,
+          "actions", Obj("read", Value(true))
+        )))
+      ).get();
+
+    Value allowedCollections = new ArrayV(asList(collectionRef));
+    Value allowedRoles = new ArrayV(asList(role.get(REF_FIELD)));
+
+    Value accessProvider =
+      adminClient.query(
+        CreateAccessProvider(Obj(
+          "name", Value(name),
+          "issuer", Value(issuer),
+          "jwks_uri", Value(jwksUri),
+          "allowed_collections", allowedCollections,
+          "allowed_roles", allowedRoles
+        ))
+      ).get();
+
+    assertThat(accessProvider.getOptional(REF_FIELD).isPresent(), equalTo(Boolean.TRUE));
+    assertThat(accessProvider.getOptional(TS_FIELD).isPresent(), equalTo(Boolean.TRUE));
+    assertThat(accessProvider.at("name").to(STRING).get(), equalTo(name));
+    assertThat(accessProvider.at("issuer").to(STRING).get(), equalTo(issuer));
+    assertThat(accessProvider.at("jwks_uri").to(STRING).get(), equalTo(jwksUri));
+    assertThat(accessProvider.at("allowed_collections"), equalTo(allowedCollections));
+    assertThat(accessProvider.at("allowed_roles"), equalTo(allowedRoles));
   }
 
   private CompletableFuture<Value> query(Expr expr) {

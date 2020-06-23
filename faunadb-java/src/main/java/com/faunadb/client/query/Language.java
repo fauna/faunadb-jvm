@@ -1808,6 +1808,18 @@ public final class Language {
   }
 
   /**
+   * Creates a new access provider in the current database.
+   *
+   * @param params the access provider's configuration parameters. Type: Object
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see #Obj(Map)
+   */
+  public static Expr CreateAccessProvider(Expr params) {
+    return Fn.apply("create_access_provider", params);
+  }
+
+  /**
    * Creates a new class in the current database.
    *
    * @param params the class's configuration parameters. Type: Object
