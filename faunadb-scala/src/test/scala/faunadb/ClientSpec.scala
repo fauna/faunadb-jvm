@@ -1454,6 +1454,7 @@ class ClientSpec
   }
 
   it should "create an access provider" in {
+    // Set up
     val name = aRandomString
     val issuer = aRandomString
     val jwksUri = "https://xxxx.auth0.com/"
@@ -1474,6 +1475,7 @@ class ClientSpec
     val allowedCollections = Arr(collection(RefField).get).value
     val allowedRoles = Arr(role(RefField).get).value
 
+    // Run
     val accessProvider =
       adminClient.query(
         CreateAccessProvider(
@@ -1487,6 +1489,7 @@ class ClientSpec
         )
       ).futureValue
 
+    // Verify
     accessProvider("ref").toOpt shouldBe defined
     accessProvider("ts").toOpt shouldBe defined
     accessProvider("name").to[String].get shouldBe name
@@ -1497,6 +1500,7 @@ class ClientSpec
   }
 
   it should "retrieve an existing access provider" in {
+    // Set up
     val name = aRandomString
     val issuer = aRandomString
     val jwksUri = "https://xxxx.auth0.com/"
@@ -1511,8 +1515,10 @@ class ClientSpec
       )
     ).futureValue
 
+    // Run
     val accessProvider = adminClient.query(Get(AccessProvider(name))).futureValue
 
+    // Verify
     accessProvider("ref").toOpt shouldBe defined
     accessProvider("ts").toOpt shouldBe defined
     accessProvider("name").to[String].get shouldBe name
@@ -1521,6 +1527,7 @@ class ClientSpec
   }
 
   it should "retrieve all existing access providers" in {
+    // Set up
     val jwksUri = "https://xxxx.auth0.com/"
 
     val accessProvider1 =
@@ -1545,8 +1552,10 @@ class ClientSpec
         )
       ).futureValue
 
+    // Run
     val accessProviders = adminClient.query(Paginate(AccessProviders())).futureValue
 
+    // Verify
     val expectedAccessProvidersRefs = Seq(accessProvider1(RefField).get, accessProvider2(RefField).get)
     accessProviders("data").to[ArrayV].get.elems should contain theSameElementsAs expectedAccessProvidersRefs
   }
