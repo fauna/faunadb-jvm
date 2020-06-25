@@ -1067,6 +1067,58 @@ public class SerializationSpec {
       "{\"contains\":[\"favorites\",\"foods\"],\"in\":" +
         "{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}");
   }
+  @Test
+  public void shouldSerializeContainsField() throws Exception {
+    assertJson(
+      ContainsField(
+        Value("foo"),
+        Obj("foo", Value("bar"))
+      ),
+      "{\"contains_field\":\"foo\",\"in\":" +
+        "{\"object\":{\"foo\":\"bar\"}}}");
+  }
+
+  @Test
+  public void shouldSerializeContainsPath() throws Exception {
+    assertJson(
+      ContainsPath(
+        Path("favorites", "foods"),
+        Obj("favorites",
+          Obj("foods", Arr(
+            Value("crunchings"),
+            Value("munchings"),
+            Value("lunchings")
+          ))
+        )
+      ),
+      "{\"contains_path\":[\"favorites\",\"foods\"],\"in\":" +
+        "{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}");
+
+    assertJson(
+      ContainsPath(
+        Arr(Value("favorites"), Value("foods")),
+        Obj("favorites",
+          Obj("foods", Arr(
+            Value("crunchings"),
+            Value("munchings"),
+            Value("lunchings")
+          ))
+        )
+      ),
+      "{\"contains_path\":[\"favorites\",\"foods\"],\"in\":" +
+        "{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}");
+  }
+
+  @Test
+  public void shouldSerializeContainsValue() throws Exception {
+    assertJson(
+      ContainsValue(
+        Value("bar"),
+        Obj("foo", Value("bar"))
+      ),
+      "{\"contains_value\":\"bar\",\"in\":" +
+        "{\"object\":{\"foo\":\"bar\"}}}");
+  }
 
   @Test
   public void shouldSerializeSelect() throws Exception {
