@@ -1042,6 +1042,14 @@ package object query {
     Expr(ObjectV("access_provider" -> name.value))
 
   /**
+    * An Access Provider expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider]]
+    */
+  def AccessProvider(name: Expr, scope: Expr): Expr =
+    Expr(ObjectV("access_provider" -> name.value, "scope" -> scope.value))
+
+  /**
     * A Class expression.
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
