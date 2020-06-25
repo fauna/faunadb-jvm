@@ -404,6 +404,14 @@ package object query {
     Expr(ObjectV("reduce" -> lambda.value, "initial" -> initial.value, "collection" -> collection.value))
 
   /**
+    * A Reverse expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/reverse]]
+    */
+  def Reverse(source: Expr): Expr =
+    Expr(ObjectV("reverse" -> source.value))
+
+  /**
    * A Paginate expression.
    *
    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#read-functions]]
