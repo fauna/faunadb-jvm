@@ -133,6 +133,11 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeAccessProvider() throws Exception {
+    assertJson(AccessProvider(Value("access-provider")), "{\"access_provider\":\"access-provider\"}");
+  }
+
+  @Test
   public void shouldSerializeCollection() throws Exception {
     assertJson(Collection(Value("spells")), "{\"collection\":\"spells\"}");
   }
@@ -565,6 +570,21 @@ public class SerializationSpec {
       ),
       "{\"remove\":{\"@ref\":{\"id\":\"104979509696660483\",\"collection\":{\"@ref\":{\"id\":\"spells\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}}," +
         "\"ts\":{\"@ts\":\"1970-01-01T00:00:00Z\"},\"action\":\"delete\"}"
+    );
+  }
+
+  @Test
+  public void shouldSerializeCreateAccessProvider() throws Exception {
+    assertJson(
+      CreateAccessProvider(Obj(
+        "name", Value("access-provider-name"),
+        "issuer", Value("access-provider-issuer"),
+        "jwks_uri", Value("https://xxxx.auth0.com/"),
+        "allowed_collections", Arr(new RefV("spells", Native.COLLECTIONS)),
+        "allowed_roles" , Arr(new RefV("104979509696660483", Native.ROLES))
+      )),
+      "{\"create_access_provider\":{\"object\":{\"name\":\"access-provider-name\",\"issuer\":\"access-provider-issuer\",\"jwks_uri\":\"https://xxxx.auth0.com/\"," +
+              "\"allowed_collections\":[{\"@ref\":{\"id\":\"104979509696660483\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}],\"allowed_roles\":[{\"@ref\":{\"id\":\"104979509696660483\",\"collection\":{\"@ref\":{\"id\":\"roles\"}}}}]}}}"
     );
   }
 
@@ -1066,6 +1086,58 @@ public class SerializationSpec {
       ),
       "{\"contains\":[\"favorites\",\"foods\"],\"in\":" +
         "{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}");
+  }
+  @Test
+  public void shouldSerializeContainsField() throws Exception {
+    assertJson(
+      ContainsField(
+        Value("foo"),
+        Obj("foo", Value("bar"))
+      ),
+      "{\"contains_field\":\"foo\",\"in\":" +
+        "{\"object\":{\"foo\":\"bar\"}}}");
+  }
+
+  @Test
+  public void shouldSerializeContainsPath() throws Exception {
+    assertJson(
+      ContainsPath(
+        Path("favorites", "foods"),
+        Obj("favorites",
+          Obj("foods", Arr(
+            Value("crunchings"),
+            Value("munchings"),
+            Value("lunchings")
+          ))
+        )
+      ),
+      "{\"contains_path\":[\"favorites\",\"foods\"],\"in\":" +
+        "{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}");
+
+    assertJson(
+      ContainsPath(
+        Arr(Value("favorites"), Value("foods")),
+        Obj("favorites",
+          Obj("foods", Arr(
+            Value("crunchings"),
+            Value("munchings"),
+            Value("lunchings")
+          ))
+        )
+      ),
+      "{\"contains_path\":[\"favorites\",\"foods\"],\"in\":" +
+        "{\"object\":{\"favorites\":{\"object\":{\"foods\":[\"crunchings\",\"munchings\",\"lunchings\"]}}}}}");
+  }
+
+  @Test
+  public void shouldSerializeContainsValue() throws Exception {
+    assertJson(
+      ContainsValue(
+        Value("bar"),
+        Obj("foo", Value("bar"))
+      ),
+      "{\"contains_value\":\"bar\",\"in\":" +
+        "{\"object\":{\"foo\":\"bar\"}}}");
   }
 
   @Test

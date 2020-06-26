@@ -651,24 +651,68 @@ class ClientSpec
   }
 
   it should "test miscellaneous functions" in {
+    // NewId
     val newIdR = client.query(NewId()).futureValue
     newIdR.to[String].get should not be null
 
+    // Equals
     val equalsR = client.query(Equals("fire", "fire")).futureValue
     equalsR.to[Boolean].get shouldBe true
 
+    // Concat
     val concatR = client.query(Concat(Arr("Magic", "Missile"))).futureValue
     concatR.to[String].get shouldBe "MagicMissile"
 
     val concat2R = client.query(Concat(Arr("Magic", "Missile"), " ")).futureValue
     concat2R.to[String].get shouldBe "Magic Missile"
 
+    // Contains
     val containsR = client.query(Contains("favorites" / "foods", Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings"))))).futureValue
     containsR.to[Boolean].get shouldBe true
 
     client.query(Contains("field", Obj("field" -> "value"))).futureValue shouldBe TrueV
     client.query(Contains(1, Arr("value0", "value1", "value2"))).futureValue shouldBe TrueV
 
+    client.query(Contains("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value")))))).futureValue shouldBe TrueV
+
+    // ContainsField
+    client.query(ContainsField("foo", Obj("foo" -> "bar"))).futureValue shouldBe TrueV
+    client.query(ContainsField("foo", Obj())).futureValue shouldBe FalseV
+
+    // ContainsPath
+    val containsPath = client.query(ContainsPath("favorites" / "foods", Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings"))))).futureValue
+    containsPath.to[Boolean].get shouldBe true
+
+    client.query(ContainsPath("field", Obj("field" -> "value"))).futureValue shouldBe TrueV
+    client.query(ContainsPath(1, Arr("value0", "value1", "value2"))).futureValue shouldBe TrueV
+
+    client.query(ContainsPath("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value")))))).futureValue shouldBe TrueV
+
+    // ContainsValue
+    val collectionName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collectionName))).futureValue
+
+    val document = client.query(Create(Collection(collectionName), Obj())).futureValue
+    val ref = document("ref").to[RefV].get
+    client.query(ContainsValue(ref.id, ref)).futureValue shouldBe TrueV
+
+    client.query(ContainsValue("1", Arr("1", "2", "3"))).futureValue shouldBe TrueV
+
+    client.query(ContainsValue("bar", Obj("foo" -> "bar"))).futureValue shouldBe TrueV
+
+    val indexName = aRandomString
+    client.query(
+      CreateIndex(Obj(
+        "name" -> indexName,
+          "source" -> Collection(collectionName),
+          "terms" -> Arr(Obj("field" -> Arr("data", "value"))),
+          "values" -> Arr(Obj("field" -> Arr("data", "value")))
+        ))).futureValue
+
+    client.query(Create(Collection(collectionName), Obj("data" -> Obj("value" -> "foo")))).futureValue
+    client.query(ContainsValue("foo", Match(Index(indexName), "foo"))).futureValue shouldBe TrueV
+
+    // Select
     val selectR = client.query(Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings", "lunchings"))))).futureValue
     selectR.to[String].get shouldBe "munchings"
 
@@ -678,23 +722,27 @@ class ClientSpec
     client.query(Select(1, Arr("value0", "value1", "value2"))).futureValue shouldBe StringV("value1")
     client.query(Select(100, Arr("value0", "value1", "value2"), "a default value")).futureValue shouldBe StringV("a default value")
 
-    client.query(Contains("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value")))))).futureValue shouldBe TrueV
     client.query(Select("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value")))))).futureValue shouldBe StringV("value")
 
+    // SelectAll
     client.query(SelectAll("foo", Arr(Obj("foo" -> "bar"), Obj("foo" -> "baz"), Obj("a" -> "b")))).futureValue shouldBe ArrayV("bar", "baz")
     client.query(SelectAll("foo" / "bar", Arr(Obj("foo" -> Obj("bar" -> 1)), Obj("foo" -> Obj("bar" -> 2))))).futureValue shouldBe ArrayV(1, 2)
     client.query(SelectAll("foo" / 0, Arr(Obj("foo" -> Arr(0, 1)), Obj("foo" -> Arr(2, 3))))).futureValue shouldBe ArrayV(0, 2)
 
+    // SelectAsIndex
     client.query(SelectAsIndex("foo", Arr(Obj("foo" -> "bar"), Obj("foo" -> "baz"), Obj("a" -> "b")))).futureValue shouldBe ArrayV("bar", "baz")
     client.query(SelectAsIndex("foo" / "bar", Arr(Obj("foo" -> Obj("bar" -> 1)), Obj("foo" -> Obj("bar" -> 2))))).futureValue shouldBe ArrayV(1, 2)
     client.query(SelectAsIndex("foo" / 0, Arr(Obj("foo" -> Arr(0, 1)), Obj("foo" -> Arr(2, 3))))).futureValue shouldBe ArrayV(0, 2)
 
+    // And
     val andR = client.query(And(true, false)).futureValue
     andR.to[Boolean].get shouldBe false
 
+    // Or
     val orR = client.query(Or(true, false)).futureValue
     orR.to[Boolean].get shouldBe true
 
+    // Not
     val notR = client.query(Not(false)).futureValue
     notR.to[Boolean].get shouldBe true
   }
@@ -995,17 +1043,47 @@ class ClientSpec
     allCollections("data").to[List[RefV]].get shouldBe List(RefV("a_collection", Native.Collections, RefV("child-database", Native.Databases, RefV("parent-database", Native.Databases))))
   }
 
-  it should "test for keys in nested database" in {
-    val client = createNewDatabase(adminClient, "db-for-keys")
+  it should "retrieve keys created for a child database" in {
+    // Set up
+    val parentDatabaseName = aRandomString
+    val client = createNewDatabase(adminClient, parentDatabaseName)
 
-    client.query(CreateDatabase(Obj("name" -> "db-test"))).futureValue
+    val childDatabaseName = aRandomString
+    client.query(CreateDatabase(Obj("name" -> childDatabaseName))).futureValue
 
-    val serverKey = (client.query(CreateKey(Obj("database" -> Database("db-test"), "role" -> "server"))).futureValue).apply("ref").get
-    val adminKey = (client.query(CreateKey(Obj("database" -> Database("db-test"), "role" -> "admin"))).futureValue).apply("ref").get
+    val serverKey = (client.query(CreateKey(Obj("database" -> Database(childDatabaseName), "role" -> "server"))).futureValue).apply(RefField).get
+    val adminKey = (client.query(CreateKey(Obj("database" -> Database(childDatabaseName), "role" -> "admin"))).futureValue).apply(RefField).get
 
-    (client.query(Paginate(Keys())).futureValue).apply("data").to[List[Value]].get shouldBe List(serverKey, adminKey)
+    // Run
+    val keys = client.query(Paginate(Keys())).futureValue
 
-    (adminClient.query(Paginate(Keys(Database("db-for-keys")))).futureValue).apply("data").to[List[Value]].get shouldBe List(serverKey, adminKey)
+    // Verify
+    val expectedKeys = Seq(serverKey, adminKey)
+    keys("data").to[List[Value]].get should contain theSameElementsAs expectedKeys
+  }
+
+  it should "retrieve keys created for a child database from a given database defined by the scope param" in {
+    // Set up
+    val parentDatabaseName = aRandomString
+    val client = createNewDatabase(adminClient, parentDatabaseName)
+
+    val childDatabaseName = aRandomString
+    client.query(CreateDatabase(Obj("name" -> childDatabaseName))).futureValue
+
+    val serverKey = (client.query(CreateKey(Obj("database" -> Database(childDatabaseName), "role" -> "server"))).futureValue).apply(RefField).get
+    val adminKey = (client.query(CreateKey(Obj("database" -> Database(childDatabaseName), "role" -> "admin"))).futureValue).apply(RefField).get
+
+    // Run
+    val keys = adminClient.query(Paginate(Keys(Database(parentDatabaseName)))).futureValue
+
+    // Verify
+    val expectedKeys =
+      Seq(serverKey, adminKey).map { key =>
+        def addDatabaseScope(ref: RefV, database: RefV): RefV = ref.copy(database = Some(database))
+        key.copy(collection = key.collection.map(collection => addDatabaseScope(collection, RefV(parentDatabaseName, Native.Databases))))
+      }
+
+    keys("data").to[List[Value]].get shouldBe expectedKeys.toList
   }
 
   it should "create recursive refs from string" in {
@@ -1451,6 +1529,113 @@ class ClientSpec
     for (i <- 1 to 10) client.query(Create(coll, Obj())).futureValue
     val docs = client.query(Paginate(Documents(coll))).futureValue
     docs("data").to[Seq[Value]].get should have size 10
+  }
+
+  it should "create an access provider" in {
+    // Set up
+    val name = aRandomString
+    val issuer = aRandomString
+    val jwksUri = "https://xxxx.auth0.com/"
+    val collection = client.query(CreateCollection(Obj("name" -> aRandomString))).futureValue
+    val role =
+      adminClient.query(
+        CreateRole(
+          Obj(
+            "name" -> aRandomString,
+            "privileges" -> Obj(
+              "resource" -> collection(RefField).get,
+              "actions" -> Obj("read" -> true)
+            )
+          )
+        )
+      ).futureValue
+
+    val allowedCollections = Arr(collection(RefField).get).value
+    val allowedRoles = Arr(role(RefField).get).value
+
+    // Run
+    val accessProvider =
+      adminClient.query(
+        CreateAccessProvider(
+          Obj(
+            "name" -> name,
+            "issuer" -> issuer,
+            "jwks_uri" -> jwksUri,
+            "allowed_collections" -> allowedCollections,
+            "allowed_roles" -> allowedRoles
+          )
+        )
+      ).futureValue
+
+    // Verify
+    accessProvider("ref").toOpt shouldBe defined
+    accessProvider("ts").toOpt shouldBe defined
+    accessProvider("name").to[String].get shouldBe name
+    accessProvider("issuer").to[String].get shouldBe issuer
+    accessProvider("jwks_uri").to[String].get shouldBe jwksUri
+    accessProvider("allowed_collections").get shouldBe allowedCollections
+    accessProvider("allowed_roles").get shouldBe allowedRoles
+  }
+
+  it should "retrieve an existing access provider" in {
+    // Set up
+    val name = aRandomString
+    val issuer = aRandomString
+    val jwksUri = "https://xxxx.auth0.com/"
+
+    adminClient.query(
+      CreateAccessProvider(
+        Obj(
+          "name" -> name,
+          "issuer" -> issuer,
+          "jwks_uri" -> jwksUri
+        )
+      )
+    ).futureValue
+
+    // Run
+    val accessProvider = adminClient.query(Get(AccessProvider(name))).futureValue
+
+    // Verify
+    accessProvider("ref").toOpt shouldBe defined
+    accessProvider("ts").toOpt shouldBe defined
+    accessProvider("name").to[String].get shouldBe name
+    accessProvider("issuer").to[String].get shouldBe issuer
+    accessProvider("jwks_uri").to[String].get shouldBe jwksUri
+  }
+
+  it should "retrieve all existing access providers" in {
+    // Set up
+    val jwksUri = "https://xxxx.auth0.com/"
+
+    val accessProvider1 =
+      adminClient.query(
+        CreateAccessProvider(
+          Obj(
+            "name" -> aRandomString,
+            "issuer" -> aRandomString,
+            "jwks_uri" -> jwksUri
+          )
+        )
+      ).futureValue
+
+    val accessProvider2 =
+      adminClient.query(
+        CreateAccessProvider(
+          Obj(
+            "name" -> aRandomString,
+            "issuer" -> aRandomString,
+            "jwks_uri" -> jwksUri
+          )
+        )
+      ).futureValue
+
+    // Run
+    val accessProviders = adminClient.query(Paginate(AccessProviders())).futureValue
+
+    // Verify
+    val expectedAccessProvidersRefs = Seq(accessProvider1(RefField).get, accessProvider2(RefField).get)
+    accessProviders("data").to[ArrayV].get.elems should contain theSameElementsAs expectedAccessProvidersRefs
   }
 
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {

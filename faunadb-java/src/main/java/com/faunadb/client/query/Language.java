@@ -255,6 +255,30 @@ public final class Language {
   }
 
   /**
+   * Returns a reference to a set of all access providers in the database.
+   * A reference set must be paginated in order to retrieve its values.
+   *
+   * @param scope a reference to a database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see #Database(String)
+   * @see #Paginate(Expr)
+   */
+  public static Expr AccessProviders(Expr scope) {
+    return Fn.apply("access_providers", scope);
+  }
+
+  /**
+   * Returns a reference to a set of all access providers in the database.
+   * A reference set must be paginated in order to retrieve its values.
+   *
+   * @return a new {@link Expr} instance
+   * @see #Paginate(Expr)
+   */
+  public static Expr AccessProviders() {
+    return AccessProviders(Null());
+  }
+
+  /**
    * Returns a reference to a set of all classes in the database.
    * A reference set must be paginated in order to retrieve its values.
    *
@@ -1805,6 +1829,18 @@ public final class Language {
    */
   public static Expr Remove(Expr ref, Expr timestamp, Action action) {
     return Remove(ref, timestamp, action.value);
+  }
+
+  /**
+   * Creates a new access provider in the current database.
+   *
+   * @param params the access provider's configuration parameters. Type: Object
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see #Obj(Map)
+   */
+  public static Expr CreateAccessProvider(Expr params) {
+    return Fn.apply("create_access_provider", params);
   }
 
   /**
@@ -5043,6 +5079,54 @@ public final class Language {
   }
 
   /**
+   * Creates a reference for the access provider name.
+   *
+   * @param name the access provider name. Type: String
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr AccessProvider(Expr name) {
+    return Fn.apply("access_provider", name);
+  }
+
+  /**
+   * Creates a reference for the access provider name.
+   *
+   * @param name the access provider name
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr AccessProvider(String name) {
+    return AccessProvider(Value(name));
+  }
+
+  /**
+   * Creates a reference for the given access provider name, scoped to the database provided.
+   *
+   * @param name the access provider name. Type: String
+   * @param database the scope database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see #Database(String)
+   */
+  public static Expr AccessProvider(Expr name, Expr database) {
+    return Fn.apply("access_provider", name, "scope", database);
+  }
+
+  /**
+   * Creates a reference for the given access provider name, scoped to the database provided.
+   *
+   * @param name the access provider name
+   * @param database the scope database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see #Database(String)
+   */
+  public static Expr AccessProvider(String name, Expr database) {
+    return AccessProvider(Value(name), database);
+  }
+
+  /**
    * Creates a new reference for the given class name.
    *
    * @param name the class name. Type: String
@@ -5129,7 +5213,7 @@ public final class Language {
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    * @see #Database(String)
-   * 
+   *
    * @deprecated use Collection instead
    */
   @Deprecated
@@ -5368,7 +5452,10 @@ public final class Language {
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    * @see #Contains(Path, Expr)
+   *
+   * @deprecated use {@code ContainsPath} instead
    */
+  @Deprecated
   public static Expr Contains(Expr path, Expr in) {
     return Fn.apply("contains", path, "in", in);
   }
@@ -5380,9 +5467,65 @@ public final class Language {
    * @param in the target value. Type: Object or Array
    * @return a new {@link Expr} instance
    * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   *
+   * @deprecated use {@code ContainsPath} instead
    */
+  @Deprecated
   public static Expr Contains(Path path, Expr in) {
     return Contains(Arr(path.segments), in);
+  }
+
+  /**
+   * Returns true if the target Expr contains the given field, and false otherwise.
+   *
+   * @param field the desired value to field for presence.
+   * @param in the target value. Type: Object or Array
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr ContainsField(Expr field, Expr in) {
+    return Fn.apply("contains_field", field, "in", in);
+  }
+
+  /**
+   * Returns true if the target value contains the given path, and false otherwise.
+   * The path must be an array in which each element can be either a string, or a number.
+   * If a string, the path segment refers to an object key. If a number, the path segment refers to an array index.
+   *
+   * For convenience, a path builder is available at the {@link #ContainsPath(Path, Expr)} function.
+   *
+   * @param path the desired path to check for presence. Type: Array
+   * @param in the target value. Type: Object or Array
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see #ContainsPath(Path, Expr)
+   */
+  public static Expr ContainsPath(Expr path, Expr in) {
+    return Fn.apply("contains_path", path, "in", in);
+  }
+
+  /**
+   * Returns true if the target value contains the given path, and false otherwise.
+   *
+   * @param path the desired path to check for presence
+   * @param in the target value. Type: Object or Array
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr ContainsPath(Path path, Expr in) {
+    return ContainsPath(Arr(path.segments), in);
+  }
+
+  /**
+   * Returns true if the target Expr contains the given value, and false otherwise.
+   *
+   * @param value the desired value to check for presence.
+   * @param in the target value. Type: Ref, Object, Array or Set
+   * @return a new {@link Expr} instance
+   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   */
+  public static Expr ContainsValue(Expr value, Expr in) {
+    return Fn.apply("contains_value", value, "in", in);
   }
 
   /**
