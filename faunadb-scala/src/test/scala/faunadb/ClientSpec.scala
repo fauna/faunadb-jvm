@@ -1648,11 +1648,13 @@ class ClientSpec
 
   it should "retrieve an existing access provider" in {
     // Set up
+    val client = createNewDatabase(adminClient, aRandomString)
+
     val name = aRandomString
     val issuer = aRandomString
     val jwksUri = "https://xxxx.auth0.com/"
 
-    adminClient.query(
+    client.query(
       CreateAccessProvider(
         Obj(
           "name" -> name,
@@ -1663,7 +1665,7 @@ class ClientSpec
     ).futureValue
 
     // Run
-    val accessProvider = adminClient.query(Get(AccessProvider(name))).futureValue
+    val accessProvider = client.query(Get(AccessProvider(name))).futureValue
 
     // Verify
     accessProvider("ref").toOpt shouldBe defined
@@ -1675,10 +1677,12 @@ class ClientSpec
 
   it should "retrieve all existing access providers" in {
     // Set up
+    val client = createNewDatabase(adminClient, aRandomString)
+
     val jwksUri = "https://xxxx.auth0.com/"
 
     val accessProvider1 =
-      adminClient.query(
+      client.query(
         CreateAccessProvider(
           Obj(
             "name" -> aRandomString,
@@ -1689,7 +1693,7 @@ class ClientSpec
       ).futureValue
 
     val accessProvider2 =
-      adminClient.query(
+      client.query(
         CreateAccessProvider(
           Obj(
             "name" -> aRandomString,
@@ -1700,7 +1704,7 @@ class ClientSpec
       ).futureValue
 
     // Run
-    val accessProviders = adminClient.query(Paginate(AccessProviders())).futureValue
+    val accessProviders = client.query(Paginate(AccessProviders())).futureValue
 
     // Verify
     val expectedAccessProvidersRefs = Seq(accessProvider1(RefField).get, accessProvider2(RefField).get)
