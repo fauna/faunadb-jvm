@@ -1531,6 +1531,74 @@ class ClientSpec
     docs("data").to[Seq[Value]].get should have size 10
   }
 
+  it should "reverse an array" in {
+    // Run
+    val values = (1 to 10).toArray
+    val result = client.query(Reverse(values)).futureValue
+
+    // Verify
+    val expectedValues = values.map(LongV(_)).reverse
+    result.to[ArrayV].get.elems should contain theSameElementsInOrderAs expectedValues
+  }
+
+  it should "reverse a set" in {
+    // Set up
+    val collectionName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collectionName))).futureValue
+
+    val indexName = aRandomString
+    client.query(
+      CreateIndex(Obj(
+        "name" -> indexName,
+        "source" -> Collection(collectionName),
+        "active" -> true
+      ))
+    ).futureValue
+
+    client.query(Create(Collection(collectionName), Obj())).futureValue
+    client.query(Create(Collection(collectionName), Obj())).futureValue
+
+    // Run
+    val result = client.query(Paginate(Reverse(Match(Index(indexName))))).futureValue
+
+    // Verify
+    val expected = {
+      val result = client.query(Paginate(Match(Index(indexName)))).futureValue
+      result("data").to[Seq[Value]].get.reverse
+    }
+
+    result("data").to[Seq[Value]].get should contain theSameElementsInOrderAs expected
+  }
+
+  it should "reverse a page" in {
+    // Set up
+    val collectionName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collectionName))).futureValue
+
+    val indexName = aRandomString
+    client.query(
+      CreateIndex(Obj(
+        "name" -> indexName,
+        "source" -> Collection(collectionName),
+        "active" -> true
+      ))
+    ).futureValue
+
+    client.query(Create(Collection(collectionName), Obj())).futureValue
+    client.query(Create(Collection(collectionName), Obj())).futureValue
+
+    // Run
+    val result = client.query(Reverse(Paginate(Match(Index(indexName))))).futureValue
+
+    // Verify
+    val expected = {
+      val result = client.query(Paginate(Match(Index(indexName)))).futureValue
+      result("data").to[Seq[Value]].get.reverse
+    }
+
+    result("data").to[Seq[Value]].get should contain theSameElementsInOrderAs expected
+  }
+
   it should "create an access provider" in {
     // Set up
     val name = aRandomString
