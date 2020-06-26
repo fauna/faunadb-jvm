@@ -1194,6 +1194,19 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldEvalContainsPathExpression() throws Exception {
+    Value contains = query(
+      ContainsPath(
+        Path("favorites", "foods"),
+        Obj("favorites",
+          Obj("foods",
+            Arr(Value("crunchings"), Value("munchings")))))
+    ).get();
+
+    assertThat(contains.to(BOOLEAN).get(), is(true));
+  }
+
+  @Test
   public void shouldEvalContainsFieldExpression() throws Exception {
     Value containsField = query(
       ContainsField(
