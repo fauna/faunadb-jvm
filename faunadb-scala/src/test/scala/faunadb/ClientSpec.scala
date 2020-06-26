@@ -705,6 +705,7 @@ class ClientSpec
       CreateIndex(Obj(
         "name" -> indexName,
           "source" -> Collection(collectionName),
+          "active" -> true,
           "terms" -> Arr(Obj("field" -> Arr("data", "value"))),
           "values" -> Arr(Obj("field" -> Arr("data", "value")))
         ))).futureValue
