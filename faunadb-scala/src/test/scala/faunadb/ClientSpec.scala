@@ -1501,6 +1501,113 @@ class ClientSpec
     docs("data").to[Seq[Value]].get should have size 10
   }
 
+  it should "create an access provider" in {
+    // Set up
+    val name = aRandomString
+    val issuer = aRandomString
+    val jwksUri = "https://xxxx.auth0.com/"
+    val collection = client.query(CreateCollection(Obj("name" -> aRandomString))).futureValue
+    val role =
+      adminClient.query(
+        CreateRole(
+          Obj(
+            "name" -> aRandomString,
+            "privileges" -> Obj(
+              "resource" -> collection(RefField).get,
+              "actions" -> Obj("read" -> true)
+            )
+          )
+        )
+      ).futureValue
+
+    val allowedCollections = Arr(collection(RefField).get).value
+    val allowedRoles = Arr(role(RefField).get).value
+
+    // Run
+    val accessProvider =
+      adminClient.query(
+        CreateAccessProvider(
+          Obj(
+            "name" -> name,
+            "issuer" -> issuer,
+            "jwks_uri" -> jwksUri,
+            "allowed_collections" -> allowedCollections,
+            "allowed_roles" -> allowedRoles
+          )
+        )
+      ).futureValue
+
+    // Verify
+    accessProvider("ref").toOpt shouldBe defined
+    accessProvider("ts").toOpt shouldBe defined
+    accessProvider("name").to[String].get shouldBe name
+    accessProvider("issuer").to[String].get shouldBe issuer
+    accessProvider("jwks_uri").to[String].get shouldBe jwksUri
+    accessProvider("allowed_collections").get shouldBe allowedCollections
+    accessProvider("allowed_roles").get shouldBe allowedRoles
+  }
+
+  it should "retrieve an existing access provider" in {
+    // Set up
+    val name = aRandomString
+    val issuer = aRandomString
+    val jwksUri = "https://xxxx.auth0.com/"
+
+    adminClient.query(
+      CreateAccessProvider(
+        Obj(
+          "name" -> name,
+          "issuer" -> issuer,
+          "jwks_uri" -> jwksUri
+        )
+      )
+    ).futureValue
+
+    // Run
+    val accessProvider = adminClient.query(Get(AccessProvider(name))).futureValue
+
+    // Verify
+    accessProvider("ref").toOpt shouldBe defined
+    accessProvider("ts").toOpt shouldBe defined
+    accessProvider("name").to[String].get shouldBe name
+    accessProvider("issuer").to[String].get shouldBe issuer
+    accessProvider("jwks_uri").to[String].get shouldBe jwksUri
+  }
+
+  it should "retrieve all existing access providers" in {
+    // Set up
+    val jwksUri = "https://xxxx.auth0.com/"
+
+    val accessProvider1 =
+      adminClient.query(
+        CreateAccessProvider(
+          Obj(
+            "name" -> aRandomString,
+            "issuer" -> aRandomString,
+            "jwks_uri" -> jwksUri
+          )
+        )
+      ).futureValue
+
+    val accessProvider2 =
+      adminClient.query(
+        CreateAccessProvider(
+          Obj(
+            "name" -> aRandomString,
+            "issuer" -> aRandomString,
+            "jwks_uri" -> jwksUri
+          )
+        )
+      ).futureValue
+
+    // Run
+    val accessProviders = adminClient.query(Paginate(AccessProviders())).futureValue
+
+    // Verify
+    val expectedAccessProvidersRefs = Seq(accessProvider1(RefField).get, accessProvider2(RefField).get)
+    accessProviders("data").to[ArrayV].get.elems should contain theSameElementsAs expectedAccessProvidersRefs
+  }
+
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
     client.query(CreateDatabase(Obj("name" -> name))).futureValue
     val key = client.query(CreateKey(Obj("database" -> Database(name), "role" -> "admin"))).futureValue
