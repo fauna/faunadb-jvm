@@ -1140,8 +1140,33 @@ package object query {
    *
    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
    */
+  @deprecated("use ContainsPath instead", "3.0.0")
   def Contains(path: Expr, in: Expr): Expr =
     Expr(ObjectV("contains" -> path.value, "in" -> in.value))
+
+  /**
+   * A ContainsField expression.
+   *
+   * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/containsfield]]
+   */
+  def ContainsField(field: Expr, in: Expr): Expr =
+    Expr(ObjectV("contains_field" -> field.value, "in" -> in.value))
+
+  /**
+   * A ContainsPath expression.
+   *
+   * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/containspath]]
+   */
+  def ContainsPath(path: Expr, in: Expr): Expr =
+    Expr(ObjectV("contains_path" -> path.value, "in" -> in.value))
+
+  /**
+   * A ContainsValue expression.
+   *
+   * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/containsvalue]]
+   */
+  def ContainsValue(value: Expr, in: Expr): Expr =
+    Expr(ObjectV("contains_value" -> value.value, "in" -> in.value))
 
   /**
    * A Select expression.

@@ -651,24 +651,68 @@ class ClientSpec
   }
 
   it should "test miscellaneous functions" in {
+    // NewId
     val newIdR = client.query(NewId()).futureValue
     newIdR.to[String].get should not be null
 
+    // Equals
     val equalsR = client.query(Equals("fire", "fire")).futureValue
     equalsR.to[Boolean].get shouldBe true
 
+    // Concat
     val concatR = client.query(Concat(Arr("Magic", "Missile"))).futureValue
     concatR.to[String].get shouldBe "MagicMissile"
 
     val concat2R = client.query(Concat(Arr("Magic", "Missile"), " ")).futureValue
     concat2R.to[String].get shouldBe "Magic Missile"
 
+    // Contains
     val containsR = client.query(Contains("favorites" / "foods", Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings"))))).futureValue
     containsR.to[Boolean].get shouldBe true
 
     client.query(Contains("field", Obj("field" -> "value"))).futureValue shouldBe TrueV
     client.query(Contains(1, Arr("value0", "value1", "value2"))).futureValue shouldBe TrueV
 
+    client.query(Contains("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value")))))).futureValue shouldBe TrueV
+
+    // ContainsField
+    client.query(ContainsField("foo", Obj("foo" -> "bar"))).futureValue shouldBe TrueV
+    client.query(ContainsField("foo", Obj())).futureValue shouldBe FalseV
+
+    // ContainsPath
+    val containsPath = client.query(ContainsPath("favorites" / "foods", Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings"))))).futureValue
+    containsPath.to[Boolean].get shouldBe true
+
+    client.query(ContainsPath("field", Obj("field" -> "value"))).futureValue shouldBe TrueV
+    client.query(ContainsPath(1, Arr("value0", "value1", "value2"))).futureValue shouldBe TrueV
+
+    client.query(ContainsPath("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value")))))).futureValue shouldBe TrueV
+
+    // ContainsValue
+    val collectionName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collectionName))).futureValue
+
+    val document = client.query(Create(Collection(collectionName), Obj())).futureValue
+    val ref = document("ref").to[RefV].get
+    client.query(ContainsValue(ref.id, ref)).futureValue shouldBe TrueV
+
+    client.query(ContainsValue("1", Arr("1", "2", "3"))).futureValue shouldBe TrueV
+
+    client.query(ContainsValue("bar", Obj("foo" -> "bar"))).futureValue shouldBe TrueV
+
+    val indexName = aRandomString
+    client.query(
+      CreateIndex(Obj(
+        "name" -> indexName,
+          "source" -> Collection(collectionName),
+          "terms" -> Arr(Obj("field" -> Arr("data", "value"))),
+          "values" -> Arr(Obj("field" -> Arr("data", "value")))
+        ))).futureValue
+
+    client.query(Create(Collection(collectionName), Obj("data" -> Obj("value" -> "foo")))).futureValue
+    client.query(ContainsValue("foo", Match(Index(indexName), "foo"))).futureValue shouldBe TrueV
+
+    // Select
     val selectR = client.query(Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings", "lunchings"))))).futureValue
     selectR.to[String].get shouldBe "munchings"
 
@@ -678,23 +722,27 @@ class ClientSpec
     client.query(Select(1, Arr("value0", "value1", "value2"))).futureValue shouldBe StringV("value1")
     client.query(Select(100, Arr("value0", "value1", "value2"), "a default value")).futureValue shouldBe StringV("a default value")
 
-    client.query(Contains("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value")))))).futureValue shouldBe TrueV
     client.query(Select("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value")))))).futureValue shouldBe StringV("value")
 
+    // SelectAll
     client.query(SelectAll("foo", Arr(Obj("foo" -> "bar"), Obj("foo" -> "baz"), Obj("a" -> "b")))).futureValue shouldBe ArrayV("bar", "baz")
     client.query(SelectAll("foo" / "bar", Arr(Obj("foo" -> Obj("bar" -> 1)), Obj("foo" -> Obj("bar" -> 2))))).futureValue shouldBe ArrayV(1, 2)
     client.query(SelectAll("foo" / 0, Arr(Obj("foo" -> Arr(0, 1)), Obj("foo" -> Arr(2, 3))))).futureValue shouldBe ArrayV(0, 2)
 
+    // SelectAsIndex
     client.query(SelectAsIndex("foo", Arr(Obj("foo" -> "bar"), Obj("foo" -> "baz"), Obj("a" -> "b")))).futureValue shouldBe ArrayV("bar", "baz")
     client.query(SelectAsIndex("foo" / "bar", Arr(Obj("foo" -> Obj("bar" -> 1)), Obj("foo" -> Obj("bar" -> 2))))).futureValue shouldBe ArrayV(1, 2)
     client.query(SelectAsIndex("foo" / 0, Arr(Obj("foo" -> Arr(0, 1)), Obj("foo" -> Arr(2, 3))))).futureValue shouldBe ArrayV(0, 2)
 
+    // And
     val andR = client.query(And(true, false)).futureValue
     andR.to[Boolean].get shouldBe false
 
+    // Or
     val orR = client.query(Or(true, false)).futureValue
     orR.to[Boolean].get shouldBe true
 
+    // Not
     val notR = client.query(Not(false)).futureValue
     notR.to[Boolean].get shouldBe true
   }
