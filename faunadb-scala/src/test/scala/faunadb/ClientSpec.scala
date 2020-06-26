@@ -1547,7 +1547,13 @@ class ClientSpec
     client.query(CreateCollection(Obj("name" -> collectionName))).futureValue
 
     val indexName = aRandomString
-    client.query(CreateIndex(Obj("name" -> indexName, "source" -> Collection(collectionName)))).futureValue
+    client.query(
+      CreateIndex(Obj(
+        "name" -> indexName,
+        "source" -> Collection(collectionName),
+        "active" -> true
+      ))
+    ).futureValue
 
     client.query(Create(Collection(collectionName), Obj())).futureValue
     client.query(Create(Collection(collectionName), Obj())).futureValue
@@ -1570,7 +1576,13 @@ class ClientSpec
     client.query(CreateCollection(Obj("name" -> collectionName))).futureValue
 
     val indexName = aRandomString
-    client.query(CreateIndex(Obj("name" -> indexName, "source" -> Collection(collectionName)))).futureValue
+    client.query(
+      CreateIndex(Obj(
+        "name" -> indexName,
+        "source" -> Collection(collectionName),
+        "active" -> true
+      ))
+    ).futureValue
 
     client.query(Create(Collection(collectionName), Obj())).futureValue
     client.query(Create(Collection(collectionName), Obj())).futureValue
