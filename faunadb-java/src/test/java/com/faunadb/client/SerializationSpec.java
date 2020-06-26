@@ -584,7 +584,7 @@ public class SerializationSpec {
         "allowed_roles" , Arr(new RefV("104979509696660483", Native.ROLES))
       )),
       "{\"create_access_provider\":{\"object\":{\"name\":\"access-provider-name\",\"issuer\":\"access-provider-issuer\",\"jwks_uri\":\"https://xxxx.auth0.com/\"," +
-              "\"allowed_collections\":[{\"@ref\":{\"id\":\"104979509696660483\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}],\"allowed_roles\":[{\"@ref\":{\"id\":\"104979509696660483\",\"collection\":{\"@ref\":{\"id\":\"roles\"}}}}]}}}"
+        "\"allowed_collections\":[{\"@ref\":{\"id\":\"spells\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}],\"allowed_roles\":[{\"@ref\":{\"id\":\"104979509696660483\",\"collection\":{\"@ref\":{\"id\":\"roles\"}}}}]}}}"
     );
   }
 
