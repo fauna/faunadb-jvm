@@ -1254,10 +1254,11 @@ public class ClientSpec {
     String indexName = randomStartingWith("index_");
     Value index = query(
       CreateIndex(Obj(
-    "name", Value(indexName),
-    "source", collectionRef,
-    "values", Arr(Obj("field", Arr(Value("data"), Value("value")))),
-    "terms", Arr(Obj("field", Arr(Value("data"), Value("value"))))
+        "name", Value(indexName),
+        "source", collectionRef,
+        "active", Value(true),
+        "values", Arr(Obj("field", Arr(Value("data"), Value("value")))),
+        "terms", Arr(Obj("field", Arr(Value("data"), Value("value"))))
       ))
     ).get();
 
