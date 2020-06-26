@@ -2098,13 +2098,11 @@ public class ClientSpec {
     RefV databaseScope = new RefV(parentDatabaseName, Native.DATABASES);
 
     String serverKeyId = serverKey.getId();
-    String serverKeyCollectionId = serverKey.getCollection().get().getId();
-    RefV serverKeyCollection = new RefV(serverKeyCollectionId, null, databaseScope);
+    RefV serverKeyCollection = new RefV(Native.KEYS.getId(), null, databaseScope);
     RefV expectedServerKey = new RefV(serverKeyId, serverKeyCollection);
 
     String adminKeyId = adminKey.getId();
-    String adminKeyCollectionId = adminKey.getCollection().get().getId();
-    RefV adminKeyCollection = new RefV(adminKeyCollectionId, null, databaseScope);
+    RefV adminKeyCollection = new RefV(Native.KEYS.getId(), null, databaseScope);
     RefV expectedAdminKey = new RefV(adminKeyId, adminKeyCollection);
 
     assertThat(keys.get(DATA).to(ARRAY).get(), hasItems(expectedServerKey, expectedAdminKey));
