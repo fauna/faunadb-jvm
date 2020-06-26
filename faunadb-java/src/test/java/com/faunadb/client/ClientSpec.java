@@ -2625,7 +2625,7 @@ public class ClientSpec {
     // Set up
     RefV collection = onARandomCollection();
     RefV index = query(
-      CreateIndex(Obj("name", Value(randomStartingWith("index_")), "source", collection ))
+      CreateIndex(Obj("name", Value(randomStartingWith("index_")), "source", collection, "active", Value(true)))
     ).get().get(REF_FIELD);
 
     query(Create(collection, Obj())).get();
@@ -2646,7 +2646,7 @@ public class ClientSpec {
     // Set up
     RefV collection = onARandomCollection();
     RefV index = query(
-      CreateIndex(Obj("name", Value(randomStartingWith("index_")), "source", collection ))
+      CreateIndex(Obj("name", Value(randomStartingWith("index_")), "source", collection,"active", Value(true)))
     ).get().get(REF_FIELD);
 
     query(Create(collection, Obj())).get();
