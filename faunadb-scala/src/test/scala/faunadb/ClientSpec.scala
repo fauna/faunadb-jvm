@@ -1043,17 +1043,47 @@ class ClientSpec
     allCollections("data").to[List[RefV]].get shouldBe List(RefV("a_collection", Native.Collections, RefV("child-database", Native.Databases, RefV("parent-database", Native.Databases))))
   }
 
-  it should "test for keys in nested database" in {
-    val client = createNewDatabase(adminClient, "db-for-keys")
+  it should "retrieve keys created for a child database" in {
+    // Set up
+    val parentDatabaseName = aRandomString
+    val client = createNewDatabase(adminClient, parentDatabaseName)
 
-    client.query(CreateDatabase(Obj("name" -> "db-test"))).futureValue
+    val childDatabaseName = aRandomString
+    client.query(CreateDatabase(Obj("name" -> childDatabaseName))).futureValue
 
-    val serverKey = (client.query(CreateKey(Obj("database" -> Database("db-test"), "role" -> "server"))).futureValue).apply("ref").get
-    val adminKey = (client.query(CreateKey(Obj("database" -> Database("db-test"), "role" -> "admin"))).futureValue).apply("ref").get
+    val serverKey = (client.query(CreateKey(Obj("database" -> Database(childDatabaseName), "role" -> "server"))).futureValue).apply(RefField).get
+    val adminKey = (client.query(CreateKey(Obj("database" -> Database(childDatabaseName), "role" -> "admin"))).futureValue).apply(RefField).get
 
-    (client.query(Paginate(Keys())).futureValue).apply("data").to[List[Value]].get shouldBe List(serverKey, adminKey)
+    // Run
+    val keys = client.query(Paginate(Keys())).futureValue
 
-    (adminClient.query(Paginate(Keys(Database("db-for-keys")))).futureValue).apply("data").to[List[Value]].get shouldBe List(serverKey, adminKey)
+    // Verify
+    val expectedKeys = Seq(serverKey, adminKey)
+    keys("data").to[List[Value]].get should contain theSameElementsAs expectedKeys
+  }
+
+  it should "retrieve keys created for a child database from a given database defined by the scope param" in {
+    // Set up
+    val parentDatabaseName = aRandomString
+    val client = createNewDatabase(adminClient, parentDatabaseName)
+
+    val childDatabaseName = aRandomString
+    client.query(CreateDatabase(Obj("name" -> childDatabaseName))).futureValue
+
+    val serverKey = (client.query(CreateKey(Obj("database" -> Database(childDatabaseName), "role" -> "server"))).futureValue).apply(RefField).get
+    val adminKey = (client.query(CreateKey(Obj("database" -> Database(childDatabaseName), "role" -> "admin"))).futureValue).apply(RefField).get
+
+    // Run
+    val keys = adminClient.query(Paginate(Keys(Database(parentDatabaseName)))).futureValue
+
+    // Verify
+    val expectedKeys =
+      Seq(serverKey, adminKey).map { key =>
+        def addDatabaseScope(ref: RefV, database: RefV): RefV = ref.copy(database = Some(database))
+        key.copy(collection = key.collection.map(collection => addDatabaseScope(collection, RefV(parentDatabaseName, Native.Databases))))
+      }
+
+    keys("data").to[List[Value]].get shouldBe expectedKeys.toList
   }
 
   it should "create recursive refs from string" in {
