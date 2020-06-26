@@ -136,6 +136,10 @@ package object query {
   def Ref(collectionRef: Expr, id: Expr): Expr =
     Expr(ObjectV("ref" -> collectionRef.value, "id" -> id.value))
 
+  /** Native reference to all access providers */
+  def AccessProviders(scope: Expr = NullV): Expr =
+    Expr(ObjectV("access_providers" -> scope.value))
+
   /** Native reference to all classes */
   @deprecated("use Collections instead", "2.7.0")
   def Classes(scope: Expr = NullV): Expr =
@@ -510,6 +514,14 @@ package object query {
 
   def Remove(ref: Expr, ts: Expr, action: Expr): Expr =
     Expr(ObjectV("remove" -> ref.value, "ts" -> ts.value, "action" -> action.value))
+
+  /**
+    * A Create Access Provider expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
+    */
+  def CreateAccessProvider(params: Expr): Expr =
+    Expr(ObjectV("create_access_provider" -> params.value))
 
   /**
     * A Create Class expression.
@@ -1028,6 +1040,22 @@ package object query {
     */
   def NewId(): Expr =
     Expr(ObjectV("new_id" -> NullV))
+
+  /**
+    * An Access Provider expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider]]
+    */
+  def AccessProvider(name: Expr): Expr =
+    Expr(ObjectV("access_provider" -> name.value))
+
+  /**
+    * An Access Provider expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider]]
+    */
+  def AccessProvider(name: Expr, scope: Expr): Expr =
+    Expr(ObjectV("access_provider" -> name.value, "scope" -> scope.value))
 
   /**
     * A Class expression.
