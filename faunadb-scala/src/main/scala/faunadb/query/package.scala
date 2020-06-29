@@ -136,6 +136,10 @@ package object query {
   def Ref(collectionRef: Expr, id: Expr): Expr =
     Expr(ObjectV("ref" -> collectionRef.value, "id" -> id.value))
 
+  /** Native reference to all access providers */
+  def AccessProviders(scope: Expr = NullV): Expr =
+    Expr(ObjectV("access_providers" -> scope.value))
+
   /** Native reference to all classes */
   @deprecated("use Collections instead", "2.7.0")
   def Classes(scope: Expr = NullV): Expr =
@@ -404,6 +408,14 @@ package object query {
     Expr(ObjectV("reduce" -> lambda.value, "initial" -> initial.value, "collection" -> collection.value))
 
   /**
+    * A Reverse expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/reverse]]
+    */
+  def Reverse(source: Expr): Expr =
+    Expr(ObjectV("reverse" -> source.value))
+
+  /**
    * A Paginate expression.
    *
    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#read-functions]]
@@ -502,6 +514,14 @@ package object query {
 
   def Remove(ref: Expr, ts: Expr, action: Expr): Expr =
     Expr(ObjectV("remove" -> ref.value, "ts" -> ts.value, "action" -> action.value))
+
+  /**
+    * A Create Access Provider expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#write-functions]]
+    */
+  def CreateAccessProvider(params: Expr): Expr =
+    Expr(ObjectV("create_access_provider" -> params.value))
 
   /**
     * A Create Class expression.
@@ -1022,6 +1042,22 @@ package object query {
     Expr(ObjectV("new_id" -> NullV))
 
   /**
+    * An Access Provider expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider]]
+    */
+  def AccessProvider(name: Expr): Expr =
+    Expr(ObjectV("access_provider" -> name.value))
+
+  /**
+    * An Access Provider expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider]]
+    */
+  def AccessProvider(name: Expr, scope: Expr): Expr =
+    Expr(ObjectV("access_provider" -> name.value, "scope" -> scope.value))
+
+  /**
     * A Class expression.
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
@@ -1132,8 +1168,33 @@ package object query {
    *
    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions]]
    */
+  @deprecated("use ContainsPath instead", "3.0.0")
   def Contains(path: Expr, in: Expr): Expr =
     Expr(ObjectV("contains" -> path.value, "in" -> in.value))
+
+  /**
+   * A ContainsField expression.
+   *
+   * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/containsfield]]
+   */
+  def ContainsField(field: Expr, in: Expr): Expr =
+    Expr(ObjectV("contains_field" -> field.value, "in" -> in.value))
+
+  /**
+   * A ContainsPath expression.
+   *
+   * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/containspath]]
+   */
+  def ContainsPath(path: Expr, in: Expr): Expr =
+    Expr(ObjectV("contains_path" -> path.value, "in" -> in.value))
+
+  /**
+   * A ContainsValue expression.
+   *
+   * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/containsvalue]]
+   */
+  def ContainsValue(value: Expr, in: Expr): Expr =
+    Expr(ObjectV("contains_value" -> value.value, "in" -> in.value))
 
   /**
    * A Select expression.
