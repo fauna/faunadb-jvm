@@ -288,7 +288,7 @@ class ClientSpec
         Paginate(
           Match(index("ref")),
           cursor = cursor,
-          size = 4,
+          size = 4
         )).futureValue
 
     val first = page(Null())
@@ -1397,7 +1397,7 @@ class ClientSpec
       "source" -> col("ref").get,
       "values" -> Arr(
         Obj("field" -> Arr("data", "value")),
-        Obj("field" -> "ref"),
+        Obj("field" -> "ref")
       ),
       "active" -> true
     ))).futureValue
