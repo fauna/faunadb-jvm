@@ -2145,23 +2145,51 @@ public class ClientSpec {
   }
 
   @Test
-  public void shouldTestNestedKeys() throws Exception {
-    FaunaClient client = createNewDatabase(adminClient, "db-for-keys");
+  public void retrieveKeysCreatedForChildDatabase() throws Exception {
+    // Set up
+    String parentDatabaseName = randomStartingWith("database_");
+    FaunaClient client = createNewDatabase(adminClient, parentDatabaseName);
 
-    client.query(CreateDatabase(Obj("name", Value("db-test")))).get();
+    String childDatabase = randomStartingWith("database_");
+    client.query(CreateDatabase(Obj("name", Value(childDatabase)))).get();
 
-    Value serverKey = client.query(CreateKey(Obj("database", Database("db-test"), "role", Value("server")))).get().get(REF_FIELD);
-    Value adminKey = client.query(CreateKey(Obj("database", Database("db-test"), "role", Value("admin")))).get().get(REF_FIELD);
+    RefV serverKey = client.query(CreateKey(Obj("database", Database(childDatabase), "role", Value("server")))).get().get(REF_FIELD);
+    RefV adminKey = client.query(CreateKey(Obj("database", Database(childDatabase), "role", Value("admin")))).get().get(REF_FIELD);
 
-    assertThat(
-            client.query(Paginate(Keys())).get().get(DATA).to(ARRAY).get(),
-            hasItems(serverKey, adminKey)
-    );
+    // Run
+    Value keys = client.query(Paginate(Keys())).get();
 
-    assertThat(
-            adminClient.query(Paginate(Keys(Database("db-for-keys")))).get().get(DATA).to(ARRAY).get(),
-            hasItems(serverKey, adminKey)
-    );
+    // Verify
+    assertThat(keys.get(DATA).to(ARRAY).get(), hasItems(serverKey, adminKey));
+  }
+
+  @Test
+  public void retrieveKeysCreatedForChildDatabaseFromDatabaseDefinedByScope() throws Exception {
+    // Set up
+    String parentDatabaseName = randomStartingWith("database_");
+    FaunaClient client = createNewDatabase(adminClient, parentDatabaseName);
+
+    String childDatabase = randomStartingWith("database_");
+    client.query(CreateDatabase(Obj("name", Value(childDatabase)))).get();
+
+    RefV serverKey = client.query(CreateKey(Obj("database", Database(childDatabase), "role", Value("server")))).get().get(REF_FIELD);
+    RefV adminKey = client.query(CreateKey(Obj("database", Database(childDatabase), "role", Value("admin")))).get().get(REF_FIELD);
+
+    // Run
+    Value keys = adminClient.query(Paginate(Keys(Database(parentDatabaseName)))).get();
+
+    // Verify
+    RefV databaseScope = new RefV(parentDatabaseName, Native.DATABASES);
+
+    String serverKeyId = serverKey.getId();
+    RefV serverKeyCollection = new RefV(Native.KEYS.getId(), null, databaseScope);
+    RefV expectedServerKey = new RefV(serverKeyId, serverKeyCollection);
+
+    String adminKeyId = adminKey.getId();
+    RefV adminKeyCollection = new RefV(Native.KEYS.getId(), null, databaseScope);
+    RefV expectedAdminKey = new RefV(adminKeyId, adminKeyCollection);
+
+    assertThat(keys.get(DATA).to(ARRAY).get(), hasItems(expectedServerKey, expectedAdminKey));
   }
 
   @Test
