@@ -109,7 +109,7 @@ lazy val scala = project.in(file("faunadb-scala"))
       "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
       "ch.qos.logback" % "logback-classic" % "1.2.3" % "test",
-      "org.scala-lang.modules" % "scala-java8-compat_2.12" % "0.9.0",
+      "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0",
       "org.scala-lang" % "scala-reflect" % "2.12.10",
       "org.scalatest" %% "scalatest" % "3.0.7" % "test"
     ),
