@@ -3,7 +3,6 @@ package faunadb
 import com.fasterxml.jackson.databind.{ JsonMappingException, ObjectMapper }
 import faunadb.values._
 import java.time.{ Instant, LocalDate }
-import java.time.ZoneOffset.UTC
 import java.time.temporal.ChronoUnit
 import org.scalatest.{ FlatSpec, Matchers }
 
@@ -129,5 +128,12 @@ class DeserializationSpec extends FlatSpec with Matchers {
     json.readValue("{\"@bytes\":\"_Q==\"}", classOf[Value]) should equal (BytesV(0xfd))
     json.readValue("{\"@bytes\":\"_g==\"}", classOf[Value]) should equal (BytesV(0xfe))
     json.readValue("{\"@bytes\":\"_w==\"}", classOf[Value]) should equal (BytesV(0xff))
+  }
+
+  it should "deserialize a query value" in {
+    val toDeserialize = """{"@query": {"lambda": "_", "expr": true, "api_version": "3"}}"""
+    val parsed = json.readValue(toDeserialize, classOf[Value])
+
+    parsed shouldBe QueryV(ObjectV("lambda" -> "_", "expr" -> true, "api_version" -> "3"))
   }
 }

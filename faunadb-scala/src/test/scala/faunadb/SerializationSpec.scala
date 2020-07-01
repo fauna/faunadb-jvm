@@ -362,7 +362,7 @@ class SerializationSpec extends FlatSpec with Matchers {
     TimeV(Instant.ofEpochMilli(0)).toString shouldBe "1970-01-01T00:00:00Z"
     DateV(LocalDate.ofEpochDay(0)).toString shouldBe "1970-01-01"
     BytesV("DEADBEEF").toString shouldBe "[0x0c 0x40 0x03 0x04 0x41 0x05]"
-    QueryV(ObjectV("lambda" -> "_", "expr" -> true)).toString shouldBe "{lambda: \"_\", expr: true}"
+    QueryV(ObjectV("lambda" -> "_", "expr" -> true, "api_version" -> "3")).toString shouldBe """{lambda: "_", expr: true, api_version: "3"}"""
   }
 
   it should "serialize the documents function" in {
