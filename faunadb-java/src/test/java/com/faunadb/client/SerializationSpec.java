@@ -749,6 +749,16 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeReverse() throws Exception {
+    assertJson(
+      Reverse(
+        Arr(Value("1"), Value("2"), Value("3"))
+      ),
+      "{\"reverse\":[\"1\",\"2\",\"3\"]}"
+    );
+  }
+
+  @Test
   public void shouldSerializeJoin() throws Exception {
     assertJson(
       Join(

@@ -2654,6 +2654,60 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldReverseAnArray() throws Exception {
+    // Run
+    List<Expr> values = IntStream.rangeClosed(1, 100).mapToObj(Language::Value).collect(Collectors.toList());
+    Value result = query(Reverse(Arr(values))).get();
+
+    // Verify
+    List<Expr> expectedValues = values;
+    Collections.reverse(expectedValues);
+    assertThat(result.to(ARRAY).get(), equalTo(expectedValues));
+  }
+
+  @Test
+  public void shouldReverseASet() throws Exception {
+    // Set up
+    RefV collection = onARandomCollection();
+    RefV index = query(
+      CreateIndex(Obj("name", Value(randomStartingWith("index_")), "source", collection, "active", Value(true)))
+    ).get().get(REF_FIELD);
+
+    query(Create(collection, Obj())).get();
+    query(Create(collection, Obj())).get();
+
+    // Run
+    Value result = query(Paginate(Reverse(Match(index)))).get();
+
+    // Verify
+    List<RefV> expectedValues = query(Paginate(Match(index))).get().get(REF_LIST);
+    Collections.reverse(expectedValues);
+
+    assertThat(result.get(DATA).to(ARRAY).get(), equalTo(expectedValues));
+  }
+
+  @Test
+  public void shouldReverseAPage() throws Exception {
+    // Set up
+    RefV collection = onARandomCollection();
+    RefV index = query(
+      CreateIndex(Obj("name", Value(randomStartingWith("index_")), "source", collection,"active", Value(true)))
+    ).get().get(REF_FIELD);
+
+    query(Create(collection, Obj())).get();
+    query(Create(collection, Obj())).get();
+
+    // Run
+    Value result = query(Reverse(Paginate(Match(index)))).get();
+
+    // Verify
+    List<RefV> expectedValues = query(Paginate(Match(index))).get().get(REF_LIST);
+    Collections.reverse(expectedValues);
+
+    assertThat(result.get(DATA).to(ARRAY).get(), equalTo(expectedValues));
+  }
+
+  @Test
   public void testMoveDatabase() throws Exception {
     String db1Name = randomStartingWith("db1_");
     String db2Name = randomStartingWith("db2_");

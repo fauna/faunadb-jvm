@@ -1622,6 +1622,17 @@ public final class Language {
   }
 
   /**
+   * Reverse the order of the given source.
+   *
+   * @param source the source set. Type: Array, Set, or Page.
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/reverse">Reverse Function</a>
+   * @return a new {@link Expr} instance
+   */
+  public static Expr Reverse(Expr source) {
+    return Fn.apply("reverse", source);
+  }
+
+  /**
    * Returns a Page object that groups a page of results and cursors for retrieving pages before or after
    * the current page. Pages are collections and can be passed directly to some functions such as
    * {@link #Map(Expr, Expr)}, {@link #Foreach(Expr, Expr)}, or {@link #Filter(Expr, Expr)}.
