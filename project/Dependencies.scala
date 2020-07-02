@@ -17,6 +17,7 @@ object Dependencies {
     val junitVersion             = "4.12"
   }
 
+  // Libraries
   object Compile {
     import Versions._
 
