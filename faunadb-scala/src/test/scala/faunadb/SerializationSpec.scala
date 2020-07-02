@@ -352,6 +352,11 @@ class SerializationSpec extends FlatSpec with Matchers {
     json.writeValueAsString(merge1) shouldBe "{\"merge\":{\"object\":{\"x\":10}},\"with\":{\"object\":{\"y\":20}},\"lambda\":{\"lambda\":\"x\",\"expr\":{\"var\":\"x\"}}}"
   }
 
+  it should "serialize query values" in {
+    val query = QueryV(ObjectV("lambda" -> "_", "expr" -> true, "api_version" -> "3"))
+    json.writeValueAsString(query) shouldBe """{"@query":{"lambda":"_","expr":true,"api_version":"3"}}"""
+  }
+
   it should "print usefully" in {
     ArrayV(1, "test").toString shouldBe "[1, \"test\"]"
     RefV("42", RefV("people", Native.Collections), RefV("db", Native.Databases)).toString shouldBe
