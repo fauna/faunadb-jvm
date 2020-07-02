@@ -82,15 +82,7 @@ lazy val common = project.in(file("faunadb-common"))
       "-link", nettyClientDocUrl
     ),
 
-    libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % jacksonVersion,
-      "io.netty" % "netty-codec-http" % nettyVersion,
-      "io.netty" % "netty-handler" % nettyVersion,
-      "io.dropwizard.metrics" % "metrics-core" % metricsVersion,
-      "org.slf4j" % "slf4j-api" % "1.7.26",
-      "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
-      "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion
-    )
+    libraryDependencies ++= Dependencies.faunadbCommon
   )
 
 lazy val scala = project.in(file("faunadb-scala"))
@@ -105,14 +97,7 @@ lazy val scala = project.in(file("faunadb-scala"))
       "-Xsource:2.12"
     ),
 
-    libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
-      "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
-      "ch.qos.logback" % "logback-classic" % "1.2.3" % "test",
-      "org.scala-lang.modules" % "scala-java8-compat_2.12" % "0.9.0",
-      "org.scala-lang" % "scala-reflect" % "2.12.10",
-      "org.scalatest" %% "scalatest" % "3.0.7" % "test"
-    ),
+    libraryDependencies ++= Dependencies.faunadbScala,
 
     autoAPIMappings := true,
     apiURL := Some(url(scalaApiUrl)),
@@ -155,10 +140,5 @@ lazy val java = project.in(file("faunadb-java"))
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q"),
 
-    libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % "1.2.3" % "test",
-      "org.yaml" % "snakeyaml" % "1.24" % "test",
-      "com.novocode" % "junit-interface" % "0.11" % "test",
-      "org.hamcrest" % "hamcrest-library" % "2.1" % "test",
-      "junit" % "junit" % "4.12" % "test"
-    ))
+    libraryDependencies ++= Dependencies.faunadbJava
+  )
