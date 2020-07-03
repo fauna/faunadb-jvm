@@ -52,7 +52,7 @@ commands:
           command: |
             mkdir -p results/{tests,coverage}
             cp **/target/test-reports/*.xml results/tests/
-            cp faunadb-scala/target/scala-2.12/*coverage-report/ results/coverage/
+            cp -r faunadb-scala/target/scala-2.12/*coverage-report/ results/coverage/
 
       - store_test_results:
           path: results/
