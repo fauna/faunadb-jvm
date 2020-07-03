@@ -30,10 +30,13 @@ object Settings {
     crossScalaVersions := Seq(scala212),
     crossPaths := false,
     autoScalaLibrary := false,
+
     exportJars := true,
+
     javacOptions ++= Seq(
       "-source", "1.8", "-target", "1.8"
     ),
+
     javacOptions in (Compile, doc) := Seq(
       "-source", "1.8",
       "-link", javaDocUrl,
