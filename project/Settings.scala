@@ -20,9 +20,32 @@ object Settings {
   lazy val scalaApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-scala/api/"
   lazy val javaApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-java/api/"
 
-  lazy val publishSettings = Seq(
+  lazy val commonSettings =
+    buildSettings ++
+    publishSettings
+
+  lazy val javaCommonSettings = Seq(
+    crossPaths := false,
+    autoScalaLibrary := false,
+    exportJars := true,
+    javacOptions ++= Seq(
+      "-source", "1.8", "-target", "1.8"
+    ),
+    javacOptions in (Compile, doc) := Seq(
+      "-source", "1.8",
+      "-link", javaDocUrl,
+      "-link", jacksonDocUrl,
+      "-link", metricsDocUrl,
+      "-link", nettyClientDocUrl
+    )
+  )
+
+  lazy val buildSettings = Seq(
     version := driverVersion,
-    organization := "com.faunadb",
+    organization := "com.faunadb"
+  )
+
+  lazy val publishSettings = Seq(
     licenses := Seq("Mozilla Public License" -> url("https://www.mozilla.org/en-US/MPL/2.0/")),
     homepage := Some(url("https://github.com/fauna/faunadb-jvm")),
     publishMavenStyle := true,
@@ -59,45 +82,21 @@ object Settings {
     usePgpKeyHex(sys.env.getOrElse("GPG_SIGNING_KEY", "0")),
     pgpPassphrase := sys.env.get("GPG_PASSPHRASE") map (_.toArray),
     pgpSecretRing := file(sys.env.getOrElse("GPG_PRIVATE_KEY", "")),
-    pgpPublicRing := file(sys.env.getOrElse("GPG_PUBLIC_KEY", "")))
-
-  lazy val rootSettings = Seq(
-    crossPaths := false,
-    autoScalaLibrary := false
+    pgpPublicRing := file(sys.env.getOrElse("GPG_PUBLIC_KEY", ""))
   )
 
   lazy val faunadbCommonSettings = Seq(
-    crossPaths := false,
-    autoScalaLibrary := false,
-    exportJars := true,
-    javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
-    apiURL := Some(url(commonApiUrl)),
-
-    javacOptions in (Compile, doc) := Seq("-source", "1.8",
-      "-link", javaDocUrl,
-      "-link", jacksonDocUrl,
-      "-link", metricsDocUrl,
-      "-link", nettyClientDocUrl
-    )
+    apiURL := Some(url(commonApiUrl))
   )
 
   lazy val faunadbJavaSettings = Seq(
-    crossPaths := false,
-    autoScalaLibrary := false,
-    exportJars := true,
-    javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
-    testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
     apiURL := Some(url(javaApiUrl)),
 
-    javacOptions in (Compile, doc) := Seq("-source", "1.8",
-      "-link", javaDocUrl,
-      "-link", jacksonDocUrl,
-      "-link", metricsDocUrl,
-      "-link", nettyClientDocUrl,
+    javacOptions in (Compile, doc) ++= Seq(
       "-linkoffline", commonApiUrl, "./faunadb-common/target/api"
     ),
 
-    testOptions += Tests.Argument(TestFrameworks.JUnit, "-q")
+    testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v")
   )
 
   lazy val faunadbScalaSettings = Seq(
