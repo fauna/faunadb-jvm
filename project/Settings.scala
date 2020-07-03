@@ -2,6 +2,7 @@ import Dependencies.Versions._
 import com.typesafe.sbt.SbtPgp.autoImport._
 import sbt.Keys._
 import sbt._
+import scoverage.ScoverageSbtPlugin.autoImport._
 
 object Settings {
 
@@ -32,6 +33,8 @@ object Settings {
     autoScalaLibrary := false,
 
     exportJars := true,
+
+    coverageEnabled := false,
 
     javacOptions ++= Seq(
       "-source", "1.8", "-target", "1.8"
