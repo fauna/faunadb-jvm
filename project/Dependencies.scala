@@ -22,34 +22,34 @@ object Dependencies {
     import Versions._
 
     // faunadb-common
-    val nettyHandler        = "io.netty"                         % "netty-handler"            % nettyVersion
-    val nettyCodecHttp      = "io.netty"                         % "netty-codec-http"         % nettyVersion
+    val nettyHandler        = "io.netty"                        %  "netty-handler"            % nettyVersion
+    val nettyCodecHttp      = "io.netty"                        %  "netty-codec-http"         % nettyVersion
 
-    val jacksonCore         = "com.fasterxml.jackson.core"       % "jackson-core"             % jacksonVersion
-    val jacksonDatabind     = "com.fasterxml.jackson.core"       % "jackson-databind"         % jacksonVersion
-    val jacksonDatatype     = "com.fasterxml.jackson.datatype"   % "jackson-datatype-jdk8"    % jacksonVersion
+    val jacksonCore         = "com.fasterxml.jackson.core"      %  "jackson-core"             % jacksonVersion
+    val jacksonDatabind     = "com.fasterxml.jackson.core"      %  "jackson-databind"         % jacksonVersion
+    val jacksonDatatype     = "com.fasterxml.jackson.datatype"  %  "jackson-datatype-jdk8"    % jacksonVersion
 
-    val metrics             = "io.dropwizard.metrics"            % "metrics-core"             % metricsVersion
-    val slf4j               = "org.slf4j"                        % "slf4j-api"                % slf4jVersion
+    val metrics             = "io.dropwizard.metrics"           %  "metrics-core"             % metricsVersion
+    val slf4j               = "org.slf4j"                       %  "slf4j-api"                % slf4jVersion
 
     // faunadb-scala
     val jacksonModuleScala  = "com.fasterxml.jackson.module"    %% "jackson-module-scala"     % jacksonVersion
-    val jacksonAnnotations  = "com.fasterxml.jackson.core"       % "jackson-annotations"      % jacksonVersion
-    val scalaJava8Compat    = "org.scala-lang.modules"           % "scala-java8-compat_2.12"  % scalaJava8CompatVersion
-    val scalaReflect        = "org.scala-lang"                   % "scala-reflect"            % scalaReflectVersion
+    val jacksonAnnotations  = "com.fasterxml.jackson.core"      %  "jackson-annotations"      % jacksonVersion
+    val scalaJava8Compat    = "org.scala-lang.modules"          %  "scala-java8-compat_2.12"  % scalaJava8CompatVersion
+    val scalaReflect        = "org.scala-lang"                  %  "scala-reflect"            % scalaReflectVersion
   }
 
   object Test {
     import Versions._
 
     // shared
-    val logbackClassic      = "ch.qos.logback"   % "logback-classic"   % logbackVersion           % "test"
+    val logbackClassic      = "ch.qos.logback"  %  "logback-classic"   % logbackVersion           % "test"
 
     // faunadb-java
-    val junitInterface      = "com.novocode"     % "junit-interface"   % junitInterfaceVersion    % "test"
-    val harmcrestLibrary    = "org.hamcrest"     % "hamcrest-library"  % harmcrestLibraryVersion  % "test"
-    val junit               = "junit"            % "junit"             % junitVersion             % "test"
-    val snakeYaml           = "org.yaml"         % "snakeyaml"         % snakeYamlVersion         % "test"
+    val junitInterface      = "com.novocode"    %  "junit-interface"   % junitInterfaceVersion    % "test"
+    val harmcrestLibrary    = "org.hamcrest"    %  "hamcrest-library"  % harmcrestLibraryVersion  % "test"
+    val junit               = "junit"           %  "junit"             % junitVersion             % "test"
+    val snakeYaml           = "org.yaml"        %  "snakeyaml"         % snakeYamlVersion         % "test"
 
     // faunadb-scala
     val scalaTest           = "org.scalatest"   %% "scalatest"         % scalaTestVersion         % "test"
