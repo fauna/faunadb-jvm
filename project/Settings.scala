@@ -119,7 +119,8 @@ object Settings {
     crossScalaVersions := supportedScalaVersions,
 
     scalacOptions ++= Seq(
-      "-Xsource:2.12"
+      "-Xsource:2.12",
+      "-Xmax-classfile-name", "240"
     ),
 
     autoAPIMappings := true,
