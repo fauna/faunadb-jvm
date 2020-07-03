@@ -60,6 +60,7 @@ commands:
           command: |
             mkdir -p results/{tests,coverage}
             cp **/target/test-reports/*.xml results/tests/
+            # TODO: save results for 2.11 as well
             cp -r faunadb-scala/target/scala-2.12/*coverage-report/ results/coverage/
 
       - store_test_results:
