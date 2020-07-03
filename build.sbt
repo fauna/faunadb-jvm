@@ -23,4 +23,4 @@ lazy val `faunadb-scala` =
     .dependsOn(`faunadb-common`)
     .settings(Settings.commonSettings: _*)
     .settings(Settings.faunadbScalaSettings)
-    .settings(libraryDependencies ++= Dependencies.faunadbScala)
+    .settings(libraryDependencies ++= Dependencies.faunadbScala(scalaVersion.value))
