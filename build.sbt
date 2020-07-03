@@ -1,5 +1,6 @@
 lazy val `faunadb-jvm` =
   (project in file("."))
+    .settings(Settings.faunadbJvmSettings)
     .aggregate(`faunadb-common`, `faunadb-scala`, `faunadb-java`)
 
 lazy val `faunadb-common` =

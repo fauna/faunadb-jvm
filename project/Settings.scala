@@ -6,10 +6,12 @@ object Settings {
 
   lazy val driverVersion = "3.0.0-SNAPSHOT"
 
+  lazy val scala211 = "2.11.12"
+  lazy val scala212 = "2.12.8"
+  lazy val supportedScalaVersions = Seq(scala211, scala212)
+
   lazy val jacksonDocVersion = "2.10"
   lazy val metricsVersion = "4.1.0"
-  lazy val scalaDefaultVersion = "2.12.8"
-  lazy val scalaVersions = Seq("2.11.12", scalaDefaultVersion)
 
   lazy val javaDocUrl = "http://docs.oracle.com/javase/7/docs/api/"
   lazy val nettyClientDocUrl = "https://netty.io/4.1/api/index.html"
@@ -25,6 +27,7 @@ object Settings {
     publishSettings
 
   lazy val javaCommonSettings = Seq(
+    crossScalaVersions := Seq(scala212),
     crossPaths := false,
     autoScalaLibrary := false,
     exportJars := true,
@@ -41,8 +44,9 @@ object Settings {
   )
 
   lazy val buildSettings = Seq(
+    organization := "com.faunadb",
     version := driverVersion,
-    organization := "com.faunadb"
+    scalaVersion := scala212
   )
 
   lazy val publishSettings = Seq(
@@ -85,6 +89,12 @@ object Settings {
     pgpPublicRing := file(sys.env.getOrElse("GPG_PUBLIC_KEY", ""))
   )
 
+  lazy val faunadbJvmSettings = Seq(
+    // crossScalaVersions must be set to Nil on the aggregating project
+    crossScalaVersions := Nil,
+    publish / skip := true
+  )
+
   lazy val faunadbCommonSettings = Seq(
     apiURL := Some(url(commonApiUrl))
   )
@@ -100,8 +110,7 @@ object Settings {
   )
 
   lazy val faunadbScalaSettings = Seq(
-    scalaVersion := scalaDefaultVersion,
-    crossScalaVersions := scalaVersions,
+    crossScalaVersions := supportedScalaVersions,
 
     scalacOptions ++= Seq(
       "-Xsource:2.12"
