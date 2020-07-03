@@ -1,3 +1,4 @@
+import Dependencies.Versions._
 import com.typesafe.sbt.SbtPgp.autoImport._
 import sbt.Keys._
 import sbt._
@@ -11,7 +12,6 @@ object Settings {
   lazy val supportedScalaVersions = Seq(scala211, scala212)
 
   lazy val jacksonDocVersion = "2.10"
-  lazy val metricsVersion = "4.1.0"
 
   lazy val javaDocUrl = "http://docs.oracle.com/javase/7/docs/api/"
   lazy val nettyClientDocUrl = "https://netty.io/4.1/api/index.html"
