@@ -51,20 +51,30 @@ commands:
           command: sbt ++2.11.12 coverage test coverageReport
 
       - run:
+          name: Collect Test Results 2.11
+          command: |
+            mkdir -p test-results/scala-2.11/{test-reports,coverage-report}
+            cp **/target/test-reports/*.xml test-results/scala-2.11/test-reports
+            cp -r faunadb-scala/target/scala-2.11/*coverage-report/ test-results/scala-2.11/coverage-report
+          when: always
+
+      - store_test_results:
+          path: test-results/scala-2.11
+
+      - run:
           name: Test 2.12
           command: sbt ++2.12.11 coverage test coverageReport
 
       - run:
-          when: always
-          name: Gather results
+          name: Collect Test Results 2.12
           command: |
-            mkdir -p results/{tests,coverage}
-            cp **/target/test-reports/*.xml results/tests/
-            # TODO: save results for 2.11 as well
-            cp -r faunadb-scala/target/scala-2.12/*coverage-report/ results/coverage/
+            mkdir -p test-results/scala-2.12/{test-reports,coverage-report}
+            cp **/target/test-reports/*.xml test-results/scala-2.12/test-reports
+            cp -r faunadb-scala/target/scala-2.12/*coverage-report/ test-results/scala-2.12/test-reports
+          when: always
 
       - store_test_results:
-          path: results/
+          path: test-results/scala-2.12
 
 jobs:
   core-stable:
