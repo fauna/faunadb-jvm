@@ -34,8 +34,12 @@ commands:
           - v1-deps-{{ checksum "build.sbt" }}
 
       - run:
-          name: Compile
-          command: sbt test:compile
+          name: Compile 2.11
+          command: sbt ++2.11.12 test:compile
+
+      - run:
+          name: Compile 2.12
+          command: sbt ++2.12.11 test:compile
 
       - save_cache:
           paths:
@@ -43,13 +47,18 @@ commands:
           key: v1-deps-{{ checksum "build.sbt" }}
 
       - run:
-          name: Run Tests
-          command: sbt coverage test coverageReport
+          name: Test 2.11
+          command: sbt ++2.11.12 coverage test coverageReport
+
+      - run:
+          name: Test 2.12
+          command: sbt ++2.12.11 coverage test coverageReport
 
       - run:
           when: always
           name: Gather results
           command: |
+            # TODO: save results for 2.11 as well (DRV-222).
             mkdir -p results/{tests,coverage}
             cp **/target/test-reports/*.xml results/tests/
             cp -r faunadb-scala/target/scala-2.12/*coverage-report/ results/coverage/

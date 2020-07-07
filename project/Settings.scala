@@ -2,13 +2,14 @@ import Dependencies.Versions._
 import com.typesafe.sbt.SbtPgp.autoImport._
 import sbt.Keys._
 import sbt._
+import scoverage.ScoverageSbtPlugin.autoImport._
 
 object Settings {
 
   lazy val driverVersion = "3.0.0-SNAPSHOT"
 
   lazy val scala211 = "2.11.12"
-  lazy val scala212 = "2.12.8"
+  lazy val scala212 = "2.12.11"
   lazy val supportedScalaVersions = Seq(scala211, scala212)
 
   lazy val jacksonDocVersion = "2.10"
@@ -32,6 +33,8 @@ object Settings {
     autoScalaLibrary := false,
 
     exportJars := true,
+
+    coverageEnabled := false,
 
     javacOptions ++= Seq(
       "-source", "1.8", "-target", "1.8"
@@ -116,7 +119,8 @@ object Settings {
     crossScalaVersions := supportedScalaVersions,
 
     scalacOptions ++= Seq(
-      "-Xsource:2.12"
+      "-Xsource:2.12",
+      "-Xmax-classfile-name", "240"
     ),
 
     autoAPIMappings := true,
