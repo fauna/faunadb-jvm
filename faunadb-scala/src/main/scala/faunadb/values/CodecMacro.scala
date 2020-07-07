@@ -153,9 +153,11 @@ class CodecMacro(val c: blackbox.Context) {
 
   private def getVariantDefs(defTrees: Seq[Tree]) =
     defTrees map {
-      case q"scala.Predef.ArrowAssoc[$_]($t).->[$_]($c)" => (t, c)
-      case q"($t, $c)"                                   => (t, c)
-      case x => c.abort(c.enclosingPosition, s"Invalid variant definition.")
+      case q"scala.Predef.ArrowAssoc[$_]($t).->[$_]($c)"      => (t, c)
+      // match ArrowAssoc in 2.11
+      case q"scala.this.Predef.ArrowAssoc[$_]($t).->[$_]($c)" => (t, c)
+      case q"($t, $c)"                                        => (t, c)
+      case _ => c.abort(c.enclosingPosition, "Invalid variant definition.")
     } map {
       case (tag, codec) =>
         val ctype = typed(codec).baseType(typed(tq"$M.Codec").typeSymbol)
