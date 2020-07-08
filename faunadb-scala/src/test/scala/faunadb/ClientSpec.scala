@@ -126,6 +126,20 @@ class ClientSpec
     client.query("qux").futureValue should equal (StringV("qux"))
   }
 
+  it should "echo a query value" in {
+    // Run
+    val result = client.query(
+      QueryV(ObjectV("lambda" -> "_", "expr" -> true))
+    ).futureValue
+
+    // Verify
+    result shouldBe a[QueryV]
+    val query = result.asInstanceOf[QueryV]
+    query.lambda("lambda").to[String].get shouldBe "_"
+    query.lambda("expr").to[Boolean].get shouldBe true
+    query.lambda("api_version").toOpt shouldBe defined
+  }
+
   it should "fail with timeout error" in {
     val timeout = Duration.Zero
     val thrown = client.query("echo", timeout).failed.futureValue
