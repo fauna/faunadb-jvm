@@ -165,7 +165,6 @@ object RefV {
 }
 
 object Native {
-  val AccessProviders: RefV = RefV("access_providers", None, None)
   val Collections: RefV = RefV("collections", None, None)
   val Indexes: RefV = RefV("indexes", None, None)
   val Databases: RefV = RefV("databases", None, None)
@@ -174,7 +173,6 @@ object Native {
   val Roles: RefV = RefV("roles", None, None)
 
   def fromName(id: String) = id match {
-    case "access_providers" => AccessProviders
     case "collections"      => Collections
     case "indexes"          => Indexes
     case "databases"        => Databases
