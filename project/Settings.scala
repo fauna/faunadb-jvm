@@ -91,14 +91,15 @@ object Settings {
     )
   )
 
-  lazy val rootSettings =
+  lazy val commonSettings =
     buildSettings ++
-    publishSettings ++
-    Seq(
-      // crossScalaVersions must be set to Nil on the aggregating project
-      crossScalaVersions := Nil,
-      publish / skip := true
-    )
+    publishSettings
+
+  lazy val rootSettings = Seq(
+    // crossScalaVersions must be set to Nil on the aggregating project
+    crossScalaVersions := Nil,
+    publish / skip := true
+  )
 
   lazy val faunadbCommonSettings = Seq(
     apiURL := Some(url(commonApiUrl))
