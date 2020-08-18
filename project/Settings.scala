@@ -23,32 +23,6 @@ object Settings {
   lazy val scalaApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-scala/api/"
   lazy val javaApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-java/api/"
 
-  lazy val commonSettings =
-    buildSettings ++
-    publishSettings
-
-  lazy val javaCommonSettings = Seq(
-    crossScalaVersions := Seq(scala212),
-    crossPaths := false,
-    autoScalaLibrary := false,
-
-    exportJars := true,
-
-    coverageEnabled := false,
-
-    javacOptions ++= Seq(
-      "-source", "1.8", "-target", "1.8"
-    ),
-
-    javacOptions in (Compile, doc) := Seq(
-      "-source", "1.8",
-      "-link", javaDocUrl,
-      "-link", jacksonDocUrl,
-      "-link", metricsDocUrl,
-      "-link", nettyClientDocUrl
-    )
-  )
-
   lazy val buildSettings = Seq(
     organization := "com.faunadb",
     version := driverVersion,
@@ -95,11 +69,36 @@ object Settings {
     pgpPublicRing := file(sys.env.getOrElse("GPG_PUBLIC_KEY", ""))
   )
 
-  lazy val faunadbJvmSettings = Seq(
-    // crossScalaVersions must be set to Nil on the aggregating project
-    crossScalaVersions := Nil,
-    publish / skip := true
+  lazy val javaCommonSettings = Seq(
+    crossScalaVersions := Seq(scala212),
+    crossPaths := false,
+    autoScalaLibrary := false,
+
+    exportJars := true,
+
+    coverageEnabled := false,
+
+    javacOptions ++= Seq(
+      "-source", "1.8", "-target", "1.8"
+    ),
+
+    javacOptions in (Compile, doc) := Seq(
+      "-source", "1.8",
+      "-link", javaDocUrl,
+      "-link", jacksonDocUrl,
+      "-link", metricsDocUrl,
+      "-link", nettyClientDocUrl
+    )
   )
+
+  lazy val rootSettings =
+    buildSettings ++
+    publishSettings ++
+    Seq(
+      // crossScalaVersions must be set to Nil on the aggregating project
+      crossScalaVersions := Nil,
+      publish / skip := true
+    )
 
   lazy val faunadbCommonSettings = Seq(
     apiURL := Some(url(commonApiUrl))
