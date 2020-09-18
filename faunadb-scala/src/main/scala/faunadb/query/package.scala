@@ -750,7 +750,7 @@ package object query {
   /**
    * A FindStr expression
    *
-   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+   *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def FindStr(value: Expr, find: Expr): Expr =
     Expr(ObjectV("findstr" -> value.value, "find" -> find.value))
@@ -761,7 +761,7 @@ package object query {
   /**
     * A FindStrRegex expression
     *
-    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+    *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def FindStrRegex(value: Expr, pattern: Expr, start: Expr): Expr =
     Expr(ObjectV("findstrregex" -> value.value, "pattern" -> pattern.value, "start" -> start.value))
@@ -769,7 +769,7 @@ package object query {
   /**
     * A FindStrRegex expression
     *
-    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+    *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def FindStrRegex(value: Expr, pattern: Expr, start: Expr, num_results: Expr): Expr =
     Expr(ObjectV("findstrregex" -> value.value, "pattern" -> pattern.value, "start" -> start.value, "num_results" -> num_results.value))
@@ -777,7 +777,7 @@ package object query {
   /**
    * A Length expression
    *
-   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+   *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def Length(value: Expr): Expr =
     Expr(ObjectV("length" -> value.value ))
@@ -785,7 +785,7 @@ package object query {
   /**
    * A LowerCase expression
    *
-   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+   *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def LowerCase(value: Expr): Expr =
     Expr(ObjectV("lowercase" -> value.value))
@@ -793,7 +793,7 @@ package object query {
   /**
    * A LTrim expression
    *
-   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+   *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def LTrim(value: Expr): Expr =
     Expr(ObjectV("ltrim" -> value.value ))
@@ -823,7 +823,7 @@ package object query {
   /**
    * A Repeat expression
    *
-   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+   *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def Repeat(value: Expr): Expr =
     Expr(ObjectV("repeat" -> value.value ))
@@ -831,7 +831,7 @@ package object query {
   /**
     * A Repeat expression
     *
-    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+    *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def Repeat(value: Expr, number: Expr): Expr =
     Expr(ObjectV("repeat" -> value.value, "number" -> number.value))
@@ -839,7 +839,7 @@ package object query {
   /**
    * A ReplaceStr expression
    *
-   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+   *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def ReplaceStr(value: Expr, find: Expr, replace: Expr): Expr =
     Expr(ObjectV("replacestr" -> value.value, "find" -> find.value, "replace" -> replace.value))
@@ -847,7 +847,7 @@ package object query {
   /**
     * A ReplaceStrRegex expression
     *
-    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+    *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def ReplaceStrRegex(value: Expr, pattern: Expr, replace: Expr): Expr =
     Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> pattern.value, "replace" -> replace.value))
@@ -855,7 +855,7 @@ package object query {
   /**
     * A ReplaceStrRegex expression
     *
-    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+    *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def ReplaceStrRegex(value: Expr, pattern: Expr, replace: Expr, first: Expr): Expr =
     Expr(ObjectV("replacestrregex" -> value.value, "pattern" -> pattern.value, "replace" -> replace.value, "first" -> first.value))
@@ -863,7 +863,7 @@ package object query {
   /**
    * A RTrim expression
    *
-   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+   *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def RTrim(value: Expr): Expr =
     Expr(ObjectV("rtrim" -> value.value))
@@ -871,7 +871,7 @@ package object query {
   /**
    * A Space expression
    *
-   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+   *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def Space(value: Expr): Expr =
     Expr(ObjectV("space" -> value.value ))
@@ -887,7 +887,7 @@ package object query {
   /**
     * A SubString expression
     *
-    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+    *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def SubString(value: Expr): Expr =
     Expr(ObjectV("substring" -> value.value))
@@ -895,7 +895,7 @@ package object query {
   /**
    * A SubString expression
    *
-   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+   *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def SubString(value: Expr, start: Expr): Expr =
     Expr(ObjectV("substring" -> value.value, "start" -> start.value))
@@ -903,7 +903,7 @@ package object query {
   /**
    * A SubString expression
    *
-   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+   *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def SubString(value: Expr, start: Expr, length: Expr): Expr =
     Expr(ObjectV("substring" -> value.value, "start" -> start.value, "length" -> length.value))
@@ -911,7 +911,7 @@ package object query {
   /**
     * A TitleCase expression
     *
-    *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+    *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
     */
   def TitleCase(value: Expr): Expr =
     Expr(ObjectV("titlecase" -> value.value ))
@@ -919,7 +919,7 @@ package object query {
   /**
    * A Trim expression
    *
-   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+   *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def Trim(term: Expr): Expr =
     Expr(ObjectV("trim" -> term.value ))
@@ -927,7 +927,7 @@ package object query {
   /**
    * A UpperCase expression
    *
-   *''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
+   *'''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#string-functions]]
    */
   def UpperCase(term: Expr): Expr =
     Expr(ObjectV("uppercase" -> term.value ))
