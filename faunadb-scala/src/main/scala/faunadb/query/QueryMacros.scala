@@ -14,7 +14,7 @@ class QueryMacros(val c: whitebox.Context) {
     val (bindings, expr) = c.untypecheck(block.duplicate) match {
       case Block(stmts, expr) =>
         stmts foreach {
-          case ValDef(_, _, _, _) => ()
+          case _: ValDef => ()
           case _ => c.abort(c.enclosingPosition, "Let call does not have the structure: Let { val a = ???, ..., val n = ???, <in_expr> }")
         }
 
