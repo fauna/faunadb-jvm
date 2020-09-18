@@ -1,5 +1,5 @@
 import Dependencies.Versions._
-import com.typesafe.sbt.SbtPgp.autoImport._
+import com.jsuereth.sbtpgp.SbtPgp.autoImport._
 import sbt.Keys._
 import sbt._
 import scoverage.ScoverageSbtPlugin.autoImport._
@@ -66,7 +66,8 @@ object Settings {
     usePgpKeyHex(sys.env.getOrElse("GPG_SIGNING_KEY", "0")),
     pgpPassphrase := sys.env.get("GPG_PASSPHRASE") map (_.toArray),
     pgpSecretRing := file(sys.env.getOrElse("GPG_PRIVATE_KEY", "")),
-    pgpPublicRing := file(sys.env.getOrElse("GPG_PUBLIC_KEY", ""))
+    pgpPublicRing := file(sys.env.getOrElse("GPG_PUBLIC_KEY", "")),
+    useGpg := false // still relies on BouncyCastle (https://github.com/sbt/sbt-pgp#usage)
   )
 
   lazy val javaCommonSettings = Seq(
