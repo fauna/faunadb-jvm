@@ -28,7 +28,7 @@ case class UnavailableException(response: Option[QueryErrorResponse], message: S
 /**
  * An exception thrown if FaunaDB cannot evaluate a query.
  */
-class BadRequestException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
+case class BadRequestException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
   def this(message: String) = this(None, message)
   def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
 }
@@ -37,7 +37,7 @@ class BadRequestException(response: Option[QueryErrorResponse], message: String)
  * An exception thrown if FaunaDB responds with an HTTP 404 for non-query endpoints.
  * @param message
  */
-class NotFoundException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
+case class NotFoundException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
   def this(message: String) = this(None, message)
   def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
 }
@@ -46,7 +46,7 @@ class NotFoundException(response: Option[QueryErrorResponse], message: String) e
  * An exception thrown if FaunaDB responds with an HTTP 500. Such errors represent an internal
  * failure within the database.
  */
-class InternalException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
+case class InternalException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
   def this(message: String) = this(None, message)
   def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
 }
@@ -54,7 +54,7 @@ class InternalException(response: Option[QueryErrorResponse], message: String) e
 /**
  * An exception thrown if FaunaDB responds with an HTTP 401.
  */
-class UnauthorizedException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
+case class UnauthorizedException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
   def this(message: String) = this(None, message)
   def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
 }
@@ -62,12 +62,12 @@ class UnauthorizedException(response: Option[QueryErrorResponse], message: Strin
 /**
   * An exception thrown if FaunaDB responds with an HTTP 403.
   */
-class PermissionDeniedException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
+case class PermissionDeniedException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
   def this(message: String) = this(None, message)
   def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
 }
 
-class UnknownException(response: Option[QueryErrorResponse], message: String, cause: Throwable) extends FaunaException(response, message, cause) {
+case class UnknownException(response: Option[QueryErrorResponse], message: String, cause: Throwable) extends FaunaException(response, message, cause) {
   def this(message: String, cause: Throwable) = this(None, message, cause)
   def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response), null)
 }
