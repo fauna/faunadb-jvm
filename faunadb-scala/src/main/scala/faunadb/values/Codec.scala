@@ -416,7 +416,7 @@ object Encoder {
   trait ArrayEncoder[T] extends Encoder[Array[T]]
 
   implicit def ArrayEncoder[T: Encoder](implicit ev: ClassTag[T]) = new ArrayEncoder[T] {
-    def encode(t: Array[T]): Value = if (t != null) ArrayV(t map { Value(_) } toVector) else NullV
+    def encode(t: Array[T]): Value = if (t != null) ArrayV(t.iterator.map(Value(_)).toVector) else NullV
   }
 
   implicit object ByteArrayEncoder extends ArrayEncoder[Byte] {
@@ -424,7 +424,7 @@ object Encoder {
   }
 
   implicit def CollectionEncoder[T: Decoder, Col[E] <: Traversable[E]](implicit ev: Encoder[T]): Encoder[Col[T]] = new Encoder[Col[T]] {
-    def encode(col: Col[T]) = if (col != null) ArrayV(col map { Value(_) } toVector) else NullV
+    def encode(col: Col[T]) = if (col != null) ArrayV(col.toIterator.map(Value(_)).toVector) else NullV
   }
 
   implicit def MapEncoder[T: Encoder](implicit encoder: Encoder[T]) = new Encoder[Map[String, T]] {

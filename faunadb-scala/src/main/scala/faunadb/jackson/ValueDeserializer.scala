@@ -15,8 +15,8 @@ private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
       case VALUE_STRING       => StringV(in.getText)
       case VALUE_NUMBER_FLOAT => DoubleV(in.getValueAsDouble(0))
       case VALUE_NUMBER_INT   => LongV(in.getValueAsLong)
-      case VALUE_TRUE         => BooleanV(true)
-      case VALUE_FALSE        => BooleanV(false)
+      case VALUE_TRUE         => TrueV
+      case VALUE_FALSE        => FalseV
       case VALUE_NULL         => NullV
       case t                  => throw new JsonMappingException(in, s"Unexpected token $t")
     }

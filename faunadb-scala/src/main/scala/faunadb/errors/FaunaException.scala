@@ -4,7 +4,7 @@ import faunadb.{QueryError, QueryErrorResponse}
 
 object FaunaException {
   private[errors] def respToError(response: QueryErrorResponse) = {
-    response.errors.map(r => r.code + ": " + r.description).mkString(", ")
+    response.errors.iterator.map(r => r.code + ": " + r.description).mkString(", ")
   }
 }
 

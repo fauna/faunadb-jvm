@@ -14,7 +14,7 @@ class QueryMacros(val c: whitebox.Context) {
     val (bindings, expr) = c.untypecheck(block.duplicate) match {
       case Block(stmts, expr) =>
         stmts foreach {
-          case v @ ValDef(_, _, _, _) => ()
+          case _: ValDef => ()
           case _ => c.abort(c.enclosingPosition, "Let call does not have the structure: Let { val a = ???, ..., val n = ???, <in_expr> }")
         }
 
@@ -23,7 +23,7 @@ class QueryMacros(val c: whitebox.Context) {
     }
 
     val types = block match {
-      case Block(stmts, _) => stmts.asInstanceOf[List[ValDef]] map { v => v.name.toString -> v.tpt.tpe } toMap
+      case Block(stmts, _) => stmts.asInstanceOf[List[ValDef]].iterator.map { v => v.name.toString -> v.tpt.tpe }.toMap
       case _ => scala.collection.immutable.Map.empty[String, Type]
     }
 
@@ -50,9 +50,9 @@ class QueryMacros(val c: whitebox.Context) {
       case _ => c.abort(c.enclosingPosition, "type mismatch: Argument must be a function literal.")
     }
 
-    val used = vals filter { v =>
+    val used = vals.iterator.filter { v =>
       expr exists { case Ident(name) => v.name == name; case _ => false }
-    } toSet
+    }.toSet
 
     val varDefs = used map { v => q"val ${v.name} = $M.Var(${v.name.toString})" }
     val paramsV = vals map { v => if (used contains v) v.name.toString else "_" } match {
