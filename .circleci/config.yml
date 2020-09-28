@@ -35,11 +35,11 @@ commands:
 
       - run:
           name: Compile 2.11
-          command: sbt ++2.11.12 test:compile
+          command: sbt ++2.11.12 compileAll
 
       - run:
           name: Compile 2.12
-          command: sbt ++2.12.12 test:compile
+          command: sbt ++2.12.12 compileAll
 
       - save_cache:
           paths:
@@ -53,6 +53,14 @@ commands:
       - run:
           name: Test 2.12
           command: sbt ++2.12.12 coverage test coverageReport
+
+      - run:
+          name: Load Test 2.11
+          command: sbt ++2.11.12 load:test
+
+      - run:
+          name: Load Test 2.12
+          command: sbt ++2.12.12 load:test
 
       - run:
           when: always
