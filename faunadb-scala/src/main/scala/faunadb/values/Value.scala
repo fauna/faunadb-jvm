@@ -220,10 +220,10 @@ case class BytesV(@(JsonIgnore @param @field @getter) bytes: Array[Byte]) extend
 
   override def hashCode(): Int = bytes.hashCode()
 
-  override def toString = bytes map { s => f"0x$s%02x" } mkString ("[", " ", "]")
+  override def toString = bytes.iterator.map(s => f"0x$s%02x").mkString("[", " ", "]")
 }
 object BytesV {
-  def apply(bytes: Int*): BytesV = BytesV(bytes map { _.toByte } toArray)
+  def apply(bytes: Int*): BytesV = BytesV(bytes.iterator.map(_.toByte).toArray)
   def apply(value: String): BytesV = BytesV(Base64.getUrlDecoder.decode(value))
 }
 
@@ -237,7 +237,7 @@ case class QueryV(@JsonProperty("@query") lambda: ObjectV) extends Value {
 /** An Object value. */
 case class ObjectV(@(JsonValue @getter) fields: Map[String, Value]) extends Value {
   @JsonIgnore val vtype: String = "Object"
-  override def toString = fields map { case (k,v) => s"$k: $v" }  mkString ("{", ", ", "}")
+  override def toString = fields.iterator.map { case (k,v) => s"$k: $v" }.mkString ("{", ", ", "}")
 }
 object ObjectV {
   val empty = ObjectV()
