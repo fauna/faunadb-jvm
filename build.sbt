@@ -6,6 +6,7 @@ lazy val `faunadb-jvm` =
 
 lazy val `faunadb-common` =
   project
+    .configs(Configs.commonConfigs: _*)
     .settings(Settings.commonSettings: _*)
     .settings(Settings.javaCommonSettings: _*)
     .settings(Settings.faunadbCommonSettings)
@@ -14,6 +15,7 @@ lazy val `faunadb-common` =
 lazy val `faunadb-java` =
   project
     .dependsOn(`faunadb-common`)
+    .configs(Configs.commonConfigs: _*)
     .settings(Settings.commonSettings: _*)
     .settings(Settings.javaCommonSettings: _*)
     .settings(Settings.faunadbJavaSettings)
@@ -22,6 +24,7 @@ lazy val `faunadb-java` =
 lazy val `faunadb-scala` =
   project
     .dependsOn(`faunadb-common`)
+    .configs(Configs.commonConfigs: _*)
     .settings(Settings.commonSettings: _*)
     .settings(Settings.faunadbScalaSettings)
     .settings(libraryDependencies ++= Dependencies.faunadbScala(scalaVersion.value))
