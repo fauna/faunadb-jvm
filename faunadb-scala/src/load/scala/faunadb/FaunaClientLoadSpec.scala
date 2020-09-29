@@ -12,9 +12,11 @@ class FaunaClientLoadSpec extends fixture.AsyncWordSpec with Matchers with Fauna
       // Fixtures
       val collectionName = RandomGenerator.aRandomString
 
+      // Note: below values result in a series of
+      // documents that add up 10 MB in size as a whole
+      val documentsNumber = 10
       val documentFieldsNumber = 1000
       val documentValuesSize = 1000
-      val documentsNumber = 10
 
       val largeDocument: Expr = {
         val fields: Seq[(String, Expr)] =
@@ -67,7 +69,11 @@ class FaunaClientLoadSpec extends fixture.AsyncWordSpec with Matchers with Fauna
         } yield result
 
       // Verify
-      result.map(_ => succeed) // If result is returned with no errors, succeed
+      result.map { _ =>
+        // TODO: once DRV-250 is done, verify the
+        // X-Query-Bytes-Out HTTP Header is greater than 10 MB
+        succeed // If result is returned with no errors, succeed
+      }
     }
   }
 
