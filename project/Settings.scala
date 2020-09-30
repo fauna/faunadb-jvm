@@ -94,7 +94,9 @@ object Settings {
 
   lazy val commonSettings =
     buildSettings ++
-    publishSettings
+    publishSettings ++
+    Tasks.settings ++
+    Testing.settings
 
   lazy val rootSettings = Seq(
     // crossScalaVersions must be set to Nil on the aggregating project
