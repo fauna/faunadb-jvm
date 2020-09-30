@@ -1,3 +1,11 @@
+3.0.1
+* Upgrade to Scala 2.12.12
+* Upgrade to sbt 1.3.13
+* Remove HTTP Response content size limit
+* Define FaunaExceptions as case classes
+* Remove unused .travis.yml file
+* Remove unused AndroidManifest.xml file
+
 3.0.0
 * Add Reverse() function
 * Refactor Contains() into family of functions
