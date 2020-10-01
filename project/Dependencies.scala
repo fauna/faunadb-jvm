@@ -15,7 +15,7 @@ object Dependencies {
     val snakeYamlVersion             = "1.24"
     val junitInterfaceVersion        = "0.11"
     val harmcrestLibraryVersion      = "2.1"
-    val junitVersion                 = "4.12"
+    val junitVersion                 = "4.13"
   }
 
   // Libraries
