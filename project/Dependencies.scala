@@ -9,7 +9,7 @@ object Dependencies {
     val slf4jVersion                 = "1.7.30"
     val logbackVersion               = "1.2.3"
     val scalaTestVersion             = "3.0.7"
-    val scalaJava8CompatVersion      = "0.9.0"
+    val scalaJava8CompatVersion      = "0.9.1"
     val scalaReflectScala211Version  = "2.11.12"
     val scalaReflectScala212Version  = "2.12.12"
     val snakeYamlVersion             = "1.27"
