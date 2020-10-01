@@ -4,7 +4,7 @@ object Dependencies {
 
   object Versions {
     val nettyVersion                 = "4.1.52.Final"
-    val jacksonVersion               = "2.10.1"
+    val jacksonVersion               = "2.11.2"
     val metricsVersion               = "4.1.0"
     val slf4jVersion                 = "1.7.26"
     val logbackVersion               = "1.2.3"
