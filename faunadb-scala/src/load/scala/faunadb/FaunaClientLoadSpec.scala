@@ -2,10 +2,11 @@ package faunadb
 
 import faunadb.query._
 import faunadb.values._
-import org.scalatest.{Matchers, fixture}
+import org.scalatest.wordspec.FixtureAsyncWordSpec
+import org.scalatest.matchers.should.Matchers
 import scala.concurrent.Future
 
-class FaunaClientLoadSpec extends fixture.AsyncWordSpec with Matchers with FaunaClientFixture {
+class FaunaClientLoadSpec extends FixtureAsyncWordSpec with Matchers with FaunaClientFixture {
 
   "When submitting query whose response is about 10 MB of size, it" should {
     "receive the response with no errors" in { client =>

@@ -8,7 +8,7 @@ object Dependencies {
     val metricsVersion               = "4.1.12.1"
     val slf4jVersion                 = "1.7.30"
     val logbackVersion               = "1.2.3"
-    val scalaTestVersion             = "3.0.7"
+    val scalaTestVersion             = "3.2.2"
     val scalaJava8CompatVersion      = "0.9.1"
     val scalaReflectScala211Version  = "2.11.12"
     val scalaReflectScala212Version  = "2.12.12"

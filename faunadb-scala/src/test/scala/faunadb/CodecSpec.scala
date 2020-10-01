@@ -2,9 +2,10 @@ package faunadb
 
 import faunadb.values._
 import java.time.{ LocalDate, Instant }
-import org.scalatest.{ FlatSpec, Matchers }
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class CodecSpec extends FlatSpec with Matchers {
+class CodecSpec extends AnyFlatSpec with Matchers {
 
   // Decoding
 
