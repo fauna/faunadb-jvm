@@ -5,7 +5,7 @@ object Dependencies {
   object Versions {
     val nettyVersion                 = "4.1.52.Final"
     val jacksonVersion               = "2.11.2"
-    val metricsVersion               = "4.1.0"
+    val metricsVersion               = "4.1.12.1"
     val slf4jVersion                 = "1.7.26"
     val logbackVersion               = "1.2.3"
     val scalaTestVersion             = "3.0.7"
