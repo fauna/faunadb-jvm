@@ -680,15 +680,6 @@ class ClientSpec
     val concat2R = client.query(Concat(Arr("Magic", "Missile"), " ")).futureValue
     concat2R.to[String].get shouldBe "Magic Missile"
 
-    // Contains
-    val containsR = client.query(Contains("favorites" / "foods", Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings"))))).futureValue
-    containsR.to[Boolean].get shouldBe true
-
-    client.query(Contains("field", Obj("field" -> "value"))).futureValue shouldBe TrueV
-    client.query(Contains(1, Arr("value0", "value1", "value2"))).futureValue shouldBe TrueV
-
-    client.query(Contains("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value")))))).futureValue shouldBe TrueV
-
     // ContainsField
     client.query(ContainsField("foo", Obj("foo" -> "bar"))).futureValue shouldBe TrueV
     client.query(ContainsField("foo", Obj())).futureValue shouldBe FalseV
@@ -906,9 +897,17 @@ class ClientSpec
       val hasIdentity = client.sessionWith(secret)(_.query(HasIdentity())).futureValue
       hasIdentity.to[Boolean].get shouldBe true
 
+     // HasIdentity
+     val hasCurrentIdentity = client.sessionWith(secret)(_.query(HasCurrentIdentity())).futureValue
+     hasCurrentIdentity.to[Boolean].get shouldBe true
+
       // Identity
       val identity = client.sessionWith(secret)(_.query(Identity())).futureValue
       identity.to[RefV].get shouldBe createR(RefField).get
+
+      // CurrentIdentity
+      val currentIdentity = client.sessionWith(secret)(_.query(CurrentIdentity())).futureValue
+      currentIdentity.to[RefV].get shouldBe createR(RefField).get
 
       // Logout
       val loggedOut = client.sessionWith(secret)(_.query(Logout(false))).futureValue

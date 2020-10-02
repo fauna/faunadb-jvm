@@ -685,16 +685,50 @@ package object query {
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#authentication]]
     */
+  @deprecated("use CurrentIdentity instead", "4.0.0")
   def Identity(): Expr =
     Expr(ObjectV("identity" -> NullV))
+
+  /**
+    * A CurrentIdentity expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#authentication]]
+    */
+  def CurrentIdentity(): Expr =
+    Expr(ObjectV("current_identity" -> NullV))
 
   /**
     * An HasIdentity expression.
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#authentication]]
     */
+  @deprecated("use HasCurrentIdentity instead", "4.0.0")
   def HasIdentity(): Expr =
     Expr(ObjectV("has_identity" -> NullV))
+
+  /**
+    * An HasCurrentIdentity expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#authentication]]
+    */
+  def HasCurrentIdentity(): Expr =
+    Expr(ObjectV("has_current_identity" -> NullV))
+
+  /**
+    * A CurrentToken expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#authentication]]
+    */
+  def CurrentToken(): Expr =
+    Expr(ObjectV("current_token" -> NullV))
+
+  /**
+    * An HasCurrentToken expression.
+    *
+    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#authentication]]
+    */
+  def HasCurrentToken(): Expr =
+    Expr(ObjectV("has_current_token" -> NullV))
 
   // String Functions
 
