@@ -793,6 +793,11 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeCurrentToken() throws Exception {
+    assertJson(CurrentToken(), "{\"current_token\":null}");
+  }
+
+  @Test
   public void shouldSerializeConcat() throws Exception {
     assertJson(
       Concat(

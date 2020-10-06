@@ -2202,6 +2202,19 @@ public final class Language {
   }
 
   /**
+   * Returns current token used for the request.
+   *
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/currenttoken">FaunaDB Authentication Functions</a>
+   * @see #Identity()
+   * @see #Identify(Expr, Expr)
+   * @see #Login(Expr, Expr)
+   */
+  public static Expr CurrentToken() {
+    return Fn.apply("current_token", Null());
+  }
+
+  /**
    * Concatenates a list of strings into a single string value.
    *
    * @param terms a list of strings. Type: Array of strings
