@@ -919,6 +919,26 @@ class ClientSpec
       identifyR.to[Boolean].get shouldBe true
       }
 
+  it should "test CurrentToken with internal token" in {
+    val createR = client.query(Create(Collection("spells"), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
+
+    // Login
+    val loginR = client.query(Login(createR(RefField), Obj("password" -> "abcdefg"))).futureValue
+    val secret = loginR(SecretField).get
+    val tokenRef = loginR(RefField).get
+
+    // CurrentToken
+    val currentToken = client.sessionWith(secret)(_.query(CurrentToken())).futureValue
+    currentToken.to[RefV].get shouldBe tokenRef
+  }
+
+  it should "test CurrentToken with internal key" in {
+    val clientKey = adminClient.query(CreateKey(Obj("role" -> "client"))).futureValue
+    val clientKeyClient = FaunaClient(secret = clientKey(SecretField).get, endpoint = config("root_url"))
+    val currentToken = clientKeyClient.query(CurrentToken()).futureValue
+    currentToken.to[RefV].get shouldBe clientKey(RefField).get
+  }
+
   it should "create session client" in {
     val otherClient = client.sessionClient(config("root_token"))
 

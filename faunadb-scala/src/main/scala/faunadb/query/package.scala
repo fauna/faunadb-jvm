@@ -696,6 +696,14 @@ package object query {
   def HasIdentity(): Expr =
     Expr(ObjectV("has_identity" -> NullV))
 
+  /**
+    * A CurrentToken expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/currenttoken]]
+    */
+  def CurrentToken(): Expr =
+    Expr(ObjectV("current_token" -> NullV))
+
   // String Functions
 
   /**
