@@ -2087,6 +2087,30 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldTestCurrentIdentity() throws Exception {
+    Value createdInstance = serverClient.query(
+            Create(onARandomCollection(),
+                    Obj("credentials",
+                            Obj("password", Value("sekret"))))
+    ).get();
+
+    Value auth = serverClient.query(
+            Login(
+                    createdInstance.get(REF_FIELD),
+                    Obj("password", Value("sekret")))
+    ).get();
+
+    String secret = auth.get(SECRET_FIELD);
+
+    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
+      assertThat(
+              sessionClient.query(CurrentIdentity()).get(),
+              equalTo(createdInstance.get(REF_FIELD))
+      );
+    }
+  }
+
+  @Test
   public void shouldGetKeyFromSecret() throws Exception {
     Value key = rootClient.query(
             CreateKey(Obj("database", DB_REF, "role", Value("server")))

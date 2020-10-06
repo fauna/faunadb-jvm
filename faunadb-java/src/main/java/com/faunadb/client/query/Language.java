@@ -2180,12 +2180,26 @@ public final class Language {
   /**
    * Returns the reference associated with the authentication token used for the current request.
    *
+   * @deprecated Use CurrentIdentity() instead.
+   *
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#authentication">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/identity">FaunaDB Authentication Functions</a>
    * @see #Login(Expr, Expr)
    */
+  @Deprecated
   public static Expr Identity() {
     return Fn.apply("identity", Null());
+  }
+
+  /**
+   * Returns the reference associated with the authentication token used for the current request.
+   *
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/currentidentity">FaunaDB Authentication Functions</a>
+   * @see #Login(Expr, Expr)
+   */
+  public static Expr CurrentIdentity() {
+    return Fn.apply("current_identity", Null());
   }
 
   /**
