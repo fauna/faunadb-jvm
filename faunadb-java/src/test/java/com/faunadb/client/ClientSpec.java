@@ -2063,6 +2063,37 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldTestHasCurrentToken() throws Exception {
+    Value createdInstance = serverClient.query(
+            Create(onARandomCollection(),
+                    Obj("credentials",
+                            Obj("password", Value("sekret"))))
+    ).get();
+
+    Value auth = serverClient.query(
+            Login(
+                    createdInstance.get(REF_FIELD),
+                    Obj("password", Value("sekret")))
+    ).get();
+
+    String secret = auth.get(SECRET_FIELD);
+
+    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
+      assertThat(
+              sessionClient.query(HasCurrentToken()).get().to(BOOLEAN).get(),
+              equalTo(true)
+      );
+    }
+
+    try (FaunaClient sessionClient = serverClient) {
+      assertThat(
+              sessionClient.query(HasCurrentToken()).get().to(BOOLEAN).get(),
+              equalTo(false)
+      );
+    }
+  }
+
+  @Test
   public void shouldTestIdentity() throws Exception {
     Value createdInstance = serverClient.query(
             Create(onARandomCollection(),

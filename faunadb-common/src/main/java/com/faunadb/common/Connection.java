@@ -40,7 +40,7 @@ import static java.lang.String.format;
  */
 public final class Connection implements AutoCloseable {
 
-  private static final String API_VERSION = "3";
+  private static final String API_VERSION = "4";
   private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
   private static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
   private static final URL FAUNA_ROOT;
