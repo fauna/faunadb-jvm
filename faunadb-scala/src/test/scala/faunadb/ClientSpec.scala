@@ -919,6 +919,22 @@ class ClientSpec
       identifyR.to[Boolean].get shouldBe true
       }
 
+  it should "test HasCurrentToken" in {
+    val createR = client.query(Create(Collection("spells"), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
+
+    // Login
+    val loginR = client.query(Login(createR(RefField), Obj("password" -> "abcdefg"))).futureValue
+    val secret = loginR(SecretField).get
+
+    // HasCurrentToken Ok.
+    val hasCurrentToken = client.sessionWith(secret)(_.query(HasCurrentToken())).futureValue
+    hasCurrentToken.to[Boolean].get shouldBe true
+
+    // HasCurrentToken fail.
+    val hasNotCurrentToken = client.query(HasCurrentToken()).futureValue
+    hasNotCurrentToken.to[Boolean].get shouldBe false
+  }
+
   it should "create session client" in {
     val otherClient = client.sessionClient(config("root_token"))
 
