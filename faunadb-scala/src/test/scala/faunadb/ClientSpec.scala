@@ -917,7 +917,131 @@ class ClientSpec
       // Identify
       val identifyR = client.query(Identify(createR(RefField), "abcdefg")).futureValue
       identifyR.to[Boolean].get shouldBe true
-      }
+   }
+
+  it should "create_access_provider successful creation" in {
+    val roleName = "my_role" + aRandomString
+    val providerName = "my_provider" + aRandomString
+    val issuerName = "my_issuer" + aRandomString
+    val fullUri = s"https://${aRandomString}.auth0.com"
+
+    val roleV = adminClient.query(CreateRole(Obj(
+      "name" -> roleName,
+      "privileges" -> Obj(
+        "resource" -> Databases(),
+        "actions" -> Obj("read" -> true)
+      )
+    ))).futureValue
+
+    val providerV = adminClient.query(CreateAccessProvider(Obj(
+      "name" -> providerName,
+      "issuer" -> issuerName,
+      "jwks_uri" -> fullUri,
+      "membership" -> ArrayV(roleV(RefField))))
+    ).futureValue
+
+    providerV("membership").to[Seq[RefV]].get.size shouldBe 1
+  }
+
+  it should "create_access_provider fails with non-unique issuer" in {
+    val roleName = "my_role" + aRandomString
+    val providerName = "my_provider" + aRandomString
+    val issuerName = "my_issuer" + aRandomString
+    val fullUri = s"https://${aRandomString}.auth0.com"
+    val roleV = adminClient.query(CreateRole(Obj(
+      "name" -> roleName,
+      "privileges" -> Obj(
+        "resource" -> Databases(),
+        "actions" -> Obj("read" -> true)
+      )
+    ))).futureValue
+
+    val providerV = adminClient.query(CreateAccessProvider(Obj(
+      "name" -> providerName,
+      "issuer" -> issuerName,
+      "jwks_uri" -> fullUri,
+      "membership" -> ArrayV(roleV(RefField))))
+    ).futureValue
+
+    providerV("membership").to[Seq[RefV]].get.size shouldBe 1
+
+    // Create provider with duplicate issuer value
+    val error = adminClient.query(CreateAccessProvider(Obj(
+      "name" -> "duplicate_provider",
+      "issuer" -> issuerName,
+      "jwks_uri" -> "https://db.fauna.com",
+      "membership" -> ArrayV(roleV(RefField))))
+    ).failed.futureValue
+
+    error shouldBe a[BadRequestException]
+  }
+
+  it should "create_access_provider fails without issuer" in {
+    val roleName = "my_role" + aRandomString
+    val providerName = "my_provider" + aRandomString
+    val fullUri = s"https://${aRandomString}.auth0.com"
+    val roleV = adminClient.query(CreateRole(Obj(
+      "name" -> roleName,
+      "privileges" -> Obj(
+        "resource" -> Databases(),
+        "actions" -> Obj("read" -> true)
+      )
+    ))).futureValue
+
+    val error = adminClient.query(CreateAccessProvider(Obj(
+      "name" -> providerName,
+      "jwks_uri" -> fullUri,
+      "membership" -> ArrayV(roleV(RefField))))
+    ).failed.futureValue
+
+    error shouldBe a[BadRequestException]
+  }
+
+  it should "create_access_provider fails without name" in {
+    val roleName = "my_role" + aRandomString
+    val issuerName = "my_issuer" + aRandomString
+    val fullUri = s"https://${aRandomString}.auth0.com"
+
+    val roleV = adminClient.query(CreateRole(Obj(
+      "name" -> roleName,
+      "privileges" -> Obj(
+        "resource" -> Databases(),
+        "actions" -> Obj("read" -> true)
+      )
+    ))).futureValue
+
+    val error = adminClient.query(CreateAccessProvider(Obj(
+      "issuer" -> issuerName,
+      "jwks_uri" -> fullUri,
+      "membership" -> ArrayV(roleV(RefField))))
+    ).failed.futureValue
+
+    error shouldBe a[BadRequestException]
+  }
+
+  it should "create_access_provider fails with invalid URI" in {
+    val roleName = "my_role" + aRandomString
+    val providerName = "my_provider" + aRandomString
+    val issuerName = "my_issuer" + aRandomString
+    val fullUri = aRandomString
+
+    val roleV = adminClient.query(CreateRole(Obj(
+      "name" -> roleName,
+      "privileges" -> Obj(
+        "resource" -> Databases(),
+        "actions" -> Obj("read" -> true)
+      )
+    ))).futureValue
+
+    val error = adminClient.query(CreateAccessProvider(Obj(
+      "name" -> providerName,
+      "issuer" -> issuerName,
+      "jwks_uri" -> fullUri, // not a valid URI
+      "membership" -> ArrayV(roleV(RefField))))
+    ).failed.futureValue
+
+    error shouldBe a[BadRequestException]
+  }
 
   it should "create session client" in {
     val otherClient = client.sessionClient(config("root_token"))

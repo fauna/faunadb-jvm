@@ -696,6 +696,23 @@ package object query {
   def HasIdentity(): Expr =
     Expr(ObjectV("has_identity" -> NullV))
 
+  /**
+    * An CreateAccessProvider expression.
+    *
+    * @param params An object of parameters used to create a new access provider.
+    *  - name: A valid schema name
+    *  - issuer: A unique string
+    *  - jwks_uri: A valid HTTPS URI
+    *  - allowed_roles: An optional list of Role refs
+    *  - allowed_collections: An optional list of user-defined Collection refs
+    *  - membership: An array of role/predicate pairs where the predicate returns a boolean.
+    *                The array can also contain Role references.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/createaccessprovider]]
+    */
+  def CreateAccessProvider(params: Expr): Expr =
+    Expr(ObjectV("create_access_provider" -> params.value))
+
   // String Functions
 
   /**
