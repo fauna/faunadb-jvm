@@ -5,9 +5,6 @@ import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.common.http.HttpClient;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.base64.Base64;
 import io.netty.handler.codec.http.*;
 import io.netty.util.IllegalReferenceCountException;
 import org.slf4j.Logger;
@@ -475,12 +472,7 @@ public final class Connection implements AutoCloseable {
   }
 
   private static String generateAuthHeader(String authToken) {
-    String token = authToken + ":";
-    ByteBuf byteBuf = Unpooled.wrappedBuffer(token.getBytes(US_ASCII));
-    ByteBuf enc = Base64.encode(byteBuf, false); // Must not break encoded lines
-    String hdr = "Basic " + enc.toString(US_ASCII);
-    enc.release();
-    return hdr;
+    return "Bearer " + authToken;
   }
 
 }
