@@ -26,7 +26,7 @@ class ClientSpec
     val scheme = Option(System.getenv("FAUNA_SCHEME")) getOrElse { "https" }
     val port = Option(System.getenv("FAUNA_PORT")) getOrElse { "443" }
 
-    collection.Map("root_token" -> rootKey, "root_url" -> s"${scheme}://${domain}:${port}")
+    collection.Map("root_token" -> rootKey, "root_url" -> s"$scheme://$domain:$port")
   }
 
   val rootClient = FaunaClient(endpoint = config("root_url"), secret = config("root_token"))
@@ -978,7 +978,7 @@ class ClientSpec
   }
 
   it should "create a role" in {
-    val name = s"a_role_${aRandomString}"
+    val name = s"a_role_$aRandomString"
 
     rootClient.query(CreateRole(Obj(
       "name" -> name,

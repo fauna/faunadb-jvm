@@ -3,8 +3,6 @@ package faunadb.jackson
 import com.fasterxml.jackson.core.JsonToken._
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind._
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.node.ObjectNode
 import faunadb.values._
 
 private[faunadb] class ValueDeserializer extends JsonDeserializer[Value] {
