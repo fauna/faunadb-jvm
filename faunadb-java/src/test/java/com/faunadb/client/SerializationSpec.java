@@ -793,6 +793,19 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeCreateAccessProvider() throws Exception {
+    assertJson(
+      CreateAccessProvider(
+        Obj(
+        "name", Value("role_name"),
+        "issuer", Value("issuer_name"),
+        "jwks_uri", Value("https://auth0.com"),
+        "membership", Arr()
+        )),
+      "{\"create_access_provider\":{\"object\":{\"name\":\"role_name\",\"issuer\":\"issuer_name\",\"jwks_uri\":\"https://auth0.com\",\"membership\":[]}}}");
+  }
+
+  @Test
   public void shouldSerializeConcat() throws Exception {
     assertJson(
       Concat(

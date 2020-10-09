@@ -2202,6 +2202,24 @@ public final class Language {
   }
 
   /**
+   * Creates a new access provider given the params.
+   *
+   * @param params  An object of parameters used to create a new access provider.
+   *  - name: A valid schema name
+   *  - issuer: A unique string
+   *  - jwks_uri: A valid HTTPS URI
+   *  - allowed_roles: An optional list of Role refs
+   *  - allowed_collections: An optional list of user-defined Collection refs
+   *  - membership: An array of role/predicate pairs where the predicate returns a boolean.
+   *                The array can also contain Role references.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/createaccessprovider">FaunaDB Authentication Functions</a>
+   */
+  public static Expr CreateAccessProvider(Expr params) {
+    return Fn.apply("create_access_provider", params);
+  }
+
+  /**
    * Concatenates a list of strings into a single string value.
    *
    * @param terms a list of strings. Type: Array of strings

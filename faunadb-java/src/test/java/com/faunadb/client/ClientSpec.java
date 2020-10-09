@@ -2087,6 +2087,33 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldTestCreateAccessProvider() throws Exception {
+    String roleName = randomStartingWith("role_");
+    String providerName = randomStartingWith("provider_");
+    String issuerName = randomStartingWith("issuer_");
+    String fullUri = randomStartingWith("https://") + ".auth0.com";
+
+    adminClient.query(CreateRole(Obj(
+      "name", Value(roleName),
+      "privileges", Obj(
+        "resource", Databases(),
+        "actions", Obj("read", Value(true))
+      )
+    ))).get();
+
+    Value provider = adminClient.query(
+      CreateAccessProvider(Obj(
+      "name", Value(providerName),
+      "issuer" , Value(issuerName),
+      "jwks_uri" , Value(fullUri),
+      "membership", Arr(Role(roleName))))
+    ).get();
+
+    List<RefV> membership = provider.at("membership").collect(Field.as(REF));
+    assertThat(membership.size(), equalTo(1));
+  }
+
+  @Test
   public void shouldGetKeyFromSecret() throws Exception {
     Value key = rootClient.query(
             CreateKey(Obj("database", DB_REF, "role", Value("server")))
