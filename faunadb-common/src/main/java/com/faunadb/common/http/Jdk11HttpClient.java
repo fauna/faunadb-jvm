@@ -31,7 +31,7 @@ public class Jdk11HttpClient {
         if (_executor.isShutdown()) {
             throw new IllegalStateException("Client already closed");
         }
-        return _client.sendAsync(req, HttpResponse.BodyHandlers.ofString()).orTimeout(_requestTimeout, TimeUnit.SECONDS);
+        return _client.sendAsync(req, HttpResponse.BodyHandlers.ofString());
     }
 
     // TODO expose on the connection
