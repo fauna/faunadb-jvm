@@ -1619,6 +1619,6 @@ class ClientSpec
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
     client.query(CreateDatabase(Obj("name" -> name))).futureValue
     val key = client.query(CreateKey(Obj("database" -> Database(name), "role" -> "admin"))).futureValue
-    FaunaClient(secret = key(SecretField).get, endpoint = config("root_url"))
+    client.sessionClient(key(SecretField).get)
   }
 }
