@@ -14,7 +14,7 @@ public class Jdk11HttpClient {
 
     public Jdk11HttpClient(int connectionTimeout, int requestTimeout) {
         this._requestTimeout = requestTimeout;
-        this._executor = Executors.newSingleThreadExecutor();
+        this._executor = Executors.newCachedThreadPool();
         this._client = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(connectionTimeout))
                 .executor(_executor)
