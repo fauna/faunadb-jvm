@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOError;
 import java.io.IOException;
 import java.net.*;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -372,6 +373,7 @@ public final class Connection implements AutoCloseable {
     HttpRequest.Builder requestBuilder =
       HttpRequest.newBuilder()
         .uri(requestUri)
+        .version(HttpClient.Version.HTTP_1_1)
         .timeout(Duration.of(DEFAULT_REQUEST_TIMEOUT_MS, MILLIS))
         .method(httpMethod, bodyPublisher)
         .headers(
