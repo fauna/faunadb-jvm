@@ -1,9 +1,9 @@
 package faunadb
 
-import org.scalatest.{BeforeAndAfterAll, FutureOutcome, SuiteMixin, fixture}
+import org.scalatest.{BeforeAndAfterAll, FutureOutcome, SuiteMixin, FixtureAsyncTestSuite}
 import scala.concurrent.Future
 
-trait FaunaClientFixture extends SuiteMixin with BeforeAndAfterAll { self: fixture.AsyncTestSuite =>
+trait FaunaClientFixture extends SuiteMixin with BeforeAndAfterAll { self: FixtureAsyncTestSuite =>
   private var _rootClient: FaunaClient = _
   protected def rootClient = _rootClient
 
