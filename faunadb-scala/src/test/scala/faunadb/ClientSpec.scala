@@ -6,13 +6,15 @@ import faunadb.values._
 import java.time.temporal.ChronoUnit
 import java.time.{ Instant, LocalDate }
 import org.scalatest.concurrent.{ IntegrationPatience, ScalaFutures }
-import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.util.Random
 
 class ClientSpec
-    extends FlatSpec
+    extends AnyFlatSpec
     with Matchers
     with BeforeAndAfterAll
     with ScalaFutures
