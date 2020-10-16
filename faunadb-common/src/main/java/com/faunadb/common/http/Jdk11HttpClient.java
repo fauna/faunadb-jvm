@@ -27,8 +27,18 @@ public class Jdk11HttpClient {
         return null;
     }
 
+    /**
+    * Verifies if the client stills accepting new requests
+    *
+    * @return
+    * @see #close()
+    */
+    public boolean isClosed() {
+        return _executor == null || _executor.isShutdown() || _executor.isTerminated();
+    }
+
     public CompletableFuture<HttpResponse<String>> sendRequest(HttpRequest req) {
-        if (_executor.isShutdown()) {
+        if (isClosed()) {
             throw new IllegalStateException("Client already closed");
         }
         return _client.sendAsync(req, HttpResponse.BodyHandlers.ofString());
@@ -36,7 +46,7 @@ public class Jdk11HttpClient {
 
     // TODO expose on the connection
     public CompletableFuture<HttpResponse<Void>> streamRequest(HttpRequest req, Flow.Subscriber<? super String> subscription) {
-        if (_executor.isShutdown()) {
+        if (isClosed()) {
             throw new IllegalStateException("Client already closed");
         }
         return _client.sendAsync(req, HttpResponse.BodyHandlers.fromLineSubscriber(subscription));
