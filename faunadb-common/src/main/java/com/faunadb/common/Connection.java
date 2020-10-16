@@ -5,7 +5,6 @@ import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.common.http.Jdk11HttpClient;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +15,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -209,21 +207,21 @@ public final class Connection implements AutoCloseable {
   private final JvmDriver jvmDriver;
   private final Jdk11HttpClient client;
   private final MetricRegistry registry;
-  private final Optional<Duration> queryTimeout;
+  private final Optional<Duration> connectionQueryTimeout;
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final ObjectMapper json = new ObjectMapper();
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final AtomicLong txnTime = new AtomicLong(0L);
 
-  private Connection(URL faunaRoot, String authToken, Jdk11HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> queryTimeout) {
+  private Connection(URL faunaRoot, String authToken, Jdk11HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> connectionQueryTimeout) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
     this.client = client;
     this.registry = registry;
     this.jvmDriver = jvmDriver;
-    txnTime.set(lastSeenTxn);
-    this.queryTimeout = queryTimeout;
+    this.txnTime.set(lastSeenTxn);
+    this.connectionQueryTimeout = connectionQueryTimeout;
   }
 
   /**
@@ -235,7 +233,7 @@ public final class Connection implements AutoCloseable {
    * @return a new {@link Connection}
    */
   public Connection newSessionConnection(String authToken) {
-    return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), queryTimeout);
+    return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), connectionQueryTimeout);
   }
 
   /**
@@ -350,8 +348,13 @@ public final class Connection implements AutoCloseable {
     final Timer.Context ctx = registry.timer("fauna-request").time();
     final CompletableFuture<HttpResponse<String>> rv = new CompletableFuture<>();
 
-    // TODO needs multimap to send many values??
-    Map<String, String> queryParams = new HashMap<>(params);
+    URI requestUri = URI.create(mkUrl(path));
+
+    // Encode all query parameters
+    for (Map.Entry<String,String> entry : params.entrySet()) {
+      requestUri = appendUri(requestUri, entry.getKey(), entry.getValue());
+    }
+
 
     HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
     if (body.isPresent()) {
@@ -361,28 +364,31 @@ public final class Connection implements AutoCloseable {
 
     // If a query timeout has been given for the current request,
     // override the one from the Connection if any
-     requestQueryTimeout.or(() -> queryTimeout).ifPresent(timeout -> queryParams.put(X_QUERY_TIMEOUT, String.valueOf(timeout.toMillis())));
+    Optional<Duration> queryTimeout = requestQueryTimeout.or(() -> connectionQueryTimeout);
 
-    URI requestUri = URI.create(mkUrl(path));
-    queryParams.put("host", requestUri.getHost());
+    Optional<Long> lastTxnTime = (getLastTxnTime() > 0) ? Optional.of(getLastTxnTime()) : Optional.empty();
 
-    // Encode all query parameters
-    for (Map.Entry<String,String> entry : queryParams.entrySet()) {
-      requestUri = appendUri(requestUri, entry.getKey(), entry.getValue());
-    }
+    HttpRequest.Builder requestBuilder =
+      HttpRequest.newBuilder()
+        .uri(requestUri)
+        .method(httpMethod, bodyPublisher)
+        .headers(
+          "content-type", "application/json; charset=utf-8",
+          "Authorization", authHeader,
+          "X-FaunaDB-API-Version", API_VERSION,
+          "user-agent", "Fauna JVM Http Client",
+          X_FAUNA_DRIVER, jvmDriver.toString()
+        );
 
-    long time = getLastTxnTime();
+    queryTimeout.ifPresent( timeout ->
+      requestBuilder.header(X_QUERY_TIMEOUT, String.valueOf(timeout.toMillis()))
+    );
 
-    HttpRequest request = HttpRequest.newBuilder()
-      .uri(requestUri)
-      .headers("content-type", "application/json; charset=utf-8",
-              "Authorization", authHeader,
-              "X-FaunaDB-API-Version", API_VERSION,
-              "user-agent", "Fauna JVM Http Client",
-              X_FAUNA_DRIVER, jvmDriver.toString(),
-              "X-Last-Seen-Txn", Long.toString(time))
-      .method(httpMethod, bodyPublisher)
-      .build();
+    lastTxnTime.ifPresent( time ->
+      requestBuilder.header("X-Last-Seen-Txn", Long.toString(time))
+    );
+
+    HttpRequest request = requestBuilder.build();
 
     client.sendRequest(request).whenCompleteAsync((response, throwable) -> {
       ctx.stop();
