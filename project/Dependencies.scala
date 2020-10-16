@@ -3,7 +3,6 @@ import sbt._
 object Dependencies {
 
   object Versions {
-    val nettyVersion                 = "4.1.52.Final"
     val jacksonVersion               = "2.11.2"
     val metricsVersion               = "4.1.12.1"
     val slf4jVersion                 = "1.7.30"
@@ -23,9 +22,6 @@ object Dependencies {
     import Versions._
 
     // faunadb-common
-    val nettyHandler          = "io.netty"                        %  "netty-handler"            % nettyVersion
-    val nettyCodecHttp        = "io.netty"                        %  "netty-codec-http"         % nettyVersion
-
     val jacksonCore           = "com.fasterxml.jackson.core"      %  "jackson-core"             % jacksonVersion
     val jacksonDatabind       = "com.fasterxml.jackson.core"      %  "jackson-databind"         % jacksonVersion
     val jacksonDatatype       = "com.fasterxml.jackson.datatype"  %  "jackson-datatype-jdk8"    % jacksonVersion
@@ -60,7 +56,6 @@ object Dependencies {
   import Compile._
   import Test._
 
-  val netty = Seq(nettyHandler, nettyCodecHttp)
   val jacksonCommon = Seq(jacksonCore, jacksonDatabind, jacksonDatatype)
   val jacksonScala = Seq(jacksonModuleScala, jacksonAnnotations)
 
@@ -76,7 +71,7 @@ object Dependencies {
   }
 
   // Projects
-  val faunadbCommon = netty ++ jacksonCommon ++ Seq(slf4j, metrics)
+  val faunadbCommon = jacksonCommon ++ Seq(slf4j, metrics)
   val faunadbJava = Seq(logbackClassic, snakeYaml, junit, junitInterface, harmcrestLibrary)
   def faunadbScala(scalaVersion: String): Seq[ModuleID] = jacksonScala ++ scalaLang(scalaVersion) ++ Seq(logbackClassic, scalaTest)
 

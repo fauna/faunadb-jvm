@@ -4,25 +4,26 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.faunadb.common.http.HttpClient;
-import io.netty.handler.codec.http.*;
-import io.netty.util.IllegalReferenceCountException;
+import com.faunadb.common.http.Jdk11HttpClient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOError;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static io.netty.util.CharsetUtil.UTF_8;
 import static java.lang.String.format;
 
 /**
@@ -36,7 +37,7 @@ import static java.lang.String.format;
  */
 public final class Connection implements AutoCloseable {
 
-  private static final String API_VERSION = "3";
+  private static final String API_VERSION = "4";
   private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
   private static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
   private static final URL FAUNA_ROOT;
@@ -83,7 +84,7 @@ public final class Connection implements AutoCloseable {
     private String authToken;
     private MetricRegistry metricRegistry;
     private long lastSeenTxn;
-    private HttpClient client;
+    private Jdk11HttpClient client;
     private JvmDriver jvmDriver;
     private Optional<Duration> queryTimeout = Optional.empty();
 
@@ -161,13 +162,10 @@ public final class Connection implements AutoCloseable {
     /**
      * Sets the client to use for the connection.
      *
-     * @param client the {@link HttpClient} to use for this connection.
+     * @param client the {@link Jdk11HttpClient} to use for this connection.
      * @return this {@link Builder} object
      */
-    public Builder withHttpClient(HttpClient client) {
-      if (client.isClosed())
-        throw new IllegalStateException("Can not use a closed client connection.");
-
+    public Builder withHttpClient(Jdk11HttpClient client) {
       this.client = client;
       return this;
     }
@@ -189,26 +187,13 @@ public final class Connection implements AutoCloseable {
      */
     public Connection build() {
       MetricRegistry registry;
-      if (metricRegistry == null)
-        registry = new MetricRegistry();
-      else
-        registry = metricRegistry;
+      registry = Objects.requireNonNullElseGet(metricRegistry, MetricRegistry::new);
 
       URL root;
-      if (faunaRoot == null) {
-        root = FAUNA_ROOT;
-      }
-      else {
-        root = faunaRoot;
-      }
+      root = Objects.requireNonNullElseGet(faunaRoot, () -> FAUNA_ROOT);
 
-      HttpClient http;
-      if (client == null) {
-        http = new HttpClient(root, DEFAULT_CONNECTION_TIMEOUT_MS, DEFAULT_REQUEST_TIMEOUT_MS);
-      } else {
-        client.retain();
-        http = client;
-      }
+      Jdk11HttpClient http;
+      http = Objects.requireNonNullElseGet(client, () -> new Jdk11HttpClient(DEFAULT_CONNECTION_TIMEOUT_MS, DEFAULT_REQUEST_TIMEOUT_MS));
 
       return new Connection(root, authToken, http, registry, jvmDriver, lastSeenTxn, queryTimeout);
     }
@@ -222,7 +207,7 @@ public final class Connection implements AutoCloseable {
   private final URL faunaRoot;
   private final String authHeader;
   private final JvmDriver jvmDriver;
-  private final HttpClient client;
+  private final Jdk11HttpClient client;
   private final MetricRegistry registry;
   private final Optional<Duration> queryTimeout;
 
@@ -231,7 +216,7 @@ public final class Connection implements AutoCloseable {
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final AtomicLong txnTime = new AtomicLong(0L);
 
-  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> queryTimeout) {
+  private Connection(URL faunaRoot, String authToken, Jdk11HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> queryTimeout) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
     this.client = client;
@@ -250,12 +235,7 @@ public final class Connection implements AutoCloseable {
    * @return a new {@link Connection}
    */
   public Connection newSessionConnection(String authToken) {
-    try {
-      client.retain();
-      return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), queryTimeout);
-    } catch (IllegalReferenceCountException e) {
-      throw new IllegalStateException("Can not create a session connection from a closed http connection");
-    }
+    return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), queryTimeout);
   }
 
   /**
@@ -301,9 +281,8 @@ public final class Connection implements AutoCloseable {
    * @return a {@link CompletableFuture} containing the HTTP Response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<FullHttpResponse> get(String path, Optional<Duration> queryTimeout) throws IOException {
-    FullHttpRequest request = newRequest(HttpMethod.GET, path);
-    return performRequest(request, queryTimeout);
+  public CompletableFuture<HttpResponse<String>> get(String path, Optional<Duration> queryTimeout) throws Exception {
+    return performRequest("GET", path, Optional.empty(), Map.of(), queryTimeout);
   }
 
   /**
@@ -315,10 +294,8 @@ public final class Connection implements AutoCloseable {
    * @return a {@code CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<FullHttpResponse> get(String path, Map<String, List<String>> params, Optional<Duration> queryTimeout) throws IOException {
-    FullHttpRequest request = newRequest(HttpMethod.GET, path);
-    fixRequestParameters(request, params);
-    return performRequest(request, queryTimeout);
+  public CompletableFuture<HttpResponse<String>> get(String path, Map<String, String> params, Optional<Duration> queryTimeout) throws Exception {
+    return performRequest("GET", path, Optional.empty(), params, queryTimeout);
   }
 
   /**
@@ -330,9 +307,8 @@ public final class Connection implements AutoCloseable {
    * @return a {@link CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<FullHttpResponse> post(String path, JsonNode body, Optional<Duration> queryTimeout) throws IOException {
-    FullHttpRequest request = newRequest(HttpMethod.POST, path, body);
-    return performRequest(request, queryTimeout);
+  public CompletableFuture<HttpResponse<String>> post(String path, JsonNode body, Optional<Duration> queryTimeout) throws Exception {
+    return performRequest("POST", path, Optional.of(body), Map.of(), queryTimeout);
   }
 
   /**
@@ -344,9 +320,8 @@ public final class Connection implements AutoCloseable {
    * @return a {@link CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<FullHttpResponse> put(String path, JsonNode body, Optional<Duration> queryTimeout) throws IOException {
-    FullHttpRequest request = newRequest(HttpMethod.PUT, path, body);
-    return performRequest(request, queryTimeout);
+  public CompletableFuture<HttpResponse<String>> put(String path, JsonNode body, Optional<Duration> queryTimeout) throws Exception {
+    return performRequest("PUT", path, Optional.of(body), Map.of(), queryTimeout);
   }
 
   /**
@@ -358,90 +333,72 @@ public final class Connection implements AutoCloseable {
    * @return a {@link CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<FullHttpResponse> patch(String path, JsonNode body, Optional<Duration> queryTimeout) throws IOException {
-    FullHttpRequest request = newRequest(HttpMethod.PATCH, path, body);
-    return performRequest(request, queryTimeout);
+  public CompletableFuture<HttpResponse<String>> patch(String path, JsonNode body, Optional<Duration> queryTimeout) throws Exception {
+    return performRequest("PATCH", path, Optional.of(body), Map.of(), queryTimeout);
   }
 
-  private FullHttpRequest newRequest(HttpMethod method, String path) throws IOException {
-    return new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, mkUrl(path));
+  public static URI appendUri(URI oldUri, String queryKey, String queryValue) throws URISyntaxException {
+    String urlEncodedKey = URLEncoder.encode(queryKey, StandardCharsets.UTF_8);
+    String urlEncodedValue = URLEncoder.encode(queryValue, StandardCharsets.UTF_8);
+    String query = urlEncodedKey + "=" + urlEncodedValue;
+    return new URI(oldUri.getScheme(), oldUri.getAuthority(), oldUri.getPath(),
+            oldUri.getQuery() == null ? query : oldUri.getQuery() + "&" + query, oldUri.getFragment());
   }
 
-  private void fixRequestParameters(FullHttpRequest request, Map<String, List<String>> params) {
-    QueryStringEncoder encoder = new QueryStringEncoder(request.uri());
-
-    for (Map.Entry<String, List<String>> entries : params.entrySet()) {
-      String k = entries.getKey();
-      for (String v : entries.getValue())
-        encoder.addParam(k, v);
-    }
-
-    request.setUri(encoder.toString());
-  }
-
-  private FullHttpRequest newRequest(HttpMethod method, String path, JsonNode body) throws IOException {
-    FullHttpRequest request = newRequest(method, path);
-
-    byte[] jsonBody = json.writeValueAsBytes(body);
-    request.content().clear().writeBytes(jsonBody);
-
-    request.headers().set(HttpHeaderNames.CONTENT_LENGTH, jsonBody.length);
-    request.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=utf-8");
-
-    return request;
-  }
-
-  private CompletableFuture<FullHttpResponse> performRequest(final FullHttpRequest request, final Optional<Duration> requestQueryTimeout) {
+  private CompletableFuture<HttpResponse<String>> performRequest(String httpMethod, String path, Optional<JsonNode> body,
+                                                                 Map<String, String> params, final Optional<Duration> requestQueryTimeout) throws Exception {
     final Timer.Context ctx = registry.timer("fauna-request").time();
-    final CompletableFuture<FullHttpResponse> rv = new CompletableFuture<>();
+    final CompletableFuture<HttpResponse<String>> rv = new CompletableFuture<>();
 
-    request.headers().add("Authorization", authHeader);
-    request.headers().set("X-FaunaDB-API-Version", API_VERSION);
+    // TODO needs multimap to send many values??
+    Map<String, String> queryParams = new HashMap<>(params);
 
-    if(jvmDriver != null) {
-      request.headers().set(X_FAUNA_DRIVER, jvmDriver.toString());
-    }
-
-    // TODO: replace as follows when upgrade to Java 9 or higher:
-    // requestQueryTimeout.or(queryTimeout)
-    //   .ifPresent(timeout -> request.headers().set(X_QUERY_TIMEOUT, timeout.toMillis()));
-    queryTimeout
-      .ifPresent(timeout -> request.headers().set(X_QUERY_TIMEOUT, timeout.toMillis()));
+    HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
+    if (body.isPresent()) {
+      byte[] jsonBody = json.writeValueAsBytes(body.get());
+      bodyPublisher = HttpRequest.BodyPublishers.ofByteArray(jsonBody);
+    };
 
     // If a query timeout has been given for the current request,
     // override the one from the Connection if any
-    requestQueryTimeout
-      .ifPresent(timeout -> request.headers().set(X_QUERY_TIMEOUT, timeout.toMillis()));
+     requestQueryTimeout.or(() -> queryTimeout).ifPresent(timeout -> queryParams.put(X_QUERY_TIMEOUT, String.valueOf(timeout.toMillis())));
 
-    long time = getLastTxnTime();
-    if (time > 0) {
-      request.headers().set("X-Last-Seen-Txn", Long.toString(time));
+    URI requestUri = URI.create(mkUrl(path));
+    queryParams.put("host", requestUri.getHost());
+
+    // Encode all query parameters
+    for (Map.Entry<String,String> entry : queryParams.entrySet()) {
+      requestUri = appendUri(requestUri, entry.getKey(), entry.getValue());
     }
 
-    request.retain();
+    long time = getLastTxnTime();
+
+    HttpRequest request = HttpRequest.newBuilder()
+      .uri(requestUri)
+      .headers("content-type", "application/json; charset=utf-8",
+              "Authorization", authHeader,
+              "X-FaunaDB-API-Version", API_VERSION,
+              "user-agent", "Fauna JVM Http Client",
+              X_FAUNA_DRIVER, jvmDriver.toString(),
+              "X-Last-Seen-Txn", Long.toString(time))
+      .method(httpMethod, bodyPublisher)
+      .build();
 
     client.sendRequest(request).whenCompleteAsync((response, throwable) -> {
-
       ctx.stop();
 
       if (throwable != null) {
         logFailure(request, throwable);
-        request.release();
-        if (response != null)
-          response.release();
         rv.completeExceptionally(throwable);
         return;
       }
 
-      String txnTimeHeader = response.headers().get("X-Txn-Time");
-      if (txnTimeHeader != null) {
-        syncLastTxnTime(Long.parseLong(txnTimeHeader));
-      }
+      Optional<String> txnTimeHeader = response.headers().firstValue("X-Txn-Time");
+      txnTimeHeader.ifPresent(s -> syncLastTxnTime(Long.parseLong(s)));
 
       logSuccess(request, response);
 
       rv.complete(response);
-      request.release();
     });
 
     return rv;
@@ -451,23 +408,23 @@ public final class Connection implements AutoCloseable {
     return new URL(faunaRoot, path).toString();
   }
 
-  private void logSuccess(FullHttpRequest request, FullHttpResponse response) {
+  private void logSuccess(HttpRequest request, HttpResponse<String> response) {
     if (log.isDebugEnabled()) {
-      String data = Optional.ofNullable(request.content().toString(UTF_8)).orElse("");
-      String body = Optional.ofNullable(response.content().toString(UTF_8)).orElse("");
-      String host = response.headers().get(X_FAUNADB_HOST, "Unknown");
-      String build = response.headers().get(X_FAUNADB_BUILD, "Unknown");
+      String data = request.bodyPublisher().map(Object::toString).orElse("NoBody");
+      String body = Optional.ofNullable(response.body()).orElse("");
+      String host = response.headers().firstValue(X_FAUNADB_HOST).orElse("Unknown");
+      String build = response.headers().firstValue(X_FAUNADB_BUILD).orElse("Unknown");
 
       log.debug(
         format("Request: %s %s: [%s]. Response: Status=%d, Fauna Host: %s, Fauna Build: %s: %s",
-          request.method(), request.uri(), data, response.status().code(), host, build, body));
+          request.method(), request.uri(), data, response.statusCode(), host, build, body));
     }
   }
 
-  private void logFailure(FullHttpRequest request, Throwable ex) {
+  private void logFailure(HttpRequest request, Throwable ex) {
     log.info(
       format("Request: %s %s: %s. Failed: %s",
-        request.method(), request.uri(), request.content().toString(UTF_8), ex.getMessage()), ex);
+        request.method(), request.uri(), request.bodyPublisher().map(Object::toString).orElse("NoBody").toString(), ex.getMessage()), ex);
   }
 
   private static String generateAuthHeader(String authToken) {

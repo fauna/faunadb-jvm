@@ -12,13 +12,12 @@ import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
 import com.faunadb.common.Connection.JvmDriver;
 import com.faunadb.client.types.Value.NullV;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.handler.codec.http.FullHttpResponse;
 
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -313,7 +312,7 @@ public class FaunaClient implements AutoCloseable {
     return connection.getLastTxnTime();
   }
 
-  private Value handleResponse(FullHttpResponse response) {
+  private Value handleResponse(HttpResponse<String> response) {
     try {
       handleQueryErrors(response);
       JsonNode responseBody = parseResponseBody(response);
@@ -330,23 +329,21 @@ public class FaunaClient implements AutoCloseable {
       return json.treeToValue(resource, Value.class);
     } catch (IOException ex) {
       throw new AssertionError(ex);
-    } finally {
-      response.release();
     }
   }
 
   private CompletableFuture<Value> performRequest(JsonNode body, Optional<Duration> queryTimeout) {
     try {
         return handleNetworkExceptions(connection.post("", body, queryTimeout).thenApply(this::handleResponse));
-    } catch (IOException ex) {
+    } catch (Exception ex) {
         CompletableFuture<Value> oops = new CompletableFuture<>();
         oops.completeExceptionally(ex);
         return oops;
     }
   }
 
-  private void handleQueryErrors(FullHttpResponse response) {
-    int status = response.status().code();
+  private void handleQueryErrors(HttpResponse<String> response) {
+    int status = response.statusCode();
     if (status >= 300) {
       try {
         List<HttpResponses.QueryError> parsedErrors = new ArrayList<>();
@@ -376,9 +373,7 @@ public class FaunaClient implements AutoCloseable {
           default:
             throw new UnknownException(errorResponse);
         }
-      } catch (VirtualMachineError | ThreadDeath | LinkageError ex) { //like NonFatal(ex) on scala driver
-        throw ex;
-      } catch (FaunaException ex) {
+      } catch (VirtualMachineError | ThreadDeath | LinkageError | FaunaException ex) { //like NonFatal(ex) on scala driver
         throw ex;
       } catch (Exception ex) {
         if (status == 503) {
@@ -392,15 +387,14 @@ public class FaunaClient implements AutoCloseable {
 
   private <V> CompletableFuture<V> handleNetworkExceptions(CompletableFuture<V> f) {
       return f.whenComplete((v, ex) -> {
-              if (ex instanceof ConnectException ||
-                         ex instanceof TimeoutException) {
-                  throw new UnavailableException(ex.getMessage(), ex);
-              }
-          });
+          if (ex instanceof ConnectException || ex instanceof TimeoutException) {
+              throw new UnavailableException(ex.getMessage(), ex);
+          }
+      });
   }
 
-  private JsonNode parseResponseBody(FullHttpResponse response) throws IOException {
-    JsonNode body = json.readTree(new ByteBufInputStream(response.content()));
+  private JsonNode parseResponseBody(HttpResponse<String> response) throws IOException {
+    JsonNode body = json.readTree(response.body());
     if (body == null) {
       throw new IOException("Invalid JSON.");
     } else {

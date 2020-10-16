@@ -6,7 +6,6 @@ import com.faunadb.client.query.Language;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
-import io.netty.util.ResourceLeakDetector;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
@@ -95,8 +94,6 @@ public class ClientSpec {
 
   @BeforeClass
   public static void setUpClient() throws Exception {
-    ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
-
     rootClient = createFaunaClient(ROOT_TOKEN);
 
     rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
