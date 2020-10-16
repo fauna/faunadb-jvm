@@ -22,7 +22,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static io.netty.util.CharsetUtil.US_ASCII;
 import static io.netty.util.CharsetUtil.UTF_8;
 import static java.lang.String.format;
 

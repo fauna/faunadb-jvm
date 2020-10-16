@@ -30,7 +30,6 @@ import static com.faunadb.client.query.Language.TimeUnit.*;
 import static com.faunadb.client.types.Codec.*;
 import static com.faunadb.client.types.Value.NullV.NULL;
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.containsInAnyOrder;

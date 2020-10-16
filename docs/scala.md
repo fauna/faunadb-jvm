@@ -126,8 +126,8 @@ The `query` method takes an `Expr` object. `Expr` objects can be composed with o
 ```scala
 Value readHippoResults = client.query(
   Select(Value("data"),Get(hippoRef))
-).get();
-System.out.println("Hippo Spells:\n " + readHippoResults + "\n");
+).get()
+println("Hippo Spells:\n " + readHippoResults + "\n")
 ```
 
 The `query` method also accepts a `timeout` parameter. The `timeout` value defines the maximum time a `query` will be allowed to run on the server. If the value is exceeded, the query is aborted. If no `timeout` is defined in scope, a default value is assigned on the server side.

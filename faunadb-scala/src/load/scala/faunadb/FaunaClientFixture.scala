@@ -16,7 +16,7 @@ trait FaunaClientFixture extends SuiteMixin with BeforeAndAfterAll { self: Fixtu
       val scheme = Option(System.getenv("FAUNA_SCHEME")) getOrElse { "https" }
       val port = Option(System.getenv("FAUNA_PORT")) getOrElse { "443" }
 
-      collection.Map("root_token" -> rootKey, "root_url" -> s"${scheme}://${domain}:${port}")
+      collection.Map("root_token" -> rootKey, "root_url" -> s"$scheme://$domain:$port")
     }
 
     _rootClient = FaunaClient(endpoint = config("root_url"), secret = config("root_token"))

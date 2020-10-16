@@ -103,14 +103,14 @@ class CodecSpec extends AnyFlatSpec with Matchers {
 
   it should "decode aliases" in {
     case class Wrapped(s: String)
-    implicit val wrappedCodec = Codec.Alias[Wrapped, String](_.s, Wrapped(_))
+    implicit val wrappedCodec = Codec.Alias[Wrapped, String](_.s, Wrapped)
 
     val v1 = StringV("hello")
     v1.to[Wrapped].get shouldBe Wrapped("hello")
     (Wrapped("hello"): Value) shouldBe v1
 
     case class DoubleWrapped(w: Wrapped)
-    implicit val doubleWrappedCodec = Codec.Alias[DoubleWrapped, Wrapped](_.w, DoubleWrapped(_))
+    implicit val doubleWrappedCodec = Codec.Alias[DoubleWrapped, Wrapped](_.w, DoubleWrapped)
 
     val v2 = StringV("hello")
     v2.to[DoubleWrapped].get shouldBe DoubleWrapped(Wrapped("hello"))
