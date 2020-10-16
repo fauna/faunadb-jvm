@@ -79,7 +79,12 @@ object Settings {
 
     coverageEnabled := false,
 
+    javacOptions ++= Seq(
+      "-source", "11", "-target", "11"
+    ),
+
     javacOptions in (Compile, doc) := Seq(
+      "-source", "11",
       "-link", javaDocUrl,
       "-link", jacksonDocUrl,
       "-link", metricsDocUrl,
