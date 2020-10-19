@@ -4,7 +4,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.faunadb.common.http.Jdk11HttpClient;
+import com.faunadb.common.http.JavaHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +84,7 @@ public final class Connection implements AutoCloseable {
     private String authToken;
     private MetricRegistry metricRegistry;
     private long lastSeenTxn;
-    private Jdk11HttpClient client;
+    private JavaHttpClient client;
     private JvmDriver jvmDriver;
     private Optional<Duration> queryTimeout = Optional.empty();
 
@@ -162,10 +162,10 @@ public final class Connection implements AutoCloseable {
     /**
      * Sets the client to use for the connection.
      *
-     * @param client the {@link Jdk11HttpClient} to use for this connection.
+     * @param client the {@link JavaHttpClient} to use for this connection.
      * @return this {@link Builder} object
      */
-    public Builder withHttpClient(Jdk11HttpClient client) {
+    public Builder withHttpClient(JavaHttpClient client) {
       this.client = client;
       return this;
     }
@@ -192,8 +192,8 @@ public final class Connection implements AutoCloseable {
       URL root;
       root = Objects.requireNonNullElseGet(faunaRoot, () -> FAUNA_ROOT);
 
-      Jdk11HttpClient http;
-      http = Objects.requireNonNullElseGet(client, () -> new Jdk11HttpClient(DEFAULT_CONNECTION_TIMEOUT_MS, DEFAULT_REQUEST_TIMEOUT_MS));
+      JavaHttpClient http;
+      http = Objects.requireNonNullElseGet(client, () -> new JavaHttpClient(DEFAULT_CONNECTION_TIMEOUT_MS, DEFAULT_REQUEST_TIMEOUT_MS));
 
       return new Connection(root, authToken, http, registry, jvmDriver, lastSeenTxn, queryTimeout);
     }
@@ -207,7 +207,7 @@ public final class Connection implements AutoCloseable {
   private final URL faunaRoot;
   private final String authHeader;
   private final JvmDriver jvmDriver;
-  private final Jdk11HttpClient client;
+  private final JavaHttpClient client;
   private final MetricRegistry registry;
   private final Optional<Duration> connectionQueryTimeout;
 
@@ -216,7 +216,7 @@ public final class Connection implements AutoCloseable {
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final AtomicLong txnTime = new AtomicLong(0L);
 
-  private Connection(URL faunaRoot, String authToken, Jdk11HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> connectionQueryTimeout) {
+  private Connection(URL faunaRoot, String authToken, JavaHttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> connectionQueryTimeout) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
     this.client = client;

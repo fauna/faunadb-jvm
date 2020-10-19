@@ -6,13 +6,13 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.concurrent.*;
 
-public class Jdk11HttpClient implements AutoCloseable {
+public class JavaHttpClient implements AutoCloseable {
 
   private HttpClient _client;
   private ExecutorService _executor;
   private long _requestTimeout;
 
-  public Jdk11HttpClient(int connectionTimeout, int requestTimeout) {
+  public JavaHttpClient(int connectionTimeout, int requestTimeout) {
     this._requestTimeout = requestTimeout;
     this._executor = Executors.newCachedThreadPool();
     this._client = HttpClient.newBuilder()
