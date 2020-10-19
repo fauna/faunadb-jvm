@@ -216,7 +216,11 @@ class FaunaClient private (connection: Connection) {
     * @param secret user secret for the session client
     * @return a new session client
     */
-  def sessionClient(secret: String): FaunaClient = new FaunaClient(connection.newSessionConnection(secret))
+  def sessionClient(secret: String): FaunaClient = new FaunaClient(connection.newSessionConnection(secret)) {
+    override def close(): Unit = {
+      // DO NOTHING
+    }
+  }
 
   /** Frees any resources held by the client and close the underlying connection. */
   def close(): Unit = connection.close()

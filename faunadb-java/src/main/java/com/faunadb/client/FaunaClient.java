@@ -162,7 +162,12 @@ public class FaunaClient implements AutoCloseable {
    * @return a new {@link FaunaClient}
    */
   public FaunaClient newSessionClient(String secret) {
-    return new FaunaClient(connection.newSessionConnection(secret));
+    return new FaunaClient(connection.newSessionConnection(secret)) {
+      @Override
+      public void close() {
+        // DO NOTHING
+      }
+    };
   }
 
   /**
