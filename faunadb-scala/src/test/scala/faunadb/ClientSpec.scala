@@ -6,13 +6,15 @@ import faunadb.values._
 import java.time.temporal.ChronoUnit
 import java.time.{ Instant, LocalDate }
 import org.scalatest.concurrent.{ IntegrationPatience, ScalaFutures }
-import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.util.Random
 
 class ClientSpec
-    extends FlatSpec
+    extends AnyFlatSpec
     with Matchers
     with BeforeAndAfterAll
     with ScalaFutures
@@ -26,7 +28,7 @@ class ClientSpec
     val scheme = Option(System.getenv("FAUNA_SCHEME")) getOrElse { "https" }
     val port = Option(System.getenv("FAUNA_PORT")) getOrElse { "443" }
 
-    collection.Map("root_token" -> rootKey, "root_url" -> s"${scheme}://${domain}:${port}")
+    collection.Map("root_token" -> rootKey, "root_url" -> s"$scheme://$domain:$port")
   }
 
   val rootClient = FaunaClient(endpoint = config("root_url"), secret = config("root_token"))
@@ -978,7 +980,7 @@ class ClientSpec
   }
 
   it should "create a role" in {
-    val name = s"a_role_${aRandomString}"
+    val name = s"a_role_$aRandomString"
 
     rootClient.query(CreateRole(Obj(
       "name" -> name,
@@ -1617,6 +1619,6 @@ class ClientSpec
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
     client.query(CreateDatabase(Obj("name" -> name))).futureValue
     val key = client.query(CreateKey(Obj("database" -> Database(name), "role" -> "admin"))).futureValue
-    FaunaClient(secret = key(SecretField).get, endpoint = config("root_url"))
+    client.sessionClient(key(SecretField).get)
   }
 }

@@ -35,7 +35,6 @@ case class BadRequestException(response: Option[QueryErrorResponse], message: St
 
 /**
  * An exception thrown if FaunaDB responds with an HTTP 404 for non-query endpoints.
- * @param message
  */
 case class NotFoundException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
   def this(message: String) = this(None, message)
