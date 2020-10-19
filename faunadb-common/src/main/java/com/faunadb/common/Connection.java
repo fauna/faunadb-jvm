@@ -35,7 +35,7 @@ import static java.time.temporal.ChronoUnit.MILLIS;
  * <p>The {@link Connection#close()} method must be called in order to
  * release {@link Connection} I/O resources</p>
  */
-public final class Connection implements AutoCloseable {
+public class Connection implements AutoCloseable {
 
   private static final String API_VERSION = "4";
   private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
@@ -234,10 +234,18 @@ public final class Connection implements AutoCloseable {
    * @param authToken the token or key to be used to authenticate requests to the new {@link Connection}
    * @return a new {@link Connection}
    */
+  // TODO: [DRV-174] Update JavaDoc to reflect new close method behaviour
   public Connection newSessionConnection(String authToken) {
-    // TODO: [DRV-174] Decide if we need a session connection or not.
-    // Remove this method in case we don't.
-    return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), connectionQueryTimeout);
+    if (isClosed()) {
+      throw new IllegalStateException("Connection already closed");
+    }
+
+    return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), connectionQueryTimeout) {
+      @Override
+      public void close() {
+        // DO NOTHING
+      }
+    };
   }
 
   /**
@@ -248,6 +256,16 @@ public final class Connection implements AutoCloseable {
     if (closed.compareAndSet(false, true)) {
       client.close();
     }
+  }
+
+  /**
+   * Verifies if the connection still accepts new requests.
+   *
+   * @return true if closed, false if not
+   * @see #close()
+   */
+  public boolean isClosed() {
+    return closed.get();
   }
 
   /**
