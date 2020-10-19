@@ -206,7 +206,7 @@ class FaunaClient private (connection: Connection) {
     */
   def sessionWith[A](secret: String)(session: FaunaClient => A): A = {
     val client = sessionClient(secret)
-    try session(client) finally client.close()
+    session(client)
   }
 
   /**
