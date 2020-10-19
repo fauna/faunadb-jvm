@@ -6,7 +6,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.concurrent.*;
 
-public class Jdk11HttpClient {
+public class Jdk11HttpClient implements AutoCloseable {
 
     private HttpClient _client;
     private ExecutorService _executor;
@@ -21,10 +21,9 @@ public class Jdk11HttpClient {
                 .build();
     }
 
-    public Void close() {
+    public void close() {
         _executor.shutdownNow();
         _client = null;
-        return null;
     }
 
     /**
