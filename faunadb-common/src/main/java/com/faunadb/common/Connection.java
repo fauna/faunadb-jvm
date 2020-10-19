@@ -193,7 +193,7 @@ public final class Connection implements AutoCloseable {
       root = Objects.requireNonNullElseGet(faunaRoot, () -> FAUNA_ROOT);
 
       JavaHttpClient http;
-      http = Objects.requireNonNullElseGet(client, () -> new JavaHttpClient(DEFAULT_CONNECTION_TIMEOUT_MS, DEFAULT_REQUEST_TIMEOUT_MS));
+      http = Objects.requireNonNullElseGet(client, () -> new JavaHttpClient(DEFAULT_CONNECTION_TIMEOUT_MS));
 
       return new Connection(root, authToken, http, registry, jvmDriver, lastSeenTxn, queryTimeout);
     }

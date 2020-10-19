@@ -10,10 +10,8 @@ public class JavaHttpClient implements AutoCloseable {
 
   private HttpClient _client;
   private ExecutorService _executor;
-  private long _requestTimeout;
 
-  public JavaHttpClient(int connectionTimeout, int requestTimeout) {
-    this._requestTimeout = requestTimeout;
+  public JavaHttpClient(int connectionTimeout) {
     this._executor = Executors.newCachedThreadPool();
     this._client = HttpClient.newBuilder()
       .connectTimeout(Duration.ofMillis(connectionTimeout))
