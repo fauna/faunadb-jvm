@@ -235,6 +235,8 @@ public final class Connection implements AutoCloseable {
    * @return a new {@link Connection}
    */
   public Connection newSessionConnection(String authToken) {
+    // TODO: [DRV-174] Decide if we need a session connection or not.
+    // Remove this method in case we don't.
     return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), connectionQueryTimeout);
   }
 

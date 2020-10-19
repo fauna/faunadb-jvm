@@ -161,6 +161,7 @@ public class FaunaClient implements AutoCloseable {
    * @param secret user secret for the session client
    * @return a new {@link FaunaClient}
    */
+  // TODO: [DRV-174] Update JavDoc to reflect new close method behaviour
   public FaunaClient newSessionClient(String secret) {
     return new FaunaClient(connection.newSessionConnection(secret)) {
       @Override

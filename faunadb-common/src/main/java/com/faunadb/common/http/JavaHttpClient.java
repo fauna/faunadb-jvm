@@ -21,17 +21,19 @@ public class JavaHttpClient implements AutoCloseable {
 
   public void close() {
     _executor.shutdownNow();
+    // Garbage Collector frees any associated resources
+    // when setting the reference to the HttpClient to null.
     _client = null;
   }
 
   /**
-   * Verifies if the client still accepts new requests
+   * Verifies if the client still accepts new requests.
    *
-   * @return
+   * @return true if closed, false if not
    * @see #close()
    */
   public boolean isClosed() {
-    return _executor == null || _executor.isShutdown() || _executor.isTerminated();
+    return _client == null || _executor == null || _executor.isShutdown() || _executor.isTerminated();
   }
 
   public CompletableFuture<HttpResponse<String>> sendRequest(HttpRequest req) {

@@ -204,6 +204,7 @@ class FaunaClient private (connection: Connection) {
     * @param session a function that receives a session client
     * @return the value produced by the session function
     */
+  // TODO: [DRV-174] Update ScalaDoc to reflect new close method behaviour
   def sessionWith[A](secret: String)(session: FaunaClient => A): A = {
     val client = sessionClient(secret)
     session(client)
@@ -216,6 +217,7 @@ class FaunaClient private (connection: Connection) {
     * @param secret user secret for the session client
     * @return a new session client
     */
+  // TODO: [DRV-174] Update ScalaDoc to reflect new close method behaviour
   def sessionClient(secret: String): FaunaClient = new FaunaClient(connection.newSessionConnection(secret)) {
     override def close(): Unit = {
       // DO NOTHING
