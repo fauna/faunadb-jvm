@@ -27,7 +27,7 @@ public class JavaHttpClient implements AutoCloseable {
   }
 
   /**
-   * Verifies if the client stills accepting new requests
+   * Verifies if the client still accepts new requests
    *
    * @return
    * @see #close()
