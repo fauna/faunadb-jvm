@@ -9,7 +9,7 @@ executors:
         enum: ["stable", "nightly"]
     resource_class: large
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: cimg/openjdk:11.0
 
       - image: gcr.io/faunadb-cloud/faunadb/enterprise/<<parameters.version>>:latest
         name: core
