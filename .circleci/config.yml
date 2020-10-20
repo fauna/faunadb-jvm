@@ -9,14 +9,14 @@ executors:
         enum: ["stable", "nightly"]
     resource_class: large
     docker:
-      - image: cimg/openjdk:11.0
-
+      - image: openjdk:11
       - image: gcr.io/faunadb-cloud/faunadb/enterprise/<<parameters.version>>:latest
         name: core
         auth:
           username: _json_key
           password: $GCR_KEY
     environment:
+      SBT_VERSION: 1.3.13
       FAUNA_ROOT_KEY: secret
       FAUNA_DOMAIN: core
       FAUNA_SCHEME: http
@@ -26,6 +26,17 @@ executors:
 commands:
   build_and_test:
     description: "Run JVM tests"
+    - run:
+        name: Get sbt binary
+        command: |
+          apt update && apt install -y curl
+          curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb
+          dpkg -i sbt-$SBT_VERSION.deb
+          rm sbt-$SBT_VERSION.deb
+          apt-get update
+          apt-get install -y python-pip git
+          pip install awscli
+          apt-get clean && apt-get autoclean
     steps:
       - checkout
 
