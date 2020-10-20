@@ -12,6 +12,7 @@ public class JavaHttpClient implements AutoCloseable {
   private ExecutorService _executor;
 
   public JavaHttpClient(int connectionTimeout) {
+    // TODO: [DRV-169] allow users to override default executor
     this._executor = Executors.newCachedThreadPool();
     this._client = HttpClient.newBuilder()
       .connectTimeout(Duration.ofMillis(connectionTimeout))
