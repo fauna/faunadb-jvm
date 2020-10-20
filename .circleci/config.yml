@@ -27,6 +27,8 @@ commands:
   build_and_test:
     description: "Run JVM tests"
     steps:
+      // TODO: [DRV-222] Evaluate using an image
+      // with sbt preinstalled in it instead
       - run:
           name: Get sbt binary
           command: |
