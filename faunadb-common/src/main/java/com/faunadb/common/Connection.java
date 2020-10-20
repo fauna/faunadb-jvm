@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static java.lang.String.format;
-import static java.time.temporal.ChronoUnit.MILLIS;
 
 /**
  * The HTTP Connection adapter for FaunaDB drivers.
@@ -394,14 +393,14 @@ public class Connection implements AutoCloseable {
       HttpRequest.newBuilder()
         .uri(requestUri)
         .version(HttpClient.Version.HTTP_1_1)
-        .timeout(Duration.of(DEFAULT_REQUEST_TIMEOUT_MS, MILLIS))
+        .timeout(Duration.ofMillis(DEFAULT_REQUEST_TIMEOUT_MS))
         .method(httpMethod, bodyPublisher)
         .headers(
-          "content-type", "application/json; charset=utf-8",
           "Authorization", authHeader,
           "X-FaunaDB-API-Version", API_VERSION,
-          "user-agent", "Fauna JVM Http Client",
-          X_FAUNA_DRIVER, jvmDriver.toString()
+          "User-agent", "Fauna JVM Http Client",
+          X_FAUNA_DRIVER, jvmDriver.toString(),
+          "Content-type", "application/json; charset=utf-8"
         );
 
     queryTimeout.ifPresent( timeout ->
