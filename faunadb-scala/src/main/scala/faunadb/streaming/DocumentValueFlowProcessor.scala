@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.{Flow, SubmissionPublisher}
 
 import faunadb.values._
+
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.{ExecutionContext, Future}

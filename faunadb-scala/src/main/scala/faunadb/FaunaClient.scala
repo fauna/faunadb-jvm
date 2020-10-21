@@ -13,7 +13,6 @@ import java.io.IOException
 import java.net.ConnectException
 import java.net.http.HttpResponse
 import java.util.concurrent.{Flow, TimeoutException}
-
 import com.faunadb.common.http.ResponseBodyStringProcessor
 import faunadb.FaunaClient.EventField
 import faunadb.streaming.{BodyValueFlowProcessor, SnapshotEventFlowProcessor}
@@ -23,7 +22,7 @@ import scala.compat.java8.DurationConverters._
 import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 
 /** Companion object to the FaunaClient class. */
 object FaunaClient {

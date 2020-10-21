@@ -8,7 +8,10 @@ import java.time.{Instant, LocalDate}
 import java.util
 import java.util.concurrent.Flow
 
+<<<<<<< HEAD
 import faunadb.FaunaClient._
+=======
+>>>>>>> streaming API for scala driver
 import monix.execution.Scheduler
 import monix.reactive.Observable
 import org.reactivestreams.{FlowAdapters, Publisher}
@@ -19,7 +22,11 @@ import org.scalatest.matchers.should.Matchers
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.concurrent.ExecutionContext.Implicits.global
+<<<<<<< HEAD
 import scala.concurrent.{Future, Promise}
+=======
+import scala.concurrent.Promise
+>>>>>>> streaming API for scala driver
 import scala.concurrent.duration._
 import scala.util.Random
 
