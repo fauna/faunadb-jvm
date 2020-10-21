@@ -250,6 +250,51 @@ class FaunaClient private (connection: Connection) {
       .recoverWith(handleNetworkExceptions)
   }
 
+  /**
+    * Creates a subscription to the result of the given read-only expression. When
+    * executed, the expression must only perform reads and produce a single
+    * streamable type, such as a reference or a version. Expressions that attempt
+    * to perform writes or produce non-streamable types will result in an error.
+    * Otherwise, any expression can be used to initiate a stream, including
+    * user-defined function calls.
+    *
+    * @param expr the query to subscribe to.
+    * @param fields fields to opt-in on the events.
+    * @param snapshot if true the second event will be a snapshot event of the target
+    * @param ec the `ExecutionContext` used to run the query asynchronously.
+    * @return A [[scala.concurrent.Future]] containing a [[java.util.concurrent.Flow.Publisher]] which yields element of
+    *         type [[faunadb.values.Value]]. The [[scala.concurrent.Future]] fails if the stream cannot be setup.
+    */
+  def stream(expr: Expr, fields: Seq[EventField] = Nil, snapshot: Boolean = false)(implicit ec: ExecutionContext): Future[Flow.Publisher[Value]] =
+    performStreamRequest(json.valueToTree(expr), fields).map { valuePublisher =>
+      if (snapshot) {
+        val documentValueFlowProcessor = new SnapshotEventFlowProcessor(() => query(Get(expr)))
+        valuePublisher.subscribe(documentValueFlowProcessor)
+        documentValueFlowProcessor
+      } else {
+        valuePublisher
+      }
+    }
+
+  private def performStreamRequest(body: JsonNode, fields: Seq[EventField] = Nil)(implicit ec: ExecutionContext): Future[Flow.Publisher[Value]] = {
+    val params = Map("fields" -> fields.iterator.map(_.value).toList.asJava).asJava
+    connection.performStreamRequest("POST", "stream", body, params)
+      .toScala
+      .flatMap {
+        case successResponse if successResponse.statusCode() < 300 =>
+          // Subscribe a new FlowEventValueProcessor to consume the Body's Flow.Publisher
+          val flowEventValueProcessor = new BodyValueFlowProcessor(json, txn => syncLastTxnTime(txn))
+          successResponse.body().subscribe(flowEventValueProcessor)
+          Future.successful(flowEventValueProcessor)
+        case errorResponse =>
+          // The request failed, we need to consume the body manually for error reporting
+          ResponseBodyStringProcessor.consumeBody(errorResponse)
+            .toScala
+            .flatMap(errorBody => handleErrorResponse(errorResponse.statusCode(), errorBody))
+      }
+      .recoverWith(handleNetworkExceptions)
+  }
+
 
   /**
     * Creates a new scope to execute session queries. Queries submitted within the session scope will be

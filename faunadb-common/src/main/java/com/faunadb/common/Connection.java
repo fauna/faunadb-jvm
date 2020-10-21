@@ -353,7 +353,6 @@ public class Connection {
     }
     sendRequest(request).whenCompleteAsync((response, throwable) -> {
       ctx.stop();
-
       if (throwable != null) {
         logFailure(request, throwable);
         rv.completeExceptionally(throwable);
