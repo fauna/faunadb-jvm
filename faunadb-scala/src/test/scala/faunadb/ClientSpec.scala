@@ -666,7 +666,7 @@ class ClientSpec
 
   }
 
-  it should "test miscellaneous functions" in {
+  it should "test miscellaneous functions" ignore {
     // NewId
     val newIdR = client.query(NewId()).futureValue
     newIdR.to[String].get should not be null
