@@ -136,6 +136,84 @@ object Main extends App {
 }
 ```
 
+##### Document Streaming
+
+Fauna supports document streaming, where changes to a streamed document are pushed to all clients subscribing to that document.
+
+The following sections provide examples for managing streams with Flow or Monix, and
+assume that you have already created a `FaunaClient`.
+
+###### Flow subscriber
+
+It is possible to use the [java.util.concurrent.Flow](https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/Flow.html) API directly by binding a `Subscriber` manually.
+
+In the example below, we are capturing the 4 first messages:
+
+```scala
+// docRef is a reference to the document for which we want to stream updates.
+// You can acquire a document reference with a query like the following, but it
+// needs to work with the documents that you have.
+// val docRef = Ref(Collection("scoreboards"), "123")
+
+client.stream(docRef).flatMap { publisher =>
+  // Promise to hold the final state
+  val capturedEventsP = Promise[List[Value]]
+
+  // Our manual Subscriber
+  val valueSubscriber = new Flow.Subscriber[Value] {
+    var subscription: Flow.Subscription = null
+    val captured = new ConcurrentLinkedQueue[Value]
+
+    override def onSubscribe(s: Flow.Subscription): Unit = {
+      subscription = s
+      subscription.request(1)
+    }
+
+    override def onNext(v: Value): Unit = {
+      captured.add(v)
+      if (captured.size() == 4) {
+        capturedEventsP.success(captured.iterator().asScala.toList)
+        subscription.cancel()
+      } else {
+        subscription.request(1)
+      }
+    }
+
+    override def onError(t: Throwable): Unit =
+      capturedEventsP.failure(t)
+
+    override def onComplete(): Unit =
+      capturedEventsP.failure(new IllegalStateException("not expecting the stream to complete"))
+  }
+  // subscribe to publisher
+  publisher.subscribe(valueSubscriber)
+  // wait for Future completion
+  capturedEventsP.future
+}
+```
+
+###### Monix
+
+The [reactive-streams](http://www.reactive-streams.org/) standard offers a strong interoperability in the streaming ecosystem.
+
+We can replicate the previous example using the [Monix](https://monix.io/) streaming library.
+
+```scala
+// docRef is a reference to the document for which we want to stream updates.
+// You can acquire a document reference with a query like the following, but it
+// needs to work with the documents that you have.
+// val docRef = Ref(Collection("scoreboards"), "123")
+
+client.stream(docRef).flatMap { publisher =>
+  val reactiveStreamsPublisher: Publisher[Value] = FlowAdapters.toPublisher(publisherValue)
+  Observable.fromReactivePublisher(reactiveStreamsPublisher)
+    .take(4) // 4 events
+    .toListL
+    .runToFuture(Scheduler.Implicits.global)
+}
+```
+
+
 ## Building
 
 The faunadb-jvm project is built using sbt:

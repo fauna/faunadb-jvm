@@ -7,12 +7,16 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.common.Connection
 import com.faunadb.common.Connection.JvmDriver
 import faunadb.errors._
-import faunadb.query.Expr
+import faunadb.query.{Expr, Get}
 import faunadb.values.{ArrayV, NullV, Value}
 import java.io.IOException
 import java.net.ConnectException
 import java.net.http.HttpResponse
-import java.util.concurrent.TimeoutException
+import java.util.concurrent.{Flow, TimeoutException}
+
+import com.faunadb.common.http.ResponseBodyStringProcessor
+import faunadb.FaunaClient.EventField
+import faunadb.streaming.{BodyValueFlowProcessor, SnapshotEventFlowProcessor}
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.DurationConverters._
@@ -49,6 +53,12 @@ object FaunaClient {
 
     new FaunaClient(b.build)
   }
+
+  sealed abstract class EventField(val value: String)
+  case object DocumentField extends EventField("document")
+  case object PrevField extends EventField("prev")
+  case object DiffField extends EventField("diff")
+  case object ActionField extends EventField("action")
 }
 
 /**
@@ -190,10 +200,56 @@ class FaunaClient private (connection: Connection) {
     response
       .flatMap {
         case successResponse if successResponse.statusCode() < 300 => handleSuccessResponse(successResponse)
-        case errorResponse => handleErrorResponse(errorResponse)
+        case errorResponse => handleErrorResponse(errorResponse.statusCode(), errorResponse.body())
       }
       .recoverWith(handleNetworkExceptions)
   }
+
+  /**
+    * Creates a subscription to the result of the given read-only expression. When
+    * executed, the expression must only perform reads and produce a single
+    * streamable type, such as a reference or a version. Expressions that attempt
+    * to perform writes or produce non-streamable types will result in an error.
+    * Otherwise, any expression can be used to initiate a stream, including
+    * user-defined function calls.
+    *
+    * @param expr the query to subscribe to.
+    * @param fields fields to opt-in on the events.
+    * @param snapshot if true the second event will be a snapshot event of the target
+    * @param ec the `ExecutionContext` used to run the query asynchronously.
+    * @return A [[scala.concurrent.Future]] containing a [[java.util.concurrent.Flow.Publisher]] which yields element of
+    *         type [[faunadb.values.Value]]. The [[scala.concurrent.Future]] fails if the stream cannot be setup.
+    */
+  def stream(expr: Expr, fields: Seq[EventField] = Nil, snapshot: Boolean = false)(implicit ec: ExecutionContext): Future[Flow.Publisher[Value]] =
+    performStreamRequest(json.valueToTree(expr), fields).map { valuePublisher =>
+      if (snapshot) {
+        val documentValueFlowProcessor = new SnapshotEventFlowProcessor(() => query(Get(expr)))
+        valuePublisher.subscribe(documentValueFlowProcessor)
+        documentValueFlowProcessor
+      } else {
+        valuePublisher
+      }
+    }
+
+  private def performStreamRequest(body: JsonNode, fields: Seq[EventField] = Nil)(implicit ec: ExecutionContext): Future[Flow.Publisher[Value]] = {
+    val params = Map("fields" -> fields.iterator.map(_.value).toList.asJava).asJava
+    connection.performStreamRequest("POST", "stream", body, params)
+      .toScala
+      .flatMap {
+        case successResponse if successResponse.statusCode() < 300 =>
+          // Subscribe a new FlowEventValueProcessor to consume the Body's Flow.Publisher
+          val flowEventValueProcessor = new BodyValueFlowProcessor(json, txn => syncLastTxnTime(txn))
+          successResponse.body().subscribe(flowEventValueProcessor)
+          Future.successful(flowEventValueProcessor)
+        case errorResponse =>
+          // The request failed, we need to consume the body manually for error reporting
+          ResponseBodyStringProcessor.consumeBody(errorResponse)
+            .toScala
+            .flatMap(errorBody => handleErrorResponse(errorResponse.statusCode(), errorBody))
+      }
+      .recoverWith(handleNetworkExceptions)
+  }
+
 
   /**
     * Creates a new scope to execute session queries. Queries submitted within the session scope will be
@@ -236,8 +292,8 @@ class FaunaClient private (connection: Connection) {
   def syncLastTxnTime(timestamp: Long): Unit =
     connection.syncLastTxnTime(timestamp)
 
-  private def parseResponseBody(response: HttpResponse[String])(implicit ec: ExecutionContext): Future[JsonNode] = {
-    def parse: Future[Option[JsonNode]] = Future(Option(json.readTree(response.body())))
+  private def parseResponseBody(responseBody: String)(implicit ec: ExecutionContext): Future[JsonNode] = {
+    def parse: Future[Option[JsonNode]] = Future(Option(json.readTree(responseBody)))
 
     parse.flatMap {
       case Some(json) => Future.successful(json)
@@ -257,16 +313,14 @@ class FaunaClient private (connection: Connection) {
     }
 
     for {
-      body <- parseResponseBody(response)
+      body <- parseResponseBody(response.body())
       resource <- getResource(body)
       value <- parseValue(resource)
     } yield value
   }
 
-  private def handleErrorResponse(response: HttpResponse[String])(implicit ec: ExecutionContext): Future[Nothing] = {
+  private def handleErrorResponse(statusCode: Int, responseBody: String)(implicit ec: ExecutionContext): Future[Nothing] = {
     def parseErrors(): Future[QueryErrorResponse] = {
-      val statusCode = response.statusCode()
-
       def getErrors(body: JsonNode): Future[Iterator[JsonNode]] = Option(body.get("errors")) match {
         case Some(errors: ArrayNode) => Future.successful(errors.iterator().asScala)
         case _ => Future.successful(Iterator.empty)
@@ -278,7 +332,7 @@ class FaunaClient private (connection: Connection) {
 
       val result: Future[QueryErrorResponse] =
         for {
-          body <- parseResponseBody(response)
+          body <- parseResponseBody(responseBody)
           errors <- getErrors(body)
           queryErrors <- parseErrors(errors)
         } yield QueryErrorResponse(statusCode, queryErrors)
@@ -286,7 +340,7 @@ class FaunaClient private (connection: Connection) {
       result
         .recoverWith {
           case e: FaunaException => Future.failed(e)
-          case unavailable if response.statusCode() == 503 => Future.failed(new UnavailableException("Service Unavailable: Unparseable response.", unavailable))
+          case unavailable if statusCode == 503 => Future.failed(new UnavailableException("Service Unavailable: Unparseable response.", unavailable))
           case unknown => Future.failed(new UnknownException(s"Unparseable service $unknown response.", unknown))
         }
     }
@@ -298,7 +352,7 @@ class FaunaClient private (connection: Connection) {
       }
     }
 
-    response.statusCode() match {
+    statusCode match {
       case 400 => parseErrorsAndFailWith(new BadRequestException(_))
       case 401 => parseErrorsAndFailWith(new UnauthorizedException(_))
       case 403 => parseErrorsAndFailWith(new PermissionDeniedException(_))
@@ -315,3 +369,4 @@ class FaunaClient private (connection: Connection) {
   }
 
 }
+

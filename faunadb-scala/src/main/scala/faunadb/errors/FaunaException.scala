@@ -3,14 +3,14 @@ package faunadb.errors
 import faunadb.{QueryError, QueryErrorResponse}
 
 object FaunaException {
-  private[errors] def respToError(response: QueryErrorResponse) = {
-    response.errors.iterator.map(r => r.code + ": " + r.description).mkString(", ")
+  private[errors] def respToError(errors: IndexedSeq[QueryError]): String = {
+    errors.iterator.map(r => r.code + ": " + r.description).mkString(", ")
   }
 }
 
 class FaunaException(response: Option[QueryErrorResponse], msg: String, cause: Throwable = null) extends Exception(msg, cause) {
   def this(msg: String, cause: Throwable) = this(None, msg, cause)
-  def this(resp: QueryErrorResponse) = this(Some(resp), FaunaException.respToError(resp), null)
+  def this(resp: QueryErrorResponse) = this(Some(resp), FaunaException.respToError(resp.errors), null)
 
   def errors: IndexedSeq[QueryError] = response.map(_.errors).getOrElse(IndexedSeq.empty)
   def status: Int = response.map(_.status).getOrElse(0)
@@ -22,7 +22,7 @@ class FaunaException(response: Option[QueryErrorResponse], msg: String, cause: T
   */
 case class UnavailableException(response: Option[QueryErrorResponse], message: String, cause: Throwable) extends FaunaException(response, message, cause) {
   def this(message: String, cause: Throwable) = this(None, message, cause)
-  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response), null)
+  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response.errors), null)
 }
 
 /**
@@ -30,7 +30,7 @@ case class UnavailableException(response: Option[QueryErrorResponse], message: S
  */
 case class BadRequestException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
   def this(message: String) = this(None, message)
-  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
+  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response.errors))
 }
 
 /**
@@ -38,7 +38,7 @@ case class BadRequestException(response: Option[QueryErrorResponse], message: St
  */
 case class NotFoundException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
   def this(message: String) = this(None, message)
-  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
+  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response.errors))
 }
 
 /**
@@ -47,7 +47,7 @@ case class NotFoundException(response: Option[QueryErrorResponse], message: Stri
  */
 case class InternalException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
   def this(message: String) = this(None, message)
-  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
+  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response.errors))
 }
 
 /**
@@ -55,7 +55,7 @@ case class InternalException(response: Option[QueryErrorResponse], message: Stri
  */
 case class UnauthorizedException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
   def this(message: String) = this(None, message)
-  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
+  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response.errors))
 }
 
 /**
@@ -63,10 +63,14 @@ case class UnauthorizedException(response: Option[QueryErrorResponse], message: 
   */
 case class PermissionDeniedException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
   def this(message: String) = this(None, message)
-  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response))
+  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response.errors))
 }
 
 case class UnknownException(response: Option[QueryErrorResponse], message: String, cause: Throwable) extends FaunaException(response, message, cause) {
   def this(message: String, cause: Throwable) = this(None, message, cause)
-  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response), null)
+  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response.errors), null)
+}
+
+case class StreamingException(message: String) extends FaunaException(None, message) {
+  def this(queryError: QueryError) = this(s"Stream interrupted by error event:\n${FaunaException.respToError(Vector(queryError))}")
 }
