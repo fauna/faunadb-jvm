@@ -75,7 +75,7 @@ sealed abstract class Field[T] {
     new TypedField(ev(this), dec)
 
   def collect[U, Col[_]](inner: Field[U])(implicit ev: Field[T] =:= Field[Value], cbf: CanBuildFrom[_, U, Col[U]]): Field[Col[U]] =
-    new CollectionField(ev(this), cbf, inner.get _)
+    new CollectionField(ev(this), cbf, inner.get)
 }
 
 private[values] class SubField(parent: Field[Value], subpath: FieldPath) extends Field[Value] {

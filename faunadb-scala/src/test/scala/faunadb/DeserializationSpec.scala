@@ -4,9 +4,10 @@ import com.fasterxml.jackson.databind.{ JsonMappingException, ObjectMapper }
 import faunadb.values._
 import java.time.{ Instant, LocalDate }
 import java.time.temporal.ChronoUnit
-import org.scalatest.{ FlatSpec, Matchers }
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class DeserializationSpec extends FlatSpec with Matchers {
+class DeserializationSpec extends AnyFlatSpec with Matchers {
   val json = new ObjectMapper()
 
   "Query AST deserialization" should "deserialize a query response with refs" in {
