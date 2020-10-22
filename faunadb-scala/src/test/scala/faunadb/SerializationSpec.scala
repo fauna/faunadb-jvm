@@ -6,9 +6,10 @@ import faunadb.query._
 import faunadb.values._
 import java.time.{ Instant, LocalDate }
 import java.time.temporal.ChronoUnit
-import org.scalatest.{ FlatSpec, Matchers }
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class SerializationSpec extends FlatSpec with Matchers {
+class SerializationSpec extends AnyFlatSpec with Matchers {
   val json = new ObjectMapper()
   json.registerModule(new DefaultScalaModule)
 
