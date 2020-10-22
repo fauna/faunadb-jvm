@@ -22,8 +22,6 @@ import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{Success, Try}
-import scala.util.control.NonFatal
 
 /** Companion object to the FaunaClient class. */
 object FaunaClient {

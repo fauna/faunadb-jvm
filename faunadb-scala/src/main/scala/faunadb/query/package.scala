@@ -81,7 +81,7 @@ package query {
     * Helper for path syntax
     */
   case class Path private (segments: Expr*) extends AnyVal {
-    def /(sub: Path) = Path(segments ++ sub.segments: _*)
+    def /(sub: Path): Path = Path(segments ++ sub.segments: _*)
   }
 
   /**
@@ -103,7 +103,7 @@ package object query {
   // implicit conversions
 
   implicit def strToPath(str: String): Path = Path(Expr(StringV(str)))
-  implicit def intToPath(int: Int): Path = Path(Expr(LongV(int)))
+  implicit def intToPath(int: Int): Path = Path(Expr(LongV(int.toLong)))
   implicit def pathToExpr(path: Path): Expr = Expr(varargs(path.segments))
 
   // Helpers
@@ -216,7 +216,7 @@ package object query {
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#basic-forms]]
     */
-  def Call(ref: Expr, arguments: Expr*) =
+  def Call(ref: Expr, arguments: Expr*): Expr =
     Expr(ObjectV("call" -> ref.value, "arguments" -> varargs(arguments)))
 
   /**
@@ -235,7 +235,7 @@ package object query {
   def Query(fn: (Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr) => Expr): Expr = macro QueryMacros.query
   def Query(fn: (Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr) => Expr): Expr = macro QueryMacros.query
 
-  def Query(lambda: Expr) =
+  def Query(lambda: Expr): Expr =
     Expr(ObjectV("query" -> lambda.value))
 
   /**

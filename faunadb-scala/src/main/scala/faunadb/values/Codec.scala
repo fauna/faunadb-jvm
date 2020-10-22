@@ -191,7 +191,7 @@ object Decoder {
   implicit def MapDecoder[T](implicit decoder: Decoder[T]): Decoder[Map[String, T]] = new Decoder[Map[String, T]] {
     def decode(v: Value, path: FieldPath) =
       v match {
-        case ObjectV(fields) => {
+        case ObjectV(fields) =>
           val successBuilder = Map.newBuilder[String, T]
           val failureBuilder = List.newBuilder[FieldError]
 
@@ -208,7 +208,6 @@ object Decoder {
             VFail(failures)
           else
             VSuccess(successBuilder.result(), path)
-        }
         case _ => Result.Unexpected(v, "Map", path)
       }
   }
@@ -386,19 +385,19 @@ object Encoder {
   }
 
   implicit object CharEncoder extends Encoder[Char] {
-    def encode(t: Char) = LongV(t)
+    def encode(t: Char) = LongV(t.toLong)
   }
 
   implicit object ByteEncoder extends Encoder[Byte] {
-    def encode(t: Byte) = LongV(t)
+    def encode(t: Byte) = LongV(t.toLong)
   }
 
   implicit object ShortEncoder extends Encoder[Short] {
-    def encode(t: Short) = LongV(t)
+    def encode(t: Short) = LongV(t.toLong)
   }
 
   implicit object IntEncoder extends Encoder[Int] {
-    def encode(t: Int) = LongV(t)
+    def encode(t: Int) = LongV(t.toLong)
   }
 
   implicit object LongEncoder extends Encoder[Long] {
@@ -406,7 +405,7 @@ object Encoder {
   }
 
   implicit object FloatEncoder extends Encoder[Float] {
-    def encode(t: Float) = DoubleV(t)
+    def encode(t: Float) = DoubleV(t.toDouble)
   }
 
   implicit object DoubleEncoder extends Encoder[Double] {

@@ -1,9 +1,9 @@
 package faunadb
 
-import org.scalatest.{BeforeAndAfterAll, FutureOutcome, SuiteMixin, fixture}
+import org.scalatest.{BeforeAndAfterAll, FutureOutcome, SuiteMixin, FixtureAsyncTestSuite}
 import scala.concurrent.Future
 
-trait FaunaClientFixture extends SuiteMixin with BeforeAndAfterAll { self: fixture.AsyncTestSuite =>
+trait FaunaClientFixture extends SuiteMixin with BeforeAndAfterAll { self: FixtureAsyncTestSuite =>
   private var _rootClient: FaunaClient = _
   protected def rootClient = _rootClient
 
@@ -16,7 +16,7 @@ trait FaunaClientFixture extends SuiteMixin with BeforeAndAfterAll { self: fixtu
       val scheme = Option(System.getenv("FAUNA_SCHEME")) getOrElse { "https" }
       val port = Option(System.getenv("FAUNA_PORT")) getOrElse { "443" }
 
-      collection.Map("root_token" -> rootKey, "root_url" -> s"${scheme}://${domain}:${port}")
+      collection.Map("root_token" -> rootKey, "root_url" -> s"$scheme://$domain:$port")
     }
 
     _rootClient = FaunaClient(endpoint = config("root_url"), secret = config("root_token"))
