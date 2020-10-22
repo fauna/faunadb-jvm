@@ -6,13 +6,15 @@ import faunadb.values._
 import java.time.temporal.ChronoUnit
 import java.time.{ Instant, LocalDate }
 import org.scalatest.concurrent.{ IntegrationPatience, ScalaFutures }
-import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.util.Random
 
 class ClientSpec
-    extends FlatSpec
+    extends AnyFlatSpec
     with Matchers
     with BeforeAndAfterAll
     with ScalaFutures
@@ -26,7 +28,7 @@ class ClientSpec
     val scheme = Option(System.getenv("FAUNA_SCHEME")) getOrElse { "https" }
     val port = Option(System.getenv("FAUNA_PORT")) getOrElse { "443" }
 
-    collection.Map("root_token" -> rootKey, "root_url" -> s"${scheme}://${domain}:${port}")
+    collection.Map("root_token" -> rootKey, "root_url" -> s"$scheme://$domain:$port")
   }
 
   val rootClient = FaunaClient(endpoint = config("root_url"), secret = config("root_token"))
@@ -680,15 +682,6 @@ class ClientSpec
     val concat2R = client.query(Concat(Arr("Magic", "Missile"), " ")).futureValue
     concat2R.to[String].get shouldBe "Magic Missile"
 
-    // Contains
-    val containsR = client.query(Contains("favorites" / "foods", Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings"))))).futureValue
-    containsR.to[Boolean].get shouldBe true
-
-    client.query(Contains("field", Obj("field" -> "value"))).futureValue shouldBe TrueV
-    client.query(Contains(1, Arr("value0", "value1", "value2"))).futureValue shouldBe TrueV
-
-    client.query(Contains("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value")))))).futureValue shouldBe TrueV
-
     // ContainsField
     client.query(ContainsField("foo", Obj("foo" -> "bar"))).futureValue shouldBe TrueV
     client.query(ContainsField("foo", Obj())).futureValue shouldBe FalseV
@@ -760,6 +753,16 @@ class ClientSpec
     // Not
     val notR = client.query(Not(false)).futureValue
     notR.to[Boolean].get shouldBe true
+  }
+
+  it should "test Contains function" ignore {
+    val containsR = client.query(Contains("favorites" / "foods", Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings"))))).futureValue
+    containsR.to[Boolean].get shouldBe true
+
+    client.query(Contains("field", Obj("field" -> "value"))).futureValue shouldBe TrueV
+    client.query(Contains(1, Arr("value0", "value1", "value2"))).futureValue shouldBe TrueV
+
+    client.query(Contains("a" / "nested" / 0 / "path", Obj("a" -> Obj("nested" -> Arr(Obj("path" -> "value")))))).futureValue shouldBe TrueV
   }
 
   it should "test conversion functions" in {
@@ -982,7 +985,7 @@ class ClientSpec
   }
 
   it should "create a role" in {
-    val name = s"a_role_${aRandomString}"
+    val name = s"a_role_$aRandomString"
 
     rootClient.query(CreateRole(Obj(
       "name" -> name,
@@ -1621,6 +1624,6 @@ class ClientSpec
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
     client.query(CreateDatabase(Obj("name" -> name))).futureValue
     val key = client.query(CreateKey(Obj("database" -> Database(name), "role" -> "admin"))).futureValue
-    FaunaClient(secret = key(SecretField).get, endpoint = config("root_url"))
+    client.sessionClient(key(SecretField).get)
   }
 }
