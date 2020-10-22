@@ -10,7 +10,7 @@ object FieldPath {
 sealed abstract class FieldPath {
   def subValue(v: Result[Value]): Result[Value]
 
-  def ++(other: FieldPath) =
+  def ++(other: FieldPath): FieldPath =
     this match {
       case FieldPathEmpty => other
       case p              => FieldPathNode(p, other)
@@ -19,7 +19,7 @@ sealed abstract class FieldPath {
 
 case object FieldPathEmpty extends FieldPath {
   override def toString = "/"
-  def subValue(v: Result[Value]) = v
+  def subValue(v: Result[Value]): Result[Value] = v
 }
 
 case class FieldPathField(field: String) extends FieldPath {
