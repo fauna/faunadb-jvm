@@ -1176,6 +1176,7 @@ public class ClientSpec {
     );
   }
 
+  @Ignore
   @Test
   public void shouldEvalContainsExpression() throws Exception {
     Value contains = query(
