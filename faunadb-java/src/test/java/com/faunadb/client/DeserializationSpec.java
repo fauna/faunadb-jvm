@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -19,10 +18,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.faunadb.client.types.Codec.*;
-import static com.faunadb.client.types.Value.RefV;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static java.time.ZoneOffset.UTC;
 import static org.junit.Assert.assertThat;
 
 public class DeserializationSpec {

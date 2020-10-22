@@ -2,7 +2,6 @@ package com.faunadb.client.types;
 
 import com.faunadb.client.types.Value.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
