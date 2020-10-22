@@ -3,8 +3,6 @@ package com.faunadb.client.types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.faunadb.client.types.Codec.ARRAY;

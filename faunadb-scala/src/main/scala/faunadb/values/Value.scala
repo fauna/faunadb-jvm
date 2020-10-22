@@ -3,7 +3,7 @@ package faunadb.values
 import java.nio.ByteBuffer
 import java.time.{ Instant, LocalDate }
 import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
-import java.util.Base64;
+import java.util.Base64
 
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
