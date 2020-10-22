@@ -7062,7 +7062,7 @@ public final class Language {
   /**
    * Returns a time expression's day of the month, from 1 to 31.
    *
-   * @param value an expression. Type: Any
+   * @param expr an expression. Type: Any
    * @return a new {@link Expr}
    */
   public static Expr DayOfMonth(Expr expr) {
@@ -7073,7 +7073,7 @@ public final class Language {
    * Returns a time expression's day of the week following ISO-8601 convention,
    * from 1 (Monday) to 7 (Sunday).
    *
-   * @param value an expression. Type: Any
+   * @param expr an expression. Type: Any
    * @return a new {@link Expr}
    */
   public static Expr DayOfWeek(Expr expr) {
@@ -7084,7 +7084,7 @@ public final class Language {
    * Returns a time expression's day of the year, from 1 to 365, or 366 in a leap
    * year.
    *
-   * @param value an expression. Type: Any
+   * @param expr an expression. Type: Any
    * @return a new {@link Expr}
    */
   public static Expr DayOfYear(Expr expr) {
@@ -7094,7 +7094,7 @@ public final class Language {
   /**
    * Returns the time expression's year, following the ISO-8601 standard.
    *
-   * @param value an expression. Type: Any
+   * @param expr an expression. Type: Any
    * @return a new {@link Expr}
    */
   public static Expr Year(Expr expr) {
@@ -7104,7 +7104,7 @@ public final class Language {
   /**
    * Returns a time expression's month of the year, from 1 to 12.
    *
-   * @param value an expression. Type: Any
+   * @param expr an expression. Type: Any
    * @return a new {@link Expr}
    */
   public static Expr Month(Expr expr) {
@@ -7114,7 +7114,7 @@ public final class Language {
   /**
    * Returns a time expression's hour of the day, from 0 to 23.
    *
-   * @param value an expression. Type: Any
+   * @param expr an expression. Type: Any
    * @return a new {@link Expr}
    */
   public static Expr Hour(Expr expr) {
@@ -7124,7 +7124,7 @@ public final class Language {
   /**
    * Returns a time expression's minute of the hour, from 0 to 59.
    *
-   * @param value an expression. Type: Any
+   * @param expr an expression. Type: Any
    * @return a new {@link Expr}
    */
   public static Expr Minute(Expr expr) {
@@ -7134,7 +7134,7 @@ public final class Language {
   /**
    * Returns a time expression's second of the minute, from 0 to 59.
    *
-   * @param value an expression. Type: Any
+   * @param expr an expression. Type: Any
    * @return a new {@link Expr}
    */
   public static Expr Second(Expr expr) {
