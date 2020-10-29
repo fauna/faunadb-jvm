@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.*;
 import static java.util.Arrays.asList;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Flow;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -31,6 +33,7 @@ import static com.faunadb.client.types.Codec.*;
 import static com.faunadb.client.types.Value.NullV.NULL;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -3046,6 +3049,219 @@ public class ClientSpec {
       adminClient.query(falseExprs).get(),
       equalTo(Collections.nCopies(falseExprs.size(), BooleanV.FALSE))
     );
+  }
+
+  @Test
+  public void streamFailsIfTargetDoesNotExist() throws Exception {
+    thrown.expectCause(isA(NotFoundException.class));
+
+    adminClient.stream(Get(Ref(Collection("spells"), "1234"))).get();
+  }
+
+  @Test
+  public void streamFailsIfQueryIsNotReadOnly() throws Exception {
+    thrown.expectCause(isA(BadRequestException.class));
+    thrown.expectMessage(containsString("invalid expression: Write effect in read-only query expression."));
+
+    adminClient.stream(CreateCollection(Collection("spells"))).get();
+  }
+
+  @Test
+  public void streamEventsOnDocumentReference() throws Exception {
+    query(CreateCollection(Obj("name", Value("streamed-things")))).get();
+    RefV createdDoc = query(
+      Create(Collection("streamed-things"),
+        Obj("credentials",
+          Obj("password", Value("abcdefg"))))
+    ).get().get(REF_FIELD);
+
+    Flow.Publisher<Value> valuePublisher = adminClient.stream(createdDoc).get();
+    CompletableFuture<List<Value>> capturedEvents = new CompletableFuture<>();
+
+    Flow.Subscriber<Value> valueSubscriber = new Flow.Subscriber<>() {
+      Flow.Subscription subscription = null;
+      ConcurrentLinkedQueue<Value> captured = new ConcurrentLinkedQueue<>();
+      @Override
+      public void onSubscribe(Flow.Subscription s) {
+        subscription = s;
+        subscription.request(1);
+      }
+
+      @Override
+      public void onNext(Value v) {
+        captured.add(v);
+        if (captured.size() == 4) {
+          List<Value> list = new ArrayList<>();
+          captured.iterator().forEachRemaining(list::add);
+          capturedEvents.complete(list);
+        }
+        else
+          subscription.request(1);
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+         capturedEvents.completeExceptionally(throwable);
+      }
+
+      @Override
+      public void onComplete() {
+        capturedEvents.completeExceptionally(new IllegalStateException("not expecting the stream to complete"));
+      }
+    };
+
+    // subscribe to publisher
+    valuePublisher.subscribe(valueSubscriber);
+
+    // push 3 updates
+    adminClient.query(Update(createdDoc, Obj("data", Obj("testField", Value("testValue1"))))).get();
+    adminClient.query(Update(createdDoc, Obj("data", Obj("testField", Value("testValue2"))))).get();
+    adminClient.query(Update(createdDoc, Obj("data", Obj("testField", Value("testValue3"))))).get();
+
+    // blocking
+    List<Value> events = capturedEvents.get();
+    Value startEvent = events.get(0);
+    assertThat(startEvent.at("event").to(STRING).get(), equalTo("start"));
+
+    Value e1 = events.get(1);
+    assertThat(e1.at("event").to(STRING).get(), equalTo("version"));
+    assertThat(e1.at("data", "new", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue1"))));
+
+    Value e2 = events.get(2);
+    assertThat(e2.at("event").to(STRING).get(), equalTo("version"));
+    assertThat(e2.at("data", "new", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue2"))));
+
+    Value e3 = events.get(3);
+    assertThat(e3.at("event").to(STRING).get(), equalTo("version"));
+    assertThat(e3.at("data", "new", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue3"))));
+  }
+
+  @Test
+  public void streamHandlesLossOfAuthorization() throws Exception {
+    query(CreateCollection(Obj("name", Value("streamed-things-auth")))).get();
+    RefV createdDoc = query(
+      Create(Collection("streamed-things-auth"),
+        Obj("credentials",
+          Obj("password", Value("abcdefg"))))
+    ).get().get(REF_FIELD);
+
+    // new new + client
+    Value newKey = adminClient.query(CreateKey(Obj("role", Value("server-readonly")))).get();
+    FaunaClient streamingClient = adminClient.newSessionClient(newKey.at("secret").to(STRING).get());
+
+    Flow.Publisher<Value> valuePublisher = streamingClient.stream(createdDoc).get();
+    CompletableFuture<List<Value>> capturedEvents = new CompletableFuture<>();
+
+    Flow.Subscriber<Value> valueSubscriber = new Flow.Subscriber<>() {
+      Flow.Subscription subscription = null;
+      ConcurrentLinkedQueue<Value> captured = new ConcurrentLinkedQueue<>();
+      @Override
+      public void onSubscribe(Flow.Subscription s) {
+        subscription = s;
+        subscription.request(1);
+      }
+
+      @Override
+      public void onNext(Value v) {
+        if (captured.isEmpty()) {
+          try {
+            // update doc on `start` event
+            adminClient.query(Update(createdDoc, Obj("data", Obj("testField", Value("afterStart"))))).get();
+
+            // delete key
+            adminClient.query(Delete(newKey.at("ref").to(REF).get())).get();
+
+            // push an update to force auth revalidation.
+            adminClient.query(Update(createdDoc, Obj("data", Obj("testField", Value("afterKeyDelete"))))).get();
+          } catch (Exception e) {
+          capturedEvents.completeExceptionally(e);
+        }
+        }
+        captured.add(v);          // capture element
+        subscription.request(1);  // ask for more elements
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+        capturedEvents.completeExceptionally(throwable);
+      }
+
+      @Override
+      public void onComplete() {
+        capturedEvents.completeExceptionally(new IllegalStateException("not expecting the stream to complete"));
+      }
+    };
+
+    // subscribe to publisher
+    valuePublisher.subscribe(valueSubscriber);
+
+    thrown.expectCause(isA(PermissionDeniedException.class));
+    thrown.expectMessage(containsString("code: permission denied, description:Authorization lost during stream evaluation."));
+    capturedEvents.get();
+  }
+
+  @Test
+  public void streamBuffersEventsIfTheProducerIsFasterThanConsumer() throws Exception {
+    query(CreateCollection(Obj("name", Value("streamed-things-buffered")))).get();
+    RefV createdDoc = query(
+      Create(Collection("streamed-things-buffered"),
+        Obj("credentials",
+          Obj("password", Value("abcdefg"))))
+    ).get().get(REF_FIELD);
+
+    Flow.Publisher<Value> valuePublisher = adminClient.stream(createdDoc).get();
+    CompletableFuture<List<Value>> capturedEvents = new CompletableFuture<>();
+    int bufferSize = 30; // increasing this value makes the test too slow so we can't test the real limit (256)
+
+    Flow.Subscriber<Value> valueSubscriber = new Flow.Subscriber<>() {
+      Flow.Subscription subscription = null;
+      ConcurrentLinkedQueue<Value> captured = new ConcurrentLinkedQueue<>();
+      @Override
+      public void onSubscribe(Flow.Subscription s) {
+        subscription = s;
+        subscription.request(1);
+      }
+
+      @Override
+      public void onNext(Value v) {
+        if (captured.isEmpty()) {
+          // update doc on `start` event
+          for (int i = 0; i < bufferSize; i++) {
+            try {
+              adminClient.query(Update(createdDoc, Obj("data", Obj("testField", Value("testValue" + i))))).get();
+            } catch (Exception e) {
+              capturedEvents.completeExceptionally(e);
+            }
+          }
+          captured.add(v);
+        } else {
+          captured.add(v); // capture element
+          if (captured.size() > bufferSize) {
+            List<Value> list = new ArrayList<>();
+            captured.iterator().forEachRemaining(list::add);
+            capturedEvents.complete(list);
+          }
+        }
+        subscription.request(1);
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+        capturedEvents.completeExceptionally(throwable);
+      }
+
+      @Override
+      public void onComplete() {
+        capturedEvents.completeExceptionally(new IllegalStateException("not expecting the stream to complete"));
+      }
+    };
+
+    // subscribe to publisher
+    valuePublisher.subscribe(valueSubscriber);
+
+    // blocking
+    List<Value> events = capturedEvents.get();
+    assertThat(events.size(), equalTo(bufferSize + 1)); // +1 for start event
   }
 
   private CompletableFuture<Value> query(Expr expr) {

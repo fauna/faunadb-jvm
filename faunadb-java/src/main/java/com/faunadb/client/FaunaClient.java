@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
+import com.faunadb.client.streaming.BodyValueFlowProcessor;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
@@ -20,13 +21,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Flow;
 import java.util.concurrent.TimeoutException;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.faunadb.common.http.ResponseBodyStringProcessor;
 
 import static com.faunadb.client.types.Codec.VALUE;
 
@@ -308,8 +308,8 @@ public class FaunaClient {
 
   private Value handleResponse(HttpResponse<String> response) {
     try {
-      handleQueryErrors(response);
-      JsonNode responseBody = parseResponseBody(response);
+      handleQueryErrors(response.statusCode(), response.body());
+      JsonNode responseBody = parseResponseBody(response.body());
       JsonNode resource = responseBody.get("resource");
 
       if(resource == null) {
@@ -330,22 +330,70 @@ public class FaunaClient {
     return handleNetworkExceptions(connection.post("", body, queryTimeout).thenApply(this::handleResponse));
   }
 
-  private void handleQueryErrors(HttpResponse<String> response) {
-    int status = response.statusCode();
-    if (status >= 300) {
+  /**
+   * Creates a subscription to the result of the given read-only expression. When
+   * executed, the expression must only perform reads and produce a single
+   * streamable type, such as a reference or a version. Expressions that attempt
+   * to perform writes or produce non-streamable types will result in an error.
+   * Otherwise, any expression can be used to initiate a stream, including
+   * user-defined function calls.
+   *
+   * @param expr the query to subscribe to.
+   * @return a {@link CompletableFuture} containing a {@link java.util.concurrent.Flow.Publisher} of {@link Value}.
+   * @see Value
+   * @see com.faunadb.client.query.Language
+   */
+  public CompletableFuture<Flow.Publisher<Value>> stream(Expr expr) {
+    return performStreamRequest(json.valueToTree(expr));
+  }
+
+  private CompletableFuture<Flow.Publisher<Value>> performStreamRequest(JsonNode body) {
+    try {
+      return handleNetworkExceptions(
+        connection.performStreamRequest("POST", "stream", body, Map.of())
+          .thenCompose(response -> {
+            CompletableFuture<Flow.Publisher<Value>> publisher = new CompletableFuture<>();
+            if (response.statusCode() < 300) {
+              BodyValueFlowProcessor bodyValueFlowProcessor = new BodyValueFlowProcessor();
+              response.body().subscribe(bodyValueFlowProcessor);
+              publisher.complete(bodyValueFlowProcessor);
+            } else {
+              ResponseBodyStringProcessor.consumeBody(response).thenCompose(bodyString -> {
+                try {
+                  // this always throws in the error case
+                  handleQueryErrors(response.statusCode(), bodyString);
+                } catch (Exception ex) {
+                  publisher.completeExceptionally(ex);
+                }
+                return publisher;
+              });
+            }
+            return publisher;
+          }
+        )
+      );
+    } catch (Exception ex) {
+      CompletableFuture<Flow.Publisher<Value>> oops = new CompletableFuture<>();
+      oops.completeExceptionally(ex);
+      return oops;
+    }
+  }
+
+  private void handleQueryErrors(int statusCode, String body) {
+    if (statusCode >= 300) {
       try {
         List<HttpResponses.QueryError> parsedErrors = new ArrayList<>();
 
-        ArrayNode errors = (ArrayNode) parseResponseBody(response).get("errors");
+        ArrayNode errors = (ArrayNode) parseResponseBody(body).get("errors");
         if (errors != null) {
           for (JsonNode errorNode : errors) {
             parsedErrors.add(json.treeToValue(errorNode, HttpResponses.QueryError.class));
           }
         }
 
-        HttpResponses.QueryErrorResponse errorResponse = HttpResponses.QueryErrorResponse.create(status, parsedErrors);
+        HttpResponses.QueryErrorResponse errorResponse = HttpResponses.QueryErrorResponse.create(statusCode, parsedErrors);
 
-        switch (status) {
+        switch (statusCode) {
           case 400:
             throw new BadRequestException(errorResponse);
           case 401:
@@ -362,10 +410,10 @@ public class FaunaClient {
             throw new UnknownException(errorResponse);
         }
       } catch (JsonProcessingException | IllegalArgumentException ex) {
-        if (status == 503) {
+        if (statusCode == 503) {
           throw new UnavailableException("Service Unavailable: Unparseable response.", ex);
         } else {
-          throw new UnknownException("Unparseable service " + status + " response.", ex);
+          throw new UnknownException("Unparseable service " + statusCode + " response.", ex);
         }
       }
     }
@@ -379,8 +427,8 @@ public class FaunaClient {
       });
   }
 
-  private JsonNode parseResponseBody(HttpResponse<String> response) throws JsonProcessingException, IllegalArgumentException {
-    JsonNode body = json.readTree(response.body());
+  private JsonNode parseResponseBody(String responseBody) throws JsonProcessingException, IllegalArgumentException {
+    JsonNode body = json.readTree(responseBody);
     if (body == null) {
       throw new IllegalArgumentException("Invalid JSON.");
     } else {
