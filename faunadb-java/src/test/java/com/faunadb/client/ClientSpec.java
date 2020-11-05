@@ -2106,11 +2106,11 @@ public class ClientSpec {
       "name", Value(providerName),
       "issuer" , Value(issuerName),
       "jwks_uri" , Value(fullUri),
-      "membership", Arr(Role(roleName))))
+      "roles", Arr(Role(roleName))))
     ).get();
 
-    List<RefV> membership = provider.at("membership").collect(Field.as(REF));
-    assertThat(membership.size(), equalTo(1));
+    List<RefV> roles = provider.at("roles").collect(Field.as(REF));
+    assertThat(roles.size(), equalTo(1));
   }
 
   @Test
