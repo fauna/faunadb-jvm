@@ -940,10 +940,10 @@ class ClientSpec
       "name" -> providerName,
       "issuer" -> issuerName,
       "jwks_uri" -> fullUri,
-      "membership" -> ArrayV(roleV(RefField))))
+      "roles" -> ArrayV(roleV(RefField))))
     ).futureValue
 
-    providerV("membership").to[Seq[RefV]].get.size shouldBe 1
+    providerV("roles").to[Seq[RefV]].get.size shouldBe 1
   }
 
   it should "create_access_provider fails with non-unique issuer" in {
@@ -963,17 +963,17 @@ class ClientSpec
       "name" -> providerName,
       "issuer" -> issuerName,
       "jwks_uri" -> fullUri,
-      "membership" -> ArrayV(roleV(RefField))))
+      "roles" -> ArrayV(roleV(RefField))))
     ).futureValue
 
-    providerV("membership").to[Seq[RefV]].get.size shouldBe 1
+    providerV("roles").to[Seq[RefV]].get.size shouldBe 1
 
     // Create provider with duplicate issuer value
     val error = adminClient.query(CreateAccessProvider(Obj(
       "name" -> "duplicate_provider",
       "issuer" -> issuerName,
       "jwks_uri" -> "https://db.fauna.com",
-      "membership" -> ArrayV(roleV(RefField))))
+      "roles" -> ArrayV(roleV(RefField))))
     ).failed.futureValue
 
     error shouldBe a[BadRequestException]
@@ -994,7 +994,7 @@ class ClientSpec
     val error = adminClient.query(CreateAccessProvider(Obj(
       "name" -> providerName,
       "jwks_uri" -> fullUri,
-      "membership" -> ArrayV(roleV(RefField))))
+      "roles" -> ArrayV(roleV(RefField))))
     ).failed.futureValue
 
     error shouldBe a[BadRequestException]
@@ -1016,7 +1016,7 @@ class ClientSpec
     val error = adminClient.query(CreateAccessProvider(Obj(
       "issuer" -> issuerName,
       "jwks_uri" -> fullUri,
-      "membership" -> ArrayV(roleV(RefField))))
+      "roles" -> ArrayV(roleV(RefField))))
     ).failed.futureValue
 
     error shouldBe a[BadRequestException]
@@ -1040,7 +1040,7 @@ class ClientSpec
       "name" -> providerName,
       "issuer" -> issuerName,
       "jwks_uri" -> fullUri, // not a valid URI
-      "membership" -> ArrayV(roleV(RefField))))
+      "roles" -> ArrayV(roleV(RefField))))
     ).failed.futureValue
 
     error shouldBe a[BadRequestException]
