@@ -30,8 +30,7 @@ commands:
       - checkout
 
       - restore_cache:
-          keys:
-          - v1-deps-{{ checksum "build.sbt" }}
+          key: sbt-cache
 
       - run:
           name: Compile 2.11
@@ -42,9 +41,11 @@ commands:
           command: sbt ++2.12.12 compileAll
 
       - save_cache:
+          key: sbt-cache
           paths:
-          - ~/.ivy2
-          key: v1-deps-{{ checksum "build.sbt" }}
+            - "~/.ivy2/cache"
+            - "~/.sbt"
+            - "~/.m2"
 
       - run:
           name: Test 2.11
