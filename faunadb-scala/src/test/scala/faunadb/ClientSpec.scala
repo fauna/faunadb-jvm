@@ -917,6 +917,10 @@ class ClientSpec
       val identity = client.sessionWith(secret)(_.query(Identity())).futureValue
       identity.to[RefV].get shouldBe createR(RefField).get
 
+     // CurrentIdentity
+     val currentIdentity = client.sessionWith(secret)(_.query(CurrentIdentity())).futureValue
+     currentIdentity.to[RefV].get shouldBe createR(RefField).get
+
       // Logout
       val loggedOut = client.sessionWith(secret)(_.query(Logout(false))).futureValue
       loggedOut.to[Boolean].get shouldBe true
