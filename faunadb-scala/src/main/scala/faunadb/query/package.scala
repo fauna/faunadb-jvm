@@ -704,6 +704,7 @@ package object query {
     */
   def HasCurrentIdentity(): Expr =
     Expr(ObjectV("has_current_identity" -> NullV))
+
   // String Functions
 
   /**
