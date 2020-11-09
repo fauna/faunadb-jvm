@@ -35,6 +35,8 @@ object Dependencies {
 
     val config                = "com.typesafe"                    %  "config"                   % "1.3.4"
 
+    val cats                  = "org.typelevel"                   %% "cats-core"                % "2.1.1"
+
     // faunadb-scala
     val jacksonModuleScala    = "com.fasterxml.jackson.module"    %% "jackson-module-scala"     % jacksonVersion
     val jacksonAnnotations    = "com.fasterxml.jackson.core"      %  "jackson-annotations"      % jacksonVersion
@@ -81,6 +83,6 @@ object Dependencies {
   // Projects
   val faunadbCommon = netty ++ jacksonCommon ++ Seq(slf4j, metrics)
   val faunadbJava = Seq(logbackClassic, snakeYaml, junit, junitInterface, harmcrestLibrary)
-  def faunadbScala(scalaVersion: String): Seq[ModuleID] = Seq(config) ++ jacksonScala ++ scalaLang(scalaVersion) ++ Seq(logbackClassic, scalaTest)
+  def faunadbScala(scalaVersion: String): Seq[ModuleID] = Seq(config) ++  Seq(cats) ++ jacksonScala ++ scalaLang(scalaVersion) ++ Seq(logbackClassic, scalaTest)
 
 }
