@@ -33,6 +33,8 @@ object Dependencies {
     val metrics               = "io.dropwizard.metrics"           %  "metrics-core"             % metricsVersion
     val slf4j                 = "org.slf4j"                       %  "slf4j-api"                % slf4jVersion
 
+    val akka                  = "com.typesafe.akka"               %% "akka-actor-typed"         % "2.6.10"
+
     // faunadb-scala
     val jacksonModuleScala    = "com.fasterxml.jackson.module"    %% "jackson-module-scala"     % jacksonVersion
     val jacksonAnnotations    = "com.fasterxml.jackson.core"      %  "jackson-annotations"      % jacksonVersion
@@ -52,6 +54,7 @@ object Dependencies {
     val harmcrestLibrary    = "org.hamcrest"    %  "hamcrest-library"  % harmcrestLibraryVersion  % "test"
     val junit               = "junit"           %  "junit"             % junitVersion             % "test"
     val snakeYaml           = "org.yaml"        %  "snakeyaml"         % snakeYamlVersion         % "test"
+
 
     // faunadb-scala
     val scalaTest           = "org.scalatest"   %% "scalatest"         % scalaTestVersion         % "test"
@@ -78,6 +81,6 @@ object Dependencies {
   // Projects
   val faunadbCommon = netty ++ jacksonCommon ++ Seq(slf4j, metrics)
   val faunadbJava = Seq(logbackClassic, snakeYaml, junit, junitInterface, harmcrestLibrary)
-  def faunadbScala(scalaVersion: String): Seq[ModuleID] = jacksonScala ++ scalaLang(scalaVersion) ++ Seq(logbackClassic, scalaTest)
+  def faunadbScala(scalaVersion: String): Seq[ModuleID] = Seq(akka) ++ jacksonScala ++ scalaLang(scalaVersion) ++ Seq(logbackClassic, scalaTest)
 
 }
