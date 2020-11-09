@@ -81,6 +81,6 @@ object Dependencies {
   // Projects
   val faunadbCommon = netty ++ jacksonCommon ++ Seq(slf4j, metrics)
   val faunadbJava = Seq(logbackClassic, snakeYaml, junit, junitInterface, harmcrestLibrary)
-  def faunadbScala(scalaVersion: String): Seq[ModuleID] = Seq(config) ++  Seq(cats) ++ jacksonScala ++ scalaLang(scalaVersion) ++ Seq(logbackClassic, scalaTest)
+  def faunadbScala(scalaVersion: String): Seq[ModuleID] = Seq(cats) ++ jacksonScala ++ scalaLang(scalaVersion) ++ Seq(logbackClassic, scalaTest)
 
 }
