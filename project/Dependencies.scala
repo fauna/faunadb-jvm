@@ -33,8 +33,6 @@ object Dependencies {
     val metrics               = "io.dropwizard.metrics"           %  "metrics-core"             % metricsVersion
     val slf4j                 = "org.slf4j"                       %  "slf4j-api"                % slf4jVersion
 
-    val config                = "com.typesafe"                    %  "config"                   % "1.3.4"
-
     val cats                  = "org.typelevel"                   %% "cats-core"                % "2.1.1"
 
     // faunadb-scala
