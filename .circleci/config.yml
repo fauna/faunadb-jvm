@@ -30,7 +30,7 @@ commands:
       - checkout
 
       - restore_cache:
-          key: <faunadb-jvm>-v1-<{{ .Branch }}>-<{{checksum "project/Dependencies.scala" }}>
+          key: <faunadb-jvm>-<v1>-<{{ .Branch }}>-<{{checksum "project/Dependencies.scala" }}>
 
 #      - run:
 #          name: Compile 2.11
