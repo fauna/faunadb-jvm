@@ -13,7 +13,6 @@ class DummyAccountServiceImpl extends AccountService {
   def dummyAccount: Account = ???
 
 
-
   /* ... */
   override def getAccountById(id: Int): Option[Account] = dummyAccount.some
   /* ... */
