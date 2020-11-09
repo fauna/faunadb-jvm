@@ -17,6 +17,7 @@ executors:
           username: _json_key
           password: $GCR_KEY
     environment:
+      CACHE_VERSION: v1
       FAUNA_ROOT_KEY: secret
       FAUNA_DOMAIN: core
       FAUNA_SCHEME: http
@@ -30,7 +31,7 @@ commands:
       - checkout
 
       - restore_cache:
-          key: sbt-cache
+          key: faunadb-jvm-{{ .Environment.CACHE_VERSION }}-{{ .Branch }}-{{ .Revision }}-{{checksum "project/Dependencies.scala" }}
 
 #      - run:
 #          name: Compile 2.11
