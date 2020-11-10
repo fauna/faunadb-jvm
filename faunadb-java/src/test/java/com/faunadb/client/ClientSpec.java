@@ -2063,7 +2063,7 @@ public class ClientSpec {
   }
 
   @Test
-  public void shouldTestCurrentToken() throws Exception {
+  public void shouldTestCurrentTokenWithInternalToken() throws Exception {
     Value createdInstance = serverClient.query(
             Create(onARandomCollection(),
                     Obj("credentials",
