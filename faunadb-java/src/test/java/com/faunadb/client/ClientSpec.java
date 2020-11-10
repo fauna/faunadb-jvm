@@ -3,6 +3,8 @@ package com.faunadb.client;
 import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
+import com.faunadb.client.streaming.EventField;
+import static com.faunadb.client.streaming.EventFields.*;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
@@ -3139,6 +3141,88 @@ public class ClientSpec {
     Value e3 = events.get(3);
     assertThat(e3.at("type").to(STRING).get(), equalTo("version"));
     assertThat(e3.at("event", "document", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue3"))));
+  }
+
+  @Test
+  public void streamEventsOnDocumentReferenceWithOptInFields() throws Exception {
+    String collectionName = randomStartingWith("collection_");
+    query(CreateCollection(Obj("name", Value(collectionName)))).get();
+    RefV createdDoc = query(Create(Collection(collectionName), Obj("data", Obj("testField", Value("testValue0"))))
+    ).get().get(REF_FIELD);
+    List<EventField> fields = List.of(DocumentField, PrevField, DiffField, ActionField);
+    Flow.Publisher<Value> valuePublisher = adminClient.stream(createdDoc, fields).get();
+    CompletableFuture<List<Value>> capturedEvents = new CompletableFuture<>();
+
+    Flow.Subscriber<Value> valueSubscriber = new Flow.Subscriber<>() {
+      Flow.Subscription subscription = null;
+      ArrayList<Value> captured = new ArrayList<>();
+      @Override
+      public void onSubscribe(Flow.Subscription s) {
+        subscription = s;
+        subscription.request(1);
+      }
+
+      @Override
+      public void onNext(Value v) {
+        // make sure the client's txn time is updated for each event
+        if (v.at("txn").to(Long.class).get() <= adminClient.getLastTxnTime()) {
+          captured.add(v);
+          if (captured.size() == 4) {
+            capturedEvents.complete(captured);
+            subscription.cancel();
+          } else {
+            subscription.request(1);
+          }
+        } else {
+          Throwable t = new IllegalStateException("event's txnTS did not update client's value");
+          capturedEvents.completeExceptionally(t);
+        }
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+        capturedEvents.completeExceptionally(throwable);
+      }
+
+      @Override
+      public void onComplete() {
+        capturedEvents.completeExceptionally(new IllegalStateException("not expecting the stream to complete"));
+      }
+    };
+
+    // subscribe to publisher
+    valuePublisher.subscribe(valueSubscriber);
+
+    // push 3 updates
+    adminClient.query(Update(createdDoc, Obj("data", Obj("testField", Value("testValue1"))))).get();
+    adminClient.query(Update(createdDoc, Obj("data", Obj("testField", Value("testValue2"))))).get();
+    adminClient.query(Update(createdDoc, Obj("data", Obj("testField", Value("testValue3"))))).get();
+
+    // blocking
+    List<Value> events = capturedEvents.get();
+    Value startEvent = events.get(0);
+    assertThat(startEvent.at("type").to(STRING).get(), equalTo("start"));
+
+    Value e1 = events.get(1);
+    assertThat(e1.at("type").to(STRING).get(), equalTo("version"));
+    assertThat(e1.at("event", "action").to(STRING).get(), equalTo("update"));
+    assertThat(e1.at("event", "diff", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue1"))));
+    assertThat(e1.at("event", "document", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue1"))));
+    assertThat(e1.at("event", "prev", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue0"))));
+
+    Value e2 = events.get(2);
+    assertThat(e2.at("type").to(STRING).get(), equalTo("version"));
+    assertThat(e2.at("event", "action").to(STRING).get(), equalTo("update"));
+    assertThat(e2.at("event", "diff", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue2"))));
+    assertThat(e2.at("event", "document", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue2"))));
+    assertThat(e2.at("event", "prev", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue1"))));
+
+    Value e3 = events.get(3);
+    assertThat(e3.at("type").to(STRING).get(), equalTo("version"));
+    assertThat(e3.at("event", "action").to(STRING).get(), equalTo("update"));
+    assertThat(e3.at("event", "diff", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue3"))));
+    assertThat(e3.at("event", "document", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue3"))));
+    assertThat(e3.at("event", "prev", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue2"))));
   }
 
   @Test

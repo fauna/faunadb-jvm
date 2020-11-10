@@ -57,7 +57,7 @@ public class BodyValueFlowProcessor extends SubmissionPublisher<Value> implement
     @Override
     public void onNext(List<ByteBuffer> items) {
         String text = items.stream()
-            .map(b -> StandardCharsets.US_ASCII.decode(b).toString())
+            .map(b -> StandardCharsets.UTF_8.decode(b).toString())
             .collect(Collectors.joining());
 
         try {

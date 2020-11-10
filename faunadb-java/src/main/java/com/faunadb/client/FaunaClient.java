@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.streaming.BodyValueFlowProcessor;
+import com.faunadb.client.streaming.EventField;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
@@ -25,6 +26,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Flow;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.faunadb.common.http.ResponseBodyStringProcessor;
 
@@ -344,13 +347,18 @@ public class FaunaClient {
    * @see com.faunadb.client.query.Language
    */
   public CompletableFuture<Flow.Publisher<Value>> stream(Expr expr) {
-    return performStreamRequest(json.valueToTree(expr));
+    return performStreamRequest(json.valueToTree(expr), List.of());
   }
 
-  private CompletableFuture<Flow.Publisher<Value>> performStreamRequest(JsonNode body) {
+  public CompletableFuture<Flow.Publisher<Value>> stream(Expr expr, List<EventField> fields) {
+    return performStreamRequest(json.valueToTree(expr), fields);
+  }
+
+  private CompletableFuture<Flow.Publisher<Value>> performStreamRequest(JsonNode body, List<EventField> fields) {
+    Map<String, List<String>> params = Map.of("fields", fields.stream().map(EventField::value).collect(Collectors.toList()));
     try {
       return handleNetworkExceptions(
-        connection.performStreamRequest("POST", "stream", body, Map.of())
+        connection.performStreamRequest("POST", "stream", body, params)
           .thenCompose(response -> {
             CompletableFuture<Flow.Publisher<Value>> publisher = new CompletableFuture<>();
             if (response.statusCode() < 300) {
