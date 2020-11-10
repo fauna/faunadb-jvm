@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.*;
 import static java.util.Arrays.asList;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Flow;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -3081,7 +3080,7 @@ public class ClientSpec {
 
     Flow.Subscriber<Value> valueSubscriber = new Flow.Subscriber<>() {
       Flow.Subscription subscription = null;
-      ConcurrentLinkedQueue<Value> captured = new ConcurrentLinkedQueue<>();
+      ArrayList<Value> captured = new ArrayList<>();
       @Override
       public void onSubscribe(Flow.Subscription s) {
         subscription = s;
@@ -3094,9 +3093,7 @@ public class ClientSpec {
         if (v.at("txn").to(Long.class).get() <= adminClient.getLastTxnTime()) {
           captured.add(v);
           if (captured.size() == 4) {
-            List<Value> list = new ArrayList<>();
-            captured.iterator().forEachRemaining(list::add);
-            capturedEvents.complete(list);
+            capturedEvents.complete(captured);
             subscription.cancel();
           } else {
             subscription.request(1);
@@ -3162,7 +3159,7 @@ public class ClientSpec {
 
     Flow.Subscriber<Value> valueSubscriber = new Flow.Subscriber<>() {
       Flow.Subscription subscription = null;
-      ConcurrentLinkedQueue<Value> captured = new ConcurrentLinkedQueue<>();
+      ArrayList<Value> captured = new ArrayList<>();
       @Override
       public void onSubscribe(Flow.Subscription s) {
         subscription = s;

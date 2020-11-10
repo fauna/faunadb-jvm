@@ -92,6 +92,63 @@ public class Main {
 }
 ```
 
+##### Document Streaming
+
+Fauna supports document streaming, where changes to a streamed document are pushed to all clients subscribing to that document.
+
+The streaming API is built using the [java.util.concurrent.Flow](https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/Flow.html) which enable users to establish flow-controlled components in which `Publishers` produce items consumed by one or more `Subscribers`, each managed by a `Subscription`.
+
+The following example assumes that you have already created a `FaunaClient`.
+
+In the example below, we are capturing the 4 first messages by manually binding a `Subscriber`.
+
+```java
+// docRef is a reference to the document for which we want to stream updates.
+// You can acquire a document reference with a query like the following, but it
+// needs to work with the documents that you have.
+// Value docRef = client.query(Get(Ref(Collection("scoreboards"), "123")))
+
+Flow.Publisher<Value> valuePublisher = adminClient.stream(createdDoc).get();
+CompletableFuture<List<Value>> capturedEvents = new CompletableFuture<>();
+
+Flow.Subscriber<Value> valueSubscriber = new Flow.Subscriber<>() {
+  Flow.Subscription subscription = null;
+  ArrayList<Value> captured = new ArrayList<>();
+  @Override
+  public void onSubscribe(Flow.Subscription s) {
+    subscription = s;
+    subscription.request(1);
+  }
+
+  @Override
+  public void onNext(Value v) {
+    captured.add(v);
+    if (captured.size() == 4) {
+      capturedEvents.complete(captured);
+      subscription.cancel();
+    } else {
+      subscription.request(1);
+    }
+  }
+
+  @Override
+  public void onError(Throwable throwable) {
+     capturedEvents.completeExceptionally(throwable);
+  }
+
+  @Override
+  public void onComplete() {
+    capturedEvents.completeExceptionally(new IllegalStateException("not expecting the stream to complete"));
+  }
+};
+
+// subscribe to publisher
+valuePublisher.subscribe(valueSubscriber);
+
+// blocking
+List<Value> events = capturedEvents.get();
+```
+
 [Detailed Java Documentation can be found here](docs/java.md)
 
 ### Scala
