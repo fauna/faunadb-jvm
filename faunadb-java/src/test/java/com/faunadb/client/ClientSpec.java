@@ -2063,7 +2063,7 @@ public class ClientSpec {
   }
 
   @Test
-  public void shouldTestHasCurrentToken() throws Exception {
+  public void shouldTestHasCurrentTokenWithInternalToken() throws Exception {
     Value createdInstance = serverClient.query(
             Create(onARandomCollection(),
                     Obj("credentials",
@@ -2084,13 +2084,14 @@ public class ClientSpec {
               equalTo(true)
       );
     }
+  }
 
-    try (FaunaClient sessionClient = serverClient) {
-      assertThat(
-              sessionClient.query(HasCurrentToken()).get().to(BOOLEAN).get(),
-              equalTo(false)
-      );
-    }
+  @Test
+  public void shouldTestHasCurrentTokenWithInternalKey() throws Exception {
+    assertThat(
+      serverClient.query(HasCurrentToken()).get().to(BOOLEAN).get(),
+      equalTo(false)
+    );
   }
 
   @Test
