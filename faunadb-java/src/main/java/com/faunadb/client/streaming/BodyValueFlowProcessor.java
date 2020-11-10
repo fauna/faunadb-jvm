@@ -87,6 +87,8 @@ public class BodyValueFlowProcessor extends SubmissionPublisher<Value> implement
             }
         } catch (Exception ex){
             log.error("could not parse event " + text, ex);
+            subscriber.onError(ex); // notify subscriber stream
+            subscription.cancel(); // cancel subscription on the request body
         }
 
         requestOne();
