@@ -354,7 +354,7 @@ public class FaunaClient {
           .thenCompose(response -> {
             CompletableFuture<Flow.Publisher<Value>> publisher = new CompletableFuture<>();
             if (response.statusCode() < 300) {
-              BodyValueFlowProcessor bodyValueFlowProcessor = new BodyValueFlowProcessor(json);
+              BodyValueFlowProcessor bodyValueFlowProcessor = new BodyValueFlowProcessor(json, connection);
               response.body().subscribe(bodyValueFlowProcessor);
               publisher.complete(bodyValueFlowProcessor);
             } else {

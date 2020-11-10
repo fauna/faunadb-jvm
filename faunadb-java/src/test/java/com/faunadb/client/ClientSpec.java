@@ -3090,15 +3090,21 @@ public class ClientSpec {
 
       @Override
       public void onNext(Value v) {
-        captured.add(v);
-        if (captured.size() == 4) {
-          List<Value> list = new ArrayList<>();
-          captured.iterator().forEachRemaining(list::add);
-          capturedEvents.complete(list);
-          subscription.cancel();
+        // make sure the client's txn time is updated for each event
+        if (v.at("txn").to(Long.class).get() <= adminClient.getLastTxnTime()) {
+          captured.add(v);
+          if (captured.size() == 4) {
+            List<Value> list = new ArrayList<>();
+            captured.iterator().forEachRemaining(list::add);
+            capturedEvents.complete(list);
+            subscription.cancel();
+          } else {
+            subscription.request(1);
+          }
+        } else {
+          Throwable t = new IllegalStateException("event's txnTS did not update client's value");
+          capturedEvents.completeExceptionally(t);
         }
-        else
-          subscription.request(1);
       }
 
       @Override
