@@ -683,10 +683,19 @@ package object query {
   /**
     * An Identity expression.
     *
-    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#authentication]]
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/identity]]
     */
+  @deprecated("use CurrentIdentity instead", "4.0.0")
   def Identity(): Expr =
     Expr(ObjectV("identity" -> NullV))
+
+  /**
+    * A CurrentIdentity expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/currentidentity]]
+    */
+  def CurrentIdentity(): Expr =
+    Expr(ObjectV("current_identity" -> NullV))
 
   /**
     * An HasIdentity expression.
