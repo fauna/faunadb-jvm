@@ -2,6 +2,7 @@ package com.faunadb.client.streaming;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.faunadb.client.HttpResponses;
 import com.faunadb.client.errors.PermissionDeniedException;
 import com.faunadb.client.types.Result;
 import com.faunadb.client.types.Value;
@@ -17,8 +18,14 @@ import java.util.concurrent.SubmissionPublisher;
 import java.util.stream.Collectors;
 
 public class BodyValueFlowProcessor extends SubmissionPublisher<Value> implements Flow.Processor<java.util.List<ByteBuffer>, Value> {
+
+    public BodyValueFlowProcessor(ObjectMapper json) {
+        this.json = json;
+    }
+    private static Value ErrorValue = new Value.StringV("error");
+
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final ObjectMapper json = new ObjectMapper();
+    private ObjectMapper json;
     private Flow.Subscription subscription = null;
     private Flow.Subscriber<? super Value> subscriber = null;
 
@@ -51,24 +58,17 @@ public class BodyValueFlowProcessor extends SubmissionPublisher<Value> implement
             JsonNode jsonNode = json.readTree(text);
             Value value = json.treeToValue(jsonNode, Value.class);
 
-            Boolean errorEventType = value.at("event")
+            Boolean errorEventType = value.at("type")
                 .getOptional()
-                .flatMap(v -> v.to(String.class).getOptional())
-                .map(s -> s.equals("error"))
+                .map(v -> v.equals(ErrorValue))
                 .orElse(false);
 
             if (errorEventType) {
-                Boolean unrecoverablePermissionError = value.at("data", "code")
-                        .getOptional()
-                        .flatMap(v -> v.to(String.class).getOptional())
-                        .map(s -> s.equals("permission denied"))
-                        .orElse(false);
+                HttpResponses.QueryError queryError = json.treeToValue(jsonNode.get("event"), HttpResponses.QueryError.class);
+                boolean unrecoverablePermissionError = queryError.code().equals("permission denied");
                 if (unrecoverablePermissionError) {
-                    String description =  value.at("data", "description")
-                            .getOptional()
-                            .flatMap(v -> v.to(String.class).getOptional())
-                            .orElse("no description available");
-                    Exception ex = new PermissionDeniedException("code: permission denied, description:" + description);
+                    HttpResponses.QueryErrorResponse qer = new HttpResponses.QueryErrorResponse(401, List.of(queryError));
+                    Exception ex = new PermissionDeniedException(qer);
                     subscriber.onError(ex); // notify subscriber stream
                     subscription.cancel(); // cancel subscription on the request body
                 } else {

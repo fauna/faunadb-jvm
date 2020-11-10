@@ -3067,10 +3067,11 @@ public class ClientSpec {
   }
 
   @Test
-  public void streamEventsOnDocumentReference() throws Exception {
-    query(CreateCollection(Obj("name", Value("streamed-things")))).get();
+  public void streamEventsOnDocumentReferenceWithDocumentFieldByDefault() throws Exception {
+    String collectionName = randomStartingWith("collection_");
+    query(CreateCollection(Obj("name", Value(collectionName)))).get();
     RefV createdDoc = query(
-      Create(Collection("streamed-things"),
+      Create(Collection(collectionName),
         Obj("credentials",
           Obj("password", Value("abcdefg"))))
     ).get().get(REF_FIELD);
@@ -3094,6 +3095,7 @@ public class ClientSpec {
           List<Value> list = new ArrayList<>();
           captured.iterator().forEachRemaining(list::add);
           capturedEvents.complete(list);
+          subscription.cancel();
         }
         else
           subscription.request(1);
@@ -3121,19 +3123,19 @@ public class ClientSpec {
     // blocking
     List<Value> events = capturedEvents.get();
     Value startEvent = events.get(0);
-    assertThat(startEvent.at("event").to(STRING).get(), equalTo("start"));
+    assertThat(startEvent.at("type").to(STRING).get(), equalTo("start"));
 
     Value e1 = events.get(1);
-    assertThat(e1.at("event").to(STRING).get(), equalTo("version"));
-    assertThat(e1.at("data", "new", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue1"))));
+    assertThat(e1.at("type").to(STRING).get(), equalTo("version"));
+    assertThat(e1.at("event", "document", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue1"))));
 
     Value e2 = events.get(2);
-    assertThat(e2.at("event").to(STRING).get(), equalTo("version"));
-    assertThat(e2.at("data", "new", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue2"))));
+    assertThat(e2.at("type").to(STRING).get(), equalTo("version"));
+    assertThat(e2.at("event", "document", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue2"))));
 
     Value e3 = events.get(3);
-    assertThat(e3.at("event").to(STRING).get(), equalTo("version"));
-    assertThat(e3.at("data", "new", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue3"))));
+    assertThat(e3.at("type").to(STRING).get(), equalTo("version"));
+    assertThat(e3.at("event", "document", "data").to(OBJECT).get(), is(Collections.singletonMap("testField", Value("testValue3"))));
   }
 
   @Test
@@ -3174,8 +3176,9 @@ public class ClientSpec {
             // push an update to force auth revalidation.
             adminClient.query(Update(createdDoc, Obj("data", Obj("testField", Value("afterKeyDelete"))))).get();
           } catch (Exception e) {
-          capturedEvents.completeExceptionally(e);
-        }
+            capturedEvents.completeExceptionally(e);
+            subscription.cancel();
+          }
         }
         captured.add(v);          // capture element
         subscription.request(1);  // ask for more elements
@@ -3196,72 +3199,8 @@ public class ClientSpec {
     valuePublisher.subscribe(valueSubscriber);
 
     thrown.expectCause(isA(PermissionDeniedException.class));
-    thrown.expectMessage(containsString("code: permission denied, description:Authorization lost during stream evaluation."));
+    thrown.expectMessage(containsString("permission denied: Authorization lost during stream evaluation."));
     capturedEvents.get();
-  }
-
-  @Test
-  public void streamBuffersEventsIfTheProducerIsFasterThanConsumer() throws Exception {
-    query(CreateCollection(Obj("name", Value("streamed-things-buffered")))).get();
-    RefV createdDoc = query(
-      Create(Collection("streamed-things-buffered"),
-        Obj("credentials",
-          Obj("password", Value("abcdefg"))))
-    ).get().get(REF_FIELD);
-
-    Flow.Publisher<Value> valuePublisher = adminClient.stream(createdDoc).get();
-    CompletableFuture<List<Value>> capturedEvents = new CompletableFuture<>();
-    int bufferSize = 30; // increasing this value makes the test too slow so we can't test the real limit (256)
-
-    Flow.Subscriber<Value> valueSubscriber = new Flow.Subscriber<>() {
-      Flow.Subscription subscription = null;
-      ConcurrentLinkedQueue<Value> captured = new ConcurrentLinkedQueue<>();
-      @Override
-      public void onSubscribe(Flow.Subscription s) {
-        subscription = s;
-        subscription.request(1);
-      }
-
-      @Override
-      public void onNext(Value v) {
-        if (captured.isEmpty()) {
-          // update doc on `start` event
-          for (int i = 0; i < bufferSize; i++) {
-            try {
-              adminClient.query(Update(createdDoc, Obj("data", Obj("testField", Value("testValue" + i))))).get();
-            } catch (Exception e) {
-              capturedEvents.completeExceptionally(e);
-            }
-          }
-          captured.add(v);
-        } else {
-          captured.add(v); // capture element
-          if (captured.size() > bufferSize) {
-            List<Value> list = new ArrayList<>();
-            captured.iterator().forEachRemaining(list::add);
-            capturedEvents.complete(list);
-          }
-        }
-        subscription.request(1);
-      }
-
-      @Override
-      public void onError(Throwable throwable) {
-        capturedEvents.completeExceptionally(throwable);
-      }
-
-      @Override
-      public void onComplete() {
-        capturedEvents.completeExceptionally(new IllegalStateException("not expecting the stream to complete"));
-      }
-    };
-
-    // subscribe to publisher
-    valuePublisher.subscribe(valueSubscriber);
-
-    // blocking
-    List<Value> events = capturedEvents.get();
-    assertThat(events.size(), equalTo(bufferSize + 1)); // +1 for start event
   }
 
   private CompletableFuture<Value> query(Expr expr) {
