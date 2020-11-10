@@ -689,7 +689,7 @@ package object query {
     Expr(ObjectV("identity" -> NullV))
 
   /**
-    * An HasIdentity expression.
+    * A HasIdentity expression.
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#authentication]]
     */

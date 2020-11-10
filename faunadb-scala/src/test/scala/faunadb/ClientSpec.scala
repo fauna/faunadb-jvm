@@ -922,19 +922,33 @@ class ClientSpec
       identifyR.to[Boolean].get shouldBe true
       }
 
-  it should "test HasCurrentToken" in {
-    val createR = client.query(Create(Collection("spells"), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
-
-    // Login
+  it should "return true when querying HasCurrentToken when authenticated with an internal token" in {
+    // Setup
+    val collName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collName))).futureValue
+    val createR = client.query(Create(Collection(collName), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
     val loginR = client.query(Login(createR(RefField), Obj("password" -> "abcdefg"))).futureValue
     val secret = loginR(SecretField).get
 
-    // HasCurrentToken Ok.
+    // Run
     val hasCurrentToken = client.sessionWith(secret)(_.query(HasCurrentToken())).futureValue
-    hasCurrentToken.to[Boolean].get shouldBe true
 
-    // HasCurrentToken fail.
+    // Verify
+    hasCurrentToken.to[Boolean].get shouldBe true
+  }
+
+  it should "return false when querying HasCurrentToken when not authenticated with an internal key" in {
+    // Setup
+    val collName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collName))).futureValue
+    val createR = client.query(Create(Collection(collName), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
+    val loginR = client.query(Login(createR(RefField), Obj("password" -> "abcdefg"))).futureValue
+    val secret = loginR(SecretField).get
+
+    // Run
     val hasNotCurrentToken = client.query(HasCurrentToken()).futureValue
+
+    // Verify
     hasNotCurrentToken.to[Boolean].get shouldBe false
   }
 
