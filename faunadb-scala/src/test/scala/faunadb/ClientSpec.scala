@@ -923,15 +923,18 @@ class ClientSpec
       }
 
   it should "test CurrentToken with internal token" in {
-    val createR = client.query(Create(Collection("spells"), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
-
-    // Login
+    // Setup
+    val collName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collName))).futureValue
+    val createR = client.query(Create(Collection(collName), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
     val loginR = client.query(Login(createR(RefField), Obj("password" -> "abcdefg"))).futureValue
     val secret = loginR(SecretField).get
     val tokenRef = loginR(RefField).get
 
-    // CurrentToken
+    // Run
     val currentToken = client.sessionWith(secret)(_.query(CurrentToken())).futureValue
+
+    // Verify
     currentToken.to[RefV].get shouldBe tokenRef
   }
 
