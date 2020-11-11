@@ -41,14 +41,4 @@ public class JavaHttpClient implements AutoCloseable {
     return _client.sendAsync(req, HttpResponse.BodyHandlers.ofString());
   }
 
-  // TODO expose on the connection
-  public CompletableFuture<HttpResponse<Void>> streamRequest(HttpRequest req, Flow.Subscriber<? super String> subscription) {
-    if (isClosed()) {
-      return CompletableFuture.failedFuture(new IllegalStateException("Client already closed"));
-    }
-
-    return _client.sendAsync(req, HttpResponse.BodyHandlers.fromLineSubscriber(subscription));
-  }
-
-
 }
