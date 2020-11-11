@@ -2062,7 +2062,7 @@ public class ClientSpec {
     }
   }
 
-    @Test
+  @Test
   public void shouldTestHasCurrentIdentity() throws Exception {
     Value createdInstance = serverClient.query(
             Create(onARandomCollection(),

@@ -2227,8 +2227,9 @@ public final class Language {
    * @see #Identify(Expr, Expr)
    * @see #Login(Expr, Expr)
    */
-  public static Expr() {
+  public static Expr HasCurrentToken() {
     return Fn.apply("has_current_token", Null());
+  }
   
   /**
    * Returns true if the authentication used for the request has an identity.
