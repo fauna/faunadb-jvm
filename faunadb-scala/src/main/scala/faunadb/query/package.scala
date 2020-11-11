@@ -700,8 +700,9 @@ package object query {
   /**
     * An HasIdentity expression.
     *
-    * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#authentication]]
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/hasidentity]]
     */
+  @deprecated("use HasCurrentIdentity instead", "4.0.0")
   def HasIdentity(): Expr =
     Expr(ObjectV("has_identity" -> NullV))
 
@@ -721,6 +722,15 @@ package object query {
     */
   def CreateAccessProvider(params: Expr): Expr =
     Expr(ObjectV("create_access_provider" -> params.value))
+  
+  /**
+    * An HasCurrentIdentity expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/hascurrentidentity]]
+    */
+  def HasCurrentIdentity(): Expr =
+    Expr(ObjectV("has_current_identity" -> NullV))
+
 
   // String Functions
 
