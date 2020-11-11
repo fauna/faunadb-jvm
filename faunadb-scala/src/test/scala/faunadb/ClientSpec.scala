@@ -944,10 +944,14 @@ class ClientSpec
       "name" -> providerName,
       "issuer" -> issuerName,
       "jwks_uri" -> fullUri,
-      "roles" -> ArrayV(roleV(RefField))))
+      "roles" -> Arr(Role(roleName))))
     ).futureValue
 
-    providerV("roles").to[Seq[RefV]].get.size shouldBe 1
+    providerV("roles").to[Seq[RefV]].get should contain theSameElementsAs(Vector(roleV(RefField).get))
+    providerV("audience").toOpt shouldBe defined
+    providerV("name").to[String].get shouldBe(providerName)
+    providerV("issuer").to[String].get shouldBe(issuerName)
+    providerV("jwks_uri").to[String].get shouldBe(fullUri)
   }
 
   it should "create_access_provider fails with non-unique issuer" in {
@@ -967,7 +971,7 @@ class ClientSpec
       "name" -> providerName,
       "issuer" -> issuerName,
       "jwks_uri" -> fullUri,
-      "roles" -> ArrayV(roleV(RefField))))
+      "roles" -> Arr(Role(roleName))))
     ).futureValue
 
     providerV("roles").to[Seq[RefV]].get.size shouldBe 1
@@ -977,7 +981,7 @@ class ClientSpec
       "name" -> "duplicate_provider",
       "issuer" -> issuerName,
       "jwks_uri" -> "https://db.fauna.com",
-      "roles" -> ArrayV(roleV(RefField))))
+      "roles" -> Arr(Role(roleName))))
     ).failed.futureValue
 
     error shouldBe a[BadRequestException]
@@ -998,7 +1002,7 @@ class ClientSpec
     val error = adminClient.query(CreateAccessProvider(Obj(
       "name" -> providerName,
       "jwks_uri" -> fullUri,
-      "roles" -> ArrayV(roleV(RefField))))
+      "roles" -> Arr(Role(roleName))))
     ).failed.futureValue
 
     error shouldBe a[BadRequestException]
@@ -1020,7 +1024,7 @@ class ClientSpec
     val error = adminClient.query(CreateAccessProvider(Obj(
       "issuer" -> issuerName,
       "jwks_uri" -> fullUri,
-      "roles" -> ArrayV(roleV(RefField))))
+      "roles" -> Arr(Role(roleName))))
     ).failed.futureValue
 
     error shouldBe a[BadRequestException]
@@ -1044,7 +1048,7 @@ class ClientSpec
       "name" -> providerName,
       "issuer" -> issuerName,
       "jwks_uri" -> fullUri, // not a valid URI
-      "roles" -> ArrayV(roleV(RefField))))
+      "roles" -> Arr(Role(roleName))))
     ).failed.futureValue
 
     error shouldBe a[BadRequestException]

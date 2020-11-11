@@ -714,7 +714,7 @@ package object query {
     *  - jwks_uri: A valid HTTPS URI
     *  - allowed_roles: An optional list of Role refs
     *  - allowed_collections: An optional list of user-defined Collection refs
-    *  - membership: An array of role/predicate pairs where the predicate returns a boolean.
+    *  - roles: An array of role/predicate pairs where the predicate returns a boolean.
     *                The array can also contain Role references.
     *
     * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/createaccessprovider]]
