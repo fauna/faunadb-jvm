@@ -2076,7 +2076,7 @@ public class ClientSpec {
                     Obj("password", Value("sekret")))
     ).get();
 
-    String secret = auth.get(SECRET_FIELD);
+    String secret = auth.get(SECRET_FIELD); 
     Value tokenRef= auth.get(REF_FIELD);
 
     try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
@@ -2102,6 +2102,62 @@ public class ClientSpec {
       );
     }
   }
+  
+  @Test
+  public void shouldTestHasCurrentIdentity() throws Exception {
+    Value createdInstance = serverClient.query(
+            Create(onARandomCollection(),
+                    Obj("credentials",
+                            Obj("password", Value("sekret"))))
+    ).get();
+
+    Value auth = serverClient.query(
+            Login(
+                    createdInstance.get(REF_FIELD),
+                    Obj("password", Value("sekret")))
+    ).get();
+
+    String secret = auth.get(SECRET_FIELD);
+    
+    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
+      assertThat(
+              sessionClient.query(HasCurrentIdentity()).get().to(BOOLEAN).get(),
+              equalTo(true)
+      );
+    }
+  }
+  
+  @Test
+  public void shouldTestHasCurrentTokenWithInternalToken() throws Exception {
+    Value createdInstance = serverClient.query(
+            Create(onARandomCollection(),
+                    Obj("credentials",
+                            Obj("password", Value("sekret"))))
+    ).get();
+
+    Value auth = serverClient.query(
+            Login(
+                    createdInstance.get(REF_FIELD),
+                    Obj("password", Value("sekret")))
+    ).get();
+
+    String secret = auth.get(SECRET_FIELD);
+
+    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
+      assertThat(
+              sessionClient.query(HasCurrentToken()).get().to(BOOLEAN).get(),
+              equalTo(true)
+      );
+    }
+  }
+
+  @Test
+  public void shouldTestHasCurrentTokenWithInternalKey() throws Exception {
+    assertThat(
+      serverClient.query(HasCurrentToken()).get().to(BOOLEAN).get(),
+      equalTo(false)
+    );
+  }
 
   @Test
   public void shouldTestIdentity() throws Exception {
@@ -2122,6 +2178,30 @@ public class ClientSpec {
     try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
       assertThat(
               sessionClient.query(Identity()).get(),
+              equalTo(createdInstance.get(REF_FIELD))
+      );
+    }
+  }
+
+  @Test
+  public void shouldTestCurrentIdentity() throws Exception {
+    Value createdInstance = serverClient.query(
+            Create(onARandomCollection(),
+                    Obj("credentials",
+                            Obj("password", Value("sekret"))))
+    ).get();
+
+    Value auth = serverClient.query(
+            Login(
+                    createdInstance.get(REF_FIELD),
+                    Obj("password", Value("sekret")))
+    ).get();
+
+    String secret = auth.get(SECRET_FIELD);
+
+    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
+      assertThat(
+              sessionClient.query(CurrentIdentity()).get(),
               equalTo(createdInstance.get(REF_FIELD))
       );
     }
