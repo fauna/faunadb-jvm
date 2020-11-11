@@ -909,9 +909,17 @@ class ClientSpec
       val hasIdentity = client.sessionWith(secret)(_.query(HasIdentity())).futureValue
       hasIdentity.to[Boolean].get shouldBe true
 
+     // HasCurrentIdentity
+     val hasCurrentIdentity = client.sessionWith(secret)(_.query(HasCurrentIdentity())).futureValue
+     hasCurrentIdentity.to[Boolean].get shouldBe true
+
       // Identity
       val identity = client.sessionWith(secret)(_.query(Identity())).futureValue
       identity.to[RefV].get shouldBe createR(RefField).get
+
+     // CurrentIdentity
+     val currentIdentity = client.sessionWith(secret)(_.query(CurrentIdentity())).futureValue
+     currentIdentity.to[RefV].get shouldBe createR(RefField).get
 
       // Logout
       val loggedOut = client.sessionWith(secret)(_.query(Logout(false))).futureValue
@@ -921,6 +929,61 @@ class ClientSpec
       val identifyR = client.query(Identify(createR(RefField), "abcdefg")).futureValue
       identifyR.to[Boolean].get shouldBe true
       }
+
+
+  it should "return true when querying HasCurrentToken when authenticated with an internal token" in {
+    // Setup
+    val collName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collName))).futureValue
+    val createR = client.query(Create(Collection(collName), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
+    val loginR = client.query(Login(createR(RefField), Obj("password" -> "abcdefg"))).futureValue
+    val secret = loginR(SecretField).get
+    
+    // Run
+    val hasCurrentToken = client.sessionWith(secret)(_.query(HasCurrentToken())).futureValue
+
+    // Verify
+    hasCurrentToken.to[Boolean].get shouldBe true
+  }
+
+  it should "return false when querying HasCurrentToken when not authenticated with an internal key" in {
+    // Setup
+    val collName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collName))).futureValue
+    val createR = client.query(Create(Collection(collName), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
+    val loginR = client.query(Login(createR(RefField), Obj("password" -> "abcdefg"))).futureValue
+    val secret = loginR(SecretField).get
+
+    // Run
+    val hasNotCurrentToken = client.query(HasCurrentToken()).futureValue
+
+    // Verify
+    hasNotCurrentToken.to[Boolean].get shouldBe false
+  }
+      
+  it should "test CurrentToken with internal token" in {
+    // Setup
+    val collName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collName))).futureValue
+    val createR = client.query(Create(Collection(collName), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
+    val loginR = client.query(Login(createR(RefField), Obj("password" -> "abcdefg"))).futureValue
+    val secret = loginR(SecretField).get
+    val tokenRef = loginR(RefField).get
+
+    // Run
+    val currentToken = client.sessionWith(secret)(_.query(CurrentToken())).futureValue
+
+    // Verify
+    currentToken.to[RefV].get shouldBe tokenRef
+  }    
+
+  it should "test CurrentToken with internal key" in {
+    val clientKey = adminClient.query(CreateKey(Obj("role" -> "client"))).futureValue
+    val clientKeyClient = FaunaClient(secret = clientKey(SecretField).get, endpoint = config("root_url"))
+    val currentToken = clientKeyClient.query(CurrentToken()).futureValue
+    currentToken.to[RefV].get shouldBe clientKey(RefField).get
+
+  }
 
   it should "create session client" in {
     val otherClient = client.sessionClient(config("root_token"))
