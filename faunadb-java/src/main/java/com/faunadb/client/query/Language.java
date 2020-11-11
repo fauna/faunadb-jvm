@@ -2206,7 +2206,7 @@ public final class Language {
    *
    * @return a new {@link Expr} instance
    * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/currenttoken">FaunaDB Authentication Functions</a>
-   * @see #Identity()
+   * @see #CurrentIdentity()
    * @see #Identify(Expr, Expr)
    * @see #Login(Expr, Expr)
    */
