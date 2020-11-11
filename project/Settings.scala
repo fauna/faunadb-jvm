@@ -70,6 +70,20 @@ object Settings {
     useGpg := false // still relies on BouncyCastle (https://github.com/sbt/sbt-pgp#usage)
   )
 
+  lazy val compilerSettings = Seq(
+    javacOptions ++= Seq(
+      "-source", "11",
+      "-target", "11"
+    )
+  )
+
+  lazy val commonSettings =
+    buildSettings ++
+    compilerSettings ++
+    publishSettings ++
+    Tasks.settings ++
+    Testing.settings
+
   lazy val javaCommonSettings = Seq(
     crossScalaVersions := Seq(scala212),
     crossPaths := false,
@@ -79,10 +93,6 @@ object Settings {
 
     coverageEnabled := false,
 
-    javacOptions ++= Seq(
-      "-source", "11", "-target", "11"
-    ),
-
     javacOptions in (Compile, doc) := Seq(
       "-source", "11",
       "-link", javaDocUrl,
@@ -91,12 +101,6 @@ object Settings {
       "-link", nettyClientDocUrl
     )
   )
-
-  lazy val commonSettings =
-    buildSettings ++
-    publishSettings ++
-    Tasks.settings ++
-    Testing.settings
 
   lazy val rootSettings = Seq(
     // crossScalaVersions must be set to Nil on the aggregating project
