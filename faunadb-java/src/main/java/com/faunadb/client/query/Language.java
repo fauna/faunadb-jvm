@@ -2210,7 +2210,7 @@ public final class Language {
    *  - jwks_uri: A valid HTTPS URI
    *  - allowed_roles: An optional list of Role refs
    *  - allowed_collections: An optional list of user-defined Collection refs
-   *  - membership: An array of role/predicate pairs where the predicate returns a boolean.
+   *  - roles: An array of role/predicate pairs where the predicate returns a boolean.
    *                The array can also contain Role references.
    * @return a new {@link Expr} instance
    * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/createaccessprovider">FaunaDB Authentication Functions</a>

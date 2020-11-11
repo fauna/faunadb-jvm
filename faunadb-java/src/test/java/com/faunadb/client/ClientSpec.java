@@ -2111,6 +2111,10 @@ public class ClientSpec {
 
     List<RefV> roles = provider.at("roles").collect(Field.as(REF));
     assertThat(roles.size(), equalTo(1));
+    assertThat(provider.at("name").to(String.class).get(), is(providerName));
+    assertThat(provider.at("issuer").to(String.class).get(), is(issuerName));
+    assertThat(provider.at("jwks_uri").to(String.class).get(), is(fullUri));
+    assertThat(provider.at("audience").getOptional().isPresent(), is(true));
   }
 
   @Test
