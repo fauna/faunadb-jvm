@@ -798,6 +798,16 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeCurrentToken() throws Exception {
+    assertJson(CurrentToken(), "{\"current_token\":null}");
+  }
+
+  @Test
+  public void shouldSerializeHasCurrentToken() throws Exception {
+    assertJson(HasCurrentToken(), "{\"has_current_token\":null}");
+  }
+
+  @Test  
   public void shouldSerializeHasCurrentIdentity() throws Exception {
     assertJson(HasCurrentIdentity(), "{\"has_current_identity\":null}");
   }
