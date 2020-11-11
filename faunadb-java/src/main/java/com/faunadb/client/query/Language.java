@@ -2219,6 +2219,19 @@ public final class Language {
   }
 
   /**
+   * Returns true if the authentication used for the request has a token.
+   *
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hascurrenttoken">FaunaDB Authentication Functions</a>
+   * @see #Identity()
+   * @see #Identify(Expr, Expr)
+   * @see #Login(Expr, Expr)
+   */
+  public static Expr HasCurrentToken() {
+    return Fn.apply("has_current_token", Null());
+  }
+  
+  /**
    * Returns true if the authentication used for the request has an identity.
    *
    * @return a new {@link Expr} instance
