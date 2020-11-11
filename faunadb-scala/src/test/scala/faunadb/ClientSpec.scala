@@ -909,6 +909,10 @@ class ClientSpec
       val hasIdentity = client.sessionWith(secret)(_.query(HasIdentity())).futureValue
       hasIdentity.to[Boolean].get shouldBe true
 
+     // HasCurrentIdentity
+     val hasCurrentIdentity = client.sessionWith(secret)(_.query(HasCurrentIdentity())).futureValue
+     hasCurrentIdentity.to[Boolean].get shouldBe true
+
       // Identity
       val identity = client.sessionWith(secret)(_.query(Identity())).futureValue
       identity.to[RefV].get shouldBe createR(RefField).get
