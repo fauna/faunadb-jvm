@@ -14,7 +14,7 @@ object Settings {
 
   lazy val jacksonDocVersion = "2.10"
 
-  lazy val javaDocUrl = "http://docs.oracle.com/javase/7/docs/api/"
+  lazy val javaDocUrl = "https://docs.oracle.com/en/java/javase/11/docs/api/"
   lazy val nettyClientDocUrl = "https://netty.io/4.1/api/index.html"
   lazy val jacksonDocUrl = s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/"
   lazy val metricsDocUrl = s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/"
