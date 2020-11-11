@@ -28,7 +28,7 @@ import static java.lang.String.format;
 /**
  * The HTTP Connection adapter for FaunaDB drivers.
  *
- * <p>Relies on <a href="https://netty.io/">Netty</a>
+ * <p>Relies on {@link java.net.http.HttpClient}
  * for the underlying implementation.</p>
  *
  * <p>The {@link Connection#close()} method must be called in order to
