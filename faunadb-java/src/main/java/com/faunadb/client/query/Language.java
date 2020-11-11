@@ -2205,14 +2205,30 @@ public final class Language {
   /**
    * Returns true if the authentication used for the request has an identity.
    *
+   * @deprecated Use HasCurrentIdentity() instead.
+   *
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#authentication">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hasidentity">FaunaDB Authentication Functions</a>
    * @see #Identity()
    * @see #Identify(Expr, Expr)
    * @see #Login(Expr, Expr)
    */
+  @Deprecated
   public static Expr HasIdentity() {
     return Fn.apply("has_identity", Null());
+  }
+
+  /**
+   * Returns true if the authentication used for the request has an identity.
+   *
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hascurrentidentity">FaunaDB Authentication Functions</a>
+   * @see #Identity()
+   * @see #Identify(Expr, Expr)
+   * @see #Login(Expr, Expr)
+   */
+  public static Expr HasCurrentIdentity() {
+    return Fn.apply("has_current_identity", Null());
   }
 
   /**
