@@ -788,6 +788,11 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeCurrentIdentity() throws Exception {
+    assertJson(CurrentIdentity(), "{\"current_identity\":null}");
+  }
+
+  @Test
   public void shouldSerializeHasIdentity() throws Exception {
     assertJson(HasIdentity(), "{\"has_identity\":null}");
   }
