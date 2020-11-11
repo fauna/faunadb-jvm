@@ -715,6 +715,14 @@ package object query {
     Expr(ObjectV("has_current_token" -> NullV))
 
   /**
+    * A CurrentToken expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/currenttoken]]
+    */
+  def CurrentToken(): Expr =
+    Expr(ObjectV("current_token" -> NullV))
+
+  /**
     * A HasCurrentIdentity expression.
     *
     * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/hascurrentidentity]]
