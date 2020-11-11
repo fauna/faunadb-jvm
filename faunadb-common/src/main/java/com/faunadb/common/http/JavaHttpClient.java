@@ -9,19 +9,15 @@ import java.util.concurrent.*;
 public class JavaHttpClient implements AutoCloseable {
 
   private HttpClient _client;
-  private ExecutorService _executor;
 
   public JavaHttpClient(int connectionTimeout) {
     // TODO: [DRV-169] allow users to override default executor
-    this._executor = Executors.newCachedThreadPool();
     this._client = HttpClient.newBuilder()
       .connectTimeout(Duration.ofMillis(connectionTimeout))
-      .executor(_executor)
       .build();
   }
 
   public void close() {
-    _executor.shutdownNow();
     // Garbage Collector frees any associated resources
     // when setting the reference to the HttpClient to null.
     _client = null;
@@ -34,7 +30,7 @@ public class JavaHttpClient implements AutoCloseable {
    * @see #close()
    */
   public boolean isClosed() {
-    return _client == null || _executor == null || _executor.isShutdown() || _executor.isTerminated();
+    return _client == null;
   }
 
   public CompletableFuture<HttpResponse<String>> sendRequest(HttpRequest req) {
