@@ -227,13 +227,12 @@ public class Connection implements AutoCloseable {
 
   /**
    * Creates a new {@link Connection} sharing its underneath I/O resources. Queries submitted to a
-   * session connection will be authenticated with the token provided. The {@link #close()} method
-   * must be called before releasing the connection.
+   * session connection will be authenticated with the token provided. Close the parent Connection
+   * for freeing up any resources held by the parent connection and this session connection.
    *
    * @param authToken the token or key to be used to authenticate requests to the new {@link Connection}
    * @return a new {@link Connection}
    */
-  // TODO: [DRV-174] Update JavaDoc to reflect new close method behaviour
   public Connection newSessionConnection(String authToken) {
     if (isClosed()) {
       throw new IllegalStateException("Connection already closed");
@@ -248,7 +247,8 @@ public class Connection implements AutoCloseable {
   }
 
   /**
-   * Releases any resources being held by the {@link Connection} instance.
+   * Releases any resources being held by this {@link Connection} instance
+   * and any associated session {@link Connection} instances.
    */
   @Override
   public void close() {

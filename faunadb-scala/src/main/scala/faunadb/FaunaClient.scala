@@ -197,34 +197,37 @@ class FaunaClient private (connection: Connection) {
 
   /**
     * Creates a new scope to execute session queries. Queries submitted within the session scope will be
-    * authenticated with the secret provided. A session client shares its parent's
-    * [[com.faunadb.common.Connection]] instance and is closed as soon as the session scope ends.
+    * authenticated with the secret provided. A session client shares its parent's [com.faunadb.common.Connection]]
+    * instance and thus it does not need to be closed after its usage. Close the parent session for freeing up any
+    * resources held by the parent session and this session client.
     *
     * @param secret user secret for the session scope
     * @param session a function that receives a session client
     * @return the value produced by the session function
     */
-  // TODO: [DRV-174] Update ScalaDoc to reflect new close method behaviour
   def sessionWith[A](secret: String)(session: FaunaClient => A): A = {
     val client = sessionClient(secret)
     session(client)
   }
 
   /**
-    * Create a new session client. The returned session client shares its parent [[com.faunadb.common.Connection]] instance.
-    * The returned session client must be closed after its usage.
+    * Create a new session client. The returned session client shares its parent [[com.faunadb.common.Connection]]
+    * instance and thus it does not need to be closed after its usage. Close the parent session for freeing up any
+    * resources held by the parent session and this session client.
     *
     * @param secret user secret for the session client
     * @return a new session client
     */
-  // TODO: [DRV-174] Update ScalaDoc to reflect new close method behaviour
   def sessionClient(secret: String): FaunaClient = new FaunaClient(connection.newSessionConnection(secret)) {
     override def close(): Unit = {
       // DO NOTHING
     }
   }
 
-  /** Frees any resources held by the client and close the underlying connection. */
+  /**
+   * Releases any resources being held by this [[faunadb.FaunaClient]] instance
+   * and any associated session [[faunadb.FaunaClient]] instances.
+   */
   def close(): Unit = connection.close()
 
   /**

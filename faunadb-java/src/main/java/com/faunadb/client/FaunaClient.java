@@ -156,12 +156,12 @@ public class FaunaClient implements AutoCloseable {
   /**
    * Creates a session client with the user secret provided. Queries submitted to a session client will be
    * authenticated with the secret provided. A session client shares its parent's {@link Connection} instance
-   * and must be closed after used.
+   * and thus it does not need be closed after its usage. Close the parent session for freeing up any
+   * resources held by the parent session and this session client.
    *
    * @param secret user secret for the session client
    * @return a new {@link FaunaClient}
    */
-  // TODO: [DRV-174] Update JavDoc to reflect new close method behaviour
   public FaunaClient newSessionClient(String secret) {
     return new FaunaClient(connection.newSessionConnection(secret)) {
       @Override
@@ -172,7 +172,8 @@ public class FaunaClient implements AutoCloseable {
   }
 
   /**
-   * Releases any resources being held by the {@link FaunaClient} instance.
+   * Releases any resources being held by this {@link FaunaClient} instance
+   * and any associated session {@link FaunaClient} instances.
    */
   @Override
   public void close() {
