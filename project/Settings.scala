@@ -12,9 +12,12 @@ object Settings {
   lazy val scala212 = "2.12.12"
   lazy val supportedScalaVersions = Seq(scala211, scala212)
 
+  lazy val jacksonDocVersion = "2.11"
+
   lazy val javaDocUrl = "http://docs.oracle.com/javase/7/docs/api/"
   lazy val nettyClientDocUrl = "https://netty.io/4.1/api/index.html"
-  lazy val metricsDocUrl = s"http://dropwizard.github.io/metrics/$metricsVersion/apidocs/"
+  lazy val jacksonDocUrl = s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/"
+  lazy val metricsDocUrl = s"https://javadoc.io/doc/io.dropwizard.metrics/metrics-core/$metricsVersion/"
 
   lazy val commonApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-common/api/"
   lazy val scalaApiUrl = s"http://fauna.github.io/faunadb-jvm/$driverVersion/faunadb-scala/api/"
