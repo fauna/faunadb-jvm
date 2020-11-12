@@ -956,6 +956,9 @@ class ClientSpec
     providerV("name").to[String].get shouldBe(providerName)
     providerV("issuer").to[String].get shouldBe(issuerName)
     providerV("jwks_uri").to[String].get shouldBe(fullUri)
+
+    // Cleanup
+    adminClient.query(Delete(AccessProvider(providerName))).futureValue
   }
 
   it should "create_access_provider fails with non-unique issuer" in {
@@ -963,7 +966,7 @@ class ClientSpec
     val providerName = "my_provider" + aRandomString
     val issuerName = "my_issuer" + aRandomString
     val fullUri = s"https://${aRandomString}.auth0.com"
-    val roleV = adminClient.query(CreateRole(Obj(
+    adminClient.query(CreateRole(Obj(
       "name" -> roleName,
       "privileges" -> Obj(
         "resource" -> Databases(),
@@ -989,13 +992,16 @@ class ClientSpec
     ).failed.futureValue
 
     error shouldBe a[BadRequestException]
+
+    // Cleanup
+    adminClient.query(Delete(AccessProvider(providerName))).futureValue
   }
 
   it should "create_access_provider fails without issuer" in {
     val roleName = "my_role" + aRandomString
     val providerName = "my_provider" + aRandomString
     val fullUri = s"https://${aRandomString}.auth0.com"
-    val roleV = adminClient.query(CreateRole(Obj(
+    adminClient.query(CreateRole(Obj(
       "name" -> roleName,
       "privileges" -> Obj(
         "resource" -> Databases(),
@@ -1040,7 +1046,7 @@ class ClientSpec
     val issuerName = "my_issuer" + aRandomString
     val fullUri = aRandomString
 
-    val roleV = adminClient.query(CreateRole(Obj(
+    adminClient.query(CreateRole(Obj(
       "name" -> roleName,
       "privileges" -> Obj(
         "resource" -> Databases(),
@@ -1058,6 +1064,75 @@ class ClientSpec
     error shouldBe a[BadRequestException]
   }
 
+  it should "retrieve an existing access provider" in {
+    // Set up
+    val providerName = aRandomString
+    val issuer = aRandomString
+    val jwksUri = "https://xxxx.auth0.com/"
+
+    adminClient.query(
+      CreateAccessProvider(
+        Obj(
+          "name" -> providerName,
+          "issuer" -> issuer,
+          "jwks_uri" -> jwksUri
+        )
+      )
+    ).futureValue
+
+    // Run
+    val accessProvider = adminClient.query(Get(AccessProvider(providerName))).futureValue
+
+    // Verify
+    accessProvider("ref").toOpt shouldBe defined
+    accessProvider("ts").toOpt shouldBe defined
+    accessProvider("name").to[String].get shouldBe providerName
+    accessProvider("issuer").to[String].get shouldBe issuer
+    accessProvider("jwks_uri").to[String].get shouldBe jwksUri
+
+    // Cleanup
+    adminClient.query(Delete(AccessProvider(providerName))).futureValue
+  }
+
+  it should "retrieve all existing access providers" in {
+    // Set up
+    val jwksUri = "https://xxxx.auth0.com/"
+    val providerName1 = aRandomString
+    val providerName2 = aRandomString
+
+    val accessProvider1 =
+      adminClient.query(
+        CreateAccessProvider(
+          Obj(
+            "name" -> providerName1,
+            "issuer" -> aRandomString,
+            "jwks_uri" -> jwksUri
+          )
+        )
+      ).futureValue
+
+    val accessProvider2 =
+      adminClient.query(
+        CreateAccessProvider(
+          Obj(
+            "name" -> providerName2,
+            "issuer" -> aRandomString,
+            "jwks_uri" -> jwksUri
+          )
+        )
+      ).futureValue
+
+    // Run
+    val accessProviders = adminClient.query(Paginate(AccessProviders())).futureValue
+
+    // Verify
+    val expectedAccessProvidersRefs = Seq(accessProvider1(RefField).get, accessProvider2(RefField).get)
+    accessProviders("data").to[ArrayV].get.elems should contain theSameElementsAs expectedAccessProvidersRefs
+
+    // Cleanup
+    adminClient.query(Delete(AccessProvider(providerName1))).futureValue
+    adminClient.query(Delete(AccessProvider(providerName2))).futureValue
+  }
 
   it should "return true when querying HasCurrentToken when authenticated with an internal token" in {
     // Setup

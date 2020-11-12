@@ -720,7 +720,28 @@ package object query {
     */
   def CreateAccessProvider(params: Expr): Expr =
     Expr(ObjectV("create_access_provider" -> params.value))
-  
+
+  /** Native reference to all access providers */
+  def AccessProviders(scope: Expr = NullV): Expr =
+    Expr(ObjectV("access_providers" -> scope.value))
+
+  /**
+    * An Access Provider expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider]]
+    */
+  def AccessProvider(name: Expr): Expr =
+     Expr(ObjectV("access_provider" -> name.value))
+
+  /**
+    * An Access Provider expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider]]
+    */
+  def AccessProvider(name: Expr, scope: Expr): Expr =
+    Expr(ObjectV("access_provider" -> name.value, "scope" -> scope.value))
+
+
   /**
     * An HasCurrentIdentity expression.
     * A HasCurrentToken expression.
