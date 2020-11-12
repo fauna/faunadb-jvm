@@ -808,7 +808,12 @@ public class SerializationSpec {
         "membership", Arr()
         )),
       "{\"create_access_provider\":{\"object\":{\"name\":\"role_name\",\"issuer\":\"issuer_name\",\"jwks_uri\":\"https://auth0.com\",\"membership\":[]}}}");
-  }  
+  }
+
+  @Test
+  public void shouldSerializeAccessProvider() throws Exception {
+    assertJson(AccessProvider(Value("access-provider")), "{\"access_provider\":\"access-provider\"}");
+  }
 
   @Test
   public void shouldSerializeCurrentToken() throws Exception {

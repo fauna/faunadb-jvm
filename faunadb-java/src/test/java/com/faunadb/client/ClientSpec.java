@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.*;
+import static java.util.Arrays.asList;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -2212,6 +2213,75 @@ public class ClientSpec {
     assertThat(provider.at("issuer").to(String.class).get(), is(issuerName));
     assertThat(provider.at("jwks_uri").to(String.class).get(), is(fullUri));
     assertThat(provider.at("audience").getOptional().isPresent(), is(true));
+
+    // Cleanup
+    adminClient.query(Delete(AccessProvider(providerName))).get();
+  }
+
+  @Test
+  public void shouldRetrieveAnExistingAccessProvider() throws Exception {
+    // Set up
+    String providerName = randomStartingWith("name_");
+    String issuer = randomStartingWith("issuer_");
+    String jwksUri = "https://xxxx.auth0.com/";
+
+    adminClient.query(
+            CreateAccessProvider(Obj(
+                    "name", Value(providerName),
+                    "issuer", Value(issuer),
+                    "jwks_uri", Value(jwksUri)
+            ))
+    ).get();
+
+    // Run
+    Value accessProvider = adminClient.query(Get(AccessProvider(providerName))).get();
+
+    // Verify
+    assertThat(accessProvider.getOptional(REF_FIELD).isPresent(), equalTo(Boolean.TRUE));
+    assertThat(accessProvider.getOptional(TS_FIELD).isPresent(), equalTo(Boolean.TRUE));
+    assertThat(accessProvider.at("name").to(STRING).get(), equalTo(providerName));
+    assertThat(accessProvider.at("issuer").to(STRING).get(), equalTo(issuer));
+    assertThat(accessProvider.at("jwks_uri").to(STRING).get(), equalTo(jwksUri));
+
+    // Cleanup
+    adminClient.query(Delete(AccessProvider(providerName))).get();
+  }
+
+  @Test
+  public void shouldRetrieveAllExistingAccessProviders() throws Exception {
+    // Set up
+    String jwksUri = "https://xxxx.auth0.com/";
+    String providerName1 = randomStartingWith("name_");
+    String providerName2 = randomStartingWith("name_");
+
+    Value accessProvider1 =
+            adminClient.query(
+                    CreateAccessProvider(Obj(
+                            "name", Value(providerName1),
+                            "issuer", Value(randomStartingWith("issuer_")),
+                            "jwks_uri", Value(jwksUri)
+                    ))
+            ).get();
+
+    Value accessProvider2 =
+            adminClient.query(
+                    CreateAccessProvider(Obj(
+                            "name", Value(providerName2),
+                            "issuer", Value(randomStartingWith("issuer_")),
+                            "jwks_uri", Value(jwksUri)
+                    ))
+            ).get();
+
+    // Run
+    Value accessProviders = adminClient.query(Paginate(AccessProviders())).get();
+
+    // Verify
+    Value expectedAccessProvidersRefs = new ArrayV(asList(accessProvider1.get(REF_FIELD), accessProvider2.get(REF_FIELD)));
+    assertThat(accessProviders.at("data"), equalTo(expectedAccessProvidersRefs));
+
+    // Cleanup
+    adminClient.query(Delete(AccessProvider(providerName1))).get();
+    adminClient.query(Delete(AccessProvider(providerName2))).get();
   }
   
   @Test
