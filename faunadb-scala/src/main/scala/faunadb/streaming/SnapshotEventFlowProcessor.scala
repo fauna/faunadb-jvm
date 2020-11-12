@@ -18,6 +18,7 @@ private [faunadb] class SnapshotEventFlowProcessor(loadDocument: () => Future[Va
   @volatile private var snapshotTS: Long = _
 
   // We do not request data from the publisher until we have one subscriber
+  // to avoid discarding events before the subscriber had the chance to subscribe.
   override def subscribe(subscriber: Flow.Subscriber[_ >: Value]): Unit = {
     if (this.subscriber == null) {
       this.subscriber = subscriber

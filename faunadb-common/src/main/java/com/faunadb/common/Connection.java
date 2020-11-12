@@ -380,12 +380,16 @@ public class Connection {
   }
 
   public CompletableFuture<HttpResponse<Flow.Publisher<List<ByteBuffer>>>> performStreamRequest(String httpMethod, String path, JsonNode body,
-                                                                                                Map<String, List<String>> params) throws Exception {
+                                                                                                Map<String, List<String>> params) {
     final Timer.Context ctx = registry.timer("fauna-request").time();
     final CompletableFuture<HttpResponse<Flow.Publisher<List<ByteBuffer>>>> rv = new CompletableFuture<>();
-
-    HttpRequest request = makeHttpRequest(httpMethod, path, Optional.of(body), params, Optional.empty(), HttpClient.Version.HTTP_2);
-
+    HttpRequest request;
+    try {
+      request = makeHttpRequest(httpMethod, path, Optional.of(body), params, Optional.empty(), HttpClient.Version.HTTP_2);
+    } catch (MalformedURLException | URISyntaxException | JsonProcessingException ex) {
+      rv.completeExceptionally(ex);
+      return rv;
+    }
     streamRequest(request).whenCompleteAsync((response, throwable) -> {
       ctx.stop();
       if (throwable != null) {

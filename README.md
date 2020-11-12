@@ -150,6 +150,9 @@ It is possible to use the [java.util.concurrent.Flow](https://docs.oracle.com/ja
 In the example below, we are capturing the 4 first messages:
 
 ```scala
+import faunadb._
+import faunadb.query._
+
 // docRef is a reference to the document for which we want to stream updates.
 // You can acquire a document reference with a query like the following, but it
 // needs to work with the documents that you have.
@@ -199,6 +202,12 @@ The [reactive-streams](http://www.reactive-streams.org/) standard offers a stron
 We can replicate the previous example using the [Monix](https://monix.io/) streaming library.
 
 ```scala
+import faunadb._
+import faunadb.query._
+import monix.execution.Scheduler
+import monix.reactive.Observable
+import org.reactivestreams.{FlowAdapters, Publisher}
+
 // docRef is a reference to the document for which we want to stream updates.
 // You can acquire a document reference with a query like the following, but it
 // needs to work with the documents that you have.
