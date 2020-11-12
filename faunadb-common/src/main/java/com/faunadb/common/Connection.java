@@ -422,7 +422,7 @@ public class Connection implements AutoCloseable {
         return;
       }
 
-      Optional<String> txnTimeHeader = response.headers().firstValue("X-Txn-Time");
+      Optional<String> txnTimeHeader = response.headers().firstValue("x-txn-time");
       txnTimeHeader.ifPresent(s -> syncLastTxnTime(Long.parseLong(s)));
 
       logSuccess(request, response);
