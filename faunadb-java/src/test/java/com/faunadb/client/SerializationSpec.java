@@ -788,6 +788,11 @@ public class SerializationSpec {
   }
 
   @Test
+  public void shouldSerializeCurrentIdentity() throws Exception {
+    assertJson(CurrentIdentity(), "{\"current_identity\":null}");
+  }
+
+  @Test
   public void shouldSerializeHasIdentity() throws Exception {
     assertJson(HasIdentity(), "{\"has_identity\":null}");
   }
@@ -803,6 +808,21 @@ public class SerializationSpec {
         "membership", Arr()
         )),
       "{\"create_access_provider\":{\"object\":{\"name\":\"role_name\",\"issuer\":\"issuer_name\",\"jwks_uri\":\"https://auth0.com\",\"membership\":[]}}}");
+  }  
+
+  @Test
+  public void shouldSerializeCurrentToken() throws Exception {
+    assertJson(CurrentToken(), "{\"current_token\":null}");
+  }
+
+  @Test
+  public void shouldSerializeHasCurrentToken() throws Exception {
+    assertJson(HasCurrentToken(), "{\"has_current_token\":null}");
+  }
+
+  @Test  
+  public void shouldSerializeHasCurrentIdentity() throws Exception {
+    assertJson(HasCurrentIdentity(), "{\"has_current_identity\":null}");
   }
 
   @Test
