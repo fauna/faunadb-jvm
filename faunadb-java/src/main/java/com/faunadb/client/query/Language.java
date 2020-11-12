@@ -2225,8 +2225,6 @@ public final class Language {
    *  - name: A valid schema name
    *  - issuer: A unique string
    *  - jwks_uri: A valid HTTPS URI
-   *  - allowed_roles: An optional list of Role refs
-   *  - allowed_collections: An optional list of user-defined Collection refs
    *  - roles: An array of role/predicate pairs where the predicate returns a boolean.
    *                The array can also contain Role references.
    * @return a new {@link Expr} instance
