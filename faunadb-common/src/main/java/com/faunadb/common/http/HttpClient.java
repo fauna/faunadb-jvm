@@ -125,7 +125,7 @@ public class HttpClient extends AbstractReferenceCounted implements AutoCloseabl
   /**
    * Implemented for {@link AbstractReferenceCounted}.
    *
-   * @returns ReferenceCounted
+   * @return ReferenceCounted
    */
   @Override
   public ReferenceCounted touch(Object hint) {
@@ -134,8 +134,6 @@ public class HttpClient extends AbstractReferenceCounted implements AutoCloseabl
 
   /**
    * Frees any resources held by the client. Also closes the underlying worker
-   *
-   * @throws IOException
    */
   @Override
   protected void deallocate() {
