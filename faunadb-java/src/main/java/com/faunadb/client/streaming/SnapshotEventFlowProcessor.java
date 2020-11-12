@@ -1,14 +1,12 @@
 package com.faunadb.client.streaming;
 
 import com.faunadb.client.query.Expr;
-import com.faunadb.client.query.Language;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Value;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;

@@ -353,6 +353,21 @@ public class FaunaClient {
     return performStreamRequest(json.valueToTree(expr), List.of());
   }
 
+  /**
+   * Creates a subscription to the result of the given read-only expression. When
+   * executed, the expression must only perform reads and produce a single
+   * streamable type, such as a reference or a version. Expressions that attempt
+   * to perform writes or produce non-streamable types will result in an error.
+   * Otherwise, any expression can be used to initiate a stream, including
+   * user-defined function calls.
+   *
+   * @param expr the query to subscribe to.
+   * @param fields fields to opt-in on the events.
+   * @param snapshot if true the second event will be a snapshot event of the target
+   * @return a {@link CompletableFuture} containing a {@link java.util.concurrent.Flow.Publisher} of {@link Value}.
+   * @see Value
+   * @see com.faunadb.client.query.Language
+   */
   public CompletableFuture<Flow.Publisher<Value>> stream(Expr expr, List<EventField> fields, boolean snapshot) {
     return performStreamRequest(json.valueToTree(expr), fields).thenApply( valuePublisher -> {
       if (snapshot) {
