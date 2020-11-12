@@ -106,7 +106,7 @@ In the example below, we are capturing the 4 first messages by manually binding 
 // docRef is a reference to the document for which we want to stream updates.
 // You can acquire a document reference with a query like the following, but it
 // needs to work with the documents that you have.
-// Value docRef = client.query(Get(Ref(Collection("scoreboards"), "123")))
+// Value docRef = Ref(Collection("scoreboards"), "123")
 
 Flow.Publisher<Value> valuePublisher = adminClient.stream(createdDoc).get();
 CompletableFuture<List<Value>> capturedEvents = new CompletableFuture<>();
