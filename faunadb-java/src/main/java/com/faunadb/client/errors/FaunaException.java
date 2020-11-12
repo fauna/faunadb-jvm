@@ -54,7 +54,7 @@ public class FaunaException extends RuntimeException {
     }
   }
 
-  private static String constructErrorMessage(List<HttpResponses.QueryError> errors) {
+  protected static String constructErrorMessage(List<HttpResponses.QueryError> errors) {
     List<String> messages = new ArrayList<>();
 
     for (HttpResponses.QueryError error : errors) {

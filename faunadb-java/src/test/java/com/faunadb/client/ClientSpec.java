@@ -3285,7 +3285,7 @@ public class ClientSpec {
     // subscribe to publisher
     valuePublisher.subscribe(valueSubscriber);
 
-    thrown.expectCause(isA(PermissionDeniedException.class));
+    thrown.expectCause(isA(StreamingException.class));
     thrown.expectMessage(containsString("permission denied: Authorization lost during stream evaluation."));
     capturedEvents.get();
   }

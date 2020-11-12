@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.HttpResponses;
 import com.faunadb.client.errors.PermissionDeniedException;
+import com.faunadb.client.errors.StreamingException;
 import com.faunadb.client.types.Field;
 import com.faunadb.client.types.Result;
 import com.faunadb.client.types.Value;
@@ -73,15 +74,9 @@ public class BodyValueFlowProcessor extends SubmissionPublisher<Value> implement
 
             if (errorEventType) {
                 HttpResponses.QueryError queryError = json.treeToValue(jsonNode.get("event"), HttpResponses.QueryError.class);
-                boolean unrecoverablePermissionError = queryError.code().equals("permission denied");
-                if (unrecoverablePermissionError) {
-                    HttpResponses.QueryErrorResponse qer = new HttpResponses.QueryErrorResponse(401, List.of(queryError));
-                    Exception ex = new PermissionDeniedException(qer);
-                    subscriber.onError(ex); // notify subscriber stream
-                    subscription.cancel(); // cancel subscription on the request body
-                } else {
-                    submit(value); // submit domain error event
-                }
+                Exception ex = new StreamingException(queryError);
+                subscriber.onError(ex); // notify subscriber stream
+                subscription.cancel(); // cancel subscription on the request body
             } else {
                 submit(value);
             }
