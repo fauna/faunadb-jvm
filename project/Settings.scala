@@ -14,7 +14,7 @@ object Settings {
 
   lazy val jacksonDocVersion = "2.11"
 
-  lazy val javaDocUrl = "http://docs.oracle.com/javase/7/docs/api/"
+  lazy val javaDocUrl = "https://docs.oracle.com/en/java/javase/11/docs/api/"
   lazy val nettyClientDocUrl = "https://netty.io/4.1/api/index.html"
   lazy val jacksonDocUrl = s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/"
   lazy val metricsDocUrl = s"https://javadoc.io/doc/io.dropwizard.metrics/metrics-core/$metricsVersion/"
@@ -70,6 +70,20 @@ object Settings {
     useGpg := false // still relies on BouncyCastle (https://github.com/sbt/sbt-pgp#usage)
   )
 
+  lazy val compilerSettings = Seq(
+    javacOptions ++= Seq(
+      "-source", "11",
+      "-target", "11"
+    )
+  )
+
+  lazy val commonSettings =
+    buildSettings ++
+    compilerSettings ++
+    publishSettings ++
+    Tasks.settings ++
+    Testing.settings
+
   lazy val javaCommonSettings = Seq(
     crossScalaVersions := Seq(scala212),
     crossPaths := false,
@@ -79,23 +93,13 @@ object Settings {
 
     coverageEnabled := false,
 
-    javacOptions ++= Seq(
-      "-source", "1.8", "-target", "1.8"
-    ),
-
     javacOptions in (Compile, doc) := Seq(
-      "-source", "1.8",
+      "-source", "11",
       "-link", javaDocUrl,
       "-link", metricsDocUrl,
       "-link", nettyClientDocUrl
     )
   )
-
-  lazy val commonSettings =
-    buildSettings ++
-    publishSettings ++
-    Tasks.settings ++
-    Testing.settings
 
   lazy val rootSettings = Seq(
     // crossScalaVersions must be set to Nil on the aggregating project

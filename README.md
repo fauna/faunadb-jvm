@@ -33,7 +33,7 @@ Details Documentation for each language:
 
 ### Java
 
-* Java 8
+* Java 11
 
 ### Scala
 
