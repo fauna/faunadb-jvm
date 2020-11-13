@@ -2219,6 +2219,96 @@ public final class Language {
   }
 
   /**
+   * Returns a reference to a set of all access providers in the database.
+   * A reference set must be paginated in order to retrieve its values.
+   *
+   * @param scope a reference to a database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see #Database(String)
+   * @see #Paginate(Expr)
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessproviders">FaunaDB Authentication Functions</a>
+   */
+  public static Expr AccessProviders(Expr scope) {
+    return Fn.apply("access_providers", scope);
+  }
+
+  /**
+   * Returns a reference to a set of all access providers in the database.
+   * A reference set must be paginated in order to retrieve its values.
+   *
+   * @return a new {@link Expr} instance
+   * @see #Paginate(Expr)
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessproviders">FaunaDB Authentication Functions</a>
+   */
+  public static Expr AccessProviders() {
+    return AccessProviders(Null());
+  }
+
+  /**
+   * Creates a reference for the access provider name.
+   *
+   * @param name the access provider name. Type: String
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider">FaunaDB Authentication Functions</a>
+   */
+  public static Expr AccessProvider(Expr name) {
+    return Fn.apply("access_provider", name);
+  }
+
+  /**
+   * Creates a reference for the access provider name.
+   *
+   * @param name the access provider name
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider">FaunaDB Authentication Functions</a>
+   */
+  public static Expr AccessProvider(String name) {
+    return AccessProvider(Value(name));
+  }
+
+  /**
+   * Creates a reference for the given access provider name, scoped to the database provided.
+   *
+   * @param name the access provider name. Type: String
+   * @param database the scope database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider">FaunaDB Authentication Functions</a>
+   * @see #Database(String)
+   */
+  public static Expr AccessProvider(Expr name, Expr database) {
+    return Fn.apply("access_provider", name, "scope", database);
+  }
+
+  /**
+   * Creates a reference for the given access provider name, scoped to the database provided.
+   *
+   * @param name the access provider name
+   * @param database the scope database. Type: Reference
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider">FaunaDB Authentication Functions</a>
+   * @see #Database(String)
+   */
+  public static Expr AccessProvider(String name, Expr database) {
+    return AccessProvider(Value(name), database);
+  }
+
+  /**
+   * Creates a new access provider given the params.
+   *
+   * @param params  An object of parameters used to create a new access provider.
+   *  - name: A valid schema name
+   *  - issuer: A unique string
+   *  - jwks_uri: A valid HTTPS URI
+   *  - roles: An array of role/predicate pairs where the predicate returns a boolean.
+   *                The array can also contain Role references.
+   * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/createaccessprovider">FaunaDB Authentication Functions</a>
+   */
+  public static Expr CreateAccessProvider(Expr params) {
+    return Fn.apply("create_access_provider", params);
+  }
+  
+ /**
    * Returns current token used for the request.
    *
    * @return a new {@link Expr} instance
