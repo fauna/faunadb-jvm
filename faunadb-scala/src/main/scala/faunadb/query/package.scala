@@ -707,6 +707,43 @@ package object query {
     Expr(ObjectV("has_identity" -> NullV))
 
   /**
+    * An CreateAccessProvider expression.
+    *
+    * @param params An object of parameters used to create a new access provider.
+    *  - name: A valid schema name
+    *  - issuer: A unique string
+    *  - jwks_uri: A valid HTTPS URI
+    *  - roles: An array of role/predicate pairs where the predicate returns a boolean.
+    *                The array can also contain Role references.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/createaccessprovider]]
+    */
+  def CreateAccessProvider(params: Expr): Expr =
+    Expr(ObjectV("create_access_provider" -> params.value))
+
+  /** Native reference to all access providers */
+  def AccessProviders(scope: Expr = NullV): Expr =
+    Expr(ObjectV("access_providers" -> scope.value))
+
+  /**
+    * An Access Provider expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider]]
+    */
+  def AccessProvider(name: Expr): Expr =
+     Expr(ObjectV("access_provider" -> name.value))
+
+  /**
+    * An Access Provider expression.
+    *
+    * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider]]
+    */
+  def AccessProvider(name: Expr, scope: Expr): Expr =
+    Expr(ObjectV("access_provider" -> name.value, "scope" -> scope.value))
+
+
+  /**
+    * An HasCurrentIdentity expression.
     * A HasCurrentToken expression.
     *
     * '''Reference''': [[https://docs.fauna.com/fauna/current/api/fql/functions/hascurrenttoken]]
@@ -729,6 +766,7 @@ package object query {
     */
   def HasCurrentIdentity(): Expr =
     Expr(ObjectV("has_current_identity" -> NullV))
+
 
   // String Functions
 
