@@ -309,7 +309,7 @@ public class Connection implements AutoCloseable {
    * @return a {@link CompletableFuture} containing the HTTP Response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<HttpResponse<String>> get(String path, Optional<Duration> queryTimeout) throws Exception {
+  public CompletableFuture<HttpResponse<String>> get(String path, Optional<Duration> queryTimeout) {
     return performRequest("GET", path, Optional.empty(), Map.of(), queryTimeout);
   }
 
@@ -322,7 +322,7 @@ public class Connection implements AutoCloseable {
    * @return a {@code CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<HttpResponse<String>> get(String path, Map<String, List<String>> params, Optional<Duration> queryTimeout) throws Exception {
+  public CompletableFuture<HttpResponse<String>> get(String path, Map<String, List<String>> params, Optional<Duration> queryTimeout) {
     return performRequest("GET", path, Optional.empty(), params, queryTimeout);
   }
 
@@ -335,7 +335,7 @@ public class Connection implements AutoCloseable {
    * @return a {@link CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<HttpResponse<String>> post(String path, JsonNode body, Optional<Duration> queryTimeout) throws Exception {
+  public CompletableFuture<HttpResponse<String>> post(String path, JsonNode body, Optional<Duration> queryTimeout) {
     return performRequest("POST", path, Optional.of(body), Map.of(), queryTimeout);
   }
 
@@ -348,7 +348,7 @@ public class Connection implements AutoCloseable {
    * @return a {@link CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<HttpResponse<String>> put(String path, JsonNode body, Optional<Duration> queryTimeout) throws Exception {
+  public CompletableFuture<HttpResponse<String>> put(String path, JsonNode body, Optional<Duration> queryTimeout) {
     return performRequest("PUT", path, Optional.of(body), Map.of(), queryTimeout);
   }
 
@@ -361,7 +361,7 @@ public class Connection implements AutoCloseable {
    * @return a {@link CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<HttpResponse<String>> patch(String path, JsonNode body, Optional<Duration> queryTimeout) throws Exception {
+  public CompletableFuture<HttpResponse<String>> patch(String path, JsonNode body, Optional<Duration> queryTimeout) {
     return performRequest("PATCH", path, Optional.of(body), Map.of(), queryTimeout);
   }
 

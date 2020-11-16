@@ -340,13 +340,7 @@ public class FaunaClient implements AutoCloseable {
   }
 
   private CompletableFuture<Value> performRequest(JsonNode body, Optional<Duration> queryTimeout) {
-    try {
-        return handleNetworkExceptions(connection.post("", body, queryTimeout).thenApply(this::handleResponse));
-    } catch (Exception ex) {
-        CompletableFuture<Value> oops = new CompletableFuture<>();
-        oops.completeExceptionally(ex);
-        return oops;
-    }
+    return handleNetworkExceptions(connection.post("", body, queryTimeout).thenApply(this::handleResponse));
   }
 
   private void handleQueryErrors(HttpResponse<String> response) {
