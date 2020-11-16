@@ -2,6 +2,7 @@ package com.faunadb.common;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -15,12 +16,14 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -319,7 +322,7 @@ public class Connection implements AutoCloseable {
    * @return a {@code CompletableFuture} containing the HTTP response.
    * @throws IOException if the HTTP request cannot be issued.
    */
-  public CompletableFuture<HttpResponse<String>> get(String path, Map<String, String> params, Optional<Duration> queryTimeout) throws Exception {
+  public CompletableFuture<HttpResponse<String>> get(String path, Map<String, List<String>> params, Optional<Duration> queryTimeout) throws Exception {
     return performRequest("GET", path, Optional.empty(), params, queryTimeout);
   }
 
@@ -362,63 +365,27 @@ public class Connection implements AutoCloseable {
     return performRequest("PATCH", path, Optional.of(body), Map.of(), queryTimeout);
   }
 
-  public static URI appendUri(URI oldUri, String queryKey, String queryValue) throws URISyntaxException {
+  private static URI appendUri(URI oldUri, String queryKey, List<String> queryValues) throws URISyntaxException {
     String urlEncodedKey = URLEncoder.encode(queryKey, StandardCharsets.UTF_8);
-    String urlEncodedValue = URLEncoder.encode(queryValue, StandardCharsets.UTF_8);
+    String urlEncodedValue = queryValues.stream()
+            .map(u -> URLEncoder.encode(u, StandardCharsets.UTF_8))
+            .collect(Collectors.joining(","));
     String query = urlEncodedKey + "=" + urlEncodedValue;
     return new URI(oldUri.getScheme(), oldUri.getAuthority(), oldUri.getPath(),
             oldUri.getQuery() == null ? query : oldUri.getQuery() + "&" + query, oldUri.getFragment());
   }
 
   private CompletableFuture<HttpResponse<String>> performRequest(String httpMethod, String path, Optional<JsonNode> body,
-                                                                 Map<String, String> params, final Optional<Duration> requestQueryTimeout) throws Exception {
+                                                                 Map<String, List<String>> params, final Optional<Duration> requestQueryTimeout) {
     final Timer.Context ctx = registry.timer("fauna-request").time();
     final CompletableFuture<HttpResponse<String>> rv = new CompletableFuture<>();
-
-    URI requestUri = URI.create(mkUrl(path));
-
-    // Encode all query parameters
-    for (Map.Entry<String,String> entry : params.entrySet()) {
-      requestUri = appendUri(requestUri, entry.getKey(), entry.getValue());
+    HttpRequest request;
+    try {
+      request = makeHttpRequest(httpMethod, path, body, params, requestQueryTimeout, HttpClient.Version.HTTP_1_1);
+    } catch (MalformedURLException | URISyntaxException | JsonProcessingException ex) {
+      rv.completeExceptionally(ex);
+      return rv;
     }
-
-
-    HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
-    if (body.isPresent()) {
-      byte[] jsonBody = json.writeValueAsBytes(body.get());
-      bodyPublisher = HttpRequest.BodyPublishers.ofByteArray(jsonBody);
-    };
-
-    // If a query timeout has been given for the current request,
-    // override the one from the Connection if any
-    Optional<Duration> queryTimeout = requestQueryTimeout.or(() -> defaultQueryTimeout);
-
-    Optional<Long> lastTxnTime = (getLastTxnTime() > 0) ? Optional.of(getLastTxnTime()) : Optional.empty();
-
-    HttpRequest.Builder requestBuilder =
-      HttpRequest.newBuilder()
-        .uri(requestUri)
-        .version(HttpClient.Version.HTTP_1_1)
-        .timeout(Duration.ofMillis(DEFAULT_REQUEST_TIMEOUT_MS))
-        .method(httpMethod, bodyPublisher)
-        .headers(
-          "Authorization", authHeader,
-          "X-FaunaDB-API-Version", API_VERSION,
-          "User-agent", "Fauna JVM Http Client",
-          X_FAUNA_DRIVER, jvmDriver.toString(),
-          "Content-type", "application/json; charset=utf-8"
-        );
-
-    queryTimeout.ifPresent( timeout ->
-      requestBuilder.header(X_QUERY_TIMEOUT, String.valueOf(timeout.toMillis()))
-    );
-
-    lastTxnTime.ifPresent( time ->
-      requestBuilder.header("X-Last-Seen-Txn", Long.toString(time))
-    );
-
-    HttpRequest request = requestBuilder.build();
-
     sendRequest(request).whenCompleteAsync((response, throwable) -> {
       ctx.stop();
 
@@ -445,6 +412,50 @@ public class Connection implements AutoCloseable {
     }
 
     return client.sendAsync(req, HttpResponse.BodyHandlers.ofString());
+  }
+
+  private HttpRequest makeHttpRequest(String httpMethod, String path, Optional<JsonNode> body, Map<String, List<String>> params,
+                                      Optional<Duration> requestQueryTimeout, HttpClient.Version httpVersion) throws MalformedURLException, URISyntaxException, JsonProcessingException {
+    URI requestUri = URI.create(mkUrl(path));
+
+    // Encode all query parameters
+    for (Map.Entry<String, List<String>> entry : params.entrySet()) {
+      List<String> values = entry.getValue();
+      if (!values.isEmpty()) {
+        requestUri = appendUri(requestUri, entry.getKey(), values);
+      }
+    }
+
+    HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
+    if (body.isPresent()) {
+      byte[] jsonBody = json.writeValueAsBytes(body.get());
+      bodyPublisher = HttpRequest.BodyPublishers.ofByteArray(jsonBody);
+    }
+
+    // If a query timeout has been given for the current request,
+    // override the one from the Connection if any
+    Optional<Duration> queryTimeout = requestQueryTimeout.or(() -> defaultQueryTimeout);
+
+    Optional<Long> lastTxnTime = (getLastTxnTime() > 0) ? Optional.of(getLastTxnTime()) : Optional.empty();
+
+    HttpRequest.Builder requestBuilder =
+      HttpRequest.newBuilder()
+        .uri(requestUri)
+        .version(httpVersion)
+        .timeout(Duration.ofMillis(DEFAULT_REQUEST_TIMEOUT_MS))
+        .method(httpMethod, bodyPublisher)
+        .headers(
+          "Authorization", authHeader,
+          "X-FaunaDB-API-Version", API_VERSION,
+          "User-agent", "Fauna JVM Http Client",
+          X_FAUNA_DRIVER, jvmDriver.toString(),
+          "Content-type", "application/json; charset=utf-8"
+        );
+
+    queryTimeout.ifPresent(timeout -> requestBuilder.header(X_QUERY_TIMEOUT, String.valueOf(timeout.toMillis())));
+    lastTxnTime.ifPresent(time -> requestBuilder.header("X-Last-Seen-Txn", Long.toString(time)));
+
+    return requestBuilder.build();
   }
 
   private String mkUrl(String path) throws MalformedURLException {
