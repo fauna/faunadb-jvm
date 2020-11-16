@@ -61,7 +61,7 @@ import static com.faunadb.client.types.Codec.VALUE;
  *
  * @see com.faunadb.client.query.Language
  */
-public class FaunaClient implements AutoCloseable {
+public class FaunaClient {
 
   /**
    * Creates a new {@link Builder}
@@ -164,21 +164,7 @@ public class FaunaClient implements AutoCloseable {
    * @return a new {@link FaunaClient}
    */
   public FaunaClient newSessionClient(String secret) {
-    return new FaunaClient(connection.newSessionConnection(secret)) {
-      @Override
-      public void close() {
-        // DO NOTHING
-      }
-    };
-  }
-
-  /**
-   * Releases any resources being held by this {@link FaunaClient} instance
-   * and any associated session {@link FaunaClient} instances.
-   */
-  @Override
-  public void close() {
-    connection.close();
+    return new FaunaClient(connection.newSessionConnection(secret));
   }
 
   /**

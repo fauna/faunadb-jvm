@@ -197,7 +197,7 @@ class FaunaClient private (connection: Connection) {
 
   /**
     * Creates a new scope to execute session queries. Queries submitted within the session scope will be
-    * authenticated with the secret provided. A session client shares its parent's [com.faunadb.common.Connection]]
+    * authenticated with the secret provided. A session client shares its parent's [[com.faunadb.common.Connection]]
     * instance and thus it does not need to be closed after its usage. Close the parent session for freeing up any
     * resources held by the parent session and this session client.
     *
@@ -218,17 +218,7 @@ class FaunaClient private (connection: Connection) {
     * @param secret user secret for the session client
     * @return a new session client
     */
-  def sessionClient(secret: String): FaunaClient = new FaunaClient(connection.newSessionConnection(secret)) {
-    override def close(): Unit = {
-      // DO NOTHING
-    }
-  }
-
-  /**
-   * Releases any resources being held by this [[faunadb.FaunaClient]] instance
-   * and any associated session [[faunadb.FaunaClient]] instances.
-   */
-  def close(): Unit = connection.close()
+  def sessionClient(secret: String): FaunaClient = new FaunaClient(connection.newSessionConnection(secret))
 
   /**
    * Get the freshest timestamp reported to this client.

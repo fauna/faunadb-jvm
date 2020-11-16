@@ -32,11 +32,8 @@ import static java.lang.String.format;
  *
  * <p>Relies on {@link java.net.http.HttpClient}
  * for the underlying implementation.</p>
- *
- * <p>The {@link Connection#close()} method must be called in order to
- * release {@link Connection} I/O resources</p>
  */
-public class Connection implements AutoCloseable {
+public class Connection {
 
   private static final String API_VERSION = "4";
   private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
@@ -219,7 +216,6 @@ public class Connection implements AutoCloseable {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final ObjectMapper json = new ObjectMapper();
-  private final AtomicBoolean closed = new AtomicBoolean(false);
   private final AtomicLong txnTime = new AtomicLong(0L);
 
   private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> defaultQueryTimeout) {
@@ -241,39 +237,7 @@ public class Connection implements AutoCloseable {
    * @return a new {@link Connection}
    */
   public Connection newSessionConnection(String authToken) {
-    if (isClosed()) {
-      throw new IllegalStateException("Connection already closed");
-    }
-
-    return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), defaultQueryTimeout) {
-      @Override
-      public void close() {
-        // DO NOTHING
-      }
-    };
-  }
-
-  /**
-   * Releases any resources being held by this {@link Connection} instance
-   * and any associated session {@link Connection} instances.
-   */
-  @Override
-  public void close() {
-    if (closed.compareAndSet(false, true)) {
-      // Garbage Collector frees any associated resources
-      // when setting the reference to the HttpClient to null.
-      client = null;
-    }
-  }
-
-  /**
-   * Verifies if the connection still accepts new requests.
-   *
-   * @return true if closed, false if not
-   * @see #close()
-   */
-  public boolean isClosed() {
-    return closed.get();
+    return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), defaultQueryTimeout);
   }
 
   /**
@@ -407,10 +371,6 @@ public class Connection implements AutoCloseable {
   }
 
   private CompletableFuture<HttpResponse<String>> sendRequest(HttpRequest req) {
-    if (isClosed()) {
-      return CompletableFuture.failedFuture(new IllegalStateException("Client already closed"));
-    }
-
     return client.sendAsync(req, HttpResponse.BodyHandlers.ofString());
   }
 
