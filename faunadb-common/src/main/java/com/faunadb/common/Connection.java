@@ -158,6 +158,17 @@ public class Connection implements AutoCloseable {
     }
 
     /**
+     * Sets the client to use for the connection.
+     *
+     * @param client the {@link HttpClient} to use for this connection.
+     * @return this {@link Builder} object
+     */
+    public Builder withHttpClient(HttpClient client) {
+      this.client = client;
+      return this;
+    }
+
+    /**
      * Sets the global query timeout for this connection.
      *
      * @param timeout the query timeout value
