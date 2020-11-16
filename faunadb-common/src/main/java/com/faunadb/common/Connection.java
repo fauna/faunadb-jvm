@@ -4,7 +4,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.faunadb.common.http.JavaHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +82,7 @@ public class Connection implements AutoCloseable {
     private String authToken;
     private MetricRegistry metricRegistry;
     private long lastSeenTxn;
-    private JavaHttpClient client;
+    private HttpClient client;
     private JvmDriver jvmDriver;
     private Optional<Duration> queryTimeout = Optional.empty();
 
@@ -159,17 +158,6 @@ public class Connection implements AutoCloseable {
     }
 
     /**
-     * Sets the client to use for the connection.
-     *
-     * @param client the {@link JavaHttpClient} to use for this connection.
-     * @return this {@link Builder} object
-     */
-    public Builder withHttpClient(JavaHttpClient client) {
-      this.client = client;
-      return this;
-    }
-
-    /**
      * Sets the global query timeout for this connection.
      *
      * @param timeout the query timeout value
@@ -191,8 +179,13 @@ public class Connection implements AutoCloseable {
       URL root;
       root = Objects.requireNonNullElseGet(faunaRoot, () -> FAUNA_ROOT);
 
-      JavaHttpClient http;
-      http = Objects.requireNonNullElseGet(client, () -> new JavaHttpClient(DEFAULT_CONNECTION_TIMEOUT_MS));
+      HttpClient http;
+      http = Objects.requireNonNullElseGet(client, () ->
+        // TODO: [DRV-169] allow users to override default executor
+        HttpClient.newBuilder()
+          .connectTimeout(Duration.ofMillis(DEFAULT_CONNECTION_TIMEOUT_MS))
+          .build()
+      );
 
       return new Connection(root, authToken, http, registry, jvmDriver, lastSeenTxn, queryTimeout);
     }
@@ -206,7 +199,7 @@ public class Connection implements AutoCloseable {
   private final URL faunaRoot;
   private final String authHeader;
   private final JvmDriver jvmDriver;
-  private final JavaHttpClient client;
+  private HttpClient client;
   private final MetricRegistry registry;
   private final Optional<Duration> connectionQueryTimeout;
 
@@ -215,7 +208,7 @@ public class Connection implements AutoCloseable {
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final AtomicLong txnTime = new AtomicLong(0L);
 
-  private Connection(URL faunaRoot, String authToken, JavaHttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> connectionQueryTimeout) {
+  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> connectionQueryTimeout) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
     this.client = client;
@@ -253,7 +246,9 @@ public class Connection implements AutoCloseable {
   @Override
   public void close() {
     if (closed.compareAndSet(false, true)) {
-      client.close();
+      // Garbage Collector frees any associated resources
+      // when setting the reference to the HttpClient to null.
+      client = null;
     }
   }
 
@@ -413,7 +408,7 @@ public class Connection implements AutoCloseable {
 
     HttpRequest request = requestBuilder.build();
 
-    client.sendRequest(request).whenCompleteAsync((response, throwable) -> {
+    sendRequest(request).whenCompleteAsync((response, throwable) -> {
       ctx.stop();
 
       if (throwable != null) {
@@ -431,6 +426,14 @@ public class Connection implements AutoCloseable {
     });
 
     return rv;
+  }
+
+  private CompletableFuture<HttpResponse<String>> sendRequest(HttpRequest req) {
+    if (isClosed()) {
+      return CompletableFuture.failedFuture(new IllegalStateException("Client already closed"));
+    }
+
+    return client.sendAsync(req, HttpResponse.BodyHandlers.ofString());
   }
 
   private String mkUrl(String path) throws MalformedURLException {
