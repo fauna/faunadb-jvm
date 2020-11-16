@@ -201,21 +201,21 @@ public class Connection implements AutoCloseable {
   private final JvmDriver jvmDriver;
   private HttpClient client;
   private final MetricRegistry registry;
-  private final Optional<Duration> connectionQueryTimeout;
+  private final Optional<Duration> defaultQueryTimeout;
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final ObjectMapper json = new ObjectMapper();
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final AtomicLong txnTime = new AtomicLong(0L);
 
-  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> connectionQueryTimeout) {
+  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> defaultQueryTimeout) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
     this.client = client;
     this.registry = registry;
     this.jvmDriver = jvmDriver;
     this.txnTime.set(lastSeenTxn);
-    this.connectionQueryTimeout = connectionQueryTimeout;
+    this.defaultQueryTimeout = defaultQueryTimeout;
   }
 
   /**
@@ -231,7 +231,7 @@ public class Connection implements AutoCloseable {
       throw new IllegalStateException("Connection already closed");
     }
 
-    return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), connectionQueryTimeout) {
+    return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), defaultQueryTimeout) {
       @Override
       public void close() {
         // DO NOTHING
@@ -380,7 +380,7 @@ public class Connection implements AutoCloseable {
 
     // If a query timeout has been given for the current request,
     // override the one from the Connection if any
-    Optional<Duration> queryTimeout = requestQueryTimeout.or(() -> connectionQueryTimeout);
+    Optional<Duration> queryTimeout = requestQueryTimeout.or(() -> defaultQueryTimeout);
 
     Optional<Long> lastTxnTime = (getLastTxnTime() > 0) ? Optional.of(getLastTxnTime()) : Optional.empty();
 
