@@ -1,6 +1,7 @@
 package com.faunadb.client;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -326,7 +327,7 @@ public class FaunaClient implements AutoCloseable {
       JsonNode resource = responseBody.get("resource");
 
       if(resource == null) {
-        throw new IOException("Invalid JSON.");
+        throw new IllegalArgumentException("Invalid JSON.");
       }
 
       if(resource instanceof NullNode) {
@@ -334,7 +335,7 @@ public class FaunaClient implements AutoCloseable {
       }
 
       return json.treeToValue(resource, Value.class);
-    } catch (IOException ex) {
+    } catch (JsonProcessingException | IllegalArgumentException ex) {
       throw new AssertionError(ex);
     }
   }
@@ -374,9 +375,7 @@ public class FaunaClient implements AutoCloseable {
           default:
             throw new UnknownException(errorResponse);
         }
-      } catch (VirtualMachineError | ThreadDeath | LinkageError | FaunaException ex) { //like NonFatal(ex) on scala driver
-        throw ex;
-      } catch (Exception ex) {
+      } catch (JsonProcessingException | IllegalArgumentException ex) {
         if (status == 503) {
           throw new UnavailableException("Service Unavailable: Unparseable response.", ex);
         } else {
@@ -394,10 +393,10 @@ public class FaunaClient implements AutoCloseable {
       });
   }
 
-  private JsonNode parseResponseBody(HttpResponse<String> response) throws IOException {
+  private JsonNode parseResponseBody(HttpResponse<String> response) throws JsonProcessingException, IllegalArgumentException {
     JsonNode body = json.readTree(response.body());
     if (body == null) {
-      throw new IOException("Invalid JSON.");
+      throw new IllegalArgumentException("Invalid JSON.");
     } else {
       return body;
     }
