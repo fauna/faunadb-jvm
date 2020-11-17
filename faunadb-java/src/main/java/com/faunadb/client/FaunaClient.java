@@ -1,6 +1,7 @@
 package com.faunadb.client;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -12,13 +13,12 @@ import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
 import com.faunadb.common.Connection.JvmDriver;
 import com.faunadb.client.types.Value.NullV;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.handler.codec.http.FullHttpResponse;
 
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,7 +61,7 @@ import static com.faunadb.client.types.Codec.VALUE;
  *
  * @see com.faunadb.client.query.Language
  */
-public class FaunaClient implements AutoCloseable {
+public class FaunaClient {
 
   /**
    * Creates a new {@link Builder}
@@ -157,21 +157,14 @@ public class FaunaClient implements AutoCloseable {
   /**
    * Creates a session client with the user secret provided. Queries submitted to a session client will be
    * authenticated with the secret provided. A session client shares its parent's {@link Connection} instance
-   * and must be closed after used.
+   * and thus it does not need be closed after its usage. Close the parent session for freeing up any
+   * resources held by the parent session and this session client.
    *
    * @param secret user secret for the session client
    * @return a new {@link FaunaClient}
    */
   public FaunaClient newSessionClient(String secret) {
     return new FaunaClient(connection.newSessionConnection(secret));
-  }
-
-  /**
-   * Releases any resources being held by the {@link FaunaClient} instance.
-   */
-  @Override
-  public void close() {
-    connection.close();
   }
 
   /**
@@ -313,14 +306,14 @@ public class FaunaClient implements AutoCloseable {
     return connection.getLastTxnTime();
   }
 
-  private Value handleResponse(FullHttpResponse response) {
+  private Value handleResponse(HttpResponse<String> response) {
     try {
       handleQueryErrors(response);
       JsonNode responseBody = parseResponseBody(response);
       JsonNode resource = responseBody.get("resource");
 
       if(resource == null) {
-        throw new IOException("Invalid JSON.");
+        throw new IllegalArgumentException("Invalid JSON.");
       }
 
       if(resource instanceof NullNode) {
@@ -328,25 +321,17 @@ public class FaunaClient implements AutoCloseable {
       }
 
       return json.treeToValue(resource, Value.class);
-    } catch (IOException ex) {
+    } catch (JsonProcessingException | IllegalArgumentException ex) {
       throw new AssertionError(ex);
-    } finally {
-      response.release();
     }
   }
 
   private CompletableFuture<Value> performRequest(JsonNode body, Optional<Duration> queryTimeout) {
-    try {
-        return handleNetworkExceptions(connection.post("", body, queryTimeout).thenApply(this::handleResponse));
-    } catch (IOException ex) {
-        CompletableFuture<Value> oops = new CompletableFuture<>();
-        oops.completeExceptionally(ex);
-        return oops;
-    }
+    return handleNetworkExceptions(connection.post("", body, queryTimeout).thenApply(this::handleResponse));
   }
 
-  private void handleQueryErrors(FullHttpResponse response) {
-    int status = response.status().code();
+  private void handleQueryErrors(HttpResponse<String> response) {
+    int status = response.statusCode();
     if (status >= 300) {
       try {
         List<HttpResponses.QueryError> parsedErrors = new ArrayList<>();
@@ -376,11 +361,7 @@ public class FaunaClient implements AutoCloseable {
           default:
             throw new UnknownException(errorResponse);
         }
-      } catch (VirtualMachineError | ThreadDeath | LinkageError ex) { //like NonFatal(ex) on scala driver
-        throw ex;
-      } catch (FaunaException ex) {
-        throw ex;
-      } catch (Exception ex) {
+      } catch (JsonProcessingException | IllegalArgumentException ex) {
         if (status == 503) {
           throw new UnavailableException("Service Unavailable: Unparseable response.", ex);
         } else {
@@ -392,17 +373,16 @@ public class FaunaClient implements AutoCloseable {
 
   private <V> CompletableFuture<V> handleNetworkExceptions(CompletableFuture<V> f) {
       return f.whenComplete((v, ex) -> {
-              if (ex instanceof ConnectException ||
-                         ex instanceof TimeoutException) {
-                  throw new UnavailableException(ex.getMessage(), ex);
-              }
-          });
+          if (ex instanceof ConnectException || ex instanceof TimeoutException) {
+              throw new UnavailableException(ex.getMessage(), ex);
+          }
+      });
   }
 
-  private JsonNode parseResponseBody(FullHttpResponse response) throws IOException {
-    JsonNode body = json.readTree(new ByteBufInputStream(response.content()));
+  private JsonNode parseResponseBody(HttpResponse<String> response) throws JsonProcessingException, IllegalArgumentException {
+    JsonNode body = json.readTree(response.body());
     if (body == null) {
-      throw new IOException("Invalid JSON.");
+      throw new IllegalArgumentException("Invalid JSON.");
     } else {
       return body;
     }

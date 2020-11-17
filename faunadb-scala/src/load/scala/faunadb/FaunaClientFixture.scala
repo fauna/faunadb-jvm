@@ -71,9 +71,4 @@ trait FaunaClientFixture extends SuiteMixin with BeforeAndAfterAll { self: Fixtu
       deleteDatabase()
     }
   }
-
-  override protected def afterAll(): Unit = {
-    try super.afterAll() // To be stackable, must call super.afterAll
-    finally if (rootClient ne null) rootClient.close()
-  }
 }

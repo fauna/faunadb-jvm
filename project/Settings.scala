@@ -15,7 +15,6 @@ object Settings {
   lazy val jacksonDocVersion = "2.11"
 
   lazy val javaDocUrl = "https://docs.oracle.com/en/java/javase/11/docs/api/"
-  lazy val nettyClientDocUrl = "https://netty.io/4.1/api/index.html"
   lazy val jacksonDocUrl = s"http://fasterxml.github.io/jackson-databind/javadoc/$jacksonDocVersion/"
   lazy val metricsDocUrl = s"https://javadoc.io/doc/io.dropwizard.metrics/metrics-core/$metricsVersion/"
 
@@ -96,8 +95,7 @@ object Settings {
     javacOptions in (Compile, doc) := Seq(
       "-source", "11",
       "-link", javaDocUrl,
-      "-link", metricsDocUrl,
-      "-link", nettyClientDocUrl
+      "-link", metricsDocUrl
     )
   )
 

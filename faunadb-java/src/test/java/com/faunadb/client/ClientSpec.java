@@ -6,7 +6,6 @@ import com.faunadb.client.query.Language;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
-import io.netty.util.ResourceLeakDetector;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
@@ -96,8 +95,6 @@ public class ClientSpec {
 
   @BeforeClass
   public static void setUpClient() throws Exception {
-    ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
-
     rootClient = createFaunaClient(ROOT_TOKEN);
 
     rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
@@ -113,9 +110,6 @@ public class ClientSpec {
   @AfterClass
   public static void closeClients() throws Exception {
     rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
-    rootClient.close();
-    serverClient.close();
-    adminClient.close();
   }
 
   @Before
@@ -2024,10 +2018,9 @@ public class ClientSpec {
 
     String secret = auth.get(SECRET_FIELD);
 
-    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
-      Value loggedOut = sessionClient.query(Logout(Value(true))).get();
-      assertThat(loggedOut.to(BOOLEAN).get(), is(true));
-    }
+    FaunaClient sessionClient = serverClient.newSessionClient(secret);
+    Value loggedOut = sessionClient.query(Logout(Value(true))).get();
+    assertThat(loggedOut.to(BOOLEAN).get(), is(true));
 
     Value identified = serverClient.query(
             Identify(
@@ -2055,12 +2048,11 @@ public class ClientSpec {
 
     String secret = auth.get(SECRET_FIELD);
 
-    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
-      assertThat(
-              sessionClient.query(HasIdentity()).get().to(BOOLEAN).get(),
-              equalTo(true)
-      );
-    }
+    FaunaClient sessionClient = serverClient.newSessionClient(secret);
+    assertThat(
+            sessionClient.query(HasIdentity()).get().to(BOOLEAN).get(),
+            equalTo(true)
+    );
   }
 
   @Test
@@ -2080,12 +2072,11 @@ public class ClientSpec {
     String secret = auth.get(SECRET_FIELD); 
     Value tokenRef= auth.get(REF_FIELD);
 
-    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
-      assertThat(
-              sessionClient.query(CurrentToken()).get().to(REF).get(),
-              equalTo(tokenRef)
-      );
-    }
+    FaunaClient sessionClient = serverClient.newSessionClient(secret);
+    assertThat(
+            sessionClient.query(CurrentToken()).get().to(REF).get(),
+            equalTo(tokenRef)
+    );
   }
 
   @Test
@@ -2096,12 +2087,11 @@ public class ClientSpec {
 
     String secret = clientKey.get(SECRET_FIELD);
 
-    try (FaunaClient sessionClient = adminClient.newSessionClient(secret)) {
-      assertThat(
-              sessionClient.query(CurrentToken()).get().to(REF).get(),
-              equalTo(clientKey.get(REF_FIELD))
-      );
-    }
+    FaunaClient sessionClient = adminClient.newSessionClient(secret);
+    assertThat(
+            sessionClient.query(CurrentToken()).get().to(REF).get(),
+            equalTo(clientKey.get(REF_FIELD))
+    );
   }
   
   @Test
@@ -2120,12 +2110,11 @@ public class ClientSpec {
 
     String secret = auth.get(SECRET_FIELD);
     
-    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
-      assertThat(
-              sessionClient.query(HasCurrentIdentity()).get().to(BOOLEAN).get(),
-              equalTo(true)
-      );
-    }
+    FaunaClient sessionClient = serverClient.newSessionClient(secret);
+    assertThat(
+            sessionClient.query(HasCurrentIdentity()).get().to(BOOLEAN).get(),
+            equalTo(true)
+    );
   }
   
   @Test
@@ -2144,12 +2133,11 @@ public class ClientSpec {
 
     String secret = auth.get(SECRET_FIELD);
 
-    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
-      assertThat(
-              sessionClient.query(HasCurrentToken()).get().to(BOOLEAN).get(),
-              equalTo(true)
-      );
-    }
+    FaunaClient sessionClient = serverClient.newSessionClient(secret);
+    assertThat(
+            sessionClient.query(HasCurrentToken()).get().to(BOOLEAN).get(),
+            equalTo(true)
+    );
   }
 
   @Test
@@ -2176,12 +2164,11 @@ public class ClientSpec {
 
     String secret = auth.get(SECRET_FIELD);
 
-    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
-      assertThat(
-              sessionClient.query(Identity()).get(),
-              equalTo(createdInstance.get(REF_FIELD))
-      );
-    }
+    FaunaClient sessionClient = serverClient.newSessionClient(secret);
+    assertThat(
+            sessionClient.query(Identity()).get(),
+            equalTo(createdInstance.get(REF_FIELD))
+    );
   }
 
   @Test
@@ -2300,12 +2287,11 @@ public class ClientSpec {
 
     String secret = auth.get(SECRET_FIELD);
 
-    try (FaunaClient sessionClient = serverClient.newSessionClient(secret)) {
-      assertThat(
-              sessionClient.query(CurrentIdentity()).get(),
-              equalTo(createdInstance.get(REF_FIELD))
-      );
-    }
+    FaunaClient sessionClient = serverClient.newSessionClient(secret);
+    assertThat(
+            sessionClient.query(CurrentIdentity()).get(),
+            equalTo(createdInstance.get(REF_FIELD))
+    );
   }
 
   @Test
@@ -2431,15 +2417,11 @@ public class ClientSpec {
     String scopedSecret = secret + ":child-database1/child-database2:admin";
     FaunaClient scopedClient = adminClient.newSessionClient(scopedSecret);
 
-    try {
-      scopedClient.query(
-        CreateCollection(Obj(
-          "name", Value("foo")
-        ))
-      ).get();
-    } finally {
-      scopedClient.close();
-    }
+    scopedClient.query(
+      CreateCollection(Obj(
+        "name", Value("foo")
+      ))
+    ).get();
 
     Value collectionsPage =
       adminClient.query(
@@ -2970,8 +2952,6 @@ public class ClientSpec {
     FaunaClient cli = serverClient.newSessionClient(tok.get(SECRET_FIELD));
     Value cred = cli.query(Get(Ref("credentials/self"))).get().at("ref");
     Value token = tok.at("ref");
-
-    cli.close();
 
     List<Expr> trueExprs = Arrays.asList(
       IsNumber(Value(3.14)),

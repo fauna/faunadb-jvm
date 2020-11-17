@@ -1,27 +1,25 @@
 package faunadb
 
 import com.codahale.metrics.MetricRegistry
-import com.fasterxml.jackson.databind.{ JsonNode, ObjectMapper }
-import com.fasterxml.jackson.databind.node.{ ArrayNode, NullNode }
+import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
+import com.fasterxml.jackson.databind.node.{ArrayNode, NullNode}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.common.Connection
 import com.faunadb.common.Connection.JvmDriver
 import faunadb.errors._
 import faunadb.query.Expr
-import faunadb.values.{ ArrayV, NullV, Value }
+import faunadb.values.{ArrayV, NullV, Value}
 import java.io.IOException
 import java.net.ConnectException
+import java.net.http.HttpResponse
 import java.util.concurrent.TimeoutException
-
-import io.netty.buffer.ByteBufInputStream
-import io.netty.handler.codec.http.FullHttpResponse
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.DurationConverters._
 import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /** Companion object to the FaunaClient class. */
 object FaunaClient {
@@ -187,11 +185,11 @@ class FaunaClient private (connection: Connection) {
 
   private def performRequest(body: JsonNode, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[Value] = {
     val javaTimeout = timeout.map(_.toJava).asJava
-    val response: Future[FullHttpResponse] = connection.post("", body, javaTimeout).toScala
+    val response: Future[HttpResponse[String]] = connection.post("", body, javaTimeout).toScala
 
     response
       .flatMap {
-        case successResponse if successResponse.status().code() < 300 => handleSuccessResponse(successResponse)
+        case successResponse if successResponse.statusCode() < 300 => handleSuccessResponse(successResponse)
         case errorResponse => handleErrorResponse(errorResponse)
       }
       .recoverWith(handleNetworkExceptions)
@@ -199,8 +197,9 @@ class FaunaClient private (connection: Connection) {
 
   /**
     * Creates a new scope to execute session queries. Queries submitted within the session scope will be
-    * authenticated with the secret provided. A session client shares its parent's
-    * [[com.faunadb.common.Connection]] instance and is closed as soon as the session scope ends.
+    * authenticated with the secret provided. A session client shares its parent's [[com.faunadb.common.Connection]]
+    * instance and thus it does not need to be closed after its usage. Close the parent session for freeing up any
+    * resources held by the parent session and this session client.
     *
     * @param secret user secret for the session scope
     * @param session a function that receives a session client
@@ -208,20 +207,18 @@ class FaunaClient private (connection: Connection) {
     */
   def sessionWith[A](secret: String)(session: FaunaClient => A): A = {
     val client = sessionClient(secret)
-    try session(client) finally client.close()
+    session(client)
   }
 
   /**
-    * Create a new session client. The returned session client shares its parent [[com.faunadb.common.Connection]] instance.
-    * The returned session client must be closed after its usage.
+    * Create a new session client. The returned session client shares its parent [[com.faunadb.common.Connection]]
+    * instance and thus it does not need to be closed after its usage. Close the parent session for freeing up any
+    * resources held by the parent session and this session client.
     *
     * @param secret user secret for the session client
     * @return a new session client
     */
   def sessionClient(secret: String): FaunaClient = new FaunaClient(connection.newSessionConnection(secret))
-
-  /** Frees any resources held by the client and close the underlying connection. */
-  def close(): Unit = connection.close()
 
   /**
    * Get the freshest timestamp reported to this client.
@@ -239,8 +236,8 @@ class FaunaClient private (connection: Connection) {
   def syncLastTxnTime(timestamp: Long): Unit =
     connection.syncLastTxnTime(timestamp)
 
-  private def parseResponseBody(response: FullHttpResponse)(implicit ec: ExecutionContext): Future[JsonNode] = {
-    def parse: Future[Option[JsonNode]] = Future(Option(json.readTree(new ByteBufInputStream(response.content()))))
+  private def parseResponseBody(response: HttpResponse[String])(implicit ec: ExecutionContext): Future[JsonNode] = {
+    def parse: Future[Option[JsonNode]] = Future(Option(json.readTree(response.body())))
 
     parse.flatMap {
       case Some(json) => Future.successful(json)
@@ -248,7 +245,7 @@ class FaunaClient private (connection: Connection) {
     }
   }
 
-  private def handleSuccessResponse(response: FullHttpResponse)(implicit ec: ExecutionContext): Future[Value] = {
+  private def handleSuccessResponse(response: HttpResponse[String])(implicit ec: ExecutionContext): Future[Value] = {
     def getResource(body: JsonNode): Future[JsonNode] = Option(body.get("resource")) match {
       case Some(resource) => Future.successful(resource)
       case None => Future.failed(new IOException("Invalid JSON."))
@@ -259,21 +256,16 @@ class FaunaClient private (connection: Connection) {
       case _: JsonNode => Future(json.treeToValue[Value](resource, classOf[Value]))
     }
 
-    val result: Future[Value] =
-      for {
-        body <- parseResponseBody(response)
-        resource <- getResource(body)
-        value <- parseValue(resource)
-      } yield value
-
-    result.andThen {
-      case _ => response.release()
-    }
+    for {
+      body <- parseResponseBody(response)
+      resource <- getResource(body)
+      value <- parseValue(resource)
+    } yield value
   }
 
-  private def handleErrorResponse(response: FullHttpResponse)(implicit ec: ExecutionContext): Future[Nothing] = {
+  private def handleErrorResponse(response: HttpResponse[String])(implicit ec: ExecutionContext): Future[Nothing] = {
     def parseErrors(): Future[QueryErrorResponse] = {
-      val statusCode = response.status().code()
+      val statusCode = response.statusCode()
 
       def getErrors(body: JsonNode): Future[Iterator[JsonNode]] = Option(body.get("errors")) match {
         case Some(errors: ArrayNode) => Future.successful(errors.iterator().asScala)
@@ -294,10 +286,8 @@ class FaunaClient private (connection: Connection) {
       result
         .recoverWith {
           case e: FaunaException => Future.failed(e)
-          case unavailable if response.status().code() == 503 => Future.failed(new UnavailableException("Service Unavailable: Unparseable response.", unavailable))
+          case unavailable if response.statusCode() == 503 => Future.failed(new UnavailableException("Service Unavailable: Unparseable response.", unavailable))
           case unknown => Future.failed(new UnknownException(s"Unparseable service $unknown response.", unknown))
-        }.andThen {
-          case _ => response.release()
         }
     }
 
@@ -308,7 +298,7 @@ class FaunaClient private (connection: Connection) {
       }
     }
 
-    response.status().code() match {
+    response.statusCode() match {
       case 400 => parseErrorsAndFailWith(new BadRequestException(_))
       case 401 => parseErrorsAndFailWith(new UnauthorizedException(_))
       case 403 => parseErrorsAndFailWith(new PermissionDeniedException(_))

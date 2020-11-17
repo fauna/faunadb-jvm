@@ -89,9 +89,6 @@ class ClientSpec
 
   override protected def afterAll(): Unit = {
     dropDB()
-    client.close()
-    adminClient.close()
-    rootClient.close()
   }
 
   it should "parse nested sets" in {
@@ -1191,18 +1188,7 @@ class ClientSpec
   it should "create session client" in {
     val otherClient = client.sessionClient(config("root_token"))
 
-    try
-      otherClient.query("echo string").futureValue.to[String].get shouldBe "echo string"
-    finally
-      otherClient.close()
-  }
-
-  it should "should not create session clients on a closed client" in {
-    val newClient = FaunaClient(endpoint = config("root_url"), secret = config("root_token"))
-
-    newClient.close()
-
-    a[IllegalStateException] should be thrownBy newClient.sessionClient("sekret")
+    otherClient.query("echo string").futureValue.to[String].get shouldBe "echo string"
   }
 
   it should "find key by secret" in {
