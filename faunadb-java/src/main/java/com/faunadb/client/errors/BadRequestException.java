@@ -9,4 +9,7 @@ public class BadRequestException extends FaunaException {
   public BadRequestException(HttpResponses.QueryErrorResponse response) {
     super(response);
   }
+  public BadRequestException(String message) {
+    super(message);
+  }
 }

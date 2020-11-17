@@ -3,6 +3,7 @@ package faunadb
 import java.util
 import java.util.concurrent.Flow
 
+import faunadb.errors.BadRequestException
 import faunadb.query._
 import faunadb.values._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -85,8 +86,7 @@ class FaunaClientLoadSpec extends FixtureAsyncWordSpec with Matchers with ScalaF
   }
 
   "When streaming" should {
-    // test ignored for now as the client is shared between all tests creating interference
-    "buffers events if the producer is faster than the consumer" ignore { client =>
+    "buffers events if the producer is faster than the consumer" in { client =>
       val subscriberDone = Promise[List[Value]]
       val bufferSize = 256
 
@@ -185,6 +185,25 @@ class FaunaClientLoadSpec extends FixtureAsyncWordSpec with Matchers with ScalaF
             fail("expected 4 events")
         }
         succeed
+      }
+    }
+
+    "fail to handle more than 100 concurrent streams on the same client" in { client =>
+      val maxConcurrentStreamCount = 100
+      // create collection
+      val collectionName = RandomGenerator.aRandomString
+      val setup = for {
+        _ <- client.query(CreateCollection(Obj("name" -> collectionName)))
+        createdDoc <- client.query(Create(Collection(collectionName), Obj("credentials" -> Obj("password" -> "abcdefg"))))
+        docRef = createdDoc("ref")
+        // create a first publisher to setup the connection that will be reused by all the other publishers (makes 101 streams)
+        _ <- client.stream(docRef)
+        publisherValues <- Future.traverse(List.fill(maxConcurrentStreamCount)(docRef))(ref => client.stream(ref))
+      } yield publisherValues
+
+      setup.failed.map {
+        case BadRequestException(None, "the maximum number of streams has been reached for this client") => succeed
+        case ex => fail(s"was expecting StreamingException but got $ex")
       }
     }
   }
