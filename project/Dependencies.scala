@@ -15,6 +15,8 @@ object Dependencies {
     val junitInterfaceVersion        = "0.11"
     val harmcrestLibraryVersion      = "2.2"
     val junitVersion                 = "4.13"
+    val reactiveStreamsVersion       = "1.0.3"
+    val monixVersion                 = "3.3.0"
   }
 
   // Libraries
@@ -50,7 +52,9 @@ object Dependencies {
     val snakeYaml           = "org.yaml"        %  "snakeyaml"         % snakeYamlVersion         % "test"
 
     // faunadb-scala
-    val scalaTest           = "org.scalatest"   %% "scalatest"         % scalaTestVersion         % "test"
+    val scalaTest           = "org.scalatest"       %% "scalatest"         % scalaTestVersion         % "test"
+    val reactiveStreams     = "org.reactivestreams" %  "reactive-streams"  % reactiveStreamsVersion   % "test"
+    val monix               = "io.monix"            %% "monix"             % monixVersion             % "test"
   }
 
   import Compile._
@@ -73,6 +77,6 @@ object Dependencies {
   // Projects
   val faunadbCommon = jacksonCommon ++ Seq(slf4j, metrics)
   val faunadbJava = Seq(logbackClassic, snakeYaml, junit, junitInterface, harmcrestLibrary)
-  def faunadbScala(scalaVersion: String): Seq[ModuleID] = jacksonScala ++ scalaLang(scalaVersion) ++ Seq(logbackClassic, scalaTest)
+  def faunadbScala(scalaVersion: String): Seq[ModuleID] = jacksonScala ++ scalaLang(scalaVersion) ++ Seq(logbackClassic, scalaTest, reactiveStreams, monix)
 
 }

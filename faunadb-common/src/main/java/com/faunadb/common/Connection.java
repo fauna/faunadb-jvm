@@ -14,6 +14,7 @@ import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.Flow;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -374,6 +375,38 @@ public class Connection {
     return client.sendAsync(req, HttpResponse.BodyHandlers.ofString());
   }
 
+  public CompletableFuture<HttpResponse<Flow.Publisher<List<ByteBuffer>>>> streamRequest(HttpRequest req) {
+    return client.sendAsync(req, HttpResponse.BodyHandlers.ofPublisher());
+  }
+
+  public CompletableFuture<HttpResponse<Flow.Publisher<List<ByteBuffer>>>> performStreamRequest(String httpMethod, String path, JsonNode body,
+                                                                                                Map<String, List<String>> params) {
+    final Timer.Context ctx = registry.timer("fauna-request").time();
+    final CompletableFuture<HttpResponse<Flow.Publisher<List<ByteBuffer>>>> rv = new CompletableFuture<>();
+    HttpRequest request;
+    try {
+      request = makeHttpRequest(httpMethod, path, Optional.of(body), params, Optional.empty(), HttpClient.Version.HTTP_2);
+    } catch (MalformedURLException | URISyntaxException | JsonProcessingException ex) {
+      rv.completeExceptionally(ex);
+      return rv;
+    }
+    streamRequest(request).whenCompleteAsync((response, throwable) -> {
+      ctx.stop();
+      if (throwable != null) {
+        logFailure(request, throwable);
+        rv.completeExceptionally(throwable);
+        return;
+      }
+
+      Optional<String> txnTimeHeader = response.headers().firstValue("x-txn-time");
+      txnTimeHeader.ifPresent(s -> syncLastTxnTime(Long.parseLong(s)));
+
+      rv.complete(response);
+    });
+
+    return rv;
+  }
+
   private HttpRequest makeHttpRequest(String httpMethod, String path, Optional<JsonNode> body, Map<String, List<String>> params,
                                       Optional<Duration> requestQueryTimeout, HttpClient.Version httpVersion) throws MalformedURLException, URISyntaxException, JsonProcessingException {
     URI requestUri = URI.create(mkUrl(path));
@@ -438,11 +471,10 @@ public class Connection {
   private void logFailure(HttpRequest request, Throwable ex) {
     log.info(
       format("Request: %s %s: %s. Failed: %s",
-        request.method(), request.uri(), request.bodyPublisher().map(Object::toString).orElse("NoBody").toString(), ex.getMessage()), ex);
+        request.method(), request.uri(), request.bodyPublisher().map(Object::toString).orElse("NoBody"), ex.getMessage()), ex);
   }
 
   private static String generateAuthHeader(String authToken) {
     return "Bearer " + authToken;
   }
-
 }

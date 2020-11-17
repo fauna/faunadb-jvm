@@ -1,15 +1,25 @@
 package faunadb
 
 import faunadb.errors._
-import faunadb.query.{ TimeUnit, _ }
+import faunadb.query.{TimeUnit, _}
 import faunadb.values._
 import java.time.temporal.ChronoUnit
-import java.time.{ Instant, LocalDate }
-import org.scalatest.concurrent.{ IntegrationPatience, ScalaFutures }
+import java.time.{Instant, LocalDate}
+import java.util
+import java.util.concurrent.Flow
+
+import faunadb.FaunaClient._
+import monix.execution.Scheduler
+import monix.reactive.Observable
+import org.reactivestreams.{FlowAdapters, Publisher}
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+
+import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Future, Promise}
 import scala.concurrent.duration._
 import scala.util.Random
 
@@ -1869,9 +1879,285 @@ class ClientSpec
     result("data").to[Seq[Value]].get should contain theSameElementsInOrderAs expected
   }
 
+  it should "stream return error if it cannot find an instance" in {
+    val err = client.stream(Get(RefV("1234", RefV("spells", Native.Collections)))).failed.futureValue
+    err shouldBe a[NotFoundException]
+  }
+
+  it should "stream return error if the query is not readonly" in {
+    val err = client.stream(Create(Collection("spells"), Obj("data" -> Obj("testField" -> "testValue0")))).failed.futureValue
+    err shouldBe a[BadRequestException]
+    err.getMessage should include("Write effect in read-only query expression.")
+  }
+
+  it should "stream on document reference contains `document` field by default" in {
+    val createdDoc = client.query(Create(Collection("spells"), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
+    val docRef = createdDoc(RefField)
+    val publisherValue = client.stream(docRef).futureValue
+    val events = testSubscriber(4, publisherValue)
+
+    // push 3 updates
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue1")))).futureValue
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue2")))).futureValue
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue3")))).futureValue
+
+    // assertion 4 events (start + 3 updates)
+    events.futureValue match {
+      case startEvent :: t1 :: t2 :: t3 :: Nil =>
+        startEvent("type").get shouldBe StringV("start")
+        startEvent("event").toOpt.isDefined shouldBe true
+
+        t1("type").get shouldBe StringV("version")
+        t1("event", "action").get shouldBe StringV("update")
+        t1("event", "document", "data").get shouldBe ObjectV("testField" -> StringV("testValue1"))
+        t1("event", "prev").toOpt.isEmpty shouldBe true
+        t1("event", "diff").toOpt.isEmpty shouldBe true
+
+        t2("type").get shouldBe StringV("version")
+        t2("event", "action").get shouldBe StringV("update")
+        t2("event", "document", "data").get shouldBe ObjectV("testField" -> StringV("testValue2"))
+        t2("event", "prev").toOpt.isEmpty shouldBe true
+        t2("event", "diff").toOpt.isEmpty shouldBe true
+
+        t3("type").get shouldBe StringV("version")
+        t3("event", "action").get shouldBe StringV("update")
+        t3("event", "document", "data").get shouldBe ObjectV("testField" -> StringV("testValue3"))
+        t3("event", "prev").toOpt.isEmpty shouldBe true
+        t3("event", "diff").toOpt.isEmpty shouldBe true
+      case _ =>
+        fail("expected 4 events")
+    }
+  }
+
+  it should "stream on document reference with opt-in fields" in {
+    val createdDoc = client.query(Create(Collection("spells"), Obj("data" -> Obj("testField" -> "testValue0")))).futureValue
+    val docRef = createdDoc(RefField)
+    val publisherValue = client.stream(docRef, List(DocumentField, PrevField, DiffField)).futureValue
+    val events = testSubscriber(4, publisherValue)
+
+    // push 3 updates
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue1")))).futureValue
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue2")))).futureValue
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue3")))).futureValue
+
+    // assertion 4 events (start + 3 updates)
+    events.futureValue match {
+      case startEvent :: t1 :: t2 :: t3 :: Nil =>
+        startEvent("type").get shouldBe StringV("start")
+        startEvent("event").toOpt.isDefined shouldBe true
+
+        t1("type").get shouldBe StringV("version")
+        t1("event", "document", "data").get shouldBe ObjectV("testField" -> StringV("testValue1"))
+        t1("event", "prev", "data").get shouldBe ObjectV("testField" -> StringV("testValue0"))
+        t1("event", "diff", "data").get shouldBe ObjectV("testField" -> StringV("testValue1"))
+
+        t2("type").get shouldBe StringV("version")
+        t2("event", "document", "data").get shouldBe ObjectV("testField" -> StringV("testValue2"))
+        t2("event", "prev", "data").get shouldBe ObjectV("testField" -> StringV("testValue1"))
+        t2("event", "diff", "data").get shouldBe ObjectV("testField" -> StringV("testValue2"))
+
+        t3("type").get shouldBe StringV("version")
+        t3("event", "document", "data").get shouldBe ObjectV("testField" -> StringV("testValue3"))
+        t3("event", "prev", "data").get shouldBe ObjectV("testField" -> StringV("testValue2"))
+        t3("event", "diff", "data").get shouldBe ObjectV("testField" -> StringV("testValue3"))
+      case _ =>
+        fail("expected 4 events")
+    }
+  }
+
+  it should "stream updates last seen transaction time" in {
+    val createdDoc = client.query(Create(Collection("spells"), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
+    val docRef = createdDoc(RefField)
+    val publisherValue = client.stream(docRef).futureValue
+
+    val capturedEventsP = Promise[List[Value]]
+
+    val valueSubscriber = new Flow.Subscriber[Value] {
+      var subscription: Flow.Subscription = null
+      val captured = new util.ArrayList[Value]
+
+      override def onSubscribe(s: Flow.Subscription): Unit = {
+        subscription = s
+        subscription.request(1)
+      }
+
+      override def onNext(v: Value): Unit = {
+        if (v("txn").to[Long].get <= client.lastTxnTime) {
+          captured.add(v)
+          if (captured.size() == 4) {
+            capturedEventsP.success(captured.iterator().asScala.toList)
+            subscription.cancel()
+          } else
+            subscription.request(1)
+        } else
+          capturedEventsP.failure(new IllegalStateException("event's txnTS did not update client's value"))
+      }
+
+      override def onError(t: Throwable): Unit = capturedEventsP.failure(t)
+
+      override def onComplete(): Unit = capturedEventsP.failure(new IllegalStateException("not expecting the stream to complete"))
+    }
+
+    // subscribe to publisher
+    publisherValue.subscribe(valueSubscriber)
+
+    // push 3 updates
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue1")))).futureValue
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue2")))).futureValue
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue3")))).futureValue
+
+    // blocking
+    capturedEventsP.future.futureValue
+  }
+
+  it should "stream handles authorization lost during stream evaluation." in {
+    // create collection
+    val collectionName = "stream-things"
+    adminClient.query(CreateCollection(Obj("name" -> collectionName))).futureValue
+
+    // create doc
+    val createdDoc = adminClient.query(Create(Collection(collectionName), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
+    val docRef = createdDoc(RefField)
+
+    // create new key + client
+    val newKey = adminClient.query(CreateKey(Obj("role" -> "server-readonly"))).futureValue
+    val streamingClient = client.sessionClient(newKey(SecretField).get)
+
+    val publisherValue = streamingClient.stream(docRef).futureValue
+
+    val subscriberDone = Promise[Unit]
+
+    val valueSubscriber = new Flow.Subscriber[Value] {
+      var subscription: Flow.Subscription = null
+      val captured = new util.ArrayList[Value]
+      override def onSubscribe(s: Flow.Subscription): Unit = {
+        subscription = s
+        subscription.request(1)
+      }
+      override def onNext(v: Value): Unit = {
+        if (captured.isEmpty) {
+          // update doc on `start` event
+          adminClient.query(Update(docRef, Obj("data" -> Obj("testField" -> "afterStart")))).futureValue
+
+          // delete key
+          adminClient.query(Delete(newKey(RefField))).futureValue
+
+          // push an update to force auth revalidation.
+          adminClient.query(Update(docRef, Obj("data" -> Obj("testField" -> "afterKeyDelete")))).futureValue
+        }
+        captured.add(v)          // capture element
+        subscription.request(1)  // ask for more elements
+      }
+      override def onError(t: Throwable): Unit = subscriberDone.failure(t)
+      override def onComplete(): Unit = subscriberDone.success(())
+    }
+
+    // subscribe to publisher
+    publisherValue.subscribe(valueSubscriber)
+
+    // blocking - we expect the Promise to fail because the stream's key has been deleted
+    val subscriberError = subscriberDone.future.failed.futureValue
+    subscriberError shouldBe a[StreamingException]
+    subscriberError.getMessage should include("permission denied: Authorization lost during stream evaluation.")
+  }
+
+  it should "stream on document reference using reactive-streams & Monix" in {
+    val createdDoc = client.query(Create(Collection("spells"), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
+    val docRef = createdDoc(RefField)
+
+    val publisherValue: Flow.Publisher[Value] = client.stream(docRef).futureValue
+    val reactiveStreamsPublisher: Publisher[Value] = FlowAdapters.toPublisher(publisherValue)
+
+    // push 3 updates
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue1")))).futureValue
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue2")))).futureValue
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue3")))).futureValue
+
+    // blocking
+    val events = Observable.fromReactivePublisher(reactiveStreamsPublisher)
+      .take(4) // 4 events (start + 3 updates)
+      .toListL
+      .runToFuture(Scheduler.Implicits.global)
+      .futureValue
+
+    // assertion
+    events match {
+      case startEvent :: t1 :: t2 :: t3 :: Nil =>
+        startEvent("type").get shouldBe StringV("start")
+        t1("type").get shouldBe StringV("version")
+        t2("type").get shouldBe StringV("version")
+        t3("type").get shouldBe StringV("version")
+      case _ =>
+        fail("expected 4 events")
+    }
+  }
+
+  it should "stream with snapshot=true on document contains a document snapshot event" in {
+    val createdDoc = client.query(Create(Collection("spells"), Obj("data" -> Obj("testField" -> "testValue0")))).futureValue
+    val docRef = createdDoc(RefField)
+    val publisherValue = client.stream(docRef, snapshot = true).futureValue
+    val events = testSubscriber(5, publisherValue)
+
+    // push 3 updates
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue1")))).futureValue
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue2")))).futureValue
+    client.query(Update(docRef, Obj("data" -> Obj("testField" -> "testValue3")))).futureValue
+
+    // assertion
+    events.futureValue match {
+      case startEvent :: snapshot :: t1 :: t2 :: t3 :: Nil =>
+        startEvent("type").get shouldBe StringV("start")
+        startEvent("event").toOpt.isDefined shouldBe true
+
+        snapshot("type").get shouldBe StringV("snapshot")
+        snapshot("txn").get shouldBe snapshot("event", "ts").get
+        snapshot("event", "ref").get shouldBe docRef.get
+        snapshot("event", "data").get shouldBe ObjectV("testField" -> StringV("testValue0"))
+
+        t1("type").get shouldBe StringV("version")
+        t1("event", "document", "data").get shouldBe ObjectV("testField" -> StringV("testValue1"))
+
+        t2("type").get shouldBe StringV("version")
+        t2("event", "document", "data").get shouldBe ObjectV("testField" -> StringV("testValue2"))
+
+        t3("type").get shouldBe StringV("version")
+        t3("event", "document", "data").get shouldBe ObjectV("testField" -> StringV("testValue3"))
+      case _ =>
+        fail("expected 4 events")
+    }
+  }
+
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
     client.query(CreateDatabase(Obj("name" -> name))).futureValue
     val key = client.query(CreateKey(Obj("database" -> Database(name), "role" -> "admin"))).futureValue
     client.sessionClient(key(SecretField).get)
+  }
+
+  def testSubscriber(messageCount: Int, publisher: Flow.Publisher[Value]): Future[List[Value]] = {
+    val capturedEventsP = Promise[List[Value]]
+
+    val valueSubscriber = new Flow.Subscriber[Value] {
+      var subscription: Flow.Subscription = null
+      val captured = new util.ArrayList[Value]
+
+      override def onSubscribe(s: Flow.Subscription): Unit = {
+        subscription = s
+        subscription.request(1)
+      }
+      override def onNext(v: Value): Unit = {
+        captured.add(v)
+        if (captured.size() == messageCount) {
+          capturedEventsP.success(captured.iterator().asScala.toList)
+          subscription.cancel()
+        } else {
+          subscription.request(1)
+        }
+      }
+      override def onError(t: Throwable): Unit = capturedEventsP.failure(t)
+      override def onComplete(): Unit = capturedEventsP.failure(new IllegalStateException("not expecting the stream to complete"))
+    }
+    // subscribe to publisher
+    publisher.subscribe(valueSubscriber)
+    capturedEventsP.future
   }
 }
