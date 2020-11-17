@@ -9,6 +9,7 @@ import java.util
 import java.util.concurrent.Flow
 
 import faunadb.FaunaClient._
+import java.util.concurrent.Flow
 import monix.execution.Scheduler
 import monix.reactive.Observable
 import org.reactivestreams.{FlowAdapters, Publisher}

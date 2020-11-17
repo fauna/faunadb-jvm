@@ -158,7 +158,7 @@ public class HttpResponses {
     private final int status;
     private final List<QueryError> errors;
 
-    QueryErrorResponse(int status, List<QueryError> errors) {
+    public QueryErrorResponse(int status, List<QueryError> errors) {
       this.status = status;
       this.errors = errors;
     }

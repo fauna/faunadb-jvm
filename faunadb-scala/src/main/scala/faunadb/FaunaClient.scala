@@ -13,7 +13,6 @@ import java.io.IOException
 import java.net.ConnectException
 import java.net.http.HttpResponse
 import java.util.concurrent.{Flow, TimeoutException}
-
 import com.faunadb.common.http.ResponseBodyStringProcessor
 import faunadb.FaunaClient.EventField
 import faunadb.streaming.{BodyValueFlowProcessor, SnapshotEventFlowProcessor}

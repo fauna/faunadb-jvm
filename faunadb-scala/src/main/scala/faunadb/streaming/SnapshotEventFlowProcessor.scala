@@ -51,7 +51,7 @@ private [faunadb] class SnapshotEventFlowProcessor(loadDocument: () => Future[Va
               // follow up with the snapshot event
               val documentEvent = ObjectV(
                 "type" -> StringV("snapshot"),
-                "txn" -> LongV(snapshotTS.toLong),
+                "txn" -> LongV(snapshotTS),
                 "event" -> documentSnapshot)
               submit(documentEvent)
               initialized.set(true)
