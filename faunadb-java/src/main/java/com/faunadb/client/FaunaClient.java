@@ -17,6 +17,7 @@ import com.faunadb.common.Connection;
 import com.faunadb.common.Connection.JvmDriver;
 import com.faunadb.client.types.Value.NullV;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -456,7 +457,7 @@ public class FaunaClient {
           if (ex instanceof ConnectException || ex instanceof TimeoutException) {
               throw new UnavailableException(ex.getMessage(), ex);
           }
-          if (ex instanceof CompletionException && ex.getMessage().contains("too many concurrent streams")) {
+        if (ex instanceof CompletionException && ex.getCause() instanceof IOException && ex.getMessage().contains("too many concurrent streams")) {
             throw new BadRequestException("the maximum number of streams has been reached for this client");
           }
       });

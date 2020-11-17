@@ -8,6 +8,8 @@ trait FaunaClientFixture extends SuiteMixin with BeforeAndAfterAll { self: Fixtu
   private var _rootClient: FaunaClient = _
   protected def rootClient = _rootClient
 
+  protected def config: collection.Map[String, String] = _config
+
   override protected def beforeAll(): Unit = {
     val config = {
       val rootKey = Option(System.getenv("FAUNA_ROOT_KEY")) getOrElse {
@@ -55,8 +57,7 @@ trait FaunaClientFixture extends SuiteMixin with BeforeAndAfterAll { self: Fixtu
 
     def createFaunaClient(secret: String): Future[FaunaClient] = Future.successful {
       // each test gets a new client to avoid interference such as triggering max_concurrent_streams error
-      val newClient = FaunaClient(endpoint = _config("root_url"), secret = _config("root_token"))
-      newClient.sessionClient(secret)
+      FaunaClient(endpoint = config("root_url"), secret = secret)
     }
 
     def deleteDatabase(): Future[Value] = rootClient.query(Delete(Database(databaseName)))
