@@ -17,7 +17,6 @@ import com.faunadb.common.Connection;
 import com.faunadb.common.Connection.JvmDriver;
 import com.faunadb.client.types.Value.NullV;
 
-import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,9 +40,6 @@ import static com.faunadb.client.types.Codec.VALUE;
  *
  * <p>The client is asynchronous. All methods that performs latent operations
  * return an instance of {@link CompletableFuture}.</p>
- *
- * <p>The {@link FaunaClient#close()} method must be called in order to
- * release the {@link FaunaClient} I/O resources.</p>
  *
  * <p>Queries are constructed by using the static methods in the
  * {@link com.faunadb.client.query.Language} class.</p>
