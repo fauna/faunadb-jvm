@@ -1,3 +1,6 @@
+4.0.1
+* Fix JavaDoc errors
+
 4.0.0
 * Upgrade to Java 11
 * Upgrade project dependencies
