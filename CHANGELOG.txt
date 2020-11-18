@@ -1,3 +1,12 @@
+4.0.0
+* Upgrade to Java 11
+* Upgrade project dependencies
+* Replace Netty HTTP Client with Java HTTP client
+* Change from Basic to Bearer authentication scheme
+* Add streaming API to the FaunaClient
+* Add Third-party Auth functions: CurrentIdentity(), HasCurrentIdentity(), CurrentToken(),
+  HasCurrentToken(), CreateAccessProvider(), AccessProvider(), AccessProviders()
+
 3.0.1
 * Upgrade to Scala 2.12.12
 * Upgrade to sbt 1.3.13
