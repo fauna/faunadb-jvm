@@ -80,6 +80,14 @@ commands:
             cp **/target/test-reports/*.xml results/tests/
             cp -r faunadb-scala/target/scala-2.12/*coverage-report/ results/coverage/
 
+      - run:
+          name: Generate API documentation 2.11
+          command: sbt clean ++2.11.12 doc
+
+      - run:
+          name: Generate API documentation 2.12
+          command: sbt clean ++2.12.12 doc
+
       - store_test_results:
           path: results/
 
