@@ -12,7 +12,8 @@ import faunadb.values.{ArrayV, NullV, Value}
 import java.io.IOException
 import java.net.ConnectException
 import java.net.http.HttpResponse
-import java.util.concurrent.{Flow, TimeoutException}
+import java.util.concurrent.{CompletionException, Flow, TimeoutException}
+
 import com.faunadb.common.http.ResponseBodyStringProcessor
 import faunadb.FaunaClient.EventField
 import faunadb.streaming.{BodyValueFlowProcessor, SnapshotEventFlowProcessor}
@@ -363,8 +364,12 @@ class FaunaClient private (connection: Connection) {
   }
 
   private def handleNetworkExceptions[A]: PartialFunction[Throwable, Future[A]] = {
-    case ex: ConnectException => Future.failed(new UnavailableException(ex.getMessage, ex))
-    case ex: TimeoutException => Future.failed(new TimeoutException(ex.getMessage))
+    case ex: ConnectException =>
+      Future.failed(new UnavailableException(ex.getMessage, ex))
+    case ex: TimeoutException =>
+      Future.failed(new TimeoutException(ex.getMessage))
+    case ex: CompletionException if ex.getCause.isInstanceOf[IOException] && ex.getMessage.contains("too many concurrent streams") =>
+      Future.failed(BadRequestException(None, "the maximum number of streams has been reached for this client"))
   }
 
 }

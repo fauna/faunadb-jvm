@@ -3,6 +3,7 @@ package faunadb
 import java.util
 import java.util.concurrent.Flow
 
+import faunadb.errors.BadRequestException
 import faunadb.query._
 import faunadb.values._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -85,10 +86,11 @@ class FaunaClientLoadSpec extends FixtureAsyncWordSpec with Matchers with ScalaF
   }
 
   "When streaming" should {
-    // test ignored for now as the client is shared between all tests creating interference
-    "buffers events if the producer is faster than the consumer" ignore { client =>
+    "buffers events if the producer is faster than the consumer" in { client =>
       val subscriberDone = Promise[List[Value]]
-      val bufferSize = 256
+      // keep value low enough to not promote the stream to idle after 5 secs
+      // bump value higher once ENG-2430 is fixed
+      val bufferSize = 150
 
       // create collection
       val collectionName = RandomGenerator.aRandomString
@@ -185,6 +187,38 @@ class FaunaClientLoadSpec extends FixtureAsyncWordSpec with Matchers with ScalaF
             fail("expected 4 events")
         }
         succeed
+      }
+    }
+
+    "fail to handle more than 100 concurrent streams on the same client" in { client =>
+      def setup(): Future[Result[Value]] = {
+        val collectionName = RandomGenerator.aRandomString
+        for {
+          _ <- client.query(CreateCollection(Obj("name" -> collectionName)))
+          createdDoc <- client.query(Create(Collection(collectionName), Obj("credentials" -> Obj("password" -> "abcdefg"))))
+        } yield createdDoc("ref")
+      }
+
+      def run(docRef: Value): Future[Unit] = {
+        val maxConcurrentStreamCount = 100
+        for {
+          // create a first publisher to setup the connection that will be reused by all the other publishers
+          _ <- client.stream(docRef)
+          // adding 99 publisher (makes 100 in total)
+          _ <- Future.traverse(List.fill(maxConcurrentStreamCount - 1)(docRef))(ref => client.stream(ref))
+          // adding 101st subscriber creates the error
+          _ <- client.stream(docRef)
+        } yield ()
+      }
+
+      val result =
+        for {
+          docRef <- setup()
+          result <- run(docRef)
+        } yield result
+
+      recoverToExceptionIf[BadRequestException](result).map { e =>
+        e.getMessage should include("the maximum number of streams has been reached for this client")
       }
     }
   }

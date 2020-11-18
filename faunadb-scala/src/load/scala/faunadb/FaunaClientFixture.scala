@@ -4,8 +4,11 @@ import org.scalatest.{BeforeAndAfterAll, FutureOutcome, SuiteMixin, FixtureAsync
 import scala.concurrent.Future
 
 trait FaunaClientFixture extends SuiteMixin with BeforeAndAfterAll { self: FixtureAsyncTestSuite =>
+  private var _config: collection.Map[String, String] = _
   private var _rootClient: FaunaClient = _
   protected def rootClient = _rootClient
+
+  protected def config: collection.Map[String, String] = _config
 
   override protected def beforeAll(): Unit = {
     val config = {
@@ -19,6 +22,7 @@ trait FaunaClientFixture extends SuiteMixin with BeforeAndAfterAll { self: Fixtu
       collection.Map("root_token" -> rootKey, "root_url" -> s"$scheme://$domain:$port")
     }
 
+    _config = config
     _rootClient = FaunaClient(endpoint = config("root_url"), secret = config("root_token"))
     super.beforeAll() // To be stackable, must call super.beforeAll
   }
@@ -52,7 +56,8 @@ trait FaunaClientFixture extends SuiteMixin with BeforeAndAfterAll { self: Fixtu
     }
 
     def createFaunaClient(secret: String): Future[FaunaClient] = Future.successful {
-      rootClient.sessionClient(secret)
+      // each test gets a new client to avoid interference such as triggering max_concurrent_streams error
+      FaunaClient(endpoint = config("root_url"), secret = secret)
     }
 
     def deleteDatabase(): Future[Value] = rootClient.query(Delete(Database(databaseName)))
