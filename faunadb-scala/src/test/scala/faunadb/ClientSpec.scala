@@ -763,7 +763,7 @@ class ClientSpec
     notR.to[Boolean].get shouldBe true
   }
 
-  it should "test Contains function" ignore {
+  it should "test Contains function" in {
     val containsR = client.query(Contains("favorites" / "foods", Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings"))))).futureValue
     containsR.to[Boolean].get shouldBe true
 
