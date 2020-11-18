@@ -83,6 +83,14 @@ commands:
       - store_test_results:
           path: results/
 
+      - run:
+          name: Generate API documentation 2.11
+          command: sbt ++2.11.12 clean doc
+
+      - run:
+          name: Generate API documentation 2.12
+          command: sbt ++2.12.12 clean doc
+
 jobs:
   core-nightly:
     executor:
