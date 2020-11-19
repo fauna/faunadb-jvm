@@ -254,8 +254,7 @@ class FaunaClient private (connection: Connection) {
   /**
     * Creates a new scope to execute session queries. Queries submitted within the session scope will be
     * authenticated with the secret provided. A session client shares its parent's [[com.faunadb.common.Connection]]
-    * instance and thus it does not need to be closed after its usage. Close the parent session for freeing up any
-    * resources held by the parent session and this session client.
+    * instance.
     *
     * @param secret user secret for the session scope
     * @param session a function that receives a session client
@@ -268,8 +267,7 @@ class FaunaClient private (connection: Connection) {
 
   /**
     * Create a new session client. The returned session client shares its parent [[com.faunadb.common.Connection]]
-    * instance and thus it does not need to be closed after its usage. Close the parent session for freeing up any
-    * resources held by the parent session and this session client.
+    * instance.
     *
     * @param secret user secret for the session client
     * @return a new session client

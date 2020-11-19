@@ -231,8 +231,7 @@ public class Connection {
 
   /**
    * Creates a new {@link Connection} sharing its underneath I/O resources. Queries submitted to a
-   * session connection will be authenticated with the token provided. Close the parent Connection
-   * for freeing up any resources held by the parent connection and this session connection.
+   * session connection will be authenticated with the token provided.
    *
    * @param authToken the token or key to be used to authenticate requests to the new {@link Connection}
    * @return a new {@link Connection}
