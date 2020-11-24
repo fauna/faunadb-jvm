@@ -61,18 +61,14 @@ public class SpellExample {
 
         String key = keyResults.at("secret").to(String.class).get();
 
-        //Create the client query in a try-with-resources to ensure it gets closed
-        //Because a Fauna Client implements AutoCloseable it will be closed when the try block finishes
-        try (FaunaClient client = adminClient.newSessionClient(key)) {
-            System.out.println("Connected to Fauna database " + DB_NAME + " with server role\n");
-            runSpellExamples(DB_NAME, client);
-        }
+        FaunaClient client = adminClient.newSessionClient(key)
+        System.out.println("Connected to Fauna database " + DB_NAME + " with server role\n");
+        runSpellExamples(DB_NAME, client);
 
         /*
-         * Delete the database and close the admin connection
+         * Delete the database
          */
         deleteDB(adminClient, DB_NAME);
-        adminClient.close();
         System.out.println("Disconnected from FaunaDB as Admin!");
     }
 

@@ -86,8 +86,6 @@ public class Main {
                 Obj("name", Value("my-first-database"))
             )
         ).get();
-
-        adminClient.close();
     }
 }
 ```
@@ -188,8 +186,6 @@ object Main extends App {
   )
 
   Await.result(result, Duration.Inf)
-
-  client.close()
 }
 ```
 

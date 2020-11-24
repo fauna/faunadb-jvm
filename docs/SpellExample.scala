@@ -61,20 +61,13 @@ object SpellExample  {
     val key: String = keyResults("secret").to[String].get
     val client = adminClient.sessionClient(key)
 
-    try
-    {
-      println(s"Connected to Fauna database $DB_NAME with server role\n")
-      runSpellExamples(DB_NAME, client)
-    }
-    finally  {
-      client.close()
-    }
+    println(s"Connected to Fauna database $DB_NAME with server role\n")
+    runSpellExamples(DB_NAME, client)
 
     /*
-     * Just to keep things neat and tidy, delete the database and close the client connection
+     * Just to keep things neat and tidy, delete the database
      */
     deleteDB(adminClient, DB_NAME)
-    adminClient.close()
     println("Disconnected from FaunaDB as Admin!")
   }
 

@@ -160,9 +160,7 @@ public class FaunaClient {
 
   /**
    * Creates a session client with the user secret provided. Queries submitted to a session client will be
-   * authenticated with the secret provided. A session client shares its parent's {@link Connection} instance
-   * and thus it does not need be closed after its usage. Close the parent session for freeing up any
-   * resources held by the parent session and this session client.
+   * authenticated with the secret provided. A session client shares its parent's {@link Connection} instance.
    *
    * @param secret user secret for the session client
    * @return a new {@link FaunaClient}
