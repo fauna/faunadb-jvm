@@ -74,8 +74,16 @@ sealed abstract class Field[T] {
   def to[U](implicit ev: Field[T] =:= Field[Value], dec: Decoder[U]): Field[U] =
     new TypedField(ev(this), dec)
 
+  def at[U](field: Field[U])(implicit dec: Decoder[U]): Field[U] =
+    new TypedSubField(this, field)
+
   def collect[U, Col[_]](inner: Field[U])(implicit ev: Field[T] =:= Field[Value], cbf: CanBuildFrom[_, U, Col[U]]): Field[Col[U]] =
     new CollectionField(ev(this), cbf, inner.get)
+}
+
+private[values] class TypedSubField[T, U](parent: Field[T], child: Field[U]) extends Field[U] {
+  def path = parent.path ++ child.path
+  def get(value: Value) = child.get(value(parent.path))
 }
 
 private[values] class SubField(parent: Field[Value], subpath: FieldPath) extends Field[Value] {
