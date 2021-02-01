@@ -88,7 +88,6 @@ jobs:
   core-nightly:
     executor:
       name: core
-      version: "nightly"
     steps:
       - build_and_test
 
