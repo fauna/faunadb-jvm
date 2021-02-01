@@ -3,10 +3,6 @@ description: FaunaDB JVM Driver Tests
 
 executors:
   core:
-    parameters:
-      version:
-        type: enum
-        enum: ["nightly"]
     resource_class: large
     docker:
       - image: openjdk:11
