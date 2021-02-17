@@ -9,7 +9,7 @@ object Settings {
   lazy val driverVersion = "4.1.1"
 
   lazy val scala211 = "2.11.12"
-  lazy val scala212 = "2.12.12"
+  lazy val scala212 = "2.12.13"
   lazy val supportedScalaVersions = Seq(scala211, scala212)
 
   lazy val jacksonDocVersion = "2.11"
