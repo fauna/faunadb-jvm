@@ -36,13 +36,15 @@ object FaunaClient {
     * @param metrics An optional [[com.codahale.metrics.MetricRegistry]] to record stats.
     * @param queryTimeout An optional global timeout for all the queries issued by this client. The timeout value has
     *                     milliseconds precision. If not provided, a default timeout value is set on the server side.
+    * @param userAgent A value used for the User-Agent HTTP header.
     * @return A configured FaunaClient instance.
     */
   def apply(
     secret: String = null,
     endpoint: String = null,
     metrics: MetricRegistry = null,
-    queryTimeout: FiniteDuration = null): FaunaClient = {
+    queryTimeout: FiniteDuration = null,
+    userAgent: String = null): FaunaClient = {
 
     val b = Connection.builder
     if (endpoint ne null) b.withFaunaRoot(endpoint)
