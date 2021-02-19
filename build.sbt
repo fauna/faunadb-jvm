@@ -6,11 +6,12 @@ lazy val `faunadb-jvm` =
 
 lazy val `faunadb-common` =
   project
+    .enablePlugins(BuildInfoPlugin)
     .configs(Configs.commonConfigs: _*)
     .settings(Settings.commonSettings: _*)
     .settings(Settings.javaCommonSettings: _*)
     .settings(Settings.faunadbCommonSettings)
-    .settings(libraryDependencies ++= Dependencies.faunadbCommon)
+    .settings(libraryDependencies ++= Dependencies.faunadbCommon(scalaVersion.value))
 
 lazy val `faunadb-java` =
   project

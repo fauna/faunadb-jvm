@@ -5,11 +5,11 @@ import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.faunadb.BuildInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOError;
-import java.io.IOException;
 import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -39,7 +39,7 @@ public class Connection {
   private static final String API_VERSION = "4";
   private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
   private static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
-  private static final String DEFAULT_USER_AGENT = "Fauna JVM Http Client";
+  private static final String DEFAULT_USER_AGENT = "FaunaDriver/" + BuildInfo.version();
   private static final URL FAUNA_ROOT;
 
   static {

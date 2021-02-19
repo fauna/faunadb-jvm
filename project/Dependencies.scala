@@ -75,8 +75,9 @@ object Dependencies {
   }
 
   // Projects
-  val faunadbCommon = jacksonCommon ++ Seq(slf4j, metrics)
+  def faunadbCommon(scalaVersion: String) = jacksonCommon ++ scalaLang(scalaVersion) ++ Seq(slf4j, metrics)
   val faunadbJava = Seq(logbackClassic, snakeYaml, junit, junitInterface, harmcrestLibrary)
   def faunadbScala(scalaVersion: String): Seq[ModuleID] = jacksonScala ++ scalaLang(scalaVersion) ++ Seq(logbackClassic, scalaTest, reactiveStreams, monix)
+
 
 }

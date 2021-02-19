@@ -2,6 +2,7 @@ import Dependencies.Versions._
 import com.jsuereth.sbtpgp.SbtPgp.autoImport._
 import sbt.Keys._
 import sbt._
+import sbtbuildinfo.BuildInfoPlugin.autoImport._
 import scoverage.ScoverageSbtPlugin.autoImport._
 
 object Settings {
@@ -87,6 +88,9 @@ object Settings {
     crossScalaVersions := Seq(scala212),
     crossPaths := false,
     autoScalaLibrary := false,
+
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoPackage := organization.value,
 
     exportJars := true,
 
