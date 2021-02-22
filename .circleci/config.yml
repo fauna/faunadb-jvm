@@ -57,19 +57,19 @@ commands:
 
       - run:
           name: Test 2.11
-          command: sbt ++2.11.12 coverage test coverageReport
+          command: sbt clean ++2.11.12 coverage test coverageReport
 
       - run:
           name: Test 2.12
-          command: sbt ++2.12.12 coverage test coverageReport
+          command: sbt clean ++2.12.12 coverage test coverageReport
 
       - run:
           name: Load Test 2.11
-          command: sbt ++2.11.12 load:test
+          command: sbt clean ++2.11.12 load:test
 
       - run:
           name: Load Test 2.12
-          command: sbt ++2.12.12 load:test
+          command: sbt clean ++2.12.12 load:test
 
       - run:
           when: always
