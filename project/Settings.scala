@@ -85,7 +85,7 @@ object Settings {
     Testing.settings
 
   lazy val javaCommonSettings = Seq(
-    crossScalaVersions := Seq(scala212),
+    crossScalaVersions := supportedScalaVersions,
     crossPaths := false,
     autoScalaLibrary := false,
 
