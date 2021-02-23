@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
 
   object Versions {
-    val jacksonVersion               = "2.11.2"
+    val jacksonVersion               = "2.12.1"
     val metricsVersion               = "4.1.12.1"
     val slf4jVersion                 = "1.7.30"
     val logbackVersion               = "1.2.3"
