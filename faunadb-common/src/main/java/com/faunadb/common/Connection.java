@@ -39,6 +39,7 @@ public class Connection {
   private static final String API_VERSION = "4";
   private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
   private static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
+  private static final String DEFAULT_USER_AGENT = "Fauna JVM Http Client";
   private static final URL FAUNA_ROOT;
 
   static {
@@ -86,6 +87,7 @@ public class Connection {
     private HttpClient client;
     private JvmDriver jvmDriver;
     private Optional<Duration> queryTimeout = Optional.empty();
+    private Optional<String> userAgent = Optional.empty();
 
     private Builder() {
     }
@@ -181,6 +183,17 @@ public class Connection {
     }
 
     /**
+     * Sets the User-Agent header for this connection.
+     *
+     * @param userAgent the query timeout value
+     * @return this {@link Builder} object
+     */
+    public Builder withUserAgent(String userAgent) {
+      this.userAgent = Optional.ofNullable(userAgent);
+      return this;
+    }
+
+    /**
      * @return a newly constructed {@link Connection} with its configuration based on
      * the settings of the {@link Builder} instance.
      */
@@ -199,7 +212,9 @@ public class Connection {
           .build()
       );
 
-      return new Connection(root, authToken, http, registry, jvmDriver, lastSeenTxn, queryTimeout);
+      String connectionUserAgent = userAgent.orElseGet(() -> DEFAULT_USER_AGENT);
+
+      return new Connection(root, authToken, http, registry, jvmDriver, lastSeenTxn, queryTimeout, connectionUserAgent);
     }
   }
 
@@ -207,6 +222,9 @@ public class Connection {
   private static final String X_FAUNADB_BUILD = "X-FaunaDB-Build";
   private static final String X_FAUNA_DRIVER = "X-Fauna-Driver";
   private static final String X_QUERY_TIMEOUT = "X-Query-Timeout";
+  private static final String X_LAST_SEEN_TXN = "X-Last-Seen-Txn";
+  private static final String X_FAUNADB_API_VERSION = "X-FaunaDB-API-Version";
+  private static final String USER_AGENT = "User-Agent";
 
   private final URL faunaRoot;
   private final String authHeader;
@@ -214,12 +232,13 @@ public class Connection {
   private HttpClient client;
   private final MetricRegistry registry;
   private final Optional<Duration> defaultQueryTimeout;
+  private final String userAgent;
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final ObjectMapper json = new ObjectMapper();
   private final AtomicLong txnTime = new AtomicLong(0L);
 
-  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> defaultQueryTimeout) {
+  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> defaultQueryTimeout, String userAgent) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
     this.client = client;
@@ -227,6 +246,7 @@ public class Connection {
     this.jvmDriver = jvmDriver;
     this.txnTime.set(lastSeenTxn);
     this.defaultQueryTimeout = defaultQueryTimeout;
+    this.userAgent = userAgent;
   }
 
   /**
@@ -237,7 +257,7 @@ public class Connection {
    * @return a new {@link Connection}
    */
   public Connection newSessionConnection(String authToken) {
-    return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), defaultQueryTimeout);
+    return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), defaultQueryTimeout, userAgent);
   }
 
   /**
@@ -432,14 +452,14 @@ public class Connection {
         .method(httpMethod, bodyPublisher)
         .headers(
           "Authorization", authHeader,
-          "X-FaunaDB-API-Version", API_VERSION,
-          "User-agent", "Fauna JVM Http Client",
+          X_FAUNADB_API_VERSION, API_VERSION,
+          USER_AGENT, userAgent,
           X_FAUNA_DRIVER, jvmDriver.toString(),
           "Content-type", "application/json; charset=utf-8"
         );
 
     queryTimeout.ifPresent(timeout -> requestBuilder.header(X_QUERY_TIMEOUT, String.valueOf(timeout.toMillis())));
-    lastTxnTime.ifPresent(time -> requestBuilder.header("X-Last-Seen-Txn", Long.toString(time)));
+    lastTxnTime.ifPresent(time -> requestBuilder.header(X_LAST_SEEN_TXN, Long.toString(time)));
 
     return requestBuilder.build();
   }

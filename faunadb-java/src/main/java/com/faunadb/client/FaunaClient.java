@@ -84,6 +84,7 @@ public class FaunaClient {
     private URL endpoint;
     private MetricRegistry registry;
     private Duration queryTimeout;
+    private String userAgent;
 
     private Builder() {
     }
@@ -143,6 +144,7 @@ public class FaunaClient {
         .withAuthToken(secret)
         .withFaunaRoot(endpoint)
         .withQueryTimeout(queryTimeout)
+        .withUserAgent(userAgent)
         .withJvmDriver(JvmDriver.JAVA);
 
       if (registry != null) builder.withMetrics(registry);
