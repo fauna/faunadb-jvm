@@ -151,10 +151,17 @@ class ClientSpec
   }
 
   it should "fail with timeout error" in {
+    val timeout = 1 nano // the jdk client does not accept Duration.Zero as timeout
+    val thrown = client.query("echo", timeout).failed.futureValue
+    thrown shouldBe an[java.util.concurrent.CompletionException]
+    thrown.getCause shouldBe an[java.net.http.HttpTimeoutException]
+  }
+
+  it should "fail if timeout is zero" in {
     val timeout = Duration.Zero
     val thrown = client.query("echo", timeout).failed.futureValue
-    thrown shouldBe an[UnavailableException]
-    thrown.getMessage should include ("time out: Read timed out.")
+    thrown shouldBe an[IllegalArgumentException]
+    thrown.getMessage should include ("Invalid duration")
   }
 
   it should "fail with permission denied" in {

@@ -361,7 +361,7 @@ public class Connection {
     HttpRequest request;
     try {
       request = makeHttpRequest(httpMethod, path, body, params, requestQueryTimeout, HttpClient.Version.HTTP_1_1);
-    } catch (MalformedURLException | URISyntaxException | JsonProcessingException ex) {
+    } catch (IllegalArgumentException| MalformedURLException | URISyntaxException | JsonProcessingException ex) {
       rv.completeExceptionally(ex);
       return rv;
     }
