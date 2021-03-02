@@ -193,13 +193,15 @@ package object query {
   def Obj(pairs: (String, Expr)*): Expr =
     Expr(ObjectV("object" -> ObjectV(unwrapPairs(pairs): _*)))
 
+  private val NullExpr = Expr(NullV)
+
   /**
     * A Null value.
     *
     * '''Reference''': [[https://app.fauna.com/documentation/reference/queryapi#simple-type]]
     */
   def Null(): Expr =
-    Expr(NullV)
+    NullExpr
 
   // Basic Forms
 
@@ -419,10 +421,10 @@ package object query {
   def Paginate(
     resource: Expr,
     cursor: Cursor = NoCursor,
-    ts: Expr = Expr(NullV),
-    size: Expr = Expr(NullV),
-    sources: Expr = Expr(NullV),
-    events: Expr = Expr(NullV)): Expr = {
+    ts: Expr = Null(),
+    size: Expr = Null(),
+    sources: Expr = Null(),
+    events: Expr = Null()): Expr = {
 
     val call = List.newBuilder[(String, Value)]
     call += "paginate" -> resource.value
@@ -434,12 +436,10 @@ package object query {
       case NoCursor     => ()
     }
 
-    val nullExpr = Expr(NullV)
-
-    if (ts != nullExpr) call += "ts" -> ts.value
-    if (size != nullExpr) call += "size" -> size.value
-    if (events != nullExpr) call += "events" -> events.value
-    if (sources != nullExpr) call += "sources" -> sources.value
+    if (ts != Null()) call += "ts" -> ts.value
+    if (size != Null()) call += "size" -> size.value
+    if (events != Null()) call += "events" -> events.value
+    if (sources != Null()) call += "sources" -> sources.value
 
     Expr(ObjectV(call.result: _*))
   }
@@ -879,8 +879,8 @@ package object query {
     val b = Seq.newBuilder[(String, Value)]
 
     b += "ngram" -> terms.value
-    if (min != Expr(NullV)) b += "min" -> min.value
-    if (max != Expr(NullV)) b += "max" -> max.value
+    if (min != Null()) b += "min" -> min.value
+    if (max != Null()) b += "max" -> max.value
     Expr(ObjectV(b.result(): _*))
   }
 
