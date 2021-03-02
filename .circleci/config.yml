@@ -16,7 +16,7 @@ executors:
           username: _json_key
           password: $GCR_KEY
     environment:
-      SBT_VERSION: 1.3.13
+      SBT_VERSION: 1.4.7
       FAUNA_ROOT_KEY: secret
       FAUNA_DOMAIN: core
       FAUNA_SCHEME: http
