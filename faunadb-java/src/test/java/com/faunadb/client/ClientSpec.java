@@ -230,8 +230,8 @@ public class ClientSpec {
 
   @Test
   public void shouldThrowATimeoutErrorWhenQueryTimeoutIsZero() throws Exception {
-    thrown.expectCause(isA(UnavailableException.class));
-    thrown.expectMessage(containsString("time out: Read timed out."));
+    thrown.expectCause(isA(IllegalArgumentException.class));
+    thrown.expectMessage(containsString("Invalid duration"));
     Duration timeout = Duration.ZERO;
     query(Value("echo"), timeout).get();
   }

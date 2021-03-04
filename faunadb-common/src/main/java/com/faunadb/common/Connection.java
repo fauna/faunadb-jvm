@@ -37,8 +37,8 @@ import static java.lang.String.format;
 public class Connection {
 
   private static final String API_VERSION = "4";
-  private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
-  private static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
+  private static final Duration DEFAULT_CONNECTION_TIMEOUT = Duration.ofSeconds(10);
+  private static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofSeconds(60);
   private static final String DEFAULT_USER_AGENT = "Fauna JVM Http Client";
   private static final URL FAUNA_ROOT;
 
@@ -208,11 +208,11 @@ public class Connection {
       http = Objects.requireNonNullElseGet(client, () ->
         // TODO: [DRV-169] allow users to override default executor
         HttpClient.newBuilder()
-          .connectTimeout(Duration.ofMillis(DEFAULT_CONNECTION_TIMEOUT_MS))
+          .connectTimeout(DEFAULT_CONNECTION_TIMEOUT)
           .build()
       );
 
-      String connectionUserAgent = userAgent.orElseGet(() -> DEFAULT_USER_AGENT);
+      String connectionUserAgent = userAgent.orElse(DEFAULT_USER_AGENT);
 
       return new Connection(root, authToken, http, registry, jvmDriver, lastSeenTxn, queryTimeout, connectionUserAgent);
     }
@@ -361,7 +361,7 @@ public class Connection {
     HttpRequest request;
     try {
       request = makeHttpRequest(httpMethod, path, body, params, requestQueryTimeout, HttpClient.Version.HTTP_1_1);
-    } catch (MalformedURLException | URISyntaxException | JsonProcessingException ex) {
+    } catch (IllegalArgumentException| MalformedURLException | URISyntaxException | JsonProcessingException ex) {
       rv.completeExceptionally(ex);
       return rv;
     }
@@ -440,7 +440,8 @@ public class Connection {
 
     // If a query timeout has been given for the current request,
     // override the one from the Connection if any
-    Optional<Duration> queryTimeout = requestQueryTimeout.or(() -> defaultQueryTimeout);
+    // or use a default value
+    Duration queryTimeout = requestQueryTimeout.or(() -> defaultQueryTimeout).orElse(DEFAULT_REQUEST_TIMEOUT);
 
     Optional<Long> lastTxnTime = (getLastTxnTime() > 0) ? Optional.of(getLastTxnTime()) : Optional.empty();
 
@@ -448,17 +449,17 @@ public class Connection {
       HttpRequest.newBuilder()
         .uri(requestUri)
         .version(httpVersion)
-        .timeout(Duration.ofMillis(DEFAULT_REQUEST_TIMEOUT_MS))
+        .timeout(queryTimeout)
         .method(httpMethod, bodyPublisher)
         .headers(
           "Authorization", authHeader,
           X_FAUNADB_API_VERSION, API_VERSION,
           USER_AGENT, userAgent,
           X_FAUNA_DRIVER, jvmDriver.toString(),
+          X_QUERY_TIMEOUT, String.valueOf(queryTimeout.toMillis()),
           "Content-type", "application/json; charset=utf-8"
         );
 
-    queryTimeout.ifPresent(timeout -> requestBuilder.header(X_QUERY_TIMEOUT, String.valueOf(timeout.toMillis())));
     lastTxnTime.ifPresent(time -> requestBuilder.header(X_LAST_SEEN_TXN, Long.toString(time)));
 
     return requestBuilder.build();
