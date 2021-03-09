@@ -74,6 +74,67 @@ public class Connection {
     return new Builder();
   }
 
+  private static class RuntimeEnvironmentHeader {
+    private String runtime;
+    private String driverVersion;
+    private String os;
+    private String env;
+
+    RuntimeEnvironmentHeader(JvmDriver jvmDriver, String scalaVersion) {
+      this.driverVersion = Connection.class.getPackage().getSpecificationVersion();
+      this.os = System.getProperty("os.name");
+      this.env = this.getRuntimeEnv();
+      this.runtime = String.format("java-%s", System.getProperty("java.version"));
+
+      if (jvmDriver == JvmDriver.SCALA) {
+        this.runtime = String.format("%s,scala-%s", this.runtime, scalaVersion);
+      }
+    }
+
+    @Override public String toString() {
+      return String.format(
+        "driver=jvm-%s; runtime=%s; env=%s; os=%s",
+        this.driverVersion,
+        this.runtime,
+        this.env,
+        this.os
+      ).toLowerCase();
+    }
+
+    private String getRuntimeEnv() {
+      if (System.getenv("NETLIFY_IMAGES_CDN_DOMAIN") != null) {
+        return "Netlify";
+      }
+
+      if (System.getenv("VERCEL") != null) {
+        return "Vercel";
+      }
+
+      if (System.getenv("PATH") != null && System.getenv("PATH").contains(".heroku")) {
+        return "Heroku";
+      }
+
+      if (System.getenv("AWS_LAMBDA_FUNCTION_VERSION") != null) {
+        return "AWS Lambda";
+      }
+
+      if (System.getenv("_") != null && System.getenv("_").contains("google")) {
+        return "GCP Cloud Functions";
+      }
+
+      if (System.getenv("GOOGLE_CLOUD_PROJECT") != null) {
+        return "GCP Compute Instances";
+      }
+
+      if (System.getenv("ORYX_ENV_TYPE") != null && System.getenv("WEBSITE_INSTANCE_ID") != null && System.getenv("ORYX_ENV_TYPE") == "AppService") {
+        return "Azure Compute";
+      }
+
+      return "Unknown";
+    }
+  
+  }
+
   /**
    * A builder for the {@link Connection} instance. Use the {@link Connection#builder} method to create
    * an instance of the {@link Builder} class.
@@ -86,6 +147,7 @@ public class Connection {
     private long lastSeenTxn;
     private HttpClient client;
     private JvmDriver jvmDriver;
+    private String scalaVersion;
     private Optional<Duration> queryTimeout = Optional.empty();
     private Optional<String> userAgent = Optional.empty();
 
@@ -148,6 +210,18 @@ public class Connection {
       this.jvmDriver = jvmDriver;
       return this;
     }
+
+    /**
+     * Sets the Scala version to use for a requests header
+     *
+     * @param scalaVersion
+     * @return this {@link Builder} object
+     */
+    public Builder withScalaVersion(String scalaVersion) {
+      this.scalaVersion = scalaVersion;
+      return this;
+    }
+
 
     /**
      * Sets the last seen transaction time for the connection.
@@ -213,14 +287,15 @@ public class Connection {
       );
 
       String connectionUserAgent = userAgent.orElse(DEFAULT_USER_AGENT);
+      String runtimeEnvironmentHeader = new RuntimeEnvironmentHeader(jvmDriver, scalaVersion).toString();
 
-      return new Connection(root, authToken, http, registry, jvmDriver, lastSeenTxn, queryTimeout, connectionUserAgent);
+      return new Connection(root, authToken, http, registry, runtimeEnvironmentHeader, lastSeenTxn, queryTimeout, connectionUserAgent);
     }
   }
 
   private static final String X_FAUNADB_HOST = "X-FaunaDB-Host";
   private static final String X_FAUNADB_BUILD = "X-FaunaDB-Build";
-  private static final String X_FAUNA_DRIVER = "X-Fauna-Driver";
+  private static final String X_DRIVER_ENV = "X-Driver-Env";
   private static final String X_QUERY_TIMEOUT = "X-Query-Timeout";
   private static final String X_LAST_SEEN_TXN = "X-Last-Seen-Txn";
   private static final String X_FAUNADB_API_VERSION = "X-FaunaDB-API-Version";
@@ -228,7 +303,7 @@ public class Connection {
 
   private final URL faunaRoot;
   private final String authHeader;
-  private final JvmDriver jvmDriver;
+  private final String runtimeEnvironmentHeader;
   private HttpClient client;
   private final MetricRegistry registry;
   private final Optional<Duration> defaultQueryTimeout;
@@ -238,12 +313,12 @@ public class Connection {
   private final ObjectMapper json = new ObjectMapper();
   private final AtomicLong txnTime = new AtomicLong(0L);
 
-  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, JvmDriver jvmDriver, long lastSeenTxn, Optional<Duration> defaultQueryTimeout, String userAgent) {
+  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, String runtimeEnvironmentHeader, long lastSeenTxn, Optional<Duration> defaultQueryTimeout, String userAgent) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
+    this.runtimeEnvironmentHeader = runtimeEnvironmentHeader;
     this.client = client;
     this.registry = registry;
-    this.jvmDriver = jvmDriver;
     this.txnTime.set(lastSeenTxn);
     this.defaultQueryTimeout = defaultQueryTimeout;
     this.userAgent = userAgent;
@@ -257,7 +332,7 @@ public class Connection {
    * @return a new {@link Connection}
    */
   public Connection newSessionConnection(String authToken) {
-    return new Connection(faunaRoot, authToken, client, registry, jvmDriver, getLastTxnTime(), defaultQueryTimeout, userAgent);
+    return new Connection(faunaRoot, authToken, client, registry, runtimeEnvironmentHeader, getLastTxnTime(), defaultQueryTimeout, userAgent);
   }
 
   /**
@@ -455,8 +530,8 @@ public class Connection {
           "Authorization", authHeader,
           X_FAUNADB_API_VERSION, API_VERSION,
           USER_AGENT, userAgent,
-          X_FAUNA_DRIVER, jvmDriver.toString(),
           X_QUERY_TIMEOUT, String.valueOf(queryTimeout.toMillis()),
+          X_DRIVER_ENV, runtimeEnvironmentHeader,
           "Content-type", "application/json; charset=utf-8"
         );
 
