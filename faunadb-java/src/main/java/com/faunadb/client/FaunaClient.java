@@ -331,7 +331,7 @@ public class FaunaClient {
     return connection.getLastTxnTime();
   }
 
-  private MetricsResponse handleResponse(HttpResponse<String> response, boolean withMetrics) {
+  private Value handleResponse(HttpResponse<String> response) {
     try {
       handleQueryErrors(response.statusCode(), response.body());
       JsonNode responseBody = parseResponseBody(response.body());
@@ -341,30 +341,22 @@ public class FaunaClient {
         throw new IllegalArgumentException("Invalid JSON.");
       }
 
-      Map<MetricsResponse.Metrics, Optional<String>> metrics = Map.of();
-      if (withMetrics) {
-        metrics = MetricsResponse.Metrics.stream()
-                .collect(
-                        Collectors.toMap(Function.identity(), m -> response.headers().firstValue(m.getMetric())));
-      }
-
       if(resource instanceof NullNode) {
-        return MetricsResponse.of(NullV.NULL, metrics);
+        return NullV.NULL;
       }
 
-      Value value = json.treeToValue(resource, Value.class);
-      return MetricsResponse.of(value, metrics);
+      return json.treeToValue(resource, Value.class);
     } catch (JsonProcessingException | IllegalArgumentException ex) {
       throw new AssertionError(ex);
     }
   }
 
-  private Value handleResponse(HttpResponse<String> response) {
-    return handleResponse(response, false).getValue();
-  }
-
   private MetricsResponse handleResponseWithMetrics(HttpResponse<String> response) {
-    return handleResponse(response, true);
+    Map<MetricsResponse.Metrics, Optional<String>> metrics = MetricsResponse.Metrics.stream()
+        .collect(
+            Collectors.toMap(Function.identity(), m -> response.headers().firstValue(m.getMetric())));
+    Value value = handleResponse(response);
+    return MetricsResponse.of(value, metrics);
   }
 
   private CompletableFuture<Value> performRequest(JsonNode body, Optional<Duration> queryTimeout) {
