@@ -237,15 +237,92 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldThrowATimeoutErrorWhenQueryWithMetricsTimeoutIsZero() throws Exception {
+    thrown.expectCause(isA(IllegalArgumentException.class));
+    thrown.expectMessage(containsString("Invalid duration"));
+    Duration timeout = Duration.ZERO;
+    queryWithMetrics(Value("echo"), timeout).get();
+  }
+
+  @Test
   public void shouldThrowNotFoundWhenInstanceDoesntExists() throws Exception {
     thrown.expectCause(isA(NotFoundException.class));
     query(Get(Ref(Collection("spells"), "1234"))).get();
   }
 
   @Test
+  public void shouldThrowNotFoundWhenInstanceDoesntExistsForQueryWithMetrics() throws Exception {
+    thrown.expectCause(isA(NotFoundException.class));
+    queryWithMetrics(Get(Ref(Collection("spells"), "1234")), null).get();
+  }
+
+  @Test
   public void shouldReturnNullValueWhenTheResultIsNull() throws Exception {
     Value nullValue = query(Null()).get();
     assertThat(nullValue, equalTo(Null()));
+  }
+
+  @Test
+  public void shouldReturnNullValueWhenTheResultIsNullForQueryWithMetrics() throws Exception {
+    Value nullValue = queryWithMetrics(Null(), null).get().getValue();
+    assertThat(nullValue, equalTo(Null()));
+  }
+
+  @Test
+  public void shouldFindASingleInstanceFromIndexForQueryWithMetrics() throws Exception {
+    Value singleMatch = queryWithMetrics(
+            Paginate(Match(Index("spells_by_element"), Value("fire"))),
+            null
+    ).get().getValue();
+
+    assertThat(singleMatch.get(REF_LIST), contains(fireball));
+  }
+
+  @Test
+  public void shouldListAllItemsInACollectionForQueryWithMetrics() throws Exception {
+    Value allInstances = queryWithMetrics(
+            Paginate(Documents(Collection("spells"))),
+            null
+    ).get().getValue();
+
+    assertThat(allInstances.get(REF_LIST),
+            contains(magicMissile, fireball, faerieFire, summon, thorSpell1, thorSpell2));
+  }
+
+  @Test
+  public void shouldReturnMetricsData() throws Exception {
+    MetricsResponse metricsResponse = queryWithMetrics(
+            Paginate(Match(Index("spells_by_element"), Value("fire"))),
+            null
+    ).get();
+
+    Optional<String> byteReadOps = metricsResponse.getMetric(MetricsResponse.Metrics.BYTE_READ_OPS);
+    Optional<String> byteWriteOps = metricsResponse.getMetric(MetricsResponse.Metrics.BYTE_WRITE_OPS);
+    Optional<String> computeOps = metricsResponse.getMetric(MetricsResponse.Metrics.COMPUTE_OPS);
+    Optional<String> faunaDbBuild = metricsResponse.getMetric(MetricsResponse.Metrics.FAUNADB_BUILD);
+    Optional<String> queryBytesIn = metricsResponse.getMetric(MetricsResponse.Metrics.QUERY_BYTES_IN);
+    Optional<String> queryBytesOut = metricsResponse.getMetric(MetricsResponse.Metrics.QUERY_BYTES_OUT);
+    Optional<String> queryTime = metricsResponse.getMetric(MetricsResponse.Metrics.QUERY_TIME);
+    Optional<String> readOps = metricsResponse.getMetric(MetricsResponse.Metrics.READ_OPS);
+    Optional<String> storageBytesRead = metricsResponse.getMetric(MetricsResponse.Metrics.STORAGE_BYTES_READ);
+    Optional<String> storageBytesWrite = metricsResponse.getMetric(MetricsResponse.Metrics.STORAGE_BYTES_WRITE);
+    Optional<String> txnRetries = metricsResponse.getMetric(MetricsResponse.Metrics.TXN_RETRIES);
+    Optional<String> txnTime = metricsResponse.getMetric(MetricsResponse.Metrics.TXN_TIME);
+    Optional<String> writeOps = metricsResponse.getMetric(MetricsResponse.Metrics.WRITE_OPS);
+
+    assertThat(byteReadOps.isPresent(), is(true));
+    assertThat(byteWriteOps.isPresent(), is(true));
+    assertThat(computeOps.isPresent(), is(true));
+    assertThat(faunaDbBuild.isPresent(), is(true));
+    assertThat(queryBytesIn.isPresent(), is(true));
+    assertThat(queryBytesOut.isPresent(), is(true));
+    assertThat(queryTime.isPresent(), is(true));
+    assertThat(readOps.isPresent(), is(true));
+    assertThat(storageBytesRead.isPresent(), is(true));
+    assertThat(storageBytesWrite.isPresent(), is(true));
+    assertThat(txnRetries.isPresent(), is(true));
+    assertThat(txnTime.isPresent(), is(true));
+    assertThat(writeOps.isPresent(), is(true));
   }
 
   @Test
@@ -545,7 +622,7 @@ public class ClientSpec {
   }
 
   @Test
-  public void shouldListAllItensInACollection() throws Exception {
+  public void shouldListAllItemsInACollection() throws Exception {
     Value allInstances = query(
       Paginate(Documents(Collection("spells")))
     ).get();
@@ -555,7 +632,7 @@ public class ClientSpec {
   }
 
   @Test
-  public void shouldListAllItensOnACollectionIndex() throws Exception {
+  public void shouldListAllItemsOnACollectionIndex() throws Exception {
     Value allInstances = query(
       Paginate(Match(Index("all_spells")))
     ).get();
@@ -3377,6 +3454,10 @@ public class ClientSpec {
 
   private CompletableFuture<Value> query(Expr expr, Duration timeout) {
     return serverClient.query(expr, timeout);
+  }
+
+  private CompletableFuture<MetricsResponse> queryWithMetrics(Expr expr, Duration timeout) {
+    return serverClient.queryWithMetrics(expr, Optional.ofNullable(timeout));
   }
 
   private CompletableFuture<List<Value>> query(List<? extends Expr> exprs) {
