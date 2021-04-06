@@ -90,6 +90,42 @@ public class Main {
 }
 ```
 
+##### Per query metrics
+There are several metrics that returned per each request in response headers. Read this [doc](https://docs.fauna.com/fauna/current/concepts/billing.html#perquery) to have more info.
+You can access these metrics by:
+```java
+import com.faunadb.client.FaunaClient;
+
+import static com.faunadb.client.query.Language.*;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+
+        //Create an admin connection to FaunaDB.
+        FaunaClient adminClient =
+            FaunaClient.builder()
+                .withSecret("put-your-key-secret-here")
+                .build();
+
+        MetricsResponse metricsResponse = adminClient.queryWithMetrics(
+            Paginate(Match(Index("spells_by_element"), Value("fire"))),
+            null
+    	).get();
+
+        // the result of the query, as if you invoke 'adminClient.query' function instead
+        Value value = metricsResponse.getValue();
+
+        // gets the value of 'x-byte-read-ops' metric
+        Optional<String> byteReadOps = metricsResponse.getMetric(MetricsResponse.Metrics.BYTE_READ_OPS);
+        // gets the value of 'x-byte-write-ops' metric
+        Optional<String> byteWriteOps = metricsResponse.getMetric(MetricsResponse.Metrics.BYTE_WRITE_OPS);
+
+        // you can get other metrics in the same way,
+        // all of them are exposed via MetricsResponse.Metrics enum
+    }
+}
+```
+
 ##### Document Streaming
 
 Fauna supports document streaming, where changes to a streamed document are pushed to all clients subscribing to that document.
