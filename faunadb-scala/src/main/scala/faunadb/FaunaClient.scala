@@ -213,34 +213,29 @@ class FaunaClient private (connection: Connection) {
       result.asInstanceOf[ArrayV].elems
     }
 
-  private def performRequest(body: JsonNode, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[Value] = {
+  private def performRequestCommon[T](body: JsonNode, timeout: Option[FiniteDuration], handler: HttpResponse[String] => Future[T])(implicit ec: ExecutionContext): Future[T] = {
     val javaTimeout = timeout.map(_.toJava).asJava
     val response: Future[HttpResponse[String]] = connection.post("", body, javaTimeout).toScala
 
     response
       .flatMap {
-        case successResponse if successResponse.statusCode() < 300 => handleSuccessResponse(successResponse)
+        case successResponse if successResponse.statusCode() < 300 => handler.apply(successResponse)
         case errorResponse => handleErrorResponse(errorResponse.statusCode(), errorResponse.body())
       }
       .recoverWith(handleNetworkExceptions)
+  }
+
+  private def performRequest(body: JsonNode, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[Value] = {
+    performRequestCommon(body, timeout, handleSuccessResponse)
   }
 
   private def performRequestWithMetrics(body: JsonNode, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[MetricsResponse] = {
-    val javaTimeout = timeout.map(_.toJava).asJava
-    val response: Future[HttpResponse[String]] = connection.post("", body, javaTimeout).toScala
-
-    response
-      .flatMap {
-        case successResponse if successResponse.statusCode() < 300 => handleSuccessResponseWithMetrics(successResponse)
-        case errorResponse => handleErrorResponse(errorResponse.statusCode(), errorResponse.body())
-      }
-      .recoverWith(handleNetworkExceptions)
+    performRequestCommon(body, timeout, handleSuccessResponseWithMetrics)
   }
 
   private def handleSuccessResponseWithMetrics(response: HttpResponse[String])(implicit ec: ExecutionContext): Future[MetricsResponse] = {
-    val metricsMap = Metrics.All map (item => item -> response.headers().firstValue(item.toString).asScala) toMap
-    val metricsResponse: Future[MetricsResponse] = handleSuccessResponse(response).map(item => MetricsResponse(metricsMap, item))
-    metricsResponse
+    val metricsMap = (Metrics.All map (item => item -> response.headers().firstValue(item.toString).asScala)).toMap
+    handleSuccessResponse(response).map(item => MetricsResponse(metricsMap, item))
   }
 
   /**
