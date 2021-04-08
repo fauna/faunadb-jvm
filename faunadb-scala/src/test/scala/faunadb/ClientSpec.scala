@@ -192,7 +192,7 @@ class ClientSpec
   }
 
   it should "receive a Null value properly for query with metrics" in {
-    client.queryWithMetrics(NullV, None).futureValue shouldBe NullV
+    client.queryWithMetrics(NullV, None).futureValue.value shouldBe NullV
   }
 
   it should "create a new instance" in {
