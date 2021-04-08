@@ -8,12 +8,12 @@ import com.faunadb.common.Connection
 import com.faunadb.common.Connection.JvmDriver
 import faunadb.errors._
 import faunadb.query.{Expr, Get}
-import faunadb.values.{ArrayV, NullV, Value}
+import faunadb.values.{ArrayV, Metrics, MetricsResponse, NullV, Value}
+
 import java.io.IOException
 import java.net.ConnectException
 import java.net.http.HttpResponse
 import java.util.concurrent.{CompletionException, Flow, TimeoutException}
-
 import com.faunadb.common.http.ResponseBodyStringProcessor
 import faunadb.FaunaClient.EventField
 import faunadb.streaming.{BodyValueFlowProcessor, SnapshotEventFlowProcessor}
@@ -146,6 +146,23 @@ class FaunaClient private (connection: Connection) {
     performRequest(json.valueToTree(expr), timeout)
 
   /**
+    * Issues a query.
+    *
+    * @param expr the query to run, created using the query dsl helpers in [[faunadb.query]].
+    * @param ec the `ExecutionContext` used to run the query asynchronously.
+    * @param timeout the timeout for the current query. It replaces the timeout value set for this
+    *                [[faunadb.FaunaClient]] if any for the scope of this query. The timeout value has
+    *                milliseconds precision.
+    * @return A [[scala.concurrent.Future]] containing the query result.
+    *         The result is an instance of [[faunadb.values.Result]],
+    *         which can be cast to a typed value using the
+    *         [[faunadb.values.Field]] API. If the query fails, failed
+    *         future is returned.
+    */
+  def queryWithMetrics(expr: Expr, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[MetricsResponse] =
+    performRequestWithMetrics(json.valueToTree(expr), timeout)
+
+  /**
     * Issues multiple queries as a single transaction.
     *
     * @param exprs the queries to run.
@@ -205,6 +222,27 @@ class FaunaClient private (connection: Connection) {
         case errorResponse => handleErrorResponse(errorResponse.statusCode(), errorResponse.body())
       }
       .recoverWith(handleNetworkExceptions)
+  }
+
+  private def performRequestWithMetrics(body: JsonNode, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[MetricsResponse] = {
+    val javaTimeout = timeout.map(_.toJava).asJava
+    val response: Future[HttpResponse[String]] = connection.post("", body, javaTimeout).toScala
+
+    response
+      .flatMap {
+        case successResponse if successResponse.statusCode() < 300 => handleSuccessResponseWithMetrics(successResponse)
+        case errorResponse => handleErrorResponse(errorResponse.statusCode(), errorResponse.body())
+      }
+      .recoverWith(handleNetworkExceptions)
+  }
+
+  private def handleSuccessResponseWithMetrics(response: HttpResponse[String])(implicit ec: ExecutionContext): Future[MetricsResponse] = {
+    val metricsMap = Metrics.list map (item => item -> response.headers().firstValue(item)) toMap
+
+    for {
+      valueResponse <- handleSuccessResponse(response)
+      metricsResponse <- MetricsResponse(metricsMap, valueResponse)
+    } yield metricsResponse
   }
 
   /**
