@@ -18,6 +18,7 @@ import com.faunadb.common.http.ResponseBodyStringProcessor
 import faunadb.FaunaClient.EventField
 import faunadb.streaming.{BodyValueFlowProcessor, SnapshotEventFlowProcessor}
 
+import java.util.Optional
 import scala.collection.JavaConverters._
 import scala.compat.java8.DurationConverters._
 import scala.compat.java8.FutureConverters._
@@ -237,12 +238,9 @@ class FaunaClient private (connection: Connection) {
   }
 
   private def handleSuccessResponseWithMetrics(response: HttpResponse[String])(implicit ec: ExecutionContext): Future[MetricsResponse] = {
-    val metricsMap = Metrics.list map (item => item -> response.headers().firstValue(item)) toMap
-
-    for {
-      valueResponse <- handleSuccessResponse(response)
-      metricsResponse <- MetricsResponse(metricsMap, valueResponse)
-    } yield metricsResponse
+    val metricsMap = Metrics.All map (item => item -> response.headers().firstValue(item.toString).asScala) toMap
+    val metricsResponse: Future[MetricsResponse] = handleSuccessResponse(response).map(item => MetricsResponse(metricsMap, item))
+    metricsResponse
   }
 
   /**
