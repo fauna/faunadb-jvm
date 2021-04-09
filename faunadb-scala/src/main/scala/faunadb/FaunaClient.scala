@@ -53,6 +53,7 @@ object FaunaClient {
     if (metrics ne null) b.withMetrics(metrics)
     if (queryTimeout ne null) b.withQueryTimeout(queryTimeout.toJava)
     b.withJvmDriver(JvmDriver.SCALA)
+    b.withScalaVersion(util.Properties.versionNumberString)
 
     new FaunaClient(b.build)
   }
