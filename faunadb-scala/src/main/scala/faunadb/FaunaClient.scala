@@ -234,12 +234,13 @@ class FaunaClient private (connection: Connection) {
   }
 
   private def handleSuccessResponseWithMetrics(response: HttpResponse[String])(implicit ec: ExecutionContext): Future[MetricsResponse] = {
-    val metricsMap = Metrics.All
-      .iterator
-      .filter(item => response.headers().firstValue(item.toString).isPresent)
-      .map(item => item -> response.headers().firstValue(item.toString).asScala.get)
-      .toMap
-    handleSuccessResponse(response).map(item => MetricsResponse(metricsMap, item))
+    val metrics = for {
+      item <- Metrics.All.iterator
+      header = response.headers().firstValue(item.toString).asScala
+      if header.isDefined
+    } yield item -> header.get
+
+    handleSuccessResponse(response).map(item => MetricsResponse(metrics.toMap, item))
   }
 
   /**
