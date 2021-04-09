@@ -306,22 +306,37 @@ class ClientSpec
     resp2("before").isDefined should equal (true)
   }
 
-  //todo finish test
-//  it should "return single instance from index for query metrics" in {
-//    val res1 = client.query(Create(Collection("spells"), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L)))).futureValue
-//    val res2 = client.query(Create(Collection("spells"), Obj("data" -> Obj("name" -> "Fire bolt", "element" -> "fire", "cost" -> 15L)))).futureValue
-//
-//    val valueResponse = client.queryWithMetrics(
-//      Paginate(Match(Index("spells_by_element"), "fire")),
-//      None
-//    ).futureValue.value
-//
-//    valueResponse("data", "name").to[String].get shouldBe "Fire Bolt"
-//    valueResponse("data", "element").to[String].get shouldBe "arcane"
-//    valueResponse("data", "cost").to[Long].get shouldBe 15L
-//
-//    valueResponse shouldBe ""
-//  }
+  it should "return single instance from index for query metrics" in {
+    client.query(Create(Collection("spells"), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L)))).futureValue
+    client.query(Create(Collection("spells"), Obj("data" -> Obj("name" -> "Fire Bolt", "element" -> "fire", "cost" -> 15L)))).futureValue
+
+    val valueResponse = client.queryWithMetrics(
+      Map(
+        Paginate(Match(Index("spells_by_element"), "fire")),
+        Lambda(nextRef => Select("data", Get(nextRef)))
+      ),
+      None
+    ).futureValue.value
+
+    valueResponse("data")(0).get("name").to[String].get shouldBe "Fire Bolt"
+    valueResponse("data")(0).get("element").to[String].get shouldBe "fire"
+    valueResponse("data")(0).get("cost").to[Long].get shouldBe 15L
+  }
+
+  it should "list all items in collection for query with metrics" in {
+    client.query(Create(Collection("spells"), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L)))).futureValue
+    client.query(Create(Collection("spells"), Obj("data" -> Obj("name" -> "Fire Bolt", "element" -> "fire", "cost" -> 15L)))).futureValue
+
+    val valueResponse = client.queryWithMetrics(
+      Map(
+        Paginate(Documents(Collection("spells"))),
+        Lambda(nextRef => Select("data", Get(nextRef)))
+      ),
+      None
+    ).futureValue.value
+
+    valueResponse("data").get.asInstanceOf[ArrayV].elems.length shouldBe 2
+  }
 
   it should "return metrics data" in {
     val metricsResponse = client.queryWithMetrics(
@@ -342,6 +357,8 @@ class ClientSpec
     val txnRetries = metricsResponse.getMetric(Metrics.TxnRetries)
     val txnTime = metricsResponse.getMetric(Metrics.TxnTime)
     val writeOps = metricsResponse.getMetric(Metrics.WriteOps)
+
+    val value = metricsResponse.value
 
     byteReadOps.isDefined should equal (true)
     byteWriteOps.isDefined should equal (true)
