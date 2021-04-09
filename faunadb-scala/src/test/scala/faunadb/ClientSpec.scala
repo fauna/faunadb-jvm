@@ -307,12 +307,21 @@ class ClientSpec
   }
 
   it should "return single instance from index for query metrics" in {
-    client.query(Create(Collection("spells"), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L)))).futureValue
-    client.query(Create(Collection("spells"), Obj("data" -> Obj("name" -> "Fire Bolt", "element" -> "fire", "cost" -> 15L)))).futureValue
+    val randomCollectionName = aRandomString
+    client.query(CreateCollection(Obj("name" -> randomCollectionName))).futureValue
+
+    client.query(CreateIndex(Obj(
+      "name" -> (randomCollectionName + "_by_element"),
+      "source" -> Collection(randomCollectionName),
+      "terms" -> Arr(Obj("field" -> Arr("data", "element"))),
+      "active" -> true))).futureValue
+
+    client.query(Create(Collection(randomCollectionName), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L)))).futureValue
+    client.query(Create(Collection(randomCollectionName), Obj("data" -> Obj("name" -> "Fire Bolt", "element" -> "fire", "cost" -> 15L)))).futureValue
 
     val valueResponse = client.queryWithMetrics(
       Map(
-        Paginate(Match(Index("spells_by_element"), "fire")),
+        Paginate(Match(Index(randomCollectionName + "_by_element"), "fire")),
         Lambda(nextRef => Select("data", Get(nextRef)))
       ),
       None
@@ -324,12 +333,15 @@ class ClientSpec
   }
 
   it should "list all items in collection for query with metrics" in {
-    client.query(Create(Collection("spells"), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L)))).futureValue
-    client.query(Create(Collection("spells"), Obj("data" -> Obj("name" -> "Fire Bolt", "element" -> "fire", "cost" -> 15L)))).futureValue
+    val randomCollectionName = aRandomString
+    client.query(CreateCollection(Obj("name" -> randomCollectionName))).futureValue
+
+    client.query(Create(Collection(randomCollectionName), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L)))).futureValue
+    client.query(Create(Collection(randomCollectionName), Obj("data" -> Obj("name" -> "Fire Bolt", "element" -> "fire", "cost" -> 15L)))).futureValue
 
     val valueResponse = client.queryWithMetrics(
       Map(
-        Paginate(Documents(Collection("spells"))),
+        Paginate(Documents(Collection(randomCollectionName))),
         Lambda(nextRef => Select("data", Get(nextRef)))
       ),
       None
@@ -357,8 +369,6 @@ class ClientSpec
     val txnRetries = metricsResponse.getMetric(Metrics.TxnRetries)
     val txnTime = metricsResponse.getMetric(Metrics.TxnTime)
     val writeOps = metricsResponse.getMetric(Metrics.WriteOps)
-
-    val value = metricsResponse.value
 
     byteReadOps.isDefined should equal (true)
     byteWriteOps.isDefined should equal (true)
