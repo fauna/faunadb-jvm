@@ -352,9 +352,10 @@ public class FaunaClient {
   }
 
   private MetricsResponse handleResponseWithMetrics(HttpResponse<String> response) {
-    Map<MetricsResponse.Metrics, Optional<String>> metrics = MetricsResponse.Metrics.stream()
-        .collect(
-            Collectors.toMap(Function.identity(), m -> response.headers().firstValue(m.getMetric())));
+    Map<MetricsResponse.Metrics, String> metrics = new HashMap<>();
+    MetricsResponse.Metrics.vals().forEach(m ->
+        response.headers().firstValue(m.getMetric()).ifPresent(v -> metrics.put(m, v))
+    );
     Value value = handleResponse(response);
     return MetricsResponse.of(value, metrics);
   }

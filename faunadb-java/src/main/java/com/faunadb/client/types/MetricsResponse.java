@@ -1,5 +1,7 @@
 package com.faunadb.client.types;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -10,15 +12,15 @@ import java.util.stream.Stream;
  * and can be retrieved by using {@link #getMetric(Metrics)} method
  */
 public class MetricsResponse {
-    private final Map<Metrics, Optional<String>> metricsMap;
+    private final Map<Metrics, String> metricsMap;
     private final Value value;
 
-    private MetricsResponse(Value value, Map<Metrics, Optional<String>> metricsMap) {
+    private MetricsResponse(Value value, Map<Metrics, String> metricsMap) {
         this.value = value;
         this.metricsMap = metricsMap;
     }
 
-    public static MetricsResponse of(Value value, Map<Metrics, Optional<String>> metricsMap) {
+    public static MetricsResponse of(Value value, Map<Metrics, String> metricsMap) {
         return new MetricsResponse(value, metricsMap);
     }
 
@@ -36,11 +38,7 @@ public class MetricsResponse {
      * @return the metric value
      */
     public Optional<String> getMetric(Metrics metric) {
-        if (metricsMap.containsKey(metric)) {
-            return metricsMap.get(metric);
-        }
-
-        return Optional.empty();
+        return Optional.ofNullable(metricsMap.get(metric));
     }
 
     /**
@@ -74,5 +72,7 @@ public class MetricsResponse {
         public static Stream<Metrics> stream() {
             return Stream.of(Metrics.values());
         }
+
+        public static List<Metrics> vals() { return Arrays.asList(Metrics.values()); }
     }
 }
