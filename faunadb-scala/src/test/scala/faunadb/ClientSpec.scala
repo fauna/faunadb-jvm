@@ -127,6 +127,10 @@ class ClientSpec
     client.query(Get(RefV("1234", RefV("spells", Native.Collections)))).failed.futureValue shouldBe a[NotFoundException]
   }
 
+  "Fauna Client" should "should not find an instance for query with metrics" in {
+    client.queryWithMetrics(Get(RefV("1234", RefV("spells", Native.Collections))), None).failed.futureValue shouldBe a[NotFoundException]
+  }
+
   it should "abort the execution" in {
     client.query(Abort("a message")).failed.futureValue shouldBe a[BadRequestException]
   }
@@ -164,6 +168,13 @@ class ClientSpec
     thrown.getMessage should include ("Invalid duration")
   }
 
+  it should "fail if timeout is zero for query with metrics" in {
+    val timeout = Duration.Zero
+    val thrown = client.queryWithMetrics("echo", Some(timeout)).failed.futureValue
+    thrown shouldBe an[IllegalArgumentException]
+    thrown.getMessage should include ("Invalid duration")
+  }
+
   it should "fail with permission denied" in {
     val key = rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "client"))).futureValue
     val client = FaunaClient(endpoint = config("root_url"), secret = key(SecretField).get)
@@ -178,6 +189,10 @@ class ClientSpec
 
   it should "receive a Null value properly" in {
     client.query(NullV).futureValue shouldBe NullV
+  }
+
+  it should "receive a Null value properly for query with metrics" in {
+    client.queryWithMetrics(NullV, None).futureValue.value shouldBe NullV
   }
 
   it should "create a new instance" in {
@@ -289,6 +304,85 @@ class ClientSpec
     resp2("data").to[Seq[Value]].get.size shouldBe 1
     resp2("after").isDefined should equal (true)
     resp2("before").isDefined should equal (true)
+  }
+
+  it should "return single instance from index for query metrics" in {
+    val randomCollectionName = aRandomString
+    client.query(CreateCollection(Obj("name" -> randomCollectionName))).futureValue
+
+    client.query(CreateIndex(Obj(
+      "name" -> (randomCollectionName + "_by_element"),
+      "source" -> Collection(randomCollectionName),
+      "terms" -> Arr(Obj("field" -> Arr("data", "element"))),
+      "active" -> true))).futureValue
+
+    client.query(Create(Collection(randomCollectionName), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L)))).futureValue
+    client.query(Create(Collection(randomCollectionName), Obj("data" -> Obj("name" -> "Fire Bolt", "element" -> "fire", "cost" -> 15L)))).futureValue
+
+    val valueResponse = client.queryWithMetrics(
+      Map(
+        Paginate(Match(Index(randomCollectionName + "_by_element"), "fire")),
+        Lambda(nextRef => Select("data", Get(nextRef)))
+      ),
+      None
+    ).futureValue.value
+
+    valueResponse("data")(0).get("name").to[String].get shouldBe "Fire Bolt"
+    valueResponse("data")(0).get("element").to[String].get shouldBe "fire"
+    valueResponse("data")(0).get("cost").to[Long].get shouldBe 15L
+  }
+
+  it should "list all items in collection for query with metrics" in {
+    val randomCollectionName = aRandomString
+    client.query(CreateCollection(Obj("name" -> randomCollectionName))).futureValue
+
+    client.query(Create(Collection(randomCollectionName), Obj("data" -> Obj("name" -> "Magic Missile", "element" -> "arcane", "cost" -> 10L)))).futureValue
+    client.query(Create(Collection(randomCollectionName), Obj("data" -> Obj("name" -> "Fire Bolt", "element" -> "fire", "cost" -> 15L)))).futureValue
+
+    val valueResponse = client.queryWithMetrics(
+      Map(
+        Paginate(Documents(Collection(randomCollectionName))),
+        Lambda(nextRef => Select("data", Get(nextRef)))
+      ),
+      None
+    ).futureValue.value
+
+    valueResponse("data").get.asInstanceOf[ArrayV].elems.length shouldBe 2
+  }
+
+  it should "return metrics data" in {
+    val metricsResponse = client.queryWithMetrics(
+      Paginate(Match(Index("spells_by_element"), Value("fire"))),
+      None
+    ).futureValue
+
+    val byteReadOps = metricsResponse.getMetric(Metrics.ByteReadOps)
+    val byteWriteOps = metricsResponse.getMetric(Metrics.ByteWriteOps)
+    val computeOps = metricsResponse.getMetric(Metrics.ComputeOps)
+    val faunaDbBuild = metricsResponse.getMetric(Metrics.FaunaDbBuild)
+    val queryBytesIn = metricsResponse.getMetric(Metrics.QueryBytesIn)
+    val queryBytesOut = metricsResponse.getMetric(Metrics.QueryBytesOut)
+    val queryTime = metricsResponse.getMetric(Metrics.QueryTime)
+    val readOps = metricsResponse.getMetric(Metrics.ReadOps)
+    val storageBytesRead = metricsResponse.getMetric(Metrics.StorageBytesRead)
+    val storageBytesWrite = metricsResponse.getMetric(Metrics.StorageBytesWrite)
+    val txnRetries = metricsResponse.getMetric(Metrics.TxnRetries)
+    val txnTime = metricsResponse.getMetric(Metrics.TxnTime)
+    val writeOps = metricsResponse.getMetric(Metrics.WriteOps)
+
+    byteReadOps.isDefined should equal (true)
+    byteWriteOps.isDefined should equal (true)
+    computeOps.isDefined should equal (true)
+    faunaDbBuild.isDefined should equal (true)
+    queryBytesIn.isDefined should equal (true)
+    queryBytesOut.isDefined should equal (true)
+    queryTime.isDefined should equal (true)
+    readOps.isDefined should equal (true)
+    storageBytesRead.isDefined should equal (true)
+    storageBytesWrite.isDefined should equal (true)
+    txnRetries.isDefined should equal (true)
+    txnTime.isDefined should equal (true)
+    writeOps.isDefined should equal (true)
   }
 
   it should "paginate with cursor object" in {

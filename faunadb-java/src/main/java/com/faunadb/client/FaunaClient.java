@@ -12,6 +12,7 @@ import com.faunadb.client.streaming.BodyValueFlowProcessor;
 import com.faunadb.client.streaming.EventField;
 import com.faunadb.client.streaming.SnapshotEventFlowProcessor;
 import com.faunadb.client.types.Field;
+import com.faunadb.client.types.MetricsResponse;
 import com.faunadb.client.types.Value;
 import com.faunadb.common.Connection;
 import com.faunadb.common.Connection.JvmDriver;
@@ -229,6 +230,26 @@ public class FaunaClient {
   }
 
   /**
+   * Issues a Query to FaunaDB with extra information
+   * <p>
+   * Queries are constructed by the helper methods in the {@link com.faunadb.client.query.Language} class.
+   * <p>
+   * Responses are represented as structured tree where each node is a {@link Value} instance.
+   * {@link Value} instances can be converted to native types. See {@link Value} class for details.
+   *
+   * @param expr the query to be executed.
+   * @param timeout the timeout for the current query. It replaces the timeout value set for this
+   *                {@link FaunaClient} (if any), for the scope of this query. The timeout value
+   *                has milliseconds precision.
+   * @return a {@link CompletableFuture} containing the root node of the response tree.
+   * @see MetricsResponse
+   * @see com.faunadb.client.query.Language
+   */
+  public CompletableFuture<MetricsResponse> queryWithMetrics(Expr expr, Optional<Duration> timeout) {
+    return performRequestWithMetrics(json.valueToTree(expr), timeout);
+  }
+
+  /**
    * Issues multiple queries to FaunaDB.
    * <p>
    * These queries are sent to FaunaDB in a single request. A list containing all responses is returned
@@ -330,8 +351,21 @@ public class FaunaClient {
     }
   }
 
+  private MetricsResponse handleResponseWithMetrics(HttpResponse<String> response) {
+    Map<MetricsResponse.Metrics, String> metrics = new HashMap<>();
+    MetricsResponse.Metrics.vals().forEach(m ->
+        response.headers().firstValue(m.getMetric()).ifPresent(v -> metrics.put(m, v))
+    );
+    Value value = handleResponse(response);
+    return MetricsResponse.of(value, metrics);
+  }
+
   private CompletableFuture<Value> performRequest(JsonNode body, Optional<Duration> queryTimeout) {
     return handleNetworkExceptions(connection.post("", body, queryTimeout).thenApply(this::handleResponse));
+  }
+
+  private CompletableFuture<MetricsResponse> performRequestWithMetrics(JsonNode body, Optional<Duration> queryTimeout) {
+    return handleNetworkExceptions(connection.post("", body, queryTimeout).thenApply(this::handleResponseWithMetrics));
   }
 
   /**
