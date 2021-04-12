@@ -219,7 +219,7 @@ class FaunaClient private (connection: Connection) {
 
     response
       .flatMap {
-        case successResponse if successResponse.statusCode() < 300 => handler(successResponse)
+        case successResponse if successResponse.statusCode() < 300 => handler.apply(successResponse)
         case errorResponse => handleErrorResponse(errorResponse.statusCode(), errorResponse.body())
       }
       .recoverWith(handleNetworkExceptions)
