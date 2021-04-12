@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * An aggregation type which consists of {@link Value} instance and extra information of response.
@@ -67,10 +66,6 @@ public class MetricsResponse {
 
         public String getMetric() {
             return metric;
-        }
-
-        public static Stream<Metrics> stream() {
-            return Stream.of(Metrics.values());
         }
 
         public static List<Metrics> vals() { return Arrays.asList(Metrics.values()); }

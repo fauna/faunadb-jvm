@@ -242,7 +242,7 @@ class FaunaClient private (connection: Connection) {
       }
       .toMap
 
-    handleSuccessResponse(response).map(item => MetricsResponse(metricsMap, item))
+    handleSuccessResponse(response).map(item => MetricsResponse(item, metricsMap))
   }
 
   /**
