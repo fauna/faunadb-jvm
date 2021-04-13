@@ -15,8 +15,8 @@ This repository contains the FaunaDB drivers for the JVM languages. Currently, J
 
 Javadocs and Scaladocs are hosted on GitHub:
 
-* [faunadb-java](http://fauna.github.io/faunadb-jvm/4.0.1/faunadb-java/api/)
-* [faunadb-scala](http://fauna.github.io/faunadb-jvm/4.0.1/faunadb-scala/api/)
+* [faunadb-java](http://fauna.github.io/faunadb-jvm/4.1.0/faunadb-java/api/)
+* [faunadb-scala](http://fauna.github.io/faunadb-jvm/4.1.0/faunadb-scala/api/)
 
 Details Documentation for each language:
 
@@ -54,7 +54,7 @@ Download from the Maven central repository:
   <dependency>
     <groupId>com.faunadb</groupId>
     <artifactId>faunadb-java</artifactId>
-    <version>4.0.1</version>
+    <version>4.1.0</version>
     <scope>compile</scope>
   </dependency>
   ...
@@ -109,7 +109,7 @@ public class Main {
 
         MetricsResponse metricsResponse = adminClient.queryWithMetrics(
             Paginate(Match(Index("spells_by_element"), Value("fire"))),
-            null
+            Optional.empty()
     	).get();
 
         // the result of the query, as if you invoke 'adminClient.query' function instead
@@ -192,7 +192,7 @@ List<Value> events = capturedEvents.get();
 ##### faunadb-scala/sbt
 
 ```scala
-libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "4.0.1")
+libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "4.1.0")
 ```
 
 ##### Basic Usage
