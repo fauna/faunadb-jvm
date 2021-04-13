@@ -137,6 +137,17 @@ public class FaunaClient {
     }
 
     /**
+     * Sets the User-Agent header for all the Queries issued by this client.
+     *
+     * @param userAgent the userAgent value
+     * @return this {@link Builder} object
+     */
+    public Builder withUserAgent(String userAgent) {
+      this.userAgent = userAgent;
+      return this;
+    }
+
+    /**
      * Returns a newly constructed {@link FaunaClient} with configuration based on the settings of this {@link Builder}.
      * @return {@link FaunaClient}
      */
