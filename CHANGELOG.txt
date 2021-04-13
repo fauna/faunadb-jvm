@@ -1,10 +1,10 @@
 4.1.0
 * Exposes billing metrics
-* Adds runtime environment headers for http fauna requests
+* Adds runtime environment headers to queries
 * Always sends query timeout header
 * Enables user to pass a custom user agent
 * Adds ability to combine Fields
-* FaunaClient no longer needs to be closed
+* Removes the requirement to call `close()` to terminate a FaunaClient session
 * defect fixes
 
 4.0.1
