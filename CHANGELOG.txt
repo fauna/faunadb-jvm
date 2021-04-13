@@ -2,10 +2,10 @@
 * Exposes billing metrics
 * Adds runtime environment headers to queries
 * Always sends query timeout header
+* Expr(NullV) is instantiated only once and reused
 * Enables user to pass a custom user agent
 * Adds ability to combine Fields
 * Removes the requirement to call `close()` to terminate a FaunaClient session
-* defect fixes
 
 4.0.1
 * Fix JavaDoc errors
