@@ -109,7 +109,7 @@ public class Main {
 
         MetricsResponse metricsResponse = adminClient.queryWithMetrics(
             Paginate(Match(Index("spells_by_element"), Value("fire"))),
-            null
+            Optional.empty()
     	).get();
 
         // the result of the query, as if you invoke 'adminClient.query' function instead
