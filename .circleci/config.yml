@@ -57,7 +57,7 @@ commands:
 
       - run:
           name: Test 2.11
-          command: sbt ++2.11.12 coverage test coverageReport
+          command: sbt ++2.11.12 test
 
       - run:
           name: Test 2.12
