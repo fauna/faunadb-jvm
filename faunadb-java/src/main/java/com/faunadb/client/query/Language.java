@@ -7654,7 +7654,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isrole?lang=java>IsRole</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isrole?lang=java">IsRole</a>
    */
   public static Expr IsRole(Expr expr) {
     return Fn.apply("is_role", expr);
