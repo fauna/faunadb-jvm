@@ -39,7 +39,7 @@ import static com.faunadb.client.util.SymbolGenerator.genSym;
  *   Value result = client.query(createUserExpr).get();
  * }</pre>
  *
- * @see <a href="https://app.fauna.com/documentation/reference/queryapi">FaunaDB Query API</a>
+ * @see <a href="https://docs.fauna.com/fauna/current/api/fql/">Fauna Query Language</a>
  */
 public final class Language {
 
@@ -57,7 +57,7 @@ public final class Language {
   /**
    * Enumeration for time units.
    *
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#time-and-date">FaunaDB Time Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/cheat_sheet#timedate">Fauna Time Functions</a>
    * @see #Epoch(Expr, TimeUnit)
    * @see #TimeAdd(Expr, Expr, TimeUnit)
    * @see #TimeSubtract(Expr, Expr, TimeUnit)
@@ -83,7 +83,7 @@ public final class Language {
   /**
    * Enumeration for event action types.
    *
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/cheat_sheet#write">Fauna Write Functions</a>
    * @see #Insert(Expr, Expr, Action, Expr)
    * @see #Remove(Expr, Expr, Action)
    */
@@ -101,7 +101,7 @@ public final class Language {
   /**
    * Enumeration for casefold normalizers.
    *
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/cheat_sheet#string">Fauna String Functions</a>
    * @see #Casefold(Expr, Normalizer)
    */
   public enum Normalizer {
@@ -122,7 +122,8 @@ public final class Language {
    * Builder for let expressions.
    * To complete the let binding, the {@link LetBinding#in(Expr)} method must be called.
    *
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/cheat_sheet#basic">Fauna Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/let?lang=java">Let</a>
    * @see #Let(Map)
    * @see #Let(String, Expr)
    */
@@ -148,7 +149,7 @@ public final class Language {
    * Builder for path selectors. This builder must be constructed using
    * either the {@link Path#at(String...)} or {@link Path#at(int...)} functions.
    *
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/cheat_sheet#miscellaneous">Fauna Miscellaneous Functions</a>
    * @see #Contains(Path, Expr)
    * @see #Select(Path, Expr)
    * @see #Select(Path, Expr, Expr)
@@ -213,7 +214,7 @@ public final class Language {
    *
    * @param ref the reference id
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/ref?lang=java">Ref</a>
    * @see #Ref(Expr, String)
    */
   public static Expr Ref(String ref) {
@@ -227,7 +228,7 @@ public final class Language {
    * @param collectionRef the scope reference. Type: Reference
    * @param id the reference id. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/ref?lang=java">Ref</a>
    * @see #Collection(String)
    * @see #Database(String)
    * @see #Index(String)
@@ -244,7 +245,7 @@ public final class Language {
    * @param collectionRef the scope reference. Type: Reference
    * @param id the reference id
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/ref?lang=java">Ref</a>
    * @see #Collection(String)
    * @see #Database(String)
    * @see #Index(String)
@@ -259,8 +260,9 @@ public final class Language {
    * A reference set must be paginated in order to retrieve its values.
    *
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/classes?lang=java">Classes</a>
    * @see #Paginate(Expr)
-   * 
+   *
    * @deprecated use Collections instead
    */
   @Deprecated
@@ -273,6 +275,7 @@ public final class Language {
    * A reference set must be paginated in order to retrieve its values.
    *
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/collections?lang=java">Collections</a>
    * @see #Paginate(Expr)
    */
   public static Expr Collections() {
@@ -285,9 +288,10 @@ public final class Language {
    *
    * @param scope a reference to a database. Type: Reference
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/classes?lang=java">Classes</a>
    * @see #Database(String)
    * @see #Paginate(Expr)
-   * 
+   *
    * @deprecated use Collection instead
    */
   @Deprecated
@@ -301,6 +305,7 @@ public final class Language {
    *
    * @param scope a reference to a database. Type: Reference
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/collections?lang=java">Collections</a>
    * @see #Database(String)
    * @see #Paginate(Expr)
    */
@@ -313,6 +318,7 @@ public final class Language {
    * A reference set must be paginated in order to retrieve its values.
    *
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/databases?lang=java">Databases</a>
    * @see #Paginate(Expr)
    */
   public static Expr Databases() {
@@ -325,6 +331,7 @@ public final class Language {
    *
    * @param scope a reference to a database. Type: Reference
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/databases?lang=java">Databases</a>
    * @see #Database(String)
    * @see #Paginate(Expr)
    */
@@ -337,6 +344,7 @@ public final class Language {
    * A reference set must be paginated in order to retrieve its values.
    *
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/indexes?lang=java">Indexes</a>
    * @see #Paginate(Expr)
    */
   public static Expr Indexes() {
@@ -349,6 +357,7 @@ public final class Language {
    *
    * @param scope a reference to a database. Type: Reference
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/indexes?lang=java">Indexes</a>
    * @see #Paginate(Expr)
    */
   public static Expr Indexes(Expr scope) {
@@ -360,6 +369,7 @@ public final class Language {
    * A reference set must be paginated in order to retrieve its values.
    *
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/functions?lang=java">Functions</a>
    * @see #Paginate(Expr)
    */
   public static Expr Functions() {
@@ -372,6 +382,7 @@ public final class Language {
    *
    * @param scope a reference to a database. Type: Reference
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/functions?lang=java">Functions</a>
    * @see #Ref(Expr, String)
    * @see #Database(String)
    * @see #Paginate(Expr)
@@ -385,6 +396,7 @@ public final class Language {
    * A reference set must be paginated in order to retrieve its values.
    *
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/keys?lang=java">Keys</a>
    * @see #Paginate(Expr)
    */
   public static Expr Keys() {
@@ -397,6 +409,7 @@ public final class Language {
    *
    * @param scope a reference to a database. Type: Reference
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/keys?lang=java">Keys</a>
    * @see #Ref(Expr, String)
    * @see #Database(String)
    * @see #Paginate(Expr)
@@ -410,6 +423,7 @@ public final class Language {
    * A reference set must be paginated in order to retrieve its values.
    *
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/tokens?lang=java">Tokens</a>
    * @see #Paginate(Expr)
    */
   public static Expr Tokens() {
@@ -422,6 +436,7 @@ public final class Language {
    *
    * @param scope a reference to a database. Type: Reference
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/tokens?lang=java">Tokens</a>
    * @see #Ref(Expr, String)
    * @see #Database(String)
    * @see #Paginate(Expr)
@@ -435,6 +450,7 @@ public final class Language {
    * A reference set must be paginated in order to retrieve its values.
    *
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/credentials?lang=java">Credentials</a>
    * @see #Paginate(Expr)
    */
   public static Expr Credentials() {
@@ -447,6 +463,7 @@ public final class Language {
    *
    * @param scope a reference to a database. Type: Reference
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/credentials?lang=java">Credentials</a>
    * @see #Ref(Expr, String)
    * @see #Database(String)
    * @see #Paginate(Expr)
@@ -460,6 +477,7 @@ public final class Language {
    * A reference set must be paginated in order to retrieve its values.
    *
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/roles?lang=java">Roles</a>
    * @see #Paginate(Expr)
    */
   public static Expr Roles() {
@@ -472,6 +490,7 @@ public final class Language {
    *
    * @param scope a reference to a database. Type: Reference
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/roles?lang=java">Roles</a>
    * @see #Ref(Expr, String)
    * @see #Database(String)
    * @see #Paginate(Expr)
@@ -486,6 +505,7 @@ public final class Language {
    *
    * @param collection a reference to the collection. Type: Reference
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/documents?lang=java">Documents</a>
    * @see #Paginate(Expr)
    */
   public static Expr Documents(Expr collection) {
@@ -497,6 +517,7 @@ public final class Language {
    *
    * @param value the object to be encoded
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#object">Fauna Object type</a>
    * @see Encoder
    */
   public static Expr Value(Object value) {
@@ -508,7 +529,7 @@ public final class Language {
    *
    * @param value the string to be encoded
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#string">Fauna String type</a>
    */
   public static Expr Value(String value) {
     return new StringV(value);
@@ -519,7 +540,7 @@ public final class Language {
    *
    * @param value the number to be encoded
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#number">Fauna Number type</a>
    */
   public static Expr Value(long value) {
     return new LongV(value);
@@ -530,7 +551,7 @@ public final class Language {
    *
    * @param value the number to be encoded
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#number">Fauna Number type</a>
    */
   public static Expr Value(double value) {
     return new DoubleV(value);
@@ -541,7 +562,7 @@ public final class Language {
    *
    * @param value the boolean value to be encoded
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#boolean">Fauna Boolean type</a>
    */
   public static Expr Value(boolean value) {
     return BooleanV.valueOf(value);
@@ -552,7 +573,7 @@ public final class Language {
    *
    * @param value the timestamp to be encoded
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#timestamp">Fauna Timestamp type</a>
    * @see Instant
    */
   public static Expr Value(Instant value) {
@@ -564,7 +585,7 @@ public final class Language {
    *
    * @param value the date to be encoded
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#timestamp">Fauna Timestamp type</a>
    * @see LocalDate
    */
   public static Expr Value(LocalDate value) {
@@ -576,7 +597,7 @@ public final class Language {
    *
    * @param bytes the byte array to be encoded
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#byte">Fauna Byte type</a>
    */
   public static Expr Value(byte[] bytes) {
     return new BytesV(bytes);
@@ -586,7 +607,7 @@ public final class Language {
    * Creates a new expression representing a null value.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#null">Fauna Null type</a>
    */
   public static Expr Null() {
     return NullV.NULL;
@@ -606,7 +627,7 @@ public final class Language {
    *
    * @param values the key/value {@link Map} to be wrapped
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#object">Fauna Object type</a>
    */
   public static Expr Obj(Map<String, ? extends Expr> values) {
     return Fn.apply("object", Fn.apply(values));
@@ -616,7 +637,7 @@ public final class Language {
    * Creates an empty object.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#object">Fauna Object type</a>
    */
   public static Expr Obj() {
     return Obj(Collections.emptyMap());
@@ -628,7 +649,7 @@ public final class Language {
    * @param k1 a key
    * @param v1 a value
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#object">Fauna Object type</a>
    */
   public static Expr Obj(String k1, Expr v1) {
     return Obj(Collections.singletonMap(k1, v1));
@@ -642,7 +663,7 @@ public final class Language {
    * @param k2 the second key
    * @param v2 the second value
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#object">Fauna Object type</a>
    */
   public static Expr Obj(String k1, Expr v1, String k2, Expr v2) {
     Map<String, Expr> obj = new LinkedHashMap<>();
@@ -661,7 +682,7 @@ public final class Language {
    * @param k3 the third key
    * @param v3 the third value
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#object">Fauna Object type</a>
    */
   public static Expr Obj(String k1, Expr v1, String k2, Expr v2, String k3, Expr v3) {
     Map<String, Expr> obj = new LinkedHashMap<>();
@@ -683,7 +704,7 @@ public final class Language {
    * @param k4 the fourth key
    * @param v4 the fourth value
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#object">Fauna Object type</a>
    */
   public static Expr Obj(String k1, Expr v1, String k2, Expr v2, String k3, Expr v3, String k4, Expr v4) {
     Map<String, Expr> obj = new LinkedHashMap<>();
@@ -708,7 +729,7 @@ public final class Language {
    * @param k5 the fifth key
    * @param v5 the fifth value
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#object">Fauna Object type</a>
    */
   public static Expr Obj(String k1, Expr v1, String k2, Expr v2, String k3, Expr v3, String k4, Expr v4, String k5, Expr v5) {
     Map<String, Expr> obj = new LinkedHashMap<>();
@@ -726,7 +747,7 @@ public final class Language {
    *
    * @param values the {@link List} instance to be wrapped
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#array">Fauna Array type</a>
    */
   public static Expr Arr(List<? extends Expr> values) {
     return Fn.apply(values);
@@ -737,7 +758,7 @@ public final class Language {
    *
    * @param values the elements of the new array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#simple-type">FaunaDB Values</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/types?lang=java#array">Fauna Array type</a>
    */
   public static Expr Arr(Expr... values) {
     return Arr(Collections.unmodifiableList(Arrays.asList(values)));
@@ -748,7 +769,7 @@ public final class Language {
    *
    * @param msg a message to be used when aborting the transaction
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/abort?lang=java">Abort</a>
    */
   public static Expr Abort(String msg) {
     return Abort(Value(msg));
@@ -759,7 +780,7 @@ public final class Language {
    *
    * @param msg a message to be used when aborting the transaction. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/abort?lang=java">Abort</a>
    */
   public static Expr Abort(Expr msg) {
     return Fn.apply("abort", msg);
@@ -771,7 +792,7 @@ public final class Language {
    * @param ref the reference to the user defined function to be called. Type: Reference
    * @param args the list of arguments for the given user defined function
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/call?lang=java">Call</a>
    */
   public static Expr Call(Expr ref, List<? extends  Expr> args) {
     return Fn.apply("call", ref, "arguments", varargs(args));
@@ -783,7 +804,7 @@ public final class Language {
    * @param ref the reference to the user defined function to be called. Type: Reference
    * @param args the arguments for the given user defined function
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/call?lang=java">Call</a>
    */
   public static Expr Call(Expr ref, Expr... args) {
     return Call(ref, Collections.unmodifiableList(Arrays.asList(args)));
@@ -794,7 +815,7 @@ public final class Language {
    *
    * @param lambda a lambda type
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/query?lang=java">Query</a>
    * @see #CreateFunction(Expr)
    * @see #Lambda(Expr, Expr)
    */
@@ -809,7 +830,7 @@ public final class Language {
    * @param timestamp the read timestamp. Type: Timestamp
    * @param expr the scoped expression
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/at?lang=java">At</a>
    * @see #Time(Expr)
    * @see #Value(Instant)
    */
@@ -824,7 +845,7 @@ public final class Language {
    * @param timestamp the read timestamp.
    * @param expr the scoped expression
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/at?lang=java">At</a>
    */
   public static Expr At(Instant timestamp, Expr expr) {
     return At(new TimeV(timestamp), expr);
@@ -856,7 +877,7 @@ public final class Language {
    *
    * @param bindings a {@link Map} of variable names to values.
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/let?lang=java">Let</a>
    * @see #Var(String)
    * @see LetBinding
    *
@@ -889,7 +910,7 @@ public final class Language {
    * @param v1 the variable name
    * @param d1 the variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/let?lang=java">Let</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -917,7 +938,7 @@ public final class Language {
    * @param v2 the second variable name
    * @param d2 the second variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/let?lang=java">Let</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -952,7 +973,7 @@ public final class Language {
    * @param v3 the third variable name
    * @param d3 the third variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/let?lang=java">Let</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -991,7 +1012,7 @@ public final class Language {
    * @param v4 the fourth variable name
    * @param d4 the fourth variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/let?lang=java">Let</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -1034,7 +1055,7 @@ public final class Language {
    * @param v5 the fifth variable name
    * @param d5 the fitfh variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/let?lang=java">Let</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -1081,7 +1102,7 @@ public final class Language {
    * @param v6 the sixth variable name
    * @param d6 the sixth variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/let?lang=java">Let</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -1132,7 +1153,7 @@ public final class Language {
    * @param v7 the seventh variable name
    * @param d7 the seventh variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/let?lang=java">Let</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -1187,7 +1208,7 @@ public final class Language {
    * @param v8 the eighth variable name
    * @param d8 the eighth variable value
    * @return a new {@link LetBinding} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/let?lang=java">Let</a>
    * @see #Var(String)
    * @see LetBinding
    */
@@ -1209,7 +1230,7 @@ public final class Language {
    *
    * @param name the referred variable name
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/var?lang=java">Var</a>
    * @see #Let(Map)
    * @see #Lambda(Expr, Expr)
    */
@@ -1224,7 +1245,7 @@ public final class Language {
    * @param thenExpr the then branch for the if expression
    * @param elseExpr the else branch for the if expression
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/if?lang=java">If</a>
    */
   public static Expr If(Expr condition, Expr thenExpr, Expr elseExpr) {
     return Fn.apply("if", condition, "then", thenExpr, "else", elseExpr);
@@ -1236,7 +1257,7 @@ public final class Language {
    *
    * @param exprs a list of expressions to be evaluated sequentially
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/do?lang=java">Do</a>
    */
   public static Expr Do(List<? extends Expr> exprs) {
     return Fn.apply("do", Fn.apply(exprs));
@@ -1248,7 +1269,7 @@ public final class Language {
    *
    * @param exprs a list of expressions to be evaluated sequentially
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/do?lang=java">Do</a>
    */
   public static Expr Do(Expr... exprs) {
     return Do(Collections.unmodifiableList(Arrays.asList(exprs)));
@@ -1296,7 +1317,7 @@ public final class Language {
    * @param var the lambda's parameter binding. Type: String or an Array of strings
    * @param expr the lambda's function body. Type: An expression.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/lambda?lang=java">Lambda</a>
    * @see #Map(Expr, Expr)
    * @see #Foreach(Expr, Expr)
    * @see #Filter(Expr, Expr)
@@ -1314,7 +1335,7 @@ public final class Language {
    * @param var the lambda's parameter binding.
    * @param expr the lambda's function body. Type: An expression.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#basic-forms">FaunaDB Basic Forms</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/lambda?lang=java">Lambda</a>
    * @see #Lambda(Expr, Expr)
    */
   public static Expr Lambda(String var, Expr expr) {
@@ -1332,7 +1353,7 @@ public final class Language {
    * @param collection the source collection. Type: Collection.
    * @param lambda the lambda function to be applied for each element in the given collection. Type: A lambda function.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#collections">FaunaDB Collection Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/map?lang=java">Map</a>
    * @see #Lambda(Expr, Expr)
    */
   public static Expr Map(Expr collection, Expr lambda) {
@@ -1352,7 +1373,7 @@ public final class Language {
    * @param collection the source collection. Type: Collection.
    * @param lambda the lambda function to be applied for each element in the given collection.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#collections">FaunaDB Collection Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/map?lang=java">Map</a>
    */
   public static Expr Map(Expr collection, UnaryOperator<Expr> lambda) {
     String sym = genSym("map");
@@ -1369,7 +1390,7 @@ public final class Language {
    * @param collection the source collection. Type: Collection.
    * @param lambda the lambda function to be applied for each element in the given collection. Type: A lambda function.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#collections">FaunaDB Collection Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/foreach?lang=java">Foreach</a>
    * @see #Lambda(Expr, Expr)
    */
   public static Expr Foreach(Expr collection, Expr lambda) {
@@ -1388,7 +1409,7 @@ public final class Language {
    * @param collection the source collection. Type: Collection.
    * @param lambda the lambda function to be applied for each element in the given collection.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#collections">FaunaDB Collection Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/foreach?lang=java">Foreach</a>
    */
   public static Expr Foreach(Expr collection, UnaryOperator<Expr> lambda) {
     String sym = genSym("foreach");
@@ -1402,7 +1423,7 @@ public final class Language {
    * @param collection the source collection. Type: Collection
    * @param lambda the filter lambda. Type: A lambda expression that returns a boolean value
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#collections">FaunaDB Collection Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/filter?lang=java">Filter</a>
    * @see #Lambda(Expr, Expr)
    */
   public static Expr Filter(Expr collection, Expr lambda) {
@@ -1417,7 +1438,7 @@ public final class Language {
    * @param collection the source collection. Type: Collection
    * @param lambda the filter lambda. Type: A lambda expression that returns a boolean value
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#collections">FaunaDB Collection Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/filter?lang=java">Filter</a>
    */
   public static Expr Filter(Expr collection, UnaryOperator<Expr> lambda) {
     String sym = genSym("filter");
@@ -1430,7 +1451,7 @@ public final class Language {
    * @param num the number of elements to be taken from the source collection. Type: Number
    * @param collection the source collection. Type: Collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#collections">FaunaDB Collection Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/take?lang=java">Take</a>
    */
   public static Expr Take(Expr num, Expr collection) {
     return Fn.apply("take", num, "collection", collection);
@@ -1442,7 +1463,7 @@ public final class Language {
    * @param num the number of elements to be taken from the source collection.
    * @param collection the source collection. Type: Collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#collections">FaunaDB Collection Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/take?lang=java">Take</a>
    */
   public static Expr Take(long num, Expr collection) {
     return Take(new LongV(num), collection);
@@ -1454,7 +1475,7 @@ public final class Language {
    * @param num the number of elements to be dropped from the source collection. Type: Number
    * @param collection the source collection. Type: Collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#collections">FaunaDB Collection Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/drop?lang=java">Drop</a>
    */
   public static Expr Drop(Expr num, Expr collection) {
     return Fn.apply("drop", num, "collection", collection);
@@ -1466,7 +1487,7 @@ public final class Language {
    * @param num the number of elements to be dropped from the source collection.
    * @param collection the source collection. Type: Collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#collections">FaunaDB Collection Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/drop?lang=java">Drop</a>
    */
   public static Expr Drop(long num, Expr collection) {
     return Drop(new LongV(num), collection);
@@ -1478,7 +1499,7 @@ public final class Language {
    * @param elements the elements to be prepended to the source collection. Type: Array
    * @param collection the source collection. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#collections">FaunaDB Collection Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/prepend?lang=java">Prepend</a>
    */
   public static Expr Prepend(Expr elements, Expr collection) {
     return Fn.apply("prepend", elements, "collection", collection);
@@ -1490,7 +1511,7 @@ public final class Language {
    * @param elements the elements to be appended to the source collection. Type: Array
    * @param collection the source collection. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#collections">FaunaDB Collection Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/append?lang=java">Append</a>
    */
   public static Expr Append(Expr elements, Expr collection) {
     return Fn.apply("append", elements, "collection", collection);
@@ -1501,7 +1522,7 @@ public final class Language {
    *
    * @param collection the source collection to check for emptiness. Type: Collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#collections">FaunaDB Collection Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isempty?lang=java">IsEmpty</a>
    */
   public static Expr IsEmpty(Expr collection) {
     return Fn.apply("is_empty", collection);
@@ -1512,7 +1533,7 @@ public final class Language {
    *
    * @param collection the source collection to check for non-emptiness. Type: Collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#collections">FaunaDB Collection Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isnonempty?lang=java">IsNonEmpty</a>
    */
   public static Expr IsNonEmpty(Expr collection) {
     return Fn.apply("is_nonempty", collection);
@@ -1523,7 +1544,7 @@ public final class Language {
    *
    * @param ref the reference to be retrieved. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/get?lang=java">Get</a>
    * @see #Ref(Expr, String)
    */
   public static Expr Get(Expr ref) {
@@ -1536,7 +1557,7 @@ public final class Language {
    * @param ref the reference to be retrieved. Type: Reference
    * @param timestamp the timestamp from which the reference's data will be retrieved. Type: Timestamp
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/get?lang=java">Get</a>
    * @see #Ref(Expr, String)
    * @see #Time(Expr)
    * @see #Value(Instant)
@@ -1552,7 +1573,7 @@ public final class Language {
    * @param ref the reference to be retrieved. Type: Reference
    * @param timestamp the timestamp from which the reference's data will be retrieved.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/get?lang=java">Get</a>
    * @see #Ref(Expr, String)
    * @see #Time(Expr)
    * @see #Value(Instant)
@@ -1567,7 +1588,7 @@ public final class Language {
    *
    * @param secret the key's secret string. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/keyfromsecret?lang=java">KeyFromSecret</a>
    */
   public static Expr KeyFromSecret(Expr secret) {
     return Fn.apply("key_from_secret", secret);
@@ -1578,7 +1599,7 @@ public final class Language {
    *
    * @param secret the key's secret string.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/keyfromsecret?lang=java">KeyFromSecret</a>
    */
   public static Expr KeyFromSecret(String secret) {
     return KeyFromSecret(new StringV(secret));
@@ -1590,7 +1611,7 @@ public final class Language {
    * @param lambda the accumulator lambda
    * @param initial the initial value for the accumulator.
    * @param collection the collection to be reduced.
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/reduce">Reduce Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/reduce?lang=java">Reduce</a>
    * @return a new {@link Expr} instance
    */
   public static Expr Reduce(Expr lambda, Expr initial, Expr collection) {
@@ -1601,7 +1622,7 @@ public final class Language {
    * Reverse the order of the given source.
    *
    * @param source the source set. Type: Array, Set, or Page.
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/reverse">Reverse Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/reverse?lang=java">Reverse</a>
    * @return a new {@link Expr} instance
    */
   public static Expr Reverse(Expr source) {
@@ -1653,7 +1674,7 @@ public final class Language {
    * @param resource the resource to paginate
    * @return a {@link Pagination} builder
    * @see Pagination
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/paginate?lang=java">Paginate</a>
    * @see #Match(Expr)
    * @see #Map(Expr, Expr)
    * @see #Foreach(Expr, Expr)
@@ -1668,7 +1689,7 @@ public final class Language {
    *
    * @param ref the reference to check for existence. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/exists?lang=java">Exists</a>
    * @see #Ref(Expr, String)
    */
   public static Expr Exists(Expr ref) {
@@ -1681,7 +1702,7 @@ public final class Language {
    * @param ref the reference to check for existence. Type: Reference
    * @param timestamp a timestamp to check for ref's existence. Type: Timestamp
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/exists?lang=java">Exists</a>
    * @see #Ref(Expr, String)
    */
   public static Expr Exists(Expr ref, Expr timestamp) {
@@ -1694,7 +1715,7 @@ public final class Language {
    * @param ref the collection reference for which a new document will be created. Type: Reference
    * @param params the parameters used to create the new document. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/create?lang=java">Create</a>
    * @see #Collection(Expr)
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
@@ -1710,7 +1731,7 @@ public final class Language {
    * @param ref the resource reference to update. Type: Reference
    * @param params the parameters used to update the new document. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/update?lang=java">Update</a>
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
    */
@@ -1724,7 +1745,7 @@ public final class Language {
    * @param ref the resource reference to be replaced. Type: Reference
    * @param params the parameters used to replace the resource's old values. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replace?lang=java">Replace</a>
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
    */
@@ -1737,7 +1758,7 @@ public final class Language {
    *
    * @param ref the resource reference to be deleted. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/delete?lang=java">Delete</a>
    * @see #Ref(Expr, String)
    */
   public static Expr Delete(Expr ref) {
@@ -1753,7 +1774,7 @@ public final class Language {
    * @param action the event action. Type: action
    * @param params the event's parameters. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/insert?lang=java">Insert</a>
    * @see Action
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
@@ -1773,7 +1794,7 @@ public final class Language {
    * @param action the event action
    * @param params the event's parameters. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/insert?lang=java">Insert</a>
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
    * @see #Time(Expr)
@@ -1790,7 +1811,7 @@ public final class Language {
    * @param timestamp the timestamp in which the event happened. Type: Timestamp
    * @param action the event's action. Type: event action
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/remove?lang=java">Remove</a>
    * @see Action
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
@@ -1808,7 +1829,7 @@ public final class Language {
    * @param timestamp the timestamp in which the event happened. Type: Timestamp
    * @param action the event's action
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/remove?lang=java">Remove</a>
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
    * @see #Time(Expr)
@@ -1823,7 +1844,7 @@ public final class Language {
    *
    * @param params the class's configuration parameters. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/createclass?lang=java">CreateClass</a>
    * @see #Obj(Map)
    * 
    * @deprecated use CreateCollection instead.
@@ -1838,7 +1859,7 @@ public final class Language {
    *
    * @param params the collection's configuration parameters. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/createcollection?lang=java">CreateCollection</a>
    * @see #Obj(Map)
    */
   public static Expr CreateCollection(Expr params) {
@@ -1859,7 +1880,7 @@ public final class Language {
    *
    * @param params the database's configuration parameters. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/createdatabase?lang=java">CreateDatabase</a>
    * @see #Obj(Map)
    */
   public static Expr CreateDatabase(Expr params) {
@@ -1871,7 +1892,7 @@ public final class Language {
    *
    * @param params the key's configuration parameters: Type Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/createkey?lang=java">CreateKey</a>
    * @see #Obj(Map)
    */
   public static Expr CreateKey(Expr params) {
@@ -1883,7 +1904,7 @@ public final class Language {
    *
    * @param params the index's configuration parameter. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/createindex?lang=java">CreateIndex</a>
    * @see #Obj(Map)
    */
   public static Expr CreateIndex(Expr params) {
@@ -1895,7 +1916,7 @@ public final class Language {
    *
    * @param params the function's configuration parameters. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/createfunction?lang=java">CreateFunction</a>
    * @see #Obj(Map)
    */
   public static Expr CreateFunction(Expr params) {
@@ -1907,7 +1928,7 @@ public final class Language {
    *
    * @param params the role's configuration parameters. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/createrole?lang=java">CreateRole</a>
    * @see #Obj(Map)
    */
   public static Expr CreateRole(Expr params) {
@@ -1920,7 +1941,7 @@ public final class Language {
    * @param from database reference to be moved.
    * @param to new parent database reference.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/movedatabase?lang=java">MoveDatabase</a>
    */
   public static Expr MoveDatabase(Expr from, Expr to) {
     return Fn.apply("move_database", from, "to", to);
@@ -1931,7 +1952,7 @@ public final class Language {
    *
    * @param ref the document's reference to retrieve the singleton history. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#sets">FaunaDB Set Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/singleton?lang=java">Singleton</a>
    * @see #Ref(Expr, String)
    */
   public static Expr Singleton(Expr ref) {
@@ -1943,7 +1964,7 @@ public final class Language {
    *
    * @param refSet the resource to retrieve events for. Type: Reference or set reference.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#sets">FaunaDB Set Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/events?lang=java">Events</a>
    * @see #Ref(Expr, String)
    */
   public static Expr Events(Expr refSet) {
@@ -1957,7 +1978,7 @@ public final class Language {
    *
    * @param index an index reference. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#sets">FaunaDB Set Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/match?lang=java">Match</a>
    * @see #Index(String)
    * @see #Paginate(Expr)
    */
@@ -1972,7 +1993,7 @@ public final class Language {
    * @param index an index reference. Type: Reference
    * @param term a value to search in the index provided. Type: any value
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#sets">FaunaDB Set Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/match?lang=java">Match</a>
    * @see #Index(String)
    * @see #Paginate(Expr)
    */
@@ -1985,7 +2006,7 @@ public final class Language {
    *
    * @param sets the sets to execute the union operation
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#sets">FaunaDB Set Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/union?lang=java">Union</a>
    * @see #Match(Expr)
    */
   public static Expr Union(List<? extends Expr> sets) {
@@ -1997,7 +2018,7 @@ public final class Language {
    *
    * @param sets the sets to execute the union operation. Type: Array of sets
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#sets">FaunaDB Set Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/union?lang=java">Union</a>
    * @see #Match(Expr)
    */
   public static Expr Union(Expr... sets) {
@@ -2009,7 +2030,7 @@ public final class Language {
    *
    * @param sets the sets to execute the intersection
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#sets">FaunaDB Set Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/intersection?lang=java">Intersection</a>
    * @see #Match(Expr)
    */
   public static Expr Intersection(List<? extends Expr> sets) {
@@ -2021,7 +2042,7 @@ public final class Language {
    *
    * @param sets the sets to execute the intersection. Type: Array of sets
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#sets">FaunaDB Set Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/intersection?lang=java">Intersection</a>
    * @see #Match(Expr)
    */
   public static Expr Intersection(Expr... sets) {
@@ -2033,7 +2054,7 @@ public final class Language {
    *
    * @param sets the sets to take the difference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#sets">FaunaDB Set Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/difference?lang=java">Difference</a>
    * @see #Match(Expr)
    */
   public static Expr Difference(List<? extends Expr> sets) {
@@ -2045,7 +2066,7 @@ public final class Language {
    *
    * @param sets the sets to take the difference. Type: Array of sets
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#sets">FaunaDB Set Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/difference?lang=java">Difference</a>
    * @see #Match(Expr)
    */
   public static Expr Difference(Expr... sets) {
@@ -2057,7 +2078,7 @@ public final class Language {
    *
    * @param set the set to remove duplicates. Type: Set
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#sets">FaunaDB Set Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/distinct?lang=java">Distinct</a>
    * @see #Match(Expr)
    */
   public static Expr Distinct(Expr set) {
@@ -2073,7 +2094,7 @@ public final class Language {
    * @param source the source set. Type: Array or Set.
    * @param target the join target. Type: Index reference or Lambda function
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#sets">FaunaDB Set Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/join?lang=java">Join</a>
    * @see #Index(String)
    * @see #Lambda(Expr, Expr)
    */
@@ -2089,7 +2110,7 @@ public final class Language {
    * @param source the source set. Type: Array or Set.
    * @param lambda the join target.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#sets">FaunaDB Set Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/join?lang=java">Join</a>
    */
   public static Expr Join(Expr source, UnaryOperator<Expr> lambda) {
     String sym = genSym("join");
@@ -2103,7 +2124,7 @@ public final class Language {
    * @param from lower bound
    * @param to upper bound
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/range">Range Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/range?lang=java">Range</a>
    */
   public static Expr Range(Expr set, Expr from, Expr to) {
     return Fn.apply("range", set, "from", from, "to", to);
@@ -2115,7 +2136,7 @@ public final class Language {
    * @param ref the token's owner reference. Type: Reference
    * @param params the token's configuration object. Type: Object
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#authentication">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/login?lang=java">Login</a>
    * @see #Ref(Expr, String)
    * @see #Obj(Map)
    */
@@ -2131,7 +2152,7 @@ public final class Language {
    * @param invalidateAll if the Logout function should delete all tokens
    *                      associated with the current session. Type: Boolean
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#authentication">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/logout?lang=java">Logout</a>
    * @see #Login(Expr, Expr)
    */
   public static Expr Logout(Expr invalidateAll) {
@@ -2146,7 +2167,7 @@ public final class Language {
    * @param invalidateAll if the Logout function should delete all tokens
    *                      associated with the current session.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#authentication">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/logout?lang=java">Logout</a>
    * @see #Login(Expr, Expr)
    */
   public static Expr Logout(boolean invalidateAll) {
@@ -2159,7 +2180,7 @@ public final class Language {
    * @param ref the reference to authenticate. Type: Reference
    * @param password the authentication password. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#authentication">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/identify?lang=java">Identify</a>
    */
   public static Expr Identify(Expr ref, Expr password) {
     return Fn.apply("identify", ref, "password", password);
@@ -2171,7 +2192,7 @@ public final class Language {
    * @param ref the reference to authenticate. Type: Reference
    * @param password the authentication password.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#authentication">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/identify?lang=java">Identify</a>
    */
   public static Expr Identify(Expr ref, String password) {
     return Identify(ref, new StringV(password));
@@ -2183,7 +2204,7 @@ public final class Language {
    * @deprecated Use CurrentIdentity() instead.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/identity">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/identity?lang=java">Identity</a>
    * @see #Login(Expr, Expr)
    */
   @Deprecated
@@ -2195,7 +2216,7 @@ public final class Language {
    * Returns the reference associated with the authentication token used for the current request.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/currentidentity">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/currentidentity?lang=java">CurrentIdentity</a>
    * @see #Login(Expr, Expr)
    */
   public static Expr CurrentIdentity() {
@@ -2208,7 +2229,7 @@ public final class Language {
    * @deprecated Use HasCurrentIdentity() instead.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hasidentity">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hasidentity?lang=java">HasIdentity</a>
    * @see #Identity()
    * @see #Identify(Expr, Expr)
    * @see #Login(Expr, Expr)
@@ -2226,7 +2247,7 @@ public final class Language {
    * @return a new {@link Expr} instance
    * @see #Database(String)
    * @see #Paginate(Expr)
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessproviders">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessproviders?lang=java">AccessProviders</a>
    */
   public static Expr AccessProviders(Expr scope) {
     return Fn.apply("access_providers", scope);
@@ -2238,7 +2259,7 @@ public final class Language {
    *
    * @return a new {@link Expr} instance
    * @see #Paginate(Expr)
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessproviders">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessproviders?lang=java">AccessProviders</a>
    */
   public static Expr AccessProviders() {
     return AccessProviders(Null());
@@ -2249,7 +2270,7 @@ public final class Language {
    *
    * @param name the access provider name. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider?lang=java">AccessProvider</a>
    */
   public static Expr AccessProvider(Expr name) {
     return Fn.apply("access_provider", name);
@@ -2260,7 +2281,7 @@ public final class Language {
    *
    * @param name the access provider name
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider?lang=java">AccessProvider</a>
    */
   public static Expr AccessProvider(String name) {
     return AccessProvider(Value(name));
@@ -2272,7 +2293,7 @@ public final class Language {
    * @param name the access provider name. Type: String
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider?lang=java">AccessProvider</a>
    * @see #Database(String)
    */
   public static Expr AccessProvider(Expr name, Expr database) {
@@ -2285,7 +2306,7 @@ public final class Language {
    * @param name the access provider name
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/accessprovider?lang=java">AccessProvider</a>
    * @see #Database(String)
    */
   public static Expr AccessProvider(String name, Expr database) {
@@ -2302,7 +2323,7 @@ public final class Language {
    *  - roles: An array of role/predicate pairs where the predicate returns a boolean.
    *                The array can also contain Role references.
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/createaccessprovider">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/createaccessprovider?lang=java">CreateAccessProvider</a>
    */
   public static Expr CreateAccessProvider(Expr params) {
     return Fn.apply("create_access_provider", params);
@@ -2312,7 +2333,7 @@ public final class Language {
    * Returns current token used for the request.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/currenttoken">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/currenttoken?lang=java">CurrentToken</a>
    * @see #CurrentIdentity()
    * @see #Identify(Expr, Expr)
    * @see #Login(Expr, Expr)
@@ -2325,7 +2346,7 @@ public final class Language {
    * Returns true if the authentication used for the request has a token.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hascurrenttoken">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hascurrenttoken?lang=java">HasCurrentToken</a>
    * @see #Identity()
    * @see #Identify(Expr, Expr)
    * @see #Login(Expr, Expr)
@@ -2338,7 +2359,7 @@ public final class Language {
    * Returns true if the authentication used for the request has an identity.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hascurrentidentity">FaunaDB Authentication Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hascurrentidentity?lang=java">HasCurrentIdentity</a>
    * @see #Identity()
    * @see #Identify(Expr, Expr)
    * @see #Login(Expr, Expr)
@@ -2352,7 +2373,7 @@ public final class Language {
    *
    * @param terms a list of strings. Type: Array of strings
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/concat?lang=java">Concat</a>
    * @see #Arr(List)
    * @see #Value(String)
    */
@@ -2366,7 +2387,7 @@ public final class Language {
    * @param terms a list of strings. Type: Array of strings
    * @param separator a string to separate each element in the result. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/concat?lang=java">Concat</a>
    * @see #Arr(List)
    * @see #Value(String)
    */
@@ -2381,7 +2402,7 @@ public final class Language {
    *
    * @param str the string to be normalized. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/casefold?lang=java">Casefold</a>
    * @see <a href="https://www.w3.org/TR/charmod-norm/">W3C Character Model for the World Wide Web: String Matching</a>
    * @see #Casefold(Expr, Normalizer)
    */
@@ -2396,7 +2417,7 @@ public final class Language {
    *
    * @param str the string to be normalized.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/casefold?lang=java">Casefold</a>
    * @see <a href="https://www.w3.org/TR/charmod-norm/">W3C Character Model for the World Wide Web: String Matching</a>
    * @see #Casefold(Expr, Normalizer)
    */
@@ -2411,7 +2432,7 @@ public final class Language {
    * @param str the string to be normalized. Type: String
    * @param normalizer the string normalizer to use. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/casefold?lang=java">Casefold</a>
    * @see <a href="https://www.w3.org/TR/charmod-norm/">W3C Character Model for the World Wide Web: String Matching</a>
    * @see #Casefold(Expr, Normalizer)
    */
@@ -2426,7 +2447,7 @@ public final class Language {
    * @param str the string to be normalized.
    * @param normalizer the string normalizer to use. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/casefold?lang=java">Casefold</a>
    * @see <a href="https://www.w3.org/TR/charmod-norm/">W3C Character Model for the World Wide Web: String Matching</a>
    * @see #Casefold(Expr, Normalizer)
    */
@@ -2440,7 +2461,7 @@ public final class Language {
    * @param str the string to be normalized. Type: String
    * @param normalizer the string normalizer to use
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/casefold?lang=java">Casefold</a>
    * @see <a href="https://www.w3.org/TR/charmod-norm/">W3C Character Model for the World Wide Web: String Matching</a>
    */
   public static Expr Casefold(Expr str, Normalizer normalizer) {
@@ -2453,7 +2474,7 @@ public final class Language {
    * @param str the string to be normalized.
    * @param normalizer the string normalizer to use
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/casefold?lang=java">Casefold</a>
    * @see <a href="https://www.w3.org/TR/charmod-norm/">W3C Character Model for the World Wide Web: String Matching</a>
    * @see #Casefold(Expr, Normalizer)
    */
@@ -2467,7 +2488,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param search  the substring to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstr">FaunaDB ContainsStr Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstr?lang=java">ContainsStr</a>
    * @see #Value(String)
    */
   public static Expr ContainsStr(Expr value, Expr search) {
@@ -2480,7 +2501,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param search  the substring to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstr">FaunaDB ContainsStr Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstr?lang=java">ContainsStr</a>
    * @see #Value(String)
    */
   public static Expr ContainsStr(String value, Expr search) {
@@ -2493,7 +2514,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param search  the substring to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstr">FaunaDB ContainsStr Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstr?lang=java">ContainsStr</a>
    * @see #Value(String)
    */
   public static Expr ContainsStr(Expr value, String search) {
@@ -2506,7 +2527,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param search  the substring to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstr">FaunaDB ContainsStr Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstr?lang=java">ContainsStr</a>
    * @see #Value(String)
    */
   public static Expr ContainsStr(String value, String search) {
@@ -2519,7 +2540,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param pattern the pattern to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstrregex">FaunaDB ContainsStrRegex Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstrregex?lang=java">ContainsStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ContainsStrRegex(Expr value, Expr pattern) {
@@ -2532,7 +2553,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param pattern the pattern to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstrregex">FaunaDB ContainsStrRegex Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstrregex?lang=java">ContainsStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ContainsStrRegex(String value, Expr pattern) {
@@ -2545,7 +2566,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param pattern the pattern to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstrregex">FaunaDB ContainsStrRegex Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstrregex?lang=java">ContainsStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ContainsStrRegex(Expr value, String pattern) {
@@ -2558,7 +2579,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param pattern the pattern to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstrregex">FaunaDB ContainsStrRegex Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsstrregex?lang=java">ContainsStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ContainsStrRegex(String value, String pattern) {
@@ -2571,7 +2592,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param search  the suffix to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/endswith">FaunaDB EndsWith Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/endswith?lang=java">EndsWith</a>
    * @see #Value(String)
    */
   public static Expr EndsWith(Expr value, Expr search) {
@@ -2584,7 +2605,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param search  the suffix to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/endswith">FaunaDB EndsWith Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/endswith?lang=java">EndsWith</a>
    * @see #Value(String)
    */
   public static Expr EndsWith(String value, Expr search) {
@@ -2597,7 +2618,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param search  the suffix to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/endswith">FaunaDB EndsWith Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/endswith?lang=java">EndsWith</a>
    * @see #Value(String)
    */
   public static Expr EndsWith(Expr value, String search) {
@@ -2610,7 +2631,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param search  the suffix to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/endswith">FaunaDB EndsWith Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/endswith?lang=java">EndsWith</a>
    * @see #Value(String)
    */
   public static Expr EndsWith(String value, String search) {
@@ -2623,7 +2644,7 @@ public final class Language {
    * @param value a strings
    * @param find  a substring to locate
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstr?lang=java">FindStr</a>
    * @see #Value(String)
    */
   public static Expr FindStr(Expr value, Expr find) {
@@ -2636,7 +2657,7 @@ public final class Language {
    * @param value a strings
    * @param find  a substring to locate
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstr?lang=java">FindStr</a>
    * @see #Value(String)
    */
   public static Expr FindStr(String value, Expr find) {
@@ -2649,7 +2670,7 @@ public final class Language {
    * @param value a strings
    * @param find  a substring to locate
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstr?lang=java">FindStr</a>
    * @see #Value(String)
    */
   public static Expr FindStr(Expr value, String find) {
@@ -2662,7 +2683,7 @@ public final class Language {
    * @param value a strings
    * @param find  a substring to locate
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstr?lang=java">FindStr</a>
    * @see #Value(String)
    */
   public static Expr FindStr(String value, String find) {
@@ -2676,7 +2697,7 @@ public final class Language {
    * @param find  a substring to locate
    * @param start a position to start the search
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstr?lang=java">FindStr</a>
    * @see #Value(String)
    */
   public static Expr FindStr(Expr value, Expr find, Expr start) {
@@ -2690,7 +2711,7 @@ public final class Language {
    * @param find  a substring to locate
    * @param start a position to start the search
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstr?lang=java">FindStr</a>
    * @see #Value(String)
    */
   public static Expr FindStr(Expr value, Expr find, long start) {
@@ -2704,7 +2725,7 @@ public final class Language {
    * @param find  a substring to locate
    * @param start a position to start the search
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstr?lang=java">FindStr</a>
    * @see #Value(String)
    */
   public static Expr FindStr(Expr value, String find, Expr start) {
@@ -2717,7 +2738,7 @@ public final class Language {
    * @param find  a substring to locate
    * @param start a position to start the search
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstr?lang=java">FindStr</a>
    * @see #Value(String)
    */
   public static Expr FindStr(String value, Expr find, long start) {
@@ -2731,7 +2752,7 @@ public final class Language {
    * @param find  a substring to locate
    * @param start a position to start the search
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstr?lang=java">FindStr</a>
    * @see #Value(String)
    */
   public static Expr FindStr(String value, String find, Expr start) {
@@ -2744,7 +2765,7 @@ public final class Language {
    * @param find  a substring to locate
    * @param start a position to start the search
    * @return      the offset of where the substring starts or -1 if not found
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstr?lang=java">FindStr</a>
    * @see #Value(String)
    */
   public static Expr FindStr(String value, String find, long start) {
@@ -2758,7 +2779,7 @@ public final class Language {
    * @param value   a string to search
    * @param pattern a substring to locate
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, Expr pattern) {
@@ -2771,7 +2792,7 @@ public final class Language {
    * @param value   a string to search
    * @param pattern a substring to locate
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, String pattern) {
@@ -2784,7 +2805,7 @@ public final class Language {
    * @param value   a string to search
    * @param pattern a substring to locate
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, Expr pattern) {
@@ -2796,7 +2817,7 @@ public final class Language {
    * @param value   a string to search
    * @param pattern a substring to locate
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, String pattern) {
@@ -2810,7 +2831,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, Expr pattern, Expr start) {
@@ -2824,7 +2845,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, Expr pattern, Expr start) {
@@ -2838,7 +2859,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, String pattern, Expr start) {
@@ -2852,7 +2873,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, String pattern, Expr start) {
@@ -2866,7 +2887,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, Expr pattern, long start) {
@@ -2880,7 +2901,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, Expr pattern, long start) {
@@ -2894,7 +2915,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, String pattern, long start) {
@@ -2908,7 +2929,7 @@ public final class Language {
    * @param pattern a substring to locate
    * @param start the offset into the string
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, String pattern, long start) {
@@ -2923,7 +2944,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, Expr pattern, Expr start, Expr numResults) {
@@ -2938,7 +2959,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, Expr pattern, Expr start, Expr numResults) {
@@ -2953,7 +2974,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, String pattern, Expr start, Expr numResults) {
@@ -2968,7 +2989,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, String pattern, Expr start, Expr numResults) {
@@ -2983,7 +3004,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, Expr pattern, long start, Expr numResults) {
@@ -2998,7 +3019,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, Expr pattern, long start, Expr numResults) {
@@ -3013,7 +3034,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, String pattern, long start, Expr numResults) {
@@ -3028,7 +3049,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, String pattern, long start, Expr numResults) {
@@ -3043,7 +3064,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, Expr pattern, Expr start, long numResults) {
@@ -3058,7 +3079,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, Expr pattern, Expr start, long numResults) {
@@ -3073,7 +3094,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, String pattern, Expr start, long numResults) {
@@ -3088,7 +3109,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, String pattern, Expr start, long numResults) {
@@ -3103,7 +3124,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, Expr pattern, long start, long numResults) {
@@ -3118,7 +3139,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, Expr pattern, long start, long numResults) {
@@ -3133,7 +3154,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(Expr value, String pattern, long start, long numResults) {
@@ -3148,7 +3169,7 @@ public final class Language {
    * @param start the offset into the string
    * @param numResults the maximum number of results
    * @return        an array of objects contain the locations of the match [{ "start":s, "end":e, "data"d}]
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/findstrregex?lang=java">FindStrRegex</a>
    * @see #Value(String)
    */
   public static Expr FindStrRegex(String value, String pattern, long start, long numResults) {
@@ -3161,7 +3182,7 @@ public final class Language {
    *
    * @param value   a string to determine the length of
    * @return        the length of the string as a long
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/length?lang=java">Length</a>
    * @see #Value(String)
    */
   public static Expr Length(Expr value) {
@@ -3173,7 +3194,7 @@ public final class Language {
    *
    * @param value   a string to determine the length of
    * @return        the length of the string as a long
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/length?lang=java">Length</a>
    * @see #Value(String)
    */
   public static Expr Length(String value) {
@@ -3185,7 +3206,7 @@ public final class Language {
    *
    * @param value a string to lowercase
    * @return      a string with all lowercase letters
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/lowercase?lang=java">LowerCase</a>
    * @see #Value(String)
    */
   public static Expr LowerCase(Expr value) {
@@ -3197,7 +3218,7 @@ public final class Language {
    *
    * @param value a string to lowercase
    * @return      a string with all lowercase letters
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/lowercase?lang=java">LowerCase</a>
    * @see #Value(String)
    */
   public static Expr LowerCase(String value) {
@@ -3209,7 +3230,7 @@ public final class Language {
    *
    * @param value a string to trim leading white space.
    * @return      the string with leading white space removed
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/ltrim?lang=java">LTrim</a>
    * @see #Value(String)
    */
   public static Expr LTrim(Expr value) {
@@ -3221,7 +3242,7 @@ public final class Language {
    *
    * @param value a string to trim leading white space.
    * @return      the string with leading white space removed
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/ltrim?lang=java">LTrim</a>
    * @see #Value(String)
    */
   public static Expr LTrim(String value) {
@@ -3235,7 +3256,6 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    * @see #Value(long)
    */
@@ -3250,7 +3270,6 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(long)
    */
   public static Expr NGram(String terms, Expr min, Expr max) {
@@ -3264,7 +3283,6 @@ public final class Language {
    * @param min the minimum size for the n-grams.
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    * @see #Value(long)
    */
@@ -3279,7 +3297,6 @@ public final class Language {
    * @param min the minimum size for the n-grams.
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(long)
    */
   public static Expr NGram(String terms, long min, Expr max) {
@@ -3293,7 +3310,6 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    * @see #Value(long)
    */
@@ -3308,7 +3324,6 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    * @see #Value(long)
    */
@@ -3323,7 +3338,6 @@ public final class Language {
    * @param min the minimum size for the n-grams.
    * @param max the maximum size for the n-grams.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Value(String)
    */
   public static Expr NGram(Expr terms, long min, long max) {
@@ -3337,7 +3351,6 @@ public final class Language {
    * @param min the minimum size for the n-grams.
    * @param max the maximum size for the n-grams.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    */
   public static Expr NGram(String terms, long min, long max) {
     return NGram(terms, new LongV(min), new LongV(max));
@@ -3350,7 +3363,6 @@ public final class Language {
    * @param min the minimum size for the n-grams. Type: Number
    * @param max the maximum size for the n-grams. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    * @see #Value(String)
    * @see #Value(long)
@@ -3365,7 +3377,6 @@ public final class Language {
    *
    * @param terms the list of values to tokenize. Type: Array of strings
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    * @see #Value(String)
    */
@@ -3378,7 +3389,6 @@ public final class Language {
    *
    * @param term the term to tokenize. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    * @see #Value(String)
    */
@@ -3391,7 +3401,6 @@ public final class Language {
    *
    * @param term the value to tokenize.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
    * @see #Arr(List)
    */
   public static Expr NGram(String term) {
@@ -3403,7 +3412,7 @@ public final class Language {
    *
    * @param value the string to analyze
    * @return      a regex which matches the input string verbatim
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/regexescape">FaunaDB RegexEscape Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/regexescape?lang=java">RegexEscape</a>
    * @see #Value(String)
    */
   public static Expr RegexEscape(Expr value) {
@@ -3415,7 +3424,7 @@ public final class Language {
    *
    * @param value the string to analyze
    * @return      a regex which matches the input string verbatim
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/regexescape">FaunaDB RegexEscape Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/regexescape?lang=java">RegexEscape</a>
    * @see #Value(String)
    */
   public static Expr RegexEscape(String value) {
@@ -3427,7 +3436,7 @@ public final class Language {
    *
    * @param value a strings
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/repeat?lang=java">Repeat</a>
    * @see #Value(String)
    */
   public static Expr Repeat(Expr value) {
@@ -3439,7 +3448,7 @@ public final class Language {
    *
    * @param value a strings
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/repeat?lang=java">Repeat</a>
    * @see #Value(String)
    */
   public static Expr Repeat(String value) {
@@ -3452,7 +3461,7 @@ public final class Language {
    * @param value a strings
    * @param number an integer value indicate the number of times to repeat the string
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/repeat?lang=java">Repeat</a>
    * @see #Value(String)
    */
   public static Expr Repeat(Expr value, Expr number) {
@@ -3465,7 +3474,7 @@ public final class Language {
    * @param value a strings
    * @param number an integer value indicate the number of times to repeat the string
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/repeat?lang=java">Repeat</a>
    * @see #Value(String)
    */
   public static Expr Repeat(String value, Expr number) {
@@ -3478,7 +3487,7 @@ public final class Language {
    * @param value a strings
    * @param number an integer value indicate the number of times to repeat the string
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/repeat?lang=java">Repeat</a>
    * @see #Value(String)
    */
   public static Expr Repeat(Expr value, long number) {
@@ -3491,7 +3500,7 @@ public final class Language {
    * @param value a strings
    * @param number an integer value indicate the number of times to repeat the string
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/repeat?lang=java">Repeat</a>
    * @see #Value(String)
    */
   public static Expr Repeat(String value, long number) {
@@ -3505,7 +3514,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestr?lang=java">ReplaceStr</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(Expr value, Expr find, Expr replace) {
@@ -3519,7 +3528,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestr?lang=java">ReplaceStr</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(String value, Expr find, Expr replace) {
@@ -3533,7 +3542,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestr?lang=java">ReplaceStr</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(Expr value, String find, Expr replace) {
@@ -3547,7 +3556,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestr?lang=java">ReplaceStr</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(String value, String find, Expr replace) {
@@ -3561,7 +3570,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestr?lang=java">ReplaceStr</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(Expr value, Expr find, String replace) {
@@ -3575,7 +3584,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestr?lang=java">ReplaceStr</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(String value, Expr find, String replace) {
@@ -3589,7 +3598,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestr?lang=java">ReplaceStr</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(Expr value, String find, String replace) {
@@ -3603,7 +3612,7 @@ public final class Language {
    * @param find    the substring to locate in in the source string
    * @param replace the string to replaice the "find" string when located
    * @return        the new string with every occurence of the "find" string changed to "replace" string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestr?lang=java">ReplaceStr</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStr(String value, String find, String replace) {
@@ -3617,7 +3626,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, Expr pattern, Expr replace) {
@@ -3631,7 +3640,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, Expr pattern, Expr replace) {
@@ -3645,7 +3654,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, String pattern, Expr replace) {
@@ -3659,7 +3668,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, String pattern, Expr replace) {
@@ -3673,7 +3682,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, Expr pattern, String replace) {
@@ -3687,7 +3696,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, Expr pattern, String replace) {
@@ -3701,7 +3710,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, String pattern, String replace) {
@@ -3715,7 +3724,7 @@ public final class Language {
    * @param pattern a java regular expression to locate
    * @param replace the string to replace the pattern when located
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, String pattern, String replace) {
@@ -3730,7 +3739,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, Expr pattern, Expr replace, Expr first) {
@@ -3745,7 +3754,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, Expr pattern, Expr replace, Expr first) {
@@ -3760,7 +3769,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, String pattern, Expr replace, Expr first) {
@@ -3775,7 +3784,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, String pattern, Expr replace, Expr first) {
@@ -3790,7 +3799,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, Expr pattern, String replace, Expr first) {
@@ -3805,7 +3814,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, Expr pattern, String replace, Expr first) {
@@ -3820,7 +3829,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, String pattern, String replace, Expr first) {
@@ -3835,7 +3844,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, String pattern, String replace, Expr first) {
@@ -3850,7 +3859,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, Expr pattern, Expr replace, Boolean first) {
@@ -3865,7 +3874,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, Expr pattern, Expr replace, boolean first) {
@@ -3880,7 +3889,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, String pattern, Expr replace, boolean first) {
@@ -3895,7 +3904,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, String pattern, Expr replace, boolean first) {
@@ -3910,7 +3919,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, Expr pattern, String replace, boolean first) {
@@ -3925,7 +3934,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, Expr pattern, String replace, boolean first) {
@@ -3940,7 +3949,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(Expr value, String pattern, String replace, boolean first) {
@@ -3955,7 +3964,7 @@ public final class Language {
    * @param replace the string to replace the pattern when located
    * @param first only replace the first found pattern
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/replacestrregex?lang=java">ReplaceStrRegex</a>
    * @see #Value(String)
    */
   public static Expr ReplaceStrRegex(String value, String pattern, String replace, boolean first) {
@@ -3967,7 +3976,7 @@ public final class Language {
    *
    * @param value a string to trim whitespace.
    * @return      the string with trailing whitespace removed
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/rtrim?lang=java">RTrim</a>
    * @see #Value(String)
    */
   public static Expr RTrim(Expr value) {
@@ -3979,7 +3988,7 @@ public final class Language {
    *
    * @param value a string to trim whitespace.
    * @return      the string with trailing whitespace removed
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/rtrim?lang=java">RTrim</a>
    * @see #Value(String)
    */
   public static Expr RTrim(String value) {
@@ -3991,7 +4000,7 @@ public final class Language {
    *
    * @param value the number of spaces
    * @return      a string with spaces
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/space?lang=java">Space</a>
    * @see #Value(String)
    */
   public static Expr Space(Expr value) {
@@ -4003,7 +4012,7 @@ public final class Language {
    *
    * @param value the number of spaces
    * @return      a string with spaces
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/space?lang=java">Space</a>
    * @see #Value(String)
    */
   public static Expr Space(Long value) {
@@ -4015,7 +4024,7 @@ public final class Language {
    *
    * @param value the number of spaces
    * @return      a string with spaces
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/space?lang=java">Space</a>
    * @see #Value(String)
    */
   public static Expr Space(Integer value) {
@@ -4027,7 +4036,7 @@ public final class Language {
    *
    * @param value the source string
    * @return      a new string contain a subset of the source string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/substring?lang=java">SubString</a>
    * @see #Value(String)
    */
   public static Expr SubString(Expr value) {
@@ -4039,7 +4048,7 @@ public final class Language {
    *
    * @param value the source string
    * @return      a new string contain a subset of the source string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/substring?lang=java">SubString</a>
    * @see #Value(String)
    */
   public static Expr SubString(String value) {
@@ -4052,7 +4061,7 @@ public final class Language {
    * @param value the source string
    * @param start the position in the source string where SubString starts extracting characters
    * @return      a new string contain a subset of the source string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/substring?lang=java">SubString</a>
    * @see #Value(String)
    */
   public static Expr SubString(Expr value, Expr start) {
@@ -4065,7 +4074,7 @@ public final class Language {
    * @param value the source string
    * @param start the position in the source string where SubString starts extracting characters
    * @return      a new string contain a subset of the source string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/substring?lang=java">SubString</a>
    * @see #Value(String)
    */
   public static Expr SubString(String value, Expr start) {
@@ -4078,7 +4087,7 @@ public final class Language {
    * @param value the source string
    * @param start the position in the source string where SubString starts extracting characters
    * @return      a new string contain a subset of the source string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/substring?lang=java">SubString</a>
    * @see #Value(String)
    */
   public static Expr SubString(Expr value, long start) {
@@ -4091,7 +4100,7 @@ public final class Language {
    * @param value the source string
    * @param start the position in the source string where SubString starts extracting characters
    * @return      a new string contain a subset of the source string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/substring?lang=java">SubString</a>
    * @see #Value(String)
    */
   public static Expr SubString(String value, long start) {
@@ -4105,7 +4114,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/substring?lang=java">SubString</a>
    * @see #Value(String)
    */
   public static Expr SubString(Expr value, Expr start, Expr length) {
@@ -4119,7 +4128,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/substring?lang=java">SubString</a>
    * @see #Value(String)
    */
   public static Expr SubString(String value, Expr start, Expr length) {
@@ -4133,7 +4142,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/substring?lang=java">SubString</a>
    * @see #Value(String)
    */
   public static Expr SubString(Expr value, long start, Expr length) {
@@ -4147,7 +4156,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/substring?lang=java">SubString</a>
    * @see #Value(String)
    */
   public static Expr SubString(String value, long start, Expr length) {
@@ -4161,7 +4170,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/substring?lang=java">SubString</a>
    * @see #Value(String)
    */
   public static Expr SubString(Expr value, long start, long length) {
@@ -4175,7 +4184,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/substring?lang=java">SubString</a>
    * @see #Value(String)
    */
   public static Expr SubString(Expr value, Expr start, long length) {
@@ -4189,7 +4198,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/substring?lang=java">SubString</a>
    * @see #Value(String)
    */
   public static Expr SubString(String value, Expr start, long length) {
@@ -4203,7 +4212,7 @@ public final class Language {
    * @param start the position in the source string where SubString starts extracting characters
    * @param length the number of characters to be returned
    * @return       a new string contain a subset of the source string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/substring?lang=java">SubString</a>
    * @see #Value(String)
    */
   public static Expr SubString(String value, long start, long length) {
@@ -4215,7 +4224,7 @@ public final class Language {
    *
    * @param value a strings to TitleCase
    * @return      a new string in TitleCase
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/titlecase?lang=java">TitleCase</a>
    * @see #Value(String)
    */
   public static Expr TitleCase(Expr value) {
@@ -4227,7 +4236,7 @@ public final class Language {
    *
    * @param value a strings to TitleCase
    * @return      a new string in TitleCase
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/titlecase?lang=java">TitleCase</a>
    * @see #Value(String)
    */
   public static Expr TitleCase(String value) {
@@ -4241,7 +4250,7 @@ public final class Language {
    * @return      the string with leading and trailing whitespace removed
    * Trim function returns
    *
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/trim?lang=java">Trim</a>
    * @see #Value(String)
    */
   public static Expr Trim(Expr value) {
@@ -4253,7 +4262,7 @@ public final class Language {
    *
    * @param value a string to trim white space.
    * @return      the string with leading and trailing whitespace removed
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/trim?lang=java">Trim</a>
    * @see #Value(String)
    */
   public static Expr Trim(String value) {
@@ -4265,7 +4274,7 @@ public final class Language {
    *
    * @param value a string to uppercase
    * @return      a string with all uppercase letters
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/uppercase?lang=java">UpperCase</a>
    * @see #Value(String)
    */
   public static Expr UpperCase(Expr value) {
@@ -4277,7 +4286,7 @@ public final class Language {
    *
    * @param value a string to uppercase
    * @return      a string with all uppercase letters
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/uppercase?lang=java">UpperCase</a>
    * @see #Value(String)
    */
   public static Expr UpperCase(String value) {
@@ -4290,7 +4299,7 @@ public final class Language {
    * @param format a string with format specifiers
    * @param values a list of values to format
    * @return      a string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/format?lang=java">Format</a>
    * @see #Value(String)
    */
   public static Expr Format(Expr format, Expr ...values) {
@@ -4303,7 +4312,7 @@ public final class Language {
    * @param format a string with format specifiers
    * @param values a list of values to format
    * @return      a string
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#string-functions">FaunaDB String Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/format?lang=java">Format</a>
    */
   public static Expr Format(String format, Expr ...values) {
     return Format(new StringV(format), values);
@@ -4315,7 +4324,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param search  the prefix to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/startswith">FaunaDB StartsWith Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/startswith?lang=java">StartsWith</a>
    * @see #Value(String)
    */
   public static Expr StartsWith(Expr value, Expr search) {
@@ -4328,7 +4337,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param search  the prefix to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/startswith">FaunaDB StartsWith Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/startswith?lang=java">StartsWith</a>
    * @see #Value(String)
    */
   public static Expr StartsWith(String value, Expr search) {
@@ -4341,7 +4350,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param search  the prefix to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/startswith">FaunaDB StartsWith Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/startswith?lang=java">StartsWith</a>
    * @see #Value(String)
    */
   public static Expr StartsWith(Expr value, String search) {
@@ -4354,7 +4363,7 @@ public final class Language {
    * @param value   the string to evaluate
    * @param search  the prefix to search for
    * @return        a {@link Expr} instance with the evaluation result
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/startswith">FaunaDB StartsWith Function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/startswith?lang=java">StartsWith</a>
    * @see #Value(String)
    */
   public static Expr StartsWith(String value, String search) {
@@ -4367,7 +4376,7 @@ public final class Language {
    *
    * @param str an ISO-8601 formatted string or the string literal "now". Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#time-and-date">FaunaDB Time and Date Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/time?lang=java">Time</a>
    * @see #Value(String)
    */
   public static Expr Time(Expr str) {
@@ -4380,7 +4389,7 @@ public final class Language {
    *
    * @param str an ISO-8601 formatted string or the string literal "now"
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#time-and-date">FaunaDB Time and Date Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/time?lang=java">Time</a>
    */
   public static Expr Time(String str) {
     return Time(new StringV(str));
@@ -4392,7 +4401,7 @@ public final class Language {
    * @param num the number of units. Type: Number
    * @param unit the unit type
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#time-and-date">FaunaDB Time and Date Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/epoch?lang=java">Epoch</a>
    * @see TimeUnit
    * @see #Value(long)
    */
@@ -4406,7 +4415,7 @@ public final class Language {
    * @param num the number of units.
    * @param unit the unit type
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#time-and-date">FaunaDB Time and Date Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/epoch?lang=java">Epoch</a>
    * @see TimeUnit
    */
   public static Expr Epoch(long num, TimeUnit unit) {
@@ -4430,7 +4439,7 @@ public final class Language {
    * @param num the number of units. Type: Number
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#time-and-date">FaunaDB Time and Date Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/epoch?lang=java">Epoch</a>
    * @see #Value(long)
    */
   public static Expr Epoch(Expr num, Expr unit) {
@@ -4443,7 +4452,7 @@ public final class Language {
    * @param num the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#time-and-date">FaunaDB Time and Date Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/epoch?lang=java">Epoch</a>
    * @see #Value(long)
    */
   public static Expr Epoch(Expr num, String unit) {
@@ -4456,7 +4465,7 @@ public final class Language {
    * @param num the number of units.
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#time-and-date">FaunaDB Time and Date Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/epoch?lang=java">Epoch</a>
    * @see #Value(String)
    */
   public static Expr Epoch(long num, Expr unit) {
@@ -4469,7 +4478,7 @@ public final class Language {
    * @param num the number of units.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#time-and-date">FaunaDB Time and Date Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/epoch?lang=java">Epoch</a>
    */
   public static Expr Epoch(long num, String unit) {
     return Epoch(new LongV(num), new StringV(unit));
@@ -4483,6 +4492,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(Expr base, Expr offset, Expr unit) {
     return Fn.apply("time_add", base, "offset", offset, "unit", unit);
@@ -4496,6 +4506,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(Expr base, Expr offset, TimeUnit unit) {
     return TimeAdd(base, offset, unit.value);
@@ -4509,6 +4520,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(Expr base, Expr offset, String unit) {
     return TimeAdd(base, offset, Value(unit));
@@ -4522,6 +4534,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(Expr base, long offset, Expr unit) {
     return TimeAdd(base, new LongV(offset), unit);
@@ -4535,6 +4548,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(Expr base, long offset, TimeUnit unit) {
     return TimeAdd(base, new LongV(offset), unit.value);
@@ -4561,6 +4575,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(Instant base, Expr offset, Expr unit) {
     return TimeAdd(new TimeV(base), offset, unit);
@@ -4574,6 +4589,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(Instant base, Expr offset, TimeUnit unit) {
     return TimeAdd(new TimeV(base), offset, unit.value);
@@ -4587,6 +4603,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(Instant base, Expr offset, String unit) {
     return TimeAdd(new TimeV(base), offset, Value(unit));
@@ -4600,6 +4617,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(Instant base, long offset, Expr unit) {
     return TimeAdd(new TimeV(base), new LongV(offset), unit);
@@ -4626,6 +4644,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(Instant base, long offset, String unit) {
     return TimeAdd(new TimeV(base), new LongV(offset), Value(unit));
@@ -4639,6 +4658,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(LocalDate base, Expr offset, Expr unit) {
     return TimeAdd(new DateV(base), offset, unit);
@@ -4652,6 +4672,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(LocalDate base, long offset, Expr unit) {
      return TimeAdd(new DateV(base), new LongV(offset), unit);
@@ -4678,6 +4699,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(LocalDate base, long offset, String unit) {
     return TimeAdd(new DateV(base), new LongV(offset), Value(unit));
@@ -4691,6 +4713,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(LocalDate base, Expr offset, TimeUnit unit) {
     return TimeAdd(new DateV(base), offset, unit.value);
@@ -4704,6 +4727,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timeadd?lang=java">TimeAdd</a>
    */
   public static Expr TimeAdd(LocalDate base, Expr offset, String unit) {
     return TimeAdd(new DateV(base), offset, Value(unit));
@@ -4717,6 +4741,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(Expr base, Expr offset, Expr unit) {
     return Fn.apply("time_subtract", base, "offset", offset, "unit", unit);
@@ -4730,6 +4755,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(Expr base, Expr offset, TimeUnit unit) {
     return TimeSubtract(base, offset, unit.value);
@@ -4743,6 +4769,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(Expr base, Expr offset, String unit) {
     return TimeSubtract(base, offset, Value(unit));
@@ -4756,6 +4783,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(Expr base, long offset, Expr unit) {
     return TimeSubtract(base, new LongV(offset), unit);
@@ -4769,6 +4797,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(Expr base, long offset, TimeUnit unit) {
     return TimeSubtract(base, new LongV(offset), unit.value);
@@ -4782,6 +4811,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(Expr base, long offset, String unit) {
     return TimeSubtract(base, new LongV(offset), Value(unit));
@@ -4795,6 +4825,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(Instant base, Expr offset, Expr unit) {
     return TimeSubtract(new TimeV(base), offset, unit);
@@ -4808,6 +4839,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(Instant base, Expr offset, TimeUnit unit) {
     return TimeSubtract(new TimeV(base), offset, unit.value);
@@ -4821,6 +4853,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(Instant base, Expr offset, String unit) {
     return TimeSubtract(new TimeV(base), offset, Value(unit));
@@ -4834,6 +4867,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(Instant base, long offset, Expr unit) {
     return TimeSubtract(new TimeV(base), new LongV(offset), unit);
@@ -4847,6 +4881,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(Instant base, long offset, TimeUnit unit) {
     return TimeSubtract(new TimeV(base), new LongV(offset), unit.value);
@@ -4860,6 +4895,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(Instant base, long offset, String unit) {
     return TimeSubtract(new TimeV(base), new LongV(offset), Value(unit));
@@ -4873,6 +4909,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(LocalDate base, Expr offset, Expr unit) {
     return TimeSubtract(new DateV(base), offset, unit);
@@ -4886,6 +4923,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(LocalDate base, Expr offset, TimeUnit unit) {
     return TimeSubtract(new DateV(base), offset, unit.value);
@@ -4899,6 +4937,7 @@ public final class Language {
    * @param offset the number of units. Type: Number
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(LocalDate base, Expr offset, String unit) {
     return TimeSubtract(new DateV(base), offset, Value(unit));
@@ -4912,6 +4951,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(LocalDate base, long offset, Expr unit) {
      return TimeSubtract(new DateV(base), new LongV(offset), unit);
@@ -4925,6 +4965,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(LocalDate base, long offset, TimeUnit unit) {
     return TimeSubtract(new DateV(base), new LongV(offset), unit.value);
@@ -4938,6 +4979,7 @@ public final class Language {
    * @param offset the number of units.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timesubtract?lang=java">TimeSubtract</a>
    */
   public static Expr TimeSubtract(LocalDate base, long offset, String unit) {
     return TimeSubtract(new DateV(base), new LongV(offset), Value(unit));
@@ -4952,6 +4994,7 @@ public final class Language {
    * @param finish the ending time or date, exclusive. Type: Time or Date
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(Expr start, Expr finish, Expr unit) {
     return Fn.apply("time_diff", start, "other", finish, "unit", unit);
@@ -4966,6 +5009,7 @@ public final class Language {
    * @param finish the ending time or date, exclusive. Type: Time or Date
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(Expr start, Expr finish, TimeUnit unit) {
     return TimeDiff(start, finish, unit.value);
@@ -4980,6 +5024,7 @@ public final class Language {
    * @param finish the ending time or date, exclusive. Type: Time or Date
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(Expr start, Expr finish, String unit) {
     return TimeDiff(start, finish, Value(unit));
@@ -4993,6 +5038,7 @@ public final class Language {
    * @param finish the ending time, exclusive. Type: Time
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(Instant start, Expr finish, Expr unit) {
     return TimeDiff(new TimeV(start), finish, unit);
@@ -5006,6 +5052,7 @@ public final class Language {
    * @param finish the ending time, exclusive. Type: Time
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(Instant start, Expr finish, TimeUnit unit) {
     return TimeDiff(new TimeV(start), finish, unit.value);
@@ -5019,6 +5066,7 @@ public final class Language {
    * @param finish the ending time, exclusive. Type: Time
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(Instant start, Expr finish, String unit) {
     return TimeDiff(new TimeV(start), finish, Value(unit));
@@ -5032,6 +5080,7 @@ public final class Language {
    * @param finish the ending time, exclusive.
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(Instant start, Instant finish, Expr unit) {
     return TimeDiff(new TimeV(start), new TimeV(finish), unit);
@@ -5045,6 +5094,7 @@ public final class Language {
    * @param finish the ending time, exclusive.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(Instant start, Instant finish, TimeUnit unit) {
     return TimeDiff(new TimeV(start), new TimeV(finish), unit.value);
@@ -5058,6 +5108,7 @@ public final class Language {
    * @param finish the ending time, exclusive.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(Instant start, Instant finish, String unit) {
     return TimeDiff(new TimeV(start), new TimeV(finish), Value(unit));
@@ -5071,6 +5122,7 @@ public final class Language {
    * @param finish the ending date, exclusive. Type: Date
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(LocalDate start, Expr finish, Expr unit) {
     return TimeDiff(new DateV(start), finish, unit);
@@ -5084,6 +5136,7 @@ public final class Language {
    * @param finish the ending date, exclusive. Type: Date
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(LocalDate start, Expr finish, TimeUnit unit) {
     return TimeDiff(new DateV(start), finish, unit.value);
@@ -5097,6 +5150,7 @@ public final class Language {
    * @param finish the ending date, exclusive. Type: Date
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(LocalDate start, Expr finish, String unit) {
     return TimeDiff(new DateV(start), finish, Value(unit));
@@ -5110,6 +5164,7 @@ public final class Language {
    * @param finish the ending date, exclusive.
    * @param unit the unit type. Type: String
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(LocalDate start, LocalDate finish, Expr unit) {
     return TimeDiff(new DateV(start), new DateV(finish), unit);
@@ -5123,6 +5178,7 @@ public final class Language {
    * @param finish the ending date, exclusive.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(LocalDate start, LocalDate finish, TimeUnit unit) {
     return TimeDiff(new DateV(start), new DateV(finish), unit.value);
@@ -5136,6 +5192,7 @@ public final class Language {
    * @param finish the ending date, exclusive.
    * @param unit the unit type.
    * @return a new {@link Expr} instance
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/timediff?lang=java">TimeDiff</a>
    */
   public static Expr TimeDiff(LocalDate start, LocalDate finish, String unit) {
     return TimeDiff(new DateV(start), new DateV(finish), Value(unit));
@@ -5146,7 +5203,7 @@ public final class Language {
    *
    * @param str an ISO-8601 formatted date string. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#time-and-date">FaunaDB Time and Date Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/date?lang=java">Date</a>
    * @see #Value(String)
    */
   public static Expr Date(Expr str) {
@@ -5158,7 +5215,7 @@ public final class Language {
    *
    * @param str an ISO-8601 formatted date string
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#time-and-date">FaunaDB Time and Date Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/date?lang=java">Date</a>
    */
   public static Expr Date(String str) {
     return Date(new StringV(str));
@@ -5168,7 +5225,7 @@ public final class Language {
    * Returns the current snapshot time.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/now">Now function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/now?lang=java">Now</a>
    */
   public static Expr Now() {
     return Fn.apply("now", Null());
@@ -5180,7 +5237,6 @@ public final class Language {
    * @deprecated Use NewId() instead.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
    * @see #Ref(Expr, Expr)
    */
   @Deprecated
@@ -5192,7 +5248,7 @@ public final class Language {
    * Returns a new string identifier suitable for use when constructing references.
    *
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/newid?lang=java">NewId</a>
    * @see #Ref(Expr, Expr)
    */
   public static Expr NewId() {
@@ -5204,7 +5260,7 @@ public final class Language {
    *
    * @param name the class name. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/class?lang=java">Class</a>
    * 
    * @deprecated use Collection instead
    */
@@ -5218,7 +5274,7 @@ public final class Language {
    *
    * @param name the class name
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/class?lang=java">Class</a>
    * 
    * @deprecated use Collection instead
    */
@@ -5233,7 +5289,7 @@ public final class Language {
    * @param name the class name. Type: String
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/class?lang=java">Class</a>
    * @see #Database(String)
    * 
    * @deprecated use Collection instead
@@ -5248,7 +5304,7 @@ public final class Language {
    *
    * @param name the collection name. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/collection?lang=java">Collection</a>
    */
   public static Expr Collection(Expr name) {
     return Fn.apply("collection", name);
@@ -5259,7 +5315,7 @@ public final class Language {
    *
    * @param name the collection name
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/collection?lang=java">Collection</a>
    */
   public static Expr Collection(String name) {
     return Collection(Value(name));
@@ -5271,7 +5327,7 @@ public final class Language {
    * @param name the collection name. Type: String
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/collection?lang=java">Collection</a>
    * @see #Database(String)
    */
   public static Expr Collection(Expr name, Expr database) {
@@ -5284,7 +5340,7 @@ public final class Language {
    * @param name the class name
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/class?lang=java">Class</a>
    * @see #Database(String)
    *
    * @deprecated use Collection instead
@@ -5300,7 +5356,7 @@ public final class Language {
    * @param name the collection name
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/collection?lang=java">Collection</a>
    * @see #Database(String)
    */
   public static Expr Collection(String name, Expr database) {
@@ -5312,7 +5368,7 @@ public final class Language {
    *
    * @param name the database name. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/database?lang=java">Database</a>
    */
   public static Expr Database(Expr name) {
     return Fn.apply("database", name);
@@ -5323,7 +5379,7 @@ public final class Language {
    *
    * @param name the database name
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/database?lang=java">Database</a>
    */
   public static Expr Database(String name) {
     return Database(Value(name));
@@ -5335,7 +5391,7 @@ public final class Language {
    * @param name the database name. Type: String
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/database?lang=java">Database</a>
    */
   public static Expr Database(Expr name, Expr database) {
       return Fn.apply("database", name, "scope", database);
@@ -5347,7 +5403,7 @@ public final class Language {
    * @param name the database name
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/database?lang=java">Database</a>
    */
   public static Expr Database(String name, Expr database) {
     return Database(Value(name), database);
@@ -5358,7 +5414,7 @@ public final class Language {
    *
    * @param name the index name. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/iindex?lang=java">Index</a>
    */
   public static Expr Index(Expr name) {
     return Fn.apply("index", name);
@@ -5369,7 +5425,7 @@ public final class Language {
    *
    * @param name the index name
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/iindex?lang=java">Index</a>
    */
   public static Expr Index(String name) {
     return Index(Value(name));
@@ -5381,7 +5437,7 @@ public final class Language {
    * @param name the index name. Type: String
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/iindex?lang=java">Index</a>
    */
   public static Expr Index(Expr name, Expr database) {
     return Fn.apply("index", name, "scope", database);
@@ -5393,7 +5449,7 @@ public final class Language {
    * @param name the index name
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/iindex?lang=java">Index</a>
    */
   public static Expr Index(String name, Expr database) {
     return Index(Value(name), database);
@@ -5404,7 +5460,7 @@ public final class Language {
    *
    * @param name the user defined function name. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/function?lang=java">Function</a>
    */
   public static Expr Function(Expr name) {
     return Fn.apply("function", name);
@@ -5415,7 +5471,7 @@ public final class Language {
    *
    * @param name the user defined function name
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/function?lang=java">Function</a>
    */
   public static Expr Function(String name) {
     return Function(Value(name));
@@ -5427,7 +5483,7 @@ public final class Language {
    * @param name the user defined function name. Type: String
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/function?lang=java">Function</a>
    */
   public static Expr Function(Expr name, Expr database) {
     return Fn.apply("function", name, "scope", database);
@@ -5439,7 +5495,7 @@ public final class Language {
    * @param name the user defined function name
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/function?lang=java">Function</a>
    */
   public static Expr Function(String name, Expr database) {
     return Function(Value(name), database);
@@ -5450,7 +5506,7 @@ public final class Language {
    *
    * @param name the role name. Type: String
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/role?lang=java">Role</a>
    */
   public static Expr Role(Expr name) {
     return Fn.apply("role", name);
@@ -5461,7 +5517,7 @@ public final class Language {
    *
    * @param name the role name
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/role?lang=java">Role</a>
    */
   public static Expr Role(String name) {
     return Role(Value(name));
@@ -5473,7 +5529,7 @@ public final class Language {
    * @param name the role name. Type: String
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/role?lang=java">Role</a>
    */
   public static Expr Role(Expr name, Expr database) {
     return Fn.apply("role", name, "scope", database);
@@ -5485,7 +5541,7 @@ public final class Language {
    * @param name the role name.
    * @param database the scope database. Type: Reference
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/role?lang=java">Role</a>
    */
   public static Expr Role(String name, Expr database) {
     return Role(Value(name), database);
@@ -5496,7 +5552,7 @@ public final class Language {
    *
    * @param values the values to test equivalence for
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/equals?lang=java">Equals</a>
    */
   public static Expr Equals(List<? extends Expr> values) {
     return Fn.apply("equals", varargs(values));
@@ -5507,7 +5563,7 @@ public final class Language {
    *
    * @param values the values to test equivalence for
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/equals?lang=java">Equals</a>
    */
   public static Expr Equals(Expr... values) {
     return Equals(Collections.unmodifiableList(Arrays.asList(values)));
@@ -5523,7 +5579,7 @@ public final class Language {
    * @param path the desired path to check for presence. Type: Array
    * @param in the target value. Type: Object or Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/contains?lang=java">Contains</a>
    * @see #Contains(Path, Expr)
    *
    * @deprecated use {@code ContainsPath} instead
@@ -5539,7 +5595,7 @@ public final class Language {
    * @param path the desired path to check for presence
    * @param in the target value. Type: Object or Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/contains?lang=java">Contains</a>
    *
    * @deprecated use {@code ContainsPath} instead
    */
@@ -5554,7 +5610,7 @@ public final class Language {
    * @param field the desired value to field for presence.
    * @param in the target value. Type: Object or Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsfield?lang=java">ContainsField</a>
    */
   public static Expr ContainsField(Expr field, Expr in) {
     return Fn.apply("contains_field", field, "in", in);
@@ -5570,7 +5626,7 @@ public final class Language {
    * @param path the desired path to check for presence. Type: Array
    * @param in the target value. Type: Object or Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containspath?lang=java">ContainsPath</a>
    * @see #ContainsPath(Path, Expr)
    */
   public static Expr ContainsPath(Expr path, Expr in) {
@@ -5583,7 +5639,7 @@ public final class Language {
    * @param path the desired path to check for presence
    * @param in the target value. Type: Object or Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containspath?lang=java">ContainsPath</a>
    */
   public static Expr ContainsPath(Path path, Expr in) {
     return ContainsPath(Arr(path.segments), in);
@@ -5595,7 +5651,7 @@ public final class Language {
    * @param value the desired value to check for presence.
    * @param in the target value. Type: Ref, Object, Array or Set
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#miscellaneous-functions">FaunaDB Miscellaneous Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/containsvalue?lang=java">ContainsValue</a>
    */
   public static Expr ContainsValue(Expr value, Expr in) {
     return Fn.apply("contains_value", value, "in", in);
@@ -5641,7 +5697,7 @@ public final class Language {
    * @param path the path to the desired value. Type: Array
    * @param from the target resource. Type: Object or Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/select?lang=java">Select</a>
    * @see #Select(Path, Expr)
    */
   public static Expr Select(Expr path, Expr from) {
@@ -5659,7 +5715,7 @@ public final class Language {
    * @param from the target resource. Type: Object or Array
    * @param defaultValue the default value to return if the desired path doesn't exist
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/select?lang=java">Select</a>
    * @see #Select(Path, Expr, Expr)
    */
   public static Expr Select(Expr path, Expr from, Expr defaultValue) {
@@ -5672,7 +5728,7 @@ public final class Language {
    * @param path the path to the desired value
    * @param from the target resource. Type: Object or Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/select?lang=java">Select</a>
    */
   public static Expr Select(Path path, Expr from) {
     return Select(Arr(path.segments), from);
@@ -5686,7 +5742,7 @@ public final class Language {
    * @param from the target resource. Type: Object or Array
    * @param defaultValue the default value to return if the desired path doesn't exist
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/select?lang=java">Select</a>
    */
   public static Expr Select(Path path, Expr from, Expr defaultValue) {
     return Select(Arr(path.segments), from, defaultValue);
@@ -5702,7 +5758,7 @@ public final class Language {
    * @param path the path to the desired value. Type: Array
    * @param from the collection to traverse. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/selectall?lang=java">SelectAll</a>
    * @see #Select(Path, Expr)
    *
    * @deprecated use SelectAsIndex instead
@@ -5718,7 +5774,7 @@ public final class Language {
    * @param path the path to the desired value
    * @param from the collection to traverse. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#read-functions">FaunaDB Read Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/selectall?lang=java">SelectAll</a>
    *
    * @deprecated use SelectAsIndex instead
    */
@@ -5737,7 +5793,6 @@ public final class Language {
    * @param path the path to the desired value. Type: Array
    * @param from the collection to traverse. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/selectasindex">FaunaDB SelectAsIndex Function</a>
    * @see #Select(Path, Expr)
    */
   public static Expr SelectAsIndex(Expr path, Expr from) {
@@ -5750,7 +5805,6 @@ public final class Language {
    * @param path the path to the desired value
    * @param from the collection to traverse. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/selectasindex">FaunaDB SelectAsIndex Function</a>
    */
   public static Expr SelectAsIndex(Path path, Expr from) {
     return SelectAsIndex(Arr(path.segments), from);
@@ -5761,7 +5815,7 @@ public final class Language {
    *
    * @param value The operand to abs. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/abs?lang=java">Abs</a>
    */
   public static Expr Abs(Expr value) {
     return Fn.apply("abs", value);
@@ -5772,7 +5826,7 @@ public final class Language {
    *
    * @param value The operand to abs. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/abs?lang=java">Abs</a>
    */
   public static Expr Abs(Long value) {
     return Fn.apply("abs", new LongV(value));
@@ -5783,29 +5837,29 @@ public final class Language {
    *
    * @param value The operand to abs. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/abs?lang=java">Abs</a>
    */
   public static Expr Abs(Double value) {
     return Fn.apply("abs", new DoubleV(value));
   }
 
   /**
-   * Computes the acos of a numbers.
+   * Computes the acos of a number.
    *
    * @param value The operand to acos. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/acos?lang=java">Acos</a>
    */
   public static Expr Acos(Expr value) {
     return Fn.apply("acos", value);
   }
 
   /**
-   * Computes the acos of a numbers.
+   * Computes the acos of a number.
    *
    * @param value The operand to acos. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/acos?lang=java">Acos</a>
    */
     public static Expr Acos(Double value) {
       return Fn.apply("acos", new DoubleV(value));
@@ -5817,7 +5871,7 @@ public final class Language {
      *
      * @param values the list of numbers. Type: Array
      * @return a {@link Expr} instance
-     * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+     * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/add?lang=java">Add</a>
      */
   public static Expr Add(List<? extends Expr> values) {
     return Fn.apply("add", varargs(values));
@@ -5828,51 +5882,51 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+     * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/add?lang=java">Add</a>
    */
   public static Expr Add(Expr... values) {
     return Add(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**
-   * Computes the asin of a numbers.
+   * Computes the asin of a number.
    *
    * @param value The operand to asin. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/asin?lang=java">Asin</a>
    */
   public static Expr Asin(Expr value) {
     return Fn.apply("asin", value);
   }
 
   /**
-   * Computes the asin of a numbers.
+   * Computes the asin of a number.
    *
    * @param value The operand to asin. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/asin?lang=java">Asin</a>
    */
   public static Expr Asin(Double value) {
     return Fn.apply("asin", new DoubleV(value));
   }
 
   /**
-   * Computes the atan of a numbers.
+   * Computes the atan of a number.
    *
    * @param value The operand to atan. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/atan?lang=java">Atan</a>
    */
   public static Expr Atan(Expr value) {
     return Fn.apply("atan", value);
   }
 
   /**
-   * Computes the atan of a numbers.
+   * Computes the atan of a number.
    *
    * @param value The operand to atan. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/atan?lang=java">Atan</a>
    */
   public static Expr Atan(Double value) {
     return Fn.apply("atan", new DoubleV(value));
@@ -5883,7 +5937,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/bitand?lang=java">BitAnd</a>
    */
   public static Expr BitAnd(List<? extends Expr> values) {
     return Fn.apply("bitand", varargs(values));
@@ -5894,29 +5948,29 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/bitand?lang=java">BitAnd</a>
    */
   public static Expr BitAnd(Expr... values) {
     return BitAnd(Arrays.asList(values));
   }
 
   /**
-   * Computes the bitwise NOT of a numbers.
+   * Computes the bitwise NOT of a number.
    *
    * @param value The operand to atan. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/bitnot?lang=java">BitNot</a>
    */
   public static Expr BitNot(Expr value) {
     return Fn.apply("bitnot", value);
   }
 
   /**
-   * Computes the bitwise NOT of a numbers.
+   * Computes the bitwise NOT of a number.
    *
    * @param value The operand to atan. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/bitnot?lang=java">BitNot</a>
    */
   public static Expr BitNot(Long value) {
     return Fn.apply("bitnot", new LongV(value));
@@ -5927,7 +5981,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/bitor?lang=java">BitOr</a>
    */
   public static Expr BitOr(List<? extends Expr> values) {
     return Fn.apply("bitor", varargs(values));
@@ -5938,7 +5992,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/bitor?lang=java">BitOr</a>
    */
   public static Expr BitOr(Expr... values) {
     return BitOr(Arrays.asList(values));
@@ -5949,7 +6003,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/bitxor?lang=java">BitXor</a>
    */
   public static Expr BitXor(List<? extends Expr> values) {
     return Fn.apply("bitxor", varargs(values));
@@ -5960,7 +6014,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/bitxor?lang=java">BitXor</a>
    */
   public static Expr BitXor(Expr... values) {
     return BitXor(Arrays.asList(values));
@@ -5971,7 +6025,7 @@ public final class Language {
    *
    * @param value The operand to ceil. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/ceil?lang=java">Ceil</a>
    */
   public static Expr Ceil(Expr value) {
     return Fn.apply("ceil", value);
@@ -5982,7 +6036,7 @@ public final class Language {
    *
    * @param value The operand to ceil. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/ceil?lang=java">Ceil</a>
    */
   public static Expr Ceil(Long value) {
     return Fn.apply("ceil", new LongV(value));
@@ -5993,95 +6047,95 @@ public final class Language {
    *
    * @param value The operand to ceil. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/ceil?lang=java">Ceil</a>
    */
   public static Expr Ceil(Double value) {
     return Fn.apply("ceil", new DoubleV(value));
   }
 
   /**
-   * Computes the cosine of a numbers.
+   * Computes the cosine of a number.
    *
    * @param value The operand to cos. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/cos?lang=java">Cos</a>
    */
   public static Expr Cos(Expr value) {
     return Fn.apply("cos", value);
   }
 
   /**
-   * Computes the cosine of a numbers.
+   * Computes the cosine of a number.
    *
    * @param value The operand to cos. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/cos?lang=java">Cos</a>
    */
   public static Expr Cos(Double value) {
     return Fn.apply("cos", new DoubleV(value));
   }
 
   /**
-   * Computes the hyperbolic cosine of a numbers.
+   * Computes the hyperbolic cosine of a number.
    *
    * @param value The operand to cosh. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/cosh?lang=java">Cosh</a>
    */
   public static Expr Cosh(Expr value) {
     return Fn.apply("cosh", value);
   }
 
   /**
-   * Computes the hyperbolic cosine of a numbers.
+   * Computes the hyperbolic cosine of a number.
    *
    * @param value The operand to cosh. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/cosh?lang=java">Cosh</a>
    */
   public static Expr Cosh(Double value) {
     return Fn.apply("cosh", new DoubleV(value));
   }
 
   /**
-   * Computes the degrees of a numbers.
+   * Computes the degrees of a number.
    *
    * @param value The operand to degrees. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/degrees?lang=java">Degrees</a>
    */
   public static Expr Degrees(Expr value) {
     return Fn.apply("degrees", value);
   }
 
   /**
-   * Computes the degrees of a numbers.
+   * Computes the degrees of a number.
    *
    * @param value The operand to degrees. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/degrees?lang=java">Degrees</a>
    */
   public static Expr Degrees(Double value) {
     return Fn.apply("degrees", new DoubleV(value));
   }
 
   /**
-   * Computes the degrees of a numbers.
+   * Computes the degrees of a number.
    *
    * @param value The operand to degrees. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/degrees?lang=java">Degrees</a>
    */
   public static Expr Degrees(Long value) {
     return Fn.apply("degrees", new LongV(value));
   }
 
-  /*
+  /**
    * Computes the quotient of a list of numbers.
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/divide?lang=java">Divide</a>
    */
   public static Expr Divide(List<? extends Expr> values) {
     return Fn.apply("divide", varargs(values));
@@ -6092,95 +6146,95 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/divide?lang=java">Divide</a>
    */
   public static Expr Divide(Expr... values) {
     return Divide(Collections.unmodifiableList(Arrays.asList(values)));
   }
 
   /**
-   * Computes the exp of a numbers.
+   * Computes the exp of a number.
    *
    * @param value The operand to exp. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/exp?lang=java">Exp</a>
    */
   public static Expr Exp(Expr value) {
     return Fn.apply("exp", value);
   }
 
   /**
-   * Computes the exp of a numbers.
+   * Computes the exp of a number.
    *
    * @param value The operand to exp. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/exp?lang=java">Exp</a>
    */
   public static Expr Exp(Long value) {
     return Fn.apply("exp", new LongV(value));
   }
 
   /**
-   * Computes the exp of a numbers.
+   * Computes the exp of a number.
    *
    * @param value The operand to exp. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/exp?lang=java">Exp</a>
    */
   public static Expr Exp(Double value) {
     return Fn.apply("exp", new DoubleV(value));
   }
 
   /**
-   * Computes the floor of a numbers.
+   * Computes the floor of a number.
    *
    * @param value The operand to floor Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/floor?lang=java">Floor</a>
    */
   public static Expr Floor(Expr value) {
     return Fn.apply("floor", value);
   }
 
   /**
-   * Computes the floor of a numbers.
+   * Computes the floor of a number.
    *
    * @param value The operand to floor Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/floor?lang=java">Floor</a>
    */
   public static Expr Floor(Long value) {
     return Fn.apply("floor", new LongV(value));
   }
 
   /**
-   * Computes the floor of a numbers.
+   * Computes the floor of a number.
    *
    * @param value The operand to floor Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/floor?lang=java">Floor</a>
    */
   public static Expr Floor(Double value) {
     return Fn.apply("floor", new DoubleV(value));
   }
 
   /**
-   * Computes the ln of a numbers.
+   * Computes the ln of a number.
    *
    * @param value The operand to ln. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/ln?lang=java">Ln</a>
    */
   public static Expr Ln(Expr value) {
     return Fn.apply("ln", value);
   }
 
   /**
-   * Computes the ln of a numbers.
+   * Computes the ln of a number.
    *
    * @param value The operand to ln. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/ln?lang=java">Ln</a>
    */
   public static Expr Ln(Double value) {
     return Fn.apply("ln", new DoubleV(value));
@@ -6192,7 +6246,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hypot?lang=java">Hypot</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6206,7 +6260,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hypot?lang=java">Hypot</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6220,7 +6274,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hypot?lang=java">Hypot</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6234,7 +6288,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hypot?lang=java">Hypot</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6247,7 +6301,7 @@ public final class Language {
    *
    * @param num the base. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hypot?lang=java">Hypot</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6260,7 +6314,7 @@ public final class Language {
    *
    * @param num the base. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hypot?lang=java">Hypot</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6269,22 +6323,22 @@ public final class Language {
   }
 
   /**
-   * Computes the log of a numbers.
+   * Computes the log of a number.
    *
    * @param value The operand to log. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/log?lang=java">Log</a>
    */
   public static Expr Log(Expr value) {
     return Fn.apply("log", value);
   }
 
   /**
-   * Computes the log of a numbers.
+   * Computes the log of a number.
    *
    * @param value The operand to log. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/log?lang=java">Log</a>
    */
   public static Expr Log(Double value) {
     return Fn.apply("log", new DoubleV(value));
@@ -6295,7 +6349,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/max?lang=java">Max</a>
    */
   public static Expr Max(List<? extends Expr> values) {
     return Fn.apply("max", varargs(values));
@@ -6306,7 +6360,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/max?lang=java">Max</a>
    */
   public static Expr Max(Expr... values) {
     return Max(Arrays.asList(values));
@@ -6317,7 +6371,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/min?lang=java">Min</a>
    */
   public static Expr Min(List<? extends Expr> values) {
     return Fn.apply("min", varargs(values));
@@ -6328,7 +6382,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/min?lang=java">Min</a>
    */
   public static Expr Min(Expr... values) {
     return Min(Arrays.asList(values));
@@ -6339,7 +6393,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/modulo?lang=java">Modulo</a>
    */
   public static Expr Modulo(List<? extends Expr> values) {
     return Fn.apply("modulo", varargs(values));
@@ -6350,7 +6404,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/modulo?lang=java">Modulo</a>
    */
   public static Expr Modulo(Expr... values) {
     return Modulo(Collections.unmodifiableList(Arrays.asList(values)));
@@ -6361,7 +6415,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/multiply?lang=java">Multiply</a>
    */
   public static Expr Multiply(List<? extends Expr> values) {
     return Fn.apply("multiply", varargs(values));
@@ -6372,7 +6426,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/multiply?lang=java">Multiply</a>
    */
   public static Expr Multiply(Expr... values) {
     return Multiply(Arrays.asList(values));
@@ -6384,7 +6438,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/pow?lang=java">Pow</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6398,7 +6452,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/pow?lang=java">Pow</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6412,7 +6466,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/pow?lang=java">Pow</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6426,7 +6480,7 @@ public final class Language {
    * @param num the base. Type: Number
    * @param exp the exponent, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/pow?lang=java">Pow</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6439,7 +6493,7 @@ public final class Language {
    *
    * @param num the base. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/pow?lang=java">Pow</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6452,7 +6506,7 @@ public final class Language {
    *
    * @param value The operand to radians. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/radians?lang=java">Radians</a>
    */
   public static Expr Radians(Expr value) {
     return Fn.apply("radians", value);
@@ -6463,7 +6517,7 @@ public final class Language {
    *
    * @param value The operand to radians. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/radians?lang=java">Radians</a>
    */
   public static Expr Radians(Double value) {
     return Fn.apply("radians", new DoubleV(value));
@@ -6475,7 +6529,7 @@ public final class Language {
    * @param num the number to round. Type: Number
    * @param precision where to round
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/round?lang=java">Round</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6489,7 +6543,7 @@ public final class Language {
    * @param num the number to round. Type: Number
    * @param precision where to round
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/round?lang=java">Round</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6503,7 +6557,7 @@ public final class Language {
    * @param num the number to round. Type: Number
    * @param precision where to round
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/round?lang=java">Round</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6517,7 +6571,7 @@ public final class Language {
    * @param num the number to round. Type: Number
    * @param precision where to round
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/round?lang=java">Round</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6531,7 +6585,7 @@ public final class Language {
    * @param num the number to round. Type: Number
    * @param precision where to round
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/round?lang=java">Round</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6545,7 +6599,7 @@ public final class Language {
    * @param num the number to round. Type: Number
    * @param precision where to round
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/round?lang=java">Round</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6558,7 +6612,7 @@ public final class Language {
    *
    * @param num the number to round to 2 decimal places. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/round?lang=java">Round</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6571,7 +6625,7 @@ public final class Language {
    *
    * @param num the number to round to 2 decimal places. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/round?lang=java">Round</a>
    * @see #Value(long)
    * @see #Value(double)
    */
@@ -6584,7 +6638,7 @@ public final class Language {
    *
    * @param value The operand to log. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/sign?lang=java">Sign</a>
    */
   public static Expr Sign(Expr value) {
     return Fn.apply("sign", value);
@@ -6595,7 +6649,7 @@ public final class Language {
    *
    * @param value The operand to log. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/sign?lang=java">Sign</a>
    */
   public static Expr Sign(Double value) {
     return Fn.apply("sign", new DoubleV(value));
@@ -6606,7 +6660,7 @@ public final class Language {
    *
    * @param value The operand to log. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/sign?lang=java">Sign</a>
    */
   public static Expr Sign(Long value) {
     return Fn.apply("sign", new LongV(value));
@@ -6617,7 +6671,7 @@ public final class Language {
    *
    * @param value The operand to sin. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/sin?lang=java">Sin</a>
    */
   public static Expr Sin(Expr value) {
     return Fn.apply("sin", value);
@@ -6628,7 +6682,7 @@ public final class Language {
    *
    * @param value The operand to sin. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/sin?lang=java">Sin</a>
    */
   public static Expr Sin(Double value) {
     return Fn.apply("sin", new DoubleV(value));
@@ -6639,7 +6693,7 @@ public final class Language {
    *
    * @param value The operand to hyperbolic sine. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/sinh?lang=java">Sinh</a>
    */
   public static Expr Sinh(Expr value) {
     return Fn.apply("sinh", value);
@@ -6650,29 +6704,29 @@ public final class Language {
    *
    * @param value The operand to hyperbolic sine. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/sinh?lang=java">Sinh</a>
    */
   public static Expr Sinh(Double value) {
     return Fn.apply("sinh", new DoubleV(value));
   }
 
   /**
-   * Computes the square root of a numbers.
+   * Computes the square root of a number.
    *
    * @param value The operand to log. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/sqrt?lang=java">Sqrt</a>
    */
   public static Expr Sqrt(Expr value) {
     return Fn.apply("sqrt", value);
   }
 
   /**
-   * Computes the square root of a numbers.
+   * Computes the square root of a number.
    *
    * @param value The operand to log. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/sqrt?lang=java">Sqrt</a>
    */
   public static Expr Sqrt(Double value) {
     return Fn.apply("sqrt", new DoubleV(value));
@@ -6683,7 +6737,7 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/subtract?lang=java">Subtract</a>
    */
   public static Expr Subtract(List<? extends Expr> values) {
     return Fn.apply("subtract", varargs(values));
@@ -6694,51 +6748,51 @@ public final class Language {
    *
    * @param values the list of numbers. Type: Array
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/subtract?lang=java">Subtract</a>
    */
   public static Expr Subtract(Expr... values) {
     return Subtract(Arrays.asList(values));
   }
 
   /**
-   * Computes the tangent of a numbers.
+   * Computes the tangent of a number.
    *
    * @param value The operand to tan. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/tan?lang=java">Tan</a>
    */
   public static Expr Tan(Expr value) {
     return Fn.apply("tan", value);
   }
 
   /**
-   * Computes the tangent of a numbers.
+   * Computes the tangent of a number.
    *
    * @param value The operand to tan. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/tan?lang=java">Tan</a>
    */
   public static Expr Tan(Double value) {
     return Fn.apply("tan", new DoubleV(value));
   }
 
   /**
-   * Computes the hyperbolic tangent of a numbers.
+   * Computes the hyperbolic tangent of a number.
    *
    * @param value The operand to tanh. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/tanh?lang=java">Tanh</a>
    */
   public static Expr Tanh(Expr value) {
     return Fn.apply("tanh", value);
   }
 
   /**
-   * Computes the hyperbolic tangent of a numbers.
+   * Computes the hyperbolic tangent of a number.
    *
    * @param value The operand to tanh. Type: Number
    * @return a {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/tanh?lang=java">Tanh</a>
    */
   public static Expr Tanh(Double value) {
     return Fn.apply("tanh", new DoubleV(value));
@@ -6750,7 +6804,7 @@ public final class Language {
    * @param num the number to truncate. Type: Number
    * @param precision where to truncate, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/trunc?lang=java">Trunc</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Expr num, Expr precision) {
@@ -6763,7 +6817,7 @@ public final class Language {
    * @param num the number to truncate. Type: Number
    * @param precision where to truncate, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/trunc?lang=java">Trunc</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Double num, Expr precision) {
@@ -6775,7 +6829,7 @@ public final class Language {
    * @param num the number to truncate. Type: Number
    * @param precision where to truncate, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/trunc?lang=java">Trunc</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Long num, Expr precision) {
@@ -6788,7 +6842,7 @@ public final class Language {
    * @param num the number to truncate. Type: Number
    * @param precision where to truncate, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/trunc?lang=java">Trunc</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Expr num, Long precision) {
@@ -6801,7 +6855,7 @@ public final class Language {
    * @param num the number to truncate. Type: Number
    * @param precision where to truncate, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/trunc?lang=java">Trunc</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Double num, Long precision) {
@@ -6813,7 +6867,7 @@ public final class Language {
    * @param num the number to truncate. Type: Number
    * @param precision where to truncate, default 2
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/trunc?lang=java">Trunc</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Long num, Long precision) {
@@ -6825,7 +6879,7 @@ public final class Language {
    *
    * @param num the number to truncate to 2 decimal places. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/trunc?lang=java">Trunc</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Expr num) {
@@ -6837,7 +6891,7 @@ public final class Language {
    *
    * @param num the number to truncate to 2 decimal places. Type: Number
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#mathematical-functions">FaunaDB Mathematical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/trunc?lang=java">Trunc</a>
    * @see #Value(long)
    */
   public static Expr Trunc(Double num) {
@@ -6850,7 +6904,7 @@ public final class Language {
    *
    * @param collection the collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/count">Count function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/count?lang=java">Count</a>
    */
   public static Expr Count(Expr collection) {
     return Fn.apply("count", collection);
@@ -6862,7 +6916,7 @@ public final class Language {
    *
    * @param collection the collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/sum">Sum function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/sum?lang=java">Sum</a>
    */
   public static Expr Sum(Expr collection) {
     return Fn.apply("sum", collection);
@@ -6874,7 +6928,7 @@ public final class Language {
    *
    * @param collection the collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/mean">Mean function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/mean?lang=java">Mean</a>
    */
   public static Expr Mean(Expr collection) {
     return Fn.apply("mean", collection);
@@ -6886,7 +6940,7 @@ public final class Language {
    *
    * @param collection the collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/all">All function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/all?lang=java">All</a>
    */
   public static Expr All(Expr collection) {
     return Fn.apply("all", collection);
@@ -6898,7 +6952,7 @@ public final class Language {
    *
    * @param collection the collection
    * @return a new {@link Expr} instance
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/any">Any function</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/any?lang=java">Any</a>
    */
   public static Expr Any(Expr collection) {
     return Fn.apply("any", collection);
@@ -6909,7 +6963,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#logical-functions">FaunaDB Logical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/lt?lang=java">LT</a>
    */
   public static Expr LT(List<? extends Expr> values) {
     return Fn.apply("lt", varargs(values));
@@ -6920,7 +6974,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#logical-functions">FaunaDB Logical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/lt?lang=java">LT</a>
    */
   public static Expr LT(Expr... values) {
     return LT(Collections.unmodifiableList(Arrays.asList(values)));
@@ -6932,7 +6986,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#logical-functions">FaunaDB Logical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/lte?lang=java">LTE</a>
    */
   public static Expr LTE(List<? extends Expr> values) {
     return Fn.apply("lte", varargs(values));
@@ -6944,7 +6998,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#logical-functions">FaunaDB Logical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/lte?lang=java">LTE</a>
    */
   public static Expr LTE(Expr... values) {
     return LTE(Collections.unmodifiableList(Arrays.asList(values)));
@@ -6955,7 +7009,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#logical-functions">FaunaDB Logical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/gt?lang=java">GT</a>
    */
   public static Expr GT(List<? extends Expr> values) {
     return Fn.apply("gt", varargs(values));
@@ -6966,7 +7020,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#logical-functions">FaunaDB Logical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/gt?lang=java">GT</a>
    */
   public static Expr GT(Expr... values) {
     return GT(Collections.unmodifiableList(Arrays.asList(values)));
@@ -6978,7 +7032,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#logical-functions">FaunaDB Logical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/gte?lang=java">GTE</a>
    */
   public static Expr GTE(List<? extends Expr> values) {
     return Fn.apply("gte", varargs(values));
@@ -6990,7 +7044,7 @@ public final class Language {
    *
    * @param values the list of numbers to compare. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#logical-functions">FaunaDB Logical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/gte?lang=java">GTE</a>
    */
   public static Expr GTE(Expr... values) {
     return GTE(Collections.unmodifiableList(Arrays.asList(values)));
@@ -7001,7 +7055,7 @@ public final class Language {
    *
    * @param values a collection of boolean values. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#logical-functions">FaunaDB Logical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/and?lang=java">And</a>
    */
   public static Expr And(List<? extends Expr> values) {
     return Fn.apply("and", varargs(values));
@@ -7012,7 +7066,7 @@ public final class Language {
    *
    * @param values a collection of boolean values. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#logical-functions">FaunaDB Logical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/and?lang=java">And</a>
    */
   public static Expr And(Expr... values) {
     return And(Collections.unmodifiableList(Arrays.asList(values)));
@@ -7023,7 +7077,7 @@ public final class Language {
    *
    * @param values a collection of boolean values. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#logical-functions">FaunaDB Logical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/or?lang=java">Or</a>
    */
   public static Expr Or(List<? extends Expr> values) {
     return Fn.apply("or", varargs(values));
@@ -7034,7 +7088,7 @@ public final class Language {
    *
    * @param values a collection of boolean values. Type: Array
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#logical-functions">FaunaDB Logical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/or?lang=java">Or</a>
    */
   public static Expr Or(Expr... values) {
     return Or(Collections.unmodifiableList(Arrays.asList(values)));
@@ -7045,7 +7099,7 @@ public final class Language {
    *
    * @param bool a boolean value. Type: Boolean
    * @return a new {@link Expr} instance
-   * @see <a href="https://app.fauna.com/documentation/reference/queryapi#logical-functions">FaunaDB Logical Functions</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/not?lang=java">Not</a>
    */
   public static Expr Not(Expr bool) {
     return Fn.apply("not", bool);
@@ -7056,6 +7110,7 @@ public final class Language {
    *
    * @param value an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/tostring?lang=java">ToString</a>
    */
   public static Expr ToString(Expr value) {
     return Fn.apply("to_string", value);
@@ -7066,6 +7121,7 @@ public final class Language {
    *
    * @param value an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/tonumber?lang=java">ToNumber</a>
    */
   public static Expr ToNumber(Expr value) {
     return Fn.apply("to_number", value);
@@ -7076,6 +7132,7 @@ public final class Language {
    *
    * @param value an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/todouble?lang=java">ToDouble</a>
    */
   public static Expr ToDouble(Expr value) {
     return Fn.apply("to_double", value);
@@ -7086,6 +7143,7 @@ public final class Language {
    *
    * @param value a string
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/todouble?lang=java">ToDouble</a>
    */
   public static Expr ToDouble(String value) {
     return ToDouble(Value(value));
@@ -7096,6 +7154,7 @@ public final class Language {
    *
    * @param value a double value.
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/todouble?lang=java">ToDouble</a>
    */
   public static Expr ToDouble(double value) {
     return ToDouble(Value(value));
@@ -7106,6 +7165,7 @@ public final class Language {
    *
    * @param value a long value
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/todouble?lang=java">ToDouble</a>
    */
   public static Expr ToDouble(long value) {
     return ToDouble(Value(value));
@@ -7116,6 +7176,7 @@ public final class Language {
    *
    * @param value an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/tointeger?lang=java">ToInteger</a>
    */
   public static Expr ToInteger(Expr value) {
     return Fn.apply("to_integer", value);
@@ -7126,6 +7187,7 @@ public final class Language {
    *
    * @param value a string.
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/tointeger?lang=java">ToInteger</a>
    */
   public static Expr ToInteger(String value) {
     return ToInteger(Value(value));
@@ -7136,6 +7198,7 @@ public final class Language {
    *
    * @param value a double value
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/tointeger?lang=java">ToInteger</a>
    */
   public static Expr ToInteger(double value) {
     return ToInteger(Value(value));
@@ -7146,6 +7209,7 @@ public final class Language {
    *
    * @param value a long value
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/tointeger?lang=java">ToInteger</a>
    */
   public static Expr ToInteger(long value) {
     return ToInteger(Value(value));
@@ -7156,6 +7220,7 @@ public final class Language {
    *
    * @param value an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/totime?lang=java">ToTime</a>
    */
   public static Expr ToTime(Expr value) {
     return Fn.apply("to_time", value);
@@ -7166,6 +7231,7 @@ public final class Language {
    *
    * @param value an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/toseconds?lang=java">ToSeconds</a>
    */
   public static Expr ToSeconds(Expr value) {
     return Fn.apply("to_seconds", value);
@@ -7176,6 +7242,7 @@ public final class Language {
    *
    * @param value an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/tomillis?lang=java">ToMillis</a>
    */
   public static Expr ToMillis(Expr value) {
     return Fn.apply("to_millis", value);
@@ -7186,6 +7253,7 @@ public final class Language {
    *
    * @param value an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/tomicros?lang=java">ToMicros</a>
    */
   public static Expr ToMicros(Expr value) {
     return Fn.apply("to_micros", value);
@@ -7196,6 +7264,7 @@ public final class Language {
    *
    * @param expr an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/dayofmonth?lang=java">DayOfMonth</a>
    */
   public static Expr DayOfMonth(Expr expr) {
     return Fn.apply("day_of_month", expr);
@@ -7207,6 +7276,7 @@ public final class Language {
    *
    * @param expr an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/dayofweek?lang=java">DayOfWeek</a>
    */
   public static Expr DayOfWeek(Expr expr) {
     return Fn.apply("day_of_week", expr);
@@ -7218,6 +7288,7 @@ public final class Language {
    *
    * @param expr an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/dayofyear?lang=java">DayOfYear</a>
    */
   public static Expr DayOfYear(Expr expr) {
     return Fn.apply("day_of_year", expr);
@@ -7228,6 +7299,7 @@ public final class Language {
    *
    * @param expr an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/year?lang=java">Year</a>
    */
   public static Expr Year(Expr expr) {
     return Fn.apply("year", expr);
@@ -7238,6 +7310,7 @@ public final class Language {
    *
    * @param expr an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/month?lang=java">Month</a>
    */
   public static Expr Month(Expr expr) {
     return Fn.apply("month", expr);
@@ -7248,6 +7321,7 @@ public final class Language {
    *
    * @param expr an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/hour?lang=java">Hour</a>
    */
   public static Expr Hour(Expr expr) {
     return Fn.apply("hour", expr);
@@ -7258,6 +7332,7 @@ public final class Language {
    *
    * @param expr an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/minute?lang=java">Minute</a>
    */
   public static Expr Minute(Expr expr) {
     return Fn.apply("minute", expr);
@@ -7268,6 +7343,7 @@ public final class Language {
    *
    * @param expr an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/second?lang=java">Second</a>
    */
   public static Expr Second(Expr expr) {
     return Fn.apply("second", expr);
@@ -7278,6 +7354,7 @@ public final class Language {
    *
    * @param value an expression. Type: Any
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/todate?lang=java">ToDate</a>
    */
   public static Expr ToDate(Expr value) {
     return Fn.apply("to_date", value);
@@ -7289,6 +7366,7 @@ public final class Language {
    * @param merge the first object. Type: Object
    * @param with the second object or a list of objects: Type: Object or Array of Objects
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/merge?lang=java">Merge</a>
    */
   public static Expr Merge(Expr merge, Expr with) {
     return Fn.apply("merge", merge, "with", with);
@@ -7301,6 +7379,7 @@ public final class Language {
    * @param with the second object or a list of objects: Type: Object or Array of Objects
    * @param lambda a lambda to resolve possible conflicts: Type: A lambda function
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/merge?lang=java">Merge</a>
    */
   public static Expr Merge(Expr merge, Expr with, Expr lambda) {
     return Fn.apply("merge", merge, "with", with, "lambda", lambda);
@@ -7311,6 +7390,7 @@ public final class Language {
    *
    * @param fields an expr that result into an array of (field, value)
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/toobject?lang=java">ToObject</a>
    */
   public static Expr ToObject(Expr fields) {
     return Fn.apply("to_object", fields);
@@ -7321,6 +7401,7 @@ public final class Language {
    *
    * @param object the object to convert.
    * @return a new {@link Expr}
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/toarray?lang=java">ToArray</a>
    */
   public static Expr ToArray(Expr object) {
     return Fn.apply("to_array", object);
@@ -7331,7 +7412,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isnumber">IsNumber</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isnumber?lang=java">IsNumber</a>
    */
   public static Expr IsNumber(Expr expr) {
     return Fn.apply("is_number", expr);
@@ -7342,7 +7423,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isdouble">IsDouble</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isdouble?lang=java">IsDouble</a>
    */
   public static Expr IsDouble(Expr expr) {
     return Fn.apply("is_double", expr);
@@ -7353,7 +7434,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isinteger">IsInteger</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isinteger?lang=java">IsInteger</a>
    */
   public static Expr IsInteger(Expr expr) {
     return Fn.apply("is_integer", expr);
@@ -7364,7 +7445,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isboolean">IsBoolean</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isboolean?lang=java">IsBoolean</a>
    */
   public static Expr IsBoolean(Expr expr) {
     return Fn.apply("is_boolean", expr);
@@ -7375,7 +7456,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isnull">IsNull</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isnull?lang=java">IsNull</a>
    */
   public static Expr IsNull(Expr expr) {
     return Fn.apply("is_null", expr);
@@ -7386,7 +7467,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isbytes">IsBytes</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isbytes?lang=java">IsBytes</a>
    */
   public static Expr IsBytes(Expr expr) {
     return Fn.apply("is_bytes", expr);
@@ -7397,7 +7478,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/istimestamp">IsTimestamp</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/istimestamp?lang=java">IsTimestamp</a>
    */
   public static Expr IsTimestamp(Expr expr) {
     return Fn.apply("is_timestamp", expr);
@@ -7408,7 +7489,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isdate">IsDate</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isdate?lang=java">IsDate</a>
    */
   public static Expr IsDate(Expr expr) {
     return Fn.apply("is_date", expr);
@@ -7419,7 +7500,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isstring">IsString</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isstring?lang=java">IsString</a>
    */
   public static Expr IsString(Expr expr) {
     return Fn.apply("is_string", expr);
@@ -7430,7 +7511,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isarray">IsArray</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isarray?lang=java">IsArray</a>
    */
   public static Expr IsArray(Expr expr) {
     return Fn.apply("is_array", expr);
@@ -7441,7 +7522,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isobject">IsObject</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isobject?lang=java">IsObject</a>
    */
   public static Expr IsObject(Expr expr) {
     return Fn.apply("is_object", expr);
@@ -7452,7 +7533,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isref">IsRef</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isref?lang=java">IsRef</a>
    */
   public static Expr IsRef(Expr expr) {
     return Fn.apply("is_ref", expr);
@@ -7463,7 +7544,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isset">IsSet</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isset?lang=java">IsSet</a>
    */
   public static Expr IsSet(Expr expr) {
     return Fn.apply("is_set", expr);
@@ -7474,7 +7555,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isdoc">IsDoc</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isdoc?lang=java">IsDoc</a>
    */
   public static Expr IsDoc(Expr expr) {
     return Fn.apply("is_doc", expr);
@@ -7485,7 +7566,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/islambda">IsLambda</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/islambda?lang=java">IsLambda</a>
    */
   public static Expr IsLambda(Expr expr) {
     return Fn.apply("is_lambda", expr);
@@ -7496,7 +7577,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/iscollection">IsCollection</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/iscollection?lang=java">IsCollection</a>
    */
   public static Expr IsCollection(Expr expr) {
     return Fn.apply("is_collection", expr);
@@ -7507,7 +7588,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isdatabase">IsDatabase</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isdatabase?lang=java">IsDatabase</a>
    */
   public static Expr IsDatabase(Expr expr) {
     return Fn.apply("is_database", expr);
@@ -7518,7 +7599,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isindex">IsIndex</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isindex?lang=java">IsIndex</a>
    */
   public static Expr IsIndex(Expr expr) {
     return Fn.apply("is_index", expr);
@@ -7529,7 +7610,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isfunction">IsFunction</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isfunction?lang=java">IsFunction</a>
    */
   public static Expr IsFunction(Expr expr) {
     return Fn.apply("is_function", expr);
@@ -7540,7 +7621,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/iskey">IsKey</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/iskey?lang=java">IsKey</a>
    */
   public static Expr IsKey(Expr expr) {
     return Fn.apply("is_key", expr);
@@ -7551,7 +7632,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/istoken">IsToken</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/istoken?lang=java">IsToken</a>
    */
   public static Expr IsToken(Expr expr) {
     return Fn.apply("is_token", expr);
@@ -7562,7 +7643,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/iscredentials">IsCredentials</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/iscredentials?lang=java">IsCredentials</a>
    */
   public static Expr IsCredentials(Expr expr) {
     return Fn.apply("is_credentials", expr);
@@ -7573,7 +7654,7 @@ public final class Language {
    *
    * @param expr the expression to check
    * @return a new {@link Expr}
-   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isrole">IsRole</a>
+   * @see <a href="https://docs.fauna.com/fauna/current/api/fql/functions/isrole?lang=java>IsRole</a>
    */
   public static Expr IsRole(Expr expr) {
     return Fn.apply("is_role", expr);
