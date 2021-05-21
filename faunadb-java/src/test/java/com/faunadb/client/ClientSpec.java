@@ -3477,10 +3477,9 @@ public class ClientSpec {
                 = CompletableFuture.supplyAsync(
                 () -> {
                   try {
-
                     Expr values = Arr(IntStream.rangeClosed(1, 10).mapToObj(Language::Value).collect(Collectors.toList()));
-                    Value val = client.query(Map(Paginate(Documents(Collection(PARALLEL_COLLECTION_NAME))), reference -> Get(reference))).get();
-                    Value sumValue = client.query(Sum(values)).get();
+                    client.query(Map(Paginate(Documents(Collection(PARALLEL_COLLECTION_NAME))), reference -> Get(reference))).get();
+                    client.query(Sum(values)).get();
                   //  Thread.sleep(100);
                   } catch (Exception ex) {
                     return Optional.of(ex);
