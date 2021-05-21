@@ -22,6 +22,7 @@ import java.util.*;
 import static java.util.Arrays.asList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Flow;
+import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -55,7 +56,9 @@ public class ClientSpec {
 
   private static final String DB_NAME = "faunadb-java-test-" + new Random().nextLong();
   private static final Expr DB_REF = Database(DB_NAME);
-
+  private static final String PARALLEL_COLLECTION_NAME = "JavaParallelTestCollection";
+  private static final Integer IN_PARALLEL_VALUE = 1000;
+  private static final Integer MAX_PARALLEL_ATTEMPT = 10;
   private static FaunaClient rootClient;
   private static FaunaClient serverClient;
   private static FaunaClient adminClient;
@@ -126,7 +129,8 @@ public class ClientSpec {
     query(Arrays.asList(
       CreateCollection(Obj("name", Value("spells"))),
       CreateCollection(Obj("name", Value("characters"))),
-      CreateCollection(Obj("name", Value("spellbooks")))
+      CreateCollection(Obj("name", Value("spellbooks"))),
+      CreateCollection(Obj("name", Value(PARALLEL_COLLECTION_NAME)))
     )).get();
 
     query(Arrays.asList(
@@ -164,6 +168,15 @@ public class ClientSpec {
         "terms", Arr(Obj("field", Arr(Value("data"), Value("spellbook"))))
       ))
     )).get();
+
+    for (int i = 0; i < MAX_PARALLEL_ATTEMPT; i++) {
+      query(
+              Create(Collection(PARALLEL_COLLECTION_NAME),
+                      Obj("data",
+                              Obj(
+                                      "value", Value(i+1))))
+      ).get();
+    }
 
     magicMissile = query(
       Create(Collection("spells"),
@@ -3446,6 +3459,55 @@ public class ClientSpec {
     thrown.expectCause(isA(StreamingException.class));
     thrown.expectMessage(containsString("permission denied: Authorization lost during stream evaluation."));
     capturedEvents.get();
+  }
+
+  @Test
+  public void ParallelsQueriesTest() throws ExecutionException, InterruptedException {
+    Collection<Exception> syncCollection = Collections.synchronizedCollection(new ArrayList<>());
+    List<FaunaClient> clientPool = getClientPool();
+    Random rand = new Random();
+
+    for (int j = 0; j < MAX_PARALLEL_ATTEMPT; j++) {
+      ExecutorService executor = Executors.newFixedThreadPool(IN_PARALLEL_VALUE);
+      for (int i = 0; i < IN_PARALLEL_VALUE; i++) {
+        int randomNum =  rand.nextInt((MAX_PARALLEL_ATTEMPT-1));
+        Runnable worker = new RunnableInParallel(clientPool.get(randomNum), syncCollection);
+        executor.execute(worker);
+      }
+      executor.shutdown();
+      while (!executor.isTerminated()) {}
+      Thread.sleep(1000);
+    }
+    assertThat(syncCollection.isEmpty(), equalTo(true));
+  }
+
+  private ArrayList<FaunaClient> getClientPool() throws ExecutionException, InterruptedException {
+    ArrayList<FaunaClient> clients = new ArrayList<>();
+    Value serverKey = rootClient.query(CreateKey(Obj("database", DB_REF, "role", Value("server")))).get();
+    for (int i = 0; i < MAX_PARALLEL_ATTEMPT; i++) {
+      clients.add(rootClient.newSessionClient(serverKey.get(SECRET_FIELD)));
+    }
+    return clients;
+  }
+
+  private class RunnableInParallel implements Runnable {
+    private FaunaClient client;
+    private Expr values;
+    private Collection<Exception> collection;
+    RunnableInParallel(FaunaClient client,  Collection<Exception> collection) {
+      this.client = client;
+      this.values = Arr(IntStream.rangeClosed(1, 10).mapToObj(Language:: Value).collect(Collectors.toList()));
+      this.collection = collection;
+    }
+    @Override
+    public void run() {
+      try {
+        Value val = client.query(Map(Paginate(Documents(Collection(PARALLEL_COLLECTION_NAME))), reference -> Get(reference))).get();
+        Value sumValue = client.query(Sum(values)).get();
+      } catch(Exception ex) {
+        collection.add(ex);
+      }
+    }
   }
 
   private CompletableFuture<Value> query(Expr expr) {
