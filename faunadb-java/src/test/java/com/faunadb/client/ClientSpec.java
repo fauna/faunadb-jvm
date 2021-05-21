@@ -26,6 +26,7 @@ import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.Action.CREATE;
@@ -3467,47 +3468,46 @@ public class ClientSpec {
     List<FaunaClient> clientPool = getClientPool();
     Random rand = new Random();
 
-    for (int j = 0; j < MAX_PARALLEL_ATTEMPT; j++) {
-      ExecutorService executor = Executors.newFixedThreadPool(IN_PARALLEL_VALUE);
-      for (int i = 0; i < IN_PARALLEL_VALUE; i++) {
+    ExecutorService executor = Executors.newFixedThreadPool(MAX_PARALLEL_ATTEMPT);
+    List<CompletableFuture<Optional<Exception>>> results = new ArrayList<>();
+    for (int i = 0; i < IN_PARALLEL_VALUE ; i++) {
         int randomNum =  rand.nextInt((MAX_PARALLEL_ATTEMPT-1));
-        Runnable worker = new RunnableInParallel(clientPool.get(randomNum), syncCollection);
-        executor.execute(worker);
-      }
-      executor.shutdown();
-      while (!executor.isTerminated()) {}
-      Thread.sleep(1000);
+        FaunaClient client = clientPool.get(randomNum);
+        CompletableFuture<Optional<Exception>> future
+                = CompletableFuture.supplyAsync(
+                () -> {
+                  try {
+
+                    Expr values = Arr(IntStream.rangeClosed(1, 10).mapToObj(Language::Value).collect(Collectors.toList()));
+                    Value val = client.query(Map(Paginate(Documents(Collection(PARALLEL_COLLECTION_NAME))), reference -> Get(reference))).get();
+                    Value sumValue = client.query(Sum(values)).get();
+                  //  Thread.sleep(100);
+                  } catch (Exception ex) {
+                    return Optional.of(ex);
+                  }
+                  return Optional.empty();
+                }, executor
+        );
+
+        results.add(future);
     }
-    assertThat(syncCollection.isEmpty(), equalTo(true));
+
+    List<Exception> exceptions =  results
+              .stream()
+              .map(CompletableFuture::join)
+              .filter(Optional::isPresent)
+              .map(Optional::get)
+              .collect(Collectors.toList());
+    assertThat(exceptions.isEmpty(), equalTo(true));
   }
 
-  private ArrayList<FaunaClient> getClientPool() throws ExecutionException, InterruptedException {
-    ArrayList<FaunaClient> clients = new ArrayList<>();
+  private List<FaunaClient> getClientPool() throws ExecutionException, InterruptedException {
+    List<FaunaClient> clients = new ArrayList<>();
     Value serverKey = rootClient.query(CreateKey(Obj("database", DB_REF, "role", Value("server")))).get();
     for (int i = 0; i < MAX_PARALLEL_ATTEMPT; i++) {
       clients.add(rootClient.newSessionClient(serverKey.get(SECRET_FIELD)));
     }
     return clients;
-  }
-
-  private class RunnableInParallel implements Runnable {
-    private FaunaClient client;
-    private Expr values;
-    private Collection<Exception> collection;
-    RunnableInParallel(FaunaClient client,  Collection<Exception> collection) {
-      this.client = client;
-      this.values = Arr(IntStream.rangeClosed(1, 10).mapToObj(Language:: Value).collect(Collectors.toList()));
-      this.collection = collection;
-    }
-    @Override
-    public void run() {
-      try {
-        Value val = client.query(Map(Paginate(Documents(Collection(PARALLEL_COLLECTION_NAME))), reference -> Get(reference))).get();
-        Value sumValue = client.query(Sum(values)).get();
-      } catch(Exception ex) {
-        collection.add(ex);
-      }
-    }
   }
 
   private CompletableFuture<Value> query(Expr expr) {
