@@ -2231,9 +2231,9 @@ class ClientSpec
     }
   }
 
-  it should "parallel testing should be executed without exceptions" in {
+  it should "throw no exceptions when running 500 queries in parallel" in {
     val key = rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "admin"))).futureValue
-    val clientPool = List.tabulate(10)(n=> FaunaClient(endpoint = config("root_url"), secret = key(SecretField).get))
+    val clientPool = List.tabulate(10)(n => FaunaClient(endpoint = config("root_url"), secret = key(SecretField).get))
 
     val random = scala.util.Random
     val COLLECTION_NAME = "ParallelTestCollection"
@@ -2245,10 +2245,9 @@ class ClientSpec
             Obj("data" -> Obj("testField" -> "testValue")))).futureValue
     }
 
-    val numJobs = 500
     ExecutionContext.fromExecutor(Executors.newFixedThreadPool(10))
 
-    val tasks = for (i <- 1 to numJobs) yield Future {
+    val tasks = for (i <- 1 to 500) yield Future {
       val taskClient = clientPool(random.nextInt(9))
       try {
         taskClient.queryWithMetrics(
@@ -2258,7 +2257,7 @@ class ClientSpec
           ),
           None
         ).futureValue.value
-      } catch  {
+      } catch {
         case e: Exception => fail("exception occurred: " + e)
       }
 
@@ -2266,7 +2265,7 @@ class ClientSpec
       try {
         val result = taskClient.query(Sum(values)).futureValue
         result shouldBe 55
-      } catch  {
+      } catch {
         case e: Exception => fail("exception occurred: " + e)
       }
     }
