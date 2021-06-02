@@ -3,12 +3,13 @@ package faunadb
 import faunadb.errors._
 import faunadb.query.{TimeUnit, _}
 import faunadb.values._
+
 import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate}
 import java.util
 import java.util.concurrent.Flow
-
 import faunadb.FaunaClient._
+
 import java.util.concurrent.Flow
 import monix.execution.Scheduler
 import monix.reactive.Observable
@@ -20,9 +21,10 @@ import org.scalatest.matchers.should.Matchers
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.concurrent.duration._
 import scala.util.Random
+import java.util.concurrent.Executors
 
 class ClientSpec
     extends AnyFlatSpec
@@ -2227,6 +2229,50 @@ class ClientSpec
       case _ =>
         fail("expected 4 events")
     }
+  }
+
+  it should "parallel testing should be executed without exceptions" in {
+    val key = rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "admin"))).futureValue
+    val clientPool = List.tabulate(10)(n=> FaunaClient(endpoint = config("root_url"), secret = key(SecretField).get))
+
+    val random = scala.util.Random
+    val COLLECTION_NAME = "ParallelTestCollection"
+    //create sample collection with 10 documents
+    client.query(CreateCollection(Obj("name" -> COLLECTION_NAME))).futureValue
+    for (i <- 1 to 3) {
+      client.query(
+          Create(Collection(COLLECTION_NAME),
+            Obj("data" -> Obj("testField" -> "testValue")))).futureValue
+    }
+
+    val numJobs = 500
+    ExecutionContext.fromExecutor(Executors.newFixedThreadPool(10))
+
+    val tasks = for (i <- 1 to numJobs) yield Future {
+      val taskClient = clientPool(random.nextInt(9))
+      try {
+        taskClient.queryWithMetrics(
+          Map(
+            Paginate(Documents(Collection(COLLECTION_NAME))),
+            Lambda(nextRef => Select("data", Get(nextRef)))
+          ),
+          None
+        ).futureValue.value
+      } catch  {
+        case e: Exception => fail("exception occurred: " + e)
+      }
+
+      val values = Arr((1 to 10).map(i => i: Expr): _*)
+      try {
+        val result = taskClient.query(Sum(values)).futureValue
+        result shouldBe 55
+      } catch  {
+        case e: Exception => fail("exception occurred: " + e)
+      }
+    }
+
+    val aggregated = Future.sequence(tasks)
+    Await.ready(aggregated, 30.second)
   }
 
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
