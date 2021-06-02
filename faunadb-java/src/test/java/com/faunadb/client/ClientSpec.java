@@ -20,8 +20,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.*;
 import static java.util.Arrays.asList;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Flow;
+
 import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -3478,9 +3477,8 @@ public class ClientSpec {
                 () -> {
                   try {
                     Expr values = Arr(IntStream.rangeClosed(1, 10).mapToObj(Language::Value).collect(Collectors.toList()));
-                    client.query(Map(Paginate(Documents(Collection(PARALLEL_COLLECTION_NAME))), reference -> Get(reference))).get();
+                    client.query(Paginate(Documents(Collection(PARALLEL_COLLECTION_NAME)))).get();
                     client.query(Sum(values)).get();
-                  //  Thread.sleep(100);
                   } catch (Exception ex) {
                     return Optional.of(ex);
                   }
