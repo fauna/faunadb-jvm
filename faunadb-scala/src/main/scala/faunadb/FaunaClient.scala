@@ -406,7 +406,9 @@ class FaunaClient private (connection: Connection) {
     case ex: ConnectException =>
       Future.failed(new UnavailableException(ex.getMessage, ex))
     case ex: TimeoutException =>
-      Future.failed(new TimeoutException(ex.getMessage))
+      Future.failed(new UnavailableException(ex.getMessage, ex))
+    case ex: CompletionException if ex.getCause.isInstanceOf[IOException] && ex.getMessage.contains("header parser received no bytes") =>
+      Future.failed(new UnavailableException(ex.getMessage, ex))
     case ex: CompletionException if ex.getCause.isInstanceOf[IOException] && ex.getMessage.contains("too many concurrent streams") =>
       Future.failed(BadRequestException(None, "the maximum number of streams has been reached for this client"))
   }
