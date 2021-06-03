@@ -110,7 +110,7 @@ private[values] class CollectionField[T, Col](field: Field[Value], cbf: CanBuild
         val errs = List.newBuilder[FieldError]
         val rv = cbf()
 
-        elems.zipWithIndex foreach {
+        elems.iterator.zipWithIndex foreach {
           case (v, i) =>
             tr(v) match {
               case VSuccess(t, _) => rv += t
