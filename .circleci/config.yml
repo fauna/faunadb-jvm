@@ -46,7 +46,7 @@ commands:
 
       - run:
           name: Compile 2.12
-          command: sbt ++2.12.12 compileAll
+          command: sbt ++2.12.14 compileAll
 
       - save_cache:
           key: faunadb-jvm-v1-{{ .Branch }}-{{checksum "project/Dependencies.scala" }}
@@ -57,11 +57,11 @@ commands:
 
       - run:
           name: Test 2.11
-          command: sbt ++2.11.12 coverage test coverageReport
+          command: sbt ++2.11.12 test
 
       - run:
           name: Test 2.12
-          command: sbt ++2.12.12 coverage test coverageReport
+          command: sbt ++2.12.14 coverage test coverageReport
 
       - run:
           name: Load Test 2.11
@@ -69,7 +69,7 @@ commands:
 
       - run:
           name: Load Test 2.12
-          command: sbt ++2.12.12 load:test
+          command: sbt ++2.12.14 load:test
 
       - run:
           when: always
@@ -86,7 +86,7 @@ commands:
 
       - run:
           name: Generate API documentation 2.12
-          command: sbt clean ++2.12.12 doc
+          command: sbt clean ++2.12.14 doc
 
       - store_test_results:
           path: results/
