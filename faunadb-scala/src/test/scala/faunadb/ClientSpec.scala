@@ -2239,11 +2239,11 @@ class ClientSpec
     val COLLECTION_NAME = "ParallelTestCollection"
     //create sample collection with 10 documents
     client.query(CreateCollection(Obj("name" -> COLLECTION_NAME))).futureValue
-    for (i <- 1 to 3) {
+    (1 to 3).foreach(_ =>
       client.query(
           Create(Collection(COLLECTION_NAME),
             Obj("data" -> Obj("testField" -> "testValue")))).futureValue
-    }
+    )
 
     ExecutionContext.fromExecutor(Executors.newFixedThreadPool(10))
 
