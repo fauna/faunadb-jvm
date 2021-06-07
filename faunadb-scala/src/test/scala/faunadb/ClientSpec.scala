@@ -1,30 +1,27 @@
 package faunadb
 
-import faunadb.errors._
-import faunadb.query.{TimeUnit, _}
-import faunadb.values._
-
 import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate}
 import java.util
 import java.util.concurrent.Flow
-import faunadb.FaunaClient._
 
-import java.util.concurrent.Flow
+import faunadb.FaunaClient._
+import faunadb.errors._
+import faunadb.query.{TimeUnit, _}
+import faunadb.values._
 import monix.execution.Scheduler
 import monix.reactive.Observable
 import org.reactivestreams.{FlowAdapters, Publisher}
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.BeforeAndAfterAll
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.concurrent.duration._
+import scala.concurrent.{Future, Promise}
 import scala.util.Random
-import java.util.concurrent.Executors
 
 class ClientSpec
     extends AnyFlatSpec
@@ -1252,7 +1249,7 @@ class ClientSpec
     val createR = client.query(Create(Collection(collName), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
     val loginR = client.query(Login(createR(RefField), Obj("password" -> "abcdefg"))).futureValue
     val secret = loginR(SecretField).get
-    
+
     // Run
     val hasCurrentToken = client.sessionWith(secret)(_.query(HasCurrentToken())).futureValue
 
@@ -1274,7 +1271,7 @@ class ClientSpec
     // Verify
     hasNotCurrentToken.to[Boolean].get shouldBe false
   }
-      
+
   it should "test CurrentToken with internal token" in {
     // Setup
     val collName = aRandomString
@@ -1289,7 +1286,7 @@ class ClientSpec
 
     // Verify
     currentToken.to[RefV].get shouldBe tokenRef
-  }    
+  }
 
   it should "test CurrentToken with internal key" in {
     val clientKey = adminClient.query(CreateKey(Obj("role" -> "client"))).futureValue
@@ -2245,33 +2242,31 @@ class ClientSpec
             Obj("data" -> Obj("testField" -> "testValue")))).futureValue
     )
 
-    ExecutionContext.fromExecutor(Executors.newFixedThreadPool(10))
-
-    val tasks = for (i <- 1 to 500) yield Future {
+    val counter = 500
+    def metricsQuery: Future[MetricsResponse] = {
       val taskClient = clientPool(random.nextInt(9))
-      try {
-        taskClient.queryWithMetrics(
-          Map(
-            Paginate(Documents(Collection(COLLECTION_NAME))),
-            Lambda(nextRef => Select("data", Get(nextRef)))
-          ),
-          None
-        ).futureValue.value
-      } catch {
-        case e: Exception => fail("exception occurred: " + e)
-      }
-
+      val result = taskClient.queryWithMetrics(
+        Map(
+          Paginate(Documents(Collection(COLLECTION_NAME))),
+          Lambda(nextRef => Select("data", Get(nextRef)))
+        ),
+        None
+      )
+      result
+    }
+    def sumQuery: Future[Value] = {
+      val taskClient = clientPool(random.nextInt(9))
       val values = Arr((1 to 10).map(i => i: Expr): _*)
-      try {
-        val result = taskClient.query(Sum(values)).futureValue
-        result shouldBe 55
-      } catch {
-        case e: Exception => fail("exception occurred: " + e)
-      }
+      taskClient.query(Sum(values))
     }
 
-    val aggregated = Future.sequence(tasks)
-    Await.ready(aggregated, 30.second)
+    (Seq.fill(counter)(metricsQuery))
+      .par
+      .foreach((result: Future[MetricsResponse]) => noException should be thrownBy result.futureValue)
+
+    (Seq.fill(counter)(sumQuery))
+      .par
+      .foreach((result: Future[Value]) => result.futureValue shouldBe(LongV(55)) )
   }
 
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {
