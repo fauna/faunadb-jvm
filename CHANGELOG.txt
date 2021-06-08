@@ -1,3 +1,8 @@
+4.1.1
+* Improve handling of network timeouts to make sure the driver returns an `UnavailableException`
+* Relax JSON parsing to not fail on unknown fields
+* Update documentation links for the Java and Scala drivers
+
 4.1.0
 * Exposes billing metrics
 * Adds runtime environment headers to queries

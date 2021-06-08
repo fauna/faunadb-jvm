@@ -10,7 +10,7 @@ object Dependencies {
     val scalaTestVersion             = "3.2.3"
     val scalaJava8CompatVersion      = "0.9.1"
     val scalaReflectScala211Version  = "2.11.12"
-    val scalaReflectScala212Version  = "2.12.12"
+    val scalaReflectScala212Version  = "2.12.14"
     val snakeYamlVersion             = "1.27"
     val junitInterfaceVersion        = "0.11"
     val harmcrestLibraryVersion      = "2.2"

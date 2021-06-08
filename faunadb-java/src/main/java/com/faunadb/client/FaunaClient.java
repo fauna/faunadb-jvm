@@ -498,14 +498,17 @@ public class FaunaClient {
   }
 
   private <V> CompletableFuture<V> handleNetworkExceptions(CompletableFuture<V> f) {
-      return f.whenComplete((v, ex) -> {
-          if (ex instanceof ConnectException || ex instanceof TimeoutException) {
-              throw new UnavailableException(ex.getMessage(), ex);
-          }
-        if (ex instanceof CompletionException && ex.getCause() instanceof IOException && ex.getMessage().contains("too many concurrent streams")) {
-            throw new BadRequestException("the maximum number of streams has been reached for this client");
-          }
-      });
+    return f.whenComplete((v, ex) -> {
+      if (ex instanceof ConnectException || ex instanceof TimeoutException) {
+        throw new UnavailableException(ex.getMessage(), ex);
+      }
+      if (ex instanceof CompletionException && ex.getCause() instanceof IOException && ex.getMessage().contains("header parser received no bytes")) {
+        throw new UnavailableException(ex.getMessage(), ex);
+      }
+      if (ex instanceof CompletionException && ex.getCause() instanceof IOException && ex.getMessage().contains("too many concurrent streams")) {
+        throw new BadRequestException("the maximum number of streams has been reached for this client");
+      }
+    });
   }
 
   private JsonNode parseResponseBody(String responseBody) throws JsonProcessingException, IllegalArgumentException {
