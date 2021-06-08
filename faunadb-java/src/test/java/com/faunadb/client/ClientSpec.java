@@ -21,7 +21,11 @@ import java.util.Map;
 import java.util.*;
 import static java.util.Arrays.asList;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Flow;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -3463,7 +3467,6 @@ public class ClientSpec {
 
   @Test
   public void ParallelsQueriesTest() throws ExecutionException, InterruptedException {
-    Collection<Exception> syncCollection = Collections.synchronizedCollection(new ArrayList<>());
     List<FaunaClient> clientPool = getClientPool();
     Random rand = new Random();
 
