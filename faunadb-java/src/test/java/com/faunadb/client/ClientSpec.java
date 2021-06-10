@@ -20,11 +20,16 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.*;
 import static java.util.Arrays.asList;
-import java.util.concurrent.CompletableFuture;
+
 import java.util.concurrent.Flow;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.Action.CREATE;
@@ -55,7 +60,9 @@ public class ClientSpec {
 
   private static final String DB_NAME = "faunadb-java-test-" + new Random().nextLong();
   private static final Expr DB_REF = Database(DB_NAME);
-
+  private static final String PARALLEL_COLLECTION_NAME = "JavaParallelTestCollection";
+  private static final Integer IN_PARALLEL_VALUE = 1000;
+  private static final Integer MAX_PARALLEL_ATTEMPT = 10;
   private static FaunaClient rootClient;
   private static FaunaClient serverClient;
   private static FaunaClient adminClient;
@@ -126,7 +133,8 @@ public class ClientSpec {
     query(Arrays.asList(
       CreateCollection(Obj("name", Value("spells"))),
       CreateCollection(Obj("name", Value("characters"))),
-      CreateCollection(Obj("name", Value("spellbooks")))
+      CreateCollection(Obj("name", Value("spellbooks"))),
+      CreateCollection(Obj("name", Value(PARALLEL_COLLECTION_NAME)))
     )).get();
 
     query(Arrays.asList(
@@ -164,6 +172,15 @@ public class ClientSpec {
         "terms", Arr(Obj("field", Arr(Value("data"), Value("spellbook"))))
       ))
     )).get();
+
+    for (int i = 0; i < MAX_PARALLEL_ATTEMPT; i++) {
+      query(
+              Create(Collection(PARALLEL_COLLECTION_NAME),
+                      Obj("data",
+                              Obj(
+                                      "value", Value(i+1))))
+      ).get();
+    }
 
     magicMissile = query(
       Create(Collection("spells"),
@@ -3446,6 +3463,51 @@ public class ClientSpec {
     thrown.expectCause(isA(StreamingException.class));
     thrown.expectMessage(containsString("permission denied: Authorization lost during stream evaluation."));
     capturedEvents.get();
+  }
+
+  @Test
+  public void ParallelsQueriesTest() throws ExecutionException, InterruptedException {
+    List<FaunaClient> clientPool = getClientPool();
+    Random rand = new Random();
+
+    ExecutorService executor = Executors.newFixedThreadPool(MAX_PARALLEL_ATTEMPT);
+    List<CompletableFuture<Optional<Exception>>> results = new ArrayList<>();
+    for (int i = 0; i < IN_PARALLEL_VALUE ; i++) {
+        int randomNum =  rand.nextInt((MAX_PARALLEL_ATTEMPT-1));
+        FaunaClient client = clientPool.get(randomNum);
+        CompletableFuture<Optional<Exception>> future
+                = CompletableFuture.supplyAsync(
+                () -> {
+                  try {
+                    Expr values = Arr(IntStream.rangeClosed(1, 10).mapToObj(Language::Value).collect(Collectors.toList()));
+                    client.query(Paginate(Documents(Collection(PARALLEL_COLLECTION_NAME)))).get();
+                    client.query(Sum(values)).get();
+                  } catch (Exception ex) {
+                    return Optional.of(ex);
+                  }
+                  return Optional.empty();
+                }, executor
+        );
+
+        results.add(future);
+    }
+
+    List<Exception> exceptions =  results
+              .stream()
+              .map(CompletableFuture::join)
+              .filter(Optional::isPresent)
+              .map(Optional::get)
+              .collect(Collectors.toList());
+    assertThat(exceptions.isEmpty(), equalTo(true));
+  }
+
+  private List<FaunaClient> getClientPool() throws ExecutionException, InterruptedException {
+    List<FaunaClient> clients = new ArrayList<>();
+    Value serverKey = rootClient.query(CreateKey(Obj("database", DB_REF, "role", Value("server")))).get();
+    for (int i = 0; i < MAX_PARALLEL_ATTEMPT; i++) {
+      clients.add(rootClient.newSessionClient(serverKey.get(SECRET_FIELD)));
+    }
+    return clients;
   }
 
   private CompletableFuture<Value> query(Expr expr) {
