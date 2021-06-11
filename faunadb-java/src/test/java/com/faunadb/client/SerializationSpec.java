@@ -5,9 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.*;
+import com.faunadb.client.util.CheckLatestVersion;
 import org.junit.Before;
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -1580,6 +1584,10 @@ public class SerializationSpec {
     assertJson(Documents(Collection("foo")), "{\"documents\":{\"collection\":\"foo\"}}");
   }
 
+  @Test
+  public void GetVersion() throws IOException, ParserConfigurationException, SAXException {
+    CheckLatestVersion.getVersion();
+  }
   private void assertJson(Expr expr, String jsonString) throws JsonProcessingException {
     assertThat(json.writeValueAsString(expr),
       equalTo(jsonString));
