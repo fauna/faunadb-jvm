@@ -5,13 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.Value.*;
-import com.faunadb.common.http.CheckLatestVersion;
 import org.junit.Before;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;

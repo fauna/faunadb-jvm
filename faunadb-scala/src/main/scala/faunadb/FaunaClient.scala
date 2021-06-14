@@ -308,10 +308,6 @@ class FaunaClient private (connection: Connection) {
     session(client)
   }
 
-  def withCheckNewVersion(checkNewVersion: Boolean): Unit = {
-
-  }
-
   /**
     * Create a new session client. The returned session client shares its parent [[com.faunadb.common.Connection]]
     * instance.
