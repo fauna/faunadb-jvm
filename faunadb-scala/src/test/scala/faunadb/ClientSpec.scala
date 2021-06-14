@@ -42,7 +42,7 @@ class ClientSpec
     collection.Map("root_token" -> rootKey, "root_url" -> s"$scheme://$domain:$port")
   }
 
-  val rootClient = FaunaClient(endpoint = config("root_url"), secret = config("root_token"), metrics =  null, queryTimeout = null, userAgent = null, checkNewVersion =  false)
+  val rootClient = FaunaClient(endpoint = config("root_url"), secret = config("root_token"))
 
   val testDbName = {
     val now = Instant.now()
