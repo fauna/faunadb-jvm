@@ -5,7 +5,7 @@ import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.faunadb.common.http.CheckLatestVersion;
+import com.faunadb.common.http.DriverVersionChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,8 +91,8 @@ public class Connection {
         this.runtime = String.format("%s,scala-%s", this.runtime, scalaVersion);
       }
 
-      if (checkNewVersion && !CheckLatestVersion.getAlreadyChecked()) {
-          CheckLatestVersion.checkLatestVersion();
+      if (checkNewVersion && !DriverVersionChecker.isAlreadyChecked()) {
+        DriverVersionChecker.checkLatestVersion();
       }
     }
 
@@ -156,6 +156,7 @@ public class Connection {
     private Optional<Duration> queryTimeout = Optional.empty();
     private Optional<String> userAgent = Optional.empty();
     private boolean checkNewDriverVersion = true;
+
     private Builder() {
     }
 

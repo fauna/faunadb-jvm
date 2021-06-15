@@ -56,6 +56,7 @@ object FaunaClient {
     b.withScalaVersion(util.Properties.versionNumberString)
     b.withUserAgent(userAgent)
     b.withCheckNewDriverVersion(checkNewVersion)
+
     new FaunaClient(b.build)
   }
 

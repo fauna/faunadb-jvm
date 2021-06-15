@@ -1,9 +1,7 @@
 package com.faunadb.common.http;
 
-//import com.faunadb.client.FaunaClient;
 import com.faunadb.common.Connection;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -13,27 +11,25 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class CheckLatestVersion
+public class DriverVersionChecker
 {
     private static boolean alreadyChecked = false;
 
-    public static void setAlreadyCheck() {
+    public static void setAlreadyChecked() {
         alreadyChecked = true;
     }
 
-    private static String urlString = "https://repo.maven.apache.org/maven2/com/faunadb/faunadb-common/maven-metadata.xml";
+    private final static String urlString = "https://repo.maven.apache.org/maven2/com/faunadb/faunadb-common/maven-metadata.xml";
     private static boolean javaDriver;
 
-    public static boolean getAlreadyChecked() {
+    public static boolean isAlreadyChecked() {
         return alreadyChecked;
     }
+
     public static void checkLatestVersion() {
+        if (alreadyChecked) return;
         try {
-            if (!alreadyChecked) {
                 getVersion();
-            } else {
-                return;
-            }
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -42,8 +38,9 @@ public class CheckLatestVersion
         } catch (SAXException e) {
             e.printStackTrace();
         }
-        setAlreadyCheck();
+        setAlreadyChecked();
     }
+
     private static void getVersion() throws IOException, ParserConfigurationException, SAXException {
         URL url = new URL(urlString);
         URLConnection conn = url.openConnection();
@@ -57,10 +54,9 @@ public class CheckLatestVersion
         {
             System.out.println("\n");
             System.out.println("=".repeat(80));
-            System.out.println("New fauna version available "+repositoryVersion +" -> "+ driverVersion);
+            System.out.println("New fauna version available " + repositoryVersion + " -> " + driverVersion);
             System.out.println("Changelog: https://github.com/fauna/faunadb-jvm/blob/master/CHANGELOG.txt");
             System.out.println("=".repeat(80));
-            System.out.println("\n");
         }
     }
 

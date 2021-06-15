@@ -173,6 +173,7 @@ public class FaunaClient {
         .withCheckNewDriverVersion(checkNewVersion);
 
       if (registry != null) builder.withMetrics(registry);
+
       return new FaunaClient(builder.build());
     }
   }
