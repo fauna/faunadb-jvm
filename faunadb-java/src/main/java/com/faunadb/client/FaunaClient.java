@@ -86,6 +86,7 @@ public class FaunaClient {
     private MetricRegistry registry;
     private Duration queryTimeout;
     private String userAgent;
+    private boolean checkNewVersion = true;
 
     private Builder() {
     }
@@ -148,6 +149,17 @@ public class FaunaClient {
     }
 
     /**
+     * Sets the checkNewVersion variable for checking latets driver version
+     *
+     * @param checkNewVersion
+     * @return this {@link Connection.Builder} object
+     */
+    public Builder withCheckNewVersion(boolean checkNewVersion) {
+      this.checkNewVersion = checkNewVersion;
+      return this;
+    }
+
+    /**
      * Returns a newly constructed {@link FaunaClient} with configuration based on the settings of this {@link Builder}.
      * @return {@link FaunaClient}
      */
@@ -157,7 +169,8 @@ public class FaunaClient {
         .withFaunaRoot(endpoint)
         .withQueryTimeout(queryTimeout)
         .withUserAgent(userAgent)
-        .withJvmDriver(JvmDriver.JAVA);
+        .withJvmDriver(JvmDriver.JAVA)
+        .withCheckNewDriverVersion(checkNewVersion);
 
       if (registry != null) builder.withMetrics(registry);
 

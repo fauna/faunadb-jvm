@@ -5,6 +5,7 @@ import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.faunadb.common.http.DriverVersionChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +81,7 @@ public class Connection {
     private String os;
     private String env;
 
-    RuntimeEnvironmentHeader(JvmDriver jvmDriver, String scalaVersion) {
+    RuntimeEnvironmentHeader(JvmDriver jvmDriver, String scalaVersion, boolean checkNewVersion) {
       this.driverVersion = Connection.class.getPackage().getSpecificationVersion();
       this.os = System.getProperty("os.name");
       this.env = this.getRuntimeEnv();
@@ -88,6 +89,10 @@ public class Connection {
 
       if (jvmDriver == JvmDriver.SCALA) {
         this.runtime = String.format("%s,scala-%s", this.runtime, scalaVersion);
+      }
+
+      if (checkNewVersion && !DriverVersionChecker.isAlreadyChecked()) {
+        DriverVersionChecker.checkLatestVersion();
       }
     }
 
@@ -150,6 +155,7 @@ public class Connection {
     private String scalaVersion;
     private Optional<Duration> queryTimeout = Optional.empty();
     private Optional<String> userAgent = Optional.empty();
+    private boolean checkNewDriverVersion = true;
 
     private Builder() {
     }
@@ -222,6 +228,16 @@ public class Connection {
       return this;
     }
 
+    /**
+     * Sets the checkNewVersion variable for checking latets driver version
+     *
+     * @param checkNewVersion
+     * @return this {@link Builder} object
+     */
+    public Builder withCheckNewDriverVersion(boolean checkNewVersion) {
+      this.checkNewDriverVersion = checkNewVersion;
+      return this;
+    }
 
     /**
      * Sets the last seen transaction time for the connection.
@@ -287,7 +303,7 @@ public class Connection {
       );
 
       String connectionUserAgent = userAgent.orElse(DEFAULT_USER_AGENT);
-      String runtimeEnvironmentHeader = new RuntimeEnvironmentHeader(jvmDriver, scalaVersion).toString();
+      String runtimeEnvironmentHeader = new RuntimeEnvironmentHeader(jvmDriver, scalaVersion, checkNewDriverVersion).toString();
 
       return new Connection(root, authToken, http, registry, runtimeEnvironmentHeader, lastSeenTxn, queryTimeout, connectionUserAgent);
     }

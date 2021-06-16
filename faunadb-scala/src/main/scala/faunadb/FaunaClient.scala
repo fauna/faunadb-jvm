@@ -44,7 +44,8 @@ object FaunaClient {
     endpoint: String = null,
     metrics: MetricRegistry = null,
     queryTimeout: FiniteDuration = null,
-    userAgent: String = null): FaunaClient = {
+    userAgent: String = null,
+    checkNewVersion: Boolean = true): FaunaClient = {
 
     val b = Connection.builder
     if (endpoint ne null) b.withFaunaRoot(endpoint)
@@ -54,6 +55,7 @@ object FaunaClient {
     b.withJvmDriver(JvmDriver.SCALA)
     b.withScalaVersion(util.Properties.versionNumberString)
     b.withUserAgent(userAgent)
+    b.withCheckNewDriverVersion(checkNewVersion)
 
     new FaunaClient(b.build)
   }
