@@ -49,8 +49,9 @@ class ClientSpec
     val randomSuffix = aRandomString(10)
     s"faunadb-scala-test-$timeSuffix-$randomSuffix"
   }
-  var client: FaunaClient = null
-  var adminClient: FaunaClient = null
+  var client: FaunaClient = _
+  var adminClient: FaunaClient = _
+  var clientWithCustomHeaders: FaunaClient = _
 
   // Helper fields
 
@@ -87,6 +88,12 @@ class ClientSpec
 
     client = FaunaClient(endpoint = config("root_url"), secret = serverKey(SecretField).get)
     adminClient = FaunaClient(endpoint = config("root_url"), secret = adminKey(SecretField).get)
+
+    clientWithCustomHeaders = FaunaClient(
+      endpoint = config("root_url"),
+      secret = serverKey(SecretField).get,
+      customHeaders = scala.Predef.Map("test-header-1" -> "test-value-1", "test-header-2" -> "test-value-2")
+    )
 
     client.query(CreateCollection(Obj("name" -> "spells"))).futureValue
 
@@ -1909,6 +1916,13 @@ class ClientSpec
     val coll = (client.query(CreateCollection(Obj("name" -> aRandomString))).futureValue).apply("ref").get
     for (i <- 1 to 10) client.query(Create(coll, Obj())).futureValue
     val docs = client.query(Paginate(Documents(coll))).futureValue
+    docs("data").to[Seq[Value]].get should have size 10
+  }
+
+  it should "retrieve documents from a collection by using a client with custom headers" in {
+    val coll = (clientWithCustomHeaders.query(CreateCollection(Obj("name" -> aRandomString))).futureValue).apply("ref").get
+    for (i <- 1 to 10) clientWithCustomHeaders.query(Create(coll, Obj())).futureValue
+    val docs = clientWithCustomHeaders.query(Paginate(Documents(coll))).futureValue
     docs("data").to[Seq[Value]].get should have size 10
   }
 

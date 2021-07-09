@@ -87,6 +87,7 @@ public class FaunaClient {
     private Duration queryTimeout;
     private String userAgent;
     private boolean checkNewVersion = true;
+    private Map<String, String> customHeaders;
 
     private Builder() {
     }
@@ -160,6 +161,16 @@ public class FaunaClient {
     }
 
     /**
+     * Sets user defined headers that will be sent with each http request to fauna db server
+     * @param headers a map of key-value pairs
+     * @return this {@link Connection.Builder} object
+     */
+    public Builder withCustomHeaders(Map<String, String> headers) {
+      this.customHeaders = headers;
+      return this;
+    }
+
+    /**
      * Returns a newly constructed {@link FaunaClient} with configuration based on the settings of this {@link Builder}.
      * @return {@link FaunaClient}
      */
@@ -173,6 +184,7 @@ public class FaunaClient {
         .withCheckNewDriverVersion(checkNewVersion);
 
       if (registry != null) builder.withMetrics(registry);
+      if (customHeaders != null) builder.withCustomHeaders(customHeaders);
 
       return new FaunaClient(builder.build());
     }
