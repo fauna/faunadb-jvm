@@ -66,6 +66,7 @@ public class ClientSpec {
   private static FaunaClient rootClient;
   private static FaunaClient serverClient;
   private static FaunaClient adminClient;
+  private static FaunaClient clientWithCustomHeaders;
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -116,6 +117,8 @@ public class ClientSpec {
 
     serverClient = rootClient.newSessionClient(serverKey.get(SECRET_FIELD));
     adminClient = rootClient.newSessionClient(adminKey.get(SECRET_FIELD));
+
+    clientWithCustomHeaders = createFaunaClientWithCustomHeaders(serverKey.get(SECRET_FIELD));
   }
 
   @AfterClass
@@ -414,6 +417,12 @@ public class ClientSpec {
   @Test
   public void shouldBeAbleToGetAnInstance() throws Exception {
     Value instance = query(Get(magicMissile)).get();
+    assertThat(instance.get(NAME_FIELD), equalTo("Magic Missile"));
+  }
+
+  @Test
+  public void shouldBeAbleToGetAnInstanceWithCustomHeaders() throws Exception {
+    Value instance = queryWithCustomHeadersClient(Get(magicMissile)).get();
     assertThat(instance.get(NAME_FIELD), equalTo("Magic Missile"));
   }
 
@@ -3519,6 +3528,10 @@ public class ClientSpec {
     return serverClient.query(expr);
   }
 
+  private CompletableFuture<Value> queryWithCustomHeadersClient(Expr expr) {
+    return clientWithCustomHeaders.query(expr);
+  }
+
   private CompletableFuture<Value> query(Expr expr, Duration timeout) {
     return serverClient.query(expr, timeout);
   }
@@ -3561,6 +3574,23 @@ public class ClientSpec {
       return FaunaClient.builder()
               .withEndpoint(ROOT_URL)
               .withSecret(secret)
+              .build();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static FaunaClient createFaunaClientWithCustomHeaders(String secret) {
+    try {
+      return FaunaClient.builder()
+              .withEndpoint(ROOT_URL)
+              .withSecret(secret)
+              .withCustomHeaders(
+                      Map.of(
+                              "test-header-1", "test-value-1",
+                              "test-header-2", "test-value-2"
+                      )
+              )
               .build();
     } catch (Exception e) {
       throw new RuntimeException(e);

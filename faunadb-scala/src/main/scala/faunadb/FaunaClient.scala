@@ -45,13 +45,15 @@ object FaunaClient {
     metrics: MetricRegistry = null,
     queryTimeout: FiniteDuration = null,
     userAgent: String = null,
-    checkNewVersion: Boolean = true): FaunaClient = {
+    checkNewVersion: Boolean = true,
+    customHeaders: Map[String, String] = Map.empty): FaunaClient = {
 
     val b = Connection.builder
     if (endpoint ne null) b.withFaunaRoot(endpoint)
     if (secret ne null) b.withAuthToken(secret)
     if (metrics ne null) b.withMetrics(metrics)
     if (queryTimeout ne null) b.withQueryTimeout(queryTimeout.toJava)
+    if (customHeaders.nonEmpty) b.withCustomHeaders(customHeaders.asJava)
     b.withJvmDriver(JvmDriver.SCALA)
     b.withScalaVersion(util.Properties.versionNumberString)
     b.withUserAgent(userAgent)
