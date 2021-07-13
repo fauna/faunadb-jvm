@@ -750,8 +750,8 @@ public class ClientSpec {
         Value("was true"),
         Value("was false"))
     ).get();
-
     assertThat(res.to(STRING).get(), equalTo("was true"));
+
   }
 
   @Test
@@ -1351,9 +1351,14 @@ public class ClientSpec {
     ).get();
 
     assertThat(containsValue3.to(BOOLEAN).get(), is(true));
+  }
 
+  @Test
+  public void shouldEvalContainsValueExpressionByIndex() throws Exception {
+    RefV collectionRef = onARandomCollection();
     String indexName = randomStartingWith("index_");
-    Value index = query(
+
+    query(
       CreateIndex(Obj(
         "name", Value(indexName),
         "source", collectionRef,
@@ -1368,7 +1373,7 @@ public class ClientSpec {
     Value containsValue4 = query(
       ContainsValue(
         Value("foo"),
-        Match(Index(indexName), Value("foo"))
+        Match(Index(Value(indexName)), Value("foo"))
       )
     ).get();
 

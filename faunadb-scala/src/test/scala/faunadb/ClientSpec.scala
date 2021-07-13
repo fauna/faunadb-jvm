@@ -822,19 +822,6 @@ class ClientSpec
 
     client.query(ContainsValue("bar", Obj("foo" -> "bar"))).futureValue shouldBe TrueV
 
-    val indexName = aRandomString
-    client.query(
-      CreateIndex(Obj(
-        "name" -> indexName,
-          "source" -> Collection(collectionName),
-          "active" -> true,
-          "terms" -> Arr(Obj("field" -> Arr("data", "value"))),
-          "values" -> Arr(Obj("field" -> Arr("data", "value")))
-        ))).futureValue
-
-    client.query(Create(Collection(collectionName), Obj("data" -> Obj("value" -> "foo")))).futureValue
-    client.query(ContainsValue("foo", Match(Index(indexName), "foo"))).futureValue shouldBe TrueV
-
     // Select
     val selectR = client.query(Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings", "lunchings"))))).futureValue
     selectR.to[String].get shouldBe "munchings"
@@ -868,6 +855,25 @@ class ClientSpec
     // Not
     val notR = client.query(Not(false)).futureValue
     notR.to[Boolean].get shouldBe true
+  }
+
+  it should "test ContainsValue function by index" in {
+    val collectionName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collectionName))).futureValue
+
+    val indexName = aRandomString
+    client.query(
+      CreateIndex(Obj(
+        "name" -> indexName,
+        "source" -> Collection(collectionName),
+        "active" -> true,
+        "terms" -> Arr(Obj("field" -> Arr("data", "value"))),
+        "values" -> Arr(Obj("field" -> Arr("data", "value")))
+      ))).futureValue
+
+    client.query(Create(Collection(collectionName), Obj("data" -> Obj("value" -> "foo")))).futureValue
+    val containsValueR = client.query(ContainsValue("foo", Match(Index(indexName), "foo"))).futureValue
+    containsValueR.to[Boolean].get shouldBe true
   }
 
   it should "test Contains function" in {
