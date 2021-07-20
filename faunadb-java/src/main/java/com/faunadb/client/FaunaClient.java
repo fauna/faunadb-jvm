@@ -86,6 +86,8 @@ public class FaunaClient {
     private MetricRegistry registry;
     private Duration queryTimeout;
     private String userAgent;
+    private boolean checkNewVersion = true;
+    private Map<String, String> customHeaders;
 
     private Builder() {
     }
@@ -148,6 +150,27 @@ public class FaunaClient {
     }
 
     /**
+     * Sets the checkNewVersion variable for checking latets driver version
+     *
+     * @param checkNewVersion
+     * @return this {@link Connection.Builder} object
+     */
+    public Builder withCheckNewVersion(boolean checkNewVersion) {
+      this.checkNewVersion = checkNewVersion;
+      return this;
+    }
+
+    /**
+     * Sets user defined headers that will be sent with each http request to fauna db server
+     * @param headers a map of key-value pairs
+     * @return this {@link Connection.Builder} object
+     */
+    public Builder withCustomHeaders(Map<String, String> headers) {
+      this.customHeaders = headers;
+      return this;
+    }
+
+    /**
      * Returns a newly constructed {@link FaunaClient} with configuration based on the settings of this {@link Builder}.
      * @return {@link FaunaClient}
      */
@@ -157,9 +180,11 @@ public class FaunaClient {
         .withFaunaRoot(endpoint)
         .withQueryTimeout(queryTimeout)
         .withUserAgent(userAgent)
-        .withJvmDriver(JvmDriver.JAVA);
+        .withJvmDriver(JvmDriver.JAVA)
+        .withCheckNewDriverVersion(checkNewVersion);
 
       if (registry != null) builder.withMetrics(registry);
+      if (customHeaders != null) builder.withCustomHeaders(customHeaders);
 
       return new FaunaClient(builder.build());
     }

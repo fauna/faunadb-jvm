@@ -1,27 +1,26 @@
 package faunadb
 
-import faunadb.errors._
-import faunadb.query.{TimeUnit, _}
-import faunadb.values._
 import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate}
 import java.util
 import java.util.concurrent.Flow
 
 import faunadb.FaunaClient._
-import java.util.concurrent.Flow
+import faunadb.errors._
+import faunadb.query.{TimeUnit, _}
+import faunadb.values._
 import monix.execution.Scheduler
 import monix.reactive.Observable
 import org.reactivestreams.{FlowAdapters, Publisher}
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.BeforeAndAfterAll
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, Promise}
 import scala.concurrent.duration._
+import scala.concurrent.{Future, Promise}
 import scala.util.Random
 
 class ClientSpec
@@ -50,8 +49,9 @@ class ClientSpec
     val randomSuffix = aRandomString(10)
     s"faunadb-scala-test-$timeSuffix-$randomSuffix"
   }
-  var client: FaunaClient = null
-  var adminClient: FaunaClient = null
+  var client: FaunaClient = _
+  var adminClient: FaunaClient = _
+  var clientWithCustomHeaders: FaunaClient = _
 
   // Helper fields
 
@@ -88,6 +88,12 @@ class ClientSpec
 
     client = FaunaClient(endpoint = config("root_url"), secret = serverKey(SecretField).get)
     adminClient = FaunaClient(endpoint = config("root_url"), secret = adminKey(SecretField).get)
+
+    clientWithCustomHeaders = FaunaClient(
+      endpoint = config("root_url"),
+      secret = serverKey(SecretField).get,
+      customHeaders = scala.Predef.Map("test-header-1" -> "test-value-1", "test-header-2" -> "test-value-2")
+    )
 
     client.query(CreateCollection(Obj("name" -> "spells"))).futureValue
 
@@ -816,19 +822,6 @@ class ClientSpec
 
     client.query(ContainsValue("bar", Obj("foo" -> "bar"))).futureValue shouldBe TrueV
 
-    val indexName = aRandomString
-    client.query(
-      CreateIndex(Obj(
-        "name" -> indexName,
-          "source" -> Collection(collectionName),
-          "active" -> true,
-          "terms" -> Arr(Obj("field" -> Arr("data", "value"))),
-          "values" -> Arr(Obj("field" -> Arr("data", "value")))
-        ))).futureValue
-
-    client.query(Create(Collection(collectionName), Obj("data" -> Obj("value" -> "foo")))).futureValue
-    client.query(ContainsValue("foo", Match(Index(indexName), "foo"))).futureValue shouldBe TrueV
-
     // Select
     val selectR = client.query(Select("favorites" / "foods" / 1, Obj("favorites" -> Obj("foods" -> Arr("crunchings", "munchings", "lunchings"))))).futureValue
     selectR.to[String].get shouldBe "munchings"
@@ -862,6 +855,25 @@ class ClientSpec
     // Not
     val notR = client.query(Not(false)).futureValue
     notR.to[Boolean].get shouldBe true
+  }
+
+  it should "test ContainsValue function by index" in {
+    val collectionName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collectionName))).futureValue
+
+    val indexName = aRandomString
+    client.query(
+      CreateIndex(Obj(
+        "name" -> indexName,
+        "source" -> Collection(collectionName),
+        "active" -> true,
+        "terms" -> Arr(Obj("field" -> Arr("data", "value"))),
+        "values" -> Arr(Obj("field" -> Arr("data", "value")))
+      ))).futureValue
+
+    client.query(Create(Collection(collectionName), Obj("data" -> Obj("value" -> "foo")))).futureValue
+    val containsValueR = client.query(ContainsValue("foo", Match(Index(indexName), "foo"))).futureValue
+    containsValueR.to[Boolean].get shouldBe true
   }
 
   it should "test Contains function" in {
@@ -1250,7 +1262,7 @@ class ClientSpec
     val createR = client.query(Create(Collection(collName), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
     val loginR = client.query(Login(createR(RefField), Obj("password" -> "abcdefg"))).futureValue
     val secret = loginR(SecretField).get
-    
+
     // Run
     val hasCurrentToken = client.sessionWith(secret)(_.query(HasCurrentToken())).futureValue
 
@@ -1272,7 +1284,7 @@ class ClientSpec
     // Verify
     hasNotCurrentToken.to[Boolean].get shouldBe false
   }
-      
+
   it should "test CurrentToken with internal token" in {
     // Setup
     val collName = aRandomString
@@ -1287,7 +1299,7 @@ class ClientSpec
 
     // Verify
     currentToken.to[RefV].get shouldBe tokenRef
-  }    
+  }
 
   it should "test CurrentToken with internal key" in {
     val clientKey = adminClient.query(CreateKey(Obj("role" -> "client"))).futureValue
@@ -1913,6 +1925,13 @@ class ClientSpec
     docs("data").to[Seq[Value]].get should have size 10
   }
 
+  it should "retrieve documents from a collection by using a client with custom headers" in {
+    val coll = (clientWithCustomHeaders.query(CreateCollection(Obj("name" -> aRandomString))).futureValue).apply("ref").get
+    for (i <- 1 to 10) clientWithCustomHeaders.query(Create(coll, Obj())).futureValue
+    val docs = clientWithCustomHeaders.query(Paginate(Documents(coll))).futureValue
+    docs("data").to[Seq[Value]].get should have size 10
+  }
+
   it should "reverse an array" in {
     // Run
     val values = (1 to 10).toArray
@@ -2227,6 +2246,47 @@ class ClientSpec
       case _ =>
         fail("expected 4 events")
     }
+  }
+
+  it should "throw no exceptions when running 500 queries in parallel" in {
+    val key = rootClient.query(CreateKey(Obj("database" -> Database(testDbName), "role" -> "admin"))).futureValue
+    val clientPool = List.tabulate(10)(n => FaunaClient(endpoint = config("root_url"), secret = key(SecretField).get))
+
+    val random = scala.util.Random
+    val COLLECTION_NAME = "ParallelTestCollection"
+    //create sample collection with 10 documents
+    client.query(CreateCollection(Obj("name" -> COLLECTION_NAME))).futureValue
+    (1 to 3).foreach(_ =>
+      client.query(
+          Create(Collection(COLLECTION_NAME),
+            Obj("data" -> Obj("testField" -> "testValue")))).futureValue
+    )
+
+    val counter = 100
+    def metricsQuery: Future[MetricsResponse] = {
+      val taskClient = clientPool(random.nextInt(9))
+      val result = taskClient.queryWithMetrics(
+        Map(
+          Paginate(Documents(Collection(COLLECTION_NAME))),
+          Lambda(nextRef => Select("data", Get(nextRef)))
+        ),
+        None
+      )
+      result
+    }
+    def sumQuery: Future[Value] = {
+      val taskClient = clientPool(random.nextInt(9))
+      val values = Arr((1 to 10).map(i => i: Expr): _*)
+      taskClient.query(Sum(values))
+    }
+
+    (Seq.fill(counter)(metricsQuery))
+      .par
+      .foreach((result: Future[MetricsResponse]) => noException should be thrownBy result.futureValue)
+
+    (Seq.fill(counter)(sumQuery))
+      .par
+      .foreach((result: Future[Value]) => result.futureValue shouldBe(LongV(55)) )
   }
 
   def createNewDatabase(client: FaunaClient, name: String): FaunaClient = {

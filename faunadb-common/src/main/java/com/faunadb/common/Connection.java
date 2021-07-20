@@ -5,6 +5,7 @@ import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.faunadb.common.http.DriverVersionChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,10 +18,7 @@ import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Flow;
 import java.util.concurrent.atomic.AtomicLong;
@@ -80,7 +78,7 @@ public class Connection {
     private String os;
     private String env;
 
-    RuntimeEnvironmentHeader(JvmDriver jvmDriver, String scalaVersion) {
+    RuntimeEnvironmentHeader(JvmDriver jvmDriver, String scalaVersion, boolean checkNewVersion) {
       this.driverVersion = Connection.class.getPackage().getSpecificationVersion();
       this.os = System.getProperty("os.name");
       this.env = this.getRuntimeEnv();
@@ -88,6 +86,10 @@ public class Connection {
 
       if (jvmDriver == JvmDriver.SCALA) {
         this.runtime = String.format("%s,scala-%s", this.runtime, scalaVersion);
+      }
+
+      if (checkNewVersion && !DriverVersionChecker.isAlreadyChecked()) {
+        DriverVersionChecker.checkLatestVersion();
       }
     }
 
@@ -150,6 +152,8 @@ public class Connection {
     private String scalaVersion;
     private Optional<Duration> queryTimeout = Optional.empty();
     private Optional<String> userAgent = Optional.empty();
+    private boolean checkNewDriverVersion = true;
+    private Map<String, String> customHeaders;
 
     private Builder() {
     }
@@ -222,6 +226,16 @@ public class Connection {
       return this;
     }
 
+    /**
+     * Sets the checkNewVersion variable for checking latets driver version
+     *
+     * @param checkNewVersion
+     * @return this {@link Builder} object
+     */
+    public Builder withCheckNewDriverVersion(boolean checkNewVersion) {
+      this.checkNewDriverVersion = checkNewVersion;
+      return this;
+    }
 
     /**
      * Sets the last seen transaction time for the connection.
@@ -267,6 +281,11 @@ public class Connection {
       return this;
     }
 
+    public Builder withCustomHeaders(Map<String, String> headers) {
+      this.customHeaders = headers;
+      return this;
+    }
+
     /**
      * @return a newly constructed {@link Connection} with its configuration based on
      * the settings of the {@link Builder} instance.
@@ -287,9 +306,9 @@ public class Connection {
       );
 
       String connectionUserAgent = userAgent.orElse(DEFAULT_USER_AGENT);
-      String runtimeEnvironmentHeader = new RuntimeEnvironmentHeader(jvmDriver, scalaVersion).toString();
+      String runtimeEnvironmentHeader = new RuntimeEnvironmentHeader(jvmDriver, scalaVersion, checkNewDriverVersion).toString();
 
-      return new Connection(root, authToken, http, registry, runtimeEnvironmentHeader, lastSeenTxn, queryTimeout, connectionUserAgent);
+      return new Connection(root, authToken, http, registry, runtimeEnvironmentHeader, lastSeenTxn, queryTimeout, connectionUserAgent, customHeaders);
     }
   }
 
@@ -308,12 +327,13 @@ public class Connection {
   private final MetricRegistry registry;
   private final Optional<Duration> defaultQueryTimeout;
   private final String userAgent;
+  private final Map<String, String> customHeaders;
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final ObjectMapper json = new ObjectMapper();
   private final AtomicLong txnTime = new AtomicLong(0L);
 
-  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, String runtimeEnvironmentHeader, long lastSeenTxn, Optional<Duration> defaultQueryTimeout, String userAgent) {
+  private Connection(URL faunaRoot, String authToken, HttpClient client, MetricRegistry registry, String runtimeEnvironmentHeader, long lastSeenTxn, Optional<Duration> defaultQueryTimeout, String userAgent, Map<String, String> customHeaders) {
     this.faunaRoot = faunaRoot;
     this.authHeader = generateAuthHeader(authToken);
     this.runtimeEnvironmentHeader = runtimeEnvironmentHeader;
@@ -322,6 +342,7 @@ public class Connection {
     this.txnTime.set(lastSeenTxn);
     this.defaultQueryTimeout = defaultQueryTimeout;
     this.userAgent = userAgent;
+    this.customHeaders = customHeaders;
   }
 
   /**
@@ -332,7 +353,7 @@ public class Connection {
    * @return a new {@link Connection}
    */
   public Connection newSessionConnection(String authToken) {
-    return new Connection(faunaRoot, authToken, client, registry, runtimeEnvironmentHeader, getLastTxnTime(), defaultQueryTimeout, userAgent);
+    return new Connection(faunaRoot, authToken, client, registry, runtimeEnvironmentHeader, getLastTxnTime(), defaultQueryTimeout, userAgent, customHeaders);
   }
 
   /**
@@ -527,17 +548,39 @@ public class Connection {
         .timeout(queryTimeout)
         .method(httpMethod, bodyPublisher)
         .headers(
-          "Authorization", authHeader,
-          X_FAUNADB_API_VERSION, API_VERSION,
-          USER_AGENT, userAgent,
-          X_QUERY_TIMEOUT, String.valueOf(queryTimeout.toMillis()),
-          X_DRIVER_ENV, runtimeEnvironmentHeader,
-          "Content-type", "application/json; charset=utf-8"
+          mkHeaders(queryTimeout)
         );
 
     lastTxnTime.ifPresent(time -> requestBuilder.header(X_LAST_SEEN_TXN, Long.toString(time)));
 
     return requestBuilder.build();
+  }
+
+  private String[] mkHeaders(Duration queryTimeout) {
+    Map<String, String> defaultHeaders = Map.of(
+            "Authorization", authHeader,
+            X_FAUNADB_API_VERSION, API_VERSION,
+            USER_AGENT, userAgent,
+            X_QUERY_TIMEOUT, String.valueOf(queryTimeout.toMillis()),
+            X_DRIVER_ENV, runtimeEnvironmentHeader,
+            "Content-type", "application/json; charset=utf-8"
+    );
+
+    Map<String, String> combinedHeaders = new HashMap<>(defaultHeaders);
+    if (customHeaders != null) {
+      for (Map.Entry<String, String> entry : customHeaders.entrySet()) {
+        combinedHeaders.put(entry.getKey(), entry.getValue());
+      }
+    }
+
+    String[] headersAsArray = new String[combinedHeaders.size() * 2];
+    int index = 0;
+    for (Map.Entry<String, String> entry : combinedHeaders.entrySet()) {
+      headersAsArray[index] = entry.getKey();
+      headersAsArray[index + 1] = entry.getValue();
+      index += 2;
+    }
+    return headersAsArray;
   }
 
   private String mkUrl(String path) throws MalformedURLException {

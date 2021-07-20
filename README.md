@@ -126,6 +126,21 @@ public class Main {
 }
 ```
 
+##### Custom headers
+There is an optional possibility to send custom headers for each http request. They can be defined in the client's constructor:
+```java
+FaunaClient adminClient =
+    FaunaClient.builder()
+        .withSecret("put-your-key-secret-here")
+        .withCustomHeaders(
+            Map.of(
+                "custom-header-1", "value-1",
+                "custom-header-2", "value-2"
+            )
+        )
+        .build();
+```
+
 ##### Document Streaming
 
 Fauna supports document streaming, where changes to a streamed document are pushed to all clients subscribing to that document.
@@ -261,6 +276,15 @@ object Main extends App {
 
   // you can get other metrics in the same way,
   // all of them are exposed via Metrics enum}
+```
+
+##### Custom headers
+There is an optional possibility to send custom headers for each http request. They can be defined in the client's constructor:
+```scala
+val client = FaunaClient(
+  secret = "put-your-secret-here",
+  customHeaders = scala.Predef.Map("custom-header-1" -> "value-1", "custom-header-2" -> "value-2")
+)
 ```
 
 ##### Document Streaming
