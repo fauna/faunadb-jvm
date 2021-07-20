@@ -10,5 +10,5 @@ echo "Going to publish version: $PACKAGE_VERSION"
 
 sbt faunadb-common/publishSigned
 sbt faunadb-java/publishSigned
-sbt faunadb-scala/publishSigned
+sbt +faunadb-scala/publishSigned
 sbt sonatypeRelease
