@@ -1,3 +1,7 @@
+4.1.2
+* Added a possibility to provide custom headers for the FaunaClient constructors
+* Notifies about new package version
+
 4.1.1
 * Improve handling of network timeouts to make sure the driver returns an `UnavailableException`
 * Relax JSON parsing to not fail on unknown fields
