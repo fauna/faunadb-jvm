@@ -1,0 +1,50 @@
+---
+resources:
+  - name: fauna-jvm-repository
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/fauna/faunadb-jvm.git
+      branch: master
+
+  - name: fauna-jvm-repository-docs
+    type: git
+    icon: github
+    source:
+      uri: git@github.com:fauna/faunadb-jvm.git
+      branch: gh-pages
+      private_key: ((fauna/repo.key))
+
+jobs:
+  - name: release
+    serial: true
+    public: false
+    plan:
+      - get: fauna-jvm-repository
+      - get: fauna-jvm-repository-docs
+
+      - task: integration-tests
+        file: fauna-jvm-repository/concourse/tasks/integration-tests.yml
+        privileged: true
+        params:
+          FAUNA_ROOT_KEY: ((fauna.secret))
+          FAUNA_DOMAIN: ((fauna.domain))
+          FAUNA_SCHEME: ((fauna.scheme))
+          FAUNA_PORT: ((fauna.port))
+
+      - task: publish
+        file: fauna-jvm-repository/concourse/tasks/publish.yml
+        params:
+          SONATYPE_USER: ((sonatype_user))
+          SONATYPE_PASS: ((sonatype_pass))
+          GPG_PRIVATE_KEY: ((gpg_private_key))
+          GPG_PUBLIC_KEY: ((gpg_public_key))
+          GPG_PASSPHRASE: ((gpg_passphrase))
+          GPG_SIGNING_KEY: ((gpg_signing_key))
+
+      - task: publish-docs
+        file: fauna-jvm-repository/concourse/tasks/publish-docs.yml
+
+      - put: fauna-jvm-repository-docs
+        params:
+          repository: fauna-jvm-repository-updated-docs
