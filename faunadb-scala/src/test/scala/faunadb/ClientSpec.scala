@@ -1408,12 +1408,12 @@ class ClientSpec
   implicit val spellCodec: Codec[Spell] = Codec.caseClass[Spell]
 
   it should "encode/decode user classes" in {
-    val masterSummon = Spell("Master Summon", Left("wind"), None)
+    val mistressSummon = Spell("Mistress Summon", Left("wind"), None)
     val magicMissile = Spell("Magic Missile", Left("arcane"), Some(10))
     val faerieFire = Spell("Faerie Fire", Right(Seq("arcane", "nature")), Some(10))
 
-    val masterSummonCreated = client.query(Create(Collection("spells"), Obj("data" -> masterSummon))).futureValue
-    masterSummonCreated("data").to[Spell].get shouldBe masterSummon
+    val mistressSummonCreated = client.query(Create(Collection("spells"), Obj("data" -> mistressSummon))).futureValue
+    mistressSummonCreated("data").to[Spell].get shouldBe mistressSummon
 
     val spells = client.query(Map(Paginate(Match(Index("spells_by_element"), "arcane")), Lambda(x => Select("data", Get(x))))).futureValue
     spells("data").get.to[Set[Spell]].get shouldBe Set(magicMissile, faerieFire)

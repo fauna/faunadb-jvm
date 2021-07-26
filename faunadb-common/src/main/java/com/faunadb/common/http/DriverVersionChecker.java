@@ -55,7 +55,7 @@ public class DriverVersionChecker
             System.out.println("\n");
             System.out.println("=".repeat(80));
             System.out.println("New fauna version available " + repositoryVersion + " -> " + driverVersion);
-            System.out.println("Changelog: https://github.com/fauna/faunadb-jvm/blob/master/CHANGELOG.txt");
+            System.out.println("Changelog: https://github.com/fauna/faunadb-jvm/blob/main/CHANGELOG.txt");
             System.out.println("=".repeat(80));
         }
     }

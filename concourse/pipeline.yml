@@ -5,7 +5,7 @@ resources:
     icon: github
     source:
       uri: https://github.com/fauna/faunadb-jvm.git
-      branch: master
+      branch: main
 
   - name: fauna-jvm-repository-docs
     type: git
