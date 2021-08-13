@@ -29,7 +29,6 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.Action.CREATE;
@@ -246,6 +245,28 @@ public class ClientSpec {
         Obj("data",
           Obj("spellbook", thorsSpellbook)))
     ).get().get(REF_FIELD);
+
+    query(
+      CreateFunction(
+        Obj(
+          "name", Value("DivisionCustom"),
+          "body", Query(
+            Lambda(Value("x"), Divide(Var("x"), Value(0)))
+          )
+        )
+      )
+    ).get();
+
+    query(
+      CreateFunction(
+        Obj(
+          "name", Value("StackOverflowTest"),
+          "body", Query(
+            Lambda(Value("x"), Call(Function("StackOverflowTest"), Var("x")))
+          )
+        )
+      )
+    ).get();
   }
 
   @Test
@@ -266,13 +287,13 @@ public class ClientSpec {
 
   @Test
   public void shouldThrowNotFoundWhenInstanceDoesntExists() throws Exception {
-    thrown.expectCause(isA(NotFoundException.class));
+    thrown.expectCause(isA(InstanceNotFound.class));
     query(Get(Ref(Collection("spells"), "1234"))).get();
   }
 
   @Test
   public void shouldThrowNotFoundWhenInstanceDoesntExistsForQueryWithMetrics() throws Exception {
-    thrown.expectCause(isA(NotFoundException.class));
+    thrown.expectCause(isA(InstanceNotFound.class));
     queryWithMetrics(Get(Ref(Collection("spells"), "1234")), null).get();
   }
 
@@ -347,8 +368,8 @@ public class ClientSpec {
 
   @Test
   public void shouldAbort() throws Exception {
-    thrown.expectCause(isA(BadRequestException.class));
-    thrown.expectMessage(containsString("transaction aborted: a message"));
+    thrown.expectCause(isA(TransactionAbortedException.class));
+    thrown.expectMessage(containsString("a message"));
     query(Abort("a message")).get();
   }
 
@@ -517,7 +538,8 @@ public class ClientSpec {
     Value exists = query(Exists(ref)).get();
     assertThat(exists.to(BOOLEAN).get(), is(false));
 
-    thrown.expectCause(isA(NotFoundException.class));
+    thrown.expectCause(isA(InstanceNotFound.class));
+    thrown.expectMessage(containsString("Document not found."));
     query(Get(ref)).get();
   }
 
@@ -631,7 +653,8 @@ public class ClientSpec {
         Obj("data", Obj("uniqueField", Value("same value"))))
     ).get();
 
-    thrown.expectCause(isA(BadRequestException.class));
+    thrown.expectCause(isA(InstanceNotUniqueException.class));
+    thrown.expectMessage(containsString("document is not unique."));
     query(
       Create(collectionRef,
         Obj("data", Obj("uniqueField", Value("same value"))))
@@ -1737,8 +1760,8 @@ public class ClientSpec {
 
   @Test
   public void shouldThrowBadRequestOnToDouble() throws Exception {
-    thrown.expectCause(isA(BadRequestException.class));
-    thrown.expectMessage("com.faunadb.client.errors.BadRequestException: invalid argument: Cannot cast Time to Double.");
+    thrown.expectCause(isA(InvalidArgumentException.class));
+    thrown.expectMessage("com.faunadb.client.errors.InvalidArgumentException: Cannot cast Time to Double.");
 
     query(ToDouble(Now())).get();
   }
@@ -1757,8 +1780,8 @@ public class ClientSpec {
 
   @Test
   public void shouldThrowBadRequestOnToInteger() throws Exception {
-    thrown.expectCause(isA(BadRequestException.class));
-    thrown.expectMessage("com.faunadb.client.errors.BadRequestException: invalid argument: Cannot cast Time to Integer.");
+    thrown.expectCause(isA(InvalidArgumentException.class));
+    thrown.expectMessage("com.faunadb.client.errors.InvalidArgumentException: Cannot cast Time to Integer.");
 
     query(ToInteger(Now())).get();
   }
@@ -2105,6 +2128,7 @@ public class ClientSpec {
   @Test
   public void shouldThrowPermissionDeniedException() throws Exception {
     thrown.expectCause(isA(PermissionDeniedException.class));
+    thrown.expectMessage("com.faunadb.client.errors.PermissionDeniedException: Insufficient privileges to perform the action.");
 
     Value key = rootClient.query(CreateKey(Obj("database", DB_REF, "role", Value("client")))).get();
 
@@ -2180,7 +2204,7 @@ public class ClientSpec {
                     Obj("password", Value("sekret")))
     ).get();
 
-    String secret = auth.get(SECRET_FIELD); 
+    String secret = auth.get(SECRET_FIELD);
     Value tokenRef= auth.get(REF_FIELD);
 
     FaunaClient sessionClient = serverClient.newSessionClient(secret);
@@ -2204,7 +2228,7 @@ public class ClientSpec {
             equalTo(clientKey.get(REF_FIELD))
     );
   }
-  
+
   @Test
   public void shouldTestHasCurrentIdentity() throws Exception {
     Value createdInstance = serverClient.query(
@@ -2220,14 +2244,14 @@ public class ClientSpec {
     ).get();
 
     String secret = auth.get(SECRET_FIELD);
-    
+
     FaunaClient sessionClient = serverClient.newSessionClient(secret);
     assertThat(
             sessionClient.query(HasCurrentIdentity()).get().to(BOOLEAN).get(),
             equalTo(true)
     );
   }
-  
+
   @Test
   public void shouldTestHasCurrentTokenWithInternalToken() throws Exception {
     Value createdInstance = serverClient.query(
@@ -2381,7 +2405,7 @@ public class ClientSpec {
     adminClient.query(Delete(AccessProvider(providerName1))).get();
     adminClient.query(Delete(AccessProvider(providerName2))).get();
   }
-  
+
   @Test
   public void shouldTestCurrentIdentity() throws Exception {
     Value createdInstance = serverClient.query(
@@ -2403,6 +2427,39 @@ public class ClientSpec {
             sessionClient.query(CurrentIdentity()).get(),
             equalTo(createdInstance.get(REF_FIELD))
     );
+  }
+
+  @Test
+  public void shouldTestExceptionOnCurrentIdentity() throws Exception {
+    thrown.expectCause(isA(MissingIdentityException.class));
+    thrown.expectMessage(containsString("Authentication does not contain an identity"));
+
+    serverClient.query(CurrentIdentity()).get();
+  }
+
+  @Test
+  public void shouldTestExceptionOnCurrentToken() throws Exception {
+    thrown.expectCause(isA(InvalidTokenException.class));
+    thrown.expectMessage(containsString("Token metadata is not accessible."));
+
+    serverClient.query(CurrentToken()).get();
+  }
+
+  @Test
+  public void shouldTestInsertingEventsIntoTheFuture() throws Exception {
+    thrown.expectCause(isA(InvalidWriteTimeException.class));
+    thrown.expectMessage(containsString("Cannot write outside of snapshot time."));
+
+    adminClient.query(
+            Insert(
+                    Ref(Collection("spells"), "1234"),
+                    TimeAdd(Now(), 5, "days"),
+                    CREATE,
+                    Obj("data", Obj(
+                            "color", Value("YELLOW")
+                    ))
+      )
+    ).get();
   }
 
   @Test
@@ -3161,15 +3218,16 @@ public class ClientSpec {
 
   @Test
   public void streamFailsIfTargetDoesNotExist() throws Exception {
-    thrown.expectCause(isA(NotFoundException.class));
+    thrown.expectCause(isA(InstanceNotFound.class));
+    thrown.expectMessage(containsString("Document not found."));
 
     adminClient.stream(Get(Ref(Collection("spells"), "1234"))).get();
   }
 
   @Test
   public void streamFailsIfQueryIsNotReadOnly() throws Exception {
-    thrown.expectCause(isA(BadRequestException.class));
-    thrown.expectMessage(containsString("invalid expression: Write effect in read-only query expression."));
+    thrown.expectCause(isA(InvalidExpressionException.class));
+    thrown.expectMessage(containsString("Write effect in read-only query expression."));
 
     adminClient.stream(CreateCollection(Collection("spells"))).get();
   }
@@ -3513,6 +3571,81 @@ public class ClientSpec {
               .map(Optional::get)
               .collect(Collectors.toList());
     assertThat(exceptions.isEmpty(), equalTo(true));
+  }
+
+  @Test
+  public void shouldThrowFunctionCallException() throws Exception {
+    thrown.expectCause(isA(FunctionCallException.class));
+    thrown.expectMessage("com.faunadb.client.errors.FunctionCallException: Calling the function resulted in an error.");
+
+    query(Call(Value("DivisionCustom"))).get();
+  }
+
+  @Test
+  public void shouldThrowStackOverflowException() throws Exception {
+    thrown.expectCause(isA(StackOverflowException.class));
+    thrown.expectMessage(containsString("Call stack reached the maximum limit of 200."));
+
+
+    query(Call(Value("StackOverflowTest"))).get();
+  }
+
+  @Test
+  public void shouldThrowInvalidReferenceExceptionIfCollectionDoesNotExist() throws Exception {
+    thrown.expectCause(isA(InvalidReferenceException.class));
+    thrown.expectMessage("com.faunadb.client.errors.InvalidReferenceException: Ref refers to undefined collection 'spells_not_exists'");
+
+    query(
+        Paginate(Documents(Collection("spells_not_exists")))
+    ).get();
+  }
+
+  @Test
+  public void shouldThrowInstanceAlreadyExists() throws Exception {
+    thrown.expectCause(isA(InstanceAlreadyExistsException.class));
+    thrown.expectMessage("com.faunadb.client.errors.InstanceAlreadyExistsException: Collection already exists.");
+
+    query(
+        CreateCollection(Obj("name", Value("spells")))
+    ).get();
+  }
+
+  @Test
+  public void shouldThrowAuthenticationFailedException() throws Exception {
+    thrown.expectCause(isA(AuthenticationFailedException.class));
+    thrown.expectMessage(containsString("The document was not found or provided password was incorrect."));
+
+    Value createdInstance = serverClient.query(
+        Create(onARandomCollection(),
+            Obj("credentials",
+                Obj("password", Value("sekret"))))
+    ).get();
+
+    serverClient.query(
+        Login(
+            createdInstance.get(REF_FIELD),
+            Obj("password", Value("sekret2")))
+    ).get();
+  }
+
+  @Test
+  public void shouldThrowValidationFailedException() throws Exception {
+    thrown.expectCause(isA(ValidationFailedException.class));
+    thrown.expectMessage(containsString("document data is not valid."));
+
+    query(
+        Create(Collection("spells"), Obj("data", Arr(Value(1))))
+    ).get();
+  }
+
+  @Test
+  public void shouldThrowValueNotFoundException() throws Exception {
+    thrown.expectCause(isA(ValueNotFoundException.class));
+    thrown.expectMessage(containsString("Value not found at path [c]."));
+
+    query(
+        Select(Value("c"), Obj("a", Value(1), "b", Value(2)))
+    ).get();
   }
 
   private List<FaunaClient> getClientPool() throws ExecutionException, InterruptedException {

@@ -1,16 +1,18 @@
 package com.faunadb.client.errors;
 
-import com.faunadb.client.HttpResponses;
+import java.util.List;
 
 /**
  * An exception thrown if a HTTP 403 (Forbidden) is returned from FaunaDB.
  */
 public class PermissionDeniedException extends FaunaException {
-  public PermissionDeniedException(HttpResponses.QueryErrorResponse response) {
-    super(response);
+
+  public PermissionDeniedException(String message, int httpStatusCode, List<String> position) {
+    super(message, httpStatusCode, position);
   }
 
-  public PermissionDeniedException(String message) {
-    super(message);
+  @Override
+  public CoreExceptionCodes code() {
+    return CoreExceptionCodes.PERMISSION_DENIED;
   }
 }

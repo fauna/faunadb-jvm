@@ -494,24 +494,7 @@ public class FaunaClient {
           }
         }
 
-        HttpResponses.QueryErrorResponse errorResponse = HttpResponses.QueryErrorResponse.create(statusCode, parsedErrors);
-
-        switch (statusCode) {
-          case 400:
-            throw new BadRequestException(errorResponse);
-          case 401:
-            throw new UnauthorizedException(errorResponse);
-          case 403:
-            throw new PermissionDeniedException(errorResponse);
-          case 404:
-            throw new NotFoundException(errorResponse);
-          case 500:
-            throw new InternalException(errorResponse);
-          case 503:
-            throw new UnavailableException(errorResponse);
-          default:
-            throw new UnknownException(errorResponse);
-        }
+        throwQueryError(parsedErrors, statusCode);
       } catch (JsonProcessingException | IllegalArgumentException ex) {
         if (statusCode == 503) {
           throw new UnavailableException("Service Unavailable: Unparseable response.", ex);
@@ -520,6 +503,102 @@ public class FaunaClient {
         }
       }
     }
+  }
+
+  private void throwQueryError(List<HttpResponses.QueryError> parsedErrors, int statusCode) {
+    if (parsedErrors.size() == 0) throw new BadRequestException("No information about error available");
+    String message = parsedErrors.stream().map(HttpResponses.QueryError::description).collect(Collectors.joining(";"));
+
+    switch (statusCode) {
+      case 400:
+      case 403:
+      case 404:
+        CoreExceptionCodes code = CoreExceptionCodes.elemByCode(parsedErrors.get(0).code());
+        List<String> position = parsedErrors.stream().flatMap(error -> error.position().stream()).collect(Collectors.toList());
+        throwKnownQueryErrors(parsedErrors, statusCode, code, message, position);
+      case 401:
+        throw new UnauthorizedException(message, statusCode);
+      case 440:
+        throw new ProcessingTimeLimitExceededException(message, statusCode);
+      case 500:
+        throw new InternalException(message, statusCode);
+      case 502:
+        throw new BadGatewayException(message, statusCode);
+      case 503:
+        throw new UnavailableException(message, statusCode);
+      default:
+        throw new UnknownException(message);
+    }
+  }
+
+  private void throwKnownQueryErrors(List<HttpResponses.QueryError> parsedErrors, int statusCode, CoreExceptionCodes code, String message, List<String> position) {
+    switch (code) {
+      case INVALID_ARGUMENT:
+        throw new InvalidArgumentException(message, statusCode, position);
+      case CALL_ERROR:
+        List<FaunaException> exceptions = transformCauses(parsedErrors);
+        throw new FunctionCallException(message, statusCode, position, exceptions);
+      case PERMISSION_DENIED:
+        throw new PermissionDeniedException(message, statusCode, position);
+      case INVALID_EXPRESSION:
+        throw new InvalidExpressionException(message, statusCode, position);
+      case INVALID_URL_PARAMETER:
+        throw new InvalidUrlParameterException(message, statusCode, position);
+      case TRANSACTION_ABORTED:
+        throw new TransactionAbortedException(message, statusCode, position);
+      case INVALID_WRITE_TIME:
+        throw new InvalidWriteTimeException(message, statusCode, position);
+      case INVALID_REF:
+        throw new InvalidReferenceException(message, statusCode, position);
+      case MISSING_IDENTITY:
+        throw new MissingIdentityException(message, statusCode, position);
+      case INVALID_TOKEN:
+        throw new InvalidTokenException(message, statusCode, position);
+      case STACK_OVERFLOW:
+        throw new StackOverflowException(message, statusCode, position);
+      case AUTHENTICATION_FAILED:
+        throw new AuthenticationFailedException(message, statusCode, position);
+      case VALUE_NOT_FOUND:
+        throw new ValueNotFoundException(message, statusCode, position);
+      case INSTANCE_NOT_FOUND:
+        throw new InstanceNotFound(message, statusCode, position);
+      case INSTANCE_ALREADY_EXISTS:
+        throw new InstanceAlreadyExistsException(message, statusCode, position);
+      case VALIDATION_FAILED:
+        List<String> failures = parsedErrors.stream()
+            .flatMap(e -> e.failures().stream()
+                .map(
+                    v -> ("field[" + String.join(",", v.field()) + "]" + " - " + v.code() + ": " + v.description())
+                )
+            ).collect(Collectors.toList());
+        throw new ValidationFailedException(message, statusCode, position, failures);
+      case INSTANCE_NOT_UNIQUE:
+        throw new InstanceNotUniqueException(message, statusCode, position);
+      case FEATURE_NOT_AVAILABLE:
+        throw new FeatureNotAvailableException(message, statusCode, position);
+      default:
+        throw new UnknownException(message, statusCode, position, code);
+    }
+  }
+
+  private List<FaunaException> transformCauses(List<HttpResponses.QueryError> parsedErrors) {
+    List<FaunaException> faunaExceptions = new LinkedList<>();
+    for (HttpResponses.QueryError queryError : parsedErrors) {
+      for (HttpResponses.QueryError cause : queryError.getCause()) {
+        FaunaException exception = addQueryError(cause);
+        faunaExceptions.add(exception);
+      }
+    }
+    return faunaExceptions;
+  }
+
+  private FaunaException addQueryError(HttpResponses.QueryError cause) {
+    List<FaunaException> faunaExceptions = new LinkedList<>();
+    for (HttpResponses.QueryError c : cause.getCause()) {
+      faunaExceptions.add(addQueryError(c));
+    }
+    return new FunctionCallException(
+            cause.description(), 0, cause.position(), faunaExceptions);
   }
 
   private <V> CompletableFuture<V> handleNetworkExceptions(CompletableFuture<V> f) {

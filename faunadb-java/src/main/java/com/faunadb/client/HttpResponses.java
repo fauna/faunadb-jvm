@@ -83,7 +83,14 @@ public class HttpResponses {
           failures = Collections.emptyList();
         }
 
-        return new QueryError(position, code, description, failures);
+        List<QueryError> cause;
+        if (tree.has("cause")) {
+          cause = json.convertValue(tree.get("cause"), tf.constructCollectionType(ArrayList.class, QueryError.class));
+        } else {
+          cause = Collections.emptyList();
+        }
+
+        return new QueryError(position, code, description, failures, cause);
       }
     }
   }
@@ -122,15 +129,18 @@ public class HttpResponses {
     private final String code;
     private final String description;
     private final List<ValidationFailure> failures;
+    private final List<QueryError> cause;
 
     public QueryError(List<String> position,
                       String code,
                       String description,
-                      List<ValidationFailure> failures) {
+                      List<ValidationFailure> failures,
+                      List<QueryError> cause) {
       this.position = Collections.unmodifiableList(position);
       this.code = code;
       this.description = description;
       this.failures = Collections.unmodifiableList(failures);
+      this.cause = Collections.unmodifiableList(cause);
     }
 
     public List<String> position() {
@@ -147,6 +157,10 @@ public class HttpResponses {
 
     public List<ValidationFailure> failures() {
       return failures;
+    }
+
+    public List<QueryError> getCause() {
+      return cause;
     }
   }
 

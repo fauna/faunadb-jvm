@@ -7,7 +7,7 @@ import com.faunadb.client.HttpResponses;
  * errors represent an internal failure within the database.
  */
 public class InternalException extends FaunaException {
-  public InternalException(HttpResponses.QueryErrorResponse response) {
-    super(response);
+  public InternalException(String message, int httpStatusCode) {
+    super(message, httpStatusCode);
   }
 }
