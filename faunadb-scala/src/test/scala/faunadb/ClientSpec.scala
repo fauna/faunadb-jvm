@@ -130,15 +130,15 @@ class ClientSpec
   }
 
   "Fauna Client" should "should not find an instance" in {
-    client.query(Get(RefV("1234", RefV("spells", Native.Collections)))).failed.futureValue shouldBe a[NotFoundException]
+    client.query(Get(RefV("1234", RefV("spells", Native.Collections)))).failed.futureValue shouldBe a[InstanceNotFound]
   }
 
   "Fauna Client" should "should not find an instance for query with metrics" in {
-    client.queryWithMetrics(Get(RefV("1234", RefV("spells", Native.Collections))), None).failed.futureValue shouldBe a[NotFoundException]
+    client.queryWithMetrics(Get(RefV("1234", RefV("spells", Native.Collections))), None).failed.futureValue shouldBe a[InstanceNotFound]
   }
 
   it should "abort the execution" in {
-    client.query(Abort("a message")).failed.futureValue shouldBe a[BadRequestException]
+    client.query(Abort("a message")).failed.futureValue shouldBe a[TransactionAbortedException]
   }
 
   it should "echo values" in {
@@ -447,8 +447,8 @@ class ClientSpec
 
     val result = client.query(Create(collectionRef, Obj("data" -> Obj("uniqueTest1" -> randomText)))).failed.futureValue
 
-    result shouldBe a[BadRequestException]
-    result.getMessage() should include("instance not unique")
+    result shouldBe a[InstanceNotUniqueException]
+    result.getMessage() should include("document is not unique.")
   }
 
   it should "test types" in {
@@ -548,7 +548,7 @@ class ClientSpec
 
     client.query(Delete(createR("ref"))).futureValue
     val getR = client.query(Get(createR("ref"))).failed.futureValue
-    getR shouldBe a[NotFoundException]
+    getR shouldBe a[InstanceNotFound]
   }
 
   it should "test sets" in {
@@ -898,16 +898,16 @@ class ClientSpec
     ).futureValue).to[List[Double]].get shouldBe List(3.14D, 10D, 3.14D)
 
     val doubleErr = client.query(ToDouble(Now())).failed.futureValue
-    doubleErr shouldBe a[BadRequestException]
-    doubleErr.getMessage should include ("invalid argument: Cannot cast Time to Double.")
+    doubleErr shouldBe a[InvalidArgumentException]
+    doubleErr.getMessage should include ("Cannot cast Time to Double.")
 
     (client.query(
       Arr(ToInteger(10D), ToInteger(10L), ToInteger("10"))
     ).futureValue).to[List[Long]].get shouldBe List(10L, 10L, 10L)
 
     val integerErr = client.query(ToInteger(Now())).failed.futureValue
-    integerErr shouldBe a[BadRequestException]
-    integerErr.getMessage should include ("invalid argument: Cannot cast Time to Integer.")
+    integerErr shouldBe a[InvalidArgumentException]
+    integerErr.getMessage should include ("Cannot cast Time to Integer.")
   }
 
   it should "test time functions" in {
@@ -1112,7 +1112,7 @@ class ClientSpec
       "roles" -> Arr(Role(roleName))))
     ).failed.futureValue
 
-    error shouldBe a[BadRequestException]
+    error shouldBe a[ValidationFailedException]
 
     // Cleanup
     adminClient.query(Delete(AccessProvider(providerName))).futureValue
@@ -1136,7 +1136,7 @@ class ClientSpec
       "roles" -> Arr(Role(roleName))))
     ).failed.futureValue
 
-    error shouldBe a[BadRequestException]
+    error shouldBe a[ValidationFailedException]
   }
 
   it should "create_access_provider fails without name" in {
@@ -1158,7 +1158,7 @@ class ClientSpec
       "roles" -> Arr(Role(roleName))))
     ).failed.futureValue
 
-    error shouldBe a[BadRequestException]
+    error shouldBe a[ValidationFailedException]
   }
 
   it should "create_access_provider fails with invalid URI" in {
@@ -1182,7 +1182,7 @@ class ClientSpec
       "roles" -> Arr(Role(roleName))))
     ).failed.futureValue
 
-    error shouldBe a[BadRequestException]
+    error shouldBe a[ValidationFailedException]
   }
 
   it should "retrieve an existing access provider" in {
@@ -1337,7 +1337,7 @@ class ClientSpec
     (client.query(Call(Function("concat_with_slash"), "a", "b")).futureValue).to[String].get shouldBe "a/b"
   }
 
-  it should "parse function errors" in {
+  it should "parse function errors - FunctionCallException" in {
     client.query(
       CreateFunction(Obj(
         "name" -> "function_with_abort",
@@ -1347,13 +1347,144 @@ class ClientSpec
 
     val err = client.query(Call(Function("function_with_abort"))).failed.futureValue
 
-    err shouldBe a[BadRequestException]
+    err shouldBe a[FunctionCallException]
     err.getMessage should include(
-      "call error: Calling the function resulted in an error.")
+      "Calling the function resulted in an error.")
+  }
 
-    val cause = err.asInstanceOf[BadRequestException].errors.head.cause.head
-    cause.code shouldEqual "transaction aborted"
-    cause.description shouldEqual "this function failed"
+  it should "parse InvalidArgument" in {
+    val err = client.query(ToDouble(Now())).failed.futureValue
+
+    err shouldBe a[InvalidArgumentException]
+    err.getMessage should include("Cannot cast Time to Double.")
+  }
+
+  it should "parse InvalidWriteTime" in {
+    val collName = aRandomString
+
+    client.query(CreateCollection(Obj("name" -> collName))).futureValue
+    val err = client
+      .query(
+        Insert(
+          Ref(Collection(collName), "1234"),
+          TimeAdd(Now(), 5, "days"),
+          Action.Create,
+          Obj(("data", Obj(("color", Value("Yellow"))))))).failed.futureValue
+
+    err shouldBe a[InvalidWriteTimeException]
+    err.getMessage should include("Cannot write outside of snapshot time.")
+  }
+
+  it should "parse InvalidReferenceException" in {
+
+    val err = client
+      .query(
+        Insert(
+          Ref(Collection("aaa"), "1234"),
+          TimeAdd(Now(), 5, "days"),
+          Action.Create,
+          Obj(("data", Obj(("color", Value("Yellow"))))))).failed.futureValue
+
+    err shouldBe a[InvalidReferenceException]
+    err.getMessage should include("Ref refers to undefined collection 'aaa'")
+  }
+
+  it should "parse MissingIdentityException" in {
+
+    val err = client
+      .query(CurrentIdentity()).failed.futureValue
+
+    err shouldBe a[MissingIdentityException]
+    err.getMessage should include("Authentication does not contain an identity")
+  }
+
+  it should "parse InvalidTokenException" in {
+
+    val err = client
+      .query(CurrentToken()).failed.futureValue
+
+    err shouldBe a[InvalidTokenException]
+    err.getMessage should include("Token metadata is not accessible.")
+  }
+
+  it should "parse StackOverflowException" in {
+    client.query(CreateFunction(
+      Obj(
+        "name" -> Value("StackOverflowTest"),
+        "body" -> Query(Lambda(Value("x"), Call(Function("StackOverflowTest"), Var("x"))))
+      )
+    )).futureValue
+
+    val err = client.query(Call(Value("StackOverflowTest"), "a")).failed.futureValue
+
+    err shouldBe a[StackOverflowException]
+    err.getMessage should include("Call stack reached the maximum limit of 200.")
+  }
+
+  it should "parse AuthenticationFailedException" in {
+    val collName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collName))).futureValue
+    val createR = client.query(Create(Collection(collName), Obj("credentials" -> Obj("password" -> "abcdefg")))).futureValue
+    val err = client.query(Login(createR(RefField), Obj("password" -> "incorrect_password"))).failed.futureValue
+
+    err shouldBe a[AuthenticationFailedException]
+    err.getMessage should include("The document was not found or provided password was incorrect.")
+  }
+
+  it should "parse ValueNotFoundException" in {
+    val err = client.query(Select(Arr("some_value", 1), Obj("a" -> "b"))).failed.futureValue
+
+    err shouldBe a[ValueNotFoundException]
+    err.getMessage should include("Value not found at path [some_value,1].")
+  }
+
+  it should "parse InstanceNotFound" in {
+    val err = client.query(Get(RefV("1234", RefV("spells", Native.Collections)))).failed.futureValue
+
+    err shouldBe a[InstanceNotFound]
+    err.getMessage should include("Document not found.")
+  }
+
+  it should "parse InstanceAlreadyExistsException" in {
+    val collName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collName))).futureValue
+    val err = client.query(CreateCollection(Obj("name" -> collName))).failed.futureValue
+
+    err shouldBe a[InstanceAlreadyExistsException]
+    err.getMessage should include("Collection already exists.")
+  }
+
+  it should "parse ValidationFailedException" in {
+    val collName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collName))).futureValue
+    val err = client.query(Create(Collection(collName), Obj("data" -> Arr("unique_field", 1)))).failed.futureValue
+
+    err shouldBe a[ValidationFailedException]
+    err.getMessage should include("document data is not valid.")
+  }
+
+  it should "parse InstanceNotUniqueException" in {
+
+    //val collectionRef = Collection("spells")
+    //    val expr1 = Create(collectionRef, Obj("data" -> Obj("queryTest1" -> randomText1)))
+    val collName = aRandomString
+    client.query(CreateCollection(Obj("name" -> collName))).futureValue//.apply("ref").get.to[RefV]
+    val ref = Collection(collName)
+    client.query(
+      CreateIndex(
+        Obj(
+          "name" ->Value(aRandomString),
+          "active" -> Value(true),
+          "source" -> ref,
+          "terms" -> Arr(Obj("field" -> Arr(Value("data"), Value("uniqueField")))),
+          "unique" -> Value(true)
+        ))
+    ).futureValue
+    client.query(Create(ref, Obj("data" -> Obj("uniqueField" -> 1)))).futureValue
+    val err = client.query(Create(ref, Obj("data" -> Obj("uniqueField" -> 1)))).failed.futureValue
+
+    err shouldBe a[InstanceNotUniqueException]
+    err.getMessage should include("document is not unique.")
   }
 
   it should "create a role" in {
@@ -2002,12 +2133,12 @@ class ClientSpec
 
   it should "stream return error if it cannot find an instance" in {
     val err = client.stream(Get(RefV("1234", RefV("spells", Native.Collections)))).failed.futureValue
-    err shouldBe a[NotFoundException]
+    err shouldBe a[InstanceNotFound]
   }
 
   it should "stream return error if the query is not readonly" in {
     val err = client.stream(Create(Collection("spells"), Obj("data" -> Obj("testField" -> "testValue0")))).failed.futureValue
-    err shouldBe a[BadRequestException]
+    err shouldBe a[InvalidExpressionException]
     err.getMessage should include("Write effect in read-only query expression.")
   }
 

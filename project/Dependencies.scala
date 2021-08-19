@@ -17,6 +17,7 @@ object Dependencies {
     val junitVersion                 = "4.13.2"
     val reactiveStreamsVersion       = "1.0.3"
     val monixVersion                 = "3.3.0"
+    val enumeratumVersion            = "1.7.0"
   }
 
   // Libraries
@@ -37,6 +38,7 @@ object Dependencies {
     val scalaJava8Compat      = "org.scala-lang.modules"          %% "scala-java8-compat"       % scalaJava8CompatVersion
     val scalaReflectScala211  = "org.scala-lang"                  %  "scala-reflect"            % scalaReflectScala211Version
     val scalaReflectScala212  = "org.scala-lang"                  %  "scala-reflect"            % scalaReflectScala212Version
+    val enumeratum            = "com.beachape"                    %% "enumeratum"               % enumeratumVersion
   }
 
   object Test {
@@ -77,6 +79,6 @@ object Dependencies {
   // Projects
   val faunadbCommon = jacksonCommon ++ Seq(slf4j, metrics)
   val faunadbJava = Seq(logbackClassic, snakeYaml, junit, junitInterface, harmcrestLibrary)
-  def faunadbScala(scalaVersion: String): Seq[ModuleID] = jacksonScala ++ scalaLang(scalaVersion) ++ Seq(logbackClassic, scalaTest, reactiveStreams, monix)
+  def faunadbScala(scalaVersion: String): Seq[ModuleID] = jacksonScala ++ scalaLang(scalaVersion) ++ Seq(logbackClassic, scalaTest, reactiveStreams, monix, enumeratum)
 
 }
