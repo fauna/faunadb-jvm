@@ -2,70 +2,70 @@ package faunadb.errors
 
 import faunadb.QueryError
 
-class InvalidArgumentException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos){
+case class InvalidArgumentException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position){
   override val code: CoreExceptionCodes = CoreExceptionCodes.INVALID_ARGUMENT
 }
-class FunctionCallException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class FunctionCallException(message: String, statusCode: Int, position: Seq[String], faunaException: List[FaunaException]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.CALL_ERROR
 }
-case class PermissionDeniedException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class PermissionDeniedException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.PERMISSION_DENIED
 }
-case class InvalidExpressionException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class InvalidExpressionException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.INVALID_EXPRESSION
 }
-case class InvalidUrlParameterException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class InvalidUrlParameterException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.INVALID_URL_PARAMETER
 }
-case class SchemaNotFoundException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class SchemaNotFoundException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.SCHEMA_NOT_FOUND
 }
-case class TransactionAbortedException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class TransactionAbortedException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.TRANSACTION_ABORTED
 }
-case class InvalidWriteTimeException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class InvalidWriteTimeException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.INVALID_WRITE_TIME
 }
-case class InvalidReferenceException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class InvalidReferenceException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.INVALID_REF
 }
-case class MissingIdentityException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class MissingIdentityException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.MISSING_IDENTITY
 }
-case class InvalidScopeException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class InvalidScopeException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.INVALID_SCOPE
 }
-case class InvalidTokenException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class InvalidTokenException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.INVALID_TOKEN
 }
-case class StackOverflowException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class StackOverflowException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.STACK_OVERFLOW
 }
-case class AuthenticationFailedException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class AuthenticationFailedException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.AUTHENTICATION_FAILED
 }
-case class ValueNotFoundException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class ValueNotFoundException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.VALUE_NOT_FOUND
 }
-case class InstanceNotFoundException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class InstanceNotFoundException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.INSTANCE_NOT_FOUND
 }
-case class InstanceAlreadyExistsException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class InstanceAlreadyExistsException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.INSTANCE_ALREADY_EXISTS
 }
-case class InstanceNotUniqueException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class InstanceNotUniqueException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.INSTANCE_NOT_UNIQUE
 }
-case class InvalidObjectInContainerException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class InvalidObjectInContainerException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.INVALID_OBJECT_IN_CONTAINER
 }
-case class MoveDatabaseException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class MoveDatabaseException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.MOVE_DATABASE_ERROR
 }
-case class RecoveryFailedException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class RecoveryFailedException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.RECOVERY_FAILED
 }
-case class FeatureNotAvailableException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class FeatureNotAvailableException(message: String, statusCode: Int, position: Seq[String]) extends FaunaException(message, statusCode, position) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.FEATURE_NOT_AVAILABLE
 }
 case class ProcessingTimeLimitExceededException(m: String, sC: Int) extends FaunaException(m, sC, Seq.empty)

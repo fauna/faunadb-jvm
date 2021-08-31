@@ -405,8 +405,10 @@ class FaunaClient private (connection: Connection) {
             CoreExceptionCodes.withName(q.code) match {
               case INVALID_ARGUMENT => new InvalidArgumentException(q.description, err.status, q.position)
               case CALL_ERROR =>
-                
-                new FunctionCallException(q.description, err.status, q.position)
+                 val faunaException: List[FaunaException] = q.cause.flatMap(flattenCause).map{ q: QueryError =>
+                   new FaunaException(q.description, 0, q.position)
+                 }.toList
+                FunctionCallException(q.description, err.status, q.position, faunaException)
               case PERMISSION_DENIED => PermissionDeniedException(q.description, err.status, q.position)
               case INVALID_EXPRESSION => InvalidExpressionException(q.description, err.status, q.position)
               case INVALID_URL_PARAMETER => InvalidUrlParameterException(q.description, err.status, q.position);
@@ -451,6 +453,11 @@ class FaunaClient private (connection: Connection) {
       case 503 => Future.failed(UnavailableException("Unavailable", statusCode))
       case _   => Future.failed(UnknownException("Unknown exception"))
     }
+  }
+
+  private def flattenCause(obj: QueryError): Seq[QueryError] = {
+    val unnested = obj.copy(cause = IndexedSeq.empty)
+    Seq(unnested) ++ obj.cause.flatMap(flattenCause)
   }
 
   private def handleNetworkExceptions[A]: PartialFunction[Throwable, Future[A]] = {
