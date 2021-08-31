@@ -1,13 +1,6 @@
 package faunadb.errors
 
-import faunadb.{QueryError, QueryErrorResponse}
-
-//abstract class NewFaunaException extends RuntimeException{
-//  val httpCode: Int
-//  val message: String
-//  val position: Seq[String]
-//  val code: CoreExceptionCodes
-//}
+import faunadb.QueryError
 
 class InvalidArgumentException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos){
   override val code: CoreExceptionCodes = CoreExceptionCodes.INVALID_ARGUMENT
@@ -54,7 +47,7 @@ case class AuthenticationFailedException(m: String, sC: Int, pos: Seq[String]) e
 case class ValueNotFoundException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.VALUE_NOT_FOUND
 }
-case class InstanceNotFound(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
+case class InstanceNotFoundException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.INSTANCE_NOT_FOUND
 }
 case class InstanceAlreadyExistsException(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos) {
@@ -77,25 +70,15 @@ case class FeatureNotAvailableException(m: String, sC: Int, pos: Seq[String]) ex
 }
 case class ProcessingTimeLimitExceededException(m: String, sC: Int) extends FaunaException(m, sC, Seq.empty)
 
-
-
-//case class UnknownExceptionNew(m: String, sC: Int, pos: Seq[String]) extends FaunaException(m, sC, pos){
-//  override val code: CoreExceptionCodes = CoreExceptionCodes.UNKNOWN_ERROR
-//}
-
 case class ValidationFailedException(m: String, sC: Int, pos: Seq[String], f: Seq[String]) extends FaunaException(m, sC, pos, null, f) {
   override val code: CoreExceptionCodes = CoreExceptionCodes.VALIDATION_FAILED
 }
 
 case class UnavailableException(message: String, statusCode: Int) extends FaunaException(message, statusCode, Seq.empty) {
   def this(message: String, cause: Throwable) = this(message, 0)
-//  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response.errors), null)
 }
 case class BadRequestException(message: String, statusCode: Int) extends FaunaException(message, statusCode, Seq.empty, null)
-case class NotFoundException(message: String) extends FaunaException(message, null) {
-//  def this(message: String) = this(None, message)
-//  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response.errors))
-}
+case class NotFoundException(message: String) extends FaunaException(message, null)
 case class InternalException(message: String, statusCode: Int) extends FaunaException(message, null)
 
 object FaunaException {

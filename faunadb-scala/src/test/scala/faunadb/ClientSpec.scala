@@ -130,11 +130,11 @@ class ClientSpec
   }
 
   "Fauna Client" should "should not find an instance" in {
-    client.query(Get(RefV("1234", RefV("spells", Native.Collections)))).failed.futureValue shouldBe a[InstanceNotFound]
+    client.query(Get(RefV("1234", RefV("spells", Native.Collections)))).failed.futureValue shouldBe a[InstanceNotFoundException]
   }
 
   "Fauna Client" should "should not find an instance for query with metrics" in {
-    client.queryWithMetrics(Get(RefV("1234", RefV("spells", Native.Collections))), None).failed.futureValue shouldBe a[InstanceNotFound]
+    client.queryWithMetrics(Get(RefV("1234", RefV("spells", Native.Collections))), None).failed.futureValue shouldBe a[InstanceNotFoundException]
   }
 
   it should "abort the execution" in {
@@ -548,7 +548,7 @@ class ClientSpec
 
     client.query(Delete(createR("ref"))).futureValue
     val getR = client.query(Get(createR("ref"))).failed.futureValue
-    getR shouldBe a[InstanceNotFound]
+    getR shouldBe a[InstanceNotFoundException]
   }
 
   it should "test sets" in {
@@ -1441,7 +1441,7 @@ class ClientSpec
   it should "parse InstanceNotFound" in {
     val err = client.query(Get(RefV("1234", RefV("spells", Native.Collections)))).failed.futureValue
 
-    err shouldBe a[InstanceNotFound]
+    err shouldBe a[InstanceNotFoundException]
     err.getMessage should include("Document not found.")
   }
 
@@ -2133,7 +2133,7 @@ class ClientSpec
 
   it should "stream return error if it cannot find an instance" in {
     val err = client.stream(Get(RefV("1234", RefV("spells", Native.Collections)))).failed.futureValue
-    err shouldBe a[InstanceNotFound]
+    err shouldBe a[InstanceNotFoundException]
   }
 
   it should "stream return error if the query is not readonly" in {

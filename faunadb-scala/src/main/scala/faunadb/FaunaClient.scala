@@ -404,7 +404,9 @@ class FaunaClient private (connection: Connection) {
           case q: QueryError =>
             CoreExceptionCodes.withName(q.code) match {
               case INVALID_ARGUMENT => new InvalidArgumentException(q.description, err.status, q.position)
-              case CALL_ERROR => new FunctionCallException(q.description, err.status, q.position)
+              case CALL_ERROR =>
+                
+                new FunctionCallException(q.description, err.status, q.position)
               case PERMISSION_DENIED => PermissionDeniedException(q.description, err.status, q.position)
               case INVALID_EXPRESSION => InvalidExpressionException(q.description, err.status, q.position)
               case INVALID_URL_PARAMETER => InvalidUrlParameterException(q.description, err.status, q.position);
@@ -418,7 +420,7 @@ class FaunaClient private (connection: Connection) {
               case STACK_OVERFLOW => StackOverflowException(q.description, err.status, q.position);
               case AUTHENTICATION_FAILED => AuthenticationFailedException(q.description, err.status, q.position);
               case VALUE_NOT_FOUND => ValueNotFoundException(q.description, err.status, q.position);
-              case INSTANCE_NOT_FOUND => InstanceNotFound(q.description, err.status, q.position);
+              case INSTANCE_NOT_FOUND => InstanceNotFoundException(q.description, err.status, q.position);
               case INSTANCE_ALREADY_EXISTS => InstanceAlreadyExistsException(q.description, err.status, q.position);
               case INSTANCE_NOT_UNIQUE => InstanceNotUniqueException(q.description, err.status, q.position);
               case INVALID_OBJECT_IN_CONTAINER => InvalidObjectInContainerException(q.description, err.status, q.position);
