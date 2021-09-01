@@ -385,8 +385,8 @@ class FaunaClient private (connection: Connection) {
       result
         .recoverWith {
           case e: FaunaException => Future.failed(e)
-          case unavailable: Throwable if statusCode == 503 => Future.failed(new UnavailableException("Service Unavailable: Unparseable response.", 503))
-          case unknown: Throwable => Future.failed(new UnknownException(s"Unparseable service $unknown response.", unknown))
+          case unavailable: Throwable if statusCode == 503 => Future.failed(UnavailableException("Service Unavailable: Unparseable response.", 503))
+          case unknown: Throwable => Future.failed(UnknownException(s"Unparseable service $unknown response.", unknown))
         }
     }
 
@@ -403,11 +403,14 @@ class FaunaClient private (connection: Connection) {
         val c = err.errors.headOption.collect{
           case q: QueryError =>
             CoreExceptionCodes.withName(q.code) match {
-              case INVALID_ARGUMENT => new InvalidArgumentException(q.description, err.status, q.position)
+              case INVALID_ARGUMENT => InvalidArgumentException(q.description, err.status, q.position)
               case CALL_ERROR =>
-                 val faunaException: List[FaunaException] = q.cause.flatMap(flattenCause).map{ q: QueryError =>
-                   new FaunaException(q.description, 0, q.position)
-                 }.toList
+
+                 val faunaException: List[FaunaException] =
+
+                   q.cause.flatMap(flattenCause).map {
+                     case q: QueryError if q.cause != null => new FaunaException(q.description, 0, q.position)
+                   }.toList
                 FunctionCallException(q.description, err.status, q.position, faunaException)
               case PERMISSION_DENIED => PermissionDeniedException(q.description, err.status, q.position)
               case INVALID_EXPRESSION => InvalidExpressionException(q.description, err.status, q.position)
@@ -456,8 +459,14 @@ class FaunaClient private (connection: Connection) {
   }
 
   private def flattenCause(obj: QueryError): Seq[QueryError] = {
-    val unnested = obj.copy(cause = IndexedSeq.empty)
-    Seq(unnested) ++ obj.cause.flatMap(flattenCause)
+    if (obj.cause == null) {
+      val unnested = obj.copy(cause = IndexedSeq.empty)
+      Seq(unnested)
+    } else {
+      val unnested = obj.copy(cause = IndexedSeq.empty)
+      Seq(unnested) ++ obj.cause.flatMap(flattenCause)
+    }
+
   }
 
   private def handleNetworkExceptions[A]: PartialFunction[Throwable, Future[A]] = {
