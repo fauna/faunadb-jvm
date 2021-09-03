@@ -406,10 +406,8 @@ class FaunaClient private (connection: Connection) {
               case INVALID_ARGUMENT => InvalidArgumentException(q.description, err.status, q.position)
               case CALL_ERROR =>
 
-                 val faunaException: List[FaunaException] =
-
-                   q.cause.flatMap(flattenCause).map {
-                     case q: QueryError if q.cause != null => new FaunaException(q.description, 0, q.position)
+                 val faunaException: List[FaunaException] = q.cause.flatMap(flattenCause).map { q =>
+                     new FaunaException(q.description, 0, q.position)
                    }.toList
                 FunctionCallException(q.description, err.status, q.position, faunaException)
               case PERMISSION_DENIED => PermissionDeniedException(q.description, err.status, q.position)

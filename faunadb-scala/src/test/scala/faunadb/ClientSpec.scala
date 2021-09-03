@@ -1352,6 +1352,31 @@ class ClientSpec
       "Calling the function resulted in an error.")
   }
 
+  it should "parse nested function errors - FunctionCallException" in {
+    client.query(
+      CreateFunction(Obj(
+        "name" -> "functionA",
+        "body" -> Query(Lambda("_", Divide(0L, 0L)))
+      ))
+    ).futureValue
+    client.query(
+      CreateFunction(Obj(
+        "name" -> "functionB",
+        "body" -> Query(Lambda("_", Call(Function("functionA"))))
+      ))
+    ).futureValue
+
+    val err = client.query(Call(Function("functionB"))).failed.futureValue
+    err shouldBe a[FunctionCallException]
+    err.getMessage should include("Calling the function resulted in an error.")
+    val faunaException = err.asInstanceOf[FunctionCallException].faunaException
+    faunaException.size should equal(2)
+    faunaException.head.getMessage should include("Calling the function resulted in an error.")
+    faunaException(1).getMessage should include("Illegal division by zero.")
+
+
+  }
+
   it should "parse InvalidArgument" in {
     val err = client.query(ToDouble(Now())).failed.futureValue
 
