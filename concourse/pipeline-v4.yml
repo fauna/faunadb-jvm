@@ -11,9 +11,9 @@ resources:
     type: git
     icon: github
     source:
-      uri: git@github.com:fauna/faunadb-jvm.git
-      branch: gh-pages
-      private_key: ((fauna/repo.key))
+      uri: https://github.com/fauna/faunadb-jvm.git
+      branch: OSS-901-v4
+#      private_key: ((fauna/repo.key))
 
 jobs:
   - name: release
