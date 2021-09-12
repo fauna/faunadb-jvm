@@ -3,6 +3,7 @@ package faunadb
 import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate}
 import java.util
+import java.util.Calendar
 import java.util.concurrent.Flow
 
 import faunadb.FaunaClient._
@@ -938,7 +939,7 @@ class ClientSpec
     dayOfMonthR.to[Long].get should equal (cal.get(DAY_OF_MONTH))
 
     val dayOfWeekR = client.query(DayOfWeek(nowStr)).futureValue
-    dayOfWeekR.to[Long].get should equal (cal.get(DAY_OF_WEEK)-1)
+    dayOfWeekR.to[Long].get should equal(Calendar.DAY_OF_WEEK)
 
     val yearR = client.query(Year(nowStr)).futureValue
     yearR.to[Long].get should equal (cal.get(YEAR))
