@@ -939,7 +939,7 @@ class ClientSpec
     dayOfMonthR.to[Long].get should equal (cal.get(DAY_OF_MONTH))
 
     val dayOfWeekR = client.query(DayOfWeek(nowStr)).futureValue
-    dayOfWeekR.to[Long].get should equal(Calendar.DAY_OF_WEEK)
+    dayOfWeekR.to[Long].get should equal(cal.get(DAY_OF_WEEK) - 1)
 
     val yearR = client.query(Year(nowStr)).futureValue
     yearR.to[Long].get should equal (cal.get(YEAR))

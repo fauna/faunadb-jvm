@@ -1805,7 +1805,7 @@ public class ClientSpec {
   @Test
   public void shouldEvalDayOfWeekExpression() throws Exception {
     Value res = query(DayOfWeek(nowStr)).get();
-    long expected = Calendar.DAY_OF_WEEK;
+    long expected = cal.get(Calendar.DAY_OF_MONTH) - 1;
     assertThat(res.to(LONG).get(), equalTo(expected));
   }
 
