@@ -66,6 +66,14 @@ case class PermissionDeniedException(response: Option[QueryErrorResponse], messa
   def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response.errors))
 }
 
+/**
+  * An exception thrown if FaunaDB responds with an HTTP 409.
+  */
+case class TransactionContentionException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
+  def this(message: String) = this(None, message)
+  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response.errors))
+}
+
 case class UnknownException(response: Option[QueryErrorResponse], message: String, cause: Throwable) extends FaunaException(response, message, cause) {
   def this(message: String, cause: Throwable) = this(None, message, cause)
   def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response.errors), null)
