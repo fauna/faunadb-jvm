@@ -3,8 +3,8 @@ platform: linux
 image_resource:
   type: registry-image
   source:
-    repository: hseeberger/scala-sbt
-    tag: 11.0.10_1.4.8_2.11.12
+    repository: mozilla/sbt
+    tag: 11.0.8_1.3.13
 
 params:
   SONATYPE_USER:
