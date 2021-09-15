@@ -23,8 +23,8 @@ jobs:
       - get: fauna-jvm-repository
       - get: fauna-jvm-repository-docs
 
-      - task: integration-tests-jdk-11-scala-2.11
-        file: fauna-jvm-repository/concourse/tasks/integration-tests-jdk-11-scala-2.11.yml
+      - task: integration-tests-jdk-11-scala-2-11
+        file: fauna-jvm-repository/concourse/tasks/integration-tests-jdk-11-scala-2-11.yml
         privileged: true
         params:
           FAUNA_ROOT_KEY: ((fauna.secret))
@@ -32,8 +32,8 @@ jobs:
           FAUNA_SCHEME: ((fauna.scheme))
           FAUNA_PORT: ((fauna.port))
 
-      - task: integration-tests-jdk-11-scala-2.12
-        file: fauna-jvm-repository/concourse/tasks/integration-tests-jdk-11-scala-2.12.yml
+      - task: integration-tests-jdk-11-scala-2-12
+        file: fauna-jvm-repository/concourse/tasks/integration-tests-jdk-11-scala-2-12.yml
         privileged: true
         params:
           FAUNA_ROOT_KEY: ((fauna.secret))
