@@ -39,3 +39,18 @@ services:
       - "../../:/tmp/app"
     working_dir: "/tmp/app"
     command: [sh, -c, "ls -la && sbt test"]
+
+  tests-jdk-8-scala-2.11:
+    environment:
+      - FAUNA_ROOT_KEY
+      - FAUNA_DOMAIN
+      - FAUNA_SCHEME
+      - FAUNA_PORT
+    image: hseeberger/scala-sbt:8u282_1.5.5_2.11.12
+    container_name: mytests
+    depends_on:
+      - faunadb
+    volumes:
+      - "../../:/tmp/app"
+    working_dir: "/tmp/app"
+    command: [sh, -c, "ls -la && sbt test"]
