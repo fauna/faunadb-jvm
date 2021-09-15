@@ -92,11 +92,11 @@ private [faunadb] class BodyValueFlowProcessor(json: ObjectMapper, syncLastTxnTi
 
   private def connectionWatcherStart(connectionWatcher:() => CompletableFuture[HttpResponse[Flow.Publisher[java.util.List[ByteBuffer]]]]): Unit = {
     val infiniteLoop: Future[Unit] = Future {
-      while (Thread.currentThread().isInterrupted()) {
+      while (!Thread.currentThread().isInterrupted()) {
         connectionWatcher()
           .toScala
           .flatMap {
-            case successResponse if successResponse.statusCode() < 300 =>  Future.unit
+            case successResponse if successResponse.statusCode() < 300 => Future { successResponse }
             case errorResponse => Future {onError(new Throwable(s"Status code: $errorResponse.statusCode() Body: $errorResponse.body()"))}
           }
         Thread.sleep(10000)
