@@ -284,7 +284,7 @@ class FaunaClient private (connection: Connection) {
       .flatMap {
         case successResponse if successResponse.statusCode() < 300 =>
           // Subscribe a new FlowEventValueProcessor to consume the Body's Flow.Publisher
-          val flowEventValueProcessor = new BodyValueFlowProcessor(json, txn => syncLastTxnTime(txn))
+          val flowEventValueProcessor = new BodyValueFlowProcessor(json, txn => syncLastTxnTime(txn), () => connection.performStreamRequest("POST", "stream", body, params))
           successResponse.body().subscribe(flowEventValueProcessor)
           Future.successful(flowEventValueProcessor)
         case errorResponse =>
