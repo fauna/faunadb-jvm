@@ -2262,7 +2262,7 @@ class ClientSpec
             Obj("data" -> Obj("testField" -> "testValue")))).futureValue
     )
 
-    val counter = 50
+    val counter = 100
     def metricsQuery: Future[MetricsResponse] = {
       val taskClient = clientPool(random.nextInt(9))
       val result = taskClient.queryWithMetrics(
@@ -2280,9 +2280,9 @@ class ClientSpec
       taskClient.query(Sum(values))
     }
 
-    (Seq.fill(counter)(metricsQuery))
-      .par
-      .foreach((result: Future[MetricsResponse]) => noException should be thrownBy result.futureValue)
+//    (Seq.fill(counter)(metricsQuery))
+//      .par
+//      .foreach((result: Future[MetricsResponse]) => noException should be thrownBy result.futureValue)
 
     (Seq.fill(counter)(sumQuery))
       .par
