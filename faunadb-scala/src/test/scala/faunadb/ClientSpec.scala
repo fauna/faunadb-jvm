@@ -2262,7 +2262,7 @@ class ClientSpec
             Obj("data" -> Obj("testField" -> "testValue")))).futureValue
     )
 
-    val counter = 80
+    val counter = 50
     def metricsQuery: Future[MetricsResponse] = {
       val taskClient = clientPool(random.nextInt(9))
       val result = taskClient.queryWithMetrics(
