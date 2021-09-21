@@ -66,7 +66,8 @@ object Settings {
     pgpPassphrase := sys.env.get("GPG_PASSPHRASE") map (_.toArray),
     pgpSecretRing := file(sys.env.getOrElse("GPG_PRIVATE_KEY", "")),
     pgpPublicRing := file(sys.env.getOrElse("GPG_PUBLIC_KEY", "")),
-    useGpg := false // still relies on BouncyCastle (https://github.com/sbt/sbt-pgp#usage)
+    useGpg := false, // still relies on BouncyCastle (https://github.com/sbt/sbt-pgp#usage)
+    updateOptions := updateOptions.value.withGigahorse(false)
   )
 
   lazy val compilerSettings = Seq(
