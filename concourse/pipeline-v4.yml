@@ -41,8 +41,8 @@ jobs:
 #          FAUNA_SCHEME: ((fauna.scheme))
 #          FAUNA_PORT: ((fauna.port))
 
-      - task: integration-tests-jdk8-scala-2-11
-        file: fauna-jvm-repository/concourse/tasks/integration-tests-jdk8-scala-2-11.yml
+      - task: integration-tests-oracle-jdk11-scala-2-11
+        file: fauna-jvm-repository/concourse/tasks/integration-tests-oracle-jdk11-scala-2-11.yml
         privileged: true
         params:
           FAUNA_ROOT_KEY: ((fauna.secret))

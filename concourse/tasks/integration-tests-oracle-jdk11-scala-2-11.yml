@@ -3,7 +3,10 @@ platform: linux
 image_resource:
   type: registry-image
   source:
-    repository: karlkfi/concourse-dcind
+    repository: devex-oracle-java-11
+    tag: latest
+    aws_access_key_id: ((aws_access_key_id))
+    aws_secret_access_key: ((aws_secret_access_key))
 
 params:
   FAUNA_ROOT_KEY:
@@ -21,7 +24,7 @@ run:
     - -ceu
     - |
       # start containers
-      docker-compose -f fauna-jvm-repository/concourse/tasks/integration.yml run tests-jdk-8-scala-2.11
+      docker-compose -f fauna-jvm-repository/concourse/tasks/integration.yml run tests-oracle-jdk-11-scala-2.11
       # stop and remove containers
       docker-compose -f fauna-jvm-repository/concourse/tasks/integration.yml down
       # remove volumes
