@@ -46,8 +46,8 @@ services:
       - FAUNA_DOMAIN
       - FAUNA_SCHEME
       - FAUNA_PORT
-#    image: hseeberger/scala-sbt:8u282_1.4.9_2.11.12
-#    container_name: mytests
+    image: devex-oracle-java-11
+    container_name: mytests
     depends_on:
       - faunadb
     volumes:
