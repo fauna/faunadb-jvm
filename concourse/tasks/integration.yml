@@ -46,7 +46,7 @@ services:
       - FAUNA_DOMAIN
       - FAUNA_SCHEME
       - FAUNA_PORT
-    image: devex-oracle-java-11
+    image: 768923903788.dkr.ecr.us-east-2.amazonaws.com/devex-oracle-java-11
     container_name: mytests
     depends_on:
       - faunadb
