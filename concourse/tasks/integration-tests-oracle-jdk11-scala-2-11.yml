@@ -5,8 +5,8 @@ image_resource:
   source:
     repository: devex-oracle-java-11
     tag: latest
-    aws_access_key_id: ((aws_access_key_id))
-    aws_secret_access_key: ((aws_secret_access_key))
+#    aws_access_key_id: ((aws_access_key_id))
+#    aws_secret_access_key: ((aws_secret_access_key))
 
 params:
   FAUNA_ROOT_KEY:
