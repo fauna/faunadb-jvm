@@ -22,6 +22,9 @@ jobs:
     plan:
       - get: fauna-jvm-repository
       - get: fauna-jvm-repository-docs
+    vars:
+      aws_access_key_id: ((concourse_aws_access_key_id))
+      aws_secret_access_key: ((concourse_aws_access_key_secret))
 
 #      - task: integration-tests-jdk11-scala-2-11
 #        file: fauna-jvm-repository/concourse/tasks/integration-tests-jdk11-scala-2-11.yml
