@@ -19,7 +19,7 @@ inputs:
   - name: fauna-jvm-repository
 
 run:
-  path: /bin/bash
+  path: /bin/bash --login
   args:
     - bash
     - -ceu
