@@ -28,8 +28,11 @@ run:
     - bash
     - -ceu
     - |
+      apk add --no-cache python3 py3-pip && \
+          pip3 install --upgrade pip && \
+          pip3 install awscli \
+          && rm -rf /var/cache/apk/*
       # start containers
-      echo ">>>>>>>>>>>>>>>>>>${AWS_ACCESS_KEY_ID}"
       docker-compose -f fauna-jvm-repository/concourse/tasks/integration.yml run tests-oracle-jdk-11-scala-2.11
       # stop and remove containers
       docker-compose -f fauna-jvm-repository/concourse/tasks/integration.yml down
