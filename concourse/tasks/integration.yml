@@ -49,7 +49,6 @@ services:
       - AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY
       - AWS_DEFAULT_REGION
-#    image: devex-oracle-java-11
     image: 768923903788.dkr.ecr.us-east-2.amazonaws.com/devex-oracle-java-11:latest
     container_name: mytests
     depends_on:
@@ -57,4 +56,4 @@ services:
     volumes:
       - "../../:/tmp/app"
     working_dir: "/tmp/app"
-    command: [sh, -c, "ls -la && sbt test"]
+    command: [sh, -c, "ls -la && sbt ++2.11.12 test"]
