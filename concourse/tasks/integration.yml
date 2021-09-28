@@ -57,4 +57,4 @@ services:
     volumes:
       - "../../:/tmp/app"
     working_dir: "/tmp/app"
-    command: [sh, -c, ls -la && sbt test"]
+    command: [sh, -c, "ls -la && sbt test"]

@@ -2,13 +2,13 @@ FROM centos:7
 # FROM karlkfi/concourse-dcind:latest
 
 ENV HOME="/root" \
+    SBT_VERSION=1.4.9 \
+    JAVA_HOME=/usr/local/oracle-java/jdk-11.0.12 \
+    SCALA_VERSION=2.11.12
 #     DOCKER_CHANNEL=stable \
 #     DOCKER_VERSION=19.03.2 \
 #     DOCKER_COMPOSE_VERSION=1.24.1 \
 #     DOCKER_SQUASH=0.2.0 \
-    SBT_VERSION=1.4.9 \
-    JAVA_HOME=/usr/local/oracle-java/jdk-11.0.12 \
-    SCALA_VERSION=2.11.12
 
 ADD ./jdk-11.0.12_linux-x64_bin.tar.gz /usr/local/oracle-java
 # ADD ./entrypoint.sh /usr/local
@@ -32,7 +32,7 @@ RUN yum install -y epel-release && \
     yum -y install which unzip zip wget && \
     curl -s "https://get.sdkman.io" | bash && \
     source "$HOME/.sdkman/bin/sdkman-init.sh" && \
-    sdk install scala 2.11.12 && \
+#     sdk install scala 2.11.12 && \
     sdk install sbt 1.4.9
 
 ENV PATH "$PATH:/root/.sdkman/candidates/sbt/current/bin:/root/.sdkman/candidates/scala/current/bin:$JAVA_HOME:$JAVA_HOME/bin"
