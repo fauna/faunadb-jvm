@@ -19,7 +19,7 @@ inputs:
   - name: fauna-jvm-repository
 
 run:
-  path: /usr/local/entrypoint.sh
+  path: entrypoint.sh
   args:
     - bash
     - -ceu
