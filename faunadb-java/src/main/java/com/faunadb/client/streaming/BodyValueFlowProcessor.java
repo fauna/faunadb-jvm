@@ -71,7 +71,7 @@ public class BodyValueFlowProcessor extends SubmissionPublisher<Value> implement
 
             if (errorEventType) {
                 HttpResponses.QueryError queryError = json.treeToValue(jsonNode.get("event"), HttpResponses.QueryError.class);
-                Exception ex = new StreamingException(queryError);
+                Exception ex = new StreamingException(queryError.code() + ": " + queryError.description());
                 subscriber.onError(ex); // notify subscriber stream
                 subscription.cancel(); // cancel subscription on the request body
             } else {
