@@ -6,7 +6,7 @@ import scoverage.ScoverageSbtPlugin.autoImport._
 
 object Settings {
 
-  lazy val driverVersion = "4.1.2"
+  lazy val driverVersion = "4.2.0"
 
   lazy val scala211 = "2.11.12"
   lazy val scala212 = "2.12.14"
@@ -66,7 +66,8 @@ object Settings {
     pgpPassphrase := sys.env.get("GPG_PASSPHRASE") map (_.toArray),
     pgpSecretRing := file(sys.env.getOrElse("GPG_PRIVATE_KEY", "")),
     pgpPublicRing := file(sys.env.getOrElse("GPG_PUBLIC_KEY", "")),
-    useGpg := false // still relies on BouncyCastle (https://github.com/sbt/sbt-pgp#usage)
+    useGpg := false, // still relies on BouncyCastle (https://github.com/sbt/sbt-pgp#usage)
+    updateOptions := updateOptions.value.withGigahorse(false)
   )
 
   lazy val compilerSettings = Seq(

@@ -520,6 +520,8 @@ public class FaunaClient {
         throw new UnauthorizedException(message, statusCode);
       case 440:
         throw new ProcessingTimeLimitExceededException(message, statusCode);
+      case 409:
+        throw new TransactionContentionException(message, statusCode);
       case 500:
         throw new InternalException(message, statusCode);
       case 502:

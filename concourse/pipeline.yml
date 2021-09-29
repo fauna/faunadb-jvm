@@ -13,7 +13,7 @@ resources:
     source:
       uri: git@github.com:fauna/faunadb-jvm.git
       branch: gh-pages
-      private_key: ((fauna/repo.key))
+      private_key: ((github_repo_key))
 
 jobs:
   - name: release
@@ -35,12 +35,12 @@ jobs:
       - task: publish
         file: fauna-jvm-repository/concourse/tasks/publish.yml
         params:
-          SONATYPE_USER: ((sonatype_user))
-          SONATYPE_PASS: ((sonatype_pass))
+          SONATYPE_USER: ((sonatype_user_escaped))
+          SONATYPE_PASS: ((sonatype_pass_escaped))
           GPG_PRIVATE_KEY: ((gpg_private_key))
           GPG_PUBLIC_KEY: ((gpg_public_key))
-          GPG_PASSPHRASE: ((gpg_passphrase))
-          GPG_SIGNING_KEY: ((gpg_signing_key))
+          GPG_PASSPHRASE: ((gpg_passphrase_escaped))
+          GPG_SIGNING_KEY: ((gpg_signing_key_escaped))
 
       - task: publish-docs
         file: fauna-jvm-repository/concourse/tasks/publish-docs.yml
