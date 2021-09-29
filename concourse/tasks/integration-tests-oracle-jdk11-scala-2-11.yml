@@ -4,11 +4,7 @@ image_resource:
   type: registry-image
   source:
     repository: karlkfi/concourse-dcind
-#    repository: devex-oracle-java-11
     tag: latest
-#    aws_access_key_id: ((aws_access_key_id))
-#    aws_secret_access_key: ((aws_secret_access_key))
-#    aws_region: us-east-2
 
 params:
   FAUNA_ROOT_KEY:
