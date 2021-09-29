@@ -23,7 +23,7 @@ services:
     volumes:
       - "../../:/tmp/app"
     working_dir: "/tmp/app"
-    command: [sh, -c, "ls -la && sbt test"]
+    command: [sh, -c, "ls -la && sbt ++2.11.12 test"]
 
   tests-jdk-11-scala-2.12:
     environment:
@@ -38,7 +38,7 @@ services:
     volumes:
       - "../../:/tmp/app"
     working_dir: "/tmp/app"
-    command: [sh, -c, "ls -la && sbt test"]
+    command: [sh, -c, "ls -la && sbt ++2.12.14 test"]
 
   tests-oracle-jdk-11-scala-2.11:
     environment:
