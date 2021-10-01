@@ -1,3 +1,6 @@
+4.2.0
+* Added TransactionContentionException in case 409 HTTP status code is returned from server
+
 4.1.2
 * Added a possibility to provide custom headers for the FaunaClient constructors
 * Notifies about new package version
