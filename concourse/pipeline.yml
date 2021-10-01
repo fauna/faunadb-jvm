@@ -70,6 +70,7 @@ jobs:
           FAUNA_DOMAIN: ((fauna.domain))
           FAUNA_SCHEME: ((fauna.scheme))
           FAUNA_PORT: ((fauna.port))
+
 #      - task: publish
 #        file: fauna-jvm-repository/concourse/tasks/publish.yml
 #        params:
