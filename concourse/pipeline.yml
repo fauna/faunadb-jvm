@@ -5,14 +5,14 @@ resources:
     icon: github
     source:
       uri: https://github.com/fauna/faunadb-jvm.git
-      branch: OSS-901-v5
+      branch: v5
 
   - name: fauna-jvm-repository-docs
     type: git
     icon: github
     source:
       uri: git@github.com:fauna/faunadb-jvm.git
-      branch: OSS-901-v5
+      branch: v5
       private_key: ((github_repo_key))
 
 jobs:
