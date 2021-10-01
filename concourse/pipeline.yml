@@ -71,19 +71,19 @@ jobs:
           FAUNA_SCHEME: ((fauna.scheme))
           FAUNA_PORT: ((fauna.port))
 
-      - task: publish
-        file: fauna-jvm-repository/concourse/tasks/publish.yml
-        params:
-          SONATYPE_USER: ((sonatype_user))
-          SONATYPE_PASS: ((sonatype_pass))
-          GPG_PRIVATE_KEY: ((gpg_private_key))
-          GPG_PUBLIC_KEY: ((gpg_public_key))
-          GPG_PASSPHRASE: ((gpg_passphrase))
-          GPG_SIGNING_KEY: ((gpg_signing_key))
-
-      - task: publish-docs
-        file: fauna-jvm-repository/concourse/tasks/publish-docs.yml
-
-      - put: fauna-jvm-repository-docs
-        params:
-          repository: fauna-jvm-repository-updated-docs
+#      - task: publish
+#        file: fauna-jvm-repository/concourse/tasks/publish.yml
+#        params:
+#          SONATYPE_USER: ((sonatype_user))
+#          SONATYPE_PASS: ((sonatype_pass))
+#          GPG_PRIVATE_KEY: ((gpg_private_key))
+#          GPG_PUBLIC_KEY: ((gpg_public_key))
+#          GPG_PASSPHRASE: ((gpg_passphrase))
+#          GPG_SIGNING_KEY: ((gpg_signing_key))
+#
+#      - task: publish-docs
+#        file: fauna-jvm-repository/concourse/tasks/publish-docs.yml
+#
+#      - put: fauna-jvm-repository-docs
+#        params:
+#          repository: fauna-jvm-repository-updated-docs
