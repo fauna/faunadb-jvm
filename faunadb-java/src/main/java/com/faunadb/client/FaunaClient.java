@@ -505,6 +505,8 @@ public class FaunaClient {
             throw new PermissionDeniedException(errorResponse);
           case 404:
             throw new NotFoundException(errorResponse);
+          case 409:
+            throw new TransactionContentionException(errorResponse);
           case 500:
             throw new InternalException(errorResponse);
           case 503:
