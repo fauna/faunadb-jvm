@@ -448,6 +448,7 @@ class FaunaClient private (connection: Connection) {
       case 401 => Future.failed(UnauthorizedException("Unauthorized", statusCode))
       case 403 => throwQueryError(parseErrors())
       case 404 => throwQueryError(parseErrors())
+      case 409 => Future.failed(TransactionContentionException("Transaction exception", statusCode))
       case 440 => Future.failed(ProcessingTimeLimitExceededException("Processing timeout exceeded", statusCode))
       case 500 => Future.failed(InternalException("Internal Server Error", statusCode))
       case 502 => Future.failed(BadGatewayException("Bad gateway", statusCode))

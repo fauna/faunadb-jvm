@@ -94,6 +94,10 @@ class FaunaException(msg: String, httpStatusCode: Int, pos: Seq[String], cause: 
   def status: Int = httpStatusCode
   def code(): CoreExceptionCodes = null
 }
+/**
+  * An exception thrown if FaunaDB responds with an HTTP 409.
+  */
+case class TransactionContentionException(message: String, statusCode: Int) extends FaunaException(message, statusCode, Seq.empty)
 
 case class UnauthorizedException(message: String, statusCode: Int) extends FaunaException(message, statusCode, Seq.empty)
 case class BadGatewayException(message: String, statusCode: Int) extends FaunaException(message, statusCode, Seq.empty)
