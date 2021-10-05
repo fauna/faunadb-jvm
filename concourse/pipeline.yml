@@ -12,7 +12,7 @@ resources:
     icon: github
     source:
       uri: git@github.com:fauna/faunadb-jvm.git
-      branch: v4
+      branch: gh-pages
       private_key: ((github_repo_key))
 
 jobs:
