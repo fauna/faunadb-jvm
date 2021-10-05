@@ -1,0 +1,37 @@
+---
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: karlkfi/concourse-dcind
+    tag: latest
+
+params:
+  FAUNA_ROOT_KEY:
+  FAUNA_DOMAIN:
+  FAUNA_SCHEME:
+  FAUNA_PORT:
+  AWS_ACCESS_KEY_ID:
+  AWS_SECRET_ACCESS_KEY:
+  AWS_DEFAULT_REGION:
+
+inputs:
+  - name: fauna-jvm-repository
+
+run:
+  path: entrypoint.sh
+  args:
+    - bash
+    - -ceu
+    - |
+      apk add --no-cache python3 py3-pip && \
+          pip3 install --upgrade pip && \
+          pip3 install awscli \
+          && rm -rf /var/cache/apk/* \
+          && aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 768923903788.dkr.ecr.us-east-2.amazonaws.com
+      # start containers
+      docker-compose -f fauna-jvm-repository/concourse/tasks/integration.yml run tests-oracle-jdk-11-scala-2.12
+      # stop and remove containers
+      docker-compose -f fauna-jvm-repository/concourse/tasks/integration.yml down
+      # remove volumes
+      docker volume rm $(docker volume ls -q)
