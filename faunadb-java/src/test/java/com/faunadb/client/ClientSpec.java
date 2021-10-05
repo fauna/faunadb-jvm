@@ -125,17 +125,38 @@ public class ClientSpec {
 
   @AfterClass
   public static void closeClients() throws Exception {
-    rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
+//    rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
 
 
-    rootClient.query(KeyFromSecret(ROOT_TOKEN)).get(10L, SECONDS); // rootKey
-    rootClient.query(Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref"))))); // keys
-    rootClient.query(Map(
-            Filter(Var("keys"),
-                    Lambda(Var("key"),
-                            Not(Equals(Select(Arr(Value("ref")), Var("key"), NULL ),
-                                       Select(Arr(Value("ref")), Var("rootKey")))))),
-            Lambda(Var("key"), Select(Arr(Value("ref")), Var("rootKey")))));
+    rootClient.query(
+                Let("rootKey", KeyFromSecret(ROOT_TOKEN),
+                    "keys", Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref")))),
+                    "allKeysExceptRoot", Map(
+                            Filter(Var("keys"),
+                                    Lambda(Value("key"),
+                                            Not(Equals(Select(Arr(Value("ref")), Var("key"), NULL),
+                                                    Select(Arr(Value("ref")), Var("rootKey")))))),
+                            Lambda(Var("key"), Select(Arr(Value("ref")), Var("rootKey")))),
+                    "refsToRemove", Union(
+                            Select(Arr(Value("data")), Paginate(Databases())),
+                            Select(Arr(Value("data")), Paginate(Collections())),
+                            Select(Arr(Value("data")), Paginate(Indexes())),
+                            Select(Arr(Value("data")), Paginate(Functions())),
+                            Select(Arr(Value("data")), Paginate(Var("allKeysExceptRoot"))))
+                ).in(
+                    Foreach(
+                            Var("refsToRemove"),
+                            Lambda(Value("ref"), If(Exists(Value("ref")), Delete(Value("ref")), NULL)))
+            )
+    ).get();
+//    rootClient.query(KeyFromSecret(ROOT_TOKEN)).get(10L, SECONDS); // rootKey
+//    rootClient.query(Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref"))))); // keys
+//    rootClient.query(Map(
+//            Filter(Var("keys"),
+//                    Lambda(Var("key"),
+//                            Not(Equals(Select(Arr(Value("ref")), Var("key"), NULL),
+//                                       Select(Arr(Value("ref")), Var("rootKey")))))),
+//            Lambda(Var("key"), Select(Arr(Value("ref")), Var("rootKey")))));
 
     //      allKeysExceptRoot: query.Map(
     //        query.Filter(query.Var('keys'), key =>
