@@ -30,6 +30,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import static java.util.concurrent.TimeUnit.*;
+
 
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.Action.CREATE;
@@ -124,6 +126,28 @@ public class ClientSpec {
   @AfterClass
   public static void closeClients() throws Exception {
     rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
+
+
+    rootClient.query(KeyFromSecret(ROOT_TOKEN)).get(10L, SECONDS); // rootKey
+    rootClient.query(Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref"))))); // keys
+    rootClient.query(Map(
+            Filter(Var("keys"),
+                    Lambda(Var("key"),
+                            Not(Equals(Select(Arr(Value("ref")), Var("key"), NULL ),
+                                       Select(Arr(Value("ref")), Var("rootKey")))))),
+            Lambda(Var("key"), Select(Arr(Value("ref")), Var("rootKey")))));
+
+    //      allKeysExceptRoot: query.Map(
+    //        query.Filter(query.Var('keys'), key =>
+    //          query.Not(
+    //            query.Equals(
+    //              query.Select(['ref'], key, null),
+    //              query.Select(['ref'], query.Var('rootKey'))
+    //            )
+    //          )
+    //        ),
+    //        key => query.Select(['ref'], key)
+    //      ),
   }
 
   @Before
