@@ -9,13 +9,14 @@ import com.faunadb.common.Connection.JvmDriver
 import faunadb.errors._
 import faunadb.query.{Expr, Get}
 import faunadb.values.{ArrayV, Metrics, MetricsResponse, NullV, Value}
-
 import java.io.IOException
 import java.net.ConnectException
 import java.net.http.HttpResponse
 import java.util.concurrent.{CompletionException, Flow, TimeoutException}
+
 import com.faunadb.common.http.ResponseBodyStringProcessor
 import faunadb.FaunaClient.EventField
+import faunadb.errors.CoreExceptionCodes.{AUTHENTICATION_FAILED, CALL_ERROR, FEATURE_NOT_AVAILABLE, INSTANCE_ALREADY_EXISTS, INSTANCE_NOT_FOUND, INSTANCE_NOT_UNIQUE, INVALID_ARGUMENT, INVALID_EXPRESSION, INVALID_OBJECT_IN_CONTAINER, INVALID_REF, INVALID_SCOPE, INVALID_TOKEN, INVALID_URL_PARAMETER, INVALID_WRITE_TIME, MISSING_IDENTITY, MOVE_DATABASE_ERROR, PERMISSION_DENIED, RECOVERY_FAILED, SCHEMA_NOT_FOUND, STACK_OVERFLOW, TRANSACTION_ABORTED, VALIDATION_FAILED, VALUE_NOT_FOUND}
 import faunadb.streaming.{BodyValueFlowProcessor, SnapshotEventFlowProcessor}
 
 import scala.collection.JavaConverters._
@@ -384,39 +385,98 @@ class FaunaClient private (connection: Connection) {
       result
         .recoverWith {
           case e: FaunaException => Future.failed(e)
-          case unavailable if statusCode == 503 => Future.failed(new UnavailableException("Service Unavailable: Unparseable response.", unavailable))
-          case unknown => Future.failed(new UnknownException(s"Unparseable service $unknown response.", unknown))
+          case unavailable: Throwable if statusCode == 503 => Future.failed(UnavailableException("Service Unavailable: Unparseable response.", 503))
+          case unknown: Throwable => Future.failed(UnknownException(s"Unparseable service $unknown response.", unknown))
         }
     }
 
     def parseErrorsAndFailWith(fun: QueryErrorResponse => FaunaException): Future[Nothing] = {
-      parseErrors().flatMap { errors =>
+      parseErrors().flatMap { errors: QueryErrorResponse =>
         val exception = fun(errors)
         Future.failed(exception)
       }
     }
 
-    statusCode match {
-      case 400 => parseErrorsAndFailWith(new BadRequestException(_))
-      case 401 => parseErrorsAndFailWith(new UnauthorizedException(_))
-      case 403 => parseErrorsAndFailWith(new PermissionDeniedException(_))
-      case 404 => parseErrorsAndFailWith(new NotFoundException(_))
-      case 409 => parseErrorsAndFailWith(new TransactionContentionException(_))
-      case 500 => parseErrorsAndFailWith(new InternalException(_))
-      case 503 => parseErrorsAndFailWith(new UnavailableException(_))
-      case _   => parseErrorsAndFailWith(new UnknownException(_))
+    def throwQueryError(parsedErrors: Future[QueryErrorResponse]) = {
+      parseErrors().flatMap{ err: QueryErrorResponse =>
+
+        val c = err.errors.headOption.collect{
+          case q: QueryError =>
+            CoreExceptionCodes.withName(q.code) match {
+              case INVALID_ARGUMENT => InvalidArgumentException(q.description, err.status, q.position)
+              case CALL_ERROR =>
+
+                 val faunaException: List[FaunaException] = q.cause.flatMap(flattenCause).map { q =>
+                     new FaunaException(q.description, 0, q.position)
+                   }.toList
+                FunctionCallException(q.description, err.status, q.position, faunaException)
+              case PERMISSION_DENIED => PermissionDeniedException(q.description, err.status, q.position)
+              case INVALID_EXPRESSION => InvalidExpressionException(q.description, err.status, q.position)
+              case INVALID_URL_PARAMETER => InvalidUrlParameterException(q.description, err.status, q.position);
+              case SCHEMA_NOT_FOUND => SchemaNotFoundException(q.description, err.status, q.position);
+              case TRANSACTION_ABORTED => TransactionAbortedException(q.description, err.status, q.position);
+              case INVALID_WRITE_TIME =>InvalidWriteTimeException(q.description, err.status, q.position);
+              case INVALID_REF => InvalidReferenceException(q.description, err.status, q.position);
+              case MISSING_IDENTITY => MissingIdentityException(q.description, err.status, q.position);
+              case INVALID_SCOPE => InvalidScopeException(q.description, err.status, q.position);
+              case INVALID_TOKEN => InvalidTokenException(q.description, err.status, q.position);
+              case STACK_OVERFLOW => StackOverflowException(q.description, err.status, q.position);
+              case AUTHENTICATION_FAILED => AuthenticationFailedException(q.description, err.status, q.position);
+              case VALUE_NOT_FOUND => ValueNotFoundException(q.description, err.status, q.position);
+              case INSTANCE_NOT_FOUND => InstanceNotFoundException(q.description, err.status, q.position);
+              case INSTANCE_ALREADY_EXISTS => InstanceAlreadyExistsException(q.description, err.status, q.position);
+              case INSTANCE_NOT_UNIQUE => InstanceNotUniqueException(q.description, err.status, q.position);
+              case INVALID_OBJECT_IN_CONTAINER => InvalidObjectInContainerException(q.description, err.status, q.position);
+              case MOVE_DATABASE_ERROR => MoveDatabaseException(q.description, err.status, q.position);
+              case RECOVERY_FAILED => RecoveryFailedException(q.description, err.status, q.position);
+              case FEATURE_NOT_AVAILABLE => FeatureNotAvailableException(q.description, err.status, q.position);
+              case VALIDATION_FAILED =>
+                val failures: IndexedSeq[String] = q.failures
+                  .map{ v => s"field[${v.field.mkString(",")}] - ${v.code}: ${v.description}"}
+                ValidationFailedException(q.description, err.status, q.position, failures)
+              case _ => UnknownException(err.errors.head.description)
+            }
+        }
+
+        Future.failed(c.getOrElse(UnknownException(err.errors.head.description)))
+      }
+
     }
+
+    statusCode match {
+      case 400 => throwQueryError(parseErrors())
+      case 401 => Future.failed(UnauthorizedException("Unauthorized", statusCode))
+      case 403 => throwQueryError(parseErrors())
+      case 404 => throwQueryError(parseErrors())
+      case 409 => Future.failed(TransactionContentionException("Transaction exception", statusCode))
+      case 440 => Future.failed(ProcessingTimeLimitExceededException("Processing timeout exceeded", statusCode))
+      case 500 => Future.failed(InternalException("Internal Server Error", statusCode))
+      case 502 => Future.failed(BadGatewayException("Bad gateway", statusCode))
+      case 503 => Future.failed(UnavailableException("Unavailable", statusCode))
+      case _   => Future.failed(UnknownException("Unknown exception"))
+    }
+  }
+
+  private def flattenCause(obj: QueryError): Seq[QueryError] = {
+    if (obj.cause == null) {
+      val unnested = obj.copy(cause = IndexedSeq.empty)
+      Seq(unnested)
+    } else {
+      val unnested = obj.copy(cause = IndexedSeq.empty)
+      Seq(unnested) ++ obj.cause.flatMap(flattenCause)
+    }
+
   }
 
   private def handleNetworkExceptions[A]: PartialFunction[Throwable, Future[A]] = {
     case ex: ConnectException =>
-      Future.failed(new UnavailableException(ex.getMessage, ex))
+      Future.failed(new UnavailableException(ex.getMessage, 503))
     case ex: TimeoutException =>
       Future.failed(new UnavailableException(ex.getMessage, ex))
     case ex: CompletionException if ex.getCause.isInstanceOf[IOException] && ex.getMessage.contains("header parser received no bytes") =>
       Future.failed(new UnavailableException(ex.getMessage, ex))
     case ex: CompletionException if ex.getCause.isInstanceOf[IOException] && ex.getMessage.contains("too many concurrent streams") =>
-      Future.failed(BadRequestException(None, "the maximum number of streams has been reached for this client"))
+      Future.failed(BadRequestException("the maximum number of streams has been reached for this client", 503))
   }
 
 }
