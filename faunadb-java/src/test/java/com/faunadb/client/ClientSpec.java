@@ -102,7 +102,7 @@ public class ClientSpec {
   public static void setUpClient() throws Exception {
     rootClient = createFaunaClient(ROOT_TOKEN);
 
-    rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
+//    rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
     rootClient.query(CreateDatabase(Obj("name", Value(DB_NAME)))).get();
 
     Value serverKey = rootClient.query(CreateKey(Obj("database", DB_REF, "role", Value("server")))).get();
