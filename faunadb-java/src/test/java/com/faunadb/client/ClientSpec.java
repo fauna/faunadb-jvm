@@ -122,8 +122,8 @@ public class ClientSpec {
                     "allKeysExceptRoot", Map(
                             Filter(Var("keys"),
                                     Lambda(Value("key"),
-                                            Not(Equals(Select(Arr(Value("ref")), Value("key"), NULL),
-                                                       Select(Arr(Value("ref")), Var("rootKey")))))),
+                                            Not(Equals(Select(Arr(Value("ref")), Var("key"), NULL),
+                                                       Select(Arr(Value("ref")), Var("rootKey"), NULL))))),
                             Lambda(Value("key"), Select(Arr(Value("ref")), Var("key")))),
                     "refsToRemove", Union(
                             Select(Arr(Value("data")), Paginate(Databases())),
