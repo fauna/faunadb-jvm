@@ -117,7 +117,7 @@ public class ClientSpec {
   @AfterClass
   public static void closeClients() throws Exception {
     System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-    System.out.println(rootClient.query(KeyFromSecret(ROOT_TOKEN)));
+    System.out.println(rootClient.query(KeyFromSecret(ROOT_TOKEN)).get());
     System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     rootClient.query(
                 Let("rootKey", KeyFromSecret(ROOT_TOKEN),
