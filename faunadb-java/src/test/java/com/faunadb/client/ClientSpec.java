@@ -122,7 +122,7 @@ public class ClientSpec {
                     "allKeysExceptRoot", Map(
                             Filter(Var("keys"),
                                     Lambda(Value("key"),
-                                            Not(Equals(Select(Arr(Value("ref")), Var("key"), NULL),
+                                            Not(Equals(Select(Arr(Value("ref")), Value("key"), NULL),
                                                        Select(Arr(Value("ref")), Var("rootKey")))))),
                             Lambda(Value("key"), Select(Arr(Value("ref")), Var("key")))),
                     "refsToRemove", Union(
