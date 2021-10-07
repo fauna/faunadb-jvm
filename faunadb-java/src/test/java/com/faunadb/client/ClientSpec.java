@@ -116,6 +116,9 @@ public class ClientSpec {
 
   @AfterClass
   public static void closeClients() throws Exception {
+    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    System.out.println(rootClient.query(KeyFromSecret(ROOT_TOKEN)));
+    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     rootClient.query(
                 Let("rootKey", KeyFromSecret(ROOT_TOKEN),
                     "keys", Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref")))),
