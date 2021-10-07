@@ -4,7 +4,6 @@ import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
 import com.faunadb.client.streaming.EventField;
-import static com.faunadb.client.streaming.EventFields.*;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
@@ -19,29 +18,21 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.*;
-import static java.util.Arrays.asList;
-
-import java.util.concurrent.Flow;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
-import static java.util.concurrent.TimeUnit.*;
-
 
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
 import static com.faunadb.client.query.Language.TimeUnit.*;
+import static com.faunadb.client.streaming.EventFields.*;
 import static com.faunadb.client.types.Codec.*;
 import static com.faunadb.client.types.Value.NullV.NULL;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -125,9 +116,6 @@ public class ClientSpec {
 
   @AfterClass
   public static void closeClients() throws Exception {
-//    rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
-
-
     rootClient.query(
                 Let("rootKey", KeyFromSecret(ROOT_TOKEN),
                     "keys", Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref")))),
@@ -135,40 +123,21 @@ public class ClientSpec {
                             Filter(Var("keys"),
                                     Lambda(Value("key"),
                                             Not(Equals(Select(Arr(Value("ref")), Var("key"), NULL),
-                                                    Select(Arr(Value("ref")), Var("rootKey")))))),
-                            Lambda(Var("key"), Select(Arr(Value("ref")), Var("rootKey")))),
+                                                       Select(Arr(Value("ref")), Var("rootKey")))))),
+                            Lambda(Value("key"), Select(Arr(Value("ref")), Var("key")))),
                     "refsToRemove", Union(
                             Select(Arr(Value("data")), Paginate(Databases())),
                             Select(Arr(Value("data")), Paginate(Collections())),
                             Select(Arr(Value("data")), Paginate(Indexes())),
                             Select(Arr(Value("data")), Paginate(Functions())),
-                            Select(Arr(Value("data")), Paginate(Var("allKeysExceptRoot"))))
+                            Select(Arr(Value("data")), Paginate(Keys())),
+                            Select(Arr(Value("data")), Var("allKeysExceptRoot")))
                 ).in(
                     Foreach(
                             Var("refsToRemove"),
-                            Lambda(Value("ref"), If(Exists(Value("ref")), Delete(Value("ref")), NULL)))
+                            Lambda(Value("ref"), If(Exists(Var("ref")), Delete(Var("ref")), NULL)))
             )
     ).get();
-//    rootClient.query(KeyFromSecret(ROOT_TOKEN)).get(10L, SECONDS); // rootKey
-//    rootClient.query(Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref"))))); // keys
-//    rootClient.query(Map(
-//            Filter(Var("keys"),
-//                    Lambda(Var("key"),
-//                            Not(Equals(Select(Arr(Value("ref")), Var("key"), NULL),
-//                                       Select(Arr(Value("ref")), Var("rootKey")))))),
-//            Lambda(Var("key"), Select(Arr(Value("ref")), Var("rootKey")))));
-
-    //      allKeysExceptRoot: query.Map(
-    //        query.Filter(query.Var('keys'), key =>
-    //          query.Not(
-    //            query.Equals(
-    //              query.Select(['ref'], key, null),
-    //              query.Select(['ref'], query.Var('rootKey'))
-    //            )
-    //          )
-    //        ),
-    //        key => query.Select(['ref'], key)
-    //      ),
   }
 
   @Before
