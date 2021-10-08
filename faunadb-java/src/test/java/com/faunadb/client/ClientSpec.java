@@ -116,9 +116,6 @@ public class ClientSpec {
 
   @AfterClass
   public static void closeClients() throws Exception {
-//    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-//    System.out.println(rootClient.query(KeyFromSecret(ROOT_TOKEN)).get());
-//    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     rootClient.query(KeyFromSecret(ROOT_TOKEN))
             .handle((v, ex) -> handleBadRequest(v, ex))
             .thenApply((Value rootKey) ->
@@ -139,7 +136,7 @@ public class ClientSpec {
                             Var("refsToRemove"),
                             Lambda(Value("ref"), If(Exists(Var("ref")), Delete(Var("ref")), NULL)))
             )
-    )).get();
+    ).handle(ClientSpec::handleBadRequest)).get();
   }
 
   private static Expr getMap(Value rootKey) {
