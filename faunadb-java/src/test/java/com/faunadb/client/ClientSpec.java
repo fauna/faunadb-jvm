@@ -119,28 +119,41 @@ public class ClientSpec {
 //    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 //    System.out.println(rootClient.query(KeyFromSecret(ROOT_TOKEN)).get());
 //    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-    rootClient.query(
-                Let("rootKey", KeyFromSecret(ROOT_TOKEN),
-                    "keys", Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref")))),
-                    "allKeysExceptRoot", Map(
-                            Filter(Var("keys"),
-                                    Lambda(Value("key"),
-                                            Not(Equals(Select(Arr(Value("ref")), Var("key"), NULL),
-                                                       Select(Arr(Value("ref")), Var("rootKey"), NULL))))),
-                            Lambda(Value("key"), Select(Arr(Value("ref")), Var("key")))),
-                    "refsToRemove", Union(
-                            Select(Arr(Value("data")), Paginate(Databases())),
-                            Select(Arr(Value("data")), Paginate(Collections())),
-                            Select(Arr(Value("data")), Paginate(Indexes())),
-                            Select(Arr(Value("data")), Paginate(Functions())),
-                            Select(Arr(Value("data")), Paginate(Keys())),
-                            Select(Arr(Value("data")), Var("allKeysExceptRoot")))
+    rootClient.query(KeyFromSecret(ROOT_TOKEN))
+            .handle((v, ex) -> handleBadRequest(v, ex))
+            .thenApply((Value rootKey) ->
+                    rootClient.query(
+                            Let(
+                                    "rootKey", rootKey,
+                                    "keys", Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref")))),
+                                    "allKeysExceptRoot", getMap(rootKey),
+                                 "refsToRemove", Union(
+                                      Select(Arr(Value("data")), Paginate(Databases())),
+                                      Select(Arr(Value("data")), Paginate(Collections())),
+                                      Select(Arr(Value("data")), Paginate(Indexes())),
+                                      Select(Arr(Value("data")), Paginate(Functions())),
+                                      Select(Arr(Value("data")), Paginate(Keys())),
+                                      Select(Arr(Value("data")), Var("allKeysExceptRoot")))
                 ).in(
                     Foreach(
                             Var("refsToRemove"),
                             Lambda(Value("ref"), If(Exists(Var("ref")), Delete(Var("ref")), NULL)))
             )
-    ).handle((v, ex) -> handleBadRequest(v, ex)).get();
+    )).get();
+  }
+
+  private static Expr getMap(Value rootKey) {
+    return Map( checkNull(rootKey) ?
+            Filter(Var("keys"),
+                    Lambda(Value("key"),
+                            Not(Equals(Select(Arr(Value("ref")), Var("key"), NULL),
+                                    Select(Arr(Value("ref")), Var("rootKey"), NULL)))))
+                    : Var("keys"),
+            Lambda(Value("key"), Select(Arr(Value("ref")), Var("key"))));
+  }
+
+  private static Boolean checkNull(Value v) {
+    return v != NULL;
   }
 
   @Before
