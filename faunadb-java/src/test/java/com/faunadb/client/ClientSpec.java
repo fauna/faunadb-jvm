@@ -102,7 +102,7 @@ public class ClientSpec {
   public static void setUpClient() throws Exception {
     rootClient = createFaunaClient(ROOT_TOKEN);
 
-//    rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
+    rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
     rootClient.query(CreateDatabase(Obj("name", Value(DB_NAME)))).get();
 
     Value serverKey = rootClient.query(CreateKey(Obj("database", DB_REF, "role", Value("server")))).get();
@@ -116,9 +116,9 @@ public class ClientSpec {
 
   @AfterClass
   public static void closeClients() throws Exception {
-    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-    System.out.println(rootClient.query(KeyFromSecret(ROOT_TOKEN)).get());
-    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+//    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+//    System.out.println(rootClient.query(KeyFromSecret(ROOT_TOKEN)).get());
+//    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     rootClient.query(
                 Let("rootKey", KeyFromSecret(ROOT_TOKEN),
                     "keys", Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref")))),
@@ -140,7 +140,7 @@ public class ClientSpec {
                             Var("refsToRemove"),
                             Lambda(Value("ref"), If(Exists(Var("ref")), Delete(Var("ref")), NULL)))
             )
-    ).get();
+    ).handle((v, ex) -> handleBadRequest(v, ex)).get();
   }
 
   @Before
