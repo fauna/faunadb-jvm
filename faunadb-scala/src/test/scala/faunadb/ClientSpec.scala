@@ -78,7 +78,11 @@ class ClientSpec
   def dropDB(): Unit = {
 //    rootClient.query(Delete(Database(testDbName))).futureValue
 
-    rootClient.query(KeyFromSecret(config("root_token"))).flatMap { rootKey: Value =>
+    rootClient.query(KeyFromSecret(config("root_token")))
+      .flatMap {
+        case BadRequestException(_, _) => Future.successful(Value(Null()))
+      }
+      .flatMap { rootKey: Value =>
       rootClient.query(
         Let(Seq(
                 "rootKey" -> rootKey,
