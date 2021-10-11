@@ -78,11 +78,9 @@ class ClientSpec
   def dropDB(): Unit = {
 //    rootClient.query(Delete(Database(testDbName))).futureValue
 
-    rootClient.query(KeyFromSecret(config("root_token")))
-      .flatMap {
-        case BadRequestException(_, _) => Future.successful(Value(Null()))
-      }
-      .flatMap { rootKey: Value =>
+    rootClient.query(KeyFromSecret(config("root_token"))).recoverWith {
+        case BadRequestException(_, _) => Future.successful(NullV)
+      }.flatMap { rootKey =>
       rootClient.query(
         Let(Seq(
                 "rootKey" -> rootKey,
@@ -103,7 +101,7 @@ class ClientSpec
   }
 
   private def getMap(rootKey: Value): Expr = {
-    Map(if (rootKey != Null()) {
+    Map(if (rootKey != NullV) {
       Filter(Var("keys"),
         Lambda(Value("key"),
           Not(Equals(Select(Arr(Value("ref")), Var("key"), Null()),
