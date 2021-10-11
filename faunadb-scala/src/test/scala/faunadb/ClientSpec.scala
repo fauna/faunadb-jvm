@@ -95,7 +95,7 @@ class ClientSpec
               Var("refsToRemove"),
               Lambda(Value("ref"), If(Exists(Var("ref")), Delete(Var("ref")), Null())))
       ))
-    }
+    }.futureValue
   }
 
   private def getMap(rootKey: Value): Expr = {
