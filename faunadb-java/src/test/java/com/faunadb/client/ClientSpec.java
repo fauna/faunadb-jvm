@@ -2285,7 +2285,7 @@ public class ClientSpec {
   @Test
   public void shouldTestCreateAccessProvider() throws Exception {
     String roleName = randomStartingWith("role_");
-    String providerName = randomStartingWith("provider_");
+    String providerName = randomStartingWith("provider_jvm_");
     String issuerName = randomStartingWith("issuer_");
     String fullUri = randomStartingWith("https://") + ".auth0.com";
 
