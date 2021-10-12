@@ -75,9 +75,7 @@ class ClientSpec
   def aRandomString: String = aRandomString(size = 8)
   def aRandomString(size: Int): String = Random.alphanumeric.take(size).mkString
 
-  def dropDB(): Unit = {
-//    rootClient.query(Delete(Database(testDbName))).futureValue
-
+  def testDataCleanup(): Unit = {
     rootClient.query(KeyFromSecret(config("root_token"))).recoverWith {
         case BadRequestException(_, _) => Future.successful(NullV)
       }.flatMap { rootKey =>
@@ -137,7 +135,7 @@ class ClientSpec
   }
 
   override protected def afterAll(): Unit = {
-    dropDB()
+    testDataCleanup()
   }
 
   it should "parse nested sets" in {

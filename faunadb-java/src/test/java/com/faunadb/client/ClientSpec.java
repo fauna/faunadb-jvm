@@ -115,7 +115,7 @@ public class ClientSpec {
   }
 
   @AfterClass
-  public static void closeClients() throws Exception {
+  public static void testDataCleanup() throws Exception {
     rootClient.query(KeyFromSecret(ROOT_TOKEN))
             .handle((v, ex) -> handleBadRequest(v, ex))
             .thenApply((Value rootKey) ->
