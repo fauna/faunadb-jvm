@@ -76,8 +76,38 @@ class ClientSpec
   def aRandomString: String = aRandomString(size = 8)
   def aRandomString(size: Int): String = Random.alphanumeric.take(size).mkString
 
-  def dropDB(): Unit =
-    rootClient.query(Delete(Database(testDbName))).futureValue
+  def testDataCleanup(): Unit = {
+    rootClient.query(KeyFromSecret(config("root_token"))).recoverWith {
+        case BadRequestException(_, _) => Future.successful(NullV)
+      }.flatMap { rootKey =>
+      rootClient.query(
+        Let(Seq(
+                "rootKey" -> rootKey,
+                "keys" -> Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref")))),
+                "allKeysExceptRoot" -> getMap(rootKey),
+                "refsToRemove" -> Union(
+                  Select(Arr(Value("data")), Paginate(Databases())),
+                  Select(Arr(Value("data")), Paginate(Collections())),
+                  Select(Arr(Value("data")), Paginate(Indexes())),
+                  Select(Arr(Value("data")), Paginate(Functions())),
+                  Select(Arr(Value("data")), Paginate(Keys())),
+                  Select(Arr(Value("data")), Var("allKeysExceptRoot")))
+          ), Foreach(
+              Var("refsToRemove"),
+              Lambda(Value("ref"), If(Exists(Var("ref")), Delete(Var("ref")), Null())))
+      ))
+    }.futureValue
+  }
+
+  private def getMap(rootKey: Value): Expr = {
+    Map(if (rootKey != NullV) {
+      Filter(Var("keys"),
+        Lambda(Value("key"),
+          Not(Equals(Select(Arr(Value("ref")), Var("key"), Null()),
+            Select(Arr(Value("ref")), Var("rootKey"), Null())))))
+    } else Var("keys"),
+    Lambda(Value("key"), Select(Arr(Value("ref")), Var("key"))))
+  }
 
   // tests
 
@@ -106,7 +136,7 @@ class ClientSpec
   }
 
   override protected def afterAll(): Unit = {
-    dropDB()
+    testDataCleanup()
   }
 
   it should "parse nested sets" in {
@@ -2263,7 +2293,7 @@ class ClientSpec
             Obj("data" -> Obj("testField" -> "testValue")))).futureValue
     )
 
-    val counter = 100
+    val counter = 20
     def metricsQuery: Future[MetricsResponse] = {
       val taskClient = clientPool(random.nextInt(9))
       val result = taskClient.queryWithMetrics(
