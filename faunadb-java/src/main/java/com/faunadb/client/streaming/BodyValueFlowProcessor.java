@@ -10,18 +10,29 @@ import com.faunadb.common.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Flow;
 import java.util.concurrent.SubmissionPublisher;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class BodyValueFlowProcessor extends SubmissionPublisher<Value> implements Flow.Processor<java.util.List<ByteBuffer>, Value> {
 
     public BodyValueFlowProcessor(ObjectMapper json, Connection connection) {
         this.json = json;
         this.connection = connection;
+    }
+
+    public BodyValueFlowProcessor(ObjectMapper json, Connection connection, Supplier<CompletableFuture<HttpResponse<Flow.Publisher<List<ByteBuffer>>>>> connectionWatcher) {
+        this(json, connection);
+        connectionWatcherStart(connectionWatcher);
     }
 
     private static Value ErrorValue = new Value.StringV("error");
@@ -32,6 +43,7 @@ public class BodyValueFlowProcessor extends SubmissionPublisher<Value> implement
     private Connection connection;
     private Flow.Subscription subscription = null;
     private Flow.Subscriber<? super Value> subscriber = null;
+    private CompletableFuture<Optional<Exception>> connectionWatcherFuture;
 
     private void requestOne() {
         subscription.request(1);
@@ -96,5 +108,31 @@ public class BodyValueFlowProcessor extends SubmissionPublisher<Value> implement
     public void onComplete() {
         log.debug("subscription completed");
         subscriber.onComplete();
+
+        if (connectionWatcherFuture != null) {
+            connectionWatcherFuture.cancel(true);
+        }
+    }
+
+    private void connectionWatcherStart(Supplier<CompletableFuture<HttpResponse<Flow.Publisher<List<ByteBuffer>>>>> connectionWatcher) {
+        connectionWatcherFuture = CompletableFuture.supplyAsync(() -> {
+                while (true) {
+                    if(Thread.interrupted()) {
+                        break;
+                    }
+                    try {
+                        connectionWatcher.get().whenCompleteAsync((response, throwable) -> {
+                            if (throwable != null) {
+                                onError(throwable);
+                            }
+                        });
+                        SECONDS.sleep(10);
+                    } catch (Exception ex) {
+                        onError(ex);
+                    }
+                }
+                return Optional.empty();
+            }
+        );
     }
 }

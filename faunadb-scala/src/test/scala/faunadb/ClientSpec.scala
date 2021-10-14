@@ -2263,9 +2263,9 @@ class ClientSpec
     )
 
     val counter = 100
-    def metricsQuery: Future[MetricsResponse] = {
+    def metricsQuery: Future[Value] = {
       val taskClient = clientPool(random.nextInt(9))
-      val result = taskClient.queryWithMetrics(
+      val result = taskClient.query(
         Map(
           Paginate(Documents(Collection(COLLECTION_NAME))),
           Lambda(nextRef => Select("data", Get(nextRef)))
@@ -2282,7 +2282,7 @@ class ClientSpec
 
     (Seq.fill(counter)(metricsQuery))
       .par
-      .foreach((result: Future[MetricsResponse]) => noException should be thrownBy result.futureValue)
+      .foreach((result: Future[Value]) => noException should be thrownBy result.futureValue)
 
     (Seq.fill(counter)(sumQuery))
       .par
