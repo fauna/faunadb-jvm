@@ -79,6 +79,7 @@ class ClientSpec
   def testDataCleanup(): Unit = {
     rootClient.query(KeyFromSecret(config("root_token"))).recoverWith {
         case BadRequestException(_, _) => Future.successful(NullV)
+        case InstanceNotFoundException(_, _, _) => Future.successful(NullV)
       }.flatMap { rootKey =>
       rootClient.query(
         Let(Seq(
