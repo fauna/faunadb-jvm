@@ -8,18 +8,17 @@ export SBT_OPTS="-Dsbt.log.noformat=true -Djava.net.preferIPv4Stack=true -Dhttp.
 
 PACKAGE_VERSION=$(sbt faunadb-common/version | tail -n 1 | cut -c 8-)
 
-#echo "Going to publish version: $PACKAGE_VERSION"
-#
-#echo "$GPG_PRIVATE_KEY" > gpg_private_key
-#echo "$GPG_PUBLIC_KEY" > gpg_public_key
-#
-#export GPG_PRIVATE_KEY=gpg_private_key
-#export GPG_PUBLIC_KEY=gpg_public_key
-#
-#sbt faunadb-common/publishSigned
-#sbt faunadb-java/publishSigned
-#sbt +faunadb-scala/publishSigned
-#sbt sonatypeRelease
+echo "Going to publish version: $PACKAGE_VERSION"
 
-#echo "faunadb-go@$PACKAGE_VERSION has been released [fyi <@ewan.edwards>]" > ../slack-message/publish
-echo "faunadb-jvm@$PACKAGE_VERSION test (please ignore this message)" > ../slack-message/publish
+echo "$GPG_PRIVATE_KEY" > gpg_private_key
+echo "$GPG_PUBLIC_KEY" > gpg_public_key
+
+export GPG_PRIVATE_KEY=gpg_private_key
+export GPG_PUBLIC_KEY=gpg_public_key
+
+sbt faunadb-common/publishSigned
+sbt faunadb-java/publishSigned
+sbt +faunadb-scala/publishSigned
+sbt sonatypeRelease
+
+echo "faunadb-jvm@$PACKAGE_VERSION has been published (but sometimes it can take up to 2 days before it appears in maven repository) [fyi <@ewan.edwards>]" > ../slack-message/publish

@@ -16,7 +16,7 @@ resources:
     icon: github
     source:
       uri: https://github.com/fauna/faunadb-jvm.git
-      branch: FE-1409-jvm
+      branch: v5
 
   - name: fauna-jvm-repository-docs
     type: git
@@ -34,71 +34,71 @@ jobs:
       - get: fauna-jvm-repository
       - get: fauna-jvm-repository-docs
 
-#      - task: integration-tests-oracle-jdk11-scala-2-11
-#        file: fauna-jvm-repository/concourse/tasks/integration-tests-oracle-jdk11-scala-2-11.yml
-#        privileged: true
-#        vars:
-#          aws_access_key_id: ((concourse_aws_access_key_id))
-#          aws_secret_access_key: ((concourse_aws_access_key_secret))
-#        params:
-#          FAUNA_ROOT_KEY: ((fauna.secret))
-#          FAUNA_DOMAIN: ((fauna.domain))
-#          FAUNA_SCHEME: ((fauna.scheme))
-#          FAUNA_PORT: ((fauna.port))
-#          AWS_ACCESS_KEY_ID: ((concourse_aws_access_key_id))
-#          AWS_SECRET_ACCESS_KEY: ((concourse_aws_access_key_secret))
-#          AWS_DEFAULT_REGION: us-east-2
-#
-#      - task: integration-tests-oracle-jdk11-scala-2-12
-#        file: fauna-jvm-repository/concourse/tasks/integration-tests-oracle-jdk11-scala-2-12.yml
-#        privileged: true
-#        vars:
-#          aws_access_key_id: ((concourse_aws_access_key_id))
-#          aws_secret_access_key: ((concourse_aws_access_key_secret))
-#        params:
-#          FAUNA_ROOT_KEY: ((fauna.secret))
-#          FAUNA_DOMAIN: ((fauna.domain))
-#          FAUNA_SCHEME: ((fauna.scheme))
-#          FAUNA_PORT: ((fauna.port))
-#          AWS_ACCESS_KEY_ID: ((concourse_aws_access_key_id))
-#          AWS_SECRET_ACCESS_KEY: ((concourse_aws_access_key_secret))
-#          AWS_DEFAULT_REGION: us-east-2
-#
-#      - task: integration-tests-openjdk11-scala-2-11
-#        file: fauna-jvm-repository/concourse/tasks/integration-tests-jdk11-scala-2-11.yml
-#        privileged: true
-#        params:
-#          FAUNA_ROOT_KEY: ((fauna.secret))
-#          FAUNA_DOMAIN: ((fauna.domain))
-#          FAUNA_SCHEME: ((fauna.scheme))
-#          FAUNA_PORT: ((fauna.port))
-#
-#      - task: integration-tests-openjdk11-scala-2-12
-#        file: fauna-jvm-repository/concourse/tasks/integration-tests-jdk11-scala-2-12.yml
-#        privileged: true
-#        params:
-#          FAUNA_ROOT_KEY: ((fauna.secret))
-#          FAUNA_DOMAIN: ((fauna.domain))
-#          FAUNA_SCHEME: ((fauna.scheme))
-#          FAUNA_PORT: ((fauna.port))
+      - task: integration-tests-oracle-jdk11-scala-2-11
+        file: fauna-jvm-repository/concourse/tasks/integration-tests-oracle-jdk11-scala-2-11.yml
+        privileged: true
+        vars:
+          aws_access_key_id: ((concourse_aws_access_key_id))
+          aws_secret_access_key: ((concourse_aws_access_key_secret))
+        params:
+          FAUNA_ROOT_KEY: ((fauna.secret))
+          FAUNA_DOMAIN: ((fauna.domain))
+          FAUNA_SCHEME: ((fauna.scheme))
+          FAUNA_PORT: ((fauna.port))
+          AWS_ACCESS_KEY_ID: ((concourse_aws_access_key_id))
+          AWS_SECRET_ACCESS_KEY: ((concourse_aws_access_key_secret))
+          AWS_DEFAULT_REGION: us-east-2
+
+      - task: integration-tests-oracle-jdk11-scala-2-12
+        file: fauna-jvm-repository/concourse/tasks/integration-tests-oracle-jdk11-scala-2-12.yml
+        privileged: true
+        vars:
+          aws_access_key_id: ((concourse_aws_access_key_id))
+          aws_secret_access_key: ((concourse_aws_access_key_secret))
+        params:
+          FAUNA_ROOT_KEY: ((fauna.secret))
+          FAUNA_DOMAIN: ((fauna.domain))
+          FAUNA_SCHEME: ((fauna.scheme))
+          FAUNA_PORT: ((fauna.port))
+          AWS_ACCESS_KEY_ID: ((concourse_aws_access_key_id))
+          AWS_SECRET_ACCESS_KEY: ((concourse_aws_access_key_secret))
+          AWS_DEFAULT_REGION: us-east-2
+
+      - task: integration-tests-openjdk11-scala-2-11
+        file: fauna-jvm-repository/concourse/tasks/integration-tests-jdk11-scala-2-11.yml
+        privileged: true
+        params:
+          FAUNA_ROOT_KEY: ((fauna.secret))
+          FAUNA_DOMAIN: ((fauna.domain))
+          FAUNA_SCHEME: ((fauna.scheme))
+          FAUNA_PORT: ((fauna.port))
+
+      - task: integration-tests-openjdk11-scala-2-12
+        file: fauna-jvm-repository/concourse/tasks/integration-tests-jdk11-scala-2-12.yml
+        privileged: true
+        params:
+          FAUNA_ROOT_KEY: ((fauna.secret))
+          FAUNA_DOMAIN: ((fauna.domain))
+          FAUNA_SCHEME: ((fauna.scheme))
+          FAUNA_PORT: ((fauna.port))
 
       - task: publish
         file: fauna-jvm-repository/concourse/tasks/publish.yml
         params:
-          SONATYPE_USER: ((sonatype_user))
-          SONATYPE_PASS: ((sonatype_pass))
+          SONATYPE_USER: ((sonatype_user_escaped))
+          SONATYPE_PASS: ((sonatype_pass_escaped))
           GPG_PRIVATE_KEY: ((gpg_private_key))
           GPG_PUBLIC_KEY: ((gpg_public_key))
-          GPG_PASSPHRASE: ((gpg_passphrase))
-          GPG_SIGNING_KEY: ((gpg_signing_key))
+          GPG_PASSPHRASE: ((gpg_passphrase_escaped))
+          GPG_SIGNING_KEY: ((gpg_signing_key_escaped))
         on_success:
           put: notify
           params:
             text_file: slack-message/publish
 
-#      - task: publish-docs
-#        file: fauna-jvm-repository/concourse/tasks/publish-docs.yml
-#
-#      - put: fauna-jvm-repository-docs
-#        params:
-#          repository: fauna-jvm-repository-updated-docs
+      - task: publish-docs
+        file: fauna-jvm-repository/concourse/tasks/publish-docs.yml
+
+      - put: fauna-jvm-repository-docs
+        params:
+          repository: fauna-jvm-repository-updated-docs
