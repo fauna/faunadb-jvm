@@ -9,6 +9,7 @@ import com.faunadb.common.Connection.JvmDriver
 import faunadb.errors._
 import faunadb.query.{Expr, Get}
 import faunadb.values.{ArrayV, Metrics, MetricsResponse, NullV, Value}
+import faunadb.FaunaClient.json
 
 import java.io.IOException
 import java.net.ConnectException
@@ -27,6 +28,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /** Companion object to the FaunaClient class. */
 object FaunaClient {
+
+  // singleton ObjectMapper for all clients
+  private[faunadb] val json = new ObjectMapper
+  json.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+  json.registerModule(new DefaultScalaModule)
 
   /**
     * Creates a new FaunaDB client.
@@ -101,10 +107,6 @@ object FaunaClient {
   * @constructor create a new client with a configured [[com.faunadb.common.Connection]].
   */
 class FaunaClient private (connection: Connection) {
-
-  private[this] val json = new ObjectMapper
-  json.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-  json.registerModule(new DefaultScalaModule)
 
   /**
     * Issues a query.
