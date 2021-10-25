@@ -116,6 +116,10 @@ public class ClientSpec {
 
   @AfterClass
   public static void testDataCleanup() throws Exception {
+    System.out.println("******************************Environment Vars*****************************");
+    Map<String, String> enviorntmentVars  = System.getenv();
+    enviorntmentVars.entrySet().forEach(System.out::println);
+    System.out.println("***********************************************************");
     rootClient.query(KeyFromSecret(ROOT_TOKEN))
             .handle((v, ex) -> handleBadRequest(v, ex))
             .thenApply((Value rootKey) ->
