@@ -122,29 +122,29 @@ public class ClientSpec {
 //    enviorntmentVars.entrySet().forEach(System.out::println);
 //    System.out.println("***********************************************************");
 //    if (System.getenv("CIRCLE_PULL_REQUESTS") != null) {
-      rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
+//      rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
 //    } else {
-//      rootClient.query(KeyFromSecret(ROOT_TOKEN))
-//              .handle((v, ex) -> handleBadRequest(v, ex))
-//              .thenApply((Value rootKey) ->
-//                      rootClient.query(
-//                              Let(
-//                                      "rootKey", rootKey,
-//                                      "keys", Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref")))),
-//                                      "allKeysExceptRoot", getMap(rootKey),
-//                                      "refsToRemove", Union(
-//                                              Select(Arr(Value("data")), Paginate(Databases())),
-//                                              Select(Arr(Value("data")), Paginate(Collections())),
-//                                              Select(Arr(Value("data")), Paginate(Indexes())),
-//                                              Select(Arr(Value("data")), Paginate(Functions())),
+      rootClient.query(KeyFromSecret(ROOT_TOKEN))
+              .handle((v, ex) -> handleBadRequest(v, ex))
+              .thenApply((Value rootKey) ->
+                      rootClient.query(
+                              Let(
+                                      "rootKey", rootKey,
+                                      "keys", Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref")))),
+                                      "allKeysExceptRoot", getMap(rootKey),
+                                      "refsToRemove", Union(
+                                              Select(Arr(Value("data")), Paginate(Databases())),
+                                              Select(Arr(Value("data")), Paginate(Collections())),
+                                              Select(Arr(Value("data")), Paginate(Indexes())),
+                                              Select(Arr(Value("data")), Paginate(Functions())),
 //                                              Select(Arr(Value("data")), Paginate(Keys())),
-//                                              Select(Arr(Value("data")), Var("allKeysExceptRoot")))
-//                              ).in(
-//                                      Foreach(
-//                                              Var("refsToRemove"),
-//                                              Lambda(Value("ref"), If(Exists(Var("ref")), Delete(Var("ref")), NULL)))
-//                              )
-//                      ).handle(ClientSpec::handleBadRequest)).get();
+                                              Select(Arr(Value("data")), Var("allKeysExceptRoot")))
+                              ).in(
+                                      Foreach(
+                                              Var("refsToRemove"),
+                                              Lambda(Value("ref"), If(Exists(Var("ref")), Delete(Var("ref")), NULL)))
+                              )
+                      ).handle(ClientSpec::handleBadRequest)).get();
 //    }
 
   }
