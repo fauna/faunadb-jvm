@@ -91,10 +91,10 @@ class ClientSpec
                   Select(Arr(Value("data")), Paginate(Databases())),
                   Select(Arr(Value("data")), Paginate(Collections())),
                   Select(Arr(Value("data")), Paginate(Indexes())),
-                  Select(Arr(Value("data")), Paginate(Functions())),
+                  Select(Arr(Value("data")), Paginate(Functions()))
 //                  Select(Arr(Value("data")), Paginate(Keys())),
-                  Select(Arr(Value("data")), Var("allKeysExceptRoot")))
-          ), Foreach(
+//                  Select(Arr(Value("data")), Var("allKeysExceptRoot")))
+                )), Foreach(
               Var("refsToRemove"),
               Lambda(Value("ref"), If(Exists(Var("ref")), Delete(Var("ref")), Null())))
       ))
