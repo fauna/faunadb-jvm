@@ -80,16 +80,6 @@ class ClientSpec
     rootClient.query(Delete(Database(testDbName))).futureValue
   }
 
-  private def getMap(rootKey: Value): Expr = {
-    Map(if (rootKey != NullV) {
-      Filter(Var("keys"),
-        Lambda(Value("key"),
-          Not(Equals(Select(Arr(Value("ref")), Var("key"), Null()),
-            Select(Arr(Value("ref")), Var("rootKey"), Null())))))
-    } else Var("keys"),
-    Lambda(Value("key"), Select(Arr(Value("ref")), Var("key"))))
-  }
-
   // tests
 
   override protected def beforeAll(): Unit = {

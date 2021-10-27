@@ -119,20 +119,6 @@ public class ClientSpec {
     rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
   }
 
-  private static Expr getMap(Value rootKey) {
-    return Map( checkNull(rootKey) ?
-            Filter(Var("keys"),
-                    Lambda(Value("key"),
-                            Not(Equals(Select(Arr(Value("ref")), Var("key"), NULL),
-                                    Select(Arr(Value("ref")), Var("rootKey"), NULL)))))
-                    : Var("keys"),
-            Lambda(Value("key"), Select(Arr(Value("ref")), Var("key"))));
-  }
-
-  private static Boolean checkNull(Value v) {
-    return v != NULL;
-  }
-
   @Before
   public void setUpSchema() throws Exception {
     if (initialized)

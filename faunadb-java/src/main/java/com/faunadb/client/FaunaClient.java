@@ -190,7 +190,7 @@ public class FaunaClient {
     }
   }
 
-  private final ObjectMapper json = new ObjectMapper().registerModule(new Jdk8Module());
+  private static final ObjectMapper json = new ObjectMapper().registerModule(new Jdk8Module());
   private final Connection connection;
 
   private FaunaClient(Connection connection) {
