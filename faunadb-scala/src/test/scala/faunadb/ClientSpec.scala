@@ -77,28 +77,7 @@ class ClientSpec
   def aRandomString(size: Int): String = Random.alphanumeric.take(size).mkString
 
   def testDataCleanup(): Unit = {
-//    rootClient.query(Delete(Database(testDbName))).futureValue
-    rootClient.query(KeyFromSecret(config("root_token"))).recoverWith {
-        case BadRequestException(_, _) => Future.successful(NullV)
-        case InstanceNotFoundException(_, _, _) => Future.successful(NullV)
-      }.flatMap { rootKey =>
-      rootClient.query(
-        Let(Seq(
-                "rootKey" -> rootKey,
-                "keys" -> Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref")))),
-                "allKeysExceptRoot" -> getMap(rootKey),
-                "refsToRemove" -> Union(
-                  Select(Arr(Value("data")), Paginate(Databases())),
-                  Select(Arr(Value("data")), Paginate(Collections())),
-                  Select(Arr(Value("data")), Paginate(Indexes())),
-                  Select(Arr(Value("data")), Paginate(Functions()))
-//                  Select(Arr(Value("data")), Paginate(Keys())),
-//                  Select(Arr(Value("data")), Var("allKeysExceptRoot")))
-                )), Foreach(
-              Var("refsToRemove"),
-              Lambda(Value("ref"), If(Exists(Var("ref")), Delete(Var("ref")), Null())))
-      ))
-    }.futureValue
+    rootClient.query(Delete(Database(testDbName))).futureValue
   }
 
   private def getMap(rootKey: Value): Expr = {
