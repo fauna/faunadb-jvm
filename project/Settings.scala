@@ -6,7 +6,7 @@ import scoverage.ScoverageSbtPlugin.autoImport._
 
 object Settings {
 
-  lazy val driverVersion = "4.2.0"
+  lazy val driverVersion = "5.0.0-beta"
 
   lazy val scala211 = "2.11.12"
   lazy val scala212 = "2.12.14"
