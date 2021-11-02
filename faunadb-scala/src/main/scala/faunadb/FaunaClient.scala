@@ -447,7 +447,7 @@ class FaunaClient private (connection: Connection) {
 
     statusCode match {
       case 400 => throwQueryError(parseErrors())
-      case 401 => Future.failed(UnauthorizedException("Unauthorized", statusCode))
+      case 401 => Future.failed(UnauthorizedException("Unauthorized. Check that endpoint, schema, port and secret are correct during client’s instantiation", statusCode))
       case 403 => throwQueryError(parseErrors())
       case 404 => throwQueryError(parseErrors())
       case 409 => Future.failed(TransactionContentionException("Transaction exception", statusCode))
