@@ -140,6 +140,53 @@ FaunaClient adminClient =
         )
         .build();
 ```
+##### Exceptions handling
+
+With the 5.0.0 release, child classes of the base FaunaException class now exist.
+For example:
+```
+public class AuthenticationFailedException extends FaunaException {
+    public AuthenticationFailedException(final String message, final int httpStatusCode, final List<String> position) {
+      super(message, httpStatusCode, position);
+    }
+}
+public class InvalidArgumentException extends FaunaException {
+    public InvalidArgumentException(String message, int httpStatusCode, List<String> position) {
+        super(message, httpStatusCode, position);
+    }
+}
+public class TransactionAbortedException extends FaunaException {
+  public TransactionAbortedException(final String message, final int httpStatusCode, final List<String> position) {
+    super(message, httpStatusCode, position);
+  }
+}
+```
+Each class corresponds to an error code from Fauna.
+Inspect the [`FaunaException.java`](https://github.com/fauna/faunadb-jvm/blob/v5/faunadb-java/src/main/java/com/faunadb/client/errors/FaunaException.java)
+file for more information on how it is implemented.
+
+The following example demonstrates the methods that you can access from the exception object:
+```
+
+adminClient.query(ToDouble(Now()))
+    .handle((v, ex) -> handleBadRequest(v, ex)).get();
+
+private static Value handleBadRequest(Value v, Throwable ex) {
+    if (ex instanceof BadRequestException) {
+      ((BadRequestException) ex).status();
+      return NULL;
+    } else {
+      return v;
+    }
+  }
+```
+
+```scala
+adminClient.query(ToDouble(Now())).recoverWith {
+        case BadRequestException(_, _) => Future.successful(NullV)
+        case InstanceNotFoundException(_, _, _) => Future.successful(NullV)
+      }
+```
 
 ##### Document Streaming
 
