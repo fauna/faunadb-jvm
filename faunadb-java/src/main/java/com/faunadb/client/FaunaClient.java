@@ -517,7 +517,7 @@ public class FaunaClient {
         List<String> position = parsedErrors.stream().flatMap(error -> error.position().stream()).collect(Collectors.toList());
         throwKnownQueryErrors(parsedErrors, statusCode, code, message, position);
       case 401:
-        throw new UnauthorizedException(message, statusCode);
+        throw new UnauthorizedException(String.format("%s. Check that endpoint, schema, port and secret are correct during client’s instantiation", message), statusCode);
       case 440:
         throw new ProcessingTimeLimitExceededException(message, statusCode);
       case 409:
