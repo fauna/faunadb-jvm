@@ -34,7 +34,7 @@ import static java.lang.String.format;
  */
 public class Connection {
 
-  private static final String API_VERSION = "4";
+  private static final String API_VERSION = "5";
   private static final Duration DEFAULT_CONNECTION_TIMEOUT = Duration.ofSeconds(10);
   private static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofSeconds(60);
   private static final String DEFAULT_USER_AGENT = "Fauna JVM Http Client";
