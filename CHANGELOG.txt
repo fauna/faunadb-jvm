@@ -1,4 +1,5 @@
 5.0.0-beta
+* Supports fauna database API v5
 * Implemented new driver exception hierarchy
 
 4.2.0
