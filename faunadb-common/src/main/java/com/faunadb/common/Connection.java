@@ -319,6 +319,7 @@ public class Connection {
   private static final String X_LAST_SEEN_TXN = "X-Last-Seen-Txn";
   private static final String X_FAUNADB_API_VERSION = "X-FaunaDB-API-Version";
   private static final String USER_AGENT = "User-Agent";
+  private static final String KEEP_ALIVE = "Keep-Alive";
 
   private final URL faunaRoot;
   private final String authHeader;
@@ -563,7 +564,8 @@ public class Connection {
             USER_AGENT, userAgent,
             X_QUERY_TIMEOUT, String.valueOf(queryTimeout.toMillis()),
             X_DRIVER_ENV, runtimeEnvironmentHeader,
-            "Content-type", "application/json; charset=utf-8"
+            "Content-type", "application/json; charset=utf-8",
+            KEEP_ALIVE, "timeout=3"
     );
 
     Map<String, String> combinedHeaders = new HashMap<>(defaultHeaders);
