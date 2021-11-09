@@ -178,12 +178,12 @@ try {
 
 ```scala
 adminClient.query(ToDouble(Now())).recoverWith {
-        case InvalidExpressionException(message, httpStatusCode, position) => {
-          println(s"Message - $message")
-          println(s"HttpStatusCode - $httpStatusCode")
-          println(s"Position - $position")
-        }      
-      }
+    case InvalidExpressionException(message, httpStatusCode, position) => {
+      println(s"Message - $message")
+      println(s"HttpStatusCode - $httpStatusCode")
+      println(s"Position - $position")
+    }
+}
 ```
 
 ##### Document Streaming
