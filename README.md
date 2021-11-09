@@ -166,25 +166,23 @@ Inspect the [`FaunaException.java`](https://github.com/fauna/faunadb-jvm/blob/v5
 file for more information on how it is implemented.
 
 The following example demonstrates the methods that you can access from the exception object:
-```
-
-adminClient.query(ToDouble(Now()))
-    .handle((v, ex) -> handleBadRequest(v, ex)).get();
-
-private static Value handleBadRequest(Value v, Throwable ex) {
-    if (ex instanceof BadRequestException) {
-      ((BadRequestException) ex).status();
-      return NULL;
-    } else {
-      return v;
-    }
-  }
+```java
+try {
+    rootClient.query(Delete(DB_REF));
+} catch (InvalidExpressionException e) {
+    e.getHttpStatusCode();
+    e.getPosition();
+    e.getMessage();
+}
 ```
 
 ```scala
 adminClient.query(ToDouble(Now())).recoverWith {
-        case BadRequestException(_, _) => Future.successful(NullV)
-        case InstanceNotFoundException(_, _, _) => Future.successful(NullV)
+        case InvalidExpressionException(message, httpStatusCode, position) => {
+          println(s"Message - $message")
+          println(s"HttpStatusCode - $httpStatusCode")
+          println(s"Position - $position")
+        }      
       }
 ```
 
