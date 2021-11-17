@@ -15,8 +15,8 @@ This repository contains the FaunaDB drivers for the JVM languages. Currently, J
 
 Javadocs and Scaladocs are hosted on GitHub:
 
-* [faunadb-java](http://fauna.github.io/faunadb-jvm/4.2.0/faunadb-java/api/)
-* [faunadb-scala](http://fauna.github.io/faunadb-jvm/4.2.0/faunadb-scala/api/)
+* [faunadb-java](http://fauna.github.io/faunadb-jvm/5.0.0-beta/faunadb-java/api/)
+* [faunadb-scala](http://fauna.github.io/faunadb-jvm/5.0.0-beta/faunadb-scala/api/)
 
 Details Documentation for each language:
 
@@ -54,7 +54,7 @@ Download from the Maven central repository:
   <dependency>
     <groupId>com.faunadb</groupId>
     <artifactId>faunadb-java</artifactId>
-    <version>4.2.0</version>
+    <version>5.0.0-beta</version>
     <scope>compile</scope>
   </dependency>
   ...
@@ -140,6 +140,51 @@ FaunaClient adminClient =
         )
         .build();
 ```
+##### Exceptions handling
+
+With the 5.0.0 release, child classes of the base FaunaException class now exist.
+For example:
+```
+public class AuthenticationFailedException extends FaunaException {
+    public AuthenticationFailedException(final String message, final int httpStatusCode, final List<String> position) {
+      super(message, httpStatusCode, position);
+    }
+}
+public class InvalidArgumentException extends FaunaException {
+    public InvalidArgumentException(String message, int httpStatusCode, List<String> position) {
+        super(message, httpStatusCode, position);
+    }
+}
+public class TransactionAbortedException extends FaunaException {
+  public TransactionAbortedException(final String message, final int httpStatusCode, final List<String> position) {
+    super(message, httpStatusCode, position);
+  }
+}
+```
+Each class corresponds to an error code from Fauna.
+Inspect the [`FaunaException.java`](https://github.com/fauna/faunadb-jvm/blob/v5/faunadb-java/src/main/java/com/faunadb/client/errors/FaunaException.java)
+file for more information on how it is implemented.
+
+The following example demonstrates the methods that you can access from the exception object:
+```java
+try {
+    rootClient.query(Delete(DB_REF));
+} catch (InvalidExpressionException e) {
+    e.getHttpStatusCode();
+    e.getPosition();
+    e.getMessage();
+}
+```
+
+```scala
+adminClient.query(ToDouble(Now())).recoverWith {
+    case InvalidExpressionException(message, httpStatusCode, position) => {
+      println(s"Message - $message")
+      println(s"HttpStatusCode - $httpStatusCode")
+      println(s"Position - $position")
+    }
+}
+```
 
 ##### Document Streaming
 
@@ -207,7 +252,7 @@ List<Value> events = capturedEvents.get();
 ##### faunadb-scala/sbt
 
 ```scala
-libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "4.2.0")
+libraryDependencies += ("com.faunadb" %% "faunadb-scala" % "5.0.0-beta")
 ```
 
 ##### Basic Usage

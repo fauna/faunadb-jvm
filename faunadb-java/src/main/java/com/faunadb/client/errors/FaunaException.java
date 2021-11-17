@@ -33,7 +33,7 @@ public class FaunaException extends RuntimeException {
    *
    * @return HTTP status code
    */
-  public int httpStatusCode() {
+  public int getHttpStatusCode() {
     return httpStatusCode;
   }
 
