@@ -291,6 +291,7 @@ public class Connection {
      * the settings of the {@link Builder} instance.
      */
     public Connection build() {
+      System.setProperty("jdk.httpclient.keepalive.timeout", "3");
       MetricRegistry registry;
       registry = Objects.requireNonNullElseGet(metricRegistry, MetricRegistry::new);
 
