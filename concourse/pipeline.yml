@@ -85,12 +85,12 @@ jobs:
       - task: publish
         file: fauna-jvm-repository/concourse/tasks/publish.yml
         params:
-          SONATYPE_USER: ((sonatype_user_escaped))
-          SONATYPE_PASS: ((sonatype_pass_escaped))
-          GPG_PRIVATE_KEY: ((gpg_private_key))
-          GPG_PUBLIC_KEY: ((gpg_public_key))
-          GPG_PASSPHRASE: ((gpg_passphrase_escaped))
-          GPG_SIGNING_KEY: ((gpg_signing_key_escaped))
+          SONATYPE_USER: ((sonatype_user_escaped_v2))
+          SONATYPE_PASS: ((sonatype_pass))
+          GPG_PRIVATE_KEY: ((gpg_private_key_escaped))
+          GPG_PUBLIC_KEY: ((gpg_public_key_escaped))
+          GPG_PASSPHRASE: ((gpg_passphrase))
+          GPG_SIGNING_KEY: ((gpg_signing_key))
         on_success:
           put: notify
           params:
