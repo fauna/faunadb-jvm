@@ -3251,6 +3251,62 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldStreamSetEvents() throws Exception {
+    String coll = randomStartingWith("collection_");
+    query(CreateCollection(Obj("name", Value(coll))));
+
+    Flow.Publisher<Value> pub = adminClient.stream(Documents(Collection(coll))).get();
+    CompletableFuture<List<Value>> capturedEvents = new CompletableFuture<>();
+
+    Flow.Subscriber<Value> sub = new Flow.Subscriber<>() {
+      List<Value> captured = new ArrayList<>();
+      Flow.Subscription sub = null;
+
+      @Override
+      public void onSubscribe(Flow.Subscription sub) {
+        this.sub = sub;
+        this.sub.request(1);
+      }
+
+      @Override
+      public void onNext(Value v) {
+        captured.add(v);
+        if (captured.size() == 3) {
+          capturedEvents.complete(captured);
+          sub.cancel();
+        } else {
+          sub.request(1);
+        }
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+         capturedEvents.completeExceptionally(throwable);
+      }
+
+      @Override
+      public void onComplete() {
+        capturedEvents.completeExceptionally(
+          new IllegalStateException("not expecting the stream to complete"));
+      }
+    };
+
+    // subscribe to publisher
+    pub.subscribe(sub);
+
+    // push 2 events
+    Value doc = adminClient.query(Create(Collection(coll), Obj())).get();
+    adminClient.query(Delete(doc.at("ref"))).get();
+
+    List<Value> events = capturedEvents.get();
+    assertThat(events.get(0).at("type").to(STRING).get(), equalTo("start"));
+    assertThat(events.get(1).at("type").to(STRING).get(), equalTo("set"));
+    assertThat(events.get(1).at("event").at("action").to(STRING).get(), equalTo("add"));
+    assertThat(events.get(2).at("type").to(STRING).get(), equalTo("set"));
+    assertThat(events.get(2).at("event").at("action").to(STRING).get(), equalTo("remove"));
+  }
+
+  @Test
   public void streamEventsWithSnapshotData() throws Exception {
     String collectionName = randomStartingWith("collection_");
     query(CreateCollection(Obj("name", Value(collectionName)))).get();
