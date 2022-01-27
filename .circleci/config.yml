@@ -10,7 +10,7 @@ executors:
     resource_class: large
     docker:
       - image: openjdk:11
-      - image: gcr.io/faunadb-cloud/faunadb/enterprise:latest
+      - image: gcr.io/faunadb-cloud/faunadb/core/nightly:latest
         name: core
         auth:
           username: _json_key
