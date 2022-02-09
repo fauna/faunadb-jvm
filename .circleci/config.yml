@@ -10,11 +10,9 @@ executors:
     resource_class: large
     docker:
       - image: openjdk:11
-      - image: gcr.io/faunadb-cloud/faunadb/enterprise/<<parameters.version>>:latest
+      - image: fauna/faunadb
         name: core
-        auth:
-          username: _json_key
-          password: $GCR_KEY
+
     environment:
       SBT_VERSION: 1.4.7
       FAUNA_ROOT_KEY: secret
