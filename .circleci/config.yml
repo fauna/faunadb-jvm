@@ -12,6 +12,7 @@ executors:
       - image: openjdk:11
       - image: fauna/faunadb
         name: core
+
     environment:
       SBT_VERSION: 1.4.7
       FAUNA_ROOT_KEY: secret
