@@ -29,4 +29,11 @@ public class EventFields {
             return "action";
         }
     };
+
+    public static EventField IndexField = new EventField() {
+        @Override
+        public String value() {
+            return "index";
+        }
+    };
 }
