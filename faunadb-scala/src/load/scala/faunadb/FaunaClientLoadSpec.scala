@@ -190,37 +190,6 @@ class FaunaClientLoadSpec extends FixtureAsyncWordSpec with Matchers with ScalaF
       }
     }
 
-    "fail to handle more than 100 concurrent streams on the same client" in { client =>
-      def setup(): Future[Result[Value]] = {
-        val collectionName = RandomGenerator.aRandomString
-        for {
-          _ <- client.query(CreateCollection(Obj("name" -> collectionName)))
-          createdDoc <- client.query(Create(Collection(collectionName), Obj("credentials" -> Obj("password" -> "abcdefg"))))
-        } yield createdDoc("ref")
-      }
-
-      def run(docRef: Value): Future[Unit] = {
-        val maxConcurrentStreamCount = 100
-        for {
-          // create a first publisher to setup the connection that will be reused by all the other publishers
-          _ <- client.stream(docRef)
-          // adding 99 publisher (makes 100 in total)
-          _ <- Future.traverse(List.fill(maxConcurrentStreamCount - 1)(docRef))(ref => client.stream(ref))
-          // adding 101st subscriber creates the error
-          _ <- client.stream(docRef)
-        } yield ()
-      }
-
-      val result =
-        for {
-          docRef <- setup()
-          result <- run(docRef)
-        } yield result
-
-      recoverToExceptionIf[BadRequestException](result).map { e =>
-        e.getMessage should include("the maximum number of streams has been reached for this client")
-      }
-    }
   }
 
   def testSubscriber(messageCount: Int, publisher: Flow.Publisher[Value]): Future[List[Value]] = {
