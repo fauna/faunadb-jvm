@@ -2081,6 +2081,28 @@ class ClientSpec
     }
   }
 
+  it should "stream set events" in {
+    client.query(CreateCollection(Obj("name" -> "foo"))).futureValue
+    val publisherValue = client.stream(Documents(Collection("foo"))).futureValue
+    val events = testSubscriber(3, publisherValue)
+
+    // push 3 updates
+    val doc = client.query(Create(Collection("foo"), Obj())).futureValue
+    client.query(Delete(doc("ref"))).futureValue
+
+    // assertion 3 events (start + 2 updates)
+    events.futureValue match {
+      case start :: e1 :: e2 :: Nil =>
+        start("type").get shouldBe StringV("start")
+        e1("type").get shouldBe StringV("set")
+        e1("event", "action").get shouldBe StringV("add")
+        e2("type").get shouldBe StringV("set")
+        e2("event", "action").get shouldBe StringV("remove")
+      case _ =>
+        fail("expected 3 events")
+    }
+  }
+
   it should "stream on document reference with opt-in fields" in {
     val createdDoc = client.query(Create(Collection("spells"), Obj("data" -> Obj("testField" -> "testValue0")))).futureValue
     val docRef = createdDoc(RefField)

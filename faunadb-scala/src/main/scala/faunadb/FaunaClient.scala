@@ -73,6 +73,7 @@ object FaunaClient {
   case object PrevField extends EventField("prev")
   case object DiffField extends EventField("diff")
   case object ActionField extends EventField("action")
+  case object IndexField extends EventField("index")
 }
 
 /**
