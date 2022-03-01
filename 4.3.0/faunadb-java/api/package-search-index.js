@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"com.faunadb.client"},{"l":"com.faunadb.client.errors"},{"l":"com.faunadb.client.query"},{"l":"com.faunadb.client.streaming"},{"l":"com.faunadb.client.types"},{"l":"com.faunadb.client.util"}]
