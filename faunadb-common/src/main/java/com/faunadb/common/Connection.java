@@ -22,6 +22,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Flow;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -387,10 +389,16 @@ public class Connection {
    *
    * @param path the relative path of the resource.
    * @param queryTimeout the query timeout for the current request.
+   * @param traceId A unique identifier for this query. Adheres to the
+   *                [W3C Trace Context](https://w3c.github.io/trace-context/) spec.
+   * @param tags Key-value pair metadata to associate with this query.
    * @return a {@link CompletableFuture} containing the HTTP Response.
    */
-  public CompletableFuture<HttpResponse<String>> get(String path, Optional<Duration> queryTimeout) {
-    return performRequest("GET", path, Optional.empty(), Map.of(), queryTimeout);
+  public CompletableFuture<HttpResponse<String>> get(String path,
+                                                     Optional<Duration> queryTimeout,
+                                                     Optional<String> traceId,
+                                                     Optional<Map<String, String>> tags) {
+    return performRequest("GET", path, Optional.empty(), Map.of(), queryTimeout, traceId, tags);
   }
 
   /**
@@ -399,10 +407,17 @@ public class Connection {
    * @param path   the relative path of the resource.
    * @param params a map containing the request parameters.
    * @param queryTimeout the query timeout for the current request.
+   * @param traceId A unique identifier for this query. Adheres to the
+   *                [W3C Trace Context](https://w3c.github.io/trace-context/) spec.
+   * @param tags Key-value pair metadata to associate with this query.
    * @return a {@code CompletableFuture} containing the HTTP response.
    */
-  public CompletableFuture<HttpResponse<String>> get(String path, Map<String, List<String>> params, Optional<Duration> queryTimeout) {
-    return performRequest("GET", path, Optional.empty(), params, queryTimeout);
+  public CompletableFuture<HttpResponse<String>> get(String path,
+                                                     Map<String, List<String>> params,
+                                                     Optional<Duration> queryTimeout,
+                                                     Optional<String> traceId,
+                                                     Optional<Map<String, String>> tags) {
+    return performRequest("GET", path, Optional.empty(), params, queryTimeout, traceId, tags);
   }
 
   /**
@@ -411,10 +426,17 @@ public class Connection {
    * @param path the relative path of the resource.
    * @param body the JSON tree that will be serialized into the request body.
    * @param queryTimeout the query timeout for the current request.
+   * @param traceId A unique identifier for this query. Adheres to the
+   *                [W3C Trace Context](https://w3c.github.io/trace-context/) spec.
+   * @param tags Key-value pair metadata to associate with this query.
    * @return a {@link CompletableFuture} containing the HTTP response.
    */
-  public CompletableFuture<HttpResponse<String>> post(String path, JsonNode body, Optional<Duration> queryTimeout) {
-    return performRequest("POST", path, Optional.of(body), Map.of(), queryTimeout);
+  public CompletableFuture<HttpResponse<String>> post(String path,
+                                                      JsonNode body,
+                                                      Optional<Duration> queryTimeout,
+                                                      Optional<String> traceId,
+                                                      Optional<Map<String,String>> tags) {
+    return performRequest("POST", path, Optional.of(body), Map.of(), queryTimeout, traceId, tags);
   }
 
   /**
@@ -423,10 +445,17 @@ public class Connection {
    * @param path the relative path of the resource.
    * @param body the JSON tree that will be serialized into the request body.
    * @param queryTimeout the query timeout for the current request.
+   * @param traceId A unique identifier for this query. Adheres to the
+   *                [W3C Trace Context](https://w3c.github.io/trace-context/) spec.
+   * @param tags Key-value pair metadata to associate with this query.
    * @return a {@link CompletableFuture} containing the HTTP response.
    */
-  public CompletableFuture<HttpResponse<String>> put(String path, JsonNode body, Optional<Duration> queryTimeout) {
-    return performRequest("PUT", path, Optional.of(body), Map.of(), queryTimeout);
+  public CompletableFuture<HttpResponse<String>> put(String path,
+                                                     JsonNode body,
+                                                     Optional<Duration> queryTimeout,
+                                                     Optional<String> traceId,
+                                                     Optional<Map<String, String>> tags) {
+    return performRequest("PUT", path, Optional.of(body), Map.of(), queryTimeout, traceId, tags);
   }
 
   /**
@@ -435,10 +464,17 @@ public class Connection {
    * @param path the relative path of the resource.
    * @param body the JSON tree that will be serialized into the request body.
    * @param queryTimeout the query timeout for the current request.
+   * @param traceId A unique identifier for this query. Adheres to the
+   *                [W3C Trace Context](https://w3c.github.io/trace-context/) spec.
+   * @param tags Key-value pair metadata to associate with this query.
    * @return a {@link CompletableFuture} containing the HTTP response.
    */
-  public CompletableFuture<HttpResponse<String>> patch(String path, JsonNode body, Optional<Duration> queryTimeout) {
-    return performRequest("PATCH", path, Optional.of(body), Map.of(), queryTimeout);
+  public CompletableFuture<HttpResponse<String>> patch(String path,
+                                                       JsonNode body,
+                                                       Optional<Duration> queryTimeout,
+                                                       Optional<String> traceId,
+                                                       Optional<Map<String, String>> tags) {
+    return performRequest("PATCH", path, Optional.of(body), Map.of(), queryTimeout, traceId, tags);
   }
 
   private static URI appendUri(URI oldUri, String queryKey, List<String> queryValues) throws URISyntaxException {
@@ -451,13 +487,20 @@ public class Connection {
             oldUri.getQuery() == null ? query : oldUri.getQuery() + "&" + query, oldUri.getFragment());
   }
 
-  private CompletableFuture<HttpResponse<String>> performRequest(String httpMethod, String path, Optional<JsonNode> body,
-                                                                 Map<String, List<String>> params, final Optional<Duration> requestQueryTimeout) {
+  private CompletableFuture<HttpResponse<String>> performRequest(String httpMethod,
+                                                                 String path,
+                                                                 Optional<JsonNode> body,
+                                                                 Map<String, List<String>> params,
+                                                                 final Optional<Duration> requestQueryTimeout,
+                                                                 final Optional<String> requestTraceId,
+                                                                 final Optional<Map<String, String>> requestTags) {
     final Timer.Context ctx = registry.timer("fauna-request").time();
     final CompletableFuture<HttpResponse<String>> rv = new CompletableFuture<>();
     HttpRequest request;
     try {
-      request = makeHttpRequest(httpMethod, path, body, params, requestQueryTimeout, HttpClient.Version.HTTP_1_1);
+      request = makeHttpRequest(httpMethod, path, body, params, requestQueryTimeout, requestTraceId, requestTags,
+                                HttpClient.Version.HTTP_1_1
+      );
     } catch (IllegalArgumentException| MalformedURLException | URISyntaxException | JsonProcessingException ex) {
       rv.completeExceptionally(ex);
       return rv;
@@ -495,7 +538,10 @@ public class Connection {
     final CompletableFuture<HttpResponse<Flow.Publisher<List<ByteBuffer>>>> rv = new CompletableFuture<>();
     HttpRequest request;
     try {
-      request = makeHttpRequest(httpMethod, path, Optional.of(body), params, Optional.empty(), HttpClient.Version.HTTP_2);
+      // TODO Implement traceId/tags for streaming requests
+      request = makeHttpRequest(httpMethod, path, Optional.of(body), params, Optional.empty(), Optional.empty(),
+                                Optional.empty(), HttpClient.Version.HTTP_2
+      );
     } catch (MalformedURLException | URISyntaxException | JsonProcessingException ex) {
       rv.completeExceptionally(ex);
       return rv;
@@ -517,8 +563,15 @@ public class Connection {
     return rv;
   }
 
-  private HttpRequest makeHttpRequest(String httpMethod, String path, Optional<JsonNode> body, Map<String, List<String>> params,
-                                      Optional<Duration> requestQueryTimeout, HttpClient.Version httpVersion) throws MalformedURLException, URISyntaxException, JsonProcessingException {
+  private HttpRequest makeHttpRequest(String httpMethod,
+                                      String path,
+                                      Optional<JsonNode> body,
+                                      Map<String, List<String>> params,
+                                      Optional<Duration> requestQueryTimeout,
+                                      Optional<String> requestTraceId,
+                                      Optional<Map<String, String>> requestTags,
+                                      HttpClient.Version httpVersion
+  ) throws MalformedURLException, URISyntaxException, JsonProcessingException {
     URI requestUri = URI.create(mkUrl(path));
 
     // Encode all query parameters
@@ -549,7 +602,7 @@ public class Connection {
         .timeout(queryTimeout)
         .method(httpMethod, bodyPublisher)
         .headers(
-          mkHeaders(queryTimeout)
+          mkHeaders(queryTimeout, requestTraceId, requestTags)
         );
 
     lastTxnTime.ifPresent(time -> requestBuilder.header(X_LAST_SEEN_TXN, Long.toString(time)));
@@ -557,7 +610,7 @@ public class Connection {
     return requestBuilder.build();
   }
 
-  private String[] mkHeaders(Duration queryTimeout) {
+  private String[] mkHeaders(Duration queryTimeout, Optional<String> traceId, Optional<Map<String, String>> tags) {
     Map<String, String> defaultHeaders = Map.of(
             "Authorization", authHeader,
             X_FAUNADB_API_VERSION, API_VERSION,
@@ -568,10 +621,17 @@ public class Connection {
     );
 
     Map<String, String> combinedHeaders = new HashMap<>(defaultHeaders);
-    if (customHeaders != null) {
-      for (Map.Entry<String, String> entry : customHeaders.entrySet()) {
-        combinedHeaders.put(entry.getKey(), entry.getValue());
-      }
+
+    Map<String, String> perRequestHeaders = new HashMap<>();
+    traceId.ifPresent(traceIdVal -> perRequestHeaders.put("traceparent", getValidatedTraceId(traceIdVal)));
+    tags.ifPresent(tagMap -> perRequestHeaders.put("x-fauna-tags", serializeTags(tagMap)));
+
+    if (!perRequestHeaders.isEmpty()) {
+      combinedHeaders.putAll(perRequestHeaders);
+    }
+
+    if (customHeaders != null && !customHeaders.isEmpty()) {
+      combinedHeaders.putAll(customHeaders);
     }
 
     String[] headersAsArray = new String[combinedHeaders.size() * 2];
@@ -584,8 +644,27 @@ public class Connection {
     return headersAsArray;
   }
 
+  private String getValidatedTraceId(String traceIdVal) {
+    Pattern p = Pattern.compile("^\\p{XDigit}{2}-\\p{XDigit}{32}-\\p{XDigit}{16}-\\p{XDigit}{2}$");
+    Matcher m = p.matcher(traceIdVal);
+    if (m.matches()) {
+      return traceIdVal;
+    } else {
+      throw new RuntimeException("Invalid traceparent! It must adhere to the W3C Trace Context spec. " +
+                                         "See https://w3c.github.io/trace-context for more details");
+    }
+  }
+
   private String mkUrl(String path) throws MalformedURLException {
     return new URL(faunaRoot, path).toString();
+  }
+
+  private String serializeTags(Map<String, String> tags) {
+    // TODO validation
+    return tags.entrySet()
+            .stream()
+            .map(entry -> String.join("=", entry.getKey(), entry.getValue()))
+            .collect(Collectors.joining(","));
   }
 
   private void logSuccess(HttpRequest request, HttpResponse<String> response) {

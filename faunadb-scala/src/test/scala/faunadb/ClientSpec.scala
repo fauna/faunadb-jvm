@@ -3,9 +3,7 @@ package faunadb
 import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate}
 import java.util
-import java.util.Calendar
 import java.util.concurrent.Flow
-
 import faunadb.FaunaClient._
 import faunadb.errors._
 import faunadb.query.{TimeUnit, _}
@@ -136,7 +134,7 @@ class ClientSpec
   }
 
   override protected def afterAll(): Unit = {
-    testDataCleanup()
+    //testDataCleanup()
   }
 
   it should "parse nested sets" in {
@@ -275,6 +273,21 @@ class ClientSpec
     results.length shouldBe 2
     results(0)("data", "queryTest1").to[String].get shouldBe randomText1
     results(1)("data", "queryTest1").to[String].get shouldBe randomText2
+  }
+
+  it should "throw error if invalid traceparent provided" in {
+    try {
+      client.query(Now(), None, Some("NotAValidTraceparent"), None).failed.futureValue
+    } catch {
+      case re: RuntimeException => re.getMessage should include("Invalid traceparent!")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "accept tags if customer provides them" in {
+      val valueResponse: Value = client.query(Now(), None, None, Some(scala.collection.immutable.Map("Key1" -> "Value1", "Key2" -> "Value2")))
+                                .futureValue
+    valueResponse.toString should include("Z")
   }
 
   it should "get at timestamp" in {
