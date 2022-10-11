@@ -177,7 +177,7 @@ class FaunaClient private (connection: Connection) {
              expr: Expr,
              timeout: Option[FiniteDuration],
              traceId: Option[String],
-             tags: Option[Map[String, String]],
+             tags: Option[Map[String, String]]
            )(implicit ec: ExecutionContext): Future[Value] =
     performRequest(json.valueToTree(expr), timeout, traceId, tags)
 
