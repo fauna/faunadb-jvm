@@ -285,7 +285,7 @@ class FaunaClient private (connection: Connection) {
                                                                  body,
                                                                  javaTimeout,
                                                                  traceId.asJava,
-                                                                 tags.map(mapAsJavaMap(_)).asJava)
+                                                                 tags.map(_.asJava).asJava)
                                                            .toScala
 
     response
