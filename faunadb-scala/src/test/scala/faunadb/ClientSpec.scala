@@ -137,7 +137,7 @@ class ClientSpec
   }
 
   override protected def afterAll(): Unit = {
-    //testDataCleanup()
+    testDataCleanup()
   }
 
   it should "parse nested sets" in {

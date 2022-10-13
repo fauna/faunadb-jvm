@@ -20,6 +20,9 @@ import scala.concurrent.duration.FiniteDuration
 class RequestParameters(val timeout: Option[FiniteDuration] = None,
                         val traceId: Option[String] = None,
                         val tags: Set[Tag] = Set()) {
+  if (tags == null) {
+    throw new RuntimeException("Tags cannot be null. Consider passing an empty set instead")
+  }
   def timeoutAsJavaDuration: Option[Duration] = timeout.map(_.toJava)
   def asJava: com.faunadb.common.models.request.RequestParameters =
     new com.faunadb.common.models.request.RequestParameters(timeoutAsJavaDuration.asJava,
