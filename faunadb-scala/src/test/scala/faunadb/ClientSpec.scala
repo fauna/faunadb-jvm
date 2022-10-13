@@ -1,12 +1,15 @@
 package faunadb
 
+import com.faunadb.common.models.tags.Tag
+
 import java.time.temporal.ChronoUnit
-import java.time.{Instant, LocalDate}
+import java.time.{Instant, LocalDate, LocalDateTime}
 import java.util
 import java.util.concurrent.Flow
 import faunadb.FaunaClient._
 import faunadb.errors._
 import faunadb.query.{TimeUnit, _}
+import faunadb.types.RequestParameters
 import faunadb.values._
 import monix.execution.Scheduler
 import monix.reactive.Observable
@@ -277,7 +280,9 @@ class ClientSpec
 
   it should "throw error if invalid traceparent provided" in {
     try {
-      client.query(Now(), None, Some("NotAValidTraceparent"), None).failed.futureValue
+      client.query(Now(), new RequestParameters(timeout = None,
+                                                traceId = Some("NotAValidTraceparent"))).failed.futureValue
+      fail("Expected exception here, but none encountered")
     } catch {
       case re: RuntimeException => re.getMessage should include("Invalid traceparent!")
       case e: Throwable => fail("Unexpected exception encountered!", e)
@@ -285,9 +290,78 @@ class ClientSpec
   }
 
   it should "accept tags if customer provides them" in {
-      val valueResponse: Value = client.query(Now(), None, None, Some(scala.collection.immutable.Map("Key1" -> "Value1", "Key2" -> "Value2")))
+      val valueResponse: Value = client.query(Now(),
+                                              new RequestParameters(
+                                                tags = Set(new Tag("Key1","Value1"), new Tag("Key2","Value2")))
+                                              )
                                 .futureValue
     valueResponse.toString should include("Z")
+  }
+
+  it should "throw error if provided tags contain invalid characters, 0x20" in {
+    try {
+      new Tag("Invalid Key", "Value1")
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case re: RuntimeException => re.getMessage should include("contains invalid characters")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags contain invalid characters, special characters" in {
+    try {
+      new Tag("Tag@!---", "Value1")
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case re: RuntimeException => re.getMessage should include("contains invalid characters")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags have a key with greater than 40 characters" in {
+    try {
+      new Tag(Random.alphanumeric.take(41).mkString, "Value1")
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case re: RuntimeException => re.getMessage should include("longer than the allowable limit")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags have a value with greater than 80 characters" in {
+    try {
+      new Tag("Key1", Random.alphanumeric.take(81).mkString)
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case re: RuntimeException => re.getMessage should include("longer than the allowable limit")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if more than 25 tag pairs provided" in {
+    try {
+      val requestTags = scala.collection.mutable.Set[Tag]()
+      (1 to 26) foreach {
+        iter => requestTags.add(new Tag("Key"+iter, "Value"+iter))
+      }
+      client.query(Now(), new RequestParameters(tags = requestTags.toSet))
+            .futureValue
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case re: RuntimeException => re.getMessage should include("Maximum number of tags provided")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if null tags provided" in {
+    try {
+      client.query(Now(), new RequestParameters(tags = null))
+            .futureValue
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case re: RuntimeException => re.getMessage should include("Tags cannot be null")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
   }
 
   it should "get at timestamp" in {

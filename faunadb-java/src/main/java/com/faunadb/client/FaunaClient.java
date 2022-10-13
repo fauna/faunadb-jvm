@@ -397,13 +397,11 @@ public class FaunaClient {
   }
 
   private CompletableFuture<Value> performRequest(JsonNode body, Optional<Duration> queryTimeout) {
-    // TODO fixup
-    return handleNetworkExceptions(connection.post("", body, queryTimeout, Optional.empty(), Optional.empty()).thenApply(this::handleResponse));
+    return handleNetworkExceptions(connection.post("", body, queryTimeout).thenApply(this::handleResponse));
   }
 
   private CompletableFuture<MetricsResponse> performRequestWithMetrics(JsonNode body, Optional<Duration> queryTimeout) {
-    // TODO fixup
-    return handleNetworkExceptions(connection.post("", body, queryTimeout, Optional.empty(), Optional.empty()).thenApply(this::handleResponseWithMetrics));
+    return handleNetworkExceptions(connection.post("", body, queryTimeout).thenApply(this::handleResponseWithMetrics));
   }
 
   /**

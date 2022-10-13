@@ -16,6 +16,8 @@ import java.net.ConnectException
 import java.net.http.HttpResponse
 import java.util.concurrent.{CompletionException, Flow, TimeoutException}
 import com.faunadb.common.http.ResponseBodyStringProcessor
+import com.faunadb.common.models.tags.Tag
+import faunadb.types.RequestParameters
 import faunadb.FaunaClient.EventField
 import faunadb.streaming.{BodyValueFlowProcessor, SnapshotEventFlowProcessor}
 
@@ -120,7 +122,7 @@ class FaunaClient private (connection: Connection) {
     *         [[faunadb.values.Field]] API. If the query fails, failed
     *         future is returned.
     */
-  def query(expr: Expr)(implicit ec: ExecutionContext): Future[Value] = query(expr, None, None, None)
+  def query(expr: Expr)(implicit ec: ExecutionContext): Future[Value] = query(expr, None)
 
   /**
     * Issues a query.
@@ -136,8 +138,7 @@ class FaunaClient private (connection: Connection) {
     *         [[faunadb.values.Field]] API. If the query fails, failed
     *         future is returned.
     */
-  def query(expr: Expr, timeout: FiniteDuration)(implicit ec: ExecutionContext): Future[Value] =
-    query(expr, Some(timeout), None, None)
+  def query(expr: Expr, timeout: FiniteDuration)(implicit ec: ExecutionContext): Future[Value] = query(expr, Some(timeout))
 
   /**
     * Issues a query.
@@ -154,19 +155,14 @@ class FaunaClient private (connection: Connection) {
     *         future is returned.
     */
   def query(expr: Expr, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[Value] =
-    query(json.valueToTree(expr), timeout, None, None)
+    query(expr, new RequestParameters(timeout))
 
   /**
    * Issues a query.
    *
    * @param expr the query to run, created using the query dsl helpers in [[faunadb.query]].
    * @param ec the `ExecutionContext` used to run the query asynchronously.
-   * @param timeout the timeout for the current query. It replaces the timeout value set for this
-   *                [[faunadb.FaunaClient]] if any for the scope of this query. The timeout value has
-   *                milliseconds precision.
-   * @param traceId A unique identifier for this query. Adheres to the
-   *                [W3C Trace Context](https://w3c.github.io/trace-context) spec.
-   * @param tags    Key-value pair metadata to associate with this query.
+   * @param requestParameters Additional metadata to be passed along with the request.
    * @return A [[scala.concurrent.Future]] containing the query result.
    *         The result is an instance of [[faunadb.values.Result]],
    *         which can be cast to a typed value using the
@@ -175,11 +171,9 @@ class FaunaClient private (connection: Connection) {
    */
   def query(
              expr: Expr,
-             timeout: Option[FiniteDuration],
-             traceId: Option[String],
-             tags: Option[Map[String, String]]
+             requestParameters: RequestParameters
            )(implicit ec: ExecutionContext): Future[Value] =
-    performRequest(json.valueToTree(expr), timeout, traceId, tags)
+    performRequest(json.valueToTree(expr), requestParameters)
 
   /**
     * Issues a query.
@@ -196,7 +190,7 @@ class FaunaClient private (connection: Connection) {
     *         future is returned.
     */
   def queryWithMetrics(expr: Expr, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[MetricsResponse] =
-    queryWithMetrics(expr, timeout, None, None)
+    queryWithMetrics(expr, new RequestParameters(timeout))
 
   /**
    * Issues a query.
@@ -217,11 +211,9 @@ class FaunaClient private (connection: Connection) {
    */
   def queryWithMetrics(
                         expr: Expr,
-                        timeout: Option[FiniteDuration],
-                        traceId: Option[String],
-                        tags: Option[Map[String, String]]
+                        requestParameters: RequestParameters
                       )(implicit ec: ExecutionContext): Future[MetricsResponse] =
-    performRequestWithMetrics(json.valueToTree(expr), timeout, traceId, tags)
+    performRequestWithMetrics(json.valueToTree(expr), requestParameters)
 
   /**
     * Issues multiple queries as a single transaction.
@@ -269,23 +261,18 @@ class FaunaClient private (connection: Connection) {
     *         query fails, a failed future is returned.
     */
   def query(exprs: Iterable[Expr], timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[IndexedSeq[Value]] =
-    performRequest(json.valueToTree(exprs), timeout, None, None).map { result =>
+    performRequest(json.valueToTree(exprs), new RequestParameters(timeout)).map { result =>
       result.asInstanceOf[ArrayV].elems
     }
 
   private def performRequestCommon[T](
                                        body: JsonNode,
-                                       timeout: Option[FiniteDuration],
-                                       traceId: Option[String],
-                                       tags: Option[Map[String, String]],
+                                       requestParameters: RequestParameters,
                                        handler: HttpResponse[String] => Future[T]
                                      )(implicit ec: ExecutionContext): Future[T] = {
-    val javaTimeout = timeout.map(_.toJava).asJava
     val response: Future[HttpResponse[String]] = connection.post("",
                                                                  body,
-                                                                 javaTimeout,
-                                                                 traceId.asJava,
-                                                                 tags.map(_.asJava).asJava)
+                                                                 requestParameters.asJava)
                                                            .toScala
 
     response
@@ -298,20 +285,18 @@ class FaunaClient private (connection: Connection) {
 
   private def performRequest(
                               body: JsonNode,
-                              timeout: Option[FiniteDuration],
-                              traceId: Option[String],
-                              tags: Option[Map[String, String]]
+                              requestParameters: RequestParameters
                             )(implicit ec: ExecutionContext): Future[Value] = {
-    performRequestCommon(body, timeout, traceId, tags, handleSuccessResponse)
+    performRequestCommon(body, requestParameters, handleSuccessResponse)
   }
 
   private def performRequestWithMetrics(
                                          body: JsonNode,
-                                         timeout: Option[FiniteDuration],
-                                         traceId: Option[String],
-                                         tags: Option[Map[String, String]]
+                                         requestParameters: RequestParameters
                                        )(implicit ec: ExecutionContext): Future[MetricsResponse] = {
-    performRequestCommon(body, timeout, traceId, tags, handleSuccessResponseWithMetrics)
+    performRequestCommon(body,
+                         requestParameters,
+                         handleSuccessResponseWithMetrics)
   }
 
   private def handleSuccessResponseWithMetrics(response: HttpResponse[String])(implicit ec: ExecutionContext): Future[MetricsResponse] = {
