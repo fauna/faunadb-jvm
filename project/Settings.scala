@@ -122,7 +122,7 @@ object Settings {
 
   lazy val faunadbScalaSettings = Seq(
     crossScalaVersions := supportedScalaVersions,
-    Test / parallelExecution := false,
+
     scalacOptions ++= Seq(
       "-Xsource:2.12",
       "-Xmax-classfile-name", "240"
