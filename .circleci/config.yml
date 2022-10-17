@@ -16,7 +16,7 @@ executors:
     environment:
       SBT_VERSION: 1.4.7
       FAUNA_ROOT_KEY: secret
-      FAUNA_DOMAIN: core
+      FAUNA_DOMAIN: db.fauna.com
       FAUNA_SCHEME: http
       FAUNA_PORT: 8443
       FAUNA_TIMEOUT: 60s
