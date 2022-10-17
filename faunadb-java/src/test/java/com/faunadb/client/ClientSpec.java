@@ -114,31 +114,6 @@ public class ClientSpec {
     clientWithCustomHeaders = createFaunaClientWithCustomHeaders(serverKey.get(SECRET_FIELD));
   }
 
-  @AfterClass
-  public static void testDataCleanup() throws Exception {
-    rootClient.query(KeyFromSecret(ROOT_TOKEN))
-            .handle((v, ex) -> handleBadRequest(v, ex))
-            .thenApply((Value rootKey) ->
-                    rootClient.query(
-                            Let(
-                                    "rootKey", rootKey,
-                                    "keys", Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref")))),
-                                    "allKeysExceptRoot", getMap(rootKey),
-                                 "refsToRemove", Union(
-                                      Select(Arr(Value("data")), Paginate(Databases())),
-                                      Select(Arr(Value("data")), Paginate(Collections())),
-                                      Select(Arr(Value("data")), Paginate(Indexes())),
-                                      Select(Arr(Value("data")), Paginate(Functions())),
-                                      Select(Arr(Value("data")), Paginate(Keys())),
-                                      Select(Arr(Value("data")), Var("allKeysExceptRoot")))
-                ).in(
-                    Foreach(
-                            Var("refsToRemove"),
-                            Lambda(Value("ref"), If(Exists(Var("ref")), Delete(Var("ref")), NULL)))
-            )
-    ).handle(ClientSpec::handleBadRequest)).get();
-  }
-
   private static Expr getMap(Value rootKey) {
     return Map( checkNull(rootKey) ?
             Filter(Var("keys"),
@@ -3638,7 +3613,7 @@ public class ClientSpec {
     Value clazz = query(
       CreateCollection(
         Obj("name", Value(randomStartingWith("some_collection_"))))
-    ).get();
+                        ).get();
 
     return clazz.get(REF_FIELD);
   }
