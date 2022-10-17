@@ -13,10 +13,6 @@ public class Tag {
     private String key;
     private String value;
 
-    public Tag() {
-        this.key = "";
-        this.value = "";
-    }
 
     public Tag(String key, String value) {
         this.key = getValidatedKey(key);
