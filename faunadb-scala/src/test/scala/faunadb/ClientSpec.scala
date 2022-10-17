@@ -1,11 +1,5 @@
 package faunadb
 
-import com.faunadb.common.models.tags.Tag
-
-import java.time.temporal.ChronoUnit
-import java.time.{Instant, LocalDate, LocalDateTime}
-import java.util
-import java.util.concurrent.Flow
 import faunadb.FaunaClient._
 import faunadb.errors._
 import faunadb.query.{TimeUnit, _}
@@ -19,6 +13,10 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+import java.time.temporal.ChronoUnit
+import java.time.{Instant, LocalDate}
+import java.util
+import java.util.concurrent.Flow
 import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -292,15 +290,21 @@ class ClientSpec
   it should "accept tags if customer provides them" in {
       val valueResponse: Value = client.query(Now(),
                                               new RequestParameters(
-                                                tags = Set(new Tag("Key1","Value1"), new Tag("Key2","Value2")))
+                                                tags = scala.collection.immutable
+                                                            .Map[String, String]("Key1" -> "Value1",
+                                                                                 "Key2" -> "Value2"))
                                               )
-                                .futureValue
+                                       .futureValue
     valueResponse.toString should include("Z")
   }
 
   it should "throw error if provided tags contain invalid characters, 0x20" in {
     try {
-      new Tag("Invalid Key", "Value1")
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection.immutable.Map[String, String]("Invalid Key" -> "Value1"))
+                   )
+            .futureValue
       fail("Expected exception here, but none encountered")
     } catch {
       case re: RuntimeException => re.getMessage should include("contains invalid characters")
@@ -310,7 +314,11 @@ class ClientSpec
 
   it should "throw error if provided tags contain invalid characters, special characters" in {
     try {
-      new Tag("Tag@!---", "Value1")
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection.immutable.Map[String, String]("Tag@!---" -> "Value1"))
+                   )
+            .futureValue
       fail("Expected exception here, but none encountered")
     } catch {
       case re: RuntimeException => re.getMessage should include("contains invalid characters")
@@ -320,7 +328,13 @@ class ClientSpec
 
   it should "throw error if provided tags have a key with greater than 40 characters" in {
     try {
-      new Tag(Random.alphanumeric.take(41).mkString, "Value1")
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection
+                                 .immutable
+                                 .Map[String, String](Random.alphanumeric.take(41).mkString -> "Value1"))
+                   )
+            .futureValue
       fail("Expected exception here, but none encountered")
     } catch {
       case re: RuntimeException => re.getMessage should include("longer than the allowable limit")
@@ -330,7 +344,13 @@ class ClientSpec
 
   it should "throw error if provided tags have a value with greater than 80 characters" in {
     try {
-      new Tag("Key1", Random.alphanumeric.take(81).mkString)
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection
+                                 .immutable
+                                 .Map[String, String]("Key1" -> Random.alphanumeric.take(81).mkString))
+                   )
+            .futureValue
       fail("Expected exception here, but none encountered")
     } catch {
       case re: RuntimeException => re.getMessage should include("longer than the allowable limit")
@@ -340,11 +360,11 @@ class ClientSpec
 
   it should "throw error if more than 25 tag pairs provided" in {
     try {
-      val requestTags = scala.collection.mutable.Set[Tag]()
+      val requestTags = scala.collection.mutable.Map[String, String]()
       (1 to 26) foreach {
-        iter => requestTags.add(new Tag("Key"+iter, "Value"+iter))
+        iter => requestTags.put("Key" + iter, "Value" + iter)
       }
-      client.query(Now(), new RequestParameters(tags = requestTags.toSet))
+      client.query(Now(), new RequestParameters(tags = requestTags.toMap))
             .futureValue
       fail("Expected exception here, but none encountered")
     } catch {

@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.faunadb.common.http.DriverVersionChecker;
 import com.faunadb.common.models.request.RequestParameters;
-import com.faunadb.common.models.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -636,7 +635,7 @@ public class Connection {
     return requestBuilder.build();
   }
 
-  private String[] mkHeaders(Duration queryTimeout, Optional<String> traceId, Set<Tag> tags) {
+  private String[] mkHeaders(Duration queryTimeout, Optional<String> traceId, Map<String, String> tags) {
     Map<String, String> defaultHeaders = Map.of(
             "Authorization", authHeader,
             X_FAUNADB_API_VERSION, API_VERSION,
@@ -688,10 +687,11 @@ public class Connection {
     return new URL(faunaRoot, path).toString();
   }
 
-  private String serializeTags(Set<Tag> tags) {
+  private String serializeTags(Map<String, String> tags) {
     return tags
+            .entrySet()
             .stream()
-            .map(tag -> tag.toString())
+            .map(entry -> String.join("=", entry.getKey(), entry.getValue()))
             .collect(Collectors.joining(","));
   }
 

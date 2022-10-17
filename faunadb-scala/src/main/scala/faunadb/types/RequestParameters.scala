@@ -1,7 +1,5 @@
 package faunadb.types
 
-import com.faunadb.common.models.tags.Tag
-
 import java.time.Duration
 import scala.collection.JavaConversions._
 import scala.compat.java8.DurationConverters.FiniteDurationops
@@ -19,7 +17,7 @@ import scala.concurrent.duration.FiniteDuration
  */
 class RequestParameters(val timeout: Option[FiniteDuration] = None,
                         val traceId: Option[String] = None,
-                        val tags: Set[Tag] = Set()) {
+                        val tags: Map[String, String] = Map()) {
   if (tags == null) {
     throw new RuntimeException("Tags cannot be null. Consider passing an empty set instead")
   }
@@ -27,5 +25,5 @@ class RequestParameters(val timeout: Option[FiniteDuration] = None,
   def asJava: com.faunadb.common.models.request.RequestParameters =
     new com.faunadb.common.models.request.RequestParameters(timeoutAsJavaDuration.asJava,
                                                             traceId.asJava,
-                                                            setAsJavaSet(tags))
+                                                            mapAsJavaMap(tags))
 }

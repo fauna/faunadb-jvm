@@ -1,26 +1,23 @@
 package faunadb
 
 import com.codahale.metrics.MetricRegistry
-import com.fasterxml.jackson.databind.{DeserializationFeature, JsonNode, ObjectMapper}
 import com.fasterxml.jackson.databind.node.{ArrayNode, NullNode}
+import com.fasterxml.jackson.databind.{DeserializationFeature, JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.common.Connection
 import com.faunadb.common.Connection.JvmDriver
+import com.faunadb.common.http.ResponseBodyStringProcessor
+import faunadb.FaunaClient.{EventField, json}
 import faunadb.errors._
 import faunadb.query.{Expr, Get}
-import faunadb.values.{ArrayV, Metrics, MetricsResponse, NullV, Value}
-import faunadb.FaunaClient.json
+import faunadb.streaming.{BodyValueFlowProcessor, SnapshotEventFlowProcessor}
+import faunadb.types.RequestParameters
+import faunadb.values._
 
 import java.io.IOException
 import java.net.ConnectException
 import java.net.http.HttpResponse
 import java.util.concurrent.{CompletionException, Flow, TimeoutException}
-import com.faunadb.common.http.ResponseBodyStringProcessor
-import com.faunadb.common.models.tags.Tag
-import faunadb.types.RequestParameters
-import faunadb.FaunaClient.EventField
-import faunadb.streaming.{BodyValueFlowProcessor, SnapshotEventFlowProcessor}
-
 import scala.collection.JavaConverters._
 import scala.compat.java8.DurationConverters._
 import scala.compat.java8.FutureConverters._
