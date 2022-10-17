@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Defines parameters which be included with the outgoing request.
+ */
 public class RequestParameters {
 
     private static final int MAX_TAGS_PER_REQUEST = 25;
@@ -17,6 +20,7 @@ public class RequestParameters {
     public static RequestParameters fromOptionalTimeout(Optional<Duration> timeout) {
         return new RequestParameters(timeout, Optional.empty(), new HashSet<>());
     }
+
     public RequestParameters() {
         this.timeout = Optional.empty();
         this.traceId = Optional.empty();
@@ -25,7 +29,7 @@ public class RequestParameters {
 
     public RequestParameters(Optional<Duration> timeout, Optional<String> traceId, Set<Tag> tags) {
 
-        if(tags == null) {
+        if (tags == null) {
             throw new RuntimeException("Tags cannot be null. Consider passing an empty set instead");
         } else if (tags.size() > MAX_TAGS_PER_REQUEST) {
             throw new RuntimeException(
