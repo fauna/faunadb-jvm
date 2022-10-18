@@ -678,7 +678,7 @@ public class Connection {
     if (m.matches()) {
       return traceIdVal;
     } else {
-      throw new RuntimeException("Invalid traceparent! It must adhere to the W3C Trace Context spec. " +
+      throw new IllegalArgumentException("Invalid traceparent! It must adhere to the W3C Trace Context spec. " +
                                          "See https://w3c.github.io/trace-context for more details");
     }
   }
