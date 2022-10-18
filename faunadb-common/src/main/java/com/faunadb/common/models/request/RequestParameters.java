@@ -70,29 +70,29 @@ public class RequestParameters {
 
     private void validateKey(String key) {
         if (key == null || key.isBlank()) {
-            throw new RuntimeException("Empty keys not allowed");
+            throw new IllegalArgumentException("Empty keys not allowed");
         } else if (key.length() > KEY_CHAR_LIMIT) {
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                     String.format("Key, %s, is longer than the allowable limit of %d characters", key, KEY_CHAR_LIMIT));
         }
         Matcher m = ALLOWABLE_CHARACTER_REGEX.matcher(key);
         if (!m.matches()) {
-            throw new RuntimeException(String.format("Provided key, %s, contains invalid characters", key));
+            throw new IllegalArgumentException(String.format("Provided key, %s, contains invalid characters", key));
         }
     }
 
     private void validateValue(String value) {
         if (value == null || value.isBlank()) {
-            throw new RuntimeException("Empty values not allowed");
+            throw new IllegalArgumentException("Empty values not allowed");
         } else if (value.length() > VALUE_CHAR_LIMIT) {
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                     String.format("Value, %s, is longer than the allowable limit of %d characters", value,
                                   VALUE_CHAR_LIMIT
                     ));
         }
         Matcher m = ALLOWABLE_CHARACTER_REGEX.matcher(value);
         if (!m.matches()) {
-            throw new RuntimeException(String.format("Provided value, %s, contains invalid characters", value));
+            throw new IllegalArgumentException(String.format("Provided value, %s, contains invalid characters", value));
         }
     }
 }
