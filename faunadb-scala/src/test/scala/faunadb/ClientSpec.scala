@@ -135,7 +135,7 @@ class ClientSpec
   }
 
   override protected def afterAll(): Unit = {
-    testDataCleanup()
+    //testDataCleanup()
   }
 
   it should "parse nested sets" in {
@@ -277,14 +277,11 @@ class ClientSpec
   }
 
   it should "throw error if invalid traceparent provided" in {
-    try {
-      client.query(Now(), new RequestParameters(timeout = None,
-                                                traceId = Some("NotAValidTraceparent"))).failed.futureValue
-      fail("Expected exception here, but none encountered")
-    } catch {
-      case re: RuntimeException => re.getMessage should include("Invalid traceparent!")
-      case e: Throwable => fail("Unexpected exception encountered!", e)
-    }
+    val response = client.query(Now(), new RequestParameters(traceId = Some("NotAValidTraceparent")))
+                         .failed
+                         .futureValue
+    response shouldBe an [IllegalArgumentException]
+    response.getMessage should include("Invalid traceparent!")
   }
 
   it should "accept tags if customer provides them" in {
@@ -304,10 +301,9 @@ class ClientSpec
                    new RequestParameters(
                      tags = scala.collection.immutable.Map[String, String]("Invalid Key" -> "Value1"))
                    )
-            .futureValue
       fail("Expected exception here, but none encountered")
     } catch {
-      case re: RuntimeException => re.getMessage should include("contains invalid characters")
+      case iae: IllegalArgumentException => iae.getMessage should include("contains invalid characters")
       case e: Throwable => fail("Unexpected exception encountered!", e)
     }
   }
@@ -318,10 +314,9 @@ class ClientSpec
                    new RequestParameters(
                      tags = scala.collection.immutable.Map[String, String]("Tag@!---" -> "Value1"))
                    )
-            .futureValue
       fail("Expected exception here, but none encountered")
     } catch {
-      case re: RuntimeException => re.getMessage should include("contains invalid characters")
+      case iae: IllegalArgumentException => iae.getMessage should include("contains invalid characters")
       case e: Throwable => fail("Unexpected exception encountered!", e)
     }
   }
@@ -334,10 +329,9 @@ class ClientSpec
                                  .immutable
                                  .Map[String, String](Random.alphanumeric.take(41).mkString -> "Value1"))
                    )
-            .futureValue
       fail("Expected exception here, but none encountered")
     } catch {
-      case re: RuntimeException => re.getMessage should include("longer than the allowable limit")
+      case iae: IllegalArgumentException => iae.getMessage should include("longer than the allowable limit")
       case e: Throwable => fail("Unexpected exception encountered!", e)
     }
   }
@@ -348,10 +342,9 @@ class ClientSpec
                    new RequestParameters(
                      tags = scala.collection.immutable.Map[String, String]("Key1" -> "Invalid Value"))
                    )
-            .futureValue
       fail("Expected exception here, but none encountered")
     } catch {
-      case re: RuntimeException => re.getMessage should include("contains invalid characters")
+      case iae: IllegalArgumentException => iae.getMessage should include("contains invalid characters")
       case e: Throwable => fail("Unexpected exception encountered!", e)
     }
   }
@@ -362,10 +355,9 @@ class ClientSpec
                    new RequestParameters(
                      tags = scala.collection.immutable.Map[String, String]("Key1" -> "Value#_("))
                    )
-            .futureValue
       fail("Expected exception here, but none encountered")
     } catch {
-      case re: RuntimeException => re.getMessage should include("contains invalid characters")
+      case iae: IllegalArgumentException => iae.getMessage should include("contains invalid characters")
       case e: Throwable => fail("Unexpected exception encountered!", e)
     }
   }
@@ -378,10 +370,9 @@ class ClientSpec
                                  .immutable
                                  .Map[String, String]("Key1" -> Random.alphanumeric.take(81).mkString))
                    )
-            .futureValue
       fail("Expected exception here, but none encountered")
     } catch {
-      case re: RuntimeException => re.getMessage should include("longer than the allowable limit")
+      case iae: IllegalArgumentException => iae.getMessage should include("longer than the allowable limit")
       case e: Throwable => fail("Unexpected exception encountered!", e)
     }
   }
@@ -393,10 +384,9 @@ class ClientSpec
         iter => requestTags.put("Key" + iter, "Value" + iter)
       }
       client.query(Now(), new RequestParameters(tags = requestTags.toMap))
-            .futureValue
       fail("Expected exception here, but none encountered")
     } catch {
-      case re: RuntimeException => re.getMessage should include("Maximum number of tags provided")
+      case iae: IllegalArgumentException => iae.getMessage should include("Maximum number of tags provided")
       case e: Throwable => fail("Unexpected exception encountered!", e)
     }
   }
@@ -404,10 +394,9 @@ class ClientSpec
   it should "throw error if null tags provided" in {
     try {
       client.query(Now(), new RequestParameters(tags = null))
-            .futureValue
       fail("Expected exception here, but none encountered")
     } catch {
-      case re: RuntimeException => re.getMessage should include("Tags cannot be null")
+      case iae: IllegalArgumentException => iae.getMessage should include("Tags cannot be null")
       case e: Throwable => fail("Unexpected exception encountered!", e)
     }
   }
