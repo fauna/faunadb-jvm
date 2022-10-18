@@ -19,7 +19,7 @@ class RequestParameters(val timeout: Option[FiniteDuration] = None,
                         val traceId: Option[String] = None,
                         val tags: Map[String, String] = Map()) {
   if (tags == null) {
-    throw new RuntimeException("Tags cannot be null. Consider passing an empty set instead")
+    throw new IllegalArgumentException("Tags cannot be null. Consider passing an empty set instead")
   }
   def timeoutAsJavaDuration: Option[Duration] = timeout.map(_.toJava)
   def asJava: com.faunadb.common.models.request.RequestParameters =
