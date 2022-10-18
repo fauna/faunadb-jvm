@@ -15,9 +15,9 @@ import scala.concurrent.duration.FiniteDuration
  *                [W3C Trace Context](https://w3c.github.io/trace-context) spec.
  * @param tags    Key-value pair metadata to associate with this query.
  */
-class RequestParameters(val timeout: Option[FiniteDuration] = None,
-                        val traceId: Option[String] = None,
-                        val tags: Map[String, String] = Map()) {
+case class RequestParameters(timeout: Option[FiniteDuration] = None,
+                             traceId: Option[String] = None,
+                             tags: Map[String, String] = Map()) {
   if (tags == null) {
     throw new IllegalArgumentException("Tags cannot be null. Consider passing an empty set instead")
   }
