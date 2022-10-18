@@ -37,9 +37,9 @@ public class RequestParameters {
     public RequestParameters(Optional<Duration> timeout, Optional<String> traceId, Map<String, String> tags) {
 
         if (tags == null) {
-            throw new RuntimeException("Tags cannot be null. Consider passing an empty set instead");
+            throw new IllegalArgumentException("Tags cannot be null. Consider passing an empty set instead");
         } else if (tags.size() > MAX_TAGS_PER_REQUEST) {
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                     String.format("Maximum number of tags provided, current max is %s", MAX_TAGS_PER_REQUEST));
         }
 
