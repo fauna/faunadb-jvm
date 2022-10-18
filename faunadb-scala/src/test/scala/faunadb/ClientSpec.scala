@@ -298,7 +298,7 @@ class ClientSpec
     valueResponse.toString should include("Z")
   }
 
-  it should "throw error if provided tags contain invalid characters, 0x20" in {
+  it should "throw error if provided tags contain invalid characters in key, 0x20" in {
     try {
       client.query(Now(),
                    new RequestParameters(
@@ -312,7 +312,7 @@ class ClientSpec
     }
   }
 
-  it should "throw error if provided tags contain invalid characters, special characters" in {
+  it should "throw error if provided tags contain invalid characters in key, special characters" in {
     try {
       client.query(Now(),
                    new RequestParameters(
@@ -338,6 +338,34 @@ class ClientSpec
       fail("Expected exception here, but none encountered")
     } catch {
       case re: RuntimeException => re.getMessage should include("longer than the allowable limit")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags contain invalid characters in value, 0x20" in {
+    try {
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection.immutable.Map[String, String]("Key1" -> "Invalid Value"))
+                   )
+            .futureValue
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case re: RuntimeException => re.getMessage should include("contains invalid characters")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags contain invalid characters in value, special characters" in {
+    try {
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection.immutable.Map[String, String]("Key1" -> "Value#_("))
+                   )
+            .futureValue
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case re: RuntimeException => re.getMessage should include("contains invalid characters")
       case e: Throwable => fail("Unexpected exception encountered!", e)
     }
   }
