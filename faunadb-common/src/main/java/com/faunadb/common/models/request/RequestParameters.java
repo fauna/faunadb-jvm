@@ -24,16 +24,32 @@ public class RequestParameters {
     private final Optional<String> traceId;
     private final Map<String, String> tags;
 
+    /**
+     * Constructs a {@link RequestParameters} instance from a provided timeout
+     * @param timeout
+     * @return {@link RequestParameters}
+     */
     public static RequestParameters fromOptionalTimeout(Optional<Duration> timeout) {
         return new RequestParameters(timeout, Optional.empty(), new HashMap<>());
     }
 
+    /**
+     * Constructs an empty {@link RequestParameters} instance
+     */
     public RequestParameters() {
         this.timeout = Optional.empty();
         this.traceId = Optional.empty();
         this.tags = new HashMap<>();
     }
 
+    /**
+     * Constructs a {@link RequestParameters} instance, using the provided inputs.
+     * @param timeout Timeout for the request
+     * @param traceId A unique identifier for this query. Adheres to the
+     *                [W3C Trace Context](https://w3c.github.io/trace-context) spec.
+     * @param tags    Key-value pair metadata to associate with this query.
+     * @throws IllegalArgumentException If the number of tags provided exceeds the maximum.
+     */
     public RequestParameters(Optional<Duration> timeout, Optional<String> traceId, Map<String, String> tags) {
 
         if (tags == null) {
@@ -48,14 +64,26 @@ public class RequestParameters {
         this.tags = new HashMap<>(getValidatedTags(tags));
     }
 
+    /**
+     * Get the timeout associated with this request
+     * @return timeout
+     */
     public Optional<Duration> getTimeout() {
         return this.timeout;
     }
 
+    /**
+     * Get the traceId associated with this request
+     * @return traceId
+     */
     public Optional<String> getTraceId() {
         return this.traceId;
     }
 
+    /**
+     * Get the tags associated with this request
+     * @return tags
+     */
     public Map<String, String> getTags() {
         return this.tags;
     }
