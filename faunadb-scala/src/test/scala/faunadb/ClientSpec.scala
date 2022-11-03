@@ -1,14 +1,9 @@
 package faunadb
 
-import java.time.temporal.ChronoUnit
-import java.time.{Instant, LocalDate}
-import java.util
-import java.util.Calendar
-import java.util.concurrent.Flow
-
 import faunadb.FaunaClient._
 import faunadb.errors._
 import faunadb.query.{TimeUnit, _}
+import faunadb.types.RequestParameters
 import faunadb.values._
 import monix.execution.Scheduler
 import monix.reactive.Observable
@@ -18,6 +13,10 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+import java.time.temporal.ChronoUnit
+import java.time.{Instant, LocalDate}
+import java.util
+import java.util.concurrent.Flow
 import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -275,6 +274,131 @@ class ClientSpec
     results.length shouldBe 2
     results(0)("data", "queryTest1").to[String].get shouldBe randomText1
     results(1)("data", "queryTest1").to[String].get shouldBe randomText2
+  }
+
+  it should "throw error if invalid traceparent provided" in {
+    val response = client.query(Now(), new RequestParameters(traceId = Some("NotAValidTraceparent")))
+                         .failed
+                         .futureValue
+    response shouldBe an [IllegalArgumentException]
+    response.getMessage should include("Invalid traceparent!")
+  }
+
+  it should "accept tags if customer provides them" in {
+      val valueResponse: Value = client.query(Now(),
+                                              new RequestParameters(
+                                                tags = scala.collection.immutable
+                                                            .Map[String, String]("Key1" -> "Value1",
+                                                                                 "Key2" -> "Value2"))
+                                              )
+                                       .futureValue
+    valueResponse.toString should include("Z")
+  }
+
+  it should "throw error if provided tags contain invalid characters in key, 0x20" in {
+    try {
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection.immutable.Map[String, String]("Invalid Key" -> "Value1"))
+                   )
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("contains invalid characters")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags contain invalid characters in key, special characters" in {
+    try {
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection.immutable.Map[String, String]("Tag@!---" -> "Value1"))
+                   )
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("contains invalid characters")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags have a key with greater than 40 characters" in {
+    try {
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection
+                                 .immutable
+                                 .Map[String, String](Random.alphanumeric.take(41).mkString -> "Value1"))
+                   )
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("longer than the allowable limit")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags contain invalid characters in value, 0x20" in {
+    try {
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection.immutable.Map[String, String]("Key1" -> "Invalid Value"))
+                   )
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("contains invalid characters")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags contain invalid characters in value, special characters" in {
+    try {
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection.immutable.Map[String, String]("Key1" -> "Value#_("))
+                   )
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("contains invalid characters")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags have a value with greater than 80 characters" in {
+    try {
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection
+                                 .immutable
+                                 .Map[String, String]("Key1" -> Random.alphanumeric.take(81).mkString))
+                   )
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("longer than the allowable limit")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if more than 25 tag pairs provided" in {
+    try {
+      val requestTags = scala.collection.mutable.Map[String, String]()
+      (1 to 26) foreach {
+        iter => requestTags.put("Key" + iter, "Value" + iter)
+      }
+      client.query(Now(), new RequestParameters(tags = requestTags.toMap))
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("Maximum number of tags provided")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if null tags provided" in {
+    try {
+      client.query(Now(), new RequestParameters(tags = null))
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("Tags cannot be null")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
   }
 
   it should "get at timestamp" in {

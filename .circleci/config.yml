@@ -14,7 +14,7 @@ executors:
         name: core
 
     environment:
-      SBT_VERSION: 1.4.7
+      SBT_VERSION: 1.7.2
       FAUNA_ROOT_KEY: secret
       FAUNA_DOMAIN: core
       FAUNA_SCHEME: http
