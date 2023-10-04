@@ -25,6 +25,10 @@ commands:
   build_and_test:
     description: "Run JVM tests"
     steps:
+      - setup_remote_docker:
+          version: 24.0
+          docker_layer_caching: true
+          
       - run:
           name: Get sbt binary
           command: |
