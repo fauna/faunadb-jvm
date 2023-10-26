@@ -31,7 +31,9 @@ jobs:
     serial: true
     plan:
       - get: fauna-jvm-repository
+        trigger: true
       - get: fauna-jvm-repository-docs
+        trigger: true
       - set_pipeline: self
         file: fauna-jvm-repository/concourse/pipeline.yml
   - name: release
