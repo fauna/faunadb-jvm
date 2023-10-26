@@ -1,3 +1,10 @@
+4.4.0
+* Support for tags and traceparent headers. PR: https://github.com/fauna/faunadb-jvm/pull/362
+
+4.3.0
+* Keep-alive timeouts set to 3 seconds. PR: https://github.com/fauna/faunadb-jvm/pull/342
+* set-streaming enabled. PR: https://github.com/fauna/faunadb-jvm/pull/352
+
 4.2.0
 * Added TransactionContentionException in case 409 HTTP status code is returned from server
 

@@ -6,7 +6,7 @@ import scoverage.ScoverageSbtPlugin.autoImport._
 
 object Settings {
 
-  lazy val driverVersion = "4.2.0"
+  lazy val driverVersion = "4.4.0"
 
   lazy val scala211 = "2.11.12"
   lazy val scala212 = "2.12.14"
@@ -32,7 +32,7 @@ object Settings {
     licenses := Seq("Mozilla Public License" -> url("https://www.mozilla.org/en-US/MPL/2.0/")),
     homepage := Some(url("https://github.com/fauna/faunadb-jvm")),
     publishMavenStyle := true,
-    publishArtifact in Test := false,
+    Test / publishArtifact := false,
     pomIncludeRepository := { _ => false },
     publishTo := {
       val nexus = "https://oss.sonatype.org"
@@ -93,7 +93,7 @@ object Settings {
 
     coverageEnabled := false,
 
-    javacOptions in (Compile, doc) := Seq(
+    Compile / doc / javacOptions := Seq(
       "-source", "11",
       "-link", javaDocUrl,
       "-link", metricsDocUrl
@@ -113,7 +113,7 @@ object Settings {
   lazy val faunadbJavaSettings = Seq(
     apiURL := Some(url(javaApiUrl)),
 
-    javacOptions in (Compile, doc) ++= Seq(
+    Compile / doc / javacOptions ++= Seq(
       "-linkoffline", commonApiUrl, "./faunadb-common/target/api"
     ),
 
@@ -131,7 +131,7 @@ object Settings {
     autoAPIMappings := true,
     apiURL := Some(url(scalaApiUrl)),
     apiMappings ++= {
-      val cp = (fullClasspath in Compile).value
+      val cp = (Compile / fullClasspath).value
       def findDep(org: String, name: String) = {
         for {
           entry <- cp

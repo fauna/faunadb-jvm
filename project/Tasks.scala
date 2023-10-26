@@ -7,9 +7,9 @@ object Tasks {
   
   lazy val settings =
     Seq(
-      compileAll := (compile in Testing.LoadTest)
-        .dependsOn(compile in Test)
-        .dependsOn(compile in Compile)
+      compileAll := (Testing.LoadTest / compile)
+        .dependsOn(Test / compile)
+        .dependsOn(Compile / compile)
         .value)
 
 }

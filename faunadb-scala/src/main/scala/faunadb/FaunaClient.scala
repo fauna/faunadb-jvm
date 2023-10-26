@@ -1,23 +1,23 @@
 package faunadb
 
 import com.codahale.metrics.MetricRegistry
-import com.fasterxml.jackson.databind.{DeserializationFeature, JsonNode, ObjectMapper}
 import com.fasterxml.jackson.databind.node.{ArrayNode, NullNode}
+import com.fasterxml.jackson.databind.{DeserializationFeature, JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.faunadb.common.Connection
 import com.faunadb.common.Connection.JvmDriver
+import com.faunadb.common.http.ResponseBodyStringProcessor
+import faunadb.FaunaClient.{EventField, json}
 import faunadb.errors._
 import faunadb.query.{Expr, Get}
-import faunadb.values.{ArrayV, Metrics, MetricsResponse, NullV, Value}
+import faunadb.streaming.{BodyValueFlowProcessor, SnapshotEventFlowProcessor}
+import faunadb.types.RequestParameters
+import faunadb.values._
 
 import java.io.IOException
 import java.net.ConnectException
 import java.net.http.HttpResponse
 import java.util.concurrent.{CompletionException, Flow, TimeoutException}
-import com.faunadb.common.http.ResponseBodyStringProcessor
-import faunadb.FaunaClient.EventField
-import faunadb.streaming.{BodyValueFlowProcessor, SnapshotEventFlowProcessor}
-
 import scala.collection.JavaConverters._
 import scala.compat.java8.DurationConverters._
 import scala.compat.java8.FutureConverters._
@@ -27,6 +27,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /** Companion object to the FaunaClient class. */
 object FaunaClient {
+
+  // singleton ObjectMapper for all clients
+  private[faunadb] val json = new ObjectMapper
+  json.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+  json.registerModule(new DefaultScalaModule)
 
   /**
     * Creates a new FaunaDB client.
@@ -67,6 +72,7 @@ object FaunaClient {
   case object PrevField extends EventField("prev")
   case object DiffField extends EventField("diff")
   case object ActionField extends EventField("action")
+  case object IndexField extends EventField("index")
 }
 
 /**
@@ -101,10 +107,6 @@ object FaunaClient {
   * @constructor create a new client with a configured [[com.faunadb.common.Connection]].
   */
 class FaunaClient private (connection: Connection) {
-
-  private[this] val json = new ObjectMapper
-  json.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-  json.registerModule(new DefaultScalaModule)
 
   /**
     * Issues a query.
@@ -150,7 +152,25 @@ class FaunaClient private (connection: Connection) {
     *         future is returned.
     */
   def query(expr: Expr, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[Value] =
-    performRequest(json.valueToTree(expr), timeout)
+    query(expr, new RequestParameters(timeout))
+
+  /**
+   * Issues a query.
+   *
+   * @param expr the query to run, created using the query dsl helpers in [[faunadb.query]].
+   * @param ec the `ExecutionContext` used to run the query asynchronously.
+   * @param requestParameters Additional metadata to be passed along with the request.
+   * @return A [[scala.concurrent.Future]] containing the query result.
+   *         The result is an instance of [[faunadb.values.Result]],
+   *         which can be cast to a typed value using the
+   *         [[faunadb.values.Field]] API. If the query fails, failed
+   *         future is returned.
+   */
+  def query(
+             expr: Expr,
+             requestParameters: RequestParameters
+           )(implicit ec: ExecutionContext): Future[Value] =
+    performRequest(json.valueToTree(expr), requestParameters)
 
   /**
     * Issues a query.
@@ -167,7 +187,30 @@ class FaunaClient private (connection: Connection) {
     *         future is returned.
     */
   def queryWithMetrics(expr: Expr, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[MetricsResponse] =
-    performRequestWithMetrics(json.valueToTree(expr), timeout)
+    queryWithMetrics(expr, new RequestParameters(timeout))
+
+  /**
+   * Issues a query.
+   *
+   * @param expr the query to run, created using the query dsl helpers in [[faunadb.query]].
+   * @param ec the `ExecutionContext` used to run the query asynchronously.
+   * @param timeout the timeout for the current query. It replaces the timeout value set for this
+   *                [[faunadb.FaunaClient]] if any for the scope of this query. The timeout value has
+   *                milliseconds precision.
+   * @param traceId A unique identifier for this query. Adheres to the
+   *                [W3C Trace Context](https://w3c.github.io/trace-context) spec.
+   * @param tags    Key-value pair metadata to associate with this query.
+   * @return A [[scala.concurrent.Future]] containing the query result.
+   *         The result is an instance of [[faunadb.values.Result]],
+   *         which can be cast to a typed value using the
+   *         [[faunadb.values.Field]] API. If the query fails, failed
+   *         future is returned.
+   */
+  def queryWithMetrics(
+                        expr: Expr,
+                        requestParameters: RequestParameters
+                      )(implicit ec: ExecutionContext): Future[MetricsResponse] =
+    performRequestWithMetrics(json.valueToTree(expr), requestParameters)
 
   /**
     * Issues multiple queries as a single transaction.
@@ -215,13 +258,19 @@ class FaunaClient private (connection: Connection) {
     *         query fails, a failed future is returned.
     */
   def query(exprs: Iterable[Expr], timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[IndexedSeq[Value]] =
-    performRequest(json.valueToTree(exprs), timeout).map { result =>
+    performRequest(json.valueToTree(exprs), new RequestParameters(timeout)).map { result =>
       result.asInstanceOf[ArrayV].elems
     }
 
-  private def performRequestCommon[T](body: JsonNode, timeout: Option[FiniteDuration], handler: HttpResponse[String] => Future[T])(implicit ec: ExecutionContext): Future[T] = {
-    val javaTimeout = timeout.map(_.toJava).asJava
-    val response: Future[HttpResponse[String]] = connection.post("", body, javaTimeout).toScala
+  private def performRequestCommon[T](
+                                       body: JsonNode,
+                                       requestParameters: RequestParameters,
+                                       handler: HttpResponse[String] => Future[T]
+                                     )(implicit ec: ExecutionContext): Future[T] = {
+    val response: Future[HttpResponse[String]] = connection.post("",
+                                                                 body,
+                                                                 requestParameters.asJava)
+                                                           .toScala
 
     response
       .flatMap {
@@ -231,12 +280,20 @@ class FaunaClient private (connection: Connection) {
       .recoverWith(handleNetworkExceptions)
   }
 
-  private def performRequest(body: JsonNode, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[Value] = {
-    performRequestCommon(body, timeout, handleSuccessResponse)
+  private def performRequest(
+                              body: JsonNode,
+                              requestParameters: RequestParameters
+                            )(implicit ec: ExecutionContext): Future[Value] = {
+    performRequestCommon(body, requestParameters, handleSuccessResponse)
   }
 
-  private def performRequestWithMetrics(body: JsonNode, timeout: Option[FiniteDuration])(implicit ec: ExecutionContext): Future[MetricsResponse] = {
-    performRequestCommon(body, timeout, handleSuccessResponseWithMetrics)
+  private def performRequestWithMetrics(
+                                         body: JsonNode,
+                                         requestParameters: RequestParameters
+                                       )(implicit ec: ExecutionContext): Future[MetricsResponse] = {
+    performRequestCommon(body,
+                         requestParameters,
+                         handleSuccessResponseWithMetrics)
   }
 
   private def handleSuccessResponseWithMetrics(response: HttpResponse[String])(implicit ec: ExecutionContext): Future[MetricsResponse] = {

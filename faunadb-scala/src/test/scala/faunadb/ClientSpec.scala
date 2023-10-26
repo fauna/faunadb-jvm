@@ -1,13 +1,9 @@
 package faunadb
 
-import java.time.temporal.ChronoUnit
-import java.time.{Instant, LocalDate}
-import java.util
-import java.util.concurrent.Flow
-
 import faunadb.FaunaClient._
 import faunadb.errors._
 import faunadb.query.{TimeUnit, _}
+import faunadb.types.RequestParameters
 import faunadb.values._
 import monix.execution.Scheduler
 import monix.reactive.Observable
@@ -17,6 +13,10 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+import java.time.temporal.ChronoUnit
+import java.time.{Instant, LocalDate}
+import java.util
+import java.util.concurrent.Flow
 import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -75,8 +75,38 @@ class ClientSpec
   def aRandomString: String = aRandomString(size = 8)
   def aRandomString(size: Int): String = Random.alphanumeric.take(size).mkString
 
-  def dropDB(): Unit =
-    rootClient.query(Delete(Database(testDbName))).futureValue
+  def testDataCleanup(): Unit = {
+    rootClient.query(KeyFromSecret(config("root_token"))).recoverWith {
+        case BadRequestException(_, _) => Future.successful(NullV)
+      }.flatMap { rootKey =>
+      rootClient.query(
+        Let(Seq(
+                "rootKey" -> rootKey,
+                "keys" -> Map(Paginate(Keys()), Lambda(Value("ref"), Get(Var("ref")))),
+                "allKeysExceptRoot" -> getMap(rootKey),
+                "refsToRemove" -> Union(
+                  Select(Arr(Value("data")), Paginate(Databases())),
+                  Select(Arr(Value("data")), Paginate(Collections())),
+                  Select(Arr(Value("data")), Paginate(Indexes())),
+                  Select(Arr(Value("data")), Paginate(Functions())),
+                  Select(Arr(Value("data")), Paginate(Keys())),
+                  Select(Arr(Value("data")), Var("allKeysExceptRoot")))
+          ), Foreach(
+              Var("refsToRemove"),
+              Lambda(Value("ref"), If(Exists(Var("ref")), Delete(Var("ref")), Null())))
+      ))
+    }.futureValue
+  }
+
+  private def getMap(rootKey: Value): Expr = {
+    Map(if (rootKey != NullV) {
+      Filter(Var("keys"),
+        Lambda(Value("key"),
+          Not(Equals(Select(Arr(Value("ref")), Var("key"), Null()),
+            Select(Arr(Value("ref")), Var("rootKey"), Null())))))
+    } else Var("keys"),
+    Lambda(Value("key"), Select(Arr(Value("ref")), Var("key"))))
+  }
 
   // tests
 
@@ -105,7 +135,7 @@ class ClientSpec
   }
 
   override protected def afterAll(): Unit = {
-    dropDB()
+    testDataCleanup()
   }
 
   it should "parse nested sets" in {
@@ -244,6 +274,131 @@ class ClientSpec
     results.length shouldBe 2
     results(0)("data", "queryTest1").to[String].get shouldBe randomText1
     results(1)("data", "queryTest1").to[String].get shouldBe randomText2
+  }
+
+  it should "throw error if invalid traceparent provided" in {
+    val response = client.query(Now(), new RequestParameters(traceId = Some("NotAValidTraceparent")))
+                         .failed
+                         .futureValue
+    response shouldBe an [IllegalArgumentException]
+    response.getMessage should include("Invalid traceparent!")
+  }
+
+  it should "accept tags if customer provides them" in {
+      val valueResponse: Value = client.query(Now(),
+                                              new RequestParameters(
+                                                tags = scala.collection.immutable
+                                                            .Map[String, String]("Key1" -> "Value1",
+                                                                                 "Key2" -> "Value2"))
+                                              )
+                                       .futureValue
+    valueResponse.toString should include("Z")
+  }
+
+  it should "throw error if provided tags contain invalid characters in key, 0x20" in {
+    try {
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection.immutable.Map[String, String]("Invalid Key" -> "Value1"))
+                   )
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("contains invalid characters")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags contain invalid characters in key, special characters" in {
+    try {
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection.immutable.Map[String, String]("Tag@!---" -> "Value1"))
+                   )
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("contains invalid characters")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags have a key with greater than 40 characters" in {
+    try {
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection
+                                 .immutable
+                                 .Map[String, String](Random.alphanumeric.take(41).mkString -> "Value1"))
+                   )
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("longer than the allowable limit")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags contain invalid characters in value, 0x20" in {
+    try {
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection.immutable.Map[String, String]("Key1" -> "Invalid Value"))
+                   )
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("contains invalid characters")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags contain invalid characters in value, special characters" in {
+    try {
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection.immutable.Map[String, String]("Key1" -> "Value#_("))
+                   )
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("contains invalid characters")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if provided tags have a value with greater than 80 characters" in {
+    try {
+      client.query(Now(),
+                   new RequestParameters(
+                     tags = scala.collection
+                                 .immutable
+                                 .Map[String, String]("Key1" -> Random.alphanumeric.take(81).mkString))
+                   )
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("longer than the allowable limit")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if more than 25 tag pairs provided" in {
+    try {
+      val requestTags = scala.collection.mutable.Map[String, String]()
+      (1 to 26) foreach {
+        iter => requestTags.put("Key" + iter, "Value" + iter)
+      }
+      client.query(Now(), new RequestParameters(tags = requestTags.toMap))
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("Maximum number of tags provided")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
+  }
+
+  it should "throw error if null tags provided" in {
+    try {
+      client.query(Now(), new RequestParameters(tags = null))
+      fail("Expected exception here, but none encountered")
+    } catch {
+      case iae: IllegalArgumentException => iae.getMessage should include("Tags cannot be null")
+      case e: Throwable => fail("Unexpected exception encountered!", e)
+    }
   }
 
   it should "get at timestamp" in {
@@ -938,7 +1093,7 @@ class ClientSpec
     dayOfMonthR.to[Long].get should equal (cal.get(DAY_OF_MONTH))
 
     val dayOfWeekR = client.query(DayOfWeek(nowStr)).futureValue
-    dayOfWeekR.to[Long].get should equal (cal.get(DAY_OF_WEEK)-1)
+    dayOfWeekR.to[Long].get should equal(cal.get(DAY_OF_WEEK) - 1)
 
     val yearR = client.query(Year(nowStr)).futureValue
     yearR.to[Long].get should equal (cal.get(YEAR))
@@ -2050,6 +2205,28 @@ class ClientSpec
     }
   }
 
+  it should "stream set events" in {
+    client.query(CreateCollection(Obj("name" -> "foo"))).futureValue
+    val publisherValue = client.stream(Documents(Collection("foo"))).futureValue
+    val events = testSubscriber(3, publisherValue)
+
+    // push 3 updates
+    val doc = client.query(Create(Collection("foo"), Obj())).futureValue
+    client.query(Delete(doc("ref"))).futureValue
+
+    // assertion 3 events (start + 2 updates)
+    events.futureValue match {
+      case start :: e1 :: e2 :: Nil =>
+        start("type").get shouldBe StringV("start")
+        e1("type").get shouldBe StringV("set")
+        e1("event", "action").get shouldBe StringV("add")
+        e2("type").get shouldBe StringV("set")
+        e2("event", "action").get shouldBe StringV("remove")
+      case _ =>
+        fail("expected 3 events")
+    }
+  }
+
   it should "stream on document reference with opt-in fields" in {
     val createdDoc = client.query(Create(Collection("spells"), Obj("data" -> Obj("testField" -> "testValue0")))).futureValue
     val docRef = createdDoc(RefField)
@@ -2262,7 +2439,7 @@ class ClientSpec
             Obj("data" -> Obj("testField" -> "testValue")))).futureValue
     )
 
-    val counter = 100
+    val counter = 20
     def metricsQuery: Future[MetricsResponse] = {
       val taskClient = clientPool(random.nextInt(9))
       val result = taskClient.queryWithMetrics(

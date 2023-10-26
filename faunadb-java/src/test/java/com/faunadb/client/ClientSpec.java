@@ -4,7 +4,6 @@ import com.faunadb.client.errors.*;
 import com.faunadb.client.query.Expr;
 import com.faunadb.client.query.Language;
 import com.faunadb.client.streaming.EventField;
-import static com.faunadb.client.streaming.EventFields.*;
 import com.faunadb.client.types.Value;
 import com.faunadb.client.types.*;
 import com.faunadb.client.types.Value.*;
@@ -19,27 +18,21 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.*;
-import static java.util.Arrays.asList;
-
-import java.util.concurrent.Flow;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static com.faunadb.client.query.Language.*;
 import static com.faunadb.client.query.Language.Action.CREATE;
 import static com.faunadb.client.query.Language.Action.DELETE;
 import static com.faunadb.client.query.Language.TimeUnit.*;
+import static com.faunadb.client.streaming.EventFields.*;
 import static com.faunadb.client.types.Codec.*;
 import static com.faunadb.client.types.Value.NullV.NULL;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -121,9 +114,18 @@ public class ClientSpec {
     clientWithCustomHeaders = createFaunaClientWithCustomHeaders(serverKey.get(SECRET_FIELD));
   }
 
-  @AfterClass
-  public static void closeClients() throws Exception {
-    rootClient.query(Delete(DB_REF)).handle((v, ex) -> handleBadRequest(v, ex)).get();
+  private static Expr getMap(Value rootKey) {
+    return Map( checkNull(rootKey) ?
+            Filter(Var("keys"),
+                    Lambda(Value("key"),
+                            Not(Equals(Select(Arr(Value("ref")), Var("key"), NULL),
+                                    Select(Arr(Value("ref")), Var("rootKey"), NULL)))))
+                    : Var("keys"),
+            Lambda(Value("key"), Select(Arr(Value("ref")), Var("key"))));
+  }
+
+  private static Boolean checkNull(Value v) {
+    return v != NULL;
   }
 
   @Before
@@ -2285,7 +2287,7 @@ public class ClientSpec {
   @Test
   public void shouldTestCreateAccessProvider() throws Exception {
     String roleName = randomStartingWith("role_");
-    String providerName = randomStartingWith("provider_");
+    String providerName = randomStartingWith("provider_jvm_");
     String issuerName = randomStartingWith("issuer_");
     String fullUri = randomStartingWith("https://") + ".auth0.com";
 
@@ -3251,6 +3253,62 @@ public class ClientSpec {
   }
 
   @Test
+  public void shouldStreamSetEvents() throws Exception {
+    String coll = randomStartingWith("collection_");
+    query(CreateCollection(Obj("name", Value(coll))));
+
+    Flow.Publisher<Value> pub = adminClient.stream(Documents(Collection(coll))).get();
+    CompletableFuture<List<Value>> capturedEvents = new CompletableFuture<>();
+
+    Flow.Subscriber<Value> sub = new Flow.Subscriber<>() {
+      List<Value> captured = new ArrayList<>();
+      Flow.Subscription sub = null;
+
+      @Override
+      public void onSubscribe(Flow.Subscription sub) {
+        this.sub = sub;
+        this.sub.request(1);
+      }
+
+      @Override
+      public void onNext(Value v) {
+        captured.add(v);
+        if (captured.size() == 3) {
+          capturedEvents.complete(captured);
+          sub.cancel();
+        } else {
+          sub.request(1);
+        }
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+         capturedEvents.completeExceptionally(throwable);
+      }
+
+      @Override
+      public void onComplete() {
+        capturedEvents.completeExceptionally(
+          new IllegalStateException("not expecting the stream to complete"));
+      }
+    };
+
+    // subscribe to publisher
+    pub.subscribe(sub);
+
+    // push 2 events
+    Value doc = adminClient.query(Create(Collection(coll), Obj())).get();
+    adminClient.query(Delete(doc.at("ref"))).get();
+
+    List<Value> events = capturedEvents.get();
+    assertThat(events.get(0).at("type").to(STRING).get(), equalTo("start"));
+    assertThat(events.get(1).at("type").to(STRING).get(), equalTo("set"));
+    assertThat(events.get(1).at("event").at("action").to(STRING).get(), equalTo("add"));
+    assertThat(events.get(2).at("type").to(STRING).get(), equalTo("set"));
+    assertThat(events.get(2).at("event").at("action").to(STRING).get(), equalTo("remove"));
+  }
+
+  @Test
   public void streamEventsWithSnapshotData() throws Exception {
     String collectionName = randomStartingWith("collection_");
     query(CreateCollection(Obj("name", Value(collectionName)))).get();
@@ -3555,7 +3613,7 @@ public class ClientSpec {
     Value clazz = query(
       CreateCollection(
         Obj("name", Value(randomStartingWith("some_collection_"))))
-    ).get();
+                        ).get();
 
     return clazz.get(REF_FIELD);
   }
