@@ -402,6 +402,8 @@ class FaunaClient private (connection: Connection) {
       case 403 => parseErrorsAndFailWith(new PermissionDeniedException(_))
       case 404 => parseErrorsAndFailWith(new NotFoundException(_))
       case 409 => parseErrorsAndFailWith(new TransactionContentionException(_))
+      case 410 => parseErrorsAndFailWith(new ResourceNotAvailableException(_))
+      case 429 => parseErrorsAndFailWith(new TooManyRequestsException(_))
       case 500 => parseErrorsAndFailWith(new InternalException(_))
       case 503 => parseErrorsAndFailWith(new UnavailableException(_))
       case _   => parseErrorsAndFailWith(new UnknownException(_))

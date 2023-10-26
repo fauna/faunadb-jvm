@@ -42,6 +42,23 @@ case class NotFoundException(response: Option[QueryErrorResponse], message: Stri
 }
 
 /**
+  * An exception thrown if FaunaDB responds with an HTTP 429, meaning the request was throttled.
+  */
+case class TooManyRequestsException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
+  def this(message: String) = this(None, message)
+  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response.errors))
+}
+
+/**
+  * Exception thrown if FaunaDB responds with an HTTP 410.
+  * One example of this is if an account is disabled.
+  */
+case class ResourceNotAvailableException(response: Option[QueryErrorResponse], message: String) extends FaunaException(response, message) {
+  def this(message: String) = this(None, message)
+  def this(response: QueryErrorResponse) = this(Some(response), FaunaException.respToError(response.errors))
+}
+
+/**
  * An exception thrown if FaunaDB responds with an HTTP 500. Such errors represent an internal
  * failure within the database.
  */

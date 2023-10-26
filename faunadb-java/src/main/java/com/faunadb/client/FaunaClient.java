@@ -507,6 +507,10 @@ public class FaunaClient {
             throw new NotFoundException(errorResponse);
           case 409:
             throw new TransactionContentionException(errorResponse);
+          case 410:
+            throw new ResourceNotAvailableException(errorResponse);
+          case 429:
+            throw new TooManyRequestsException(errorResponse);
           case 500:
             throw new InternalException(errorResponse);
           case 503:
