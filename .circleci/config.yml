@@ -3,16 +3,11 @@ description: FaunaDB JVM Driver Tests
 
 executors:
   core:
-    parameters:
-      version:
-        type: enum
-        enum: ["nightly"]
     resource_class: large
     docker:
       - image: openjdk:11
-      - image: fauna/faunadb
+      - image: fauna/faunadb:latest
         name: core
-
     environment:
       SBT_VERSION: 1.7.2
       FAUNA_ROOT_KEY: secret
@@ -90,10 +85,9 @@ commands:
           path: results/
 
 jobs:
-  core-nightly:
+  core:
     executor:
       name: core
-      version: nightly
     steps:
       - build_and_test
 
@@ -101,5 +95,5 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - core-nightly:
+      - core:
           context: faunadb-drivers
