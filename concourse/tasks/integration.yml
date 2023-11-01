@@ -23,7 +23,13 @@ services:
     volumes:
       - "../../:/tmp/app"
     working_dir: "/tmp/app"
-    command: [sh, -c, "ls -la && sbt ++2.11.12 -Dsbt.supershell=false test"]
+    command:
+      - sh
+      - -c
+      - |
+        ls -la
+        concourse/scripts/wait-for-it.sh http://faunadb:8443/ping
+        sbt ++2.11.12 -Dsbt.supershell=false test
 
   tests-jdk-11-scala-2.12:
     environment:
@@ -38,7 +44,13 @@ services:
     volumes:
       - "../../:/tmp/app"
     working_dir: "/tmp/app"
-    command: [sh, -c, "ls -la && sbt ++2.12.14 -Dsbt.supershell=false test"]
+    command:
+      - sh
+      - -c
+      - |
+        ls -la
+        concourse/scripts/wait-for-it.sh http://faunadb:8443/ping
+        sbt ++2.12.14 -Dsbt.supershell=false test
 
   tests-oracle-jdk-11-scala-2.11:
     environment:
@@ -56,7 +68,13 @@ services:
     volumes:
       - "../../:/tmp/app"
     working_dir: "/tmp/app"
-    command: [sh, -c, "ls -la && sbt ++2.11.12 -Dsbt.supershell=false test"]
+    command:
+      - sh
+      - -c
+      - |
+        ls -la
+        concourse/scripts/wait-for-it.sh http://faunadb:8443/ping
+        sbt ++2.11.12 -Dsbt.supershell=false test
 
   tests-oracle-jdk-11-scala-2.12:
     environment:
@@ -74,4 +92,10 @@ services:
     volumes:
       - "../../:/tmp/app"
     working_dir: "/tmp/app"
-    command: [sh, -c, "ls -la && sbt ++2.12.14 -Dsbt.supershell=false test"]
+    command:
+      - sh
+      - -c
+      - |
+        ls -la
+        concourse/scripts/wait-for-it.sh http://faunadb:8443/ping
+        sbt ++2.12.14 -Dsbt.supershell=false test
