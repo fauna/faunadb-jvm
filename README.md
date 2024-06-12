@@ -3,6 +3,13 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.faunadb/faunadb-common.svg?maxAge=21600)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.faunadb%22)
 [![License](https://img.shields.io/badge/license-MPL_2.0-blue.svg?maxAge=2592000)](https://raw.githubusercontent.com/fauna/faunadb-jvm/main/LICENSE)
 
+> [!WARNING]
+>  Fauna is decomissioning FQL v4. See the [v4 end of life (EOL)
+> announcement](https://docs.fauna.com/fauna/v4/#fql-v4-end-of-life) and
+> [related FAQ](https://docs.fauna.com/fauna/v4/migration/faq).
+>
+> This driver is not compatible with FQL v10, the latest version.
+
 This repository contains the FaunaDB drivers for the JVM languages. Currently, Java and Scala clients are implemented.
 
 ### Features
@@ -268,7 +275,7 @@ object Main extends App {
 
   // the result of the query, as if you invoke 'client.query' function instead
   val value = metricsResponse.value
-  
+
   // gets the value of 'x-byte-read-ops' metric
   val byteReadOps = metricsResponse.getMetric(Metrics.ByteReadOps)
   // gets the value of 'x-byte-write-ops' metric
