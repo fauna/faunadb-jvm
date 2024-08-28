@@ -18,7 +18,7 @@
 <script type="text/javascript" src="../../../../jquery/jquery-ui.js"></script>
     <meta name="robots" content="noindex">
 </head>
-<body>
+<body><div style="background-color: #f8d7da; color: #721c24; padding: 15px; text-align: center; font-family: Arial, sans-serif; border: 1px solid #f5c6cb; margin-bottom: 20px; font-size: 18px;"> <p><strong>Warning:</strong><br> Fauna is decommissioning FQL v4 on June 30, 2025.</p> <p>This driver is not compatible with FQL v10, the latest version. Fauna accounts created after August 21, 2024 must use FQL v10.<br>Ensure you migrate existing projects to the official v10 driver by the v4 EOL date: <a href="https://github.com/fauna/fauna-jvm">https://github.com/fauna/fauna-jvm</a>.</p><p>For more information, see the <a href="https://docs.fauna.com/fauna/v4/#fql-v4-end-of-life">v4 end of life (EOL) announcement</a> and <a href="https://docs.fauna.com/fauna/v4/migration/faq">related FAQ</a>.</p></div>
 <script type="text/javascript"><!--
     try {
         if (location.href.indexOf('is-external=true') == -1) {
@@ -150,8 +150,8 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <div class="block">Enumeration for event action types.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>, 
-<a href="Language.html#Insert(com.faunadb.client.query.Expr,com.faunadb.client.query.Expr,com.faunadb.client.query.Language.Action,com.faunadb.client.query.Expr)"><code>Language.Insert(Expr, Expr, Action, Expr)</code></a>, 
+<dd><a href="https://app.fauna.com/documentation/reference/queryapi#write-functions">FaunaDB Write Functions</a>,
+<a href="Language.html#Insert(com.faunadb.client.query.Expr,com.faunadb.client.query.Expr,com.faunadb.client.query.Language.Action,com.faunadb.client.query.Expr)"><code>Language.Insert(Expr, Expr, Action, Expr)</code></a>,
 <a href="Language.html#Remove(com.faunadb.client.query.Expr,com.faunadb.client.query.Expr,com.faunadb.client.query.Language.Action)"><code>Language.Remove(Expr, Expr, Action)</code></a></dd>
 </dl>
 </li>
@@ -302,7 +302,7 @@ for (Language.Action c : Language.Action.values())
 <pre class="methodSignature">public static&nbsp;<a href="Language.Action.html" title="enum in com.faunadb.client.query">Language.Action</a>&nbsp;valueOf&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;name)</pre>
 <div class="block">Returns the enum constant of this type with the specified name.
 The string must match <i>exactly</i> an identifier used to declare an
-enum constant in this type.  (Extraneous whitespace characters are 
+enum constant in this type.  (Extraneous whitespace characters are
 not permitted.)</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
