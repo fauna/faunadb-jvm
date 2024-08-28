@@ -25,7 +25,12 @@ object Settings {
   lazy val buildSettings = Seq(
     organization := "com.faunadb",
     version := driverVersion,
-    scalaVersion := scala212
+    scalaVersion := scala212,
+    description := """
+      This driver only supports Fauna v4, which is deprecated. To use the latest version,
+      migrate to the Fauna v10 Java driver:
+      https://github.com/fauna/fauna-jvm
+    """
   )
 
   lazy val publishSettings = Seq(
