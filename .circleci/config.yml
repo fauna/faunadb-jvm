@@ -38,9 +38,6 @@ commands:
           name: Compile 2.12
           command: sbt ++2.12.14 compileAll
 
-      - store_test_results:
-          path: results/
-
 jobs:
   core-nightly:
     executor:
