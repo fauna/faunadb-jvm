@@ -38,21 +38,6 @@ commands:
           name: Compile 2.12
           command: sbt ++2.12.14 compileAll
 
-      - save_cache:
-          key: faunadb-jvm-v1-{{ .Branch }}-{{checksum "project/Dependencies.scala" }}
-          paths:
-            - "~/.ivy2/cache"
-            - "~/.sbt"
-            - "~/.m2"
-
-      - run:
-          name: Generate API documentation 2.11
-          command: sbt clean ++2.11.12 doc
-
-      - run:
-          name: Generate API documentation 2.12
-          command: sbt clean ++2.12.14 doc
-
       - store_test_results:
           path: results/
 
