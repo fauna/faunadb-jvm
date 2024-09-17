@@ -125,7 +125,9 @@ object Settings {
 
     scalacOptions ++= Seq(
       "-Xsource:2.12",
-      "-Xmax-classfile-name", "240"
+      "-Xmax-classfile-name", "240",
+      "-deprecation",
+      "-Xfatal-warnings"
     ),
 
     autoAPIMappings := true,
