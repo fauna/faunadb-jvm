@@ -1,6 +1,18 @@
-import sbt.Keys.{baseDirectory, scalaSource, _}
 import sbt._
 
 object Testing {
-  lazy val settings = Seq.empty[Def.Setting[Task[Unit]]]
+  // Configs
+  lazy val LoadTest = config("load") extend Test
+
+  // Tasks
+  lazy val testAll = TaskKey[Unit]("test-all")
+
+  // Settings
+  lazy val loadTestSettings =
+    inConfig(LoadTest)(
+      Defaults.testSettings
+    )
+
+  lazy val settings =
+    loadTestSettings
 }
