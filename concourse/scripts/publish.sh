@@ -21,4 +21,4 @@ sbt faunadb-java/publishSigned
 sbt +faunadb-scala/publishSigned
 sbt sonatypeRelease
 
-echo "faunadb-jvm@$PACKAGE_VERSION has been published (but sometimes it can take up to 2 days before it appears in maven repository) [fyi <@ewan.edwards>]" > ../slack-message/publish
+echo "faunadb-jvm@$PACKAGE_VERSION has been published (but sometimes it can take up to 2 days before it appears in maven repository)" > ../slack-message/publish

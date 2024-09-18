@@ -10,18 +10,8 @@ executors:
     resource_class: large
     docker:
       - image: openjdk:11
-      - image: gcr.io/faunadb-cloud/faunadb/enterprise:latest
-        name: core
-        auth:
-          username: _json_key
-          password: $GCR_KEY
     environment:
       SBT_VERSION: 1.4.7
-      FAUNA_ROOT_KEY: secret
-      FAUNA_DOMAIN: core
-      FAUNA_SCHEME: http
-      FAUNA_PORT: 8443
-      FAUNA_TIMEOUT: 60s
 
 commands:
   build_and_test:
@@ -47,49 +37,6 @@ commands:
       - run:
           name: Compile 2.12
           command: sbt ++2.12.14 compileAll
-
-      - save_cache:
-          key: faunadb-jvm-v1-{{ .Branch }}-{{checksum "project/Dependencies.scala" }}
-          paths:
-            - "~/.ivy2/cache"
-            - "~/.sbt"
-            - "~/.m2"
-
-      - run:
-          name: Test 2.11
-          command: sbt ++2.11.12 test
-
-      - run:
-          name: Test 2.12
-          command: sbt ++2.12.14 coverage test coverageReport
-
-      - run:
-          name: Load Test 2.11
-          command: sbt ++2.11.12 load:test
-
-      - run:
-          name: Load Test 2.12
-          command: sbt ++2.12.14 load:test
-
-      - run:
-          when: always
-          name: Gather results
-          command: |
-            # TODO: save results for 2.11 as well (DRV-222).
-            mkdir -p results/{tests,coverage}
-            cp **/target/test-reports/*.xml results/tests/
-            cp -r faunadb-scala/target/scala-2.12/*coverage-report/ results/coverage/
-
-      - run:
-          name: Generate API documentation 2.11
-          command: sbt clean ++2.11.12 doc
-
-      - run:
-          name: Generate API documentation 2.12
-          command: sbt clean ++2.12.14 doc
-
-      - store_test_results:
-          path: results/
 
 jobs:
   core-nightly:

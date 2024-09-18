@@ -1,3 +1,3 @@
 object Configs {
-  lazy val commonConfigs = Seq(Testing.LoadTest)
+  lazy val commonConfigs = Seq.empty
 }

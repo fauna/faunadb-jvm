@@ -4,7 +4,7 @@ import sbt.{TaskKey, _}
 object Tasks {
 
   lazy val compileAll = TaskKey[Unit]("compile-all")
-  
+
   lazy val settings =
     Seq(
       compileAll := (compile in Testing.LoadTest)
