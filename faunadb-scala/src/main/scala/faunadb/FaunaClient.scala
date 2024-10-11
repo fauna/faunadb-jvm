@@ -25,7 +25,19 @@ import scala.compat.java8.OptionConverters._
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 
-/** Companion object to the FaunaClient class. */
+/**
+  * Companion object to the FaunaClient class.
+  *
+  * @deprecated
+  * Fauna is decommissioning FQL v4 on June 30, 2025. This driver is not compatible with FQL v10.
+  * Fauna accounts created after August 21, 2024 must use FQL v10.
+  * Ensure you migrate existing projects to the official v10 driver by the v4 EOL date: https://github.com/fauna/fauna-jvm.
+  */
+@deprecated("Fauna is decommissioning FQL v4 on June 30, 2025. This driver is not compatible with FQL v10. " +
+  "Fauna accounts created after August 21, 2024 must use FQL v10. " +
+  "Ensure you migrate existing projects to the official v10 driver by the v4 EOL date: https://github.com/fauna/fauna-jvm.",
+  "4.5.1"
+)
 object FaunaClient {
 
   // singleton ObjectMapper for all clients
@@ -43,7 +55,17 @@ object FaunaClient {
     *                     milliseconds precision. If not provided, a default timeout value is set on the server side.
     * @param userAgent A value used for the User-Agent HTTP header.
     * @return A configured FaunaClient instance.
+    *
+    * @deprecated
+    * Fauna is decommissioning FQL v4 on June 30, 2025. This driver is not compatible with FQL v10.
+    * Fauna accounts created after August 21, 2024 must use FQL v10.
+    * Ensure you migrate existing projects to the official v10 driver by the v4 EOL date: https://github.com/fauna/fauna-jvm.
     */
+  @deprecated("Fauna is decommissioning FQL v4 on June 30, 2025. This driver is not compatible with FQL v10. " +
+    "Fauna accounts created after August 21, 2024 must use FQL v10. " +
+    "Ensure you migrate existing projects to the official v10 driver by the v4 EOL date: https://github.com/fauna/fauna-jvm.",
+    "4.5.1"
+  )
   def apply(
     secret: String = null,
     endpoint: String = null,
@@ -105,7 +127,17 @@ object FaunaClient {
   * }}}
   *
   * @constructor create a new client with a configured [[com.faunadb.common.Connection]].
+  *
+  * @deprecated
+  * Fauna is decommissioning FQL v4 on June 30, 2025. This driver is not compatible with FQL v10.
+  * Fauna accounts created after August 21, 2024 must use FQL v10.
+  * Ensure you migrate existing projects to the official v10 driver by the v4 EOL date: https://github.com/fauna/fauna-jvm.
   */
+@deprecated("Fauna is decommissioning FQL v4 on June 30, 2025. This driver is not compatible with FQL v10. " +
+  "Fauna accounts created after August 21, 2024 must use FQL v10. " +
+  "Ensure you migrate existing projects to the official v10 driver by the v4 EOL date: https://github.com/fauna/fauna-jvm.",
+  "4.5.1"
+)
 class FaunaClient private (connection: Connection) {
 
   /**

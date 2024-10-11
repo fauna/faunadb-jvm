@@ -33,7 +33,13 @@ import static java.lang.String.format;
  *
  * <p>Relies on {@link java.net.http.HttpClient}
  * for the underlying implementation.</p>
+ *
+ * @deprecated
+ * Fauna is decommissioning FQL v4 on June 30, 2025. This driver is not compatible with FQL v10.
+ * Fauna accounts created after August 21, 2024 must use FQL v10.
+ * Ensure you migrate existing projects to the official v10 driver by the v4 EOL date: https://github.com/fauna/fauna-jvm.
  */
+@Deprecated(since = "4.5.1")
 public class Connection {
 
   private static final String API_VERSION = "4";
