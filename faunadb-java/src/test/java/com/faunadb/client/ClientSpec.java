@@ -325,12 +325,10 @@ public class ClientSpec {
     Optional<String> queryBytesIn = metricsResponse.getMetric(MetricsResponse.Metrics.QUERY_BYTES_IN);
     Optional<String> queryBytesOut = metricsResponse.getMetric(MetricsResponse.Metrics.QUERY_BYTES_OUT);
     Optional<String> queryTime = metricsResponse.getMetric(MetricsResponse.Metrics.QUERY_TIME);
-    Optional<String> readOps = metricsResponse.getMetric(MetricsResponse.Metrics.READ_OPS);
     Optional<String> storageBytesRead = metricsResponse.getMetric(MetricsResponse.Metrics.STORAGE_BYTES_READ);
     Optional<String> storageBytesWrite = metricsResponse.getMetric(MetricsResponse.Metrics.STORAGE_BYTES_WRITE);
     Optional<String> txnRetries = metricsResponse.getMetric(MetricsResponse.Metrics.TXN_RETRIES);
     Optional<String> txnTime = metricsResponse.getMetric(MetricsResponse.Metrics.TXN_TIME);
-    Optional<String> writeOps = metricsResponse.getMetric(MetricsResponse.Metrics.WRITE_OPS);
 
     assertThat(byteReadOps.isPresent(), is(true));
     assertThat(byteWriteOps.isPresent(), is(true));
@@ -339,12 +337,10 @@ public class ClientSpec {
     assertThat(queryBytesIn.isPresent(), is(true));
     assertThat(queryBytesOut.isPresent(), is(true));
     assertThat(queryTime.isPresent(), is(true));
-    assertThat(readOps.isPresent(), is(true));
     assertThat(storageBytesRead.isPresent(), is(true));
     assertThat(storageBytesWrite.isPresent(), is(true));
     assertThat(txnRetries.isPresent(), is(true));
     assertThat(txnTime.isPresent(), is(true));
-    assertThat(writeOps.isPresent(), is(true));
   }
 
   @Test
@@ -3171,7 +3167,7 @@ public class ClientSpec {
   @Test
   public void streamFailsIfQueryIsNotReadOnly() throws Exception {
     thrown.expectCause(isA(BadRequestException.class));
-    thrown.expectMessage(containsString("invalid expression: Write effect in read-only query expression."));
+    thrown.expectMessage(containsString("invalid expression: Call performs a write, which is not allowed in stream requests."));
 
     adminClient.stream(CreateCollection(Collection("spells"))).get();
   }

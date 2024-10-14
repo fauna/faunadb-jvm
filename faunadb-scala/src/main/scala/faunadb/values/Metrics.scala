@@ -10,12 +10,10 @@ object Metrics extends Enumeration {
   val QueryBytesIn = Value("x-query-bytes-in")
   val QueryBytesOut = Value("x-query-bytes-out")
   val QueryTime = Value("x-query-time")
-  val ReadOps = Value("x-read-ops")
   val StorageBytesRead = Value("x-storage-bytes-read")
   val StorageBytesWrite = Value("x-storage-bytes-write")
   val TxnRetries = Value("x-txn-retries")
   val TxnTime = Value("x-txn-time")
-  val WriteOps = Value("x-write-ops")
 
   val All = values.toList
 }
