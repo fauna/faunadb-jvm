@@ -6,7 +6,7 @@ import scoverage.ScoverageSbtPlugin.autoImport._
 
 object Settings {
 
-  lazy val driverVersion = "4.5.0"
+  lazy val driverVersion = "4.5.1"
 
   lazy val scala211 = "2.11.12"
   lazy val scala212 = "2.12.14"
@@ -61,6 +61,11 @@ object Settings {
           <organizationUrl>https://fauna.com</organizationUrl>
         </developer>
       </developers>
+      <deprecated>true</deprecated>
+      <deprecation>
+        <message>v4 EOL notice</message>
+        <since>4.5.1</since>
+      </deprecation>
     ),
     usePgpKeyHex(sys.env.getOrElse("GPG_SIGNING_KEY", "0")),
     pgpPassphrase := sys.env.get("GPG_PASSPHRASE") map (_.toArray),

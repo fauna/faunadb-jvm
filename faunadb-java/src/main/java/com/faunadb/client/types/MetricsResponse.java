@@ -51,12 +51,10 @@ public class MetricsResponse {
         QUERY_BYTES_IN("x-query-bytes-in"),
         QUERY_BYTES_OUT("x-query-bytes-out"),
         QUERY_TIME("x-query-time"),
-        READ_OPS("x-read-ops"),
         STORAGE_BYTES_READ("x-storage-bytes-read"),
         STORAGE_BYTES_WRITE("x-storage-bytes-write"),
         TXN_RETRIES("x-txn-retries"),
-        TXN_TIME("x-txn-time"),
-        WRITE_OPS("x-write-ops");
+        TXN_TIME("x-txn-time");
 
         private final String metric;
 

@@ -524,12 +524,10 @@ class ClientSpec
     val queryBytesIn = metricsResponse.getMetric(Metrics.QueryBytesIn)
     val queryBytesOut = metricsResponse.getMetric(Metrics.QueryBytesOut)
     val queryTime = metricsResponse.getMetric(Metrics.QueryTime)
-    val readOps = metricsResponse.getMetric(Metrics.ReadOps)
     val storageBytesRead = metricsResponse.getMetric(Metrics.StorageBytesRead)
     val storageBytesWrite = metricsResponse.getMetric(Metrics.StorageBytesWrite)
     val txnRetries = metricsResponse.getMetric(Metrics.TxnRetries)
     val txnTime = metricsResponse.getMetric(Metrics.TxnTime)
-    val writeOps = metricsResponse.getMetric(Metrics.WriteOps)
 
     byteReadOps.isDefined should equal (true)
     byteWriteOps.isDefined should equal (true)
@@ -538,12 +536,10 @@ class ClientSpec
     queryBytesIn.isDefined should equal (true)
     queryBytesOut.isDefined should equal (true)
     queryTime.isDefined should equal (true)
-    readOps.isDefined should equal (true)
     storageBytesRead.isDefined should equal (true)
     storageBytesWrite.isDefined should equal (true)
     txnRetries.isDefined should equal (true)
     txnTime.isDefined should equal (true)
-    writeOps.isDefined should equal (true)
   }
 
   it should "paginate with cursor object" in {
@@ -2163,7 +2159,7 @@ class ClientSpec
   it should "stream return error if the query is not readonly" in {
     val err = client.stream(Create(Collection("spells"), Obj("data" -> Obj("testField" -> "testValue0")))).failed.futureValue
     err shouldBe a[BadRequestException]
-    err.getMessage should include("Write effect in read-only query expression.")
+    err.getMessage should include("Call performs a write, which is not allowed in stream requests.")
   }
 
   it should "stream on document reference contains `document` field by default" in {
